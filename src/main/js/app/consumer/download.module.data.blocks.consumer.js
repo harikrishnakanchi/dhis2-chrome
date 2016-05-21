@@ -1,6 +1,12 @@
 define(['properties', 'lodash', 'dateUtils'], function (properties, _, dateUtils) {
     return function (dataService, approvalService, datasetRepository, userPreferenceRepository, changeLogRepository, orgUnitRepository,
                      moduleDataBlockFactory, moduleDataBlockMerger, $q) {
+
+        var getAggregateDataSetIds = function(allDataSets) {
+            var aggregateDataSets = _.filter(allDataSets, { isLineListService: false });
+            return _.pluck(aggregateDataSets, 'id');
+        };
+
         var getLastUpdatedTime = function(userProjectIds) {
             return changeLogRepository.get("dataValues:" + userProjectIds.join(';'));
         };
@@ -81,14 +87,14 @@ define(['properties', 'lodash', 'dateUtils'], function (properties, _, dateUtils
 
         this.run= function () {
             return datasetRepository.getAll().then(function (allDataSets) {
-                var allDataSetsIds = _.pluck(allDataSets, 'id');
+                var aggregateDataSetIds = getAggregateDataSetIds(allDataSets);
 
                 return userPreferenceRepository.getCurrentUsersProjectIds().then(function (currentUserProjectIds) {
                     return getLastUpdatedTime(currentUserProjectIds).then(function(projectLastUpdatedTimestamp) {
                         var periodRange = getPeriodRangeToDownload(projectLastUpdatedTimestamp);
 
                         return orgUnitRepository.getAllModulesInOrgUnits(currentUserProjectIds).then(function (allModules) {
-                            return recursivelyDownloadMergeAndSaveModules(allModules, allDataSetsIds, periodRange, projectLastUpdatedTimestamp);
+                            return recursivelyDownloadMergeAndSaveModules(allModules, aggregateDataSetIds, periodRange, projectLastUpdatedTimestamp);
                         });
                     });
                 });

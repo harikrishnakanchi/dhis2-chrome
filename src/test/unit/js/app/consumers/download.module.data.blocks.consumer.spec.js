@@ -6,7 +6,7 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
         var downloadModuleDataBlocksConsumer, dataService, approvalService,
             userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository,
             moduleDataBlockFactory, moduleDataBlockMerger,
-            q, scope, dataSet, periodRange, projectIds, mockModule, mockOriginOrgUnits, mockOriginOrgUnitIds, someMomentInTime;
+            q, scope, aggregateDataSet, periodRange, projectIds, mockModule, mockOriginOrgUnits, mockOriginOrgUnitIds, someMomentInTime;
 
         describe('downloadModuleDataBlocksConsumer', function() {
             beforeEach(mocks.inject(function($rootScope, $q) {
@@ -21,8 +21,9 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 }];
                 mockOriginOrgUnitIds = _.pluck(mockOriginOrgUnits, 'id');
                 projectIds = ['projectId'];
-                dataSet = {
-                    id: 'someDataSetId'
+                aggregateDataSet = {
+                    id: 'someAggregateDataSetId',
+                    isLineListService: false
                 };
                 periodRange = ['2016W20', '2016W21'];
                 someMomentInTime = '2016-05-20T15:48:00.888Z';
@@ -42,7 +43,7 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
 
 
                 datasetRepository = new DataSetRepository();
-                spyOn(datasetRepository, 'getAll').and.returnValue(utils.getPromise(q, [dataSet]));
+                spyOn(datasetRepository, 'getAll').and.returnValue(utils.getPromise(q, [aggregateDataSet]));
 
                 userPreferenceRepository = new UserPreferenceRepository();
                 spyOn(userPreferenceRepository, 'getCurrentUsersProjectIds').and.returnValue(utils.getPromise(q, projectIds));
@@ -67,17 +68,28 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
 
             it('should download data values from DHIS for each module', function() {
                 runConsumer();
-                expect(dataService.downloadData).toHaveBeenCalledWith(mockModule.id, [dataSet.id], periodRange, someMomentInTime);
+                expect(dataService.downloadData).toHaveBeenCalledWith(mockModule.id, [aggregateDataSet.id], periodRange, someMomentInTime);
             });
 
             it('should download completion data from DHIS for each module', function () {
                 runConsumer();
-                expect(approvalService.getCompletionData).toHaveBeenCalledWith(mockModule.id, mockOriginOrgUnitIds, [dataSet.id]);
+                expect(approvalService.getCompletionData).toHaveBeenCalledWith(mockModule.id, mockOriginOrgUnitIds, [aggregateDataSet.id]);
             });
 
             it('should download approval data from DHIS for each module', function () {
                 runConsumer();
-                expect(approvalService.getApprovalData).toHaveBeenCalledWith(mockModule.id, [dataSet.id], periodRange);
+                expect(approvalService.getApprovalData).toHaveBeenCalledWith(mockModule.id, [aggregateDataSet.id], periodRange);
+            });
+
+            it('should not download data from DHIS for linelist summary datasets', function() {
+                var lineListSummaryDataSet = {
+                    id: 'lineListDataSetId',
+                    isLineListService: true
+                };
+                datasetRepository.getAll.and.returnValue(utils.getPromise(q, [aggregateDataSet, lineListSummaryDataSet]));
+
+                runConsumer();
+                expect(dataService.downloadData).toHaveBeenCalledWith(mockModule.id, [aggregateDataSet.id], periodRange, someMomentInTime);
             });
 
             it('should instantiate module data blocks for each module', function() {
