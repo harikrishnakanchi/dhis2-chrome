@@ -14,6 +14,10 @@ define(['properties', 'lodash', 'dateUtils'], function (properties, _, dateUtils
             if (_.isEmpty(modules))
                 return $q.when();
 
+            var continueRecursion = function() {
+                return recursivelyDownloadMergeAndSaveModules(modules);
+            };
+
             return getModuleDataBlocks({
                 moduleId: modules.pop().id,
                 dataSetIds: dataSetIds,
@@ -24,9 +28,7 @@ define(['properties', 'lodash', 'dateUtils'], function (properties, _, dateUtils
             .then(getIndexedCompletionsFromDhis)
             .then(getIndexedApprovalsFromDhis)
             .then(mergeAndSaveModuleDataBlocks)
-            .finally(function() {
-                return recursivelyDownloadMergeAndSaveModules(modules);
-            });
+            .then(continueRecursion, continueRecursion);
         };
 
         var getModuleDataBlocks = function(data) {
