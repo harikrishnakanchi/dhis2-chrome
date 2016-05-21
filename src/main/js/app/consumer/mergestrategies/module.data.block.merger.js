@@ -24,7 +24,7 @@ define(['moment', 'lodash'],
                 };
 
                 var mergeAndSaveDataValues = function() {
-                    var dhisDataValuesExist = dhisDataValues.length > 0;
+                    var dhisDataValuesExist = dhisDataValues && dhisDataValues.length > 0;
 
                     if(dhisDataValuesExist) {
                         var mergedDataValues = mergeDataValues(dhisDataValues, moduleDataBlock.dataValues);

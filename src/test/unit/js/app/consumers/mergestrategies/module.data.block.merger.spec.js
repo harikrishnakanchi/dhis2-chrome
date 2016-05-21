@@ -21,7 +21,7 @@ define(['moduleDataBlockMerger', 'angularMocks', 'utils', 'moment', 'lodash', 'd
                 moduleDataBlockMerger = new ModuleDataBlockMerger(dataRepository, approvalRepository, mergeBy, q);
 
                 moduleDataBlock = {};
-                dhisDataValues = [];
+                dhisDataValues = undefined;
                 dhisCompletion = undefined;
                 dhisApproval = undefined;
                 someMomentInTime = moment('2016-05-18T13:00:00.000Z');
@@ -106,7 +106,7 @@ define(['moduleDataBlockMerger', 'angularMocks', 'utils', 'moment', 'lodash', 'd
 
             describe('data and approvals do not exist on DHIS', function () {
                 it('should not save any data values to database', function() {
-                    dhisDataValues = [];
+                    dhisDataValues = undefined;
                     dhisCompletion = undefined;
                     dhisApproval = undefined;
 
@@ -116,7 +116,7 @@ define(['moduleDataBlockMerger', 'angularMocks', 'utils', 'moment', 'lodash', 'd
                 });
 
                 it('should not save any DHIS completions or approvals to database', function() {
-                    dhisDataValues = [];
+                    dhisDataValues = undefined;
                     dhisCompletion = undefined;
                     dhisApproval = undefined;
 
