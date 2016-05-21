@@ -282,6 +282,7 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
                     });
                     scope.$apply();
 
+                    expect(orgUnitRepository.findAll).toHaveBeenCalledWith([moduleId]);
                     expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W20', {}, [], {});
                     expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W21', {}, [], {});
                     expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W22', {}, [], {});

@@ -6,7 +6,7 @@ define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
         };
 
         var createForModule = function (moduleId, periodRange) {
-            return orgUnitRepository.findAll(moduleId).then(_.partial(createForModules, _, periodRange));
+            return orgUnitRepository.findAll([moduleId]).then(_.partial(createForModules, _, periodRange));
         };
 
         var createForModules = function (moduleOrgUnits, periodRange) {
