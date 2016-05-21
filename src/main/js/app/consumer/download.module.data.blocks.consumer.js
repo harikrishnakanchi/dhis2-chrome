@@ -1,4 +1,4 @@
-define(['properties', 'lodash', 'dateUtils'], function (properties, _, dateUtils) {
+define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _, dateUtils, moment) {
     return function (dataService, approvalService, datasetRepository, userPreferenceRepository, changeLogRepository, orgUnitRepository,
                      moduleDataBlockFactory, moduleDataBlockMerger, $q) {
 
@@ -9,6 +9,10 @@ define(['properties', 'lodash', 'dateUtils'], function (properties, _, dateUtils
 
         var getLastUpdatedTime = function(userProjectIds) {
             return changeLogRepository.get("dataValues:" + userProjectIds.join(';'));
+        };
+
+        var updateLastUpdatedTime = function(userProjectIds) {
+            return changeLogRepository.upsert("dataValues:" + userProjectIds.join(';'), moment().toISOString());
         };
 
         var getPeriodRangeToDownload = function(projectLastUpdatedTimestamp) {
@@ -93,9 +97,13 @@ define(['properties', 'lodash', 'dateUtils'], function (properties, _, dateUtils
                     return getLastUpdatedTime(currentUserProjectIds).then(function(projectLastUpdatedTimestamp) {
                         var periodRange = getPeriodRangeToDownload(projectLastUpdatedTimestamp);
 
-                        return orgUnitRepository.getAllModulesInOrgUnits(currentUserProjectIds).then(function (allModules) {
-                            return recursivelyDownloadMergeAndSaveModules(allModules, aggregateDataSetIds, periodRange, projectLastUpdatedTimestamp);
-                        });
+                        return orgUnitRepository.getAllModulesInOrgUnits(currentUserProjectIds)
+                            .then(function (allModules) {
+                                return recursivelyDownloadMergeAndSaveModules(allModules, aggregateDataSetIds, periodRange, projectLastUpdatedTimestamp);
+                            })
+                            .then(function() {
+                                return updateLastUpdatedTime(currentUserProjectIds);
+                            });
                     });
                 });
             });

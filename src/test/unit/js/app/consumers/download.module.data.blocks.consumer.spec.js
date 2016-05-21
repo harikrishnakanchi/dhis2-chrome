@@ -1,7 +1,7 @@
 define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'datasetRepository', 'userPreferenceRepository', 'changeLogRepository', 'orgUnitRepository', 'moduleDataBlockFactory',
-        'moduleDataBlockMerger', 'angularMocks', 'dateUtils', 'utils'],
+        'moduleDataBlockMerger', 'angularMocks', 'dateUtils', 'utils', 'timecop'],
     function(DownloadModuleDataBlocksConsumer, DataService, ApprovalService, DataSetRepository, UserPreferenceRepository, ChangeLogRepository, OrgUnitRepository, ModuleDataBlockFactory,
-             ModuleDataBlockMerger, mocks, dateUtils, utils) {
+             ModuleDataBlockMerger, mocks, dateUtils, utils, timecop) {
         
         var downloadModuleDataBlocksConsumer, dataService, approvalService,
             userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository,
@@ -41,7 +41,6 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 spyOn(orgUnitRepository, 'getAllModulesInOrgUnits').and.returnValue(utils.getPromise(q, [mockModule]));
                 spyOn(orgUnitRepository, 'findAllByParent').and.returnValue(utils.getPromise(q, mockOriginOrgUnits));
 
-
                 datasetRepository = new DataSetRepository();
                 spyOn(datasetRepository, 'getAll').and.returnValue(utils.getPromise(q, [aggregateDataSet]));
 
@@ -50,6 +49,7 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
 
                 changeLogRepository =  new ChangeLogRepository();
                 spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, someMomentInTime));
+                spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
 
                 moduleDataBlockFactory = new ModuleDataBlockFactory();
                 spyOn(moduleDataBlockFactory, 'createForModule').and.returnValue(utils.getPromise(q, []));
@@ -128,6 +128,17 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 runConsumer();
                 expect(moduleDataBlockFactory.createForModule).toHaveBeenCalledWith(mockModuleA.id, periodRange);
                 expect(moduleDataBlockFactory.createForModule).toHaveBeenCalledWith(mockModuleB.id, periodRange);
+            });
+
+            it('should update the change log after merging all data', function() {
+                var changeLogKey = 'dataValues:' + projectIds.join(';'),
+                    currentTime = '2016-05-21T00:00:00.000Z';
+
+                Timecop.install();
+                Timecop.freeze(currentTime);
+
+                runConsumer();
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith(changeLogKey, currentTime);
             });
         });
     });
