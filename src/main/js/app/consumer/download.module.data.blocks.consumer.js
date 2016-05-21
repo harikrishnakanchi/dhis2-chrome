@@ -84,10 +84,10 @@ define(['properties', 'lodash', 'dateUtils'], function (properties, _, dateUtils
                 var allDataSetsIds = _.pluck(allDataSets, 'id');
 
                 return userPreferenceRepository.getCurrentUsersProjectIds().then(function (currentUserProjectIds) {
-                    getLastUpdatedTime(currentUserProjectIds).then(function(projectLastUpdatedTimestamp) {
+                    return getLastUpdatedTime(currentUserProjectIds).then(function(projectLastUpdatedTimestamp) {
                         var periodRange = getPeriodRangeToDownload(projectLastUpdatedTimestamp);
 
-                        orgUnitRepository.getAllModulesInOrgUnits(currentUserProjectIds).then(function (allModules) {
+                        return orgUnitRepository.getAllModulesInOrgUnits(currentUserProjectIds).then(function (allModules) {
                             return recursivelyDownloadMergeAndSaveModules(allModules, allDataSetsIds, periodRange, projectLastUpdatedTimestamp);
                         });
                     });
