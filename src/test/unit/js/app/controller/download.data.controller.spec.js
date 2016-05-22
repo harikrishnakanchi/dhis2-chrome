@@ -20,7 +20,7 @@ define(["downloadDataController", "angularMocks", "utils", "lodash", "chromeUtil
                 spyOn(chromeUtils, "createNotification").and.returnValue(utils.getPromise(q, {}));
 
                 rootScope.hasRoles = function(args) {
-                    if (args[0] === "Superuser")
+                    if (args[0] === "Projectadmin")
                         return false;
                     else
                         return true;

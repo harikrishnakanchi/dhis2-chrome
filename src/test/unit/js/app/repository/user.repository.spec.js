@@ -74,7 +74,7 @@ define(["userRepository", "angularMocks", "utils"], function(UserRepository, moc
                 "username": "projectadmin",
                 "password": "5f4dcc3b5aa765d61d8327deb882cf99",
                 "userRoles": [{
-                    "name": "Superuser"
+                    "name": "Projectadmin"
                 }]
             };
 

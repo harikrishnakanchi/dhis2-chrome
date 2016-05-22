@@ -40,7 +40,7 @@
                                         </button>
                                         <ul class="dropdown-menu" role="menu" ng-if="isLoggedIn">
                                             <li ng-include="'templates/partials/download-data.html'"> </li>
-                                            <li><a href="#/selectProjectPreference" ng-if="hasRoles(['Superuser'])" tabindex="-1">{{resourceBundle.changeProject}}</a></li>
+                                            <li><a href="#/selectProjectPreference" ng-if="hasRoles(['Projectadmin'])" tabindex="-1">{{resourceBundle.changeProject}}</a></li>
                                             <li class="divider"></li>
                                             <li><a href="" ng-click="gotoProductKeyPage()" tabindex="-1">{{ resourceBundle.updateProductKeyMenuLabel }}</a></li>
                                             <li class="dropdown-submenu pull-left" ng-include="'templates/partials/clone.html'"></li>
@@ -131,7 +131,7 @@
                         {{ resourceBundle.countryLabel }}
                     </a>
                 </li>
-                <li role="presentation" ng-class="{ active: isActive('\/orgUnits$')}" ng-if="hasRoles(['Superuser'])">
+                <li role="presentation" ng-class="{ active: isActive('\/orgUnits$')}" ng-if="hasRoles(['Projectadmin'])">
                     <a href="#/orgUnits">
                         <i class="fa fa-gear"></i>
                         {{ resourceBundle.projectsLabel }}

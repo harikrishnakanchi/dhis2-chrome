@@ -173,7 +173,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
                 "username": "projectadmin",
                 "password": "5f4dcc3b5aa765d61d8327deb882cf99",
                 "userRoles": [{
-                    "name": "Superuser"
+                    "name": "Projectadmin"
                 }]
             }));
 
@@ -269,7 +269,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
                 "username": "projectadmin",
                 "password": "5f4dcc3b5aa765d61d8327deb882cf99",
                 "userRoles": [{
-                    "name": "Superuser"
+                    "name": "Projectadmin"
                 }]
             }));
             scope.login();

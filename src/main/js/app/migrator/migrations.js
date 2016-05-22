@@ -250,6 +250,21 @@ define([], function() {
         };
     };
 
+    var change_role_to_projectadmin = function(db, tx) {
+        var userStore = tx.objectStore("users");
+        userStore.delete("msfadmin");
+        userStore.openCursor().onsuccess = function(e) {
+            var cursor = e.target.result;
+            if (cursor) {
+                var data = cursor.value;
+                if(data.userCredentials.username == "projectadmin") {
+                    data.userCredentials.userRoles[0].name = "Projectadmin";
+                    cursor.update(data);
+                }
+                cursor.continue();
+            }
+        };
+    };
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -283,6 +298,7 @@ define([], function() {
         recreate_translations_store,
         delete_program_stages_store,
         delete_keys_from_changelog,
-        update_translations_store
+        update_translations_store,
+        change_role_to_projectadmin
     ];
 });

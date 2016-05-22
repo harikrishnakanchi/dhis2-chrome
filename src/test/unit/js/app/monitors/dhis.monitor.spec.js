@@ -174,7 +174,7 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome", "us
                     name: 'somename - projectCode'
                 },
                 userRoles:[{
-                    name: "Superuser"
+                    name: "Projectadmin"
                 }]
             };
 

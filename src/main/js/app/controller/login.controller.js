@@ -33,7 +33,7 @@ define(["md5", "properties", "lodash"], function(md5, properties, _) {
 
             var productKeyLevel = systemSettingRepository.getProductKeyLevel();
 
-            if (isRole(user, "Superuser"))
+            if (isRole(user, "Projectadmin"))
                 return data;
 
             var userOrgUnitIds = _.pluck(user.organisationUnits, "id");
@@ -97,7 +97,7 @@ define(["md5", "properties", "lodash"], function(md5, properties, _) {
         var startProjectDataSync = function(data) {
             var previousUserProjects = data[2];
             var isAdminUser = function(user) {
-                return !!(isRole(user, 'Superuser') || isRole(user, 'Superadmin'));
+                return !!(isRole(user, 'Projectadmin') || isRole(user, 'Superadmin'));
             };
 
             userPreferenceRepository.getCurrentUsersProjectIds().then(function(currentUserProjects) {
@@ -119,7 +119,7 @@ define(["md5", "properties", "lodash"], function(md5, properties, _) {
         };
 
         var redirect = function() {
-            if ($rootScope.hasRoles(['Superadmin', 'Superuser']))
+            if ($rootScope.hasRoles(['Superadmin', 'Projectadmin']))
                 $location.path("/orgUnits");
             else
                 $location.path("/dashboard");

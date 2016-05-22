@@ -35,7 +35,7 @@ define(["moment"], function(moment) {
                 var getUserOrgUnits = function() {
                     if ($rootScope.hasRoles(["Coordination Level Approver"])) {
                         return orgUnitRepository.findAllByParent(user.organisationUnits[0].id);
-                    } else if($rootScope.hasRoles(["Superuser"])) {
+                    } else if($rootScope.hasRoles(["Projectadmin"])) {
                         return userPreferences ? $q.when(userPreferences.organisationUnits) : $q.when(undefined);
                     } else {
                         return $q.when(user.organisationUnits);

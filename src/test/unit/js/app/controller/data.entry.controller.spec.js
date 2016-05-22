@@ -21,7 +21,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                         "username": "dataentryuser",
                         "userRoles": [{
                             "id": "hxNB8lleCsl",
-                            "name": 'Superuser'
+                            "name": 'Projectadmin'
                         }, {
                             "id": "hxNB8lleCsl",
                             "name": 'blah'
