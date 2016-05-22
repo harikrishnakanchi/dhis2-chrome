@@ -45,7 +45,7 @@ define(['moment', 'lodash'],
                         if(dhisApprovalOrCompletionExists) {
                             return approvalDataRepository.saveApprovalsFromDhis(mergedDhisApprovalAndCompletion);
                         } else if(localApprovalsExist) {
-                            return approvalDataRepository.invalidateApproval(moduleDataBlock.period, moduleDataBlock.orgUnit);
+                            return approvalDataRepository.invalidateApproval(moduleDataBlock.period, moduleDataBlock.moduleId);
                         }
                     }
                 };
