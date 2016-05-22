@@ -298,7 +298,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
         };
 
         var translatePivotTables = function (pivotTables) {
-            return $q.when(translationsService.translateReports(pivotTables));
+            return translationsService.translateReports(pivotTables);
         };
 
         var loadPivotTables = function() {

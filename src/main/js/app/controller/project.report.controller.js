@@ -188,7 +188,7 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
         };
 
         var translatePivotTables = function (pivotTables) {
-            return $q.when(translationsService.translateReports(pivotTables));
+            return translationsService.translateReports(pivotTables);
         };
 
         var loadPivotTables = function() {

@@ -26,7 +26,7 @@ define(['lodash'], function(_){
 
         this.translateReports = function (reportsToTranslate) {
             if(_locale == 'en') {
-                return $q.when(reportsToTranslate);
+                return reportsToTranslate;
             }
 
             var result = _.each(reportsToTranslate, function (report) {
@@ -39,7 +39,7 @@ define(['lodash'], function(_){
                 });
             });
 
-            return $q.when(result);
+            return result;
         };
 
         this.translateReferralLocations = function(arrayOfObjectsToBeTranslated) {
