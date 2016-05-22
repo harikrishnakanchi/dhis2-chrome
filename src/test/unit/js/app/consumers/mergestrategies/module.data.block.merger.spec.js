@@ -117,25 +117,36 @@ define(['moduleDataBlockMerger', 'angularMocks', 'utils', 'moment', 'lodash', 'd
                 });
             });
 
-            describe('data and approvals do not exist on DHIS', function () {
+            describe('data and approvals exist only on Praxis', function () {
                 it('should not save any data values to database', function() {
                     dhisDataValues = undefined;
                     dhisCompletion = undefined;
                     dhisApproval = undefined;
+                    moduleDataBlock = createMockModuleDataBlock({
+                        dataValuesLastUpdated: someMomentInTime,
+                        approvedAtProjectLevel: true,
+                        approvedAtCoordinationLevel: true
+                    });
 
                     performMerge();
 
                     expect(dataRepository.saveDhisData).not.toHaveBeenCalled();
                 });
 
-                it('should not save any DHIS completions or approvals to database', function() {
+                it('should not invalidate or save any DHIS completions or approvals to database', function() {
                     dhisDataValues = undefined;
                     dhisCompletion = undefined;
                     dhisApproval = undefined;
+                    moduleDataBlock = createMockModuleDataBlock({
+                        dataValuesLastUpdated: someMomentInTime,
+                        approvedAtProjectLevel: true,
+                        approvedAtCoordinationLevel: true
+                    });
 
                     performMerge();
 
                     expect(approvalRepository.saveApprovalsFromDhis).not.toHaveBeenCalled();
+                    expect(approvalRepository.invalidateApproval).not.toHaveBeenCalled();
                 });
             });
 

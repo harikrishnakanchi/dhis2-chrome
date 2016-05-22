@@ -16,6 +16,12 @@ define(['moment', 'lodash'],
                     }, dhisDataValues, localDataValues);
                 };
 
+                var dhisDataValuesAreMoreRecentThanLocal = function() {
+                    return dhisDataValues && dhisDataValues.length > 0 &&
+                           moduleDataBlock.dataValuesLastUpdated &&
+                           mostRecentDhisDataValueTimestamp().isAfter(moduleDataBlock.dataValuesLastUpdated);
+                };
+
                 var mostRecentDhisDataValueTimestamp = function() {
                     var timestamps = _.map(dhisDataValues, function(dataValue) {
                         return moment(dataValue.lastUpdated);
@@ -36,12 +42,11 @@ define(['moment', 'lodash'],
 
                 var mergeAndSaveCompletionAndApproval = function() {
                     var localDataValuesDoNotExist = !moduleDataBlock.dataValuesLastUpdated,
-                        dhisDataValuesAreMoreRecentThanLocal = mostRecentDhisDataValueTimestamp().isAfter(moduleDataBlock.dataValuesLastUpdated),
                         mergedDhisApprovalAndCompletion = _.merge({}, dhisCompletion, dhisApproval),
                         dhisApprovalOrCompletionExists = !_.isEmpty(mergedDhisApprovalAndCompletion),
                         localApprovalsExist = (moduleDataBlock.approvedAtProjectLevel || moduleDataBlock.approvedAtCoordinationLevel);
 
-                    if(localDataValuesDoNotExist || dhisDataValuesAreMoreRecentThanLocal) {
+                    if(localDataValuesDoNotExist || dhisDataValuesAreMoreRecentThanLocal()) {
                         if(dhisApprovalOrCompletionExists) {
                             return approvalDataRepository.saveApprovalsFromDhis(mergedDhisApprovalAndCompletion);
                         } else if(localApprovalsExist) {
