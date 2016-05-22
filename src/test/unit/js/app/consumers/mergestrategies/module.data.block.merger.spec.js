@@ -69,6 +69,7 @@ define(['moduleDataBlockMerger', 'angularMocks', 'utils', 'moment', 'lodash', 'd
                     period: 'somePeriod',
                     moduleId: 'someModuleId',
                     dataValuesLastUpdated: '2016-05-07T09:00:00.000Z',
+                    dhisDataValuesLastUpdated: null,
                     approvedAtProjectLevel: false,
                     approvedAtCoordinationLevel: false
                 }, options);
@@ -216,6 +217,22 @@ define(['moduleDataBlockMerger', 'angularMocks', 'utils', 'moment', 'lodash', 'd
                         expect(approvalRepository.invalidateApproval).not.toHaveBeenCalled();
                     });
                 });
+            });
+
+            describe('data from DHIS has previously been downloaded and there are no updates in DHIS or Praxis', function () {
+                it('should save DHIS completion and approval data to database', function() {
+                        dhisDataValues = undefined;
+                        dhisCompletion = createMockDhisCompletion();
+                        dhisApproval = createMockDhisApproval();
+                        moduleDataBlock = createMockModuleDataBlock({
+                            dataValuesLastUpdated: someMomentInTime,
+                            dhisDataValuesLastUpdated: someMomentInTime
+                        });
+
+                        performMerge();
+
+                        expect(approvalRepository.saveApprovalsFromDhis).toHaveBeenCalled();
+                    });
             });
         });
     });

@@ -3,6 +3,10 @@ define(['moment', 'lodash'],
         return function(dataRepository, approvalDataRepository, mergeBy, $q) {
 
             var mergeAndSaveToLocalDatabase = function(moduleDataBlock, dhisDataValues, dhisCompletion, dhisApproval) {
+                var updatedDhisDataValuesExist = dhisDataValues && dhisDataValues.length > 0,
+                    dhisDataValuesExist = updatedDhisDataValuesExist || !!moduleDataBlock.dhisDataValuesLastUpdated,
+                    localDataValuesExist = !!moduleDataBlock.dataValuesLastUpdated;
+
                 var dataValuesEquals = function(dv1, dv2) {
                     return dv1.dataElement === dv2.dataElement &&
                            dv1.period === dv2.period &&
@@ -16,23 +20,28 @@ define(['moment', 'lodash'],
                     }, dhisDataValues, localDataValues);
                 };
 
+
                 var dhisDataValuesAreMoreRecentThanLocal = function() {
-                    return dhisDataValues && dhisDataValues.length > 0 &&
-                           moduleDataBlock.dataValuesLastUpdated &&
-                           mostRecentDhisDataValueTimestamp().isAfter(moduleDataBlock.dataValuesLastUpdated);
+                    return dhisDataValuesExist && (!localDataValuesExist || mostRecentDhisDataValueTimestamp().isAfter(moduleDataBlock.dataValuesLastUpdated));
+                };
+
+                var praxisDataValuesAreUpToDateWithDhisDataValues = function() {
+                    return (!dhisDataValuesExist && !localDataValuesExist) || (dhisDataValuesExist && mostRecentDhisDataValueTimestamp().isSame(moduleDataBlock.dataValuesLastUpdated));
                 };
 
                 var mostRecentDhisDataValueTimestamp = function() {
-                    var timestamps = _.map(dhisDataValues, function(dataValue) {
-                        return moment(dataValue.lastUpdated);
-                    });
-                    return moment.max(timestamps);
+                    if(updatedDhisDataValuesExist) {
+                        var timestamps = _.map(dhisDataValues, function(dataValue) {
+                            return moment(dataValue.lastUpdated);
+                        });
+                        return timestamps.length > 0 ? moment.max(timestamps) : null;
+                    } else {
+                        return moduleDataBlock.dhisDataValuesLastUpdated;
+                    }
                 };
 
                 var mergeAndSaveDataValues = function() {
-                    var dhisDataValuesExist = dhisDataValues && dhisDataValues.length > 0;
-
-                    if(dhisDataValuesExist) {
+                    if(updatedDhisDataValuesExist) {
                         var mergedDataValues = mergeDataValues(dhisDataValues, moduleDataBlock.dataValues);
                         return dataRepository.saveDhisData(mergedDataValues);
                     } else {
@@ -41,16 +50,19 @@ define(['moment', 'lodash'],
                 };
 
                 var mergeAndSaveCompletionAndApproval = function() {
-                    var localDataValuesDoNotExist = !moduleDataBlock.dataValuesLastUpdated,
-                        mergedDhisApprovalAndCompletion = _.merge({}, dhisCompletion, dhisApproval),
+                    var mergedDhisApprovalAndCompletion = _.merge({}, dhisCompletion, dhisApproval),
                         dhisApprovalOrCompletionExists = !_.isEmpty(mergedDhisApprovalAndCompletion),
                         localApprovalsExist = (moduleDataBlock.approvedAtProjectLevel || moduleDataBlock.approvedAtCoordinationLevel);
 
-                    if(localDataValuesDoNotExist || dhisDataValuesAreMoreRecentThanLocal()) {
+                    if(dhisDataValuesAreMoreRecentThanLocal()) {
                         if(dhisApprovalOrCompletionExists) {
                             return approvalDataRepository.saveApprovalsFromDhis(mergedDhisApprovalAndCompletion);
                         } else if(localApprovalsExist) {
                             return approvalDataRepository.invalidateApproval(moduleDataBlock.period, moduleDataBlock.moduleId);
+                        }
+                    } else if(praxisDataValuesAreUpToDateWithDhisDataValues()) {
+                        if(dhisApprovalOrCompletionExists) {
+                            return approvalDataRepository.saveApprovalsFromDhis(mergedDhisApprovalAndCompletion);
                         }
                     }
                 };
