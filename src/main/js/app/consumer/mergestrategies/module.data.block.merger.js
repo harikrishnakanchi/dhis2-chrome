@@ -2,8 +2,8 @@ define(['moment', 'lodash'],
     function(moment, _) {
         return function(dataRepository, approvalDataRepository, mergeBy, $q) {
 
-            var mergeAndSaveToLocalDatabase = function(moduleDataBlock, dhisDataValues, dhisCompletion, dhisApproval) {
-                var updatedDhisDataValuesExist = dhisDataValues && dhisDataValues.length > 0,
+            var mergeAndSaveToLocalDatabase = function(moduleDataBlock, updatedDhisDataValues, dhisCompletion, dhisApproval) {
+                var updatedDhisDataValuesExist = updatedDhisDataValues && updatedDhisDataValues.length > 0,
                     dhisDataValuesExist = updatedDhisDataValuesExist || !!moduleDataBlock.dhisDataValuesLastUpdated,
                     localDataValuesExist = !!moduleDataBlock.dataValuesLastUpdated;
 
@@ -31,7 +31,7 @@ define(['moment', 'lodash'],
 
                 var mostRecentDhisDataValueTimestamp = function() {
                     if(updatedDhisDataValuesExist) {
-                        var timestamps = _.map(dhisDataValues, function(dataValue) {
+                        var timestamps = _.map(updatedDhisDataValues, function(dataValue) {
                             return moment(dataValue.lastUpdated);
                         });
                         return timestamps.length > 0 ? moment.max(timestamps) : null;
@@ -42,7 +42,7 @@ define(['moment', 'lodash'],
 
                 var mergeAndSaveDataValues = function() {
                     if(updatedDhisDataValuesExist) {
-                        var mergedDataValues = mergeDataValues(dhisDataValues, moduleDataBlock.dataValues);
+                        var mergedDataValues = mergeDataValues(updatedDhisDataValues, moduleDataBlock.dataValues);
                         return dataRepository.saveDhisData(mergedDataValues);
                     } else {
                         return $q.when([]);
