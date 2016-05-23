@@ -482,5 +482,54 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                 expect(moduleDataBlock.dataValuesLastUpdated).toEqual(someMomentInTime);
             });
         });
+
+        describe('dhisDataValuesLastUpdated', function() {
+            it('should be null if aggregateDataValues are not present', function() {
+                aggregateDataValues = undefined;
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.dhisDataValuesLastUpdated).toBeNull();
+            });
+
+            it('should be null if aggregateDataValues has no data values collection', function () {
+                aggregateDataValues = {};
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.dhisDataValuesLastUpdated).toBeNull();
+            });
+
+            it('should be null if aggregateDataValues has no data values', function () {
+                aggregateDataValues = {
+                    dataValues: []
+                };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.dhisDataValuesLastUpdated).toBeNull();
+            });
+
+            it('should return the most recent lastUpdated timestamp', function () {
+                var someMomentInTime = moment('2016-05-18T00:00:00.000Z');
+                aggregateDataValues = {
+                    dataValues: [{
+                        value: 'someValue',
+                        lastUpdated: someMomentInTime.toISOString()
+                    }, {
+                        value: 'someOtherValue',
+                        lastUpdated: moment(someMomentInTime).subtract(1, 'hour').toISOString()
+                    }]
+                };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.dhisDataValuesLastUpdated).toEqual(someMomentInTime);
+            });
+
+            it('should be null if data values were all created on Praxis', function () {
+                var someMomentInTime = moment('2016-05-18T00:00:00.000Z');
+                aggregateDataValues = {
+                    dataValues: [{
+                        value: 'someValue',
+                        clientLastUpdated: someMomentInTime.toISOString()
+                    }]
+                };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.dhisDataValuesLastUpdated).toBeNull();
+            });
+        });
     });
 });

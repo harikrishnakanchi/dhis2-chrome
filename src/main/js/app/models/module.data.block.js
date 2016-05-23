@@ -6,6 +6,7 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         this.lineListService = CustomAttributes.parseAttribute(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
 
         this.dataValuesLastUpdated = getMostRecentDataValueTimestamp(aggregateDataValues);
+        this.dhisDataValuesLastUpdated = getMostRecentDhisDataValueTimestamp(aggregateDataValues);
 
         this.submitted = isSubmitted(aggregateDataValues, lineListEvents, this.lineListService);
         this.approvedAtProjectLevel = !!(approvalData && approvalData.isComplete);
@@ -66,6 +67,21 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
             aggregateDataValues.dataValues &&
             aggregateDataValues.dataValues.length > 0 &&
             getMostRecentTimestamp(aggregateDataValues.dataValues)) || null;
+    };
+
+    var getMostRecentDhisDataValueTimestamp = function(aggregateDataValues) {
+        var getMostRecentDhisTimestamp = function(dataValues) {
+            var rawTimestamps = _.compact(_.map(dataValues, 'lastUpdated')),
+                momentTimestamps = _.map(rawTimestamps, function(timestamp) {
+                    return moment(timestamp);
+                });
+            return momentTimestamps.length > 0 ? moment.max(momentTimestamps) : null;
+        };
+
+        return (aggregateDataValues &&
+            aggregateDataValues.dataValues &&
+            aggregateDataValues.dataValues.length > 0 &&
+            getMostRecentDhisTimestamp(aggregateDataValues.dataValues)) || null;
     };
 
     ModuleDataBlock.create = function () {
