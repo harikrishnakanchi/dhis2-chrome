@@ -69,7 +69,7 @@ define(['moduleDataBlockMerger', 'angularMocks', 'utils', 'moment', 'lodash', 'd
                     period: 'somePeriod',
                     moduleId: 'someModuleId',
                     dataValuesLastUpdated: '2016-05-07T09:00:00.000Z',
-                    dhisDataValuesLastUpdated: null,
+                    dataValuesLastUpdatedOnDhis: null,
                     approvedAtProjectLevel: false,
                     approvedAtCoordinationLevel: false
                 }, options);
@@ -226,7 +226,7 @@ define(['moduleDataBlockMerger', 'angularMocks', 'utils', 'moment', 'lodash', 'd
                         dhisApproval = createMockDhisApproval();
                         moduleDataBlock = createMockModuleDataBlock({
                             dataValuesLastUpdated: someMomentInTime,
-                            dhisDataValuesLastUpdated: someMomentInTime
+                            dataValuesLastUpdatedOnDhis: someMomentInTime
                         });
 
                         performMerge();

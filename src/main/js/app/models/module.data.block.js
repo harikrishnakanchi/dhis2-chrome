@@ -6,7 +6,7 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         this.lineListService = CustomAttributes.parseAttribute(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
 
         this.dataValuesLastUpdated = getMostRecentDataValueTimestamp(aggregateDataValues);
-        this.dhisDataValuesLastUpdated = getMostRecentDhisDataValueTimestamp(aggregateDataValues);
+        this.dataValuesLastUpdatedOnDhis = getMostRecentDataValueTimestampFromDhis(aggregateDataValues);
 
         this.submitted = isSubmitted(aggregateDataValues, lineListEvents, this.lineListService);
         this.approvedAtProjectLevel = !!(approvalData && approvalData.isComplete);
@@ -69,7 +69,7 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
             getMostRecentTimestamp(aggregateDataValues.dataValues)) || null;
     };
 
-    var getMostRecentDhisDataValueTimestamp = function(aggregateDataValues) {
+    var getMostRecentDataValueTimestampFromDhis = function(aggregateDataValues) {
         var getMostRecentDhisTimestamp = function(dataValues) {
             var rawTimestamps = _.compact(_.map(dataValues, 'lastUpdated')),
                 momentTimestamps = _.map(rawTimestamps, function(timestamp) {

@@ -483,17 +483,17 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
         });
 
-        describe('dhisDataValuesLastUpdated', function() {
+        describe('dataValuesLastUpdatedOnDhis', function() {
             it('should be null if aggregateDataValues are not present', function() {
                 aggregateDataValues = undefined;
                 moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.dhisDataValuesLastUpdated).toBeNull();
+                expect(moduleDataBlock.dataValuesLastUpdatedOnDhis).toBeNull();
             });
 
             it('should be null if aggregateDataValues has no data values collection', function () {
                 aggregateDataValues = {};
                 moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.dhisDataValuesLastUpdated).toBeNull();
+                expect(moduleDataBlock.dataValuesLastUpdatedOnDhis).toBeNull();
             });
 
             it('should be null if aggregateDataValues has no data values', function () {
@@ -501,7 +501,7 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                     dataValues: []
                 };
                 moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.dhisDataValuesLastUpdated).toBeNull();
+                expect(moduleDataBlock.dataValuesLastUpdatedOnDhis).toBeNull();
             });
 
             it('should return the most recent lastUpdated timestamp', function () {
@@ -516,7 +516,7 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                     }]
                 };
                 moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.dhisDataValuesLastUpdated).toEqual(someMomentInTime);
+                expect(moduleDataBlock.dataValuesLastUpdatedOnDhis).toEqual(someMomentInTime);
             });
 
             it('should be null if data values were all created on Praxis', function () {
@@ -528,7 +528,7 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                     }]
                 };
                 moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.dhisDataValuesLastUpdated).toBeNull();
+                expect(moduleDataBlock.dataValuesLastUpdatedOnDhis).toBeNull();
             });
         });
     });

@@ -4,7 +4,7 @@ define(['moment', 'lodash'],
 
             var mergeAndSaveToLocalDatabase = function(moduleDataBlock, updatedDhisDataValues, dhisCompletion, dhisApproval) {
                 var updatedDhisDataValuesExist = updatedDhisDataValues && updatedDhisDataValues.length > 0,
-                    dhisDataValuesExist = updatedDhisDataValuesExist || !!moduleDataBlock.dhisDataValuesLastUpdated,
+                    dhisDataValuesExist = updatedDhisDataValuesExist || !!moduleDataBlock.dataValuesLastUpdatedOnDhis,
                     localDataValuesExist = !!moduleDataBlock.dataValuesLastUpdated;
 
                 var dataValuesEquals = function(dv1, dv2) {
@@ -36,7 +36,7 @@ define(['moment', 'lodash'],
                         });
                         return timestamps.length > 0 ? moment.max(timestamps) : null;
                     } else {
-                        return moduleDataBlock.dhisDataValuesLastUpdated;
+                        return moduleDataBlock.dataValuesLastUpdatedOnDhis;
                     }
                 };
 
