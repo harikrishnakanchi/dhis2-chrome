@@ -1,5 +1,5 @@
 define(["md5", "properties", "lodash"], function(md5, properties, _) {
-    return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility) {
+    return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility, translationsService) {
         var loadUserData = function(loginUsername) {
             var existingUserProjects = userPreferenceRepository.getCurrentUsersProjectIds();
             var previousUser = userPreferenceRepository.getCurrentUsersUsername().then(function (username) {
@@ -125,6 +125,13 @@ define(["md5", "properties", "lodash"], function(md5, properties, _) {
                 $location.path("/dashboard");
         };
 
+        var refreshTranslations = function(){
+            systemSettingRepository.getLocale().then(function (locale) {
+                $rootScope.locale = locale;
+                translationsService.setLocale(locale);
+            });
+        };
+
         $scope.login = function() {
             var loginUsername = $scope.username.toLowerCase();
             loadUserData(loginUsername)
@@ -132,6 +139,7 @@ define(["md5", "properties", "lodash"], function(md5, properties, _) {
                 .then(authenticateUser)
                 .then(login)
                 .then(startProjectDataSync)
+                .then(refreshTranslations)
                 .then(redirect);
         };
 
