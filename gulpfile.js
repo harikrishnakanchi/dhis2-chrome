@@ -150,7 +150,7 @@ gulp.task('export-translations', function () {
         fr = require(path + '_fr.json'),
         ar = require(path + '_ar.json');
     var keys = Object.keys(en);
-    var content = 'keys\ten\tfr\tar';
+    var content = '\tEnglish\tFrench\tArabic\r\nlocale\ten\tfr\tar';
     keys.forEach(function(key) {
         content += '\r\n';
         content += key + '\t';
@@ -159,22 +159,25 @@ gulp.task('export-translations', function () {
         content += (ar[key] || '');
     });
     fs.writeFile('translations.tsv', content, function () {
-        console.log('Generated TSV');
+        console.log('Generated translations.tsv');
     });
 });
 
 gulp.task('import-translations', function () {
-    if(!argv.tsvfilepath){
-        throw Error("Usage: gulp import-translations --tsvfilepath=fileName.tsv");
+    if(!argv.tsvfilepath) {
+        console.log('Please specify TSV file path.\nUsage: gulp import-translations --tsvfilepath=fileName.tsv');
         return;
     }
     var path = argv.tsvfilepath;
 
     fs.readFile(path, function (err, data) {
+
+        if(err) throw new Error(err);
+
         var contents = data.toString('utf8');
         var lines = contents.split('\r\n');
-        var locales = lines[0].split('\t').slice(1);
-        lines = lines.slice(1);
+        var locales = lines[1].split('\t').slice(1);
+        lines = lines.slice(2);
 
         var resourceObjs = {};
         lines.forEach(function(line) {
