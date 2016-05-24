@@ -1,25 +1,21 @@
-define(["selectLanguageController", "translationsService", "angularMocks", "utils"],
-    function(SelectLanguageController, TranslationsService, mocks, utils) {
+define(["selectLanguageController", "angularMocks"],
+    function(SelectLanguageController, mocks) {
         describe("selectLanguageController", function() {
             var rootScope, selectLanguageController, translationsService, scope;
 
-            beforeEach(mocks.inject(function($rootScope, $q) {
+            beforeEach(mocks.inject(function($rootScope) {
                 scope = $rootScope.$new();
-                q = $q;
-                rootScope = $rootScope;
+                rootScope = {
+                    setLocale: jasmine.createSpy('setLocale')
+                };
 
-                translationsService = new TranslationsService();
-                spyOn(translationsService, 'setLocale').and.returnValue(utils.getPromise(q, {}));
-
-                selectLanguageController = new SelectLanguageController(scope, rootScope, translationsService);
+                selectLanguageController = new SelectLanguageController(scope, rootScope);
             }));
 
             it("should call setLocale method of translations service with selected locale", function() {
 
                 scope.changeLanguagePreference('fr');
-
-                expect(rootScope.locale).toEqual('fr');
-                expect(translationsService.setLocale).toHaveBeenCalledWith('fr');
+                expect(rootScope.setLocale).toHaveBeenCalledWith('fr');
             });
         });
     });

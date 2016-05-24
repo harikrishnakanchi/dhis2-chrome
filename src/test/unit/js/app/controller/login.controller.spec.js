@@ -348,11 +348,12 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             }));
 
             rootScope.hasRoles.and.returnValue(true);
+            rootScope.setLocale = jasmine.createSpy('setLocale');
 
             scope.login();
             scope.$apply();
 
-            expect(translationsService.setLocale).toHaveBeenCalledWith("en");
+            expect(rootScope.setLocale).toHaveBeenCalledWith("en");
         });
     });
 });

@@ -162,10 +162,12 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
 
                     systemSettingRepository.loadProductKey();
 
-                    systemSettingRepository.getLocale().then(function (locale) {
-                         $rootScope.locale = locale;
-                         translationsService.setLocale(locale);
-                    });
+                    $rootScope.setLocale = function(locale) {
+                        translationsService.setLocale(locale);
+                        $rootScope.locale = locale;
+                    };
+
+                    systemSettingRepository.getLocale().then($rootScope.setLocale);
 
                     $rootScope.hasRoles = function(allowedRoles) {
                         if ($rootScope.currentUser === undefined)

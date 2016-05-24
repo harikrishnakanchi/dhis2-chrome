@@ -34,7 +34,7 @@ define(['reportsController', 'dataEntryController', 'mainController', 'orgUnitCo
             app.controller('lineListOfflineApprovalController', ['$scope', '$q', 'programEventRepository', 'orgUnitRepository', 'programRepository', 'optionSetRepository', 'datasetRepository', 'referralLocationsRepository', 'excludedDataElementsRepository', 'translationsService', lineListOfflineApprovalController]);
             app.controller('appCloneController', ['$scope', '$modal', '$timeout', 'indexeddbUtils', 'filesystemService', 'sessionHelper', '$location', '$rootScope', appCloneController]);
             app.controller('downloadDataController', ['$scope', '$hustle', '$q', '$rootScope', '$timeout', downloadDataController]);
-            app.controller('selectLanguageController', ['$scope', '$rootScope', 'translationsService', selectLanguageController]);
+            app.controller('selectLanguageController', ['$scope', '$rootScope', selectLanguageController]);
             app.controller('referralLocationsController', ['$scope', '$hustle', '$modal', 'referralLocationsRepository', referralLocationsController]);
             app.controller('notificationsController', ['$scope', '$q', '$rootScope', 'userPreferenceRepository', 'chartRepository', 'orgUnitRepository', notificationsController]);
             app.controller('selectProjectPreferenceController', ['$rootScope', '$scope', '$hustle', '$location', 'orgUnitRepository', 'userPreferenceRepository', 'systemSettingRepository', selectProjectPreferenceController]);

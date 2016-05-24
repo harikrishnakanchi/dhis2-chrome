@@ -125,11 +125,8 @@ define(["md5", "properties", "lodash"], function(md5, properties, _) {
                 $location.path("/dashboard");
         };
 
-        var refreshTranslations = function(){
-            systemSettingRepository.getLocale().then(function (locale) {
-                $rootScope.locale = locale;
-                translationsService.setLocale(locale);
-            });
+        var refreshTranslations = function() {
+            systemSettingRepository.getLocale().then($rootScope.setLocale);
         };
 
         $scope.login = function() {
