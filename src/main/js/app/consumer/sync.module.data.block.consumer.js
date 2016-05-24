@@ -21,7 +21,7 @@ define([], function () {
         var getCompletionFromDhis = function (data) {
             return orgUnitRepository.findAllByParent([data.moduleId]).then(function (originOrgUnits) {
                 var originOrgUnitsIds = _.pluck(originOrgUnits, 'id');
-                return approvalService.getCompletionData(data.moduleId, originOrgUnitsIds, data.dataSetIds, data.period).then(function (allCompletionData) {
+                return approvalService.getCompletionData(data.moduleId, originOrgUnitsIds, data.dataSetIds, [data.period]).then(function (allCompletionData) {
                     var completionData = _.find(allCompletionData, { orgUnit: data.moduleId, period: data.period });
                     return _.merge({ dhisCompletion: completionData }, data);
                 });

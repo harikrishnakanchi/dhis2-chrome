@@ -67,7 +67,7 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
         var getIndexedCompletionsFromDhis = function (data) {
             return orgUnitRepository.findAllByParent([data.moduleId]).then(function (originOrgUnits) {
                 var originOrgUnitsIds = _.pluck(originOrgUnits, 'id');
-                return approvalService.getCompletionData(data.moduleId, originOrgUnitsIds, data.dataSetIds).then(function(allCompletionData) {
+                return approvalService.getCompletionData(data.moduleId, originOrgUnitsIds, data.dataSetIds, data.periodRange).then(function(allCompletionData) {
                     var indexedCompletions = _.indexBy(allCompletionData, function(completionData) {
                         return completionData.period + completionData.orgUnit;
                     });

@@ -73,7 +73,7 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
 
             it('should download completion data from DHIS for each module', function () {
                 runConsumer();
-                expect(approvalService.getCompletionData).toHaveBeenCalledWith(mockModule.id, mockOriginOrgUnitIds, [aggregateDataSet.id]);
+                expect(approvalService.getCompletionData).toHaveBeenCalledWith(mockModule.id, mockOriginOrgUnitIds, [aggregateDataSet.id], periodRange);
             });
 
             it('should download approval data from DHIS for each module', function () {

@@ -99,7 +99,7 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
             return $q.all(markAsUnapprovedPromises);
         };
 
-        this.getCompletionData = function(orgUnits, originOrgUnits, dataSets, period) {
+        this.getCompletionData = function(orgUnits, originOrgUnits, dataSets, periodRange) {
             var transform = function(response) {
                 if (!response.data.completeDataSetRegistrations)
                     return [];
@@ -131,9 +131,9 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
             var startDate,
                 endDate;
 
-            if(period) {
-                startDate = moment(period, 'YYYY[W]WW').format('YYYY-MM-DD');
-                endDate = moment(period, 'YYYY[W]WW').format('YYYY-MM-DD');
+            if(periodRange) {
+                endDate = moment(_.last(periodRange), 'YYYY[W]WW').format("YYYY-MM-DD");
+                startDate = moment(_.first(periodRange), 'YYYY[W]WW').format("YYYY-MM-DD");
             } else {
                 endDate = moment().format("YYYY-MM-DD");
                 startDate = moment(endDate).subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
@@ -197,7 +197,7 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
 
             if(periodRange) {
                 endDate = moment(_.last(periodRange), 'YYYY[W]WW').format("YYYY-MM-DD");
-                startDate = moment(periodRange[0], 'YYYY[W]WW').format("YYYY-MM-DD");
+                startDate = moment(_.first(periodRange), 'YYYY[W]WW').format("YYYY-MM-DD");
             } else {
                 endDate = moment().format("YYYY-MM-DD");
                 startDate = moment(endDate).subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
