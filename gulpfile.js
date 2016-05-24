@@ -14,6 +14,7 @@ var rename = require('gulp-rename');
 var path = require('path');
 var preprocess = require("gulp-preprocess");
 var zip = require('gulp-zip');
+var fs = require('fs');
 
 var baseUrl = argv.url || "http://localhost:8080";
 var baseIntUrl = argv.int_url || baseUrl;
@@ -141,4 +142,58 @@ gulp.task('zip', ['less', 'config', 'download-metadata'], function() {
     return gulp.src('./src/main/**')
         .pipe(zip("praxis_" + (argv.env || "dev") + ".zip"))
         .pipe(gulp.dest(''));
+});
+
+gulp.task('export-translations', function () {
+    var path = './src/main/js/app/i18n/resourceBundle';
+    var en = require(path + '_en.json'),
+        fr = require(path + '_fr.json'),
+        ar = require(path + '_ar.json');
+    var keys = Object.keys(en);
+    var content = 'keys\ten\tfr\tar';
+    keys.forEach(function(key) {
+        content += '\r\n';
+        content += key + '\t';
+        content += (en[key] || '') + '\t';
+        content += (fr[key] || '') + '\t';
+        content += (ar[key] || '');
+    });
+    fs.writeFile('translations.tsv', content, function () {
+        console.log('Generated TSV');
+    });
+});
+
+gulp.task('import-translations', function () {
+    if(!argv.tsvfilepath){
+        throw Error("Usage: gulp import-translations --tsvfilepath=fileName.tsv");
+        return;
+    }
+    var path = argv.tsvfilepath;
+
+    fs.readFile(path, function (err, data) {
+        var contents = data.toString('utf8');
+        var lines = contents.split('\r\n');
+        var locales = lines[0].split('\t').slice(1);
+        lines = lines.slice(1);
+
+        var resourceObjs = {};
+        lines.forEach(function(line) {
+            var values = line.split('\t');
+            var key = values[0];
+            values = values.slice(1);
+            locales.forEach(function (locale, index) {
+                var resourceObj = resourceObjs[locale] || {};
+                resourceObj[key] = values[index];
+                resourceObjs[locale] = resourceObj;
+            });
+        });
+
+        locales.forEach(function (locale) {
+            var path = './src/main/js/app/i18n/resourceBundle_';
+            fs.writeFile(path + locale + '.json', JSON.stringify(resourceObjs[locale], undefined, 4), function () {
+                console.log('Generated translations for locale: ' + locale);
+            });
+        });
+
+    });
 });
