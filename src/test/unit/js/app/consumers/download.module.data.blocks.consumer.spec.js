@@ -141,6 +141,13 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 expect(changeLogRepository.upsert).toHaveBeenCalledWith(changeLogKey, currentTime);
             });
 
+            it('should not update the change log if at least one module failed', function() {
+                dataService.downloadData.and.returnValue(utils.getRejectedPromise(q, {}));
+
+                runConsumer();
+                expect(changeLogRepository.upsert).not.toHaveBeenCalled();
+            });
+
             it('should continue to merge and save modules even if one module failed', function() {
                 var period = '2016W21',
                     mockModuleA = { id: 'mockModuleIdA' },

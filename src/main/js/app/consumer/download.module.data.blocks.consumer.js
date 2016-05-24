@@ -20,12 +20,19 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
             return dateUtils.getPeriodRange(numberOfWeeks);
         };
 
-        var recursivelyDownloadMergeAndSaveModules = function(modules, dataSetIds, periodRange, lastUpdatedTimestamp) {
-            if (_.isEmpty(modules))
-                return $q.when();
+        var recursivelyDownloadMergeAndSaveModules = function(modules, dataSetIds, periodRange, lastUpdatedTimestamp, atLeastOneModuleHasFailed) {
+            if (_.isEmpty(modules)) {
+                var allModulesSyncedSuccessfully = !atLeastOneModuleHasFailed;
+                return $q.when(allModulesSyncedSuccessfully);
+            }
 
-            var continueRecursion = function() {
-                return recursivelyDownloadMergeAndSaveModules(modules, dataSetIds, periodRange, lastUpdatedTimestamp);
+            var onSuccess = function() {
+                return recursivelyDownloadMergeAndSaveModules(modules, dataSetIds, periodRange, lastUpdatedTimestamp, atLeastOneModuleHasFailed);
+            };
+
+            var onFailure = function() {
+                atLeastOneModuleHasFailed = true;
+                return recursivelyDownloadMergeAndSaveModules(modules, dataSetIds, periodRange, lastUpdatedTimestamp, atLeastOneModuleHasFailed);
             };
 
             return getModuleDataBlocks({
@@ -38,7 +45,7 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
             .then(getIndexedCompletionsFromDhis)
             .then(getIndexedApprovalsFromDhis)
             .then(mergeAndSaveModuleDataBlocks)
-            .then(continueRecursion, continueRecursion);
+            .then(onSuccess, onFailure);
         };
 
         var getModuleDataBlocks = function(data) {
@@ -101,8 +108,10 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
                             .then(function (allModules) {
                                 return recursivelyDownloadMergeAndSaveModules(allModules, aggregateDataSetIds, periodRange, projectLastUpdatedTimestamp);
                             })
-                            .then(function() {
-                                return updateLastUpdatedTime(currentUserProjectIds);
+                            .then(function(allModulesSyncedSuccessfully) {
+                                if(allModulesSyncedSuccessfully) {
+                                    return updateLastUpdatedTime(currentUserProjectIds);
+                                }
                             });
                     });
                 });
