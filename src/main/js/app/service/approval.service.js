@@ -14,7 +14,16 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                     });
                 });
             });
-            return $http.post(dhisUrl.approvalMultipleL1, payload);
+            // TODO: Remove catch block after 6.0 update
+            return $http.post(dhisUrl.approvalMultipleL1, payload)
+                .catch(function (response) {
+                    if (response.status == 409 && _.contains(response.data, "Data set is locked:")) {
+                        return $q.when();
+                    }
+                    else {
+                        return $q.reject();
+                    }
+                });
         };
 
         this.markAsApproved = function(dataSets, periodsAndOrgUnits, approvedBy, approvalDate) {

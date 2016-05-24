@@ -242,7 +242,8 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                     $scope.itemsAwaitingApprovalAtUserLevel = _.filter($scope.dashboardData, {
                         'isSubmitted': true,
                         'isComplete': false,
-                        'isNotSynced': false
+                        'isNotSynced': false,
+                        'isApproved': false
                     });
 
                     $scope.itemsAwaitingApprovalAtOtherLevels = _.filter($scope.dashboardData, {
