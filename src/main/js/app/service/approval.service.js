@@ -99,7 +99,7 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
             return $q.all(markAsUnapprovedPromises);
         };
 
-        this.getCompletionData = function(orgUnits, originOrgUnits, dataSets) {
+        this.getCompletionData = function(orgUnits, originOrgUnits, dataSets, period) {
             var transform = function(response) {
                 if (!response.data.completeDataSetRegistrations)
                     return [];
@@ -128,8 +128,16 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                 }, []);
             };
 
-            var endDate = moment().format("YYYY-MM-DD");
-            var startDate = moment(endDate).subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
+            var startDate,
+                endDate;
+
+            if(period) {
+                startDate = moment(period, 'YYYY[W]WW').format('YYYY-MM-DD');
+                endDate = moment(period, 'YYYY[W]WW').format('YYYY-MM-DD');
+            } else {
+                endDate = moment().format("YYYY-MM-DD");
+                startDate = moment(endDate).subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
+            }
 
             return $http.get(dhisUrl.approvalL1, {
                 "params": {

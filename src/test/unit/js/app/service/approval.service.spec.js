@@ -298,6 +298,25 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             expect(actualApprovalData).toEqual(expectedApprovalData);
         });
 
+        it("should get completion data for specified period", function() {
+            var originOrgUnits = [{
+                "id": "org1",
+                "parent": {
+                    "id": "mod1"
+                }
+            }];
+            var period = "2014W01",
+                expectedStartDate = moment(period, 'YYYY[W]WW').format('YYYY-MM-DD'),
+                expectedEndDate = moment(period, 'YYYY[W]WW').format('YYYY-MM-DD');
+
+            httpBackend.expectGET(properties.dhis.url + "/api/completeDataSetRegistrations?children=true&dataSet=d1&dataSet=d2&endDate=" + expectedEndDate + "&orgUnit=ou1&orgUnit=ou2&startDate=" + expectedStartDate).respond(200, {});
+
+            approvalService = new ApprovalService(http, db, q);
+            approvalService.getCompletionData(orgUnits, originOrgUnits, dataSets, period);
+
+            httpBackend.flush();
+        });
+
         it("should get approval data by considering the lowest approval level of associated datasets", function() {
             var startDate = moment().subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
             var endDate = moment().format("YYYY-MM-DD");
