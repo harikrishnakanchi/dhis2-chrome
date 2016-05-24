@@ -89,7 +89,7 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
             return $q.all(mergePromises);
         };
 
-        this.run= function () {
+        this.run = function () {
             return datasetRepository.getAll().then(function (allDataSets) {
                 var aggregateDataSetIds = getAggregateDataSetIds(allDataSets);
 

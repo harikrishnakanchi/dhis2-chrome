@@ -140,5 +140,31 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 runConsumer();
                 expect(changeLogRepository.upsert).toHaveBeenCalledWith(changeLogKey, currentTime);
             });
+
+            it('should continue to merge and save modules even if one module failed', function() {
+                var period = '2016W21',
+                    mockModuleA = { id: 'mockModuleIdA' },
+                    mockModuleB = { id: 'mockModuleIdB' },
+                    mockModuleC = { id: 'mockModuleIdC' },
+                    mockModuleDataBlockA = { moduleId: mockModuleA.id, period: period, moduleName: 'someModuleName' },
+                    mockModuleDataBlockB = { moduleId: mockModuleB.id, period: period, moduleName: 'someModuleName' },
+                    mockModuleDataBlockC = { moduleId: mockModuleC.id, period: period, moduleName: 'someModuleName' };
+
+                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [mockModuleA, mockModuleB, mockModuleC]));
+
+                moduleDataBlockFactory.createForModule.and.callFake(function (moduleId) {
+                    var mockModuleDataBlocks = [mockModuleDataBlockA, mockModuleDataBlockB, mockModuleDataBlockC];
+                    return utils.getPromise(q, _.filter(mockModuleDataBlocks, { moduleId: moduleId }));
+                });
+
+                dataService.downloadData.and.callFake(function(moduleId) {
+                    return moduleId == mockModuleB.id ? utils.getRejectedPromise(q, {}) : utils.getPromise(q, []);
+                });
+
+                runConsumer();
+                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockA, undefined, undefined, undefined);
+                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).not.toHaveBeenCalledWith(mockModuleDataBlockB, undefined, undefined, undefined);
+                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockC, undefined, undefined, undefined);
+            });
         });
     });
