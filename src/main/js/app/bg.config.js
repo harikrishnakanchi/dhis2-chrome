@@ -103,6 +103,7 @@ require.config({
         "downloadChartDataConsumer": "app/consumer/download.chart.data.consumer",
         "uploadReferralLocationsConsumer": "app/consumer/upload.referral.locations.consumer",
         "downloadModuleDataBlocksConsumer": "app/consumer/download.module.data.blocks.consumer",
+        "syncModuleDataBlockConsumer": "app/consumer/sync.module.data.block.consumer",
 
         //merge strategies
         "mergeBy": "app/consumer/mergestrategies/merge.by",
