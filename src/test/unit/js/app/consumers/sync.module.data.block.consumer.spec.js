@@ -36,7 +36,7 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
                 spyOn(dataSetRepository, 'getAll').and.returnValue(utils.getPromise(q, [aggregateDataSet]));
 
                 moduleDataBlockFactory = new ModuleDataBlockFactory();
-                spyOn(moduleDataBlockFactory, 'createForModule').and.returnValue(utils.getPromise(q, {}));
+                spyOn(moduleDataBlockFactory, 'create').and.returnValue(utils.getPromise(q, {}));
 
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, 'findAllByParent').and.returnValue(utils.getPromise(q, mockOriginOrgUnits));
@@ -64,7 +64,7 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
 
             it('should instantiate a module data block for one module', function() {
                 runConsumer();
-                expect(moduleDataBlockFactory.createForModule).toHaveBeenCalledWith(mockModule.id, mockPeriod);
+                expect(moduleDataBlockFactory.create).toHaveBeenCalledWith(mockModule.id, mockPeriod);
             });
 
             it('should download data values from DHIS for one module', function() {
@@ -89,7 +89,7 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
                     mockDhisCompletion  = { orgUnit: mockModule.id, period: period, isComplete: true },
                     mockDhisApproval    = { orgUnit: mockModule.id, period: period, isApproved: true };
 
-                moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, [mockModuleDataBlock]));
+                moduleDataBlockFactory.create.and.returnValue(utils.getPromise(q, mockModuleDataBlock));
                 dataService.downloadData.and.returnValue(utils.getPromise(q, [mockDhisDataValue]));
                 approvalService.getCompletionData.and.returnValue(utils.getPromise(q, [mockDhisCompletion]));
                 approvalService.getApprovalData.and.returnValue(utils.getPromise(q, [mockDhisApproval]));

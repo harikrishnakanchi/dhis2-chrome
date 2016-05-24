@@ -1,6 +1,14 @@
 define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
     return function ($q, orgUnitRepository, dataRepository, programEventRepository, approvalDataRepository) {
 
+        var create = function (moduleId, period) {
+            return orgUnitRepository.findAll([moduleId])
+                .then(_.partial(createForModules, _, [period]))
+                .then(function(moduleDataBlocks) {
+                    return _.first(moduleDataBlocks);
+                });
+        };
+
         var createForProject = function (projectId, periodRange) {
             return orgUnitRepository.getAllModulesInOrgUnits(projectId).then(_.partial(createForModules, _, periodRange));
         };
@@ -22,7 +30,7 @@ define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
 
             var getIndexedLineListData = function() {
                 return orgUnitRepository.findAllByParent(moduleIds).then(function (originOrgUnits) {
-                    var startPeriod = periodRange[0],
+                    var startPeriod = _.first(periodRange),
                         originOrgUnitIds = _.pluck(originOrgUnits, 'id');
 
                     var getModuleIdFromOriginOrgUnits = _.memoize(function(originOrgUnitId) {
@@ -71,6 +79,7 @@ define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
         };
 
         return {
+            create: create,
             createForProject: createForProject,
             createForModule: createForModule
         };

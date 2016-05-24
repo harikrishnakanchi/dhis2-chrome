@@ -1,8 +1,7 @@
 define([], function () {
     return function (moduleDataBlockFactory, dataService, datasetRepository, approvalService, orgUnitRepository, moduleDataBlockMerger) {
         var getModuleDataBlock = function(data) {
-            return moduleDataBlockFactory.createForModule(data.moduleId, data.period).then(function (moduleDataBlocks) {
-                var moduleDataBlock = _.find(moduleDataBlocks, { moduleId: data.moduleId, period: data.period });
+            return moduleDataBlockFactory.create(data.moduleId, data.period).then(function (moduleDataBlock) {
                 return _.merge({ moduleDataBlock: moduleDataBlock }, data);
             });
         };

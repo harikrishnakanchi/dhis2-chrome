@@ -289,5 +289,28 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
                     expect(returnedObjects.length).toEqual(3);
                 });
             });
+
+            describe('create', function() {
+                it('should create module data block for specified module and period', function() {
+                    var moduleId = 'someModuleId',
+                        moduleOrgUnit = {},
+                        period = '2016W20',
+                        returnedObject = null;
+
+                    orgUnitRepository.findAll.and.returnValue(utils.getPromise(q, [moduleOrgUnit]));
+
+                    var mockModuleDataBlock = 'myModuleDataBlock';
+                    ModuleDataBlock.create.and.returnValue(mockModuleDataBlock);
+
+                    moduleDataBlockFactory.create(moduleId, period).then(function (data) {
+                        returnedObject = data;
+                    });
+                    scope.$apply();
+
+                    expect(orgUnitRepository.findAll).toHaveBeenCalledWith([moduleId]);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, period, {}, [], {});
+                    expect(returnedObject).toEqual(mockModuleDataBlock);
+                });
+            });
         });
 });
