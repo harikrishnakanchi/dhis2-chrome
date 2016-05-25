@@ -5,6 +5,7 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         this.moduleName = parseModuleName(orgUnit);
         this.lineListService = CustomAttributes.parseAttribute(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
 
+        this.dataValues = aggregateDataValues ? aggregateDataValues.dataValues : [];
         this.dataValuesLastUpdated = getMostRecentDataValueTimestamp(aggregateDataValues);
         this.dataValuesLastUpdatedOnDhis = getMostRecentDataValueTimestampFromDhis(aggregateDataValues);
 

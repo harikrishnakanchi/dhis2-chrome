@@ -146,6 +146,21 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
         });
 
+        describe('dataValues', function() {
+            it('should return empty array if aggregateDataValues are undefined', function() {
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.dataValues).toEqual([]);
+            });
+
+            it('should return aggregateDataValues', function() {
+                var dataValues = [{'value': "someValue"}];
+                aggregateDataValues = {
+                    dataValues: dataValues
+                };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.dataValues).toEqual(dataValues);
+            });
+        });
         describe('approvedAtProjectLevel', function() {
             it('should be true if approvalData has completed status as true', function() {
                 approvalData = {
