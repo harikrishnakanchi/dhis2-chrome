@@ -165,6 +165,8 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     $rootScope.setLocale = function(locale) {
                         translationsService.setLocale(locale);
                         $rootScope.locale = locale;
+
+                        $rootScope.layoutDirection = locale == 'ar' ? { 'direction': 'rtl' } : {};
                     };
 
                     systemSettingRepository.getLocale().then($rootScope.setLocale);
