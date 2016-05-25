@@ -48,10 +48,11 @@ define([], function () {
                     moduleId: messageData.moduleId,
                     period: messageData.period,
                     dataSetIds: aggregateDataSetIds
-                }).then(getDataValuesFromDhis)
-                    .then(getCompletionFromDhis)
-                    .then(getApprovalFromDhis)
-                    .then(mergeAndSaveModuleDataBlock);
+                })
+                .then(getDataValuesFromDhis)
+                .then(getCompletionFromDhis)
+                .then(getApprovalFromDhis)
+                .then(mergeAndSaveModuleDataBlock);
             });
         };
     };
