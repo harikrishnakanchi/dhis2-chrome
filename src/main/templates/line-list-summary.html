@@ -138,7 +138,7 @@
                             </div>
                         </div>
                     </div>
-                    <div ng-if="filterBy === 'eventSummary'">
+                    <div ng-if="filterBy === 'eventSummary'"  class="linelistSummary">
                         <div ng-include=" 'templates/partials/data-entry.html'"></div>
                         <div ng-if="!loading &amp;&amp; week &amp;&amp; selectedModule" ng-include="'templates/partials/line-list-offline-approval.html'">
                         </div>

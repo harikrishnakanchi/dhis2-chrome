@@ -1,24 +1,27 @@
-<div>
-    <div class="alert alert-info" ng-if="noNotificationsForAnyModule"> {{resourceBundle.noNotificationsForAnyModule}} </div>
-    <div ng-repeat="(moduleName, dataElementValues) in allDataElementValues | groupBy : 'moduleName'" ng-if="showTable(dataElementValues)">
-        <h4 class="text-center">{{moduleName}}</h4>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>{{ resourceBundle.dataElement }}</th>
-                    <th ng-repeat="week in weeks">
-                        {{week}}
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-if="dataElementValue.showInNotifications" ng-repeat="dataElementValue in dataElementValues">
-                    <td>{{dataElementValue.dataElementName}}</td>
-                    <td ng-class="{'red-cell': (dataElementValue.weeklyData[week]['value'] > dataElementValue.weeklyData[week]['max']) }" ng-repeat="week in weeks">
-                        {{dataElementValue.weeklyData[week]['value']}}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+<div class="dataentrypage parent-margin {{ layoutDirection.direction}}">
+    <section class="tab-panel">
+        <div class="alert alert-info" ng-if="noNotificationsForAnyModule"> {{resourceBundle.noNotificationsForAnyModule}} </div>
+        <div ng-repeat="(moduleName, dataElementValues) in allDataElementValues | groupBy : 'moduleName'" ng-if="showTable(dataElementValues)">
+            <br ng-if="!$first" />
+            <h4 class="">{{moduleName}}</h4>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>{{ resourceBundle.dataElement }}</th>
+                        <th ng-repeat="week in weeks">
+                            {{week}}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-if="dataElementValue.showInNotifications" ng-repeat="dataElementValue in dataElementValues">
+                        <td>{{dataElementValue.dataElementName}}</td>
+                        <td ng-class="{'red-cell': (dataElementValue.weeklyData[week]['value'] > dataElementValue.weeklyData[week]['max']) }" ng-repeat="week in weeks">
+                            {{dataElementValue.weeklyData[week]['value']}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
 </div>
