@@ -18,7 +18,7 @@ define(["properties"], function(properties) {
         "orgUnitGroups": with_host("/api/organisationUnitGroups"),
         "orgUnits": with_host("/api/organisationUnits.json"),
         "users": with_host("/api/users"),
-        "getProgramsAndStages": with_host("/api/programs.json?fields=id,name,displayName,organisationUnits,attributeValues[:identifiable,value,attribute[:identifiable]],programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false"),
+        "getProgramsAndStages": with_host("/api/programs.json?fields=id,name,displayName,shortName,programType,organisationUnits,attributeValues[:identifiable,value,attribute[:identifiable]],programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false"),
         "dataSets": with_host("/api/dataSets"),
         "charts": with_host("/api/charts"),
         "pivotTables": with_host("/api/reportTables"),

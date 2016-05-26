@@ -106,6 +106,37 @@ define(["userPreferenceRepository", "angularMocks", "utils", "moment", "orgUnitR
             });
         });
 
+        describe('getCurrentUserPreferences', function() {
+            it('should get current user preferences', function() {
+                var userPrefs = [{
+                    'username': 'msfadmin',
+                    'lastUpdated': '',
+                    'organisationUnits': []
+                }, {
+                    'username': 'new_user',
+                    'lastUpdated': moment('2015-08-24').toISOString(),
+                    'organisationUnits': [{
+                        'id': 'proj1'
+                    }]
+                }, {
+                    'username': 'new2_user',
+                    'lastUpdated': moment('2015-08-23').toISOString(),
+                    'organisationUnits': [{
+                        'id': 'proj2'
+                    }]
+                }];
+
+                mockStore.getAll.and.returnValue(utils.getPromise(q, userPrefs));
+                var actualUserPreferences;
+                userPreferenceRepository.getCurrentUsersPreferences().then(function(data) {
+                    actualUserPreferences = data;
+                });
+                scope.$apply();
+
+                expect(actualUserPreferences).toEqual(userPrefs[1]);
+            });
+        });
+
         describe('getCurrentUsersProjectIds', function() {
             it('should get current user projects', function() {
                 var userPrefs = [{

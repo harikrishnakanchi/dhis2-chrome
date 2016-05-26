@@ -20,13 +20,35 @@ define(["lodash", "migrations", "dateUtils", "properties", "moment"], function(_
             return store.getAll();
         };
 
+        var skipSpecificData = function(storeName, keyPathValues, keyPath) {
+            var store = db.objectStore(storeName);
+            return store.getAll().then(function (allData) {
+                return _.filter(allData, function (eachEntry) {
+                    return !_.contains(keyPathValues, eachEntry[keyPath]);
+                });
+            });
+        };
+
         var backupByPeriodStores = ["dataValues", "programEvents"];
+        var storesToSkipSpecificData = {
+            "systemSettings" : {
+                "keyPathValues" : ["productKey", "praxisUid"],
+                "keyPath" : "key"
+            }
+        };
 
         var backupStores = function(dbName, storeNames) {
-            var backupPromises = _.map(storeNames, function(name) {
-                var callback = (_.contains(backupByPeriodStores, name)) && (dbName === MSF) ? backupByPeriod : backupAll;
-                return callback(name);
 
+            var backupPromises = _.map(storeNames, function(name) {
+                var callback;
+                if (!_.contains(_.keys(storesToSkipSpecificData), name)) {
+                    callback = (_.contains(backupByPeriodStores, name)) && (dbName === MSF) ? backupByPeriod : backupAll;
+                }
+                else {
+                    var storeToSkip = storesToSkipSpecificData[name];
+                    callback = _.partial(skipSpecificData, _, storeToSkip.keyPathValues, storeToSkip.keyPath);
+                }
+                return callback(name);
             });
             return $q.all(backupPromises).then(function(data) {
                 return _.zipObject(storeNames, data);
@@ -35,8 +57,11 @@ define(["lodash", "migrations", "dateUtils", "properties", "moment"], function(_
 
         var truncate = function(storeNames) {
             var truncatePromises = _.map(storeNames, function(name) {
-                var store = db.objectStore(name);
-                return store.clear();
+                if (!_.contains(_.keys(storesToSkipSpecificData), name)){
+                    var store = db.objectStore(name);
+                    return store.clear();
+                }
+                return ;
             });
             return $q.all(truncatePromises);
         };
@@ -101,7 +126,7 @@ define(["lodash", "migrations", "dateUtils", "properties", "moment"], function(_
                 var insertAll = function() {
                     var insertPromises = _.map(storeNames, function(name) {
                         var store = db.objectStore(name);
-                        store.insert(_.flatten(data[name]));
+                        store.upsert(_.flatten(data[name]));
                     });
                     return $q.all(insertPromises);
                 };

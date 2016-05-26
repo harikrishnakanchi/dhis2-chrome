@@ -99,6 +99,13 @@ define(["moment"], function(moment) {
             });
         };
 
+        $scope.hasDuplicateReferralLocations = function() {
+            var allReferralLocations = _.filter(_.pluck($scope.referralLocations, "aliasName"), function(aliasName) {
+                return !_.isEmpty(aliasName);
+            });
+            return _.uniq(allReferralLocations).length != allReferralLocations.length;
+        };
+
         var init = function() {
             referralLocationsRepository.get($scope.orgUnit.id).then(function(data) {
                 $scope.referralLocations = transformFromDb(data);

@@ -1,16 +1,17 @@
 define(["md5", "properties", "lodash", "chromeUtils"], function(md5, properties, _, chromeUtils) {
     return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository) {
         var loadUserData = function(loginUsername) {
-            var getExistingUserProjects = function() {
-                return userPreferenceRepository.getCurrentUsersProjectIds();
-            };
+            var existingUserProjects = userPreferenceRepository.getCurrentUsersProjectIds();
+            var previousUser = userPreferenceRepository.getCurrentUsersUsername().then(function (username) {
+                return username ? userRepository.getUser(username) : username;
+            });
             var user = userRepository.getUser(loginUsername);
             var userCredentials = userRepository.getUserCredentials(loginUsername);
-            return $q.all([user, userCredentials, getExistingUserProjects()]);
+            return $q.all([user, userCredentials, existingUserProjects, previousUser]);
         };
 
         var isRole = function(user, role) {
-            return _.find(user.userCredentials.userRoles, {
+            return user && _.find(user.userCredentials.userRoles, {
                 "name": role
             });
         };
@@ -95,9 +96,18 @@ define(["md5", "properties", "lodash", "chromeUtils"], function(md5, properties,
 
         var startProjectDataSync = function(data) {
             var previousUserProjects = data[2];
+            var isAdminUser = function(user) {
+                return !!(isRole(user, 'Superuser') || isRole(user, 'Superadmin'));
+            };
 
             userPreferenceRepository.getCurrentUsersProjectIds().then(function(currentUserProjects) {
-                if (!_.isEqual(previousUserProjects,currentUserProjects)){
+                var currentUser = data[0],
+                    previousUser = data[3];
+
+                var roleChanged = isAdminUser(currentUser) ^ isAdminUser(previousUser);
+                var projectChanged = !_.isEqual(previousUserProjects, currentUserProjects);
+
+                if (projectChanged || roleChanged) {
                     $hustle.publish({
                         "type": "downloadProjectData",
                         "data": []

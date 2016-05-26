@@ -1,4 +1,4 @@
-define(["lodash", "cipherUtils", "properties"], function(_, cipherUtils, properties) {
+define(["lodash", "cipherUtils", "properties", "dhisId"], function(_, cipherUtils, properties, dhisId) {
     return function(db, $q, $rootScope) {
         var decryptProductKey = function(productKey) {
             return cipherUtils.decrypt(productKey);
@@ -56,9 +56,7 @@ define(["lodash", "cipherUtils", "properties"], function(_, cipherUtils, propert
         var get = function(key) {
             var store = db.objectStore("systemSettings");
             return store.find(key).then(function(setting) {
-                if (setting)
-                    return setting.value;
-                return $q.reject();
+                return setting ? setting.value : $q.reject();
             });
         };
 
@@ -110,6 +108,24 @@ define(["lodash", "cipherUtils", "properties"], function(_, cipherUtils, propert
             });
         };
 
+        var getPraxisUid = function () {
+            var praxisUidKey = "praxisUid";
+
+            var createPraxisUid = function () {
+                var uId = dhisId.get("b1gstr1ngWhichHa5Prax1sUid");
+                return upsert({"key": praxisUidKey, "value": uId})
+                    .then(function (setting) {
+                        return setting.value;
+                    });
+            };
+
+            var returnPraxisUid = function (uId) {
+                return uId;
+            };
+
+            return get(praxisUidKey).then(returnPraxisUid, createPraxisUid);
+        };
+
         return {
             "upsert": upsert,
             "upsertProductKey": upsertProductKey,
@@ -122,7 +138,8 @@ define(["lodash", "cipherUtils", "properties"], function(_, cipherUtils, propert
             "isProductKeySet": isProductKeySet,
             "loadProductKey": loadProductKey,
             "getAllowedOrgUnits": getAllowedOrgUnits,
-            "getProductKeyLevel": getProductKeyLevel
+            "getProductKeyLevel": getProductKeyLevel,
+            "getPraxisUid": getPraxisUid
         };
     };
 });

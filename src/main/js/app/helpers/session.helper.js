@@ -5,7 +5,8 @@ define(["moment"], function(moment) {
                 "username": $rootScope.currentUser.userCredentials.username,
                 "organisationUnits": $rootScope.currentUser.organisationUnits,
                 "selectedProject": $rootScope.currentUser.selectedProject,
-                "lastUpdated": moment().toISOString()
+                "lastUpdated": moment().toISOString(),
+                "userRoles": $rootScope.currentUser.userCredentials.userRoles
             };
             return userPreferenceRepository.save(userPreferences);
         };

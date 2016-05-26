@@ -69,6 +69,13 @@ define(["lodash", "moment"], function(_, moment) {
                 return programsStore.find(programId);
             };
 
+            // This method can be removed after release > 6.0
+            var addMandatoryFields = function (program) {
+                program.shortName = program.shortName || program.name;
+                program.programType = program.programType || "WITHOUT_REGISTRATION";
+                return program;
+            };
+
             var enrichDataElements = function(program) {
                 if (!program) return undefined;
 
@@ -91,7 +98,8 @@ define(["lodash", "moment"], function(_, moment) {
             };
 
             return getProgram(programId)
-                .then(enrichDataElements);
+                .then(enrichDataElements)
+                .then(addMandatoryFields);
         };
 
         this.associateOrgUnits = function(program, orgUnits) {

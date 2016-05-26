@@ -240,7 +240,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             };
             dispatcher.run(message);
             scope.$apply();
-            expect(updateDatasetConsumer.run).toHaveBeenCalledWith(message, {});
+            expect(updateDatasetConsumer.run).toHaveBeenCalledWith(message);
         });
 
         it("should fail if no hanlder found of payload type", function() {
