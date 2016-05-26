@@ -1,8 +1,8 @@
-define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'dataService', 'angularMocks', 'utils', 'moment', 'lodash', 'mergeBy'],
-    function(ModuleDataBlockMerger, DataRepository, ApprovalDataRepository, DataService, mocks, utils, moment, _ , MergeBy) {
+define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'datasetRepository', 'dataService', 'approvalService', 'angularMocks', 'utils', 'moment', 'lodash', 'mergeBy'],
+    function(ModuleDataBlockMerger, DataRepository, ApprovalDataRepository, DatasetRepository, DataService, ApprovalService, mocks, utils, moment, _ , MergeBy) {
         describe('moduleDataBlockMerger', function() {
             var q, scope, moduleDataBlockMerger,
-                dataRepository, approvalRepository, dataService, mergeBy,
+                dataRepository, approvalRepository, datasetRepository, dataService, approvalService, mergeBy,
                 dhisDataValues, dhisCompletion, dhisApproval, moduleDataBlock, someMomentInTime;
 
             beforeEach(mocks.inject(function($q, $rootScope, $log) {
@@ -16,12 +16,18 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                 spyOn(approvalRepository, 'saveApprovalsFromDhis').and.returnValue(utils.getPromise(q, {}));
                 spyOn(approvalRepository, 'invalidateApproval').and.returnValue(utils.getPromise(q, {}));
 
+                datasetRepository = new DatasetRepository();
+                spyOn(datasetRepository, 'getAll').and.returnValue(utils.getPromise(q, {}));
+
                 dataService = new DataService();
                 spyOn(dataService, 'save').and.returnValue(utils.getPromise(q, {}));
 
+                approvalService = new ApprovalService();
+                spyOn(approvalService, 'markAsComplete').and.returnValue(utils.getPromise(q, {}));
+
                 mergeBy = new MergeBy($log);
 
-                moduleDataBlockMerger = new ModuleDataBlockMerger(dataRepository, approvalRepository, mergeBy, dataService, q);
+                moduleDataBlockMerger = new ModuleDataBlockMerger(dataRepository, approvalRepository, mergeBy, dataService, q, datasetRepository, approvalService);
 
                 moduleDataBlock = {};
                 dhisDataValues = undefined;
@@ -240,14 +246,13 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                     });
                 });
             });
-            
+
             describe('uploadToDHIS', function() {
+                var performUpload = function () {
+                    moduleDataBlockMerger.uploadToDHIS(moduleDataBlock);
+                    scope.$apply();
+                };
                 describe('data values exist only in Praxis', function() {
-                    var performUpload = function () {
-                        moduleDataBlockMerger.uploadToDHIS(moduleDataBlock);
-                        scope.$apply();
-                    };
-                    
                     it('should upload data values to DHIS', function() {
                         var localDataValueA = createMockDataValue({ dataElement: 'dataElementA', clientLastUpdated: someMomentInTime });
 
@@ -256,6 +261,49 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         performUpload();
                         expect(dataService.save).toHaveBeenCalledWith(moduleDataBlock.dataValues);
                     });
+                });
+
+                describe('data values exist on both DHIS and Praxis with same timestamp', function() {
+                    it('should not upload data values to DHIS', function() {
+                        var localDataValueA = createMockDataValue({ dataElement: 'dataElementA', clientLastUpdated: someMomentInTime });
+
+                        moduleDataBlock = createMockModuleDataBlock({
+                            dataValues: [localDataValueA],
+                            dataValuesLastUpdatedOnDhis:  someMomentInTime.toISOString(),
+                            dataValuesLastUpdated: someMomentInTime
+                        });
+
+                        performUpload();
+                        expect(dataService.save).not.toHaveBeenCalled();
+                    });
+                });
+                
+                describe('upload data values and approvals from praxis to DHIS when there is no data on DHIS', function() {
+                    it('should upload data values and completion data from Praxis to DHIS', function() {
+                        var localDataValueA = createMockDataValue({ dataElement: 'dataElementA', clientLastUpdated: someMomentInTime });
+
+                        moduleDataBlock = createMockModuleDataBlock({
+                            dataValues: [localDataValueA],
+                            approvedAtProjectLevel: true,
+                            approvalData : createMockDhisCompletion()
+                        });
+
+                        var dataSets = [{id: 'dataSetid1'}, {id: 'dataSetid2'}];
+                        var dataSetIds = ['dataSetid1', 'dataSetid2'];
+
+                        datasetRepository.getAll.and.returnValue(utils.getPromise(q, dataSets));
+
+                        var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId};
+
+                        performUpload();
+                        expect(dataService.save).toHaveBeenCalledWith(moduleDataBlock.dataValues);
+                        
+                        expect(approvalService.markAsComplete).toHaveBeenCalledWith(dataSetIds,
+                                                                                    [periodAndOrgUnit],
+                                                                                     moduleDataBlock.approvalData.completedBy,
+                                                                                     moduleDataBlock.approvalData.completedOn);
+                    });
+
                 });
             });
         });

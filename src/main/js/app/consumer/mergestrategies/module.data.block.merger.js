@@ -1,6 +1,6 @@
 define(['moment', 'lodash'],
     function(moment, _) {
-        return function(dataRepository, approvalDataRepository, mergeBy, dataService, $q) {
+        return function(dataRepository, approvalDataRepository, mergeBy, dataService, $q, datasetRepository, approvalService) {
 
             var mergeAndSaveToLocalDatabase = function(moduleDataBlock, updatedDhisDataValues, dhisCompletion, dhisApproval) {
                 var updatedDhisDataValuesExist = updatedDhisDataValues && updatedDhisDataValues.length > 0,
@@ -70,8 +70,30 @@ define(['moment', 'lodash'],
                 return mergeAndSaveDataValues().then(mergeAndSaveCompletionAndApproval);
             };
 
+
             var uploadToDHIS = function (moduleDataBlock) {
-                return dataService.save(moduleDataBlock.dataValues);
+
+                var uploadDataValuestoDHIS = function () {
+                    if(moduleDataBlock.dataValuesLastUpdated != moduleDataBlock.dataValuesLastUpdatedOnDhis) {
+                        return dataService.save(moduleDataBlock.dataValues);
+                    }
+                    return $q.when({});
+                };
+
+                var uploadCompletionData = function () {
+                    if(moduleDataBlock.approvedAtProjectLevel) {
+                        return datasetRepository.getAll().then(function (allDatasets) {
+                            var datasetIds = _.pluck(allDatasets, 'id');
+                            var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId};
+                            var completedBy = moduleDataBlock.approvalData.completedBy;
+                            var completedOn = moduleDataBlock.approvalData.completedOn;
+
+                            return approvalService.markAsComplete(datasetIds, [periodAndOrgUnit], completedBy, completedOn);
+                        });
+                    }
+                };
+
+                return uploadDataValuestoDHIS().then(uploadCompletionData);
             };
 
             return {
