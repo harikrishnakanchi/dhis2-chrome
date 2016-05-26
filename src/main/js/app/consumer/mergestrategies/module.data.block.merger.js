@@ -1,6 +1,6 @@
 define(['moment', 'lodash'],
     function(moment, _) {
-        return function(dataRepository, approvalDataRepository, mergeBy, $q) {
+        return function(dataRepository, approvalDataRepository, mergeBy, dataService, $q) {
 
             var mergeAndSaveToLocalDatabase = function(moduleDataBlock, updatedDhisDataValues, dhisCompletion, dhisApproval) {
                 var updatedDhisDataValuesExist = updatedDhisDataValues && updatedDhisDataValues.length > 0,
@@ -70,8 +70,13 @@ define(['moment', 'lodash'],
                 return mergeAndSaveDataValues().then(mergeAndSaveCompletionAndApproval);
             };
 
+            var uploadToDHIS = function (moduleDataBlock) {
+                return dataService.save(moduleDataBlock.dataValues);
+            };
+
             return {
-                mergeAndSaveToLocalDatabase: mergeAndSaveToLocalDatabase
+                mergeAndSaveToLocalDatabase: mergeAndSaveToLocalDatabase,
+                uploadToDHIS: uploadToDHIS
             };
         };
     });
