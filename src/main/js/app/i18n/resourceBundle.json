@@ -317,5 +317,10 @@
     "projectInformationLabel": "Project Information",
     "pleaseWaitLabel": "Please wait...",
     "selectBtnLabel": "Select",
-    "dateRangeError": "Start date cannot be greater than end date."
+    "dateRangeError": "Start date cannot be greater than end date.",
+    "incompatiblePraxisVersion": "Current version of Praxis is not compatible with DHIS.",
+    "praxis": "Praxis",
+    "newUpgradeAvailable": "is available.",
+    "clickToUpgrade": "To upgrade click ",
+    "here": "here"
 }

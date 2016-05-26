@@ -24,6 +24,7 @@ var passphrase = argv.passphrase || "My Product Key";
 var iter = argv.iter || 1000;
 var ks = argv.ks || 128;
 var ts = argv.ts || 64;
+var extensionId = argv.extensionId || "My Extension ID";
 
 gulp.task('test', function(onDone) {
     new karmaServer({
@@ -86,7 +87,8 @@ gulp.task('config', function() {
                 PASSPHRASE: passphrase,
                 ITER: iter,
                 KS: ks,
-                TS: ts
+                TS: ts,
+                EXTENSION_ID: extensionId
             }
         }))
         .pipe(gulp.dest('./src/main/js/app/conf'));
@@ -124,7 +126,7 @@ gulp.task('download-programs', function() {
 });
 
 gulp.task('download-fieldapp-settings', function() {
-    return download(baseIntUrl + "/api/systemSettings.json?key=fieldAppSettings", auth)
+    return download(baseIntUrl + "/api/systemSettings.json?key=fieldAppSettings,versionCompatibilityInfo", auth)
         .pipe(rename("systemSettings.json"))
         .pipe(gulp.dest(path.dirname("src/main/data/systemSettings.json")));
 });

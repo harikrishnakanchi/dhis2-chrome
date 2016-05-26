@@ -1,4 +1,4 @@
-define(["md5", "lodash"], function(md5, _) {
+define(["md5", "properties", "lodash", "chromeUtils"], function(md5, properties, _, chromeUtils) {
     return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository) {
         var loadUserData = function(loginUsername) {
             var getExistingUserProjects = function() {
@@ -124,5 +124,34 @@ define(["md5", "lodash"], function(md5, _) {
                 .then(startProjectDataSync)
                 .then(redirect);
         };
+
+        var checkPraxisCompatibility = function () {
+            var checkCompatibility = function(compatiblePraxisVersions) {
+                var praxisVersion = chromeUtils.getPraxisVersion();
+                $scope.incompatibleVersion = !_.contains(compatiblePraxisVersions, praxisVersion);
+                if(!$scope.incompatibleVersion) {
+                    var latestVersion = _.max(compatiblePraxisVersions, function (version) {
+                        return parseFloat(version);
+                    });
+                    if (praxisVersion != latestVersion) {
+                        $scope.newerVersionAvailable = true;
+                        $scope.newerVersionNumber = latestVersion;
+                    }
+                }
+            };
+
+            var objectStoreNotFound = function() {
+                $scope.incompatibleVersion = false;
+                $scope.newerVersionAvailable = false;
+            };
+
+            return systemSettingRepository.get("compatiblePraxisVersions")
+                .then(checkCompatibility, objectStoreNotFound);
+        };
+
+        $scope.extension_id = properties.extension_id;
+        checkPraxisCompatibility();
+
+
     };
 });

@@ -3,6 +3,7 @@ define([], function() {
         "dhis": {
             "authHeader": "Basic YWRtaW46ZGlzdHJpY3Q=",
             "productKeyLevel": "global"
-        }
+        },
+        "extension_id": "extensionID"
     };
 });

@@ -3,6 +3,16 @@
         <p class='alert alert-danger' ng-show='invalidCredentials' id="loginFailedMsg">{{ resourceBundle.loginFailed }}</p>
         <p class='alert alert-danger' ng-show='invalidAccess' id="invalidAccessMsg">{{ resourceBundle.invalidAccess }}</p>
         <p class='alert alert-danger' ng-show='disabledCredentials' id="userDisabledMsg">{{ resourceBundle.disabledCredentials }}</p>
+        <p class='alert alert-danger' ng-show='incompatibleVersion'>
+            {{ resourceBundle.incompatiblePraxisVersion }}<br>
+            {{ resourceBundle.clickToUpgrade }}
+            <a href="https://chrome.google.com/webstore/detail/praxis/{{extension_id}}" target="_blank">{{ resourceBundle.here }}</a>
+        </p>
+        <p class='alert alert-info' ng-show="newerVersionAvailable">
+            {{ resourceBundle.praxis + ' v' + newerVersionNumber + ' ' + resourceBundle.newUpgradeAvailable }}
+            {{ resourceBundle.clickToUpgrade }}
+            <a href="https://chrome.google.com/webstore/detail/praxis/{{extension_id}}" target="_blank">{{ resourceBundle.here }}</a>
+        </p>
         <ul>
             <li class="form-group">
                 <label for="username" class="col-sm-4 control-label">{{ resourceBundle.usernameLabel }}</label>
@@ -18,7 +28,7 @@
             </li>
             <li class="form-group">
                 <div class=" col-sm-offset-4 col-md-offset-4 col-sm-8">
-                    <input type="submit" ng-disabled="loginForm.$invalid" value="{{ resourceBundle.loginBtn }}" class="btn btn-primary" id="loginButton">
+                    <input type="submit" ng-disabled="loginForm.$invalid || incompatibleVersion" value="{{ resourceBundle.loginBtn }}" class="btn btn-primary" id="loginButton">
                 </div>
             </li>
 

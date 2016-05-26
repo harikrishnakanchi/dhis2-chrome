@@ -21,13 +21,16 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
         };
 
         var transformFieldAppSettings = function(data) {
-            var result = _.transform(data.fieldAppSettings, function(acc, value, key) {
-                acc.push({
-                    "key": key,
-                    "value": value
-                });
-            }, []);
-            return result;
+            var accumulator = [];
+            _.each(data, function (fieldAppSetting) {
+                _.transform(fieldAppSetting, function(acc, value, key) {
+                    acc.push({
+                        "key": key,
+                        "value": value
+                    });
+                }, accumulator);
+            });
+            return accumulator;
         };
 
         var transformProjectSettings = function(data) {
@@ -63,7 +66,7 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
         };
 
         this.getSystemSettings = function() {
-            return getSettings("fieldAppSettings").then(transformFieldAppSettings);
+            return getSettings("fieldAppSettings,versionCompatibilityInfo").then(transformFieldAppSettings);
         };
 
         this.getProjectSettings = function(projectIds) {
