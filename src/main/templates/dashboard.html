@@ -1,4 +1,4 @@
-<div class="dataentrypage parent-margin" ng-controller="dashboardController"
+<div class="dataentrypage parent-margin {{ layoutDirection.direction }} dashboardpage" ng-controller="dashboardController"
      ng-if="hasRoles(['Data entry user', 'Project Level Approver', 'Coordination Level Approver','Observer'])">
     <div class="panel-group-custom-spacing">
         <div class="loading" ng-show="loading">
@@ -29,7 +29,7 @@
                 <tr>
                     <th>{{resourceBundle.moduleLabel}}</th>
                     <th ng-model="weeks">
-                        <input type="checkbox" class="dashboard-form-checkbox"
+                        <input type="checkbox" class="dashboard-form-checkbox select-all-checkbox"
                                ng-change="toggleSelectAll(selectedAllItemsForApproval)"
                                ng-model="selectedAllItemsForApproval"
                                ng-checked="(itemsAwaitingApprovalAtUserLevel | filter : { 'selectedForApproval': true}).length === itemsAwaitingApprovalAtUserLevel.length">{{resourceBundle.weekLabelForApproval}}
