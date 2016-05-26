@@ -202,13 +202,15 @@ define(["lodash", "moment"], function(_, moment) {
                     return {
                         "name": categoryOption.name,
                         "sortOrder": index + 1,
-                        "id": categoryOption.id
+                        "id": categoryOption.id,
+                        "code": categoryOption.code
                     };
                 });
             };
 
             if ($scope.isCategoryPresent) {
                 var sortedCategories = getSortedCategories();
+                var indexedSortedCategories = _.indexBy(sortedCategories, 'id');
 
                 $scope.hasOnlyOneCategory = sortedCategories.length === 1;
                 var sortedCategoryNamesForDisplay = [];
@@ -234,6 +236,7 @@ define(["lodash", "moment"], function(_, moment) {
 
             dataElements = _.uniq(_.pluck($scope.dataMap, "dataElement"));
 
+
             _.each(dataElements, function(dataElementId) {
 
                 var sortKeysAndValues = {};
@@ -241,7 +244,14 @@ define(["lodash", "moment"], function(_, moment) {
                     var filteredObjects = _.filter($scope.dataMap, function(data) {
                          return data.dataElement === dataElementId && data.period === period;
                     });
-                    var dataValues = _.map(filteredObjects, function (dataValue) {
+                    var filteredExcludedCategoryOptions = _.filter(filteredObjects, function(data){
+                        if(data.category) {
+                         var categoryOption = indexedSortedCategories[data.category];
+                         return !(categoryOption && categoryOption.code && categoryOption.code.indexOf("_excludeFromTotal") > -1);
+                        }
+                        return true;
+                    });
+                    var dataValues = _.map(filteredExcludedCategoryOptions, function (dataValue) {
                         return dataValue.value;
                     });
                     sortKeysAndValues['sortKey_' + period] = _.reduce(dataValues, function(previous, current) {
