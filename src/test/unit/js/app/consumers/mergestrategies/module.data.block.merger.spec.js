@@ -24,6 +24,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                 approvalService = new ApprovalService();
                 spyOn(approvalService, 'markAsComplete').and.returnValue(utils.getPromise(q, {}));
+                spyOn(approvalService, 'markAsApproved').and.returnValue(utils.getPromise(q, {}));
 
                 mergeBy = new MergeBy($log);
 
@@ -252,7 +253,8 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                     moduleDataBlockMerger.uploadToDHIS(moduleDataBlock);
                     scope.$apply();
                 };
-                describe('data values exist only in Praxis', function() {
+
+                describe('data and approvals exist only on Praxis', function () {
                     it('should upload data values to DHIS', function() {
                         var localDataValueA = createMockDataValue({ dataElement: 'dataElementA', clientLastUpdated: someMomentInTime });
 
@@ -261,25 +263,8 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         performUpload();
                         expect(dataService.save).toHaveBeenCalledWith(moduleDataBlock.dataValues);
                     });
-                });
 
-                describe('data values exist on both DHIS and Praxis with same timestamp', function() {
-                    it('should not upload data values to DHIS', function() {
-                        var localDataValueA = createMockDataValue({ dataElement: 'dataElementA', clientLastUpdated: someMomentInTime });
-
-                        moduleDataBlock = createMockModuleDataBlock({
-                            dataValues: [localDataValueA],
-                            dataValuesLastUpdatedOnDhis:  someMomentInTime.toISOString(),
-                            dataValuesLastUpdated: someMomentInTime
-                        });
-
-                        performUpload();
-                        expect(dataService.save).not.toHaveBeenCalled();
-                    });
-                });
-                
-                describe('upload data values and approvals from praxis to DHIS when there is no data on DHIS', function() {
-                    it('should upload data values and completion data from Praxis to DHIS', function() {
+                    it('should upload completion data from Praxis to DHIS', function() {
                         var localDataValueA = createMockDataValue({ dataElement: 'dataElementA', clientLastUpdated: someMomentInTime });
 
                         moduleDataBlock = createMockModuleDataBlock({
@@ -297,13 +282,69 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                         performUpload();
                         expect(dataService.save).toHaveBeenCalledWith(moduleDataBlock.dataValues);
-                        
+
                         expect(approvalService.markAsComplete).toHaveBeenCalledWith(dataSetIds,
-                                                                                    [periodAndOrgUnit],
-                                                                                     moduleDataBlock.approvalData.completedBy,
-                                                                                     moduleDataBlock.approvalData.completedOn);
+                            [periodAndOrgUnit],
+                            moduleDataBlock.approvalData.completedBy,
+                            moduleDataBlock.approvalData.completedOn);
                     });
 
+                    it('should upload approval data from Praxis to DHIS if data is approved at project level', function() {
+                        var localDataValueA = createMockDataValue({ dataElement: 'dataElementA', clientLastUpdated: someMomentInTime });
+
+                        moduleDataBlock = createMockModuleDataBlock({
+                            dataValues: [localDataValueA],
+                            approvedAtProjectLevel: true,
+                            approvedAtCoordinationLevel: true,
+                            approvalData : createMockDhisApproval()
+                        });
+
+                        var dataSets = [{id: 'dataSetid1'}, {id: 'dataSetid2'}];
+                        var dataSetIds = ['dataSetid1', 'dataSetid2'];
+
+                        datasetRepository.getAll.and.returnValue(utils.getPromise(q, dataSets));
+
+                        var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId};
+
+                        performUpload();
+                        expect(dataService.save).toHaveBeenCalledWith(moduleDataBlock.dataValues);
+
+                        expect(approvalService.markAsApproved).toHaveBeenCalledWith(dataSetIds,
+                            [periodAndOrgUnit],
+                            moduleDataBlock.approvalData.approvedBy,
+                            moduleDataBlock.approvalData.approvedOn);
+                    });
+
+                    it('should not upload approval data from Praxis to DHIS if data is not approved at project level', function() {
+                        var localDataValueA = createMockDataValue({dataElement: 'dataElementA', clientLastUpdated: someMomentInTime});
+
+                        moduleDataBlock = createMockModuleDataBlock({
+                            dataValues: [localDataValueA],
+                            approvedAtProjectLevel: false,
+                            approvedAtCoordinationLevel: true,
+                            approvalData: createMockDhisApproval()
+                        });
+
+                        performUpload();
+                        expect(dataService.save).toHaveBeenCalledWith(moduleDataBlock.dataValues);
+
+                        expect(approvalService.markAsApproved).not.toHaveBeenCalled();
+                    });
+                });
+
+                describe('data values exist on both DHIS and Praxis with same timestamp', function() {
+                    it('should not upload data values to DHIS', function() {
+                        var localDataValueA = createMockDataValue({ dataElement: 'dataElementA', clientLastUpdated: someMomentInTime });
+
+                        moduleDataBlock = createMockModuleDataBlock({
+                            dataValues: [localDataValueA],
+                            dataValuesLastUpdatedOnDhis:  someMomentInTime.toISOString(),
+                            dataValuesLastUpdated: someMomentInTime
+                        });
+
+                        performUpload();
+                        expect(dataService.save).not.toHaveBeenCalled();
+                    });
                 });
             });
         });

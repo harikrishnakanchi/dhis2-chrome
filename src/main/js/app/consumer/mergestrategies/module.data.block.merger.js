@@ -91,9 +91,26 @@ define(['moment', 'lodash'],
                             return approvalService.markAsComplete(datasetIds, [periodAndOrgUnit], completedBy, completedOn);
                         });
                     }
+                    return $q.when({});
                 };
 
-                return uploadDataValuestoDHIS().then(uploadCompletionData);
+                var uploadApprovalData = function () {
+                  if(moduleDataBlock.approvedAtCoordinationLevel && moduleDataBlock.approvedAtProjectLevel) {
+                      return datasetRepository.getAll().then(function (allDatasets) {
+                          var datasetIds = _.pluck(allDatasets, 'id');
+                          var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId};
+                          var approvedBy = moduleDataBlock.approvalData.approvedBy;
+                          var approvedOn = moduleDataBlock.approvalData.approvedOn;
+
+                          return approvalService.markAsApproved(datasetIds, [periodAndOrgUnit], approvedBy, approvedOn);
+                      });
+                  }
+                  return $q.when({});
+
+                };
+                return uploadDataValuestoDHIS()
+                       .then(uploadCompletionData)
+                       .then(uploadApprovalData);
             };
 
             return {
