@@ -110,7 +110,7 @@ define(["lodash"], function(_) {
             }, {});
         };
 
-        var getDataElementValues = function(chartData, module) {
+        var getDataElementValues = function(chart, chartData, module) {
             if (_.isEmpty(chartData) || _.isEmpty(chartData.rows)) {
                 return;
             }
@@ -137,10 +137,18 @@ define(["lodash"], function(_) {
 
                 });
 
+                var dataElement;
+                if(chart.columns) {
+                    dataElement = _.find(chart.columns[0].items, function (item) {
+                        return item.id == dataElementId;
+                    });
+                }
+
                 $scope.allDataElementValues.push({
                     "moduleName": module.parent.name + " - " + module.name,
                     "dataElementId": dataElementId,
                     "dataElementName": chartData.metaData.names[dataElementId],
+                    "dataElementDescription": (dataElement && dataElement.description) ? dataElement.description : '',
                     "weeklyData": weeklyData,
                     "showInNotifications": showInNotifications
                 });
@@ -152,7 +160,7 @@ define(["lodash"], function(_) {
             _.forEach(userModules, function(module) {
                 _.forEach(allCharts, function(chart) {
                     loadChartData(chart, module.id).then(function(chartData) {
-                        getDataElementValues(chartData, module);
+                        getDataElementValues(chart, chartData, module);
                     });
                 });
             });
