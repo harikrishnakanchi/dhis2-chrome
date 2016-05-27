@@ -38,8 +38,7 @@
 
                                     <div class="col-md-6 form-group">
                                         <label ng-class="{'required': programStageDE.compulsory}" ng-if="isReferralLocationPresent(programStageDE.dataElement)">
-                                            {{ programStageDE.dataElement.formName }}
-                                            <p class="glyphicon glyphicon-tag" tooltip-placement="top" tooltip-trigger="click" tooltip="{{programStageDE.dataElement.description}}"></p>
+                                            <a href="#" description-popup dp-title="{{ programStageDE.dataElement.formName }}" dp-desc="{{ programStageDE.dataElement.description }}" resource-bundle="resourceBundle">{{ programStageDE.dataElement.formName }}</a>
                                         </label>
 
                                         <div ng-if="!isReferralLocationPresent(programStageDE.dataElement)">
