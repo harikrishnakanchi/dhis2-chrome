@@ -68,7 +68,8 @@
                                                 <ul>
                                                     <li ng-repeat="de in section.programStageDataElements">
                                                         <label>
-                                                            <input type="checkbox" ng-disabled="de.compulsory || isDisabled==true" ng-model="de.dataElement.isIncluded">{{de.dataElement.formName}}
+                                                            <input type="checkbox" ng-disabled="de.compulsory || isDisabled==true" ng-model="de.dataElement.isIncluded">
+                                                            <a href="#" description-popup dp-title="{{ de.dataElement.formName }}" dp-desc="{{ de.dataElement.description }}" resource-bundle="resourceBundle">{{de.dataElement.formName}}</a>
                                                         </label>
                                                     </li>
                                                 </ul>

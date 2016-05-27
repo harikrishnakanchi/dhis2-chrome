@@ -88,7 +88,8 @@
                                                 </li>
                                                 <li ng-repeat="element in section.unGroupedDataElements">
                                                     <label>
-                                                        <input type="checkbox" ng-disabled="isDisabled || element.isMandatory" ng-model="element.isIncluded" ng-change="changeSectionSelection(section)">{{ element.formName}}
+                                                        <input type="checkbox" ng-disabled="isDisabled || element.isMandatory" ng-model="element.isIncluded" ng-change="changeSectionSelection(section)">
+                                                        <a href="#" description-popup dp-title="{{ element.formName}}" dp-desc="{{ element.description }}" resource-bundle="resourceBundle">{{ element.formName}}</a>
                                                     </label>
                                                 </li>
                                             </ul>
