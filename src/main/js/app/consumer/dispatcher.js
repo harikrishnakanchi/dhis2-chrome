@@ -4,7 +4,7 @@ define(["lodash"], function(_) {
         downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer,
         downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
         uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
-        downloadModuleDataBlocksConsumer) {
+        downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer) {
 
         this.run = function(message) {
             $log.info("Processing message: " + message.data.type, message.data);
@@ -41,6 +41,9 @@ define(["lodash"], function(_) {
 
                 case "downloadProjectDataForAdmin":
                     return downloadProjectSettingsConsumer.run(message);
+
+                case "syncModuleDataBlock":
+                    return syncModuleDataBlockConsumer.run(message);
 
                 case "uploadDataValues":
                     return downloadDataConsumer.run(message)
