@@ -3,9 +3,7 @@ define(['moment', 'lodash'],
         return function(dataRepository, approvalDataRepository, mergeBy, dataService, $q, datasetRepository, approvalService) {
 
             var mergeAndSaveToLocalDatabase = function(moduleDataBlock, updatedDhisDataValues, dhisCompletion, dhisApproval) {
-                var updatedDhisDataValuesExist = updatedDhisDataValues && updatedDhisDataValues.length > 0,
-                    dhisDataValuesExist = updatedDhisDataValuesExist || !!moduleDataBlock.dataValuesLastUpdatedOnDhis,
-                    localDataValuesExist = !!moduleDataBlock.dataValuesLastUpdated;
+                var updatedDhisDataValuesExist = updatedDhisDataValues && updatedDhisDataValues.length > 0;
 
                 var dataValuesEquals = function(dv1, dv2) {
                     return dv1.dataElement === dv2.dataElement &&
@@ -14,36 +12,37 @@ define(['moment', 'lodash'],
                            dv1.categoryOptionCombo === dv2.categoryOptionCombo;
                 };
 
+                var dataValuesAreEqual = function(originalDataValues, mergedDataValues) {
+                    return originalDataValues.length === mergedDataValues.length && _.all(originalDataValues, function(dv) {
+                            return _.any(mergedDataValues, function(mergedDv) {
+                                return dataValuesEquals(dv, mergedDv) && dv.value === mergedDv.value;
+                            });
+                        });
+                };
+
                 var mergeDataValues = function(dhisDataValues, localDataValues) {
                     return mergeBy.lastUpdated({
                         eq: dataValuesEquals
                     }, dhisDataValues, localDataValues);
                 };
 
-
-                var dhisDataValuesAreMoreRecentThanLocal = function() {
-                    return dhisDataValuesExist && (!localDataValuesExist || mostRecentDhisDataValueTimestamp().isAfter(moduleDataBlock.dataValuesLastUpdated));
+                var mergedDataValues = function() {
+                    return updatedDhisDataValuesExist ? mergeDataValues(updatedDhisDataValues, moduleDataBlock.dataValues) : moduleDataBlock.dataValues;
                 };
 
-                var praxisDataValuesAreUpToDateWithDhisDataValues = function() {
-                    return (!dhisDataValuesExist && !localDataValuesExist) || (dhisDataValuesExist && mostRecentDhisDataValueTimestamp().isSame(moduleDataBlock.dataValuesLastUpdated));
+                var mergedDataValuesAreEqualToExistingPraxisDataValues = function() {
+                    return updatedDhisDataValuesExist ? dataValuesAreEqual(moduleDataBlock.dataValues, mergedDataValues()) : true;
                 };
 
-                var mostRecentDhisDataValueTimestamp = function() {
-                    if(updatedDhisDataValuesExist) {
-                        var timestamps = _.map(updatedDhisDataValues, function(dataValue) {
-                            return moment(dataValue.lastUpdated);
-                        });
-                        return timestamps.length > 0 ? moment.max(timestamps) : null;
-                    } else {
-                        return moduleDataBlock.dataValuesLastUpdatedOnDhis;
-                    }
+                var mergedDataValuesAreEqualToDhisDataValues = function() {
+                    return _.all(mergedDataValues(), function(mergedDataValue) {
+                        return !mergedDataValue.clientLastUpdated;
+                    });
                 };
 
                 var mergeAndSaveDataValues = function() {
                     if(updatedDhisDataValuesExist) {
-                        var mergedDataValues = mergeDataValues(updatedDhisDataValues, moduleDataBlock.dataValues);
-                        return dataRepository.saveDhisData(mergedDataValues);
+                        return dataRepository.saveDhisData(mergedDataValues());
                     } else {
                         return $q.when([]);
                     }
@@ -54,16 +53,17 @@ define(['moment', 'lodash'],
                         dhisApprovalOrCompletionExists = !_.isEmpty(mergedDhisApprovalAndCompletion),
                         localApprovalsExist = (moduleDataBlock.approvedAtProjectLevel || moduleDataBlock.approvedAtCoordinationLevel);
 
-                    if(dhisDataValuesAreMoreRecentThanLocal()) {
+                    if(mergedDataValuesAreEqualToExistingPraxisDataValues() && mergedDataValuesAreEqualToDhisDataValues()) {
+                        var mergedApproval = _.merge({}, moduleDataBlock.approvalData, dhisCompletion, dhisApproval);
+                        return approvalDataRepository.saveApprovalsFromDhis(mergedApproval);
+                    } else if (mergedDataValuesAreEqualToDhisDataValues()) {
                         if(dhisApprovalOrCompletionExists) {
                             return approvalDataRepository.saveApprovalsFromDhis(mergedDhisApprovalAndCompletion);
                         } else if(localApprovalsExist) {
                             return approvalDataRepository.invalidateApproval(moduleDataBlock.period, moduleDataBlock.moduleId);
                         }
-                    } else if(praxisDataValuesAreUpToDateWithDhisDataValues()) {
-                        if(dhisApprovalOrCompletionExists) {
-                            return approvalDataRepository.saveApprovalsFromDhis(mergedDhisApprovalAndCompletion);
-                        }
+                    } else if(!mergedDataValuesAreEqualToExistingPraxisDataValues() && localApprovalsExist) {
+                        return approvalDataRepository.invalidateApproval(moduleDataBlock.period, moduleDataBlock.moduleId);
                     }
                 };
 

@@ -38,7 +38,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                 moduleDataBlockMerger = new ModuleDataBlockMerger(dataRepository, approvalRepository, mergeBy, dataService, q, datasetRepository, approvalService);
 
-                moduleDataBlock = {};
+                moduleDataBlock = createMockModuleDataBlock();
                 dhisDataValues = undefined;
                 dhisCompletion = undefined;
                 dhisApproval = undefined;
@@ -48,6 +48,9 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
             var createMockDataValue = function(options) {
                 if(options && options.lastUpdated) {
                     options.lastUpdated = options.lastUpdated.toISOString();
+                }
+                if(options && options.clientLastUpdated) {
+                    options.clientLastUpdated = options.clientLastUpdated.toISOString();
                 }
                 return _.merge({
                     dataElement: 'someDataElementId',
@@ -104,9 +107,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                 describe('data or approvals exist only on DHIS', function () {
                     it('should save DHIS data values to database', function() {
-                        dhisDataValues = [
-                            createMockDataValue()
-                        ];
+                        dhisDataValues = [createMockDataValue()];
 
                         performMerge();
 
@@ -146,6 +147,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         dhisCompletion = undefined;
                         dhisApproval = undefined;
                         moduleDataBlock = createMockModuleDataBlock({
+                            dataValues: [createMockDataValue({ lastUpdated: undefined, clientLastUpdated: someMomentInTime })],
                             dataValuesLastUpdated: someMomentInTime,
                             approvedAtProjectLevel: true,
                             approvedAtCoordinationLevel: true
@@ -161,6 +163,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         dhisCompletion = undefined;
                         dhisApproval = undefined;
                         moduleDataBlock = createMockModuleDataBlock({
+                            dataValues: [createMockDataValue({ lastUpdated: undefined, clientLastUpdated: someMomentInTime })],
                             dataValuesLastUpdated: someMomentInTime,
                             approvedAtProjectLevel: true,
                             approvedAtCoordinationLevel: true
@@ -188,12 +191,16 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         expect(dataRepository.saveDhisData).toHaveBeenCalledWith([dhisDataValueA, localDataValueB]);
                     });
 
-                    describe('data on DHIS is more recent than approved data in Praxis', function() {
+                    describe('merged DHIS and Praxis data is different than existing approved data in Praxis', function() {
                         it('should invalidate the approvals in Praxis', function() {
-                            dhisDataValues = [
-                                createMockDataValue({ lastUpdated: someMomentInTime })
-                            ];
+                            var dhisDataValueA = createMockDataValue({ dataElement: 'dataElementA', value: 'valueA', lastUpdated: someMomentInTime }),
+                                dhisDataValueB = createMockDataValue({ dataElement: 'dataElementB', value: 'valueB', lastUpdated: moment(someMomentInTime).subtract(1, 'hour') }),
+                                localDataValueA = createMockDataValue({ dataElement: 'dataElementA', value: 'valueC', clientLastUpdated: moment(someMomentInTime).subtract(1, 'hour') }),
+                                localDataValueB = createMockDataValue({ dataElement: 'dataElementB', value: 'valueD', clientLastUpdated: someMomentInTime });
+
+                            dhisDataValues = [dhisDataValueA, dhisDataValueB];
                             moduleDataBlock = createMockModuleDataBlock({
+                                dataValues: [localDataValueA, localDataValueB],
                                 dataValuesLastUpdated: moment(someMomentInTime).subtract(1, 'hour'),
                                 approvedAtProjectLevel: true,
                                 approvedAtCoordinationLevel: true
@@ -222,20 +229,24 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         });
                     });
 
-                    describe('data on Praxis is more recent than approved data in DHIS', function() {
-                        it('should not save or invalidate DHIS completion or approval data to database', function() {
-                            dhisDataValues = [
-                                createMockDataValue({ lastUpdated: moment(someMomentInTime).subtract(1, 'hour') })
-                            ];
-                            dhisCompletion = createMockCompletion();
-                            dhisApproval = createMockApproval();
+                    describe('merged DHIS and Praxis data is the same as existing approved data in Praxis', function() {
+                        it('should save merged data values but not invalidate completion or approval data in Praxis', function() {
+                            var dhisDataValueA = createMockDataValue({ dataElement: 'dataElementA', lastUpdated: someMomentInTime }),
+                                dhisDataValueB = createMockDataValue({ dataElement: 'dataElementB', lastUpdated: someMomentInTime }),
+                                localDataValueA = createMockDataValue({ dataElement: 'dataElementA', clientLastUpdated: someMomentInTime.subtract(1, 'hour') }),
+                                localDataValueB = createMockDataValue({ dataElement: 'dataElementB', clientLastUpdated: someMomentInTime.subtract(1, 'hour') });
+
+                            dhisDataValues = [dhisDataValueA, dhisDataValueB];
                             moduleDataBlock = createMockModuleDataBlock({
-                                dataValuesLastUpdated: someMomentInTime
+                                dataValuesLastUpdated: someMomentInTime,
+                                dataValues: [localDataValueA, localDataValueB],
+                                approvedAtProjectLevel: true,
+                                approvedAtCoordinationLevel: true
                             });
 
                             performMerge();
 
-                            expect(approvalRepository.saveApprovalsFromDhis).not.toHaveBeenCalled();
+                            expect(dataRepository.saveDhisData).toHaveBeenCalledWith([dhisDataValueA, dhisDataValueB]);
                             expect(approvalRepository.invalidateApproval).not.toHaveBeenCalled();
                         });
                     });
@@ -247,6 +258,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         dhisCompletion = createMockCompletion();
                         dhisApproval = createMockApproval();
                         moduleDataBlock = createMockModuleDataBlock({
+                            dataValues: [createMockDataValue()],
                             dataValuesLastUpdated: someMomentInTime,
                             dataValuesLastUpdatedOnDhis: someMomentInTime
                         });
