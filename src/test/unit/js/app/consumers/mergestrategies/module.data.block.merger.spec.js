@@ -317,9 +317,52 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         expect(dataService.save).not.toHaveBeenCalled();
                     });
 
-                    it('should upload completion data to DHIS', function() {});
+                    it('should upload completion data to DHIS', function() {
+                        moduleDataBlock = createMockModuleDataBlock({
+                            dataValuesLastUpdatedOnDhis:  someMomentInTime,
+                            dataValuesLastUpdated: someMomentInTime,
+                            approvedAtProjectLevel: true,
+                            approvedAtProjectLevelBy: 'Kuala',
+                            approvedAtProjectLevelOn: someMomentInTime
+                        });
 
-                    it('should upload approval data to DHIS', function() {});
+                        performUpload();
+                        expect(approvalService.markAsComplete).toHaveBeenCalled();
+                    });
+
+                    it('should upload approval data to DHIS', function() {
+                        moduleDataBlock = createMockModuleDataBlock({
+                            dataValuesLastUpdatedOnDhis:  someMomentInTime,
+                            dataValuesLastUpdated: someMomentInTime,
+                            approvedAtCoordinationLevel: true,
+                            approvedAtCoordinationLevelBy: 'Kuala',
+                            approvedAtCoordinationLevelOn: someMomentInTime
+                        });
+
+                        performUpload();
+                        expect(approvalService.markAsApproved).toHaveBeenCalled();
+                    });
+
+                    it('should not re-upload completion and approval data to DHIS', function() {
+                        dhisCompletion = createMockCompletion();
+                        dhisApproval = createMockApproval();
+                        moduleDataBlock = createMockModuleDataBlock({
+                            dataValuesLastUpdatedOnDhis:  someMomentInTime,
+                            dataValuesLastUpdated: someMomentInTime,
+                            approvedAtProjectLevel: true,
+                            approvedAtProjectLevelBy: 'Kuala',
+                            approvedAtProjectLevelOn: someMomentInTime,
+                            approvedAtCoordinationLevel: true,
+                            approvedAtCoordinationLevelBy: 'Kuala',
+                            approvedAtCoordinationLevelOn: someMomentInTime
+                        });
+
+                        performUpload();
+                        expect(approvalService.markAsUnapproved).not.toHaveBeenCalled();
+                        expect(approvalService.markAsIncomplete).not.toHaveBeenCalled();
+                        expect(approvalService.markAsComplete).not.toHaveBeenCalled();
+                        expect(approvalService.markAsApproved).not.toHaveBeenCalled();
+                    });
                 });
 
                 describe('data values on Praxis are more recent than approved data in DHIS', function() {

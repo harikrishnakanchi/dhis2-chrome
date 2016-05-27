@@ -72,9 +72,12 @@ define(['moment', 'lodash'],
 
 
             var uploadToDHIS = function (moduleDataBlock, dhisCompletionData, dhisApprovalData) {
-                var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId};
-                var localDataValuesAreMoreRecentThanDHIS = moment(moduleDataBlock.dataValuesLastUpdated).isAfter(moduleDataBlock.dataValuesLastUpdatedOnDhis);
-                var praxisDataValuesAreUpToDateWithDhisDataValues = moment(moduleDataBlock.dataValuesLastUpdatedOnDhis).isSame(moduleDataBlock.dataValuesLastUpdated);
+                var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId},
+                    localDataValuesAreMoreRecentThanDHIS = moment(moduleDataBlock.dataValuesLastUpdated).isAfter(moduleDataBlock.dataValuesLastUpdatedOnDhis),
+                    praxisDataValuesAreUpToDateWithDhisDataValues = moment(moduleDataBlock.dataValuesLastUpdatedOnDhis).isSame(moduleDataBlock.dataValuesLastUpdated),
+                    dataOnDhisNotPreviouslyCompleted = !dhisCompletionData,
+                    dataOnDhisNotPreviouslyApproved = !dhisApprovalData;
+
 
                 var deleteApproval = function (dataSetIds) {
                     if(dhisApprovalData && localDataValuesAreMoreRecentThanDHIS) {
@@ -100,7 +103,7 @@ define(['moment', 'lodash'],
                 };
 
                 var uploadCompletionData = function (dataSetIds) {
-                    if(moduleDataBlock.approvedAtProjectLevel) {
+                    if(moduleDataBlock.approvedAtProjectLevel && (dataOnDhisNotPreviouslyCompleted || localDataValuesAreMoreRecentThanDHIS)) {
                         var completedBy = moduleDataBlock.approvedAtProjectLevelBy;
                         var completedOn = moduleDataBlock.approvedAtProjectLevelOn.toISOString();
 
@@ -110,7 +113,7 @@ define(['moment', 'lodash'],
                 };
 
                 var uploadApprovalData = function (dataSetIds) {
-                  if(moduleDataBlock.approvedAtCoordinationLevel) {
+                  if(moduleDataBlock.approvedAtCoordinationLevel && (dataOnDhisNotPreviouslyApproved || localDataValuesAreMoreRecentThanDHIS)) {
                       var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId};
                       var approvedBy = moduleDataBlock.approvedAtCoordinationLevelBy;
                       var approvedOn = moduleDataBlock.approvedAtCoordinationLevelOn.toISOString();
