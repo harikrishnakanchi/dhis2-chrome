@@ -187,7 +187,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         expect(dataRepository.saveDhisData).toHaveBeenCalledWith([dhisDataValueA, localDataValueB]);
                     });
 
-                    describe('merged DHIS and Praxis data is different than existing approved data in Praxis', function() {
+                    describe('merged data is different than existing approved data in Praxis', function() {
                         it('should invalidate the approvals in Praxis', function() {
                             var dhisDataValueA = createMockDataValue({ dataElement: 'dataElementA', value: 'valueA', lastUpdated: someMomentInTime }),
                                 dhisDataValueB = createMockDataValue({ dataElement: 'dataElementB', value: 'valueB', lastUpdated: moment(someMomentInTime).subtract(1, 'hour') }),
@@ -223,7 +223,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         });
                     });
 
-                    describe('merged DHIS and Praxis data is the same as existing approved data in Praxis', function() {
+                    describe('merged data is the same as existing approved data in Praxis', function() {
                         it('should save merged data values but not invalidate completion or approval data in Praxis', function() {
                             var dhisDataValueA = createMockDataValue({ dataElement: 'dataElementA', lastUpdated: someMomentInTime }),
                                 dhisDataValueB = createMockDataValue({ dataElement: 'dataElementB', lastUpdated: someMomentInTime }),
@@ -243,20 +243,36 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                             expect(approvalRepository.invalidateApproval).not.toHaveBeenCalled();
                         });
                     });
-                });
 
-                describe('data from DHIS has previously been downloaded and there are no updates in DHIS or Praxis', function () {
-                    it('should save DHIS completion and approval data to database', function() {
-                        dhisDataValues = undefined;
-                        dhisCompletion = createMockCompletion();
-                        dhisApproval = createMockApproval();
-                        moduleDataBlock = createMockModuleDataBlock({
-                            dataValues: [createMockDataValue()]
+                    describe('data from DHIS has previously been downloaded and there are no updates in DHIS or Praxis', function () {
+                        it('should save DHIS completion and approval data to database', function() {
+                            dhisDataValues = undefined;
+                            dhisCompletion = createMockCompletion();
+                            dhisApproval = createMockApproval();
+                            moduleDataBlock = createMockModuleDataBlock({
+                                dataValues: [createMockDataValue()]
+                            });
+
+                            performMerge();
+
+                            expect(approvalRepository.saveApprovalsFromDhis).toHaveBeenCalled();
                         });
+                    });
 
-                        performMerge();
+                    describe('approvals from DHIS have previously been downloaded', function() {
+                        it('should not re-save DHIS completion and approval data to database', function() {
+                            dhisDataValues = undefined;
+                            dhisCompletion = createMockCompletion();
+                            dhisApproval = createMockApproval();
+                            moduleDataBlock = createMockModuleDataBlock({
+                                dataValues: [createMockDataValue()],
+                                approvalData: _.merge({ someLocalStatus: 'someStatus' }, dhisCompletion, dhisApproval)
+                            });
 
-                        expect(approvalRepository.saveApprovalsFromDhis).toHaveBeenCalled();
+                            performMerge();
+
+                            expect(approvalRepository.saveApprovalsFromDhis).not.toHaveBeenCalled();
+                        });
                     });
                 });
             });

@@ -55,7 +55,9 @@ define(['moment', 'lodash'],
 
                     if(mergedDataValuesAreEqualToExistingPraxisDataValues() && mergedDataValuesAreEqualToDhisDataValues()) {
                         var mergedApproval = _.merge({}, moduleDataBlock.approvalData, dhisCompletion, dhisApproval);
-                        return approvalDataRepository.saveApprovalsFromDhis(mergedApproval);
+                        if(!_.isEqual(mergedApproval, moduleDataBlock.approvalData)) {
+                            return approvalDataRepository.saveApprovalsFromDhis(mergedApproval);
+                        }
                     } else if (mergedDataValuesAreEqualToDhisDataValues()) {
                         if(dhisApprovalOrCompletionExists) {
                             return approvalDataRepository.saveApprovalsFromDhis(mergedDhisApprovalAndCompletion);
