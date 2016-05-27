@@ -13,6 +13,7 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
         var createModuleDataBlock = function() {
             return ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
         };
+
         describe('create()', function () {
             it('should return an instance with required properties', function () {
                 orgUnit = {
@@ -149,6 +150,12 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
 
         describe('dataValues', function() {
             it('should return empty array if aggregateDataValues are undefined', function() {
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.dataValues).toEqual([]);
+            });
+
+            it('should return empty array if aggregateDataValues has no data values collection', function() {
+                aggregateDataValues = {};
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.dataValues).toEqual([]);
             });
