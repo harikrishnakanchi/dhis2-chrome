@@ -58,8 +58,8 @@
                                                         <td>
                                                             <div>
                                                                 <span ng-if="!dataSet.isReferralDataset">
-                                                                    {{ dataElement.formName }}
-                                                                    <p class="glyphicon glyphicon-tag" tooltip-placement="top" tooltip-trigger="click" tooltip="{{dataElement.description}}"></p>
+                                                                    <a href="#" description-popup dp-title="{{ dataElement.formName }}" dp-desc="{{ dataElement.description }}" resource-bundle="resourceBundle">{{ dataElement.formName }}</a>
+                                                                   <!-- <p class="glyphicon glyphicon-tag" ></p>-->
                                                                 </span>
                                                                 <span ng-if="dataSet.isReferralDataset"> {{ referralLocations[dataElement.formName].name }} </span>
                                                             </div>
