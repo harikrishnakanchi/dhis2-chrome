@@ -71,46 +71,64 @@ define(['moment', 'lodash'],
             };
 
 
-            var uploadToDHIS = function (moduleDataBlock) {
+            var uploadToDHIS = function (moduleDataBlock, dhisCompletionData, dhisApprovalData) {
+                var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId};
+                var localDataValuesAreMoreRecentThanDHIS = moment(moduleDataBlock.dataValuesLastUpdated).isAfter(moduleDataBlock.dataValuesLastUpdatedOnDhis);
+                var praxisDataValuesAreUpToDateWithDhisDataValues = moment(moduleDataBlock.dataValuesLastUpdatedOnDhis).isSame(moduleDataBlock.dataValuesLastUpdated);
 
-                var uploadDataValuestoDHIS = function () {
-                    if(moduleDataBlock.dataValuesLastUpdated != moduleDataBlock.dataValuesLastUpdatedOnDhis) {
+                var deleteApproval = function (dataSetIds) {
+                    if(dhisApprovalData && localDataValuesAreMoreRecentThanDHIS) {
+                        return approvalService.markAsUnapproved(dataSetIds, [periodAndOrgUnit]);
+                    } else {
+                        return $q.when({});
+                    }
+                };
+
+                var deleteCompletion = function (dataSetIds) {
+                    if(dhisCompletionData && localDataValuesAreMoreRecentThanDHIS) {
+                        return approvalService.markAsIncomplete(dataSetIds, [periodAndOrgUnit]);
+                    } else {
+                        return $q.when({});
+                    }
+                };
+
+                var uploadDataValues = function () {
+                    if(!praxisDataValuesAreUpToDateWithDhisDataValues) {
                         return dataService.save(moduleDataBlock.dataValues);
                     }
                     return $q.when({});
                 };
 
-                var uploadCompletionData = function () {
+                var uploadCompletionData = function (dataSetIds) {
                     if(moduleDataBlock.approvedAtProjectLevel) {
-                        return datasetRepository.getAll().then(function (allDatasets) {
-                            var datasetIds = _.pluck(allDatasets, 'id');
-                            var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId};
-                            var completedBy = moduleDataBlock.approvalData.completedBy;
-                            var completedOn = moduleDataBlock.approvalData.completedOn;
+                        var completedBy = moduleDataBlock.approvalData.completedBy;
+                        var completedOn = moduleDataBlock.approvalData.completedOn;
 
-                            return approvalService.markAsComplete(datasetIds, [periodAndOrgUnit], completedBy, completedOn);
-                        });
+                        return approvalService.markAsComplete(dataSetIds, [periodAndOrgUnit], completedBy, completedOn);
                     }
                     return $q.when({});
                 };
 
-                var uploadApprovalData = function () {
-                  if(moduleDataBlock.approvedAtCoordinationLevel && moduleDataBlock.approvedAtProjectLevel) {
-                      return datasetRepository.getAll().then(function (allDatasets) {
-                          var datasetIds = _.pluck(allDatasets, 'id');
-                          var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId};
-                          var approvedBy = moduleDataBlock.approvalData.approvedBy;
-                          var approvedOn = moduleDataBlock.approvalData.approvedOn;
+                var uploadApprovalData = function (dataSetIds) {
+                  if(moduleDataBlock.approvedAtCoordinationLevel) {
+                      var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId};
+                      var approvedBy = moduleDataBlock.approvalData.approvedBy;
+                      var approvedOn = moduleDataBlock.approvalData.approvedOn;
 
-                          return approvalService.markAsApproved(datasetIds, [periodAndOrgUnit], approvedBy, approvedOn);
-                      });
+                      return approvalService.markAsApproved(dataSetIds, [periodAndOrgUnit], approvedBy, approvedOn);
                   }
                   return $q.when({});
-
                 };
-                return uploadDataValuestoDHIS()
-                       .then(uploadCompletionData)
-                       .then(uploadApprovalData);
+
+                return datasetRepository.getAll().then(function (allDataSet) {
+                    var dataSetIds = _.pluck(allDataSet, 'id');
+
+                    return deleteApproval(dataSetIds)
+                        .then(_.partial(deleteCompletion, dataSetIds))
+                        .then(uploadDataValues)
+                        .then(_.partial(uploadCompletionData, dataSetIds))
+                        .then(_.partial(uploadApprovalData, dataSetIds));
+                });
             };
 
             return {
