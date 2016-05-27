@@ -84,8 +84,9 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                     period: 'somePeriod',
                     moduleId: 'someModuleId',
                     dataValues: [],
-                    dataValuesLastUpdated: moment('2016-05-07T09:00:00.000Z'),
+                    dataValuesLastUpdated: null,
                     dataValuesLastUpdatedOnDhis: null,
+                    dataValuesHaveBeenModifiedLocally: false,
                     approvedAtProjectLevel: false,
                     approvedAtProjectLevelBy: null,
                     approvedAtProjectLevelOn: null,
@@ -263,10 +264,13 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                     scope.$apply();
                 };
 
-                describe('data and approvals exist only on Praxis', function () {
+                describe('data values have been entered and approved only on Praxis', function () {
                     it('should upload data values to DHIS', function() {
                         var localDataValue = createMockDataValue();
-                        moduleDataBlock = createMockModuleDataBlock({ dataValues: [localDataValue] });
+                        moduleDataBlock = createMockModuleDataBlock({
+                            dataValuesHaveBeenModifiedLocally: true,
+                            dataValues: [localDataValue]
+                        });
 
                         performUpload();
                         expect(dataService.save).toHaveBeenCalledWith([localDataValue]);
@@ -274,6 +278,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                     it('should upload completion data from Praxis to DHIS', function() {
                         moduleDataBlock = createMockModuleDataBlock({
+                            dataValuesHaveBeenModifiedLocally: true,
                             approvedAtProjectLevel: true,
                             approvedAtProjectLevelBy: 'Kuala',
                             approvedAtProjectLevelOn: someMomentInTime
@@ -290,6 +295,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                     it('should upload approval data from Praxis to DHIS if data is approved at co-ordination level', function() {
                         moduleDataBlock = createMockModuleDataBlock({
+                            dataValuesHaveBeenModifiedLocally: true,
                             approvedAtCoordinationLevel: true,
                             approvedAtCoordinationLevelBy: 'Kuala',
                             approvedAtCoordinationLevelOn: someMomentInTime
@@ -306,12 +312,9 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                 });
 
-                describe('data values exist on both DHIS and Praxis with same timestamp', function() {
+                describe('data values in Praxis have not been modified locally', function() {
                     it('should not upload data values to DHIS', function() {
-                        moduleDataBlock = createMockModuleDataBlock({
-                            dataValuesLastUpdatedOnDhis:  someMomentInTime,
-                            dataValuesLastUpdated: someMomentInTime
-                        });
+                        moduleDataBlock = createMockModuleDataBlock({ dataValuesHaveBeenModifiedLocally: false });
 
                         performUpload();
                         expect(dataService.save).not.toHaveBeenCalled();
@@ -319,8 +322,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                     it('should upload completion data to DHIS', function() {
                         moduleDataBlock = createMockModuleDataBlock({
-                            dataValuesLastUpdatedOnDhis:  someMomentInTime,
-                            dataValuesLastUpdated: someMomentInTime,
+                            dataValuesHaveBeenModifiedLocally: false,
                             approvedAtProjectLevel: true,
                             approvedAtProjectLevelBy: 'Kuala',
                             approvedAtProjectLevelOn: someMomentInTime
@@ -332,8 +334,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                     it('should upload approval data to DHIS', function() {
                         moduleDataBlock = createMockModuleDataBlock({
-                            dataValuesLastUpdatedOnDhis:  someMomentInTime,
-                            dataValuesLastUpdated: someMomentInTime,
+                            dataValuesHaveBeenModifiedLocally: false,
                             approvedAtCoordinationLevel: true,
                             approvedAtCoordinationLevelBy: 'Kuala',
                             approvedAtCoordinationLevelOn: someMomentInTime
@@ -347,8 +348,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         dhisCompletion = createMockCompletion();
                         dhisApproval = createMockApproval();
                         moduleDataBlock = createMockModuleDataBlock({
-                            dataValuesLastUpdatedOnDhis:  someMomentInTime,
-                            dataValuesLastUpdated: someMomentInTime,
+                            dataValuesHaveBeenModifiedLocally: false,
                             approvedAtProjectLevel: true,
                             approvedAtProjectLevelBy: 'Kuala',
                             approvedAtProjectLevelOn: someMomentInTime,
@@ -365,15 +365,12 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                     });
                 });
 
-                describe('data values on Praxis are more recent than approved data in DHIS', function() {
+                describe('data values in Praxis have been modified locally', function() {
                     it('should delete approval data and completion data from DHIS if it is present and upload data values to DHIS', function() {
                         dhisCompletion = createMockCompletion();
                         dhisApproval = createMockApproval();
 
-                        moduleDataBlock = createMockModuleDataBlock({
-                            dataValuesLastUpdated: someMomentInTime,
-                            dataValuesLastUpdatedOnDhis: moment(someMomentInTime).subtract(4, 'hours')
-                        });
+                        moduleDataBlock = createMockModuleDataBlock({ dataValuesHaveBeenModifiedLocally: true });
 
                         periodAndOrgUnit = { period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId };
 
@@ -386,10 +383,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                     it('should delete completion data from DHIS if it is present and upload data values to DHIS', function() {
                         dhisCompletion = createMockCompletion();
 
-                        moduleDataBlock = createMockModuleDataBlock({
-                            dataValuesLastUpdated: someMomentInTime,
-                            dataValuesLastUpdatedOnDhis: moment(someMomentInTime).subtract(4, 'hour')
-                        });
+                        moduleDataBlock = createMockModuleDataBlock({ dataValuesHaveBeenModifiedLocally: true });
 
                         periodAndOrgUnit = { period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId };
 
@@ -403,10 +397,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                     it('should delete approval data from DHIS if it is present and upload data values to DHIS', function() {
                         dhisApproval = createMockApproval();
 
-                        moduleDataBlock = createMockModuleDataBlock({
-                            dataValuesLastUpdated: someMomentInTime,
-                            dataValuesLastUpdatedOnDhis: moment(someMomentInTime).subtract(4, 'hour')
-                        });
+                        moduleDataBlock = createMockModuleDataBlock({ dataValuesHaveBeenModifiedLocally: true });
 
                         periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId};
 

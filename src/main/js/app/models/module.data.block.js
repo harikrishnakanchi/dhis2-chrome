@@ -8,6 +8,7 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         this.dataValues = aggregateDataValues && aggregateDataValues.dataValues || [];
         this.dataValuesLastUpdated = getMostRecentDataValueTimestamp(aggregateDataValues);
         this.dataValuesLastUpdatedOnDhis = getMostRecentDataValueTimestampFromDhis(aggregateDataValues);
+        this.dataValuesHaveBeenModifiedLocally = dataValuesHaveBeenModifiedLocally(this.dataValues);
 
         this.submitted = isSubmitted(aggregateDataValues, lineListEvents, this.lineListService);
         this.approvedAtProjectLevel = !!(approvalData && approvalData.isComplete);
@@ -89,6 +90,11 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
             getMostRecentDhisTimestamp(aggregateDataValues.dataValues)) || null;
     };
 
+    var dataValuesHaveBeenModifiedLocally = function(aggregateDataValues) {
+        return _.any(aggregateDataValues, function(dataValue) {
+            return !!dataValue.clientLastUpdated;
+        });
+    };
     ModuleDataBlock.create = function () {
         var moduleDataBlock = Object.create(ModuleDataBlock.prototype);
         ModuleDataBlock.apply(moduleDataBlock, arguments);

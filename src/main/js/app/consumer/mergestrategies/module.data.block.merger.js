@@ -73,14 +73,12 @@ define(['moment', 'lodash'],
 
             var uploadToDHIS = function (moduleDataBlock, dhisCompletionData, dhisApprovalData) {
                 var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId},
-                    localDataValuesAreMoreRecentThanDHIS = moment(moduleDataBlock.dataValuesLastUpdated).isAfter(moduleDataBlock.dataValuesLastUpdatedOnDhis),
-                    praxisDataValuesAreUpToDateWithDhisDataValues = moment(moduleDataBlock.dataValuesLastUpdatedOnDhis).isSame(moduleDataBlock.dataValuesLastUpdated),
                     dataOnDhisNotPreviouslyCompleted = !dhisCompletionData,
                     dataOnDhisNotPreviouslyApproved = !dhisApprovalData;
 
 
                 var deleteApproval = function (dataSetIds) {
-                    if(dhisApprovalData && localDataValuesAreMoreRecentThanDHIS) {
+                    if(dhisApprovalData && moduleDataBlock.dataValuesHaveBeenModifiedLocally) {
                         return approvalService.markAsUnapproved(dataSetIds, [periodAndOrgUnit]);
                     } else {
                         return $q.when({});
@@ -88,7 +86,7 @@ define(['moment', 'lodash'],
                 };
 
                 var deleteCompletion = function (dataSetIds) {
-                    if(dhisCompletionData && localDataValuesAreMoreRecentThanDHIS) {
+                    if(dhisCompletionData && moduleDataBlock.dataValuesHaveBeenModifiedLocally) {
                         return approvalService.markAsIncomplete(dataSetIds, [periodAndOrgUnit]);
                     } else {
                         return $q.when({});
@@ -96,14 +94,14 @@ define(['moment', 'lodash'],
                 };
 
                 var uploadDataValues = function () {
-                    if(!praxisDataValuesAreUpToDateWithDhisDataValues) {
+                    if(moduleDataBlock.dataValuesHaveBeenModifiedLocally) {
                         return dataService.save(moduleDataBlock.dataValues);
                     }
                     return $q.when({});
                 };
 
                 var uploadCompletionData = function (dataSetIds) {
-                    if(moduleDataBlock.approvedAtProjectLevel && (dataOnDhisNotPreviouslyCompleted || localDataValuesAreMoreRecentThanDHIS)) {
+                    if(moduleDataBlock.approvedAtProjectLevel && (dataOnDhisNotPreviouslyCompleted || moduleDataBlock.dataValuesHaveBeenModifiedLocally)) {
                         var completedBy = moduleDataBlock.approvedAtProjectLevelBy;
                         var completedOn = moduleDataBlock.approvedAtProjectLevelOn.toISOString();
 
@@ -113,7 +111,7 @@ define(['moment', 'lodash'],
                 };
 
                 var uploadApprovalData = function (dataSetIds) {
-                  if(moduleDataBlock.approvedAtCoordinationLevel && (dataOnDhisNotPreviouslyApproved || localDataValuesAreMoreRecentThanDHIS)) {
+                  if(moduleDataBlock.approvedAtCoordinationLevel && (dataOnDhisNotPreviouslyApproved || moduleDataBlock.dataValuesHaveBeenModifiedLocally)) {
                       var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId};
                       var approvedBy = moduleDataBlock.approvedAtCoordinationLevelBy;
                       var approvedOn = moduleDataBlock.approvedAtCoordinationLevelOn.toISOString();

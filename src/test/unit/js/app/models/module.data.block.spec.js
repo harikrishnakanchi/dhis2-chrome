@@ -632,5 +632,52 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                 expect(moduleDataBlock.dataValuesLastUpdatedOnDhis).toBeNull();
             });
         });
+
+        describe('dataValuesHaveBeenModifiedLocally', function() {
+            it('should return false if aggregateDataValues are not present', function () {
+                aggregateDataValues = undefined;
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.dataValuesHaveBeenModifiedLocally).toEqual(false);
+            });
+
+            it('should return false if aggregateDataValues has no data values collection', function () {
+                aggregateDataValues = {};
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.dataValuesHaveBeenModifiedLocally).toEqual(false);
+            });
+
+            it('should return false if aggregateDataValues has no data values', function () {
+                aggregateDataValues = {
+                    dataValues: []
+                };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.dataValuesHaveBeenModifiedLocally).toEqual(false);
+            });
+
+            it('should return true if there are locally created or updated data values', function () {
+                aggregateDataValues = {
+                    dataValues: [{
+                        value: 'someValue',
+                        clientLastUpdated: someMomentInTime.toISOString()
+                    }, {
+                        value: 'someValue',
+                        lastUpdated: someMomentInTime.toISOString()
+                    }]
+                };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.dataValuesHaveBeenModifiedLocally).toEqual(true);
+            });
+
+            it('should return false if there are only data values downloaded from DHIS', function () {
+                aggregateDataValues = {
+                    dataValues: [{
+                        value: 'someValue',
+                        lastUpdated: someMomentInTime.toISOString()
+                    }]
+                };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.dataValuesHaveBeenModifiedLocally).toEqual(false);
+            });
+        });
     });
 });
