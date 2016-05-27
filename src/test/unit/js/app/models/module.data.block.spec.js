@@ -4,9 +4,9 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
 
         beforeEach(function() {
             spyOn(CustomAttributes, 'parseAttribute');
-            aggregateDataValues = null;
-            lineListEvents = null;
-            approvalData = null;
+            aggregateDataValues = undefined;
+            lineListEvents = undefined;
+            approvalData = undefined;
             someMomentInTime = moment('2016-05-18T00:00:00.000Z');
         });
 
@@ -167,6 +167,19 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                 };
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.dataValues).toEqual(dataValues);
+            });
+        });
+
+        describe('approvalData', function() {
+            it('should return null if approvalData is undefined', function() {
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvalData).toBeNull();
+            });
+
+            it('should return approvalData', function() {
+                approvalData = { someApproval: 'data' };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvalData).toEqual(approvalData);
             });
         });
 

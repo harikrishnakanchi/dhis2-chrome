@@ -10,6 +10,7 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         this.dataValuesLastUpdatedOnDhis = getMostRecentDataValueTimestampFromDhis(aggregateDataValues);
         this.dataValuesHaveBeenModifiedLocally = dataValuesHaveBeenModifiedLocally(this.dataValues);
 
+        this.approvalData = approvalData || null;
         this.submitted = isSubmitted(aggregateDataValues, lineListEvents, this.lineListService);
         this.approvedAtProjectLevel = !!(approvalData && approvalData.isComplete);
         this.approvedAtProjectLevelBy = this.approvedAtProjectLevel ? approvalData.completedBy : null;
