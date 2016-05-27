@@ -376,6 +376,26 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         expect(approvalService.markAsComplete).not.toHaveBeenCalled();
                         expect(approvalService.markAsApproved).not.toHaveBeenCalled();
                     });
+
+                    it('should delete then re-upload approval data in DHIS if completion data needs to be uploaded', function() {
+                        dhisApproval = createMockApproval();
+
+                        moduleDataBlock = createMockModuleDataBlock({
+                            dataValuesHaveBeenModifiedLocally: false,
+                            approvedAtProjectLevel: true,
+                            approvedAtProjectLevelBy: 'Kuala',
+                            approvedAtProjectLevelOn: someMomentInTime,
+                            approvedAtCoordinationLevel: true,
+                            approvedAtCoordinationLevelBy: 'Kuala',
+                            approvedAtCoordinationLevelOn: someMomentInTime
+                        });
+
+                        performUpload();
+                        expect(approvalService.markAsUnapproved).toHaveBeenCalled();
+                        expect(approvalService.markAsIncomplete).not.toHaveBeenCalled();
+                        expect(approvalService.markAsComplete).toHaveBeenCalled();
+                        expect(approvalService.markAsApproved).toHaveBeenCalled();
+                    });
                 });
 
                 describe('data values in Praxis have been modified locally', function() {

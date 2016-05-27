@@ -76,11 +76,12 @@ define(['moment', 'lodash'],
             var uploadToDHIS = function (moduleDataBlock, dhisCompletionData, dhisApprovalData) {
                 var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId},
                     dataOnDhisNotPreviouslyCompleted = !dhisCompletionData,
-                    dataOnDhisNotPreviouslyApproved = !dhisApprovalData;
+                    dataOnDhisNotPreviouslyApproved = !dhisApprovalData,
+                    dataHasBeenCompletedLocallyButNotOnDhis = moduleDataBlock.approvedAtProjectLevel && dataOnDhisNotPreviouslyCompleted;
 
 
                 var deleteApproval = function (dataSetIds) {
-                    if(dhisApprovalData && moduleDataBlock.dataValuesHaveBeenModifiedLocally) {
+                    if(dhisApprovalData && (moduleDataBlock.dataValuesHaveBeenModifiedLocally || dataHasBeenCompletedLocallyButNotOnDhis)) {
                         return approvalService.markAsUnapproved(dataSetIds, [periodAndOrgUnit]);
                     } else {
                         return $q.when({});
@@ -113,7 +114,7 @@ define(['moment', 'lodash'],
                 };
 
                 var uploadApprovalData = function (dataSetIds) {
-                  if(moduleDataBlock.approvedAtCoordinationLevel && (dataOnDhisNotPreviouslyApproved || moduleDataBlock.dataValuesHaveBeenModifiedLocally)) {
+                  if(moduleDataBlock.approvedAtCoordinationLevel && (dataOnDhisNotPreviouslyApproved || moduleDataBlock.dataValuesHaveBeenModifiedLocally || dataHasBeenCompletedLocallyButNotOnDhis)) {
                       var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId};
                       var approvedBy = moduleDataBlock.approvedAtCoordinationLevelBy;
                       var approvedOn = moduleDataBlock.approvedAtCoordinationLevelOn.toISOString();
