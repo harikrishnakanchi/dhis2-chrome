@@ -101,8 +101,8 @@ define(['moment', 'lodash'],
 
                 var uploadCompletionData = function (dataSetIds) {
                     if(moduleDataBlock.approvedAtProjectLevel) {
-                        var completedBy = moduleDataBlock.approvalData.completedBy;
-                        var completedOn = moduleDataBlock.approvalData.completedOn;
+                        var completedBy = moduleDataBlock.approvedAtProjectLevelBy;
+                        var completedOn = moduleDataBlock.approvedAtProjectLevelOn.toISOString();
 
                         return approvalService.markAsComplete(dataSetIds, [periodAndOrgUnit], completedBy, completedOn);
                     }
@@ -112,8 +112,8 @@ define(['moment', 'lodash'],
                 var uploadApprovalData = function (dataSetIds) {
                   if(moduleDataBlock.approvedAtCoordinationLevel) {
                       var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId};
-                      var approvedBy = moduleDataBlock.approvalData.approvedBy;
-                      var approvedOn = moduleDataBlock.approvalData.approvedOn;
+                      var approvedBy = moduleDataBlock.approvedAtCoordinationLevelBy;
+                      var approvedOn = moduleDataBlock.approvedAtCoordinationLevelOn.toISOString();
 
                       return approvalService.markAsApproved(dataSetIds, [periodAndOrgUnit], approvedBy, approvedOn);
                   }

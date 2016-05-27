@@ -87,7 +87,11 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                     dataValuesLastUpdated: moment('2016-05-07T09:00:00.000Z'),
                     dataValuesLastUpdatedOnDhis: null,
                     approvedAtProjectLevel: false,
-                    approvedAtCoordinationLevel: false
+                    approvedAtProjectLevelBy: null,
+                    approvedAtProjectLevelOn: null,
+                    approvedAtCoordinationLevel: false,
+                    approvedAtCoordinationLevelBy: null,
+                    approvedAtCoordinationLevelOn: null
                 }, options);
             };
 
@@ -271,7 +275,8 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                     it('should upload completion data from Praxis to DHIS', function() {
                         moduleDataBlock = createMockModuleDataBlock({
                             approvedAtProjectLevel: true,
-                            approvalData : createMockCompletion()
+                            approvedAtProjectLevelBy: 'Kuala',
+                            approvedAtProjectLevelOn: someMomentInTime
                         });
 
                         periodAndOrgUnit = { period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId };
@@ -279,14 +284,15 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         performUpload();
                         expect(approvalService.markAsComplete).toHaveBeenCalledWith(dataSetIds,
                             [periodAndOrgUnit],
-                            moduleDataBlock.approvalData.completedBy,
-                            moduleDataBlock.approvalData.completedOn);
+                            moduleDataBlock.approvedAtProjectLevelBy,
+                            moduleDataBlock.approvedAtProjectLevelOn.toISOString());
                     });
 
                     it('should upload approval data from Praxis to DHIS if data is approved at co-ordination level', function() {
                         moduleDataBlock = createMockModuleDataBlock({
                             approvedAtCoordinationLevel: true,
-                            approvalData : createMockApproval()
+                            approvedAtCoordinationLevelBy: 'Kuala',
+                            approvedAtCoordinationLevelOn: someMomentInTime
                         });
 
                         periodAndOrgUnit = { period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId };
@@ -294,8 +300,8 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         performUpload();
                         expect(approvalService.markAsApproved).toHaveBeenCalledWith(dataSetIds,
                             [periodAndOrgUnit],
-                            moduleDataBlock.approvalData.approvedBy,
-                            moduleDataBlock.approvalData.approvedOn);
+                            moduleDataBlock.approvedAtCoordinationLevelBy,
+                            moduleDataBlock.approvedAtCoordinationLevelOn.toISOString());
                     });
 
                 });
