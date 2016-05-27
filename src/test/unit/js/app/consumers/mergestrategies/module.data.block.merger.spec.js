@@ -87,8 +87,6 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                     period: 'somePeriod',
                     moduleId: 'someModuleId',
                     dataValues: [],
-                    dataValuesLastUpdated: null,
-                    dataValuesLastUpdatedOnDhis: null,
                     dataValuesHaveBeenModifiedLocally: false,
                     approvedAtProjectLevel: false,
                     approvedAtProjectLevelBy: null,
@@ -148,7 +146,6 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         dhisApproval = undefined;
                         moduleDataBlock = createMockModuleDataBlock({
                             dataValues: [createMockDataValue({ lastUpdated: undefined, clientLastUpdated: someMomentInTime })],
-                            dataValuesLastUpdated: someMomentInTime,
                             approvedAtProjectLevel: true,
                             approvedAtCoordinationLevel: true
                         });
@@ -164,7 +161,6 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         dhisApproval = undefined;
                         moduleDataBlock = createMockModuleDataBlock({
                             dataValues: [createMockDataValue({ lastUpdated: undefined, clientLastUpdated: someMomentInTime })],
-                            dataValuesLastUpdated: someMomentInTime,
                             approvedAtProjectLevel: true,
                             approvedAtCoordinationLevel: true
                         });
@@ -201,7 +197,6 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                             dhisDataValues = [dhisDataValueA, dhisDataValueB];
                             moduleDataBlock = createMockModuleDataBlock({
                                 dataValues: [localDataValueA, localDataValueB],
-                                dataValuesLastUpdated: moment(someMomentInTime).subtract(1, 'hour'),
                                 approvedAtProjectLevel: true,
                                 approvedAtCoordinationLevel: true
                             });
@@ -218,7 +213,6 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                                 createMockDataValue({ lastUpdated: someMomentInTime })
                             ];
                             moduleDataBlock = createMockModuleDataBlock({
-                                dataValuesLastUpdated: null,
                                 approvedAtProjectLevel: true,
                                 approvedAtCoordinationLevel: true
                             });
@@ -238,7 +232,6 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                             dhisDataValues = [dhisDataValueA, dhisDataValueB];
                             moduleDataBlock = createMockModuleDataBlock({
-                                dataValuesLastUpdated: someMomentInTime,
                                 dataValues: [localDataValueA, localDataValueB],
                                 approvedAtProjectLevel: true,
                                 approvedAtCoordinationLevel: true
@@ -258,9 +251,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         dhisCompletion = createMockCompletion();
                         dhisApproval = createMockApproval();
                         moduleDataBlock = createMockModuleDataBlock({
-                            dataValues: [createMockDataValue()],
-                            dataValuesLastUpdated: someMomentInTime,
-                            dataValuesLastUpdatedOnDhis: someMomentInTime
+                            dataValues: [createMockDataValue()]
                         });
 
                         performMerge();

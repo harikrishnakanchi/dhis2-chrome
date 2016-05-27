@@ -6,8 +6,6 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         this.lineListService = CustomAttributes.parseAttribute(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
 
         this.dataValues = aggregateDataValues && aggregateDataValues.dataValues || [];
-        this.dataValuesLastUpdated = getMostRecentDataValueTimestamp(aggregateDataValues);
-        this.dataValuesLastUpdatedOnDhis = getMostRecentDataValueTimestampFromDhis(aggregateDataValues);
         this.dataValuesHaveBeenModifiedLocally = dataValuesHaveBeenModifiedLocally(this.dataValues);
 
         this.approvalData = approvalData || null;
@@ -57,38 +55,6 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         } else {
             return orgUnit.name;
         }
-    };
-
-    var getMostRecentDataValueTimestamp = function(aggregateDataValues) {
-        var getMostRecentTimestamp = function(dataValues) {
-            var timestamps = _.flatten(_.map(dataValues, function(dataValue) {
-                return [
-                    moment(dataValue.lastUpdated || null),
-                    moment(dataValue.clientLastUpdated || null)
-                ];
-            }));
-            return moment.max(timestamps);
-        };
-
-        return (aggregateDataValues &&
-            aggregateDataValues.dataValues &&
-            aggregateDataValues.dataValues.length > 0 &&
-            getMostRecentTimestamp(aggregateDataValues.dataValues)) || null;
-    };
-
-    var getMostRecentDataValueTimestampFromDhis = function(aggregateDataValues) {
-        var getMostRecentDhisTimestamp = function(dataValues) {
-            var rawTimestamps = _.compact(_.map(dataValues, 'lastUpdated')),
-                momentTimestamps = _.map(rawTimestamps, function(timestamp) {
-                    return moment(timestamp);
-                });
-            return momentTimestamps.length > 0 ? moment.max(momentTimestamps) : null;
-        };
-
-        return (aggregateDataValues &&
-            aggregateDataValues.dataValues &&
-            aggregateDataValues.dataValues.length > 0 &&
-            getMostRecentDhisTimestamp(aggregateDataValues.dataValues)) || null;
     };
 
     var dataValuesHaveBeenModifiedLocally = function(aggregateDataValues) {
