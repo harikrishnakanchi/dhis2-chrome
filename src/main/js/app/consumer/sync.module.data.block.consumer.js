@@ -35,7 +35,13 @@ define([], function () {
         };
 
         var mergeAndSaveModuleDataBlock = function (data) {
-            return moduleDataBlockMerger.mergeAndSaveToLocalDatabase(data.moduleDataBlock, data.dhisDataValues, data.dhisCompletion, data.dhisApproval);
+            return moduleDataBlockMerger.mergeAndSaveToLocalDatabase(data.moduleDataBlock, data.dhisDataValues, data.dhisCompletion, data.dhisApproval).then(function() {
+                return data;
+            });
+        };
+
+        var uploadModuleDataBlockToDhis = function (data) {
+            return moduleDataBlockMerger.uploadToDHIS(data.moduleDataBlock, data.dhisCompletion, data.dhisApproval);
         };
 
         this.run = function(message) {
@@ -52,7 +58,9 @@ define([], function () {
                 .then(getDataValuesFromDhis)
                 .then(getCompletionFromDhis)
                 .then(getApprovalFromDhis)
-                .then(mergeAndSaveModuleDataBlock);
+                .then(mergeAndSaveModuleDataBlock)
+                .then(getModuleDataBlock)
+                .then(uploadModuleDataBlockToDhis);
             });
         };
     };

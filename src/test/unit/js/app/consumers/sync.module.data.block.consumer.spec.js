@@ -50,6 +50,7 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
 
                 moduleDataBlockMerger = new ModuleDataBlockMerger();
                 spyOn(moduleDataBlockMerger, 'mergeAndSaveToLocalDatabase').and.returnValue(utils.getPromise(q, {}));
+                spyOn(moduleDataBlockMerger, 'uploadToDHIS').and.returnValue(utils.getPromise(q, {}));
 
                 changeLogRepository =  new ChangeLogRepository();
                 spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
@@ -96,6 +97,31 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
 
                 runConsumer();
                 expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlock, [mockDhisDataValue], mockDhisCompletion, mockDhisApproval);
+            });
+
+            it('should re-instantiate the module data block a second time', function() {
+                runConsumer();
+                expect(moduleDataBlockFactory.create).toHaveBeenCalledTimes(2);
+            });
+
+            it('should upload module data block to DHIS', function() {
+                var period = '2016W20',
+                    mockModuleDataBlockBeforeDownstreamSync = { moduleId: mockModule.id, period: period, moduleName: 'beforeDownstreamSync' },
+                    mockModuleDataBlockAfterDownstreamSync = { moduleId: mockModule.id, period: period, moduleName: 'afterDownstreamSync' },
+                    mockDhisCompletion  = { orgUnit: mockModule.id, period: period, isComplete: true },
+                    mockDhisApproval    = { orgUnit: mockModule.id, period: period, isApproved: true},
+                    moduleDataBlockFactoryHasBeenCalledBefore = false;
+
+                moduleDataBlockFactory.create.and.callFake(function() {
+                    var moduleDataBlock = moduleDataBlockFactoryHasBeenCalledBefore ? mockModuleDataBlockAfterDownstreamSync : mockModuleDataBlockBeforeDownstreamSync;
+                    moduleDataBlockFactoryHasBeenCalledBefore = true;
+                    return utils.getPromise(q, moduleDataBlock);
+                });
+                approvalService.getCompletionData.and.returnValue(utils.getPromise(q, [mockDhisCompletion]));
+                approvalService.getApprovalData.and.returnValue(utils.getPromise(q, [mockDhisApproval]));
+
+                runConsumer();
+                expect(moduleDataBlockMerger.uploadToDHIS).toHaveBeenCalledWith(mockModuleDataBlockAfterDownstreamSync, mockDhisCompletion, mockDhisApproval);
             });
         });
     });
