@@ -33,9 +33,16 @@
                                             <div class="spacing-div-accordian" class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) && psde.dataElement.isIncluded">
                                                 <accordion-group is-open="status.open">
                                                     <accordion-heading>
-                                                        <span>{{psde.dataElement.formName}}</span>
-                                                        <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-                                                        <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
+                                                         <div class="description-popup">
+                                                            {{psde.dataElement.formName}}
+                                                             <a class="description-popup-icon" href="#" description-popup dp-title="{{psde.dataElement.formName}}" dp-desc="{{psde.dataElement.description}}" resource-bundle="resourceBundle">
+                                                                 <i class="fa fa-info-circle" tooltip-placement="top"></i>
+                                                             </a>
+                                                             <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                                             <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
+
+                                                         </div>
+
                                                     </accordion-heading>
                                                     <table locked-table-header class="table table-bordered">
                                                         <thead>
@@ -59,7 +66,10 @@
                                 <accordion close-others="false">
                                     <accordion-group>
                                         <accordion-heading>
-                                            <span>{{resourceBundle.proceduresPerformed}}</span>
+                                            <span>
+                                                {{resourceBundle.proceduresPerformed}}
+                                                <i style="z-index: 99999" class="fa fa-info-circle" tooltip-placement="top" tooltip="Click for description"></i>
+                                            </span>
                                             <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                                             <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
                                         </accordion-heading>
