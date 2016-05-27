@@ -189,14 +189,12 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                     describe('merged data is different than existing approved data in Praxis', function() {
                         it('should invalidate the approvals in Praxis', function() {
-                            var dhisDataValueA = createMockDataValue({ dataElement: 'dataElementA', value: 'valueA', lastUpdated: someMomentInTime }),
-                                dhisDataValueB = createMockDataValue({ dataElement: 'dataElementB', value: 'valueB', lastUpdated: moment(someMomentInTime).subtract(1, 'hour') }),
-                                localDataValueA = createMockDataValue({ dataElement: 'dataElementA', value: 'valueC', clientLastUpdated: moment(someMomentInTime).subtract(1, 'hour') }),
-                                localDataValueB = createMockDataValue({ dataElement: 'dataElementB', value: 'valueD', clientLastUpdated: someMomentInTime });
+                            var dhisDataValue = createMockDataValue({ value: 'newValue', lastUpdated: someMomentInTime }),
+                                localDataValue = createMockDataValue({ value: 'oldValue', clientLastUpdated: someMomentInTime.subtract(1, 'hour') });
 
-                            dhisDataValues = [dhisDataValueA, dhisDataValueB];
+                            dhisDataValues = [dhisDataValue];
                             moduleDataBlock = createMockModuleDataBlock({
-                                dataValues: [localDataValueA, localDataValueB],
+                                dataValues: [localDataValue],
                                 approvedAtProjectLevel: true,
                                 approvedAtCoordinationLevel: true
                             });
@@ -209,10 +207,9 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                     describe('data exists in DHIS, no data exists in Praxis, but Praxis module was previously auto-approved', function() {
                         it('should invalidate the approvals in Praxis', function() {
-                            dhisDataValues = [
-                                createMockDataValue({ lastUpdated: someMomentInTime })
-                            ];
+                            dhisDataValues = [createMockDataValue()];
                             moduleDataBlock = createMockModuleDataBlock({
+                                dataValues: [],
                                 approvedAtProjectLevel: true,
                                 approvedAtCoordinationLevel: true
                             });
@@ -225,21 +222,19 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                     describe('merged data is the same as existing approved data in Praxis', function() {
                         it('should save merged data values but not invalidate completion or approval data in Praxis', function() {
-                            var dhisDataValueA = createMockDataValue({ dataElement: 'dataElementA', lastUpdated: someMomentInTime }),
-                                dhisDataValueB = createMockDataValue({ dataElement: 'dataElementB', lastUpdated: someMomentInTime }),
-                                localDataValueA = createMockDataValue({ dataElement: 'dataElementA', clientLastUpdated: someMomentInTime.subtract(1, 'hour') }),
-                                localDataValueB = createMockDataValue({ dataElement: 'dataElementB', clientLastUpdated: someMomentInTime.subtract(1, 'hour') });
+                            var dhisDataValue = createMockDataValue({ lastUpdated: someMomentInTime }),
+                                localDataValue = createMockDataValue({ clientLastUpdated: someMomentInTime.subtract(1, 'hour') });
 
-                            dhisDataValues = [dhisDataValueA, dhisDataValueB];
+                            dhisDataValues = [dhisDataValue];
                             moduleDataBlock = createMockModuleDataBlock({
-                                dataValues: [localDataValueA, localDataValueB],
+                                dataValues: [localDataValue],
                                 approvedAtProjectLevel: true,
                                 approvedAtCoordinationLevel: true
                             });
 
                             performMerge();
 
-                            expect(dataRepository.saveDhisData).toHaveBeenCalledWith([dhisDataValueA, dhisDataValueB]);
+                            expect(dataRepository.saveDhisData).toHaveBeenCalledWith([dhisDataValue]);
                             expect(approvalRepository.invalidateApproval).not.toHaveBeenCalled();
                         });
                     });
@@ -328,7 +323,6 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                             moduleDataBlock.approvedAtCoordinationLevelBy,
                             moduleDataBlock.approvedAtCoordinationLevelOn.toISOString());
                     });
-
                 });
 
                 describe('data values in Praxis have not been modified locally', function() {
