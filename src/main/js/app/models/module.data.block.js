@@ -11,7 +11,11 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
 
         this.submitted = isSubmitted(aggregateDataValues, lineListEvents, this.lineListService);
         this.approvedAtProjectLevel = !!(approvalData && approvalData.isComplete);
+        this.approvedAtProjectLevelBy = this.approvedAtProjectLevel ? approvalData.completedBy : null;
+        this.approvedAtProjectLevelAt = this.approvedAtProjectLevel ? moment(approvalData.completedOn) : null;
         this.approvedAtCoordinationLevel = !!(approvalData && approvalData.isApproved);
+        this.approvedAtCoordinationLevelBy = this.approvedAtCoordinationLevel ? approvalData.approvedBy : null;
+        this.approvedAtCoordinationLevelAt = this.approvedAtCoordinationLevel ? moment(approvalData.approvedOn) : null;
 
         var dataValuesNotSynced = dataValuesFailedToSync(this.lineListService, aggregateDataValues);
         this.awaitingActionAtDataEntryLevel = !(this.submitted || this.approvedAtCoordinationLevel) || dataValuesNotSynced;

@@ -1,12 +1,13 @@
 define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(ModuleDataBlock, CustomAttributes, moment, timecop) {
     describe('ModuleDataBlock', function () {
-        var moduleDataBlock, orgUnit, period, aggregateDataValues, lineListEvents, approvalData;
+        var moduleDataBlock, orgUnit, period, aggregateDataValues, lineListEvents, approvalData, someMomentInTime;
 
         beforeEach(function() {
             spyOn(CustomAttributes, 'parseAttribute');
             aggregateDataValues = null;
             lineListEvents = null;
             approvalData = null;
+            someMomentInTime = moment('2016-05-18T00:00:00.000Z');
         });
 
         var createModuleDataBlock = function() {
@@ -161,6 +162,7 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                 expect(moduleDataBlock.dataValues).toEqual(dataValues);
             });
         });
+
         describe('approvedAtProjectLevel', function() {
             it('should be true if approvalData has completed status as true', function() {
                 approvalData = {
@@ -191,6 +193,46 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
         });
 
+        describe('approvedAtProjectLevelBy', function() {
+            it('should be null if there is no completion data', function() {
+                approvalData = undefined;
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvedAtProjectLevelBy).toBeNull();
+            });
+
+            it('should return completedBy if there is completion data', function() {
+                approvalData = { completedBy: 'Kuala', isComplete: true };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvedAtProjectLevelBy).toEqual('Kuala');
+            });
+
+            it('should return null if completed status is false', function() {
+                approvalData = { completedBy: 'Kuala', isComplete: false };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvedAtProjectLevelBy).toBeNull();
+            });
+        });
+
+        describe('approvedAtProjectLevelAt', function() {
+            it('should be null if there is no completion data', function() {
+                approvalData = undefined;
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvedAtProjectLevelAt).toBeNull();
+            });
+
+            it('should return completedOn if there is completion data', function() {
+                approvalData = { completedOn: someMomentInTime.toISOString(), isComplete: true };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvedAtProjectLevelAt).toEqual(someMomentInTime);
+            });
+
+            it('should return null if completed status is false', function() {
+                approvalData = { completedOn: someMomentInTime.toISOString(), isComplete: false };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvedAtProjectLevelAt).toBeNull();
+            });
+        });
+
         describe('approvedAtCoordinationLevel', function() {
             it('should be true if approvalData has approved status as true', function() {
                 approvalData = {
@@ -218,6 +260,47 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                 approvalData = {};
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.approvedAtCoordinationLevel).toEqual(false);
+            });
+        });
+
+        describe('approvedAtCoordinationLevelBy', function() {
+            it('should be null if there is no approval data', function() {
+                approvalData = undefined;
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvedAtCoordinationLevelBy).toBeNull();
+            });
+
+
+            it('should return completedBy if there is approval data', function() {
+                approvalData = { approvedBy: 'Kuala', isApproved: true };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvedAtCoordinationLevelBy).toEqual('Kuala');
+            });
+
+            it('should return null if approval status is false', function() {
+                approvalData = { approvedBy: 'Kuala', isApproved: false };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvedAtCoordinationLevelBy).toBeNull();
+            });
+        });
+
+        describe('approvedAtCoordinationLevelAt', function() {
+            it('should be null if there is no approval data', function() {
+                approvalData = undefined;
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvedAtCoordinationLevelAt).toBeNull();
+            });
+
+            it('should return approvedOn if there is approval data', function() {
+                approvalData = { approvedOn: someMomentInTime.toISOString(), isApproved: true };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvedAtCoordinationLevelAt).toEqual(someMomentInTime);
+            });
+
+            it('should return null if completed status is false', function() {
+                approvalData = { approvedOn: someMomentInTime.toISOString(), isApproved: false };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvedAtCoordinationLevelAt).toBeNull();
             });
         });
 
@@ -467,7 +550,6 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
 
             it('should return the most recent lastUpdated timestamp', function () {
-                var someMomentInTime = moment('2016-05-18T00:00:00.000Z');
                 aggregateDataValues = {
                     dataValues: [{
                         value: 'someValue',
@@ -482,7 +564,6 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
 
             it('should return the most recent lastUpdated or clientLastUpdated timestamp', function () {
-                var someMomentInTime = moment('2016-05-18T00:00:00.000Z');
                 aggregateDataValues = {
                     dataValues: [{
                         value: 'someValue',
@@ -520,7 +601,6 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
 
             it('should return the most recent lastUpdated timestamp', function () {
-                var someMomentInTime = moment('2016-05-18T00:00:00.000Z');
                 aggregateDataValues = {
                     dataValues: [{
                         value: 'someValue',
@@ -535,7 +615,6 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
 
             it('should be null if data values were all created on Praxis', function () {
-                var someMomentInTime = moment('2016-05-18T00:00:00.000Z');
                 aggregateDataValues = {
                     dataValues: [{
                         value: 'someValue',
