@@ -86,10 +86,8 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 };
 
                 scope.resourceBundle = {
-                    "uploadDataValuesDesc": "upload data for ",
                     "uploadApprovalDataDesc": "approve data at coordination level for ",
-                    "uploadCompletionDataDesc": "approve data at project level for ",
-                    "deleteApprovalsDesc": "restart approval process for "
+                    "uploadCompletionDataDesc": "approve data at project level for "
                 };
 
                 fakeModal = {

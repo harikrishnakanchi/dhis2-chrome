@@ -204,27 +204,15 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             });
 
             var publishToDhis = function() {
-
-                var deleteApprovals = function() {
-                    return $hustle.publish({
-                        "data": currentPeriodAndOrgUnit,
-                        "type": "deleteApprovals",
-                        "locale": $scope.locale,
-                        "desc": $scope.resourceBundle.deleteApprovalsDesc + currentPeriod + ", " + $scope.selectedModule.name
-                    }, "dataValues");
-                };
-
-                var uploadDataValues = function() {
-                    return $hustle.publish({
-                        "data": periodsAndOrgUnits,
-                        "type": "uploadDataValues",
-                        "locale": $scope.locale,
-                        "desc": $scope.resourceBundle.uploadDataValuesDesc + currentPeriod + ", " + $scope.selectedModule.name
-                    }, "dataValues");
-                };
-
-                return deleteApprovals()
-                    .then(uploadDataValues);
+                return $hustle.publish({
+                    data: {
+                        moduleId: $scope.selectedModule.id,
+                        period: currentPeriod
+                    },
+                    type: "syncModuleDataBlock",
+                    locale: $scope.locale,
+                    desc: $scope.resourceBundle.syncModuleDataBlockDesc + currentPeriod + ", " + $scope.selectedModule.name
+                }, "dataValues");
             };
 
             if (asDraft) {

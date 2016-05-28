@@ -205,7 +205,7 @@
     "notificationRetryMessagePrefix": ". Will retry in ",
     "notificationRetryMessageSuffix": " hours.",
     "notificationAbortRetryMessageSuffix": " even after repeated retries. Please try again or contact admin.",
-    "uploadDataValuesDesc": "upload data for ",
+    "syncModuleDataBlockDesc": "upload data and approvals for ",
     "uploadApprovalDataDesc": "approve data at coordination level for ",
     "uploadCompletionDataDesc": "approve data at project level for ",
     "deleteApprovalsDesc": "restart approval process for ",

@@ -204,7 +204,7 @@
     "notificationRetryMessagePrefix": ". Nouvelle tentative dans",
     "notificationRetryMessageSuffix": "heures.",
     "notificationAbortRetryMessageSuffix": "malgré plusieurs tentatives. SVP ré-essayer à nouveau ou contacter l'administrateur.",
-    "uploadDataValuesDesc": "envoi des données VERS",
+    "syncModuleDataBlockDesc": "upload data and approvals for ",
     "uploadApprovalDataDesc": "valider les données au niveau Coordination pour",
     "uploadCompletionDataDesc": "valider les données au niveau Coordination pour",
     "deleteApprovalsDesc": "recommencer le processus de validation pour ",

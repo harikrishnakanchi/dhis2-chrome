@@ -58,10 +58,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     }
                 };
 
-                scope.resourceBundle = {
-                    "dataApprovalConfirmationMessage": ""
-                };
-
                 rootScope.locale = "en";
                 rootScope.currentUser = {
                     "firstName": "test1",
@@ -89,10 +85,9 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 };
 
                 scope.resourceBundle = {
-                    "uploadDataValuesDesc": "upload data for ",
                     "uploadApprovalDataDesc": "approve data at coordination level for ",
                     "uploadCompletionDataDesc": "approve data at project level for ",
-                    "deleteApprovalsDesc": "restart approval process for "
+                    "syncModuleDataBlockDesc": "some description"
                 };
 
                 fakeModal = {
@@ -462,16 +457,13 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
 
                 expect(dataRepository.save).toHaveBeenCalled();
                 expect(hustle.publish).toHaveBeenCalledWith({
-                    data: [{
-                        orgUnit: "mod1",
+                    data: {
+                        moduleId: "mod1",
                         period: "2014W14"
-                    }, {
-                        orgUnit: "origin1",
-                        period: "2014W14"
-                    }],
-                    type: 'uploadDataValues',
+                    },
+                    type: 'syncModuleDataBlock',
                     locale: 'en',
-                    desc: 'upload data for 2014W14, Mod1'
+                    desc: scope.resourceBundle.syncModuleDataBlockDesc + '2014W14, Mod1'
                 }, 'dataValues');
 
                 expect(scope.submitSuccess).toBe(true);
@@ -479,54 +471,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(scope.submitError).toBe(false);
                 expect(scope.saveError).toBe(false);
                 expect(scope.dataentryForm.$setPristine).toHaveBeenCalled();
-            });
-
-            it("should not include orgUnits which doesn't have any dataValues in hustle message", function() {
-                spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
-                spyOn(scope.dataentryForm, '$setPristine');
-
-                scope.dataValues = {
-                    "mod1": {
-                        "dataElement1": {
-                            "catCombo1": {
-                                "value": "10",
-                                "formula": "1+9"
-                            }
-                        }
-                    },
-                    "origin1": {
-                        "dataElement2": {
-                            "catCombo2": {
-                                "value": "67",
-                                "formula": "67"
-                            }
-                        }
-                    },
-                    "origin2": {
-                        "dataElement2": {
-                            "catCombo2": {
-                                "value": "",
-                                "formula": ""
-                            }
-                        }
-                    }
-                };
-
-                scope.submit();
-                scope.$apply();
-
-                expect(hustle.publish).toHaveBeenCalledWith({
-                    data: [{
-                        orgUnit: "mod1",
-                        period: "2014W14"
-                    }, {
-                        orgUnit: "origin1",
-                        period: "2014W14"
-                    }],
-                    type: 'uploadDataValues',
-                    locale: 'en',
-                    desc: 'upload data for 2014W14, Mod1'
-                }, 'dataValues');
             });
 
             it("should save data values as draft to indexeddb", function() {
@@ -977,28 +921,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.$apply();
 
                 expect(scope.isApproved).toBeTruthy();
-            });
-
-            it("should delete approvals if data is edited", function() {
-                spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
-                scope.$apply();
-
-                scope.submit();
-                scope.$apply();
-
-                var periodAndOrgUnit = {
-                    "period": "2014W14",
-                    "orgUnit": "mod1"
-                };
-
-                expect(dataRepository.save).toHaveBeenCalled();
-                expect(approvalDataRepository.clearApprovals.calls.argsFor(0)[0]).toEqual(periodAndOrgUnit);
-                expect(hustle.publish).toHaveBeenCalledWith({
-                    "data": periodAndOrgUnit,
-                    "type": "deleteApprovals",
-                    "locale": "en",
-                    "desc": "restart approval process for 2014W14, Mod1"
-                }, "dataValues");
             });
         });
     });
