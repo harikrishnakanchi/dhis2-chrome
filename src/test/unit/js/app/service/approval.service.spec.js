@@ -306,8 +306,8 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 }
             }];
             var periodRange = ["2014W01", "2014W02", "2014W05"],
-                expectedStartDate = moment(_.first(periodRange), 'YYYY[W]WW').format('YYYY-MM-DD'),
-                expectedEndDate = moment(_.last(periodRange), 'YYYY[W]WW').format('YYYY-MM-DD');
+                expectedStartDate = moment(_.first(periodRange), 'YYYY[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
+                expectedEndDate = moment(_.last(periodRange), 'YYYY[W]WW').endOf('isoWeek').format('YYYY-MM-DD');
 
             httpBackend.expectGET(properties.dhis.url + "/api/completeDataSetRegistrations?children=true&dataSet=d1&dataSet=d2&endDate=" + expectedEndDate + "&orgUnit=ou1&orgUnit=ou2&startDate=" + expectedStartDate).respond(200, {});
 
@@ -483,8 +483,8 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
 
         it("should get approval data for specified period range", function() {
             var periodRange = ["2014W01", "2014W02", "2014W05"],
-                expectedStartDate = moment(_.first(periodRange), 'YYYY[W]WW').format('YYYY-MM-DD'),
-                expectedEndDate = moment(_.last(periodRange), 'YYYY[W]WW').format('YYYY-MM-DD');
+                expectedStartDate = moment(_.first(periodRange), 'YYYY[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
+                expectedEndDate = moment(_.last(periodRange), 'YYYY[W]WW').endOf('isoWeek').format('YYYY-MM-DD');
 
             httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?ds=d1&ds=d2&endDate=" + expectedEndDate + "&ou=ou1&ou=ou2&pe=Weekly&startDate=" + expectedStartDate).respond(200, {});
 

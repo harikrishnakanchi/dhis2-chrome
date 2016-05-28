@@ -132,8 +132,8 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                 endDate;
 
             if(periodRange) {
-                endDate = moment(_.last(periodRange), 'YYYY[W]WW').format("YYYY-MM-DD");
-                startDate = moment(_.first(periodRange), 'YYYY[W]WW').format("YYYY-MM-DD");
+                endDate = moment(_.last(periodRange), 'YYYY[W]WW').endOf('isoWeek').format("YYYY-MM-DD");
+                startDate = moment(_.first(periodRange), 'YYYY[W]WW').startOf('isoWeek').format("YYYY-MM-DD");
             } else {
                 endDate = moment().format("YYYY-MM-DD");
                 startDate = moment(endDate).subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
@@ -196,8 +196,8 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
             var startDate, endDate;
 
             if(periodRange) {
-                endDate = moment(_.last(periodRange), 'YYYY[W]WW').format("YYYY-MM-DD");
-                startDate = moment(_.first(periodRange), 'YYYY[W]WW').format("YYYY-MM-DD");
+                endDate = moment(_.last(periodRange), 'YYYY[W]WW').endOf('isoWeek').format("YYYY-MM-DD");
+                startDate = moment(_.first(periodRange), 'YYYY[W]WW').startOf('isoWeek').format("YYYY-MM-DD");
             } else {
                 endDate = moment().format("YYYY-MM-DD");
                 startDate = moment(endDate).subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
