@@ -28,7 +28,7 @@ define([], function () {
         };
 
         var getApprovalFromDhis = function (data) {
-            return approvalService.getApprovalData(data.moduleId, data.dataSetIds, data.period).then(function (allApprovalData) {
+            return approvalService.getApprovalData(data.moduleId, data.dataSetIds, [data.period]).then(function (allApprovalData) {
                 var approvalData = _.find(allApprovalData, { orgUnit: data.moduleId, period: data.period });
                 return _.merge({ dhisApproval: approvalData }, data);
             });

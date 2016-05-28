@@ -80,7 +80,7 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
 
             it('should download approval data from DHIS for one module', function () {
                 runConsumer();
-                expect(approvalService.getApprovalData).toHaveBeenCalledWith(mockModule.id, [aggregateDataSet.id], mockPeriod);
+                expect(approvalService.getApprovalData).toHaveBeenCalledWith(mockModule.id, [aggregateDataSet.id], [mockPeriod]);
             });
 
             it('should merge and save module data block', function() {
