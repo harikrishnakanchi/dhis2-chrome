@@ -20,10 +20,13 @@ define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
         var createForModules = function (moduleOrgUnits, periodRange) {
             var moduleIds = _.pluck(moduleOrgUnits, 'id');
 
-            var getIndexedAggregateData = function () {
-                return dataRepository.getDataValuesForOrgUnitsAndPeriods(moduleIds, periodRange).then(function (aggregateDataValues) {
-                    return _.indexBy(aggregateDataValues, function (dataValue) {
-                        return dataValue.period + dataValue.orgUnit;
+            var getIndexedAggregateData = function (mapOfOriginIdsToModuleIds) {
+                var moduleIdsAndOriginIds = moduleIds.concat(_.keys(mapOfOriginIdsToModuleIds));
+
+                return dataRepository.getDataValuesForOrgUnitsAndPeriods(moduleIdsAndOriginIds, periodRange).then(function (aggregateDataValues) {
+                    return _.groupBy(aggregateDataValues, function (dataValue) {
+                        var orgUnitToGroupBy = mapOfOriginIdsToModuleIds[dataValue.orgUnit] || dataValue.orgUnit;
+                        return dataValue.period + orgUnitToGroupBy;
                     });
                 });
             };
@@ -60,7 +63,7 @@ define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
 
             return getMapOfOriginIdsToModuleIds().then(function(mapOfOriginIdsToModuleIds) {
                 return $q.all({
-                    indexedAggregateData: getIndexedAggregateData(),
+                    indexedAggregateData: getIndexedAggregateData(mapOfOriginIdsToModuleIds),
                     indexedLineListData: getIndexedLineListData(mapOfOriginIdsToModuleIds),
                     indexedApprovalData: getIndexedApprovalData()
                 });
@@ -71,7 +74,7 @@ define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
 
                 var allModuleDataBlocks = _.map(moduleOrgUnits, function (moduleOrgUnit) {
                     return _.map(periodRange, function (period) {
-                        var aggregateDataValues = indexedAggregateData[period + moduleOrgUnit.id] || {};
+                        var aggregateDataValues = indexedAggregateData[period + moduleOrgUnit.id] || [];
                         var lineListData = indexedLineListData[period + moduleOrgUnit.id] || [];
                         var approvalData = indexedApprovalData[period + moduleOrgUnit.id] || {};
 
