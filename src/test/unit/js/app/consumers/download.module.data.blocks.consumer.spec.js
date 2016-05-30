@@ -119,6 +119,22 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockB, [mockDhisDataValueB], mockDhisCompletionB, mockDhisApprovalB);
             });
 
+            it('should merge and save each module data block including origin data', function() {
+                var periodA = '2016W20',
+                    periodB = '2016W21',
+                    mockModuleDataBlockA = { moduleId: mockModule.id, period: periodA, moduleName: 'someModuleName' },
+                    mockModuleDataBlockB = { moduleId: mockModule.id, period: periodB, moduleName: 'someModuleName' },
+                    mockDhisDataValueA   = { orgUnit: mockModule.id, period: periodA, value: 'someValue' },
+                    mockDhisDataValueB   = { orgUnit: mockOriginOrgUnitIds[0], period: periodB, value: 'someValue' };
+
+                moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, [mockModuleDataBlockA, mockModuleDataBlockB]));
+                dataService.downloadData.and.returnValue(utils.getPromise(q, [mockDhisDataValueA, mockDhisDataValueB]));
+
+                runConsumer();
+                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockA, [mockDhisDataValueA], undefined, undefined);
+                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockB, [mockDhisDataValueB], undefined, undefined);
+            });
+
             it('should merge and save multiple modules', function() {
                 var mockModuleA = { id: 'mockModuleIdA' },
                     mockModuleB = { id: 'mockModuleIdB' };
