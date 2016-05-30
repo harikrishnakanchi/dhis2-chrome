@@ -28,19 +28,13 @@ define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
                 });
             };
 
-            var getIndexedLineListData = function() {
-                return orgUnitRepository.findAllByParent(moduleIds).then(function (originOrgUnits) {
-                    var startPeriod = _.first(periodRange),
-                        originOrgUnitIds = _.pluck(originOrgUnits, 'id');
+            var getIndexedLineListData = function(mapOfOriginIdsToModuleIds) {
+                var startPeriod = _.first(periodRange),
+                    originOrgUnitIds = _.keys(mapOfOriginIdsToModuleIds);
 
-                    var getModuleIdFromOriginOrgUnits = _.memoize(function(originOrgUnitId) {
-                        return _.find(originOrgUnits, { id: originOrgUnitId }).parent.id;
-                    });
-
-                    return programEventRepository.getEventsFromPeriod(startPeriod, originOrgUnitIds).then(function (lineListEvents) {
-                        return _.groupBy(lineListEvents, function(lineListEvent) {
-                            return lineListEvent.period + getModuleIdFromOriginOrgUnits(lineListEvent.orgUnit);
-                        });
+                return programEventRepository.getEventsFromPeriod(startPeriod, originOrgUnitIds).then(function (lineListEvents) {
+                    return _.groupBy(lineListEvents, function(lineListEvent) {
+                        return lineListEvent.period + mapOfOriginIdsToModuleIds[lineListEvent.orgUnit];
                     });
                 });
             };
@@ -56,10 +50,20 @@ define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
                 });
             };
 
-            return $q.all({
-                indexedAggregateData: getIndexedAggregateData(),
-                indexedLineListData: getIndexedLineListData(),
-                indexedApprovalData: getIndexedApprovalData()
+            var getMapOfOriginIdsToModuleIds = function () {
+                return orgUnitRepository.findAllByParent(moduleIds).then(function(originOrgUnits) {
+                    return _.transform(originOrgUnits, function (map, originOrgUnit) {
+                        map[originOrgUnit.id] = originOrgUnit.parent.id;
+                    }, {});
+                });
+            };
+
+            return getMapOfOriginIdsToModuleIds().then(function(mapOfOriginIdsToModuleIds) {
+                return $q.all({
+                    indexedAggregateData: getIndexedAggregateData(),
+                    indexedLineListData: getIndexedLineListData(mapOfOriginIdsToModuleIds),
+                    indexedApprovalData: getIndexedApprovalData()
+                });
             }).then(function (data) {
                 var indexedAggregateData = data.indexedAggregateData;
                 var indexedLineListData = data.indexedLineListData;
