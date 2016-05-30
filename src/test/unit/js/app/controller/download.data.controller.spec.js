@@ -1,7 +1,7 @@
 define(["downloadDataController", "angularMocks", "utils", "lodash", "chromeUtils"],
     function(DownloadDataController, mocks, utils, _, chromeUtils) {
         describe("downloadDataController", function() {
-            var q, rootScope, hustle, downloadDataController, timeout;
+            var q, rootScope, hustle, downloadDataController, timeout, scope;
 
             beforeEach(module("hustle"));
 
@@ -12,9 +12,7 @@ define(["downloadDataController", "angularMocks", "utils", "lodash", "chromeUtil
                 rootScope = $rootScope;
                 timeout = $timeout;
 
-                scope.resourceBundle = {
-                    "syncRunning": "syncRunning"
-                };
+                scope.resourceBundle = {};
 
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
                 spyOn(chromeUtils, "createNotification").and.returnValue(utils.getPromise(q, {}));
