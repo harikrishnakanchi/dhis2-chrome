@@ -338,5 +338,6 @@
     "November": "Novembre",
     "December": "Décembre",
     "weekSelector": "Une semaine est compté dans le mois, la semaine commence en (Semaine jour de début est le lundi)",
-    "country": "Pays"
+    "country": "Pays",
+    "noDescriptionLabel": "Pas de description disponible"
 }

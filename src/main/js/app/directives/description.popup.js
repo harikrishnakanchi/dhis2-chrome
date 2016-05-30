@@ -10,9 +10,10 @@ define([], function() {
                 angular.element(element).bind('click', function(event) {
                     event.preventDefault();
                     event.stopPropagation();
+                    var description = scope.description ? scope.description : scope.resourceBundle.noDescriptionLabel;
                     scope.notificationMessages = {
                         notificationTitle: scope.title,
-                        notificationMessage: scope.description
+                        notificationMessage: description
                     };
                     scope.layoutDirection = $rootScope.layoutDirection;
 
