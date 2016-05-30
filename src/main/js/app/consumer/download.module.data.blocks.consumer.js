@@ -64,8 +64,7 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
             return dataService.downloadData(data.moduleId, data.dataSetIds, data.periodRange, data.lastUpdatedTimestamp)
                 .then(function (dataValues) {
                     var indexedDataValues = _.groupBy(dataValues, function(dataValue) {
-                        var orgUnitToGroupBy = dataValue.orgUnit === data.moduleId ? dataValue.orgUnit : data.moduleId;
-                        return dataValue.period + orgUnitToGroupBy;
+                        return dataValue.period + data.moduleId;
                     });
                     return _.merge({ indexedDhisDataValues: indexedDataValues }, data);
                 });
