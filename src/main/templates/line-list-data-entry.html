@@ -38,7 +38,13 @@
 
                                     <div class="col-md-6 form-group">
                                         <label ng-class="{'required': programStageDE.compulsory}" ng-if="isReferralLocationPresent(programStageDE.dataElement)">
-                                            <a href="#" description-popup dp-title="{{ programStageDE.dataElement.formName }}" dp-desc="{{ programStageDE.dataElement.description }}" resource-bundle="resourceBundle">{{ programStageDE.dataElement.formName }}</a>
+                                            <a class="changeColor"
+                                               description-popup
+                                               dp-title="{{ programStageDE.dataElement.formName }}"
+                                               dp-desc="{{ programStageDE.dataElement.description }}"
+                                               resource-bundle="resourceBundle">
+                                            {{ programStageDE.dataElement.formName }}
+                                            </a>
                                         </label>
 
                                         <div ng-if="!isReferralLocationPresent(programStageDE.dataElement)">

@@ -24,6 +24,7 @@
     <tr ng-repeat="datum in viewMap | orderBy : orderBySortKeys">
        <td>
            <a id="elementId_{{$index}}"
+              class="changeColor"
               description-popup
               dp-title="{{getDataElementName(data.metaData.names[datum.dataElement])}}"
               dp-desc="{{datum.dataElementDescription}}"
