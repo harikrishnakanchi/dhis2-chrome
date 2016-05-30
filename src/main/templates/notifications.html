@@ -15,7 +15,6 @@
                 </thead>
                 <tbody>
                     <tr ng-if="dataElementValue.showInNotifications" ng-repeat="dataElementValue in dataElementValues">
-                        <pre>{{ dataElementValue.dataElementName }}</pre>
                         <td> <a href="#" description-popup dp-title="{{ dataElementValue.dataElementName }}" dp-desc="{{ dataElementValue.dataElementDescription }}" resource-bundle="resourceBundle">{{ dataElementValue.dataElementName }}</a></td>
                         <td ng-class="{'red-cell': (dataElementValue.weeklyData[week]['value'] > dataElementValue.weeklyData[week]['max']) }" ng-repeat="week in weeks">
                             {{dataElementValue.weeklyData[week]['value']}}

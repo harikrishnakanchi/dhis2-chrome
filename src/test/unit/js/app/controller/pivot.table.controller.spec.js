@@ -85,7 +85,18 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
                 }, {
                     id: "a67aa742313",
                     name: "Follow-up Consultations - Consultations - Out Patient Department - Pediatric"
-                }]
+                }],
+                rows: [
+                    {
+                        items: [
+                            {
+                                id: 'a0e7d3973e3',
+                                name: 'New Consultations - Consultations - Out Patient Department - Pediatric',
+                                description: 'random description'
+                            }
+                        ]
+                    }
+                ]
             };
 
             scope.locale = "en";
@@ -222,6 +233,14 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
                     "dataElements": [{
                         "id": "a0e7d3973e3",
                         "name": "New Consultations - Consultations - Out Patient Department - Pediatric"
+                    }],
+                    rows: [{
+                        items: [
+                            {
+                                id: 'a0e7d3973e3',
+                                name: 'New Consultations - Consultations - Out Patient Department - Pediatric'
+                            }
+                        ]
                     }]
                 };
                 pivotTableController = new PivotTableController(scope, rootScope);
@@ -240,12 +259,14 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
             var expectedViewMap = [{
                 dataElement: 'a0e7d3973e3',
                 dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric',
+                dataElementDescription: 'random description',
                 dataElementIndex: 1,
                 sortKey_201507: 1651,
                 sortKey_201508: 416
             }, {
                 dataElement: 'a67aa742313',
                 dataElementName: 'Follow-up Consultations - Consultations - Out Patient Department - Pediatric',
+                dataElementDescription: '',
                 dataElementIndex: 2,
                 sortKey_201507: 8205,
                 sortKey_201508: 0
@@ -346,6 +367,14 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
                 "dataElements": [{
                     "id": "a0e7d3973e3",
                     "name": "New Consultations - Consultations - Out Patient Department - Pediatric"
+                }],
+                rows: [{
+                    items: [
+                        {
+                            id: 'a0e7d3973e3',
+                            name: 'New Consultations - Consultations - Out Patient Department - Pediatric'
+                        }
+                    ]
                 }]
             };
 
@@ -355,6 +384,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
             var expectedViewMap = [{
                 dataElement: 'a0e7d3973e3',
                 dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric',
+                dataElementDescription: '',
                 dataElementIndex: 1,
                 sortKey_201508: 215,
                 sortKey_201509: 45
@@ -421,6 +451,15 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
                 "dataElements": [{
                     "id": "a0e7d3973e3",
                     "name": "New Consultations - Consultations - Out Patient Department - Pediatric"
+                }],
+                rows: [{
+                    items: [
+                        {
+                            id: 'a0e7d3973e3',
+                            name: 'New Consultations - Consultations - Out Patient Department - Pediatric',
+                            description: 'random description'
+                        }
+                    ]
                 }]
             };
 
@@ -431,6 +470,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
             var expectedViewMap = [{
                 dataElement: 'a0e7d3973e3',
                 dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric',
+                dataElementDescription: 'random description',
                 dataElementIndex: 1,
                 sortKey_201508: 25
             }];

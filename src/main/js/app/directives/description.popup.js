@@ -8,6 +8,7 @@ define([], function() {
             },
             link: function(scope, element) {
                 angular.element(element).bind('click', function(event) {
+                    event.preventDefault();
                     event.stopPropagation();
                     scope.notificationMessages = {
                         notificationTitle: scope.title,

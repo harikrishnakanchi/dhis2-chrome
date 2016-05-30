@@ -13,7 +13,15 @@
     </thead>
     <tbody>
     <tr ng-repeat="datum in viewMap | orderBy : orderBySortKeys">
-        <td>{{getDataElementName(data.metaData.names[datum.dataElement])}}</td>
+        <td>
+            <a id="elementId_{{$index}}"
+               description-popup
+               dp-title="{{getDataElementName(data.metaData.names[datum.dataElement])}}"
+               dp-desc="{{datum.dataElementDescription}}"
+               resource-bundle="resourceBundle">
+                {{getDataElementName(data.metaData.names[datum.dataElement])}}
+            </a>
+        </td>
         <td ng-repeat="item in maxColumnsHeader.headers" ng-show="periodBasedValues[item.period] !== undefined">
             <span> {{getValue(item.category, datum.dataElement, item.period)}}</span>
         </td>

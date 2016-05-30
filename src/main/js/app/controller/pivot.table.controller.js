@@ -178,6 +178,8 @@ define(["lodash", "moment"], function(_, moment) {
             $scope.periods = $scope.data.metaData.pe;
             $scope.isCategoryPresent = $scope.data.width === 4;
             $scope.showWeeks = $scope.definition.monthlyReport;
+            var items = $scope.definition.rows[0].items;
+            $scope.elements = _.groupBy(items, 'id');
             var dataElements;
 
             var periodsForHeader = _.map($scope.periods, function(pe) {
@@ -259,9 +261,11 @@ define(["lodash", "moment"], function(_, moment) {
                     }, 0);
                 });
 
+                var element = _.first($scope.elements[dataElementId]);
                 var dataElementInfo = {
                     "dataElement": dataElementId,
-                    "dataElementName": $scope.data.metaData.names[dataElementId]
+                    "dataElementName": $scope.data.metaData.names[dataElementId],
+                    "dataElementDescription": (element && element.description) ? element.description : ''
                 };
                 dataElementInfo[DEFAULT_SORT_KEY] = getDefaultSortOrder(dataElementId);
 
