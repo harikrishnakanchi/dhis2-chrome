@@ -5,11 +5,11 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         this.moduleName = parseModuleName(orgUnit);
         this.lineListService = CustomAttributes.parseAttribute(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
 
-        this.dataValues = aggregateDataValues && aggregateDataValues.dataValues || [];
+        this.dataValues = getAggregateDataValues(aggregateDataValues);
         this.dataValuesHaveBeenModifiedLocally = dataValuesHaveBeenModifiedLocally(this.dataValues);
 
         this.approvalData = approvalData || null;
-        this.submitted = isSubmitted(aggregateDataValues, lineListEvents, this.lineListService);
+        this.submitted = isSubmitted(this.dataValues, lineListEvents, this.lineListService);
         this.approvedAtProjectLevel = !!(approvalData && approvalData.isComplete);
         this.approvedAtProjectLevelBy = this.approvedAtProjectLevel ? approvalData.completedBy : null;
         this.approvedAtProjectLevelAt = this.approvedAtProjectLevel ? moment(approvalData.completedOn) : null;
@@ -27,7 +27,7 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
     };
 
     var dataValuesFailedToSync = function (isLineListService, aggregateDataValues) {
-        return isLineListService ? false : !!(aggregateDataValues && aggregateDataValues.localStatus && aggregateDataValues.localStatus == 'FAILED_TO_SYNC');
+        return isLineListService ? false : !!(aggregateDataValues && aggregateDataValues.length > 0 && _.any(aggregateDataValues, { localStatus: 'FAILED_TO_SYNC' }));
     };
 
     var isActive = function (period, openingDate) {
@@ -37,11 +37,15 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         return moment(period, "GGGG[W]W").isoWeek() >= dateToCompare.isoWeek();
     };
 
-    var isSubmitted = function (aggregateDataValues, lineListEvents, lineListService) {
+    var getAggregateDataValues = function(aggregateDataValues) {
+        return _.compact(_.flatten(_.map(aggregateDataValues, 'dataValues')));
+    };
+
+    var isSubmitted = function (dataValues, lineListEvents, lineListService) {
         if(lineListService) {
             return !!(lineListEvents && lineListEvents.length > 0 && _.all(lineListEvents, eventIsSubmitted));
         } else {
-            return !!(aggregateDataValues && aggregateDataValues.dataValues && aggregateDataValues.dataValues.length > 0 && !_.some(aggregateDataValues.dataValues, { isDraft: true }));
+            return !!(dataValues.length > 0 && !_.some(dataValues, { isDraft: true }));
         }
     };
 

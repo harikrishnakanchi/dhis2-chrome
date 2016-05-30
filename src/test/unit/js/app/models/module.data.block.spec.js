@@ -4,6 +4,10 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
 
         beforeEach(function() {
             spyOn(CustomAttributes, 'parseAttribute');
+            orgUnit = {
+                id: 'someOrgUnitId'
+            };
+            period = 'somePeriod';
             aggregateDataValues = undefined;
             lineListEvents = undefined;
             approvalData = undefined;
@@ -14,15 +18,28 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             return ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
         };
 
+        var createMockDataValue = function(options) {
+            return _.merge({
+                dataElement: 'someDataElementId',
+                period: 'somePeriod',
+                orgUnit: 'someOrgUnit',
+                categoryOptionCombo: 'someCategoryOptionComboId',
+                lastUpdated: '2016-05-04T09:00:00.000Z',
+                value: 'someValue'
+            }, options);
+        };
+
+        var createMockDataValuesObject = function(options) {
+            return _.merge({
+                dataValues: [createMockDataValue()]
+            }, options);
+        };
+
         describe('create()', function () {
             it('should return an instance with required properties', function () {
-                orgUnit = {
-                    id: 'orgUnitId'
-                };
-                period = '2016W06';
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.moduleId).toEqual(orgUnit.id);
-                expect(moduleDataBlock.period).toEqual('2016W06');
+                expect(moduleDataBlock.period).toEqual(period);
             });
         });
 
@@ -68,11 +85,7 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                 });
 
                 it('should be true if there are dataValues and none of them are draft', function () {
-                    aggregateDataValues = {
-                        dataValues: [{
-                            value: 'someValue'
-                        }]
-                    };
+                    aggregateDataValues = [createMockDataValuesObject()];
                     moduleDataBlock = createModuleDataBlock();
                     expect(moduleDataBlock.submitted).toEqual(true);
                 });
@@ -83,30 +96,25 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                     expect(moduleDataBlock.submitted).toEqual(false);
                 });
 
-                it('should be false if aggregateDataValues has no dataValues collection', function () {
-                    aggregateDataValues = {};
+                it('should be false if all of the aggregateDataValues have no dataValues collection', function () {
+                    aggregateDataValues = [{}];
                     moduleDataBlock = createModuleDataBlock();
                     expect(moduleDataBlock.submitted).toEqual(false);
                 });
 
-                it('should be false if aggregateDataValues has no empty dataValues collection', function () {
-                    aggregateDataValues = {
-                        dataValues: []
-                    };
+                it('should be false if aggregateDataValues has empty dataValues collection', function () {
+                    aggregateDataValues = [{ dataValues: [] }];
                     moduleDataBlock = createModuleDataBlock();
                     expect(moduleDataBlock.submitted).toEqual(false);
                 });
 
                 it('should be false if there are dataValues and some of them are draft', function () {
-                    aggregateDataValues = {
-                        dataValues: [{
-                            value: 'someValue'
-                        },{
-                            value: 'anotherValue',
-                            isDraft: true
-                        }],
-                        localStatus: "random status"
-                    };
+                    aggregateDataValues = [createMockDataValuesObject({
+                        dataValues: [
+                            createMockDataValue(),
+                            createMockDataValue({ isDraft: true })
+                        ]
+                    })];
                     moduleDataBlock = createModuleDataBlock();
                     expect(moduleDataBlock.submitted).toEqual(false);
                 });
@@ -150,21 +158,22 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
 
         describe('dataValues', function() {
             it('should return empty array if aggregateDataValues are undefined', function() {
+                aggregateDataValues = undefined;
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.dataValues).toEqual([]);
             });
 
             it('should return empty array if aggregateDataValues has no data values collection', function() {
-                aggregateDataValues = {};
+                aggregateDataValues = [{}];
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.dataValues).toEqual([]);
             });
 
             it('should return aggregateDataValues', function() {
-                var dataValues = [{'value': "someValue"}];
-                aggregateDataValues = {
+                var dataValues = [createMockDataValue()];
+                aggregateDataValues = [createMockDataValuesObject({
                     dataValues: dataValues
-                };
+                })];
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.dataValues).toEqual(dataValues);
             });
@@ -336,11 +345,7 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
 
             it('should be false if data has been submitted', function() {
-                aggregateDataValues = {
-                    dataValues: [{
-                        value: 'someValue'
-                    }]
-                };
+                aggregateDataValues = [createMockDataValuesObject()];
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(false);
             });
@@ -355,12 +360,9 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
 
             it('should be true if data has been submitted but not synced to DHIS', function() {
-                aggregateDataValues = {
-                    dataValues: [{
-                        value: 'someValue'
-                    }],
+                aggregateDataValues = [createMockDataValuesObject({
                     localStatus: "FAILED_TO_SYNC"
-                };
+                })];
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toBeTruthy();
             });
@@ -369,14 +371,10 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
         describe('awaitingActionAtProjectLevelApprover', function() {
             beforeEach(function() {
                 CustomAttributes.parseAttribute.and.returnValue(false);
+                aggregateDataValues = [createMockDataValuesObject()];
             });
 
             it('should be true if data has been submitted', function() {
-                aggregateDataValues = {
-                    dataValues: [{
-                        value: 'someValue'
-                    }]
-                };
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toBeTruthy();
             });
@@ -388,11 +386,6 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
 
             it('should be false if data is submitted but approved at project level', function() {
-                aggregateDataValues = {
-                    dataValues: [{
-                        value: 'someValue'
-                    }]
-                };
                 approvalData = {
                     isComplete: true
                 };
@@ -401,11 +394,6 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
 
             it('should be false if data has been submitted, not approved at project level, but approved at coordination level by auto-approve job', function() {
-                aggregateDataValues = {
-                    dataValues: [{
-                        value: 'someValue'
-                    }]
-                };
                 approvalData = {
                     isComplete: false,
                     isApproved: true
@@ -415,12 +403,9 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
 
             it('should be false if data has been submitted, not synced to DHIS', function() {
-                aggregateDataValues = {
-                    dataValues: [{
-                        value: 'someValue'
-                    }],
+                aggregateDataValues = [createMockDataValuesObject({
                     localStatus: "FAILED_TO_SYNC"
-                };
+                })];
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
             });
@@ -429,6 +414,7 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
         describe('awaitingActionAtCoordinationLevelApprover', function() {
             beforeEach(function() {
                 CustomAttributes.parseAttribute.and.returnValue(false);
+                aggregateDataValues = [createMockDataValuesObject()];
             });
 
             it('should be false if data has not been submitted ', function() {
@@ -438,11 +424,6 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
 
             it('should be true if data has submitted and approved at project level', function() {
-                aggregateDataValues = {
-                    dataValues: [{
-                        value: 'someValue'
-                    }]
-                };
                 approvalData = {
                     isComplete: true
                 };
@@ -451,22 +432,12 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
 
             it('should be false if data has been submitted but not approved at project level', function() {
-                aggregateDataValues = {
-                    dataValues: [{
-                        value: 'someValue'
-                    }]
-                };
                 approvalData = null;
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.awaitingActionAtCoordinationLevelApprover).toEqual(false);
             });
 
             it('should be false if data has been submitted and approved at project level and approved at coordination level', function() {
-                aggregateDataValues = {
-                    dataValues: [{
-                        value: 'someValue'
-                    }]
-                };
                 approvalData = {
                     isComplete: true,
                     isApproved: true
@@ -488,30 +459,18 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
 
             it('should be false if localStatus is not "FAILED_TO_SYNC" ', function() {
-                aggregateDataValues = {
-                    dataValues: [{
-                        value: 'someValue'
-                    },{
-                        value: 'anotherValue',
-                        isDraft: true
-                    }],
-                    localStatus: 'random status'
-                };
+                aggregateDataValues = [createMockDataValuesObject({
+                    localStatus: "RANDOM_STATUS"
+                })];
                 moduleDataBlock = createModuleDataBlock();
 
                 expect(moduleDataBlock.notSynced).toEqual(false);
             });
 
             it('should be true if localStatus is "FAILED_TO_SYNC" ', function() {
-                aggregateDataValues = {
-                    dataValues: [{
-                        value: 'someValue'
-                    },{
-                        value: 'anotherValue',
-                        isDraft: true
-                    }],
-                    localStatus: 'FAILED_TO_SYNC'
-                };
+                aggregateDataValues = [createMockDataValuesObject({
+                    localStatus: "FAILED_TO_SYNC"
+                })];
                 moduleDataBlock = createModuleDataBlock();
 
                 expect(moduleDataBlock.notSynced).toEqual(true);
@@ -556,40 +515,30 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
 
             it('should return false if aggregateDataValues has no data values collection', function () {
-                aggregateDataValues = {};
+                aggregateDataValues = [{}];
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.dataValuesHaveBeenModifiedLocally).toEqual(false);
             });
 
             it('should return false if aggregateDataValues has no data values', function () {
-                aggregateDataValues = {
-                    dataValues: []
-                };
+                aggregateDataValues = [{ dataValues: [] }];
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.dataValuesHaveBeenModifiedLocally).toEqual(false);
             });
 
             it('should return true if there are locally created or updated data values', function () {
-                aggregateDataValues = {
-                    dataValues: [{
-                        value: 'someValue',
-                        clientLastUpdated: someMomentInTime.toISOString()
-                    }, {
-                        value: 'someValue',
-                        lastUpdated: someMomentInTime.toISOString()
-                    }]
-                };
+                aggregateDataValues = [createMockDataValuesObject({
+                    dataValues: [
+                        createMockDataValue(),
+                        createMockDataValue({ clientLastUpdated: someMomentInTime.toISOString() })
+                    ]
+                })];
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.dataValuesHaveBeenModifiedLocally).toEqual(true);
             });
 
             it('should return false if there are only data values downloaded from DHIS', function () {
-                aggregateDataValues = {
-                    dataValues: [{
-                        value: 'someValue',
-                        lastUpdated: someMomentInTime.toISOString()
-                    }]
-                };
+                aggregateDataValues = [createMockDataValuesObject()];
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.dataValuesHaveBeenModifiedLocally).toEqual(false);
             });
