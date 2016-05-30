@@ -41,6 +41,7 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
                 periodRange: periodRange,
                 lastUpdatedTimestamp: lastUpdatedTimestamp
             })
+            .then(getOriginsForModule)
             .then(getIndexedDataValuesFromDhis)
             .then(getIndexedCompletionsFromDhis)
             .then(getIndexedApprovalsFromDhis)
@@ -54,6 +55,11 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
             });
         };
 
+        var getOriginsForModule = function(data) {
+            return orgUnitRepository.findAllByParent([data.moduleId]).then(function (originOrgUnits) {
+                return _.merge({ originOrgUnits: originOrgUnits }, data);
+            });
+        };
         var getIndexedDataValuesFromDhis = function(data) {
             return dataService.downloadData(data.moduleId, data.dataSetIds, data.periodRange, data.lastUpdatedTimestamp)
                 .then(function (dataValues) {
@@ -65,14 +71,13 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
         };
 
         var getIndexedCompletionsFromDhis = function (data) {
-            return orgUnitRepository.findAllByParent([data.moduleId]).then(function (originOrgUnits) {
-                var originOrgUnitsIds = _.pluck(originOrgUnits, 'id');
-                return approvalService.getCompletionData(data.moduleId, originOrgUnitsIds, data.dataSetIds, data.periodRange).then(function(allCompletionData) {
-                    var indexedCompletions = _.indexBy(allCompletionData, function(completionData) {
-                        return completionData.period + completionData.orgUnit;
-                    });
-                    return _.merge({ indexedDhisCompletions: indexedCompletions }, data);
+            var originOrgUnitsIds = _.pluck(data.originOrgUnits, 'id');
+
+            return approvalService.getCompletionData(data.moduleId, originOrgUnitsIds, data.dataSetIds, data.periodRange).then(function(allCompletionData) {
+                var indexedCompletions = _.indexBy(allCompletionData, function(completionData) {
+                    return completionData.period + completionData.orgUnit;
                 });
+                return _.merge({ indexedDhisCompletions: indexedCompletions }, data);
             });
         };
 
