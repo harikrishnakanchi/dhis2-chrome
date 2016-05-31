@@ -4,6 +4,6 @@ define([], function() {
             "authHeader": "Basic YWRtaW46ZGlzdHJpY3Q=",
             "productKeyLevel": "global"
         },
-        "extension_id": "extensionID"
+        "support_email": "supportEmail"
     };
 });

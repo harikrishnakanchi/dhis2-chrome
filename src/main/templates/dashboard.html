@@ -14,12 +14,7 @@
             <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
             <div class="alert alert-danger" ng-show="compatibilityInfo.incompatibleVersion">
                 <i class="fa fa-warning"></i>&nbsp;
-                {{ resourceBundle.incompatiblePraxisVersion }} {{ resourceBundle.logoutToUpgrade }}
-            </div>
-            <div class="alert alert-info" ng-show="compatibilityInfo.newerVersionAvailable">
-                <i class="fa fa-info-circle"></i>&nbsp;
-                {{ resourceBundle.praxis + ' v' + compatibilityInfo.newerVersionNumber + ' ' + resourceBundle.newUpgradeAvailable }}
-                {{ resourceBundle.logoutToUpgrade }}
+                {{ resourceBundle.incompatiblePraxisVersion }} {{ resourceBundle.contactSupport }} ({{ support_email }})
             </div>
         </div>
         <form name="approvalForm">

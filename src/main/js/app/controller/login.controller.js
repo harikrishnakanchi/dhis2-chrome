@@ -141,7 +141,7 @@ define(["md5", "properties", "lodash"], function(md5, properties, _) {
         };
 
         var init = function() {
-            $scope.extension_id = properties.extension_id;
+            $scope.support_email = properties.support_email;
             $scope.compatibilityInfo = {};
             checkVersionCompatibility($scope.compatibilityInfo);
         };

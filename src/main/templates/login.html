@@ -5,14 +5,10 @@
         <p class='alert alert-danger' ng-show='disabledCredentials' id="userDisabledMsg">{{ resourceBundle.disabledCredentials }}</p>
         <p class='alert alert-danger' ng-show='compatibilityInfo.incompatibleVersion'>
             {{ resourceBundle.incompatiblePraxisVersion }}<br>
-            {{ resourceBundle.continueUsingMsg }}
-            <a href="https://chrome.google.com/webstore/detail/praxis/{{extension_id}}" class="underline" target="_blank">{{ resourceBundle.here }}</a>
-            {{ resourceBundle.toUpgradeMsg }}
+            {{ resourceBundle.contactSupport }} ({{ support_email }})
         </p>
         <p class='alert alert-info' ng-show="compatibilityInfo.newerVersionAvailable">
-            {{ resourceBundle.praxis + ' v' + compatibilityInfo.newerVersionNumber + ' ' + resourceBundle.newUpgradeAvailable }}
-            {{ resourceBundle.clickToUpgrade }}
-            <a href="https://chrome.google.com/webstore/detail/praxis/{{extension_id}}" class="underline" target="_blank">{{ resourceBundle.here }}</a>.
+            {{ resourceBundle.praxis + ' ' + compatibilityInfo.newerVersionNumber + ' ' + resourceBundle.newUpgradeAvailable }}
         </p>
         <div class="well">
             <div class="form-group">

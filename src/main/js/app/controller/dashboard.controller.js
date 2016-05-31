@@ -136,6 +136,7 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
         };
 
         var init = function() {
+            $scope.support_email = properties.support_email;
 
             $scope.compatibilityInfo = {};
             checkVersionCompatibility($scope.compatibilityInfo);

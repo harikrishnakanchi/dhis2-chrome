@@ -5,7 +5,7 @@ define([], function() {
     var iter = parseInt("/* @echo ITER */");
     var ks = parseInt("/* @echo KS */");
     var ts = parseInt("/* @echo TS */");
-    var extensionId = "/* @echo EXTENSION_ID */";
+    var supportEmail = "/* @echo SUPPORT_EMAIL */";
 
     return {
         "dhisPing": {
@@ -35,6 +35,6 @@ define([], function() {
             "ts": ts
         },
         "devMode": false,
-        "extension_id": extensionId
+        "support_email": supportEmail
     };
 });

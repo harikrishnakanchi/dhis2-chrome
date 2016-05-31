@@ -25,7 +25,7 @@ var passphrase = argv.passphrase || "My Product Key";
 var iter = argv.iter || 1000;
 var ks = argv.ks || 128;
 var ts = argv.ts || 64;
-var extensionId = argv.extensionId || "My Extension ID";
+var supportEmail = argv.supportEmail || "";
 
 gulp.task('test', function(onDone) {
     new karmaServer({
@@ -89,7 +89,7 @@ gulp.task('config', function() {
                 ITER: iter,
                 KS: ks,
                 TS: ts,
-                EXTENSION_ID: extensionId
+                SUPPORT_EMAIL: supportEmail
             }
         }))
         .pipe(gulp.dest('./src/main/js/app/conf'));
