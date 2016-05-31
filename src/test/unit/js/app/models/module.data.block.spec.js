@@ -1,9 +1,12 @@
 define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(ModuleDataBlock, CustomAttributes, moment, timecop) {
     describe('ModuleDataBlock', function () {
-        var moduleDataBlock, orgUnit, period, aggregateDataValues, lineListEvents, approvalData, someMomentInTime;
+        var moduleDataBlock, orgUnit, period, aggregateDataValues, lineListEvents, approvalData, someMomentInTime, isLineListService;
 
         beforeEach(function() {
-            spyOn(CustomAttributes, 'parseAttribute');
+            isLineListService = false;
+            spyOn(CustomAttributes, 'parseAttribute').and.callFake(function() {
+                return isLineListService;
+            });
             orgUnit = {
                 id: 'someOrgUnitId'
             };
@@ -81,7 +84,7 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
         describe('submitted', function() {
             describe('for an aggregate module', function() {
                 beforeEach(function() {
-                    CustomAttributes.parseAttribute.and.returnValue(false);
+                    isLineListService = false;
                 });
 
                 it('should be true if there are dataValues and none of them are draft', function () {
@@ -122,7 +125,7 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
 
             describe('for a linelist module', function() {
                 beforeEach(function() {
-                    CustomAttributes.parseAttribute.and.returnValue(true);
+                    isLineListService = true;
                 });
 
                 it('should be true if none of the events have a localStatus', function () {
@@ -334,10 +337,6 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
         });
 
         describe('awaitingActionAtDataEntryLevel', function() {
-            beforeEach(function() {
-                CustomAttributes.parseAttribute.and.returnValue(false);
-            });
-
             it('should be true if data has not been submitted', function() {
                 aggregateDataValues = null;
                 moduleDataBlock = createModuleDataBlock();
@@ -370,7 +369,6 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
 
         describe('awaitingActionAtProjectLevelApprover', function() {
             beforeEach(function() {
-                CustomAttributes.parseAttribute.and.returnValue(false);
                 aggregateDataValues = [createMockDataValuesObject()];
             });
 
@@ -413,7 +411,6 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
 
         describe('awaitingActionAtCoordinationLevelApprover', function() {
             beforeEach(function() {
-                CustomAttributes.parseAttribute.and.returnValue(false);
                 aggregateDataValues = [createMockDataValuesObject()];
             });
 
@@ -449,11 +446,11 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
 
         describe('notSynced', function() {
             beforeEach(function() {
-                CustomAttributes.parseAttribute.and.returnValue(false);
+                isLineListService = false;
             });
 
             it('should be false if it is lineListService', function() {
-                CustomAttributes.parseAttribute.and.returnValue(true);
+                isLineListService = true;
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.notSynced).toEqual(false);
             });
