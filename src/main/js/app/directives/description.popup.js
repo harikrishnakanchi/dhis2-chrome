@@ -18,13 +18,10 @@ define([], function() {
                     scope.layoutDirection = $rootScope.layoutDirection;
 
                     var modalInstance = $modal.open({
-                        templateUrl: 'templates/notification-dialog.html',
+                        templateUrl: 'templates/description-dialog.html',
                         controller: 'notificationDialogController',
-                        scope: scope
-                    });
-
-                    modalInstance.result.then(function () {
-                        console.log('modal closed');
+                        scope: scope,
+                        windowClass: 'modal-lg'
                     });
                 });
             }
