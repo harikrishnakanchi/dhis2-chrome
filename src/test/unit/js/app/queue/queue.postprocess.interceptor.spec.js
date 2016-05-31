@@ -1,7 +1,7 @@
 define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtils", "utils", "dataRepository", "approvalDataRepository"], function(QueuePostProcessInterceptor, mocks, properties, chromeUtils, utils, DataRepository, ApprovalDataRepository) {
     describe('queuePostProcessInterceptor', function() {
 
-        var hustle, queuePostProcessInterceptor, q, rootScope, ngI18nResourceBundle, scope, dataRepository, approvalDataRepository;
+        var queuePostProcessInterceptor, q, rootScope, ngI18nResourceBundle, scope, dataRepository, approvalDataRepository;
 
         beforeEach(mocks.inject(function($q, $rootScope, $log) {
             q = $q;
@@ -9,7 +9,11 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
             scope = $rootScope.$new();
 
             dataRepository = new DataRepository();
+            spyOn(dataRepository, "setLocalStatus").and.returnValue(utils.getPromise(q, {}));
+            spyOn(dataRepository, "flagAsFailedToSync").and.returnValue(utils.getPromise(q, {}));
+
             approvalDataRepository = new ApprovalDataRepository();
+            spyOn(approvalDataRepository, "flagAsFailedToSync").and.returnValue(utils.getPromise(q, {}));
 
             spyOn(chromeUtils, "sendMessage");
             spyOn(chromeUtils, "createNotification");
@@ -163,10 +167,9 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
                     "type": "uploadDataValues",
                     "data": periodAndOrgUnit
                 },
-                "releases": 6
+                "releases": properties.queue.maxretries + 1
             };
 
-            spyOn(dataRepository, "setLocalStatus");
             queuePostProcessInterceptor.shouldRetry(job, {});
 
             scope.$apply();
@@ -185,51 +188,34 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
                     "type": "NOTUploadDataValues",
                     "data": periodsAndOrgUnits
                 },
-                "releases": 6
+                "releases": properties.queue.maxretries + 1
             };
 
-            spyOn(dataRepository, "setLocalStatus");
             queuePostProcessInterceptor.shouldRetry(job, {});
-
             scope.$apply();
 
             expect(dataRepository.setLocalStatus).not.toHaveBeenCalled();
         });
 
-        it("should change completion data status to 'FAILED_TO_SYNC' after maxretries", function() {
+        it("should flag that datavalues and approvalData failed to sync after maxretries", function() {
             var job = {
-                "id": 1,
-                "data": {
-                    "type": "uploadCompletionData",
-                    "data": "someData"
+                id: 1,
+                data: {
+                    type: "syncModuleDataBlock",
+                    data: {
+                        moduleId: 'someModuleId',
+                        period: 'somePeriod'
+                    }
                 },
-                "releases": 6
+                releases: properties.queue.maxretries + 1
             };
 
-            spyOn(approvalDataRepository, "setLocalStatus");
-            queuePostProcessInterceptor.shouldRetry(job, {});
 
+            queuePostProcessInterceptor.shouldRetry(job, {});
             scope.$apply();
 
-            expect(approvalDataRepository.setLocalStatus).toHaveBeenCalledWith("someData", "FAILED_TO_SYNC");
-        });
-
-        it("should change approval data status for to 'FAILED_TO_SYNC' after maxretries", function() {
-            var job = {
-                "id": 1,
-                "data": {
-                    "type": "uploadApprovalData",
-                    "data": "someData"
-                },
-                "releases": 6
-            };
-
-            spyOn(approvalDataRepository, "setLocalStatus");
-            queuePostProcessInterceptor.shouldRetry(job, {});
-
-            scope.$apply();
-
-            expect(approvalDataRepository.setLocalStatus).toHaveBeenCalledWith("someData", "FAILED_TO_SYNC");
+            expect(dataRepository.flagAsFailedToSync).toHaveBeenCalledWith(['someModuleId'], 'somePeriod');
+            expect(approvalDataRepository.flagAsFailedToSync).toHaveBeenCalledWith('someModuleId', 'somePeriod');
         });
     });
 });
