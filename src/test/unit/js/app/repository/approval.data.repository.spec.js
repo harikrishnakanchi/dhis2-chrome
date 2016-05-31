@@ -57,8 +57,7 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "completedOn": "2014-01-03T00:00:00.000Z",
                 "isComplete": true,
                 "isApproved": false,
-                "status": "NEW",
-                "localStatus": "WAITING_TO_SYNC"
+                "status": "NEW"
             }, {
                 "period": "2014W01",
                 "orgUnit": "Mod2",
@@ -66,8 +65,7 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "completedOn": "2014-01-03T00:00:00.000Z",
                 "isComplete": true,
                 "isApproved": false,
-                "status": "NEW",
-                "localStatus": "WAITING_TO_SYNC"
+                "status": "NEW"
             }, {
                 "period": "2014W02",
                 "orgUnit": "Mod1",
@@ -75,8 +73,7 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "completedOn": "2014-01-03T00:00:00.000Z",
                 "isComplete": true,
                 "isApproved": false,
-                "status": "NEW",
-                "localStatus": "WAITING_TO_SYNC"
+                "status": "NEW"
             }];
 
             expect(db.objectStore).toHaveBeenCalledWith("approvals");
@@ -146,8 +143,7 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "approvedOn": thisMoment.toISOString(),
                 "isComplete": true,
                 "isApproved": true,
-                "status": "NEW",
-                "localStatus": "WAITING_TO_SYNC"
+                "status": "NEW"
             }, {
                 "period": "2014W01",
                 "orgUnit": "Mod2",
@@ -157,8 +153,7 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "approvedOn": thisMoment.toISOString(),
                 "isComplete": true,
                 "isApproved": true,
-                "status": "NEW",
-                "localStatus": "WAITING_TO_SYNC"
+                "status": "NEW"
             }, {
                 "period": "2014W02",
                 "orgUnit": "Mod4",
@@ -168,8 +163,7 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "approvedOn": thisMoment.toISOString(),
                 "isComplete": true,
                 "isApproved": true,
-                "status": "NEW",
-                "localStatus": "WAITING_TO_SYNC"
+                "status": "NEW"
             }, {
                 "period": "2014W02",
                 "orgUnit": "Mod5",
@@ -179,8 +173,7 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "approvedOn": thisMoment.toISOString(),
                 "isComplete": true,
                 "isApproved": true,
-                "status": "NEW",
-                "localStatus": "WAITING_TO_SYNC"
+                "status": "NEW"
             }];
 
             mockStore.each.and.returnValue(utils.getPromise(q, approvalsInIdb));
@@ -254,35 +247,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
 
             expect(db.objectStore).toHaveBeenCalledWith("approvals");
             expect(mockStore.upsert).toHaveBeenCalledWith(dataFromDhis);
-        });
-
-        it("should set localStatus for data coming from DHIS", function() {
-
-            var dataFromDhis = {
-                "period": "2014W01",
-                "orgUnit": "Mod1",
-                "completedBy": "user1",
-                "completedOn": "2014-01-10T00:00:00.000Z",
-                "isComplete": true,
-                "approvedBy": "user2",
-                "approvedOn": "2014-01-10T00:00:00.000Z",
-                "isApproved": true
-            };
-
-            approvalDataRepository.saveApprovalsFromDhis(dataFromDhis);
-
-            expect(db.objectStore).toHaveBeenCalledWith("approvals");
-            expect(mockStore.upsert).toHaveBeenCalledWith({
-                "period": "2014W01",
-                "orgUnit": "Mod1",
-                "completedBy": "user1",
-                "completedOn": "2014-01-10T00:00:00.000Z",
-                "isComplete": true,
-                "approvedBy": "user2",
-                "approvedOn": "2014-01-10T00:00:00.000Z",
-                "isApproved": true,
-                "localStatus": "DATA_FROM_DHIS"
-            });
         });
 
         describe('flagAsFailedToSync', function() {

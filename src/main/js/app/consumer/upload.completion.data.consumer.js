@@ -29,13 +29,8 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
                     });
                 });
 
-                var markAsSynced = function() {
-                    return approvalDataRepository.setLocalStatus(allApprovalData, "SYNCED_TO_DHIS");
-                };
-
                 return approvalService.markAsComplete(allDatasets, periodsAndOrgUnitsForDhis, completedBy, completedOn)
-                    .then(clearStatusFlag)
-                    .then(markAsSynced);
+                    .then(clearStatusFlag);
             });
         };
     };

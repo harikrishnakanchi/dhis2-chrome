@@ -9,7 +9,6 @@ define(["uploadApprovalDataConsumer", "angularMocks", "approvalService", "approv
 
                 approvalDataRepository = new ApprovalDataRepository();
                 spyOn(approvalDataRepository, "clearStatusFlag").and.returnValue(utils.getPromise(q, {}));
-                spyOn(approvalDataRepository, "setLocalStatus");
 
                 approvalService = new ApprovalService();
                 spyOn(approvalService, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
@@ -99,42 +98,6 @@ define(["uploadApprovalDataConsumer", "angularMocks", "approvalService", "approv
                 scope.$apply();
 
                 expect(approvalDataRepository.clearStatusFlag).toHaveBeenCalledWith("2014W01", "ou1");
-            });
-
-            it("should set localStatus to SYNCED_TO_DHIS after uploading approval data to DHIS", function() {
-                var approvalData = [{
-                    "period": "2014W01",
-                    "orgUnit": "ou1",
-                    "completedBy": "user1",
-                    "completedOn": "2014-01-05T00:00:00.000+0000",
-                    "approvedBy": "approver1",
-                    "approvedOn": "2014-01-10T00:00:00.000+0000",
-                    "isComplete": true,
-                    "isApproved": true,
-                    "status": "NEW"
-                }];
-
-                spyOn(datasetRepository, "getAll").and.returnValue(utils.getPromise(q, [{
-                    'id': 'd1'
-                }, {
-                    'id': 'd2'
-                }]));
-                spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, approvalData));
-
-                var message = {
-                    "data": {
-                        "data": {
-                            "period": "2014W01",
-                            "orgUnit": "ou1"
-                        },
-                        "type": "uploadApprovalData"
-                    }
-                };
-
-                uploadApprovalDataConsumer.run(message);
-                scope.$apply();
-
-                expect(approvalDataRepository.setLocalStatus).toHaveBeenCalledWith(approvalData, 'SYNCED_TO_DHIS');
             });
         });
     });
