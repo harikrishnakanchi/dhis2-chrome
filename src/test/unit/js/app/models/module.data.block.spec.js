@@ -336,111 +336,122 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
         });
 
-        describe('awaitingActionAtDataEntryLevel', function() {
-            it('should be true if data has not been submitted', function() {
+        describe('awaitingActionAt DataEntryLevel, ProjectLevelApprover, CoordinationLevelApprover', function() {
+            it('should be waiting at dataEntryLevel if data has not been submitted', function() {
                 aggregateDataValues = null;
+
                 moduleDataBlock = createModuleDataBlock();
+
                 expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(true);
-            });
-
-            it('should be false if data has been submitted', function() {
-                aggregateDataValues = [createMockDataValuesObject()];
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(false);
-            });
-
-            it('should be false if data has not been submitted but has been approved at coordination level by auto-approve job', function() {
-                aggregateDataValues = null;
-                approvalData = {
-                    isApproved: true
-                };
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(false);
-            });
-
-            it('should be true if data has been submitted but not synced to DHIS', function() {
-                aggregateDataValues = [createMockDataValuesObject({
-                    localStatus: "FAILED_TO_SYNC"
-                })];
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toBeTruthy();
-            });
-        });
-
-        describe('awaitingActionAtProjectLevelApprover', function() {
-            beforeEach(function() {
-                aggregateDataValues = [createMockDataValuesObject()];
-            });
-
-            it('should be true if data has been submitted', function() {
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toBeTruthy();
-            });
-
-            it('should be false if data is not submitted', function() {
-                aggregateDataValues = null;
-                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
-            });
-
-            it('should be false if data is submitted but approved at project level', function() {
-                approvalData = {
-                    isComplete: true
-                };
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
-            });
-
-            it('should be false if data has been submitted, not approved at project level, but approved at coordination level by auto-approve job', function() {
-                approvalData = {
-                    isComplete: false,
-                    isApproved: true
-                };
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
-            });
-
-            it('should be false if data has been submitted, not synced to DHIS', function() {
-                aggregateDataValues = [createMockDataValuesObject({
-                    localStatus: "FAILED_TO_SYNC"
-                })];
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
-            });
-        });
-
-        describe('awaitingActionAtCoordinationLevelApprover', function() {
-            beforeEach(function() {
-                aggregateDataValues = [createMockDataValuesObject()];
-            });
-
-            it('should be false if data has not been submitted ', function() {
-                aggregateDataValues = null;
-                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.awaitingActionAtCoordinationLevelApprover).toEqual(false);
             });
 
-            it('should be true if data has submitted and approved at project level', function() {
+            it('should be waiting at projectLevel if data has been submitted', function() {
+                aggregateDataValues = [createMockDataValuesObject()];
+
+                moduleDataBlock = createModuleDataBlock();
+
+                expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(false);
+                expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(true);
+                expect(moduleDataBlock.awaitingActionAtCoordinationLevelApprover).toEqual(false);
+            });
+
+            it('should be waiting at coordinationLevel if data has been submitted and approved at project level', function() {
+                aggregateDataValues = [createMockDataValuesObject()];
                 approvalData = {
                     isComplete: true
                 };
+
                 moduleDataBlock = createModuleDataBlock();
+
+                expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(false);
+                expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
                 expect(moduleDataBlock.awaitingActionAtCoordinationLevelApprover).toEqual(true);
             });
 
-            it('should be false if data has been submitted but not approved at project level', function() {
-                approvalData = null;
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.awaitingActionAtCoordinationLevelApprover).toEqual(false);
-            });
-
-            it('should be false if data has been submitted and approved at project level and approved at coordination level', function() {
+            it('should not be waiting at any level if data has been submitted and approved at project and coordination level', function() {
+                aggregateDataValues = [createMockDataValuesObject()];
                 approvalData = {
                     isComplete: true,
                     isApproved: true
                 };
                 moduleDataBlock = createModuleDataBlock();
+
+                expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(false);
+                expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
                 expect(moduleDataBlock.awaitingActionAtCoordinationLevelApprover).toEqual(false);
+            });
+
+            it('should not be waiting at any level if data has not been submitted but has been approved at coordination level by auto-approve job', function() {
+                aggregateDataValues = null;
+                approvalData = {
+                    isApproved: true
+                };
+
+                moduleDataBlock = createModuleDataBlock();
+
+                expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(false);
+                expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
+                expect(moduleDataBlock.awaitingActionAtCoordinationLevelApprover).toEqual(false);
+            });
+
+            it('should not be waiting at any level if data has been submitted, not approved at project level, but approved at coordination level by auto-approve job', function() {
+                aggregateDataValues = [createMockDataValuesObject()];
+                approvalData = {
+                    isApproved: true
+                };
+
+                moduleDataBlock = createModuleDataBlock();
+
+                expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(false);
+                expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
+                expect(moduleDataBlock.awaitingActionAtCoordinationLevelApprover).toEqual(false);
+            });
+
+            it('should be waiting at dataEntryLevel if data has been submitted but failed to sync', function() {
+                aggregateDataValues = [createMockDataValuesObject({
+                    failedToSync: true
+                })];
+
+                moduleDataBlock = createModuleDataBlock();
+
+                expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(true);
+                expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
+                expect(moduleDataBlock.awaitingActionAtCoordinationLevelApprover).toEqual(false);
+            });
+
+            it('should be waiting at projectLevel if data has been submitted, approved at project level, but failed to sync', function() {
+                aggregateDataValues = [createMockDataValuesObject({
+                    failedToSync: true
+                })];
+                approvalData = {
+                    isComplete: true,
+                    failedToSync: true
+                };
+
+                moduleDataBlock = createModuleDataBlock();
+
+                expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(false);
+                expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(true);
+                expect(moduleDataBlock.awaitingActionAtCoordinationLevelApprover).toEqual(false);
+            });
+
+            it('should be waiting at coordinationLevel if data has been submitted, approved at project and coordination level, but failed to sync', function() {
+                aggregateDataValues = [createMockDataValuesObject({
+                    failedToSync: true
+                })];
+                approvalData = {
+                    isComplete: true,
+                    isApproved: true,
+                    failedToSync: true
+                };
+
+                moduleDataBlock = createModuleDataBlock();
+
+                expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(false);
+                expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
+                expect(moduleDataBlock.awaitingActionAtCoordinationLevelApprover).toEqual(true);
             });
         });
 

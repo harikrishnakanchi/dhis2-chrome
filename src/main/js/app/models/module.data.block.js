@@ -4,11 +4,12 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         this.period = period;
         this.moduleName = parseModuleName(orgUnit);
         this.lineListService = CustomAttributes.parseAttribute(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
+        this.active = isActive(this.period, orgUnit.openingDate);
 
         this.dataValues = getAggregateDataValues(aggregateDataValues);
         this.dataValuesHaveBeenModifiedLocally = dataValuesHaveBeenModifiedLocally(this.dataValues);
-
         this.approvalData = approvalData || null;
+
         this.submitted = isSubmitted(this.dataValues, lineListEvents, this.lineListService);
         this.approvedAtProjectLevel = !!(approvalData && approvalData.isComplete);
         this.approvedAtProjectLevelBy = this.approvedAtProjectLevel ? approvalData.completedBy : null;
@@ -19,12 +20,9 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
 
         this.failedToSync = failedToSync(this.lineListService, aggregateDataValues, approvalData);
 
-        var dataValuesNotSynced = dataValuesFailedToSync(this.lineListService, aggregateDataValues);
-        this.awaitingActionAtDataEntryLevel = !(this.submitted || this.approvedAtCoordinationLevel) || dataValuesNotSynced;
-        this.awaitingActionAtProjectLevelApprover = (this.submitted && !this.approvedAtProjectLevel && !this.approvedAtCoordinationLevel)  && !dataValuesNotSynced;
-        this.awaitingActionAtCoordinationLevelApprover = this.submitted && this.approvedAtProjectLevel && !this.approvedAtCoordinationLevel;
-
-        this.active = isActive(this.period, orgUnit.openingDate);
+        this.awaitingActionAtDataEntryLevel = isWaitingForActionAtDataEntryLevel(this.submitted, this.approvedAtProjectLevel, this.approvedAtCoordinationLevel, this.failedToSync);
+        this.awaitingActionAtProjectLevelApprover = isWaitingForActionAtProjectLevel(this.submitted, this.approvedAtProjectLevel, this.approvedAtCoordinationLevel, this.failedToSync);
+        this.awaitingActionAtCoordinationLevelApprover = isWaitingForActionAtCoordinationLevel(this.submitted, this.approvedAtProjectLevel, this.approvedAtCoordinationLevel, this.failedToSync);
     };
 
     var failedToSync = function(lineListService, aggregateDataValues, approvalData) {
@@ -37,8 +35,28 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         return !lineListService && (aggregateDataValuesFailedToSync || approvalDataFailedToSync || aggregateDataValuesFailedToSyncAsPerDeprecatedLocalStatus);
     };
 
-    var dataValuesFailedToSync = function (isLineListService, aggregateDataValues) {
-        return isLineListService ? false : !!(aggregateDataValues && aggregateDataValues.length > 0 && _.any(aggregateDataValues, { localStatus: 'FAILED_TO_SYNC' }));
+    var isWaitingForActionAtDataEntryLevel = function(submitted, approvedAtProject, approvedAtCoordination, failedToSync) {
+        if(failedToSync) {
+            return submitted && !approvedAtProject && !approvedAtCoordination;
+        } else {
+            return !submitted && !approvedAtCoordination;
+        }
+    };
+
+    var isWaitingForActionAtProjectLevel = function(submitted, approvedAtProject, approvedAtCoordination, failedToSync) {
+        if(failedToSync) {
+            return approvedAtProject &&!approvedAtCoordination;
+        } else {
+            return submitted && !approvedAtProject && !approvedAtCoordination;
+        }
+    };
+
+    var isWaitingForActionAtCoordinationLevel = function(submitted, approvedAtProject, approvedAtCoordination, failedToSync) {
+        if(failedToSync) {
+            return approvedAtCoordination;
+        } else {
+            return submitted && approvedAtProject && !approvedAtCoordination;
+        }
     };
 
     var isActive = function (period, openingDate) {
@@ -77,6 +95,7 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
             return !!dataValue.clientLastUpdated;
         });
     };
+
     ModuleDataBlock.create = function () {
         var moduleDataBlock = Object.create(ModuleDataBlock.prototype);
         ModuleDataBlock.apply(moduleDataBlock, arguments);
