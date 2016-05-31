@@ -1,5 +1,7 @@
 define(["lodash", "moment"], function(_, moment) {
     return function($q, db) {
+        var DATA_VALUES_STORE_NAME = 'dataValues';
+
         var transformAndSave = function(payload, localStatus) {
             var groupedDataValues = _.groupBy(payload, function(dataValue) {
                 return [dataValue.period, dataValue.orgUnit];
@@ -25,7 +27,7 @@ define(["lodash", "moment"], function(_, moment) {
             };
 
             var indexableDataValues = _.transform(groupedDataValues, dataValueSetsAggregator, []);
-            var dataValuesStore = db.objectStore("dataValues");
+            var dataValuesStore = db.objectStore(DATA_VALUES_STORE_NAME);
             return dataValuesStore.upsert(indexableDataValues).then(function() {
                 return payload;
             });
@@ -33,7 +35,7 @@ define(["lodash", "moment"], function(_, moment) {
 
         this.isDataPresent = function(orgUnitId) {
             var query = orgUnitId ? db.queryBuilder().$eq(orgUnitId).$index("by_organisationUnit").compile() : db.queryBuilder().$index("by_organisationUnit").compile();
-            var store = db.objectStore('dataValues');
+            var store = db.objectStore(DATA_VALUES_STORE_NAME);
             return store.exists(query).then(function(data) {
                 return data;
             });
@@ -63,7 +65,7 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         this.getDataValues = function(period, orgUnitIds) {
-            var store = db.objectStore("dataValues");
+            var store = db.objectStore(DATA_VALUES_STORE_NAME);
             return $q.all(_.map(orgUnitIds, function(orgUnitId) {
                 return store.find([period, orgUnitId]).then(function(data) {
                     if (!_.isEmpty(data))
@@ -76,7 +78,7 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         this.getDataValuesForOrgUnitsAndPeriods = function(orgUnits, periods) {
-            var store = db.objectStore("dataValues");
+            var store = db.objectStore(DATA_VALUES_STORE_NAME);
             var query = db.queryBuilder().$index("by_period").$in(periods).compile();
             return store.each(query).then(function(dataValues) {
                 var filteredDataValues = _.filter(dataValues, function(dv) {
@@ -87,7 +89,7 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         this.getDataValuesForOrgUnitsPeriods = function(orgUnits, periods) {
-            var store = db.objectStore("dataValues");
+            var store = db.objectStore(DATA_VALUES_STORE_NAME);
             var query = db.queryBuilder().$index("by_period").$in(periods).compile();
             return store.each(query).then(function(dataValues) {
                 var filteredDataValues = _.filter(dataValues, function(dv) {
@@ -105,7 +107,7 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         this.getSubmittedDataValuesForPeriodsOrgUnits = function(startPeriod, endPeriod, orgUnits) {
-            var store = db.objectStore("dataValues");
+            var store = db.objectStore(DATA_VALUES_STORE_NAME);
             var query = db.queryBuilder().$between(startPeriod, endPeriod).$index("by_period").compile();
             return store.each(query).then(function(dataValues) {
                 var filteredDV = _.filter(dataValues, function(dv) {
@@ -120,7 +122,7 @@ define(["lodash", "moment"], function(_, moment) {
             periodsAndOrgUnits = _.map(periodsAndOrgUnits, function(periodAndOrgUnit) {
                return [periodAndOrgUnit.period, periodAndOrgUnit.orgUnit];
             });
-            var store = db.objectStore("dataValues");
+            var store = db.objectStore(DATA_VALUES_STORE_NAME);
             _.each(periodsAndOrgUnits, function(tuple) {
                 store.find(tuple).then(function (data) {
                     data.localStatus = localStatus;
@@ -130,7 +132,7 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         this.getLocalStatus = function(period, orgUnit) {
-            var store = db.objectStore("dataValues");
+            var store = db.objectStore(DATA_VALUES_STORE_NAME);
             return store.find([period, orgUnit]).then(function(data) {
                 if (!_.isEmpty(data))
                     return data.localStatus;
@@ -138,5 +140,16 @@ define(["lodash", "moment"], function(_, moment) {
             });
         };
 
+        this.flagAsFailedToSync = function(orgUnitIds, period) {
+            var store = db.objectStore(DATA_VALUES_STORE_NAME);
+
+            var upsertPromises = _.map(orgUnitIds, function(orgUnitId) {
+                return store.find([period, orgUnitId]).then(function (dataValueObject) {
+                    dataValueObject.failedToSync = true;
+                    return store.upsert(dataValueObject);
+                });
+            });
+            return $q.all(upsertPromises);
+        };
     };
 });

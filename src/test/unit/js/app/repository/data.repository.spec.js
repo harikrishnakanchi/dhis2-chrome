@@ -1,9 +1,9 @@
 define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepository, mocks, utils, timecop) {
     describe("data repository", function() {
-        var q, db, mockStore, dataRepository, dataValuesFromClient, dataValuesFromDHIS, scope;
+        var q, mockDB, mockStore, dataRepository, dataValuesFromClient, dataValuesFromDHIS, scope;
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
-            var mockDB = utils.getMockDB($q);
+            mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
             scope = $rootScope;
             dataRepository = new DataRepository(q, mockDB.db);
@@ -492,6 +492,37 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                 "period": "2016W02",
                 "dataValues": []
             }]);
+        });
+
+        describe('flagAsFailedToSync', function() {
+            it("should set the failedToSync flag for specified period and orgUnits", function () {
+                var dataValueObjectA = {
+                    orgUnit: "orgUnitA",
+                    period: "2016W01",
+                    dataValues: ['someDataValue']
+                }, dataValueObjectB = {
+                    orgUnit: "orgUnitB",
+                    period: "2016W01",
+                    dataValues: ['someDataValue']
+                };
+
+                mockStore.find.and.callFake(function(periodAndOrgUnit) {
+                    var orgUnitId = _.last(periodAndOrgUnit),
+                        objectToReturn = (orgUnitId == dataValueObjectA.orgUnit ? dataValueObjectA : dataValueObjectB);
+                    return utils.getPromise(q, objectToReturn);
+                });
+
+                dataRepository.flagAsFailedToSync([dataValueObjectA.orgUnit, dataValueObjectB.orgUnit], dataValueObjectA.period);
+                scope.$apply();
+
+                var expectedDataValueObjectAToUpsert = _.merge({ failedToSync: true }, dataValueObjectA),
+                    expectedDataValueObjectBToUpsert = _.merge({ failedToSync: true }, dataValueObjectB);
+
+                expect(mockStore.find).toHaveBeenCalledWith([dataValueObjectA.period, dataValueObjectA.orgUnit]);
+                expect(mockStore.find).toHaveBeenCalledWith([dataValueObjectB.period, dataValueObjectB.orgUnit]);
+                expect(mockStore.upsert).toHaveBeenCalledWith(expectedDataValueObjectAToUpsert);
+                expect(mockStore.upsert).toHaveBeenCalledWith(expectedDataValueObjectBToUpsert);
+            });
         });
     });
 });
