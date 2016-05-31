@@ -524,5 +524,38 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                 expect(mockStore.upsert).toHaveBeenCalledWith(expectedDataValueObjectBToUpsert);
             });
         });
+
+        describe('clearFailedToSync', function() {
+            it("should clear the failedToSync flag for specified period and orgUnits", function () {
+                var dataValueObjectA = {
+                    orgUnit: "orgUnitA",
+                    period: "2016W01",
+                    dataValues: ['someDataValue'],
+                    failedToSync: true
+                }, dataValueObjectB = {
+                    orgUnit: "orgUnitB",
+                    period: "2016W01",
+                    dataValues: ['someDataValue'],
+                    failedToSync: true
+                };
+
+                mockStore.find.and.callFake(function(periodAndOrgUnit) {
+                    var orgUnitId = _.last(periodAndOrgUnit),
+                        objectToReturn = (orgUnitId == dataValueObjectA.orgUnit ? dataValueObjectA : dataValueObjectB);
+                    return utils.getPromise(q, objectToReturn);
+                });
+
+                dataRepository.clearFailedToSync([dataValueObjectA.orgUnit, dataValueObjectB.orgUnit], dataValueObjectA.period);
+                scope.$apply();
+
+                var expectedDataValueObjectAToUpsert = _.omit(dataValueObjectA, 'failedToSync'),
+                    expectedDataValueObjectBToUpsert = _.omit(dataValueObjectB, 'failedToSync');
+
+                expect(mockStore.find).toHaveBeenCalledWith([dataValueObjectA.period, dataValueObjectA.orgUnit]);
+                expect(mockStore.find).toHaveBeenCalledWith([dataValueObjectB.period, dataValueObjectB.orgUnit]);
+                expect(mockStore.upsert).toHaveBeenCalledWith(expectedDataValueObjectAToUpsert);
+                expect(mockStore.upsert).toHaveBeenCalledWith(expectedDataValueObjectBToUpsert);
+            });
+        });
     });
 });

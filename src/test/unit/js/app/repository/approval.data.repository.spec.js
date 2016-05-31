@@ -304,5 +304,26 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 expect(mockStore.upsert).toHaveBeenCalledWith(expectedObjectToUpsert);
             });
         });
+
+        describe('clearFailedToSync', function() {
+            it("should clear the failedToSync flag for specified period and orgUnit", function () {
+                var approvalObject = {
+                    orgUnit: "orgUnitA",
+                    period: "2016W01",
+                    someApprovalState: true,
+                    failedToSync: true
+                };
+
+                mockStore.find.and.returnValue(utils.getPromise(q, approvalObject));
+
+                approvalDataRepository.clearFailedToSync(approvalObject.orgUnit, approvalObject.period);
+                scope.$apply();
+
+                var expectedObjectToUpsert = _.omit(approvalObject, 'failedToSync');
+
+                expect(mockStore.find).toHaveBeenCalledWith([approvalObject.period, approvalObject.orgUnit]);
+                expect(mockStore.upsert).toHaveBeenCalledWith(expectedObjectToUpsert);
+            });
+        });
     });
 });

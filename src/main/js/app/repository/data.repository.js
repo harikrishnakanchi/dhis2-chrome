@@ -151,5 +151,16 @@ define(["lodash", "moment"], function(_, moment) {
             });
             return $q.all(upsertPromises);
         };
+
+        this.clearFailedToSync = function(orgUnitIds, period) {
+            var store = db.objectStore(DATA_VALUES_STORE_NAME);
+
+            var upsertPromises = _.map(orgUnitIds, function(orgUnitId) {
+                return store.find([period, orgUnitId]).then(function (dataValueObject) {
+                    return store.upsert(_.omit(dataValueObject, 'failedToSync'));
+                });
+            });
+            return $q.all(upsertPromises);
+        };
     };
 });

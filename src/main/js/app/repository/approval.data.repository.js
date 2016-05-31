@@ -172,5 +172,13 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
                 return store.upsert(approvalObject);
             });
         };
+
+        this.clearFailedToSync = function(orgUnitId, period) {
+            var store = db.objectStore(APPROVAL_DATA_STORE_NAME);
+
+            return store.find([period, orgUnitId]).then(function (approvalObject) {
+                return store.upsert(_.omit(approvalObject, 'failedToSync'));
+            });
+        };
     };
 });
