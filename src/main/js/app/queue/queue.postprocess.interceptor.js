@@ -74,8 +74,10 @@ define(["properties", "chromeUtils", "moment", "lodash"], function(properties, c
                 }
                 if(job.data.type == 'syncModuleDataBlock') {
                     var jobParameters = job.data.data;
-                    return dataRepository.flagAsFailedToSync([jobParameters.moduleId], jobParameters.period).then(function() {
-                        return approvalDataRepository.flagAsFailedToSync(jobParameters.moduleId, jobParameters.period);
+                    dataRepository.flagAsFailedToSync([jobParameters.moduleId], jobParameters.period).then(function() {
+                        approvalDataRepository.flagAsFailedToSync(jobParameters.moduleId, jobParameters.period).then(function() {
+                            $log.warn("Flagged that sync failed for: ", [jobParameters.moduleId, jobParameters.period]);
+                        });
                     });
                 }
                 return false;
