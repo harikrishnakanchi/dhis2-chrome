@@ -266,8 +266,8 @@ define([], function() {
         };
     };
 
-    var delete_keys_chart_and_reports_from_changelog = function (db, dx) {
-        var changeLogStore = txt.objectStore("changeLog");
+    var delete_keys_chart_and_reports_from_changelog = function (db, tx) {
+        var changeLogStore = tx.objectStore("changeLog");
         changeLogStore.delete("charts");
         changeLogStore.delete("pivotTables");
     };
