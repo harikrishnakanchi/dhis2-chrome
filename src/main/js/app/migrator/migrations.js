@@ -265,6 +265,13 @@ define([], function() {
             }
         };
     };
+
+    var delete_keys_chart_and_reports_from_changelog = function (db, dx) {
+        var changeLogStore = txt.objectStore("changeLog");
+        changeLogStore.delete("charts");
+        changeLogStore.delete("pivotTables");
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -299,6 +306,7 @@ define([], function() {
         delete_program_stages_store,
         delete_keys_from_changelog,
         update_translations_store,
-        change_role_to_projectadmin
+        change_role_to_projectadmin,
+        delete_keys_chart_and_reports_from_changelog
     ];
 });
