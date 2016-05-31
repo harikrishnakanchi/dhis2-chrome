@@ -11,10 +11,12 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                 dataRepository = new DataRepository();
                 spyOn(dataRepository, 'saveDhisData').and.returnValue(utils.getPromise(q, {}));
+                spyOn(dataRepository, 'clearFailedToSync').and.returnValue(utils.getPromise(q, {}));
 
                 approvalRepository = new ApprovalDataRepository();
                 spyOn(approvalRepository, 'saveApprovalsFromDhis').and.returnValue(utils.getPromise(q, {}));
                 spyOn(approvalRepository, 'invalidateApproval').and.returnValue(utils.getPromise(q, {}));
+                spyOn(approvalRepository, 'clearFailedToSync').and.returnValue(utils.getPromise(q, {}));
 
                 dataSets = [{
                     id: 'dataSetid1'
@@ -451,6 +453,36 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         expect(approvalService.markAsIncomplete).not.toHaveBeenCalled();
                         expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(dataSetIds, [periodAndOrgUnit]);
                         expect(dataService.save).toHaveBeenCalled();
+                    });
+                });
+
+                describe('sync job has previously failed', function() {
+                    it('should clear the failedToSync flag from the dataValues objects and approval object', function() {
+                        var moduleDataValue = createMockDataValue({ orgUnit: 'someModuleId' }),
+                            originDataValue = createMockDataValue({ orgUnit: 'someOriginId' });
+
+                        moduleDataBlock = createMockModuleDataBlock({
+                            failedToSync: true,
+                            dataValues: [moduleDataValue, originDataValue]
+                        });
+
+                        performUpload();
+
+                        expect(dataRepository.clearFailedToSync).toHaveBeenCalledWith([moduleDataValue.orgUnit, originDataValue.orgUnit], moduleDataBlock.period);
+                        expect(approvalRepository.clearFailedToSync).toHaveBeenCalledWith(moduleDataValue.orgUnit, moduleDataBlock.period);
+                    });
+                });
+
+                describe('sync job did not previously fail', function() {
+                    it('should not clear the failedToSync flag from the dataValues objects and approval object', function() {
+                        moduleDataBlock = createMockModuleDataBlock({
+                            failedToSync: false
+                        });
+
+                        performUpload();
+
+                        expect(dataRepository.clearFailedToSync).not.toHaveBeenCalled();
+                        expect(approvalRepository.clearFailedToSync).not.toHaveBeenCalled();
                     });
                 });
             });

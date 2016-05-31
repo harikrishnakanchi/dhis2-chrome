@@ -132,6 +132,18 @@ define(['moment', 'lodash'],
                   return $q.when({});
                 };
 
+                var clearFailedToSyncFlags = function () {
+                    var dataValueOrgUnitIds = _.unique(_.pluck(moduleDataBlock.dataValues, 'orgUnit'));
+
+                    if(moduleDataBlock.failedToSync) {
+                        return dataRepository.clearFailedToSync(dataValueOrgUnitIds, moduleDataBlock.period).then(function() {
+                            return approvalDataRepository.clearFailedToSync(moduleDataBlock.moduleId, moduleDataBlock.period);
+                        });
+                    } else {
+                        return $q.when({});
+                    }
+                };
+
                 return datasetRepository.getAll().then(function (allDataSet) {
                     var dataSetIds = _.pluck(allDataSet, 'id');
 
@@ -139,7 +151,8 @@ define(['moment', 'lodash'],
                         .then(_.partial(deleteCompletion, dataSetIds))
                         .then(uploadDataValues)
                         .then(_.partial(uploadCompletionData, dataSetIds))
-                        .then(_.partial(uploadApprovalData, dataSetIds));
+                        .then(_.partial(uploadApprovalData, dataSetIds))
+                        .then(clearFailedToSyncFlags);
                 });
             };
 
