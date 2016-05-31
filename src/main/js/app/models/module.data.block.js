@@ -17,13 +17,24 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         this.approvedAtCoordinationLevelBy = this.approvedAtCoordinationLevel ? approvalData.approvedBy : null;
         this.approvedAtCoordinationLevelAt = this.approvedAtCoordinationLevel ? moment(approvalData.approvedOn) : null;
 
+        this.failedToSync = failedToSync(this.lineListService, aggregateDataValues, approvalData);
+
         var dataValuesNotSynced = dataValuesFailedToSync(this.lineListService, aggregateDataValues);
         this.awaitingActionAtDataEntryLevel = !(this.submitted || this.approvedAtCoordinationLevel) || dataValuesNotSynced;
         this.awaitingActionAtProjectLevelApprover = (this.submitted && !this.approvedAtProjectLevel && !this.approvedAtCoordinationLevel)  && !dataValuesNotSynced;
         this.awaitingActionAtCoordinationLevelApprover = this.submitted && this.approvedAtProjectLevel && !this.approvedAtCoordinationLevel;
 
-        this.notSynced = dataValuesNotSynced;
         this.active = isActive(this.period, orgUnit.openingDate);
+    };
+
+    var failedToSync = function(lineListService, aggregateDataValues, approvalData) {
+        var aggregateDataValuesFailedToSync = !!aggregateDataValues && _.any(aggregateDataValues, { failedToSync: true }),
+            approvalDataFailedToSync = !!(approvalData && approvalData.failedToSync);
+
+        //This can be removed after v6.0 has been released
+        var aggregateDataValuesFailedToSyncAsPerDeprecatedLocalStatus = !!aggregateDataValues && _.any(aggregateDataValues, { localStatus: 'FAILED_TO_SYNC' });
+
+        return !lineListService && (aggregateDataValuesFailedToSync || approvalDataFailedToSync || aggregateDataValuesFailedToSyncAsPerDeprecatedLocalStatus);
     };
 
     var dataValuesFailedToSync = function (isLineListService, aggregateDataValues) {
