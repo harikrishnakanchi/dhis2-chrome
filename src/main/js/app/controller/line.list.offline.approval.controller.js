@@ -128,6 +128,15 @@ define(["lodash", "moment"], function(_, moment) {
             return $scope.showFilters && ($scope.showOfflineSummaryForViewOnly || ($scope.isCompleted && hasRoles(['Coordination Level Approver', 'Observer'])) || (hasRoles(['Project Level Approver', 'Observer'])));
         };
 
+        $scope.getDescriptionsForProceduresPerformed = function () {
+            var proceduresPerformed = _.uniq($scope.dataValues._procedures, 'formName');
+            var content = '';
+            _.each(proceduresPerformed, function (procedurePerformed, index) {
+                content += (index+1) +'. ' + '<b>' + procedurePerformed.formName + '  :</b>  ' + procedurePerformed.description + '<br/><br/>';
+            });
+            return content;
+        };
+
         $scope.shouldShowProceduresInOfflineSummary = function() {
             return !_.isEmpty($scope.procedureDataValueIds);
         };

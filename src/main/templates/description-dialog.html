@@ -4,6 +4,6 @@
         <button type="button" class="close description-dialog-close"  data-dismiss="modal" aria-label="Close" ng-click="ok()"><span aria-hidden="true">&times;</span></button>
     </div>
     <div class="modal-body">
-        <p>{{notificationMessage}}</p>
+        <p ng-bind-html="notificationMessage"></p>
     </div>
 </div>
