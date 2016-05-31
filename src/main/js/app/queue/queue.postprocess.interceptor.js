@@ -1,5 +1,5 @@
 define(["properties", "chromeUtils", "moment", "lodash"], function(properties, chromeUtils, moment, _) {
-    return function($log, ngI18nResourceBundle, dataRepository, approvalDataRepository) {
+    return function($log, ngI18nResourceBundle, dataRepository, approvalDataRepository, orgUnitRepository) {
         var getResourceBundle = function(locale) {
             return ngI18nResourceBundle.get({
                 "locale": locale
@@ -74,9 +74,14 @@ define(["properties", "chromeUtils", "moment", "lodash"], function(properties, c
                 }
                 if(job.data.type == 'syncModuleDataBlock') {
                     var jobParameters = job.data.data;
-                    dataRepository.flagAsFailedToSync([jobParameters.moduleId], jobParameters.period).then(function() {
-                        approvalDataRepository.flagAsFailedToSync(jobParameters.moduleId, jobParameters.period).then(function() {
-                            $log.warn("Flagged that sync failed for: ", [jobParameters.moduleId, jobParameters.period]);
+
+                    orgUnitRepository.findAllByParent(jobParameters.moduleId).then(function(originOrgUnits) {
+                        var originOrgUnitIds = _.pluck(originOrgUnits, 'id');
+
+                        dataRepository.flagAsFailedToSync([jobParameters.moduleId].concat(originOrgUnitIds), jobParameters.period).then(function() {
+                            approvalDataRepository.flagAsFailedToSync(jobParameters.moduleId, jobParameters.period).then(function() {
+                                $log.warn("Flagged that sync failed for: ", [jobParameters.moduleId, jobParameters.period]);
+                            });
                         });
                     });
                 }

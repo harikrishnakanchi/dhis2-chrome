@@ -1,7 +1,8 @@
-define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtils", "utils", "dataRepository", "approvalDataRepository"], function(QueuePostProcessInterceptor, mocks, properties, chromeUtils, utils, DataRepository, ApprovalDataRepository) {
+define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtils", "utils", "dataRepository", "approvalDataRepository", "orgUnitRepository"],
+    function(QueuePostProcessInterceptor, mocks, properties, chromeUtils, utils, DataRepository, ApprovalDataRepository, OrgUnitRepository) {
     describe('queuePostProcessInterceptor', function() {
 
-        var queuePostProcessInterceptor, q, rootScope, ngI18nResourceBundle, scope, dataRepository, approvalDataRepository;
+        var queuePostProcessInterceptor, q, rootScope, ngI18nResourceBundle, scope, dataRepository, approvalDataRepository, orgUnitRepository;
 
         beforeEach(mocks.inject(function($q, $rootScope, $log) {
             q = $q;
@@ -15,6 +16,9 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
             approvalDataRepository = new ApprovalDataRepository();
             spyOn(approvalDataRepository, "flagAsFailedToSync").and.returnValue(utils.getPromise(q, {}));
 
+            orgUnitRepository = new OrgUnitRepository();
+            spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, []));
+
             spyOn(chromeUtils, "sendMessage");
             spyOn(chromeUtils, "createNotification");
 
@@ -24,7 +28,7 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
                 }))
             };
 
-            queuePostProcessInterceptor = new QueuePostProcessInterceptor($log, ngI18nResourceBundle, dataRepository, approvalDataRepository);
+            queuePostProcessInterceptor = new QueuePostProcessInterceptor($log, ngI18nResourceBundle, dataRepository, approvalDataRepository, orgUnitRepository);
         }));
 
         it('should return true for retry if number of releases is less than max retries', function() {
@@ -199,7 +203,6 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
 
         it("should flag that datavalues and approvalData failed to sync after maxretries", function() {
             var job = {
-                id: 1,
                 data: {
                     type: "syncModuleDataBlock",
                     data: {
@@ -208,13 +211,17 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
                     }
                 },
                 releases: properties.queue.maxretries + 1
-            };
+            }, originOrgUnits = [{
+                id: 'someOriginId'
+            }];
 
+            orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, originOrgUnits));
 
             queuePostProcessInterceptor.shouldRetry(job, {});
             scope.$apply();
 
-            expect(dataRepository.flagAsFailedToSync).toHaveBeenCalledWith(['someModuleId'], 'somePeriod');
+            expect(orgUnitRepository.findAllByParent).toHaveBeenCalledWith('someModuleId');
+            expect(dataRepository.flagAsFailedToSync).toHaveBeenCalledWith(['someModuleId', 'someOriginId'], 'somePeriod');
             expect(approvalDataRepository.flagAsFailedToSync).toHaveBeenCalledWith('someModuleId', 'somePeriod');
         });
     });
