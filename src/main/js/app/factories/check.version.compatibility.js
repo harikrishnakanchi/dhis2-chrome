@@ -1,20 +1,20 @@
 define(['chromeUtils', 'lodash'], function (chromeUtils, _) {
     return function (systemSettingRepository) {
 
-        var versionStringComparator = function (v1, v2) {
-            v1 = v1.split(".");
-            v2 = v2.split(".");
-            var l = Math.min(v1.length, v2.length);
-            for (var i = 0; i < l; i++) {
-                var a = parseInt(v1[i]);
-                var b = parseInt(v2[i]);
-                if (a < b) {
-                    return -1;
-                } else if (a > b) {
-                    return 1;
+        var versionStringComparator = function (a, b) {
+            var i, diff;
+            var regExStrip0 = /(\.0+)+$/;
+            var segmentsA = a.replace(regExStrip0, '').split('.');
+            var segmentsB = b.replace(regExStrip0, '').split('.');
+            var l = Math.min(segmentsA.length, segmentsB.length);
+
+            for (i = 0; i < l; i++) {
+                diff = parseInt(segmentsA[i], 10) - parseInt(segmentsB[i], 10);
+                if (diff) {
+                    return diff;
                 }
             }
-            return 0;
+            return segmentsA.length - segmentsB.length;
         };
 
         return function (compatibilityInfo) {
@@ -30,9 +30,7 @@ define(['chromeUtils', 'lodash'], function (chromeUtils, _) {
                         compatibilityInfo.newerVersionAvailable = false;
                     }
                 } else {
-                    var latestVersion = _.max(compatiblePraxisVersions, function (version) {
-                        return parseFloat(version);
-                    });
+                    var latestVersion = _.last(compatiblePraxisVersions.sort(versionStringComparator));
                     if (praxisVersion != latestVersion) {
                         compatibilityInfo.newerVersionAvailable = true;
                         compatibilityInfo.newerVersionNumber = latestVersion;
