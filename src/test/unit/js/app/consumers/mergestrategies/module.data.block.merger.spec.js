@@ -290,6 +290,19 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         expect(dataService.save).toHaveBeenCalledWith([localDataValue]);
                     });
 
+                    it('should remove locally-modified timestamps from local data', function() {
+                        var localDataValue = createMockDataValue({ clientLastUpdated: someMomentInTime }),
+                            dataValueWithoutLocalTimestamp = _.omit(localDataValue, 'clientLastUpdated');
+
+                        moduleDataBlock = createMockModuleDataBlock({
+                            dataValuesHaveBeenModifiedLocally: true,
+                            dataValues: [localDataValue]
+                        });
+
+                        performUpload();
+                        expect(dataRepository.saveDhisData).toHaveBeenCalledWith([dataValueWithoutLocalTimestamp]);
+                    });
+
                     it('should upload completion data from Praxis to DHIS', function() {
                         moduleDataBlock = createMockModuleDataBlock({
                             dataValuesHaveBeenModifiedLocally: true,

@@ -98,9 +98,17 @@ define(['moment', 'lodash'],
 
                 var uploadDataValues = function () {
                     if(moduleDataBlock.dataValuesHaveBeenModifiedLocally) {
-                        return dataService.save(moduleDataBlock.dataValues);
+                        return dataService.save(moduleDataBlock.dataValues).then(removeLocallyModifiedTimestamp);
+                    } else {
+                        return $q.when({});
                     }
-                    return $q.when({});
+                };
+
+                var removeLocallyModifiedTimestamp = function() {
+                    var dataValuesWithoutLocalTimestamps = _.map(moduleDataBlock.dataValues, function(dataValue) {
+                        return _.omit(dataValue, 'clientLastUpdated');
+                    });
+                    return dataRepository.saveDhisData(dataValuesWithoutLocalTimestamps);
                 };
 
                 var uploadCompletionData = function (dataSetIds) {
