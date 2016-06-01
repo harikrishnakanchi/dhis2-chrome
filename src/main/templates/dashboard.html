@@ -39,7 +39,7 @@
                             <li ng-repeat="item in items | orderBy: 'period'">
                                 <input type="checkbox" class="dashboard-form-checkbox"
                                        ng-model="item.selectedForApproval"/>
-                                <a ng-href="{{ getTemplateUrl(item) }}" ng-class="{ 'errorHref': item.failedToSync }">{{formatPeriods(item.period)}}</a>
+                                <a ng-href="{{ getTemplateUrl(item) }}" ng-class="{ 'error-label': item.failedToSync }">{{formatPeriods(item.period)}}</a>
                             </li>
                         </ul>
                     </td>
@@ -71,8 +71,8 @@
                     <td>
                         <ul class="list-unstyled">
                             <li ng-repeat="item in items | orderBy: 'period'" ng-if="item.active">
-                                <a ng-if="hasRoles(['Data entry user'])" ng-class="{ 'errorHref': item.failedToSync }" ng-href="{{getTemplateUrl(item)}}">{{formatPeriods(item.period)}}</a>
-                                <span ng-if="!hasRoles(['Data entry user'])" ng-class="{ 'errorHref': item.failedToSync }">{{formatPeriods(item.period)}}</span>
+                                <a ng-if="hasRoles(['Data entry user'])" ng-class="{ 'error-label': item.failedToSync }" ng-href="{{getTemplateUrl(item)}}">{{formatPeriods(item.period)}}</a>
+                                <span ng-if="!hasRoles(['Data entry user'])" ng-class="{ 'error-label': item.failedToSync }">{{formatPeriods(item.period)}}</span>
                             </li>
                         </ul>
                     </td>
@@ -99,8 +99,8 @@
                     <td>
                         <ul class="list-unstyled">
                             <li ng-repeat="item in items | orderBy: 'period'">
-                                <a ng-if="hasRoles(['Data entry user', 'Observer'])" ng-class="{ 'errorHref': item.failedToSync }" ng-href="{{getTemplateUrl(item)}}">{{formatPeriods(item.period)}}</a>
-                                <span ng-if="!hasRoles(['Data entry user','Observer'])" ng-class="{ 'errorHref': item.failedToSync }">{{formatPeriods(item.period)}}</span>
+                                <a ng-if="hasRoles(['Data entry user', 'Observer'])" ng-class="{ 'error-label': item.failedToSync }" ng-href="{{getTemplateUrl(item)}}">{{formatPeriods(item.period)}}</a>
+                                <span ng-if="!hasRoles(['Data entry user','Observer'])" ng-class="{ 'error-label': item.failedToSync }">{{formatPeriods(item.period)}}</span>
                             </li>
                         </ul>
                     </td>
