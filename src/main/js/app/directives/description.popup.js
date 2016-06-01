@@ -4,12 +4,12 @@ define([], function() {
             scope: {
                 title: '@dpTitle',
                 description: '@dpDesc',
-                resourceBundle: "="
             },
             link: function(scope, element) {
                 angular.element(element).bind('click', function(event) {
                     event.preventDefault();
                     event.stopPropagation();
+                    scope.resourceBundle = $rootScope.resourceBundle;
                     var description = scope.description ? scope.description : scope.resourceBundle.noDescriptionLabel;
                     scope.notificationMessages = {
                         notificationTitle: scope.title,
