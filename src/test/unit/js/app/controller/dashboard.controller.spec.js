@@ -29,8 +29,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
 
                 scope.resourceBundle = {
                     "dataApprovalConfirmationMessage": "Are you sure?",
-                    "uploadCompletionDataDesc": "Uploading Completion Data for ",
-                    "uploadApprovalDataDesc": "Uploading Approval Data for "
+                    "syncModuleDataBlockDesc": "some description"
                 };
 
                 approvalDataRepository = new ApprovalDataRepository();
@@ -133,20 +132,25 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                         "period": "2014W02"
                     }], rootScope.currentUser.userCredentials.username);
 
-                    expect(hustle.publish.calls.count()).toEqual(1);
+                    expect(hustle.publish.calls.count()).toEqual(2);
                     expect(hustle.publish.calls.argsFor(0)[0]).toEqual({
-                        "data": [{
-                            "orgUnit": "mod2",
+                        "data": {
+                            "moduleId": "mod2",
                             "period": "2014W01"
-                        }, {
-                            "orgUnit": "mod3",
-                            "period": "2014W02"
-                        }],
-                        "type": "uploadCompletionData",
+                        },
+                        "type": "syncModuleDataBlock",
                         "locale": "en",
-                        "desc": "Uploading Completion Data for 2014W01,2014W02"
+                        "desc": scope.resourceBundle.syncModuleDataBlockDesc + " 2014W01"
                     });
-
+                    expect(hustle.publish.calls.argsFor(1)[0]).toEqual({
+                        "data": {
+                            "moduleId": "mod3",
+                            "period": "2014W02"
+                        },
+                        "type": "syncModuleDataBlock",
+                        "locale": "en",
+                        "desc": scope.resourceBundle.syncModuleDataBlockDesc + " 2014W02"
+                    });
                 });
 
                 it("should bulk approve for coordination level approvers", function() {
@@ -194,18 +198,24 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                         "period": "2014W02"
                     }], "dataentryuser");
 
-                    expect(hustle.publish.calls.count()).toEqual(1);
+                    expect(hustle.publish.calls.count()).toEqual(2);
                     expect(hustle.publish.calls.argsFor(0)[0]).toEqual({
-                        "data": [{
-                            "orgUnit": "mod2",
+                        "data": {
+                            "moduleId": "mod2",
                             "period": "2014W01"
-                        }, {
-                            "orgUnit": "mod3",
-                            "period": "2014W02"
-                        }],
-                        "type": "uploadApprovalData",
+                        },
+                        "type": "syncModuleDataBlock",
                         "locale": "en",
-                        "desc": "Uploading Approval Data for 2014W01,2014W02"
+                        "desc": scope.resourceBundle.syncModuleDataBlockDesc + " 2014W01"
+                    });
+                    expect(hustle.publish.calls.argsFor(1)[0]).toEqual({
+                        "data": {
+                            "moduleId": "mod3",
+                            "period": "2014W02"
+                        },
+                        "type": "syncModuleDataBlock",
+                        "locale": "en",
+                        "desc": scope.resourceBundle.syncModuleDataBlockDesc + " 2014W02"
                     });
                 });
             });

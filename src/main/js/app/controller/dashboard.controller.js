@@ -54,30 +54,34 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
             };
 
             var approve = function() {
+                var currentUsersUsername = $rootScope.currentUser.userCredentials.username,
+                    moduleDataBlocksToBeApproved = _.filter($scope.moduleDataBlocks, { selectedForApproval: true }),
+                    periodsAndOrgUnitsToBeApproved = _.map(moduleDataBlocksToBeApproved, function(moduleDataBlock) {
+                        return {
+                            "period": moduleDataBlock.period,
+                            "orgUnit": moduleDataBlock.moduleId
+                        };
+                    });
 
-                var periodsAndOrgUnitsToBeApproved = _.transform($scope.moduleDataBlocks, function(results, item) {
-                    if (item.selectedForApproval === true)
-                        results.push({
-                            "period": item.period,
-                            "orgUnit": item.moduleId
-                        });
-                });
-
-                var publishToDhis = function(messageType, desc) {
-                    return $hustle.publish({
-                        "data": periodsAndOrgUnitsToBeApproved,
-                        "type": messageType,
-                        "locale": $scope.locale,
-                        "desc": desc
-                    }, "dataValues");
+                var publishToDhis = function() {
+                    var publishPromises = _.map(moduleDataBlocksToBeApproved, function(moduleDataBlock) {
+                        return $hustle.publish({
+                            data: {
+                                moduleId: moduleDataBlock.moduleId,
+                                period: moduleDataBlock.period
+                            },
+                            type: 'syncModuleDataBlock',
+                            locale: $scope.locale,
+                            desc: $scope.resourceBundle.syncModuleDataBlockDesc + ' ' + moduleDataBlock.period
+                        }, "dataValues");
+                    });
+                    return $q.all(publishPromises);
                 };
 
                 if ($rootScope.hasRoles(['Project Level Approver']))
-                    return approvalDataRepository.markAsComplete(periodsAndOrgUnitsToBeApproved, $rootScope.currentUser.userCredentials.username)
-                        .then(_.partial(publishToDhis, "uploadCompletionData", $scope.resourceBundle.uploadCompletionDataDesc + _.pluck(periodsAndOrgUnitsToBeApproved, "period")));
+                    return approvalDataRepository.markAsComplete(periodsAndOrgUnitsToBeApproved, currentUsersUsername).then(publishToDhis);
                 if ($rootScope.hasRoles(['Coordination Level Approver']))
-                    return approvalDataRepository.markAsApproved(periodsAndOrgUnitsToBeApproved, $rootScope.currentUser.userCredentials.username)
-                        .then(_.partial(publishToDhis, "uploadApprovalData", $scope.resourceBundle.uploadApprovalDataDesc + _.pluck(periodsAndOrgUnitsToBeApproved, "period")));
+                    return approvalDataRepository.markAsApproved(periodsAndOrgUnitsToBeApproved, currentUsersUsername).then(publishToDhis);
             };
 
             var modalMessages = {
