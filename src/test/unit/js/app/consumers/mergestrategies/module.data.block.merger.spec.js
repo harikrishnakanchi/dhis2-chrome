@@ -92,10 +92,10 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                     dataValuesHaveBeenModifiedLocally: false,
                     approvedAtProjectLevel: false,
                     approvedAtProjectLevelBy: null,
-                    approvedAtProjectLevelOn: null,
+                    approvedAtProjectLevelAt: null,
                     approvedAtCoordinationLevel: false,
                     approvedAtCoordinationLevelBy: null,
-                    approvedAtCoordinationLevelOn: null
+                    approvedAtCoordinationLevelAt: null
                 }, options);
             };
 
@@ -310,7 +310,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                             dataValuesHaveBeenModifiedLocally: true,
                             approvedAtProjectLevel: true,
                             approvedAtProjectLevelBy: 'Kuala',
-                            approvedAtProjectLevelOn: someMomentInTime
+                            approvedAtProjectLevelAt: someMomentInTime
                         });
 
                         periodAndOrgUnit = { period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId };
@@ -319,7 +319,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         expect(approvalService.markAsComplete).toHaveBeenCalledWith(dataSetIds,
                             [periodAndOrgUnit],
                             moduleDataBlock.approvedAtProjectLevelBy,
-                            moduleDataBlock.approvedAtProjectLevelOn.toISOString());
+                            moduleDataBlock.approvedAtProjectLevelAt.toISOString());
                     });
 
                     it('should upload approval data from Praxis to DHIS if data is approved at co-ordination level', function() {
@@ -327,7 +327,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                             dataValuesHaveBeenModifiedLocally: true,
                             approvedAtCoordinationLevel: true,
                             approvedAtCoordinationLevelBy: 'Kuala',
-                            approvedAtCoordinationLevelOn: someMomentInTime
+                            approvedAtCoordinationLevelAt: someMomentInTime
                         });
 
                         periodAndOrgUnit = { period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId };
@@ -336,7 +336,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         expect(approvalService.markAsApproved).toHaveBeenCalledWith(dataSetIds,
                             [periodAndOrgUnit],
                             moduleDataBlock.approvedAtCoordinationLevelBy,
-                            moduleDataBlock.approvedAtCoordinationLevelOn.toISOString());
+                            moduleDataBlock.approvedAtCoordinationLevelAt.toISOString());
                     });
                 });
 
@@ -353,7 +353,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                             dataValuesHaveBeenModifiedLocally: false,
                             approvedAtProjectLevel: true,
                             approvedAtProjectLevelBy: 'Kuala',
-                            approvedAtProjectLevelOn: someMomentInTime
+                            approvedAtProjectLevelAt: someMomentInTime
                         });
 
                         performUpload();
@@ -365,7 +365,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                             dataValuesHaveBeenModifiedLocally: false,
                             approvedAtCoordinationLevel: true,
                             approvedAtCoordinationLevelBy: 'Kuala',
-                            approvedAtCoordinationLevelOn: someMomentInTime
+                            approvedAtCoordinationLevelAt: someMomentInTime
                         });
 
                         performUpload();
@@ -379,10 +379,10 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                             dataValuesHaveBeenModifiedLocally: false,
                             approvedAtProjectLevel: true,
                             approvedAtProjectLevelBy: 'Kuala',
-                            approvedAtProjectLevelOn: someMomentInTime,
+                            approvedAtProjectLevelAt: someMomentInTime,
                             approvedAtCoordinationLevel: true,
                             approvedAtCoordinationLevelBy: 'Kuala',
-                            approvedAtCoordinationLevelOn: someMomentInTime
+                            approvedAtCoordinationLevelAt: someMomentInTime
                         });
 
                         performUpload();
@@ -399,10 +399,10 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                             dataValuesHaveBeenModifiedLocally: false,
                             approvedAtProjectLevel: true,
                             approvedAtProjectLevelBy: 'Kuala',
-                            approvedAtProjectLevelOn: someMomentInTime,
+                            approvedAtProjectLevelAt: someMomentInTime,
                             approvedAtCoordinationLevel: true,
                             approvedAtCoordinationLevelBy: 'Kuala',
-                            approvedAtCoordinationLevelOn: someMomentInTime
+                            approvedAtCoordinationLevelAt: someMomentInTime
                         });
 
                         performUpload();

@@ -114,7 +114,7 @@ define(['moment', 'lodash'],
                 var uploadCompletionData = function (dataSetIds) {
                     if(moduleDataBlock.approvedAtProjectLevel && (dataOnDhisNotPreviouslyCompleted || moduleDataBlock.dataValuesHaveBeenModifiedLocally)) {
                         var completedBy = moduleDataBlock.approvedAtProjectLevelBy;
-                        var completedOn = moduleDataBlock.approvedAtProjectLevelOn.toISOString();
+                        var completedOn = moduleDataBlock.approvedAtProjectLevelAt.toISOString();
 
                         return approvalService.markAsComplete(dataSetIds, [periodAndOrgUnit], completedBy, completedOn);
                     }
@@ -125,7 +125,7 @@ define(['moment', 'lodash'],
                   if(moduleDataBlock.approvedAtCoordinationLevel && (dataOnDhisNotPreviouslyApproved || moduleDataBlock.dataValuesHaveBeenModifiedLocally || dataHasBeenCompletedLocallyButNotOnDhis)) {
                       var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId};
                       var approvedBy = moduleDataBlock.approvedAtCoordinationLevelBy;
-                      var approvedOn = moduleDataBlock.approvedAtCoordinationLevelOn.toISOString();
+                      var approvedOn = moduleDataBlock.approvedAtCoordinationLevelAt.toISOString();
 
                       return approvalService.markAsApproved(dataSetIds, [periodAndOrgUnit], approvedBy, approvedOn);
                   }
