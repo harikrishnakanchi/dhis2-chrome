@@ -3,7 +3,7 @@
     "version": "0.0.1",
     "private": true,
     "keywords": [
-        "dhis2"
+        "praxis"
     ],
     "dependencies": {
         "requirejs": "2.1.16",

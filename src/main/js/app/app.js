@@ -6,7 +6,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
     ],
     function(angular, Q, services, directives, dbutils, controllers, repositories, factories, migrator, migrations, properties, queuePostProcessInterceptor, monitors, helpers, indexedDBLogger, authenticationUtils, transformers) {
         var init = function() {
-            var app = angular.module('DHIS2', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs", "ui.bootstrap.transition", "ui.bootstrap.collapse",
+            var app = angular.module('PRAXIS', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs", "ui.bootstrap.transition", "ui.bootstrap.collapse",
                 "ui.bootstrap.accordion", "ui.weekselector", "angularTreeview", "ui.bootstrap.modal", "ui.bootstrap.dropdown",
                 "ui.multiselect", "ui.notIn", "ui.equals", "hustle", "angular.filter", "angucomplete-alt", "nvd3", "ui.bootstrap.tooltip", "ui.bootstrap.position", "ui.bootstrap.bindHtml",
                 "ngSanitize", "ngCsv"
@@ -203,7 +203,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
 
         var bootstrap = function(app) {
             var deferred = Q.defer();
-            var injector = angular.bootstrap(angular.element(document.querySelector('#dhis2')), ['DHIS2']);
+            var injector = angular.bootstrap(angular.element(document.querySelector('#praxis')), ['PRAXIS']);
             deferred.resolve([injector, app]);
             return deferred.promise;
         };

@@ -18,7 +18,7 @@ require(["app/bg.config"], function(config) {
             chrome.runtime.onMessage.addListener(onDbReady);
             chrome.app.runtime.onLaunched.addListener(function(launchData) {
                 chrome.app.window.create('../../index.html', {
-                    id: 'DHIS2',
+                    id: 'PRAXIS',
                     state: 'maximized'
                 });
             });

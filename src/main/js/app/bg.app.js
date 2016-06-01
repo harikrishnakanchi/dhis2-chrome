@@ -1,7 +1,7 @@
 define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "queuePostProcessInterceptor", "monitors", "logRequestReponseInterceptor", "indexedDBLogger", "chromeUtils", "factories", "angular-indexedDB", "ng-i18n"],
     function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, queuePostProcessInterceptor, monitors, logRequestReponseInterceptor, indexedDBLogger, chromeUtils, factories) {
         var init = function() {
-            var app = angular.module('DHIS2', ["xc.indexedDB", "hustle", "ngI18n"]);
+            var app = angular.module('PRAXIS', ["xc.indexedDB", "hustle", "ngI18n"]);
             services.init(app);
             factories.init(app);
             consumers.init(app);
@@ -144,7 +144,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
 
         var bootstrap = function(appInit) {
             var deferred = Q.defer();
-            var injector = angular.bootstrap(angular.element(document.querySelector('#dhis2')), ['DHIS2']);
+            var injector = angular.bootstrap(angular.element(document.querySelector('#praxis')), ['PRAXIS']);
             deferred.resolve([injector, appInit]);
             return deferred.promise;
         };
