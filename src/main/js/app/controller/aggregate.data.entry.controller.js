@@ -174,7 +174,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             return _.last(headers).length;
         };
 
-        var save = function(asDraft) {
+        var save = function(options) {
             var updateDataValuesWithPopulationData = function() {
                 var currentModuleId = $scope.selectedModule.id;
                 var populationDataset = _.find($scope.dataSets, {
@@ -215,8 +215,14 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                 }, "dataValues");
             };
 
-            if (asDraft) {
+            if(options.saveAsDraft) {
                 return dataRepository.saveAsDraft(payload);
+            } else if(options.autoApprove) {
+                var completedAndApprovedBy = $scope.currentUser.userCredentials.username;
+
+                return dataRepository.save(payload)
+                    .then(_.partial(approvalDataRepository.markAsApproved, currentPeriodAndOrgUnit, completedAndApprovedBy))
+                    .then(publishToDhis);
             } else {
                 return dataRepository.save(payload)
                     .then(_.partial(approvalDataRepository.clearApprovals, currentPeriodAndOrgUnit))
@@ -239,7 +245,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                 scrollToTop();
             };
 
-            save(true).then(successPromise, errorPromise);
+            save({ saveAsDraft: true }).then(successPromise, errorPromise);
         };
 
         $scope.submit = function() {
@@ -267,9 +273,6 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
         };
 
         $scope.submitAndApprove = function() {
-
-            var completedAndApprovedBy = $scope.currentUser.userCredentials.username;
-
             var successPromise = function() {
                 $scope.saveSuccess = false;
                 $scope.submitAndApprovalSuccess = true;
@@ -285,40 +288,11 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                 scrollToTop();
             };
 
-            var publishToDhis = function() {
-                var uploadCompletion = function() {
-                    return $hustle.publish({
-                        "data": [currentPeriodAndOrgUnit],
-                        "type": "uploadCompletionData",
-                        "locale": $scope.locale,
-                        "desc": $scope.resourceBundle.uploadCompletionDataDesc + currentPeriod + ", " + $scope.selectedModule.name
-                    }, "dataValues");
-                };
-
-                var uploadApproval = function() {
-                    return $hustle.publish({
-                        "data": [currentPeriodAndOrgUnit],
-                        "type": "uploadApprovalData",
-                        "locale": $scope.locale,
-                        "desc": $scope.resourceBundle.uploadApprovalDataDesc + currentPeriod + ", " + $scope.selectedModule.name
-                    }, "dataValues");
-                };
-
-                return uploadCompletion()
-                    .then(uploadApproval);
-            };
-
-            var upsertAndPushToDhis = function() {
-                save(false)
-                    .then(_.partial(approvalDataRepository.markAsApproved, currentPeriodAndOrgUnit, completedAndApprovedBy))
-                    .then(publishToDhis);
-            };
-
-            var modalMessages = {
+            var modalMessage = {
                 "confirmationMessage": $scope.resourceBundle.reapprovalConfirmationMessage
             };
 
-            confirmAndProceed(upsertAndPushToDhis, modalMessages, !($scope.isCompleted || $scope.isApproved))
+            confirmAndProceed(_.partial(save, { autoApprove: true }), modalMessage, !($scope.isCompleted || $scope.isApproved))
                 .then(successPromise, errorPromise);
         };
 
