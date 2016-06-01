@@ -1,7 +1,8 @@
 define(["dashboardController", "angularMocks", "approvalDataRepository", "moduleDataBlockFactory", "utils", "moment", "timecop", "properties", "lodash", "dateUtils", "checkVersionCompatibility", "systemSettingRepository", "chromeUtils"],
     function(DashboardController, mocks, ApprovalDataRepository, ModuleDataBlockFactory, utils, moment, timecop, properties, _, dateUtils, CheckVersionCompatibility, SystemSettingRepository, chromeUtils) {
         describe("dashboardController", function() {
-            var q, rootScope, hustle, scope, location, timeout, fakeModal, approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility, systemSettingRepository;
+            var q, rootScope, hustle, scope, location, timeout, fakeModal, dashboardController,
+                approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility, systemSettingRepository;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout, $location) {
@@ -109,17 +110,11 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                         'approvedAtProjectLevel': false,
                         "selectedForApproval": true
                     }, {
-                        "moduleId": "mod1",
+                        "moduleId": "mod3",
                         "period": "2014W02",
                         'submitted': true,
                         'approvedAtProjectLevel': false,
                         "selectedForApproval": true
-                    }, {
-                        "moduleId": "mod2",
-                        "period": "2014W02",
-                        'submitted': true,
-                        'approvedAtProjectLevel': true,
-                        "approvedAtCoordinationLevel": false
                     }];
 
                     moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, moduleDataBlocks));
@@ -134,17 +129,17 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                         "orgUnit": "mod2",
                         "period": "2014W01"
                     }, {
-                        "orgUnit": "mod1",
+                        "orgUnit": "mod3",
                         "period": "2014W02"
-                    }], "dataentryuser");
+                    }], rootScope.currentUser.userCredentials.username);
 
                     expect(hustle.publish.calls.count()).toEqual(1);
                     expect(hustle.publish.calls.argsFor(0)[0]).toEqual({
                         "data": [{
-                            "period": "2014W01",
-                            "orgUnit": "mod2"
+                            "orgUnit": "mod2",
+                            "period": "2014W01"
                         }, {
-                            "orgUnit": "mod1",
+                            "orgUnit": "mod3",
                             "period": "2014W02"
                         }],
                         "type": "uploadCompletionData",
@@ -175,7 +170,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                         "isApproved": false,
                         "selectedForApproval": true
                     }, {
-                        "moduleId": "mod1",
+                        "moduleId": "mod3",
                         "period": "2014W02",
                         'isSubmitted': true,
                         'isComplete': true,
@@ -195,24 +190,23 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                         "orgUnit": "mod2",
                         "period": "2014W01"
                     }, {
-                        "orgUnit": "mod1",
+                        "orgUnit": "mod3",
                         "period": "2014W02"
                     }], "dataentryuser");
 
                     expect(hustle.publish.calls.count()).toEqual(1);
                     expect(hustle.publish.calls.argsFor(0)[0]).toEqual({
                         "data": [{
-                            "period": "2014W01",
-                            "orgUnit": "mod2"
+                            "orgUnit": "mod2",
+                            "period": "2014W01"
                         }, {
-                            "orgUnit": "mod1",
+                            "orgUnit": "mod3",
                             "period": "2014W02"
                         }],
                         "type": "uploadApprovalData",
                         "locale": "en",
                         "desc": "Uploading Approval Data for 2014W01,2014W02"
                     });
-
                 });
             });
 
@@ -232,60 +226,60 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                 });
 
                 it('should filter items awaiting at data entry level', function() {
-                    var expectedModuleDataBlocks = [{
-                        "moduleId": "a0560fac722",
+                    var moduleDataBlockA = {
+                        "moduleId": "moduleA",
                         "awaitingActionAtDataEntryLevel": true,
                         "notSynced": true
-                    },{
-                        "moduleId": "a0560fac723",
+                    }, moduleDataBlockB = {
+                        "moduleId": "moduleB",
                         "awaitingActionAtDataEntryLevel": false,
                         "notSynced": false
-                    }];
+                    };
 
-                    moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, expectedModuleDataBlocks));
+                    moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, [moduleDataBlockA, moduleDataBlockB]));
 
                     dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility);
                     scope.$apply();
 
-                    expect(scope.itemsAwaitingSubmission).toEqual([expectedModuleDataBlocks[0]]);
+                    expect(scope.itemsAwaitingSubmission).toEqual([moduleDataBlockA]);
                 });
 
                 it('should filter items awaiting action at project level approval', function() {
-                    var expectedModuleDataBlocks = [{
-                        "moduleId": "a0560fac722",
+                    var moduleDataBlockA = {
+                        "moduleId": "moduleA",
                         awaitingActionAtProjectLevelApprover: false,
                         "notSynced": false
-                    },{
-                        "moduleId": "a0560fac723",
+                    }, moduleDataBlockB = {
+                        "moduleId": "moduleB",
                         "awaitingActionAtProjectLevelApprover": true,
                         "notSynced": false
-                    }];
+                    };
 
-                    moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, expectedModuleDataBlocks));
+                    moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, [moduleDataBlockA, moduleDataBlockB]));
 
                     dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility);
                     scope.$apply();
 
-                    expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual([expectedModuleDataBlocks[1]]);
+                    expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual([moduleDataBlockB]);
                 });
 
                 it('should filter items awaiting action at coordination level approval', function() {
-                    var expectedModuleDataBlocks = [{
-                        "moduleId": "a0560fac722",
+                    var moduleDataBlockA = {
+                        "moduleId": "moduleA",
                         awaitingActionAtCoordinationLevelApprover: false,
                         "notSynced": false
-                    },{
-                        "moduleId": "a0560fac723",
+                    }, moduleDataBlockB = {
+                        "moduleId": "moduleB",
                         "awaitingActionAtCoordinationLevelApprover": true,
                         "notSynced": false
-                    }];
+                    };
 
-                    moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, expectedModuleDataBlocks));
+                    moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, [moduleDataBlockA, moduleDataBlockB]));
 
                     dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility);
                     scope.$apply();
 
-                    expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual([expectedModuleDataBlocks[1]]);
+                    expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual([moduleDataBlockB]);
                 });
             });
 
