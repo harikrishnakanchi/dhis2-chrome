@@ -1,17 +1,26 @@
 define(["properties", "moment", "dateUtils", "lodash"], function(properties, moment, dateUtils, _) {
     return function($scope, $hustle, $q, $rootScope, $modal, $timeout, $location, approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility) {
 
-        var deregisterSelectedProjectListener = $rootScope.$on('selectedProjectUpdated', function() {
-            init();
-        });
-
-        $scope.$on('$destroy', function() {
-            deregisterSelectedProjectListener();
-        });
-
         $scope.formatPeriods = function(period) {
             m = moment(period, "GGGG[W]W");
             return m.format("[W]W") + " - " + m.startOf("isoWeek").toDate().toLocaleDateString() + " - " + m.endOf("isoWeek").toDate().toLocaleDateString();
+        };
+
+        $scope.getTemplateUrl = function(item) {
+
+            if (item.lineListService && $scope.hasRoles(['Data entry user'])) {
+                var m = moment(item.period, "GGGG[W]W");
+
+                var startOfWeek = m.startOf("isoWeek").format("YYYY-MM-DD");
+                var endOfWeek = m.endOf("isoWeek").format("YYYY-MM-DD");
+                return "#/line-list-summary/" + item.moduleId + "/?filterBy=dateRange&startDate=" + startOfWeek + "&endDate=" + endOfWeek;
+            }
+
+            if ($scope.hasRoles(['Project Level Approver', 'Coordination Level Approver', 'Observer'])) {
+                return "#/data-approval/" + item.moduleId + "/" + item.period;
+            }
+
+            return "#/aggregate-data-entry/" + item.moduleId + "/" + item.period;
         };
 
         $scope.toggleSelectAll = function(selectedAllItemsForApproval) {
@@ -118,23 +127,6 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
             });
         };
 
-        $scope.getTemplateUrl = function(item) {
-
-            if (item.lineListService && $scope.hasRoles(['Data entry user'])) {
-                var m = moment(item.period, "GGGG[W]W");
-
-                var startOfWeek = m.startOf("isoWeek").format("YYYY-MM-DD");
-                var endOfWeek = m.endOf("isoWeek").format("YYYY-MM-DD");
-                return "#/line-list-summary/" + item.moduleId + "/?filterBy=dateRange&startDate=" + startOfWeek + "&endDate=" + endOfWeek;
-            }
-
-            if ($scope.hasRoles(['Project Level Approver', 'Coordination Level Approver', 'Observer'])) {
-                return "#/data-approval/" + item.moduleId + "/" + item.period;
-            }
-
-            return "#/aggregate-data-entry/" + item.moduleId + "/" + item.period;
-        };
-
         var init = function() {
             $scope.support_email = properties.support_email;
 
@@ -148,6 +140,14 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                 });
             }
         };
+
+        var deregisterSelectedProjectListener = $rootScope.$on('selectedProjectUpdated', function() {
+            init();
+        });
+
+        $scope.$on('$destroy', function() {
+            deregisterSelectedProjectListener();
+        });
 
         init();
     };
