@@ -150,7 +150,7 @@ gulp.task('export-translations', function () {
         fr = require(path + '_fr.json'),
         ar = require(path + '_ar.json');
     var keys = Object.keys(en);
-    var content = '\tEnglish\tFrench\tArabic\r\nlocale\ten\tfr\tar';
+    var content = 'Key\tEnglish\tFrench\tArabic\r\nlocale\ten\tfr\tar';
     keys.forEach(function(key) {
         content += '\r\n';
         content += key + '\t';
@@ -164,39 +164,45 @@ gulp.task('export-translations', function () {
 });
 
 gulp.task('import-translations', function () {
-    if(!argv.tsvfilepath) {
-        console.log('Please specify TSV file path.\nUsage: gulp import-translations --tsvfilepath=fileName.tsv');
+    if(!argv.tsvFilePath) {
+        console.log('Please specify TSV file path.\nUsage: gulp import-translations --tsvFilePath fileName.tsv');
         return;
     }
-    var path = argv.tsvfilepath;
 
-    fs.readFile(path, function (err, data) {
+    var newTranslationsFilepath = argv.tsvFilePath,
+        resourceBundlePath = './src/main/js/app/i18n/resourceBundle_',
+        translations = {
+            en: require(resourceBundlePath + 'en.json'),
+            fr: require(resourceBundlePath + 'fr.json'),
+            ar: require(resourceBundlePath + 'ar.json')
+        };
 
+    fs.readFile(newTranslationsFilepath, function (err, fileContents) {
         if(err) throw new Error(err);
 
-        var contents = data.toString('utf8');
-        var lines = contents.split('\r\n');
-        var locales = lines[1].split('\t').slice(1);
-        lines = lines.slice(2);
+        var contents = fileContents.toString('utf8'),
+            lines = contents.split('\r\n'),
+            locales = lines[1].split('\t').slice(1),
+            newTranslations = lines.slice(2);
 
-        var resourceObjs = {};
-        lines.forEach(function(line) {
-            var values = line.split('\t');
-            var key = values[0];
-            values = values.slice(1);
-            locales.forEach(function (locale, index) {
-                var resourceObj = resourceObjs[locale] || {};
-                resourceObj[key] = values[index];
-                resourceObjs[locale] = resourceObj;
-            });
+        newTranslations.forEach(function(newTranslation) {
+            var values = newTranslation.split('\t'),
+                translationKey = values[0],
+                translationValues = values.slice(1);
+
+            if(translationKey in translations.en) {
+                locales.forEach(function (locale, index) {
+                    translations[locale][translationKey] = translationValues[index];
+                });
+            } else if(translationKey) {
+                console.log('Translation key does not exist: ' + translationKey);
+            }
         });
 
         locales.forEach(function (locale) {
-            var path = './src/main/js/app/i18n/resourceBundle_';
-            fs.writeFile(path + locale + '.json', JSON.stringify(resourceObjs[locale], undefined, 4), function () {
-                console.log('Generated translations for locale: ' + locale);
+            fs.writeFile(resourceBundlePath + locale + '.json', JSON.stringify(translations[locale], undefined, 4), function () {
+                console.log('Updated translations for locale: ' + locale);
             });
         });
-
     });
 });
