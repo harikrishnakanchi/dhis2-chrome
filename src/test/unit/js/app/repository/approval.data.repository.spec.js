@@ -267,6 +267,16 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 expect(mockStore.find).toHaveBeenCalledWith([approvalObject.period, approvalObject.orgUnit]);
                 expect(mockStore.upsert).toHaveBeenCalledWith(expectedObjectToUpsert);
             });
+
+            it('should handle approval object not existing for specified org unit and period', function() {
+                mockStore.find.and.returnValue(utils.getPromise(q, undefined));
+
+                approvalDataRepository.flagAsFailedToSync('someOrgUnitId', 'somePeriod');
+                scope.$apply();
+
+                expect(mockStore.find).toHaveBeenCalled();
+                expect(mockStore.upsert).not.toHaveBeenCalled();
+            });
         });
 
         describe('clearFailedToSync', function() {
@@ -287,6 +297,16 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
 
                 expect(mockStore.find).toHaveBeenCalledWith([approvalObject.period, approvalObject.orgUnit]);
                 expect(mockStore.upsert).toHaveBeenCalledWith(expectedObjectToUpsert);
+            });
+
+            it('should handle approval object not existing for specified org unit and period', function() {
+                mockStore.find.and.returnValue(utils.getPromise(q, undefined));
+
+                approvalDataRepository.clearFailedToSync('someOrgUnitId', 'somePeriod');
+                scope.$apply();
+
+                expect(mockStore.find).toHaveBeenCalled();
+                expect(mockStore.upsert).not.toHaveBeenCalled();
             });
         });
     });

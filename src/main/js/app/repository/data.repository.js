@@ -145,8 +145,10 @@ define(["lodash", "moment"], function(_, moment) {
 
             var upsertPromises = _.map(orgUnitIds, function(orgUnitId) {
                 return store.find([period, orgUnitId]).then(function (dataValueObject) {
-                    dataValueObject.failedToSync = true;
-                    return store.upsert(dataValueObject);
+                    if(dataValueObject) {
+                        dataValueObject.failedToSync = true;
+                        return store.upsert(dataValueObject);
+                    }
                 });
             });
             return $q.all(upsertPromises);
@@ -157,7 +159,9 @@ define(["lodash", "moment"], function(_, moment) {
 
             var upsertPromises = _.map(orgUnitIds, function(orgUnitId) {
                 return store.find([period, orgUnitId]).then(function (dataValueObject) {
-                    return store.upsert(_.omit(dataValueObject, 'failedToSync'));
+                    if(dataValueObject) {
+                        return store.upsert(_.omit(dataValueObject, 'failedToSync'));
+                    }
                 });
             });
             return $q.all(upsertPromises);

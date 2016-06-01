@@ -523,6 +523,16 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                 expect(mockStore.upsert).toHaveBeenCalledWith(expectedDataValueObjectAToUpsert);
                 expect(mockStore.upsert).toHaveBeenCalledWith(expectedDataValueObjectBToUpsert);
             });
+
+            it('should handle data value objects not existing for specified org unit and period', function() {
+                mockStore.find.and.returnValue(utils.getPromise(q, undefined));
+
+                dataRepository.flagAsFailedToSync(['someOrgUnitId'], 'somePeriod');
+                scope.$apply();
+
+                expect(mockStore.find).toHaveBeenCalled();
+                expect(mockStore.upsert).not.toHaveBeenCalled();
+            });
         });
 
         describe('clearFailedToSync', function() {
@@ -555,6 +565,16 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                 expect(mockStore.find).toHaveBeenCalledWith([dataValueObjectB.period, dataValueObjectB.orgUnit]);
                 expect(mockStore.upsert).toHaveBeenCalledWith(expectedDataValueObjectAToUpsert);
                 expect(mockStore.upsert).toHaveBeenCalledWith(expectedDataValueObjectBToUpsert);
+            });
+
+            it('should handle data value objects not existing for specified org unit and period', function() {
+                mockStore.find.and.returnValue(utils.getPromise(q, undefined));
+
+                dataRepository.clearFailedToSync(['someOrgUnitId'], 'somePeriod');
+                scope.$apply();
+
+                expect(mockStore.find).toHaveBeenCalled();
+                expect(mockStore.upsert).not.toHaveBeenCalled();
             });
         });
     });

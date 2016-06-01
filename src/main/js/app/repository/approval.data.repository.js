@@ -138,8 +138,10 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
             var store = db.objectStore(APPROVAL_DATA_STORE_NAME);
 
             return store.find([period, orgUnitId]).then(function (approvalObject) {
-                approvalObject.failedToSync = true;
-                return store.upsert(approvalObject);
+                if(approvalObject) {
+                    approvalObject.failedToSync = true;
+                    return store.upsert(approvalObject);
+                }
             });
         };
 
@@ -147,7 +149,9 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
             var store = db.objectStore(APPROVAL_DATA_STORE_NAME);
 
             return store.find([period, orgUnitId]).then(function (approvalObject) {
-                return store.upsert(_.omit(approvalObject, 'failedToSync'));
+                if(approvalObject) {
+                    return store.upsert(_.omit(approvalObject, 'failedToSync'));
+                }
             });
         };
     };
