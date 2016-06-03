@@ -4,6 +4,13 @@
         <h4>{{notificationTitle}}</h4>
     </div>
     <div class="modal-body">
-        <p ng-bind-html="notificationMessage"></p>
+        <div ng-if="!isDataPresent">{{ notificationMessage }}</div>
+        <div ng-if="isDataPresent" ng-repeat="(key, value) in data">
+            <span ng-repeat="names in value">
+                <b ng-show="!$last"> {{ names.title }}, </b>
+                <b ng-show="$last"> {{ names.title }}: </b>
+            </span>
+            {{ key }}
+        </div>
     </div>
 </div>

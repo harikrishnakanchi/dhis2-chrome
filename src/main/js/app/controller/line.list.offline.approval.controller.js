@@ -128,13 +128,15 @@ define(["lodash", "moment"], function(_, moment) {
             return $scope.showFilters && ($scope.showOfflineSummaryForViewOnly || ($scope.isCompleted && hasRoles(['Coordination Level Approver', 'Observer'])) || (hasRoles(['Project Level Approver', 'Observer'])));
         };
 
-        $scope.getDescriptionsForProceduresPerformed = function () {
+        var getDescriptionsForProceduresPerformed = function () {
             var proceduresPerformed = _.uniq($scope.dataValues._procedures, 'formName');
-            var content = '';
-            _.each(proceduresPerformed, function (procedurePerformed, index) {
-                content += (index+1) +'. ' + '<b>' + procedurePerformed.formName + '  :</b>  ' + procedurePerformed.description + '<br/><br/>';
+            proceduresPerformed =  _.map(proceduresPerformed, function (procedurePerformed) {
+                return {
+                    "title" : procedurePerformed.formName,
+                    "description": procedurePerformed.description
+                };
             });
-            return content;
+            $scope.proceduresPerformed = _.groupBy(proceduresPerformed, 'description');
         };
 
         $scope.shouldShowProceduresInOfflineSummary = function() {
@@ -267,6 +269,7 @@ define(["lodash", "moment"], function(_, moment) {
                     loadGroupedDataValues(submittedEvents);
                     setShowFilterFlag();
                     getAssociatedDataSets();
+                    getDescriptionsForProceduresPerformed();
                 });
             });
         };

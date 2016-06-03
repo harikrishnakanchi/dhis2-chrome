@@ -76,6 +76,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
+                        "formName": "Procedure performed 1",
+                        "description": "Procedure performed 1 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         }
@@ -83,6 +85,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 2",
+                        "formName": "Procedure performed 2",
+                        "description": "Procedure performed 2 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         }
@@ -118,6 +122,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
+                        "formName": "Procedure performed 1",
+                        "description": "Procedure performed 1 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         }
@@ -125,6 +131,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 2",
                         "dataElement": "Procedure performed 2",
+                        "formName": "Procedure performed 2",
+                        "description": "Procedure performed 2 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         }
@@ -249,6 +257,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
+                        "formName": "Procedure performed 1",
+                        "description": "Procedure performed 1 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         },
@@ -257,6 +267,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 2",
+                        "formName": "Procedure performed 2",
+                        "description": "Procedure performed 2 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         },
@@ -265,6 +277,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
+                        "formName": "Procedure performed 1",
+                        "description": "Procedure performed 1 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         },
@@ -273,6 +287,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 2",
                         "dataElement": "Procedure performed 2",
+                        "formName": "Procedure performed 2",
+                        "description": "Procedure performed 2 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         },
@@ -303,6 +319,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
+                        "formName": "Procedure performed 1",
+                        "description": "Procedure performed 1 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         },
@@ -311,6 +329,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 2",
+                        "formName": "Procedure performed 2",
+                        "description": "Procedure performed 2 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         },
@@ -319,6 +339,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
+                        "formName": "Procedure performed 1",
+                        "description": "Procedure performed 1 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         },
@@ -328,6 +350,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 2",
                         "dataElement": "Procedure performed 2",
+                        "formName": "Procedure performed 2",
+                        "description": "Procedure performed 2 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         },
