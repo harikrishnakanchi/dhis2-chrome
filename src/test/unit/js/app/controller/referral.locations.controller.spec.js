@@ -125,7 +125,7 @@ define(["referralLocationsController", "angularMocks", "utils", "lodash", "refer
                     "aliasName": "Some alias",
                     "hasExistingName": true,
                     "isDisabled": false,
-                    "displayName": 'MSF Facility 1'
+                    "translatedName": 'MSF Facility 1'
                 };
                 expect(scope.referralLocations[0]).toEqual(expectedReferralLocation);
             });

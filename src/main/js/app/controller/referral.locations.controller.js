@@ -114,13 +114,13 @@ define(["moment"], function(moment) {
 
         var fetchReferralLocationsForCurrentOpUnit = function (args) {
             var genericNames = args[0],
-                displayNames = args[1];
+                translatedNames = args[1];
 
             return referralLocationsRepository.get($scope.orgUnit.id).then(function(data) {
                 $scope.referralLocations = transformFromDb(data, genericNames);
 
                 _.each($scope.referralLocations, function (referralLocation, index) {
-                    referralLocation.displayName = displayNames[index];
+                    referralLocation.translatedName = translatedNames[index];
                 });
             });
         };
