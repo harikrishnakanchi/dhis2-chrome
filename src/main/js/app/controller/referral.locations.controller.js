@@ -1,17 +1,5 @@
 define(["moment"], function(moment) {
-    return function($scope, $hustle, $modal, referralLocationsRepository) {
-        var orderedReferralLocationNames = [
-            "MSF Facility 1",
-            "MSF Facility 2",
-            "MSF Facility 3",
-            "MoH Facility 1",
-            "MoH Facility 2",
-            "MoH Facility 3",
-            "Private Facility 1",
-            "Private Facility 2",
-            "Other Facility"
-        ];
-
+    return function($scope, $hustle, $modal, referralLocationsRepository, datasetRepository, translationsService) {
         var shouldDisableSaveButton = false;
 
         var showModal = function(okCallback, message) {
@@ -53,7 +41,7 @@ define(["moment"], function(moment) {
             return shouldDisableSaveButton;
         };
 
-        var transformFromDb = function(data) {
+        var transformFromDb = function(data, orderedReferralLocationNames) {
             data = data || {};
             return _.map(orderedReferralLocationNames, function(genericName, index) {
                 var aliasName = data[genericName] === undefined ? "" : data[genericName].name;
@@ -106,10 +94,41 @@ define(["moment"], function(moment) {
             return _.uniq(allReferralLocations).length != allReferralLocations.length;
         };
 
-        var init = function() {
-            referralLocationsRepository.get($scope.orgUnit.id).then(function(data) {
-                $scope.referralLocations = transformFromDb(data);
+        var fetchReferralDataset = function () {
+            return datasetRepository.getAll().then(function(datasets) {
+                return _.find(datasets, "isReferralDataset");
             });
+        };
+
+        var enrichAndTranslate = function(referralDataset) {
+            return datasetRepository.includeDataElements([referralDataset], []).then(function (enrichedDatasets) {
+                var referralSection = enrichedDatasets[0].sections[0];
+                var genericNames = _.pluck(referralSection.dataElements, 'formName');
+
+                referralSection = translationsService.translate([referralSection])[0];
+                var translatedNames = _.pluck(referralSection.dataElements, 'formName');
+
+                return [genericNames, translatedNames];
+            });
+        };
+
+        var fetchReferralLocationsForCurrentOpUnit = function (args) {
+            var genericNames = args[0],
+                displayNames = args[1];
+
+            return referralLocationsRepository.get($scope.orgUnit.id).then(function(data) {
+                $scope.referralLocations = transformFromDb(data, genericNames);
+
+                _.each($scope.referralLocations, function (referralLocation, index) {
+                    referralLocation.displayName = displayNames[index];
+                });
+            });
+        };
+
+        var init = function() {
+            fetchReferralDataset()
+                .then(enrichAndTranslate)
+                .then(fetchReferralLocationsForCurrentOpUnit);
         };
         init();
     };
