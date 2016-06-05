@@ -1,6 +1,6 @@
 define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], function(_, dataValuesMapper, orgUnitMapper, moment, properties) {
     return function($scope, $routeParams, $q, $hustle, $anchorScroll, $location, $modal, $rootScope, $window, $timeout,
-        dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService) {
+        dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory) {
 
         var currentPeriod, currentPeriodAndOrgUnit;
         var removeReferral = false;
@@ -196,12 +196,6 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
 
             updateDataValuesWithPopulationData();
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, currentPeriod, $scope.currentUser.userCredentials.username);
-            var periodsAndOrgUnits = _.map(_.uniq(_.pluck(payload, "orgUnit")), function(orgUnit) {
-                return {
-                    orgUnit: orgUnit,
-                    period: currentPeriod
-                };
-            });
 
             var publishToDhis = function() {
                 return $hustle.publish({
@@ -268,7 +262,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                 "confirmationMessage": $scope.resourceBundle.reapprovalConfirmationMessage
             };
 
-            confirmAndProceed(_.partial(save, false), modalMessages, !($scope.isCompleted || $scope.isApproved))
+            confirmAndProceed(_.partial(save, false), modalMessages, !$scope.moduleDataBlock.approvedAtProjectLevel && !$scope.moduleDataBlock.approvedAtCoordinationLevel)
                 .then(successPromise, errorPromise);
         };
 
@@ -418,15 +412,6 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                             .then(setTotalsDisplayPreferencesforDataSetSections);
                     });
 
-                var loadDataValuesPromise = dataRepository.getDataValues(currentPeriod, $scope.moduleAndOriginOrgUnitIds).then(function(dataValues) {
-                    dataValues = dataValues || [];
-                    var isDraft = !_.some(dataValues, {
-                        "isDraft": true
-                    });
-                    $scope.dataValues = dataValuesMapper.mapToView(dataValues);
-                    $scope.isSubmitted = (!_.isEmpty(dataValues) && isDraft);
-                });
-
                 var loadProjectPromise = orgUnitRepository.getParentProject($scope.selectedModule.id).then(function(orgUnit) {
                     $scope.projectIsAutoApproved = _.any(orgUnit.attributeValues, {
                         'attribute': {
@@ -437,19 +422,19 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                     $scope.projectPopulationDetails = extractPopulationDetails(orgUnit.attributeValues);
                 });
 
-                var loadApprovalDataPromise = approvalDataRepository.getApprovalData(currentPeriodAndOrgUnit).then(function(data) {
-                    $scope.isCompleted = !_.isEmpty(data) && data.isComplete;
-                    $scope.isApproved = !_.isEmpty(data) && data.isApproved;
-                });
-
-                var loadSyncStatusForPeriodAndOrgunitPromise = dataRepository.getLocalStatus(currentPeriodAndOrgUnit.period, currentPeriodAndOrgUnit.orgUnit)
-                    .then(function(status) {
-                        $scope.syncError = status == 'FAILED_TO_SYNC';
+                var loadModuleDataBlock = moduleDataBlockFactory.create($scope.selectedModule.id, currentPeriod)
+                    .then(function(moduleDataBlock) {
+                        $scope.moduleDataBlock = moduleDataBlock;
+                        $scope.syncError = moduleDataBlock.failedToSync;
+                        $scope.dataValues = dataValuesMapper.mapToView(moduleDataBlock.dataValues);
+                        $scope.isSubmitted = moduleDataBlock.submitted;
+                        $scope.isCompleted = moduleDataBlock.approvedAtProjectLevel;
+                        $scope.isApproved = moduleDataBlock.approvedAtCoordinationLevel;
                     });
 
                 if ($scope.dataentryForm !== undefined)
                     $scope.dataentryForm.$setPristine();
-                return $q.all([loadDataSetsPromise, loadDataValuesPromise, loadProjectPromise, loadApprovalDataPromise, loadSyncStatusForPeriodAndOrgunitPromise]);
+                return $q.all([loadDataSetsPromise, loadModuleDataBlock, loadProjectPromise]);
 
             }).finally(function() {
                 $scope.loading = false;
