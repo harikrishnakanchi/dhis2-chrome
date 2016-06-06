@@ -42,7 +42,6 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
             ]);
 
             app.value('ngI18nConfig', {
-                defaultLocale: 'en',
                 supportedLocales: ['en', 'fr', 'ar'],
                 basePath: "/js/app/i18n"
             });
