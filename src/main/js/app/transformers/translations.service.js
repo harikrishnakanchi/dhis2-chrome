@@ -20,7 +20,8 @@ define(['lodash'], function(_){
             var store = db.objectStore('translations');
             var query = db.queryBuilder().$index('by_locale').$eq(locale).compile();
             return store.each(query).then(function(data) {
-                translations = _.groupBy(data, 'objectId');
+                var validTranslationsWithObjectId = _.filter(data, 'objectId');
+                translations = _.groupBy(validTranslationsWithObjectId, 'objectId');
             });
         };
 
@@ -29,7 +30,7 @@ define(['lodash'], function(_){
                 return reportsToTranslate;
             }
 
-            var result = _.each(reportsToTranslate, function (report) {
+            return _.each(reportsToTranslate, function (report) {
                 var items = report.definition.rows[0].items;
                 var namesHash = report.data ? report.data.metaData.names : {};
                 return _.each(items, function (item) {
@@ -38,8 +39,6 @@ define(['lodash'], function(_){
                     namesHash[item.id] = translationsByProperty.length > 0 ? translationsByProperty[0].value : item.name;
                 });
             });
-
-            return result;
         };
 
         this.translateReferralLocations = function(arrayOfObjectsToBeTranslated) {
@@ -73,7 +72,7 @@ define(['lodash'], function(_){
             }
             
             _.each(optionSetMap, function(value) {
-                return self.translate(value);
+                self.translate(value);
             });
             return optionSetMap;
         };
@@ -96,8 +95,8 @@ define(['lodash'], function(_){
             }
 
             _.each(objectsToBeTranslated, function (objectToBeTranslated) {
-                var translationObject = translations[objectToBeTranslated.id] || translations[objectToBeTranslated.dataElement];
-                
+                var translationObject = translations[objectToBeTranslated.id] || [];
+
                 _.each(translatableProperties, function (property) {
                     if(objectToBeTranslated[property]) {
                         var translationsByProperty = _.filter(translationObject, {property: property});
