@@ -2,9 +2,9 @@
 define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "excludedDataElementsRepository", "datasetRepository", "programRepository", "referralLocationsRepository", "translationsService"],
     function(DataApprovalController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, ExcludedDataElementsRepository, DatasetRepository, ProgramRepository, ReferralLocationsRepository, TranslationsService) {
         describe("dataApprovalController ", function() {
-            var scope, routeParams, q, location, anchorScroll, dataApprovalController, rootScope, approvalStore,
-                saveSuccessPromise, saveErrorPromise, dataEntryFormMock, parentProject, getApprovalDataSpy, getDataValuesSpy, getLocalStatusSpy,
-                orgUnits, window, getOrgUnitSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository, excludedDataElementsRepository, origin1, origin2, geographicOrigins, translationsService;
+            var scope, routeParams, q, location, anchorScroll, dataApprovalController, rootScope,
+                saveSuccessPromise, saveErrorPromise, parentProject, getDataValuesSpy, getLocalStatusSpy, selectedPeriod,
+                window, getOrgUnitSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository, excludedDataElementsRepository, origin1, origin2, translationsService;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $anchorScroll, $location, $window, $timeout) {
@@ -46,13 +46,10 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     "weekNumber": 14,
                     "weekYear": 2014
                 };
+                selectedPeriod = '2014W14';
 
                 scope.dataentryForm = {
                     $setPristine: function() {}
-                };
-
-                scope.resourceBundle = {
-                    "dataApprovalConfirmationMessage": ""
                 };
 
                 rootScope.locale = "en";
@@ -86,8 +83,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 };
 
                 scope.resourceBundle = {
-                    "uploadApprovalDataDesc": "approve data at coordination level for ",
-                    "uploadCompletionDataDesc": "approve data at project level for "
+                    syncModuleDataBlockDesc: 'some description'
                 };
 
                 fakeModal = {
@@ -138,8 +134,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 spyOn(excludedDataElementsRepository, "get").and.returnValue(utils.getPromise(q, {}));
 
                 approvalDataRepository = new ApprovalDataRepository();
-                getApprovalDataSpy = spyOn(approvalDataRepository, "getApprovalData");
-                getApprovalDataSpy.and.returnValue(utils.getPromise(q, {}));
+                spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, {}));
                 spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, {}));
 
                 dataRepository = new DataRepository();
@@ -166,23 +161,13 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
             });
 
             it("should submit data for first level approval", function() {
-                var levelOneApprovalDataSaved = false;
-                getApprovalDataSpy.and.callFake(function() {
-                    if (levelOneApprovalDataSaved)
-                        return utils.getPromise(q, {
-                            "isComplete": true
-                        });
-                    return utils.getPromise(q, undefined);
-                });
+                approvalDataRepository.getApprovalData.and.returnValue(utils.getPromise(q, undefined));
 
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})
                 });
 
-                spyOn(approvalDataRepository, "markAsComplete").and.callFake(function() {
-                    levelOneApprovalDataSaved = true;
-                    return utils.getPromise(q, {});
-                });
+                spyOn(approvalDataRepository, "markAsComplete").and.returnValue(utils.getPromise(q, {}));
 
                 var periodAndOrgUnit = {
                     "period": '2014W14',
@@ -198,6 +183,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 };
 
                 dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, dataRepository, excludedDataElementsRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService);
+
                 scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
                 scope.$apply();
 
@@ -207,17 +193,19 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 expect(approvalDataRepository.markAsComplete).toHaveBeenCalledWith(periodAndOrgUnit, storedBy);
 
                 expect(hustle.publish).toHaveBeenCalledWith({
-                    "data": [periodAndOrgUnit],
-                    "type": "uploadCompletionData",
+                    "data": {
+                        moduleId: scope.selectedModule.id,
+                        period: selectedPeriod
+                    },
+                    "type": "syncModuleDataBlock",
                     "locale": "en",
-                    "desc": "approve data at project level for 2014W14, Mod1"
+                    "desc": scope.resourceBundle.syncModuleDataBlockDesc + selectedPeriod + ', ' + scope.selectedModule.name
 
                 }, "dataValues");
 
                 expect(scope.firstLevelApproveSuccess).toBe(true);
                 expect(scope.secondLevelApproveSuccess).toBe(false);
                 expect(scope.approveError).toBe(false);
-                expect(scope.isCompleted).toEqual(true);
             });
 
             it("should not submit data for approval", function() {
@@ -255,7 +243,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
 
             it("should mark data as approved if proccessed", function() {
                 var levelTwoApprovalDataSaved = false;
-                getApprovalDataSpy.and.callFake(function() {
+                approvalDataRepository.getApprovalData.and.callFake(function() {
                     if (levelTwoApprovalDataSaved)
                         return utils.getPromise(q, {
                             "isComplete": true,
@@ -298,26 +286,15 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
             });
 
             it("should submit data for second level approval", function() {
-                var levelTwoApprovalDataSaved = false;
-                getApprovalDataSpy.and.callFake(function() {
-                    if (levelTwoApprovalDataSaved)
-                        return utils.getPromise(q, {
-                            "isComplete": true,
-                            "isApproved": true
-                        });
-                    return utils.getPromise(q, {
-                        "isComplete": true
-                    });
-                });
+                approvalDataRepository.getApprovalData.and.returnValue(utils.getPromise(q, {
+                    "isComplete": true
+                }));
 
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})
                 });
 
-                spyOn(approvalDataRepository, "markAsApproved").and.callFake(function() {
-                    levelTwoApprovalDataSaved = true;
-                    return utils.getPromise(q, {});
-                });
+                spyOn(approvalDataRepository, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
 
                 var periodAndOrgUnit = {
                     "period": '2014W14',
@@ -341,10 +318,13 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
 
                 expect(approvalDataRepository.markAsApproved).toHaveBeenCalledWith(periodAndOrgUnit, approvedBy);
                 expect(hustle.publish).toHaveBeenCalledWith({
-                    "data": [periodAndOrgUnit],
-                    "type": "uploadApprovalData",
+                    "data": {
+                        period: selectedPeriod,
+                        moduleId: scope.selectedModule.id
+                    },
+                    "type": "syncModuleDataBlock",
                     "locale": "en",
-                    "desc": "approve data at coordination level for 2014W14, Mod1"
+                    "desc": scope.resourceBundle.syncModuleDataBlockDesc + selectedPeriod + ", " + scope.selectedModule.name
                 }, "dataValues");
                 expect(scope.secondLevelApproveSuccess).toBe(true);
                 expect(scope.approveError).toBe(false);

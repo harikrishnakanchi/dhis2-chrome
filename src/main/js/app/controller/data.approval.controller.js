@@ -137,10 +137,13 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
 
             var publishToDhis = function() {
                 return $hustle.publish({
-                    "data": [currentPeriodAndOrgUnit],
-                    "type": "uploadCompletionData",
+                    "data": {
+                        period: currentPeriod,
+                        moduleId: $scope.selectedModule.id
+                    },
+                    "type": "syncModuleDataBlock",
                     "locale": $scope.locale,
-                    "desc": $scope.resourceBundle.uploadCompletionDataDesc + currentPeriodAndOrgUnit.period + ", " + $scope.selectedModule.name
+                    "desc": $scope.resourceBundle.syncModuleDataBlockDesc + currentPeriod + ", " + $scope.selectedModule.name
                 }, "dataValues");
             };
 
@@ -176,10 +179,13 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
 
             var publishToDhis = function() {
                 return $hustle.publish({
-                    "data": [currentPeriodAndOrgUnit],
-                    "type": "uploadApprovalData",
+                    "data": {
+                        moduleId: $scope.selectedModule.id,
+                        period: currentPeriod
+                    },
+                    "type": "syncModuleDataBlock",
                     "locale": $scope.locale,
-                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + currentPeriodAndOrgUnit.period + ", " + $scope.selectedModule.name
+                    "desc": $scope.resourceBundle.syncModuleDataBlockDesc + currentPeriod + ", " + $scope.selectedModule.name
                 }, "dataValues");
             };
 
