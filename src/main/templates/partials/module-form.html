@@ -80,7 +80,13 @@
                                                         <ul>
                                                             <li ng-repeat="element in subSection.dataElements">
                                                                 <label>
-                                                                    <input type="checkbox" ng-disabled="isDisabled || element.isMandatory" ng-model="element.isIncluded" ng-change="changeSubSectionSelection(subSection, section)">{{ element.formName}}
+                                                                    <input type="checkbox" ng-disabled="isDisabled || element.isMandatory" ng-model="element.isIncluded" ng-change="changeSubSectionSelection(subSection, section)">
+                                                                    <a class="changeColor"
+                                                                       description-popup
+                                                                       dp-title="{{ element.formName}}"
+                                                                       dp-desc="{{ element.description }}">
+                                                                        {{ element.formName}}
+                                                                    </a>
                                                                 </label>
                                                             </li>
                                                         </ul>
