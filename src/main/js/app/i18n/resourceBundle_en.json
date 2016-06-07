@@ -271,6 +271,7 @@
     "dateRange": "Date Range",
     "search": "Search",
     "aggregateDataSyncError": "Failed to submit data for approval. Please resubmit.",
+    "dataApprovalSyncError": "Failed to submit approval data. Please reapprove.",
     "projectReportLabel": "Project Report",
     "projectInformationLabel": "Project Information",
     "pleaseWaitLabel": "Please wait...",

@@ -303,5 +303,6 @@
     "toLabel": "",
     "weeklyReports": "",
     "monthlyReports": "",
-    "aggregateDataSyncError": ""
+    "aggregateDataSyncError": "",
+    "dataApprovalSyncError": ""
 }

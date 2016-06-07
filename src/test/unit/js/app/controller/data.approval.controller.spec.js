@@ -262,7 +262,10 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
             });
 
             it("should not show form when data is not available", function() {
-                scope.dataValues = {};
+                rootScope.hasRoles.and.returnValue(true);
+                moduleDataBlockFactory.create.and.returnValue(utils.getPromise(q, {
+                    submitted: false
+                }));
                 scope.$apply();
 
                 expect(scope.showForm()).toEqual(false);

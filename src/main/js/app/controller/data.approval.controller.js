@@ -25,10 +25,13 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
         };
 
         $scope.showForm = function() {
-            if (_.isEmpty($scope.dataValues) || $scope.syncError)
-                return false;
-
-            return ($scope.isSubmitted && $rootScope.hasRoles(['Project Level Approver', 'Observer'])) || ($scope.isCompleted && $rootScope.hasRoles(['Coordination Level Approver', 'Observer']));
+            if($rootScope.hasRoles(['Observer'])) {
+                return $scope.isSubmitted;
+            } else if($rootScope.hasRoles(['Project Level Approver'])) {
+                return $scope.isSubmitted && !$scope.moduleDataBlock.awaitingActionAtDataEntryLevel;
+            } else if($rootScope.hasRoles(['Coordination Level Approver'])) {
+                return $scope.isSubmitted && !($scope.moduleDataBlock.awaitingActionAtDataEntryLevel || $scope.moduleDataBlock.awaitingActionAtProjectLevelApprover);
+            }
         };
 
         $scope.getDatasetState = function(id, isFirst) {
@@ -305,6 +308,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                     });
 
                 var loadModuleDataBlock = moduleDataBlockFactory.create($scope.selectedModule.id, currentPeriod).then(function(moduleDataBlock) {
+                    $scope.moduleDataBlock = moduleDataBlock;
                     $scope.isApproved = moduleDataBlock.approvedAtCoordinationLevel;
                     $scope.isCompleted = moduleDataBlock.approvedAtProjectLevel;
                     $scope.syncError = moduleDataBlock.failedToSync;

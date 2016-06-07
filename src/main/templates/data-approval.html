@@ -3,16 +3,38 @@
     <div ng-show="!approveError">
         <div ng-if="!isLineListModule &amp;&amp; !loading &amp;&amp; week &amp;&amp; selectedModule">
             <section class="panel tab-panel {{ layoutDirection.direction }}">
-                <div ng-if="!syncError">
-                    <div ng-show="isCompleted &amp;&amp; !isApproved &amp;&amp; !hasRoles(['Coordination Level Approver'])" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
-                    <div ng-show="isApproved &amp;&amp; !submitAndApprovalSuccess" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
-                    <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
-                    <div class="alert alert-danger" ng-if="hasRoles(['Project Level Approver', 'Coordination Level Approver']) &amp;&amp; ((!isCompleted || !isSubmitted) &amp;&amp; hasRoles(['Coordination Level Approver'])) || (!isSubmitted &amp;&amp; hasRoles(['Project Level Approver'])) &amp;&amp; dataValues !== undefined">{{resourceBundle.noDataForApproval}}</div>
-                    <div class="alert alert-info" ng-if="!isApproved  &amp;&amp; !isCompleted  &amp;&amp; !isSubmitted &amp;&amp; hasRoles(['Observer'])">{{resourceBundle.noDataAvailable}}</div>
+
+                <div ng-if="hasRoles(['Observer'])">
+                    <div class="alert alert-info" ng-if="!isSubmitted">{{resourceBundle.noDataAvailable}}</div>
                 </div>
-                <div ng-if="syncError">
-                    <div class="alert alert-danger" ng-if="hasRoles(['Project Level Approver', 'Coordination Level Approver'])">{{resourceBundle.noDataForApproval}}</div>
-                    <div class="alert alert-info" ng-if="hasRoles(['Observer'])">{{resourceBundle.noDataAvailable}}</div>
+
+                <div ng-if="hasRoles(['Project Level Approver'])">
+                    <div ng-if="!syncError || moduleDataBlock.awaitingActionAtCoordinationLevelApprover">
+                        <div ng-show="isCompleted && !isApproved" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
+                        <div ng-show="isApproved" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
+                        <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
+                        <div class="alert alert-danger" ng-if="!isSubmitted">{{resourceBundle.noDataForApproval}}</div>
+                    </div>
+                    <div ng-if="syncError && moduleDataBlock.awaitingActionAtProjectLevelApprover">
+                        <div class="alert alert-danger">{{resourceBundle.dataApprovalSyncError}}</div>
+                    </div>
+                    <div ng-if="syncError && moduleDataBlock.awaitingActionAtDataEntryLevel">
+                        <div class="alert alert-danger">{{resourceBundle.noDataForApproval}}</div>
+                    </div>
+                  </div>
+
+                <div ng-if="hasRoles(['Coordination Level Approver'])">
+                    <div ng-if="!syncError">
+                        <div ng-show="isApproved" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
+                        <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
+                        <div class="alert alert-danger" ng-if="!isCompleted || !isSubmitted">{{resourceBundle.noDataForApproval}}</div>
+                    </div>
+                    <div ng-if="syncError && moduleDataBlock.awaitingActionAtCoordinationLevelApprover">
+                        <div class="alert alert-danger">{{resourceBundle.dataApprovalSyncError}}</div>
+                    </div>
+                    <div ng-if="syncError && !moduleDataBlock.awaitingActionAtCoordinationLevelApprover">
+                        <div class="alert alert-danger">{{resourceBundle.noDataForApproval}}</div>
+                    </div>
                 </div>
 
                 <form name="dataentryForm" id="dataentry" ng-if="showForm()">
