@@ -107,8 +107,8 @@
                     <td>
                         <ul class="list-unstyled">
                             <li ng-repeat="item in items | orderBy: 'period'">
-                                <span ng-if="!item.approvedAtProjectLevel">{{ resourceBundle.itemsAwaitingApprovalAtProjectLevel }}</span>
-                                <span ng-if="item.approvedAtProjectLevel">{{ resourceBundle.itemsAwaitingApprovalAtCoordinationLevel }}</span>
+                                <span ng-if="item.awaitingActionAtProjectLevelApprover">{{ resourceBundle.itemsAwaitingApprovalAtProjectLevel }}</span>
+                                <span ng-if="item.awaitingActionAtCoordinationLevelApprover">{{ resourceBundle.itemsAwaitingApprovalAtCoordinationLevel }}</span>
                             </li>
                         </ul>
                     </td>
