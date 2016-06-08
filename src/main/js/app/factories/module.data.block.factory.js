@@ -1,5 +1,5 @@
 define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
-    return function ($q, orgUnitRepository, dataRepository, programEventRepository, approvalDataRepository) {
+    return function ($q, orgUnitRepository, dataRepository, programEventRepository, approvalDataRepository, dataSyncFailureRepository) {
 
         var create = function (moduleId, period) {
             return orgUnitRepository.findAll([moduleId])
@@ -61,24 +61,41 @@ define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
                 });
             };
 
+            var getIndexedFailedSyncStatus = function (mapOfPeriodsToModuleIds) {
+                return dataSyncFailureRepository.getAll().then(function (failedModules) {
+                    var moduleSyncStatus = [];
+                    var indexedFailedModules = _.indexBy(failedModules, function(module){
+                        return module.period + module.moduleId;
+                    });
+                    _.each(moduleIds, function (moduleId) {
+                        _.each(periodRange, function (period) {
+                            moduleSyncStatus[period + moduleId] = indexedFailedModules[period + moduleId] ? true : false;
+                        });
+                    });
+                    return moduleSyncStatus;
+                });
+            };
+
             return getMapOfOriginIdsToModuleIds().then(function(mapOfOriginIdsToModuleIds) {
                 return $q.all({
                     indexedAggregateData: getIndexedAggregateData(mapOfOriginIdsToModuleIds),
                     indexedLineListData: getIndexedLineListData(mapOfOriginIdsToModuleIds),
-                    indexedApprovalData: getIndexedApprovalData()
+                    indexedApprovalData: getIndexedApprovalData(),
+                    indexedFailedSyncStatus: getIndexedFailedSyncStatus()
                 });
             }).then(function (data) {
                 var indexedAggregateData = data.indexedAggregateData;
                 var indexedLineListData = data.indexedLineListData;
                 var indexedApprovalData = data.indexedApprovalData;
+                var indexedFailedSyncStatus = data.indexedFailedSyncStatus;
 
                 var allModuleDataBlocks = _.map(moduleOrgUnits, function (moduleOrgUnit) {
                     return _.map(periodRange, function (period) {
                         var aggregateDataValues = indexedAggregateData[period + moduleOrgUnit.id] || [];
                         var lineListData = indexedLineListData[period + moduleOrgUnit.id] || [];
                         var approvalData = indexedApprovalData[period + moduleOrgUnit.id] || {};
-
-                        return ModuleDataBlock.create(moduleOrgUnit, period, aggregateDataValues, lineListData, approvalData);
+                        var failedToSync = indexedFailedSyncStatus[period + moduleOrgUnit.id];
+                        return ModuleDataBlock.create(moduleOrgUnit, period, aggregateDataValues, lineListData, approvalData, failedToSync);
                     });
                 });
                 return _.flatten(allModuleDataBlocks);

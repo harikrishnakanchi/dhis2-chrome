@@ -1,6 +1,6 @@
-define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'programEventRepository', 'approvalDataRepository', 'moduleDataBlock', 'utils', 'angularMocks'],
-    function (ModuleDataBlockFactory, OrgUnitRepository, DataRepository, ProgramEventRepository, ApprovalDataRepository, ModuleDataBlock, utils, mocks) {
-        var q, scope, moduleDataBlockFactory, orgUnitRepository, dataRepository, programEventRepository, approvalDataRepository,
+define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'programEventRepository', 'approvalDataRepository', 'dataSyncFailureRepository', 'moduleDataBlock', 'utils', 'angularMocks'],
+    function (ModuleDataBlockFactory, OrgUnitRepository, DataRepository, ProgramEventRepository, ApprovalDataRepository, DataSyncFailureRepository, ModuleDataBlock, utils, mocks) {
+        var q, scope, moduleDataBlockFactory, orgUnitRepository, dataRepository, programEventRepository, approvalDataRepository, dataSyncFailureRepository,
             projectId, periodRange, defaultPeriodForTesting;
 
         describe('ModuleDataBlockFactory', function() {
@@ -24,11 +24,17 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
                 approvalDataRepository = new ApprovalDataRepository();
                 spyOn(approvalDataRepository, 'getApprovalDataForPeriodsOrgUnits').and.returnValue(utils.getPromise(q, {}));
 
+                dataSyncFailureRepository = new DataSyncFailureRepository();
+                spyOn(dataSyncFailureRepository, 'getAll').and.returnValue(utils.getPromise(q, [{
+                    moduleId: 'someModuleId',
+                    period: '2016W21'
+                }]));
+
                 projectId = 'myProjectId';
                 defaultPeriodForTesting = '2016W20';
                 periodRange = [defaultPeriodForTesting];
 
-                moduleDataBlockFactory = new ModuleDataBlockFactory(q, orgUnitRepository, dataRepository, programEventRepository, approvalDataRepository);
+                moduleDataBlockFactory = new ModuleDataBlockFactory(q, orgUnitRepository, dataRepository, programEventRepository, approvalDataRepository, dataSyncFailureRepository);
             }));
 
             describe('createForProject', function() {
@@ -51,7 +57,7 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
                     var returnedObjects = createModuleDataBlocksForProject();
 
                     expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(projectId);
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, defaultPeriodForTesting, [], [], {});
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, defaultPeriodForTesting, [], [], {}, false);
                     expect(returnedObjects).toEqual([mockModuleDataBlock]);
                 });
 
@@ -61,8 +67,8 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
 
                     var returnedObjects = createModuleDataBlocksForProject();
 
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnitA, defaultPeriodForTesting, [], [], {});
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnitB, defaultPeriodForTesting, [], [], {});
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnitA, defaultPeriodForTesting, [], [], {}, false);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnitB, defaultPeriodForTesting, [], [], {}, false);
                     expect(returnedObjects.length).toEqual(2);
                 });
 
@@ -74,9 +80,9 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
 
                     var returnedObjects = createModuleDataBlocksForProject();
 
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W20', [], [], {});
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W21', [], [], {});
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W22', [], [], {});
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W20', [], [], {}, false);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W21', [], [], {}, false);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W22', [], [], {}, false);
                     expect(returnedObjects.length).toEqual(3);
                 });
 
@@ -96,7 +102,7 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
                     var returnedObjects = createModuleDataBlocksForProject();
 
                     expect(dataRepository.getDataValuesForOrgUnitsAndPeriods).toHaveBeenCalledWith(['ou1'], [defaultPeriodForTesting]);
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, defaultPeriodForTesting, [aggregateDataValue], [], {});
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, defaultPeriodForTesting, [aggregateDataValue], [], {}, false);
                     expect(returnedObjects.length).toEqual(1);
                 });
 
@@ -121,7 +127,7 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
                     var returnedObjects = createModuleDataBlocksForProject();
 
                     expect(dataRepository.getDataValuesForOrgUnitsAndPeriods).toHaveBeenCalledWith(['ou1', 'origin1'], [defaultPeriodForTesting]);
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, defaultPeriodForTesting, aggregateDataValues, [], {});
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, defaultPeriodForTesting, aggregateDataValues, [], {}, false);
                     expect(returnedObjects.length).toEqual(1);
                 });
 
@@ -155,10 +161,10 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
                     dataRepository.getDataValuesForOrgUnitsAndPeriods.and.returnValue(utils.getPromise(q, [aggregateDataValueA, aggregateDataValueB, aggregateDataValueC]));
                     var returnedObjects = createModuleDataBlocksForProject();
 
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit1, '2016W01', [aggregateDataValueA], [], {});
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit1, '2016W02', [aggregateDataValueB], [], {});
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit2, '2016W01', [], [], {});
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit2, '2016W02', [aggregateDataValueC], [], {});
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit1, '2016W01', [aggregateDataValueA], [], {}, false);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit1, '2016W02', [aggregateDataValueB], [], {}, false);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit2, '2016W01', [], [], {}, false);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit2, '2016W02', [aggregateDataValueC], [], {}, false);
                     expect(returnedObjects.length).toEqual(4);
                 });
 
@@ -180,7 +186,7 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
 
                     expect(orgUnitRepository.findAllByParent).toHaveBeenCalledWith(['ou1']);
                     expect(programEventRepository.getEventsFromPeriod).toHaveBeenCalledWith(defaultPeriodForTesting, ['origin1']);
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, defaultPeriodForTesting, [], lineListEvents, {});
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, defaultPeriodForTesting, [], lineListEvents, {}, false);
                     expect(returnedObjects.length).toEqual(1);
                 });
 
@@ -212,10 +218,10 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
 
                     var returnedObjects = createModuleDataBlocksForProject();
 
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit1, '2016W01', [], [lineListEventA], {});
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit1, '2016W02', [], [lineListEventB], {});
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit2, '2016W01', [], [lineListEventC], {});
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit2, '2016W02', [], [], {});
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit1, '2016W01', [], [lineListEventA], {}, false);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit1, '2016W02', [], [lineListEventB], {}, false);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit2, '2016W01', [], [lineListEventC], {}, false);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit2, '2016W02', [], [], {}, false);
                     expect(returnedObjects.length).toEqual(4);
                 });
 
@@ -233,7 +239,7 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
                     var returnedObjects = createModuleDataBlocksForProject();
 
                     expect(approvalDataRepository.getApprovalDataForPeriodsOrgUnits).toHaveBeenCalledWith(defaultPeriodForTesting, defaultPeriodForTesting, ['ou1']);
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, defaultPeriodForTesting, [], [], approvalData[0]);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, defaultPeriodForTesting, [], [], approvalData[0], false);
                     expect(returnedObjects.length).toEqual(1);
                 });
 
@@ -262,10 +268,10 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
                     var returnedObjects = createModuleDataBlocksForProject();
 
                     expect(approvalDataRepository.getApprovalDataForPeriodsOrgUnits).toHaveBeenCalledWith(periodRange[0], periodRange[1], ['ou1', 'ou2']);
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit1, '2016W01', [], [], approvalDataA);
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit1, '2016W02', [], [], {});
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit2, '2016W01', [], [], approvalDataB);
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit2, '2016W02', [], [], approvalDataC);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit1, '2016W01', [], [], approvalDataA, false);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit1, '2016W02', [], [], {}, false);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit2, '2016W01', [], [], approvalDataB, false);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit2, '2016W02', [], [], approvalDataC, false);
                     expect(returnedObjects.length).toEqual(4);
                 });
 
@@ -287,7 +293,7 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
 
                     var returnedObjects = createModuleDataBlocksForProject();
 
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W20', [], [], approvalDataA);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W20', [], [], approvalDataA, false);
                     expect(returnedObjects.length).toEqual(1);
                 });
             });
@@ -308,9 +314,9 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
                     scope.$apply();
 
                     expect(orgUnitRepository.findAll).toHaveBeenCalledWith([moduleId]);
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W20', [], [], {});
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W21', [], [], {});
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W22', [], [], {});
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W20', [], [], {}, false);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W21', [], [], {}, false);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W22', [], [], {}, false);
                     expect(returnedObjects.length).toEqual(3);
                 });
             });
@@ -333,8 +339,28 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
                     scope.$apply();
 
                     expect(orgUnitRepository.findAll).toHaveBeenCalledWith([moduleId]);
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, period, [], [], {});
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, period, [], [], {}, false);
                     expect(returnedObject).toEqual(mockModuleDataBlock);
+                });
+                it('should create module data block with failed to sync flags for a specific failed module', function (){
+                    var moduleId = 'someModuleId',
+                        period = '2016W21',
+                        moduleOrgUnit = {id: moduleId},
+                        returnedObject = null;
+
+                    orgUnitRepository.findAll.and.returnValue(utils.getPromise(q, [moduleOrgUnit]));
+
+                    var mockModuleDataBlock = {};
+                    ModuleDataBlock.create.and.returnValue(mockModuleDataBlock);
+
+                    moduleDataBlockFactory.create(moduleId, period).then(function (data) {
+                        returnedObject = data;
+                    });
+                    scope.$apply();
+
+                    var failedToSync = true;
+                    expect(dataSyncFailureRepository.getAll).toHaveBeenCalled();
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, period, [], [], {}, failedToSync);
                 });
             });
         });

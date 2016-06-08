@@ -1,5 +1,5 @@
 define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, CustomAttributes, moment, properties) {
-    var ModuleDataBlock = function (orgUnit, period, aggregateDataValues, lineListEvents, approvalData) {
+    var ModuleDataBlock = function (orgUnit, period, aggregateDataValues, lineListEvents, approvalData, failedToSync) {
         this.moduleId = orgUnit.id;
         this.period = period;
         this.moduleName = parseModuleName(orgUnit);
@@ -18,21 +18,19 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         this.approvedAtCoordinationLevelBy = this.approvedAtCoordinationLevel ? approvalData.approvedBy : null;
         this.approvedAtCoordinationLevelAt = this.approvedAtCoordinationLevel ? moment(approvalData.approvedOn) : null;
 
-        this.failedToSync = failedToSync(this.lineListService, aggregateDataValues, approvalData);
+        this.failedToSync = isFailedToSync(this.lineListService, aggregateDataValues, failedToSync);
 
         this.awaitingActionAtDataEntryLevel = isWaitingForActionAtDataEntryLevel(this.submitted, this.approvedAtProjectLevel, this.approvedAtCoordinationLevel, this.failedToSync);
         this.awaitingActionAtProjectLevelApprover = isWaitingForActionAtProjectLevel(this.submitted, this.approvedAtProjectLevel, this.approvedAtCoordinationLevel, this.failedToSync);
         this.awaitingActionAtCoordinationLevelApprover = isWaitingForActionAtCoordinationLevel(this.submitted, this.approvedAtProjectLevel, this.approvedAtCoordinationLevel, this.failedToSync);
     };
 
-    var failedToSync = function(lineListService, aggregateDataValues, approvalData) {
-        var aggregateDataValuesFailedToSync = !!aggregateDataValues && _.any(aggregateDataValues, { failedToSync: true }),
-            approvalDataFailedToSync = !!(approvalData && approvalData.failedToSync);
+    var isFailedToSync = function(lineListService, aggregateDataValues, failedToSync) {
 
         //This can be removed after v6.0 has been released
         var aggregateDataValuesFailedToSyncAsPerDeprecatedLocalStatus = !!aggregateDataValues && _.any(aggregateDataValues, { localStatus: 'FAILED_TO_SYNC' });
 
-        return !lineListService && (aggregateDataValuesFailedToSync || approvalDataFailedToSync || aggregateDataValuesFailedToSyncAsPerDeprecatedLocalStatus);
+        return !lineListService && (failedToSync || aggregateDataValuesFailedToSyncAsPerDeprecatedLocalStatus);
     };
 
     var isWaitingForActionAtDataEntryLevel = function(submitted, approvedAtProject, approvedAtCoordination, failedToSync) {

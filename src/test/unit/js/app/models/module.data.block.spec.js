@@ -1,6 +1,6 @@
 define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(ModuleDataBlock, CustomAttributes, moment, timecop) {
     describe('ModuleDataBlock', function () {
-        var moduleDataBlock, orgUnit, period, aggregateDataValues, lineListEvents, approvalData, someMomentInTime, isLineListService;
+        var moduleDataBlock, orgUnit, period, aggregateDataValues, lineListEvents, approvalData, someMomentInTime, isLineListService, failedToSync;
 
         beforeEach(function() {
             isLineListService = false;
@@ -14,11 +14,12 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             aggregateDataValues = undefined;
             lineListEvents = undefined;
             approvalData = undefined;
+            failedToSync = false;
             someMomentInTime = moment('2016-05-18T00:00:00.000Z');
         });
 
         var createModuleDataBlock = function() {
-            return ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+            return ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData, failedToSync);
         };
 
         var createMockDataValue = function(options) {
@@ -410,10 +411,9 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
 
             it('should be waiting at dataEntryLevel if data has been submitted but failed to sync', function() {
-                aggregateDataValues = [createMockDataValuesObject({
-                    failedToSync: true
-                })];
+                aggregateDataValues = [createMockDataValuesObject()];
 
+                failedToSync = true;
                 moduleDataBlock = createModuleDataBlock();
 
                 expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(true);
@@ -422,9 +422,8 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
 
             it('should be waiting at projectLevel if data has been submitted, approved at project level, but failed to sync', function() {
-                aggregateDataValues = [createMockDataValuesObject({
-                    failedToSync: true
-                })];
+                aggregateDataValues = [createMockDataValuesObject()];
+                failedToSync = true;
                 approvalData = {
                     isComplete: true,
                     failedToSync: true
@@ -438,9 +437,8 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
 
             it('should be waiting at coordinationLevel if data has been submitted, approved at project and coordination level, but failed to sync', function() {
-                aggregateDataValues = [createMockDataValuesObject({
-                    failedToSync: true
-                })];
+                aggregateDataValues = [createMockDataValuesObject()];
+                failedToSync = true;
                 approvalData = {
                     isComplete: true,
                     isApproved: true,
@@ -459,60 +457,7 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             beforeEach(function() {
                 isLineListService = false;
             });
-
-            it('should be false if it is lineListService', function() {
-                isLineListService = true;
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.failedToSync).toEqual(false);
-            });
-
-            it('should be false if aggregateDataValues are undefined', function() {
-                aggregateDataValues = undefined;
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.failedToSync).toEqual(false);
-            });
-
-            it('should be false if aggregateDataValues is an empty array', function() {
-                aggregateDataValues = [];
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.failedToSync).toEqual(false);
-            });
-
-            it('should be true if any of the aggregate data values are flagged as failed to sync', function() {
-                aggregateDataValues = [createMockDataValuesObject({
-                    failedToSync: true
-                })];
-                moduleDataBlock = createModuleDataBlock();
-
-                expect(moduleDataBlock.failedToSync).toEqual(true);
-            });
-
-            it('should be false if none of the aggregate data values failed to sync', function() {
-                aggregateDataValues = [createMockDataValuesObject({
-                    failedToSync: false
-                })];
-                moduleDataBlock = createModuleDataBlock();
-
-                expect(moduleDataBlock.failedToSync).toEqual(false);
-            });
-
-            it('should be true if the approval failed to sync', function() {
-                approvalData = {
-                    failedToSync: true
-                };
-                moduleDataBlock = createModuleDataBlock();
-
-                expect(moduleDataBlock.failedToSync).toEqual(true);
-            });
-
-            it('should be false if the approval did not failed to sync', function() {
-                approvalData = {};
-                moduleDataBlock = createModuleDataBlock();
-
-                expect(moduleDataBlock.failedToSync).toEqual(false);
-            });
-
-            //These can be removed after v6.0 has been released
+ //These can be removed after v6.0 has been released
             describe('compatibility with deprecated localStatus flags', function() {
                 it('should be true if localStatus is FAILED_TO_SYNC', function() {
                     aggregateDataValues = [createMockDataValuesObject({
