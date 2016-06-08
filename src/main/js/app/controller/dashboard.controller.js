@@ -65,15 +65,30 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
 
                 var publishToDhis = function() {
                     var publishPromises = _.map(moduleDataBlocksToBeApproved, function(moduleDataBlock) {
-                        return $hustle.publish({
-                            data: {
-                                moduleId: moduleDataBlock.moduleId,
-                                period: moduleDataBlock.period
-                            },
-                            type: 'syncModuleDataBlock',
-                            locale: $scope.locale,
-                            desc: $scope.resourceBundle.syncModuleDataBlockDesc + ' ' + moduleDataBlock.period
-                        }, "dataValues");
+                        if(moduleDataBlock.lineListService) {
+                            var jobType = $rootScope.hasRoles(['Project Level Approver']) ? 'uploadCompletionData' : 'uploadApprovalData',
+                                descriptionKey = $rootScope.hasRoles(['Project Level Approver']) ? 'uploadCompletionDataDesc' : 'uploadApprovalDataDesc';
+
+                            return $hustle.publish({
+                                data: [{
+                                    orgUnit: moduleDataBlock.moduleId,
+                                    period: moduleDataBlock.period
+                                }],
+                                type: jobType,
+                                locale: $scope.locale,
+                                desc: $scope.resourceBundle[descriptionKey] + moduleDataBlock.period
+                            }, "dataValues");
+                        } else {
+                            return $hustle.publish({
+                                data: {
+                                    moduleId: moduleDataBlock.moduleId,
+                                    period: moduleDataBlock.period
+                                },
+                                type: 'syncModuleDataBlock',
+                                locale: $scope.locale,
+                                desc: $scope.resourceBundle.syncModuleDataBlockDesc + ' ' + moduleDataBlock.period
+                            }, "dataValues");
+                        }
                     });
                     return $q.all(publishPromises);
                 };
