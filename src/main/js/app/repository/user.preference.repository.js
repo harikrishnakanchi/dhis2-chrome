@@ -17,20 +17,21 @@ define(["lodash"], function(_) {
 
         var getCurrentUsersPreferences = function() {
             return getAll().then(function(userPreferences) {
-                var currentUserPreferences = _.last(_.sortBy(userPreferences, 'lastUpdated')) || {};
-                return currentUserPreferences;
+                var userPreferencesWithLastUpdated = _.filter(userPreferences, 'lastUpdated'),
+                    mostRecentlyUpdatedUserPreference = _.last(_.sortBy(userPreferencesWithLastUpdated, 'lastUpdated'));
+                return mostRecentlyUpdatedUserPreference || null;
             });
         };
 
         var getCurrentUsersUsername = function() {
             return getCurrentUsersPreferences().then(function(userPreference) {
-                return userPreference.username || null;
+                return (userPreference && userPreference.username) || null;
             });
         };
 
         var getCurrentUsersProjectIds = function() {
             return getCurrentUsersPreferences().then(function(userPreference) {
-                return _.pluck(userPreference.organisationUnits, 'id');
+                return (userPreference && _.pluck(userPreference.organisationUnits, 'id')) || [];
             });
         };
 
