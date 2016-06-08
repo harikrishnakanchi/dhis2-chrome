@@ -4,7 +4,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
         describe("dataApprovalController ", function() {
             var scope, routeParams, q, location, anchorScroll, dataApprovalController, rootScope,
                 saveSuccessPromise, saveErrorPromise, parentProject, getDataValuesSpy, getLocalStatusSpy, selectedPeriod,
-                window, getOrgUnitSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository, excludedDataElementsRepository, origin1, origin2, translationsService, moduleDataBlockFactory;
+                window, getOrgUnitSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository, excludedDataElementsRepository, origin1, origin2, translationsService, moduleDataBlockFactory, programRepository;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $anchorScroll, $location, $window, $timeout) {
@@ -83,7 +83,9 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 };
 
                 scope.resourceBundle = {
-                    syncModuleDataBlockDesc: 'some description'
+                    syncModuleDataBlockDesc: 'some description',
+                    uploadApprovalDataDesc: 'some description',
+                    uploadCompletionDataDesc: 'some description'
                 };
 
                 fakeModal = {
@@ -164,7 +166,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 Timecop.uninstall();
             });
 
-            it("should submit data for first level approval", function() {
+            it("should submit data for first level approval for aggregate module", function() {
                 moduleDataBlockFactory.create.and.returnValue(utils.getPromise(q, {
                     approvedAtProjectLevel: "level1ApprovalFromModuleDataBlock"
                 }));
@@ -211,11 +213,58 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 }, "dataValues");
             });
 
+            it("should submit data for first level approval for linelist module", function() {
+                moduleDataBlockFactory.create.and.returnValue(utils.getPromise(q, {
+                    approvedAtProjectLevel: "level1ApprovalFromModuleDataBlock"
+                }));
+
+                spyOn(fakeModal, "open").and.returnValue({
+                    result: utils.getPromise(q, {})
+                });
+                spyOn(approvalDataRepository, "markAsComplete").and.returnValue(utils.getPromise(q, {}));
+
+                var periodAndOrgUnit = {
+                    "period": '2014W14',
+                    "orgUnit": 'mod1'
+                };
+                var storedBy = "dataentryuser";
+
+                scope.selectedModule = {
+                    id: 'mod1',
+                    name: 'Mod1',
+                    parent: {
+                        id: 'parent'
+                    }
+                };
+                programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, {
+                    name: 'mockProgram'
+                }));
+
+                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
+                scope.$apply();
+
+                expect(moduleDataBlockFactory.create).toHaveBeenCalledWith(scope.selectedModule.id, selectedPeriod);
+                expect(scope.isCompleted).toBe("level1ApprovalFromModuleDataBlock");
+
+                scope.firstLevelApproval();
+                scope.$apply();
+
+                expect(approvalDataRepository.markAsComplete).toHaveBeenCalledWith(periodAndOrgUnit, storedBy);
+
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    "data": [periodAndOrgUnit],
+                    "type": "uploadCompletionData",
+                    "locale": "en",
+                    "desc": scope.resourceBundle.uploadCompletionDataDesc + selectedPeriod + ', ' + scope.selectedModule.name
+                }, "dataValues");
+            });
+
             it("should not publish approval to DHIS if repository operation fails", function() {
                 scope.$apply();
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})
                 });
+                programRepository = new ProgramRepository();
 
                 spyOn(approvalDataRepository, "markAsComplete").and.returnValue(utils.getRejectedPromise(q, {}));
 
@@ -271,7 +320,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 expect(scope.showForm()).toEqual(false);
             });
 
-            it("should submit data for second level approval", function() {
+            it("should submit data for second level approval for aggregate module", function() {
                 moduleDataBlockFactory.create.and.returnValue(utils.getPromise(q, {
                     approvedAtCoordinationLevel: 'level2ApprovalFromModuleDataBlock'
                 }));
@@ -312,6 +361,50 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     "type": "syncModuleDataBlock",
                     "locale": "en",
                     "desc": scope.resourceBundle.syncModuleDataBlockDesc + selectedPeriod + ", " + scope.selectedModule.name
+                }, "dataValues");
+            });
+
+            it("should submit data for second level approval for linelist module ", function() {
+                moduleDataBlockFactory.create.and.returnValue(utils.getPromise(q, {
+                    approvedAtCoordinationLevel: 'level2ApprovalFromModuleDataBlock'
+                }));
+
+                spyOn(fakeModal, "open").and.returnValue({
+                    result: utils.getPromise(q, {})
+                });
+
+                programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, {
+                    name: 'mockProgram'
+                }));
+                spyOn(approvalDataRepository, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
+
+                var periodAndOrgUnit = {
+                    "period": '2014W14',
+                    "orgUnit": 'mod1',
+                };
+                var approvedBy = "dataentryuser";
+                scope.selectedModule = {
+                    id: 'mod1',
+                    name: 'Mod1',
+                    parent: {
+                        id: 'parent'
+                    }
+                };
+
+                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
+                scope.$apply();
+
+                expect(scope.isApproved).toBe('level2ApprovalFromModuleDataBlock');
+
+                scope.secondLevelApproval();
+                scope.$apply();
+
+                expect(approvalDataRepository.markAsApproved).toHaveBeenCalledWith(periodAndOrgUnit, approvedBy);
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    "data": [periodAndOrgUnit],
+                    "type": "uploadApprovalData",
+                    "locale": "en",
+                    "desc": scope.resourceBundle.uploadApprovalDataDesc + selectedPeriod + ', ' + scope.selectedModule.name
                 }, "dataValues");
             });
 
