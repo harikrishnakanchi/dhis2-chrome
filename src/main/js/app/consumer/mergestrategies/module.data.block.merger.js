@@ -69,7 +69,23 @@ define(['moment', 'lodash'],
                     }
                 };
 
-                return mergeAndSaveDataValues().then(mergeAndSaveCompletionAndApproval);
+                var mergeAndSaveCompletionAndApprovalForLineLists = function () {
+                    var mergedDhisApprovalAndCompletion = _.merge({}, dhisCompletion, dhisApproval),
+                        dhisApprovalOrCompletionExists = !_.isEmpty(mergedDhisApprovalAndCompletion);
+
+                    // Can be removed once approval logic for line list modules is integrated properly into ModuleDataBlockMerger
+                    if(moduleDataBlock.approvalData && (moduleDataBlock.approvalData.status == 'NEW' || moduleDataBlock.approvalData.status == 'DELETED')) {
+                        //DO NOTHING
+                    } else if(dhisApprovalOrCompletionExists) {
+                        return approvalDataRepository.saveApprovalsFromDhis(mergedDhisApprovalAndCompletion);
+                    } else {
+                        return approvalDataRepository.invalidateApproval(moduleDataBlock.period, moduleDataBlock.moduleId);
+                    }
+                };
+
+                return mergeAndSaveDataValues().then(function () {
+                    return moduleDataBlock.lineListService ? mergeAndSaveCompletionAndApprovalForLineLists() : mergeAndSaveCompletionAndApproval();
+                });
             };
 
 

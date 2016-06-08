@@ -69,6 +69,7 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                             var jobType = $rootScope.hasRoles(['Project Level Approver']) ? 'uploadCompletionData' : 'uploadApprovalData',
                                 descriptionKey = $rootScope.hasRoles(['Project Level Approver']) ? 'uploadCompletionDataDesc' : 'uploadApprovalDataDesc';
 
+                            // Can be removed once approval logic for line list modules is integrated into ModuleDataBlockMerger
                             return $hustle.publish({
                                 data: [{
                                     orgUnit: moduleDataBlock.moduleId,
