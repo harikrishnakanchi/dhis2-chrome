@@ -1,6 +1,6 @@
 define(['moment', 'lodash'],
     function(moment, _) {
-        return function(dataRepository, approvalDataRepository, mergeBy, dataService, $q, datasetRepository, approvalService) {
+        return function(dataRepository, approvalDataRepository, mergeBy, dataService, $q, datasetRepository, approvalService, dataSyncFailureRepository) {
 
             var mergeAndSaveToLocalDatabase = function(moduleDataBlock, updatedDhisDataValues, dhisCompletion, dhisApproval) {
                 var updatedDhisDataValuesExist = updatedDhisDataValues && updatedDhisDataValues.length > 0;
@@ -152,9 +152,7 @@ define(['moment', 'lodash'],
                     var dataValueOrgUnitIds = _.unique(_.pluck(moduleDataBlock.dataValues, 'orgUnit'));
 
                     if(moduleDataBlock.failedToSync) {
-                        return dataRepository.clearFailedToSync(dataValueOrgUnitIds, moduleDataBlock.period).then(function() {
-                            return approvalDataRepository.clearFailedToSync(moduleDataBlock.moduleId, moduleDataBlock.period);
-                        });
+                        return dataSyncFailureRepository.delete(moduleDataBlock.moduleId, moduleDataBlock.period);
                     } else {
                         return $q.when({});
                     }

@@ -1,9 +1,9 @@
-define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'datasetRepository', 'dataService', 'approvalService', 'angularMocks', 'utils', 'moment', 'lodash', 'mergeBy'],
-    function(ModuleDataBlockMerger, DataRepository, ApprovalDataRepository, DatasetRepository, DataService, ApprovalService, mocks, utils, moment, _ , MergeBy) {
+define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'datasetRepository', 'dataService', 'approvalService', 'angularMocks', 'utils', 'moment', 'lodash', 'mergeBy', 'dataSyncFailureRepository'],
+    function(ModuleDataBlockMerger, DataRepository, ApprovalDataRepository, DatasetRepository, DataService, ApprovalService, mocks, utils, moment, _ , MergeBy, DataSyncFailureRepository) {
         describe('moduleDataBlockMerger', function() {
             var q, scope, moduleDataBlockMerger,
                 dataRepository, approvalRepository, datasetRepository, dataService, approvalService, mergeBy,
-                dhisDataValues, dhisCompletion, dhisApproval, moduleDataBlock, someMomentInTime, dataSets, dataSetIds, periodAndOrgUnit;
+                dhisDataValues, dhisCompletion, dhisApproval, moduleDataBlock, someMomentInTime, dataSets, dataSetIds, periodAndOrgUnit, dataSyncFailureRepository;
 
             beforeEach(mocks.inject(function($q, $rootScope, $log) {
                 q = $q;
@@ -37,8 +37,10 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                 spyOn(approvalService, 'markAsUnapproved').and.returnValue(utils.getPromise(q, {}));
 
                 mergeBy = new MergeBy($log);
+                dataSyncFailureRepository = new DataSyncFailureRepository();
+                spyOn(dataSyncFailureRepository, 'delete').and.returnValue(utils.getPromise(q, undefined));
 
-                moduleDataBlockMerger = new ModuleDataBlockMerger(dataRepository, approvalRepository, mergeBy, dataService, q, datasetRepository, approvalService);
+                moduleDataBlockMerger = new ModuleDataBlockMerger(dataRepository, approvalRepository, mergeBy, dataService, q, datasetRepository, approvalService, dataSyncFailureRepository);
 
                 moduleDataBlock = createMockModuleDataBlock();
                 dhisDataValues = undefined;
@@ -510,7 +512,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                 });
 
                 describe('sync job has previously failed', function() {
-                    it('should clear the failedToSync flag from the dataValues objects and approval object', function() {
+                    it('should remove the entry from dataSyncFailure store', function() {
                         var moduleDataValue = createMockDataValue({ orgUnit: 'someModuleId' }),
                             originDataValue = createMockDataValue({ orgUnit: 'someOriginId' });
 
@@ -521,21 +523,19 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                         performUpload();
 
-                        expect(dataRepository.clearFailedToSync).toHaveBeenCalledWith([moduleDataValue.orgUnit, originDataValue.orgUnit], moduleDataBlock.period);
-                        expect(approvalRepository.clearFailedToSync).toHaveBeenCalledWith(moduleDataValue.orgUnit, moduleDataBlock.period);
+                        expect(dataSyncFailureRepository.delete).toHaveBeenCalledWith(moduleDataValue.orgUnit, moduleDataBlock.period);
                     });
                 });
 
                 describe('sync job did not previously fail', function() {
-                    it('should not clear the failedToSync flag from the dataValues objects and approval object', function() {
+                    it('should not remove the entry from dataSyncFailure store', function() {
                         moduleDataBlock = createMockModuleDataBlock({
                             failedToSync: false
                         });
 
                         performUpload();
 
-                        expect(dataRepository.clearFailedToSync).not.toHaveBeenCalled();
-                        expect(approvalRepository.clearFailedToSync).not.toHaveBeenCalled();
+                        expect(dataSyncFailureRepository.delete).not.toHaveBeenCalled();
                     });
                 });
             });
