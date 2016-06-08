@@ -1,5 +1,5 @@
 define(["properties", "chromeUtils", "moment", "lodash"], function(properties, chromeUtils, moment, _) {
-    return function($log, ngI18nResourceBundle, dataRepository, approvalDataRepository, orgUnitRepository) {
+    return function($log, ngI18nResourceBundle, dataRepository, approvalDataRepository, orgUnitRepository, dataSyncFailureRepository) {
         var getResourceBundle = function(locale) {
             return ngI18nResourceBundle.get({
                 "locale": locale
@@ -78,10 +78,8 @@ define(["properties", "chromeUtils", "moment", "lodash"], function(properties, c
                     orgUnitRepository.findAllByParent(jobParameters.moduleId).then(function(originOrgUnits) {
                         var originOrgUnitIds = _.pluck(originOrgUnits, 'id');
 
-                        dataRepository.flagAsFailedToSync([jobParameters.moduleId].concat(originOrgUnitIds), jobParameters.period).then(function() {
-                            approvalDataRepository.flagAsFailedToSync(jobParameters.moduleId, jobParameters.period).then(function() {
-                                $log.warn("Flagged that sync failed for: ", [jobParameters.moduleId, jobParameters.period]);
-                            });
+                        dataSyncFailureRepository.add(jobParameters.moduleId, jobParameters.period).then(function (){
+                            $log.warn("Flagged that sync failed for: ", [jobParameters.moduleId, jobParameters.period]);
                         });
                     });
                 }

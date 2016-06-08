@@ -1,8 +1,8 @@
-define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtils", "utils", "dataRepository", "approvalDataRepository", "orgUnitRepository"],
-    function(QueuePostProcessInterceptor, mocks, properties, chromeUtils, utils, DataRepository, ApprovalDataRepository, OrgUnitRepository) {
+define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtils", "utils", "dataRepository", "approvalDataRepository", "orgUnitRepository", "dataSyncFailureRepository"],
+    function(QueuePostProcessInterceptor, mocks, properties, chromeUtils, utils, DataRepository, ApprovalDataRepository, OrgUnitRepository, DataSyncFailureRepository) {
     describe('queuePostProcessInterceptor', function() {
 
-        var queuePostProcessInterceptor, q, rootScope, ngI18nResourceBundle, scope, dataRepository, approvalDataRepository, orgUnitRepository;
+        var queuePostProcessInterceptor, q, rootScope, ngI18nResourceBundle, scope, dataRepository, approvalDataRepository, orgUnitRepository, dataSyncFailureRepository;
 
         beforeEach(mocks.inject(function($q, $rootScope, $log) {
             q = $q;
@@ -22,13 +22,15 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
             spyOn(chromeUtils, "sendMessage");
             spyOn(chromeUtils, "createNotification");
 
+            dataSyncFailureRepository = new DataSyncFailureRepository();
+            spyOn(dataSyncFailureRepository, "add").and.returnValue(utils.getPromise(q, undefined));
             ngI18nResourceBundle = {
                 "get": jasmine.createSpy("ngI18nResourceBundle").and.returnValue(utils.getPromise(q, {
                     "data": {}
                 }))
             };
 
-            queuePostProcessInterceptor = new QueuePostProcessInterceptor($log, ngI18nResourceBundle, dataRepository, approvalDataRepository, orgUnitRepository);
+            queuePostProcessInterceptor = new QueuePostProcessInterceptor($log, ngI18nResourceBundle, dataRepository, approvalDataRepository, orgUnitRepository, dataSyncFailureRepository);
         }));
 
         it('should return true for retry if number of releases is less than max retries', function() {
@@ -221,8 +223,7 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
             scope.$apply();
 
             expect(orgUnitRepository.findAllByParent).toHaveBeenCalledWith('someModuleId');
-            expect(dataRepository.flagAsFailedToSync).toHaveBeenCalledWith(['someModuleId', 'someOriginId'], 'somePeriod');
-            expect(approvalDataRepository.flagAsFailedToSync).toHaveBeenCalledWith('someModuleId', 'somePeriod');
+            expect(dataSyncFailureRepository.add).toHaveBeenCalledWith('someModuleId','somePeriod');
         });
     });
 });
