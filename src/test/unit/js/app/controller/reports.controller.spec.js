@@ -1,9 +1,10 @@
 define(["angularMocks", "utils", "moment", "reportsController", "datasetRepository", "orgUnitRepository", "chartRepository", "pivotTableRepository", "translationsService", "systemSettingRepository"], function(mocks, utils, moment, ReportsController, DatasetRepository, OrgUnitRepository, ChartRepository, PivotTableRepository, TranslationsService, SystemSettingRepository) {
     describe("reportsControllerspec", function() {
 
-        var scope, reportsController, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, systemSettingRepository;
+        var scope, rootScope, reportsController, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, systemSettingRepository;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
+            rootScope = $rootScope;
             scope = $rootScope.$new();
             q = $q;
 
@@ -192,16 +193,19 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                 "name": "chart1",
                 "title": "Title1",
                 "dataSetCode": "dataSetCode1",
+                "displayPosition": 1,
                 "type": "STACKED_COLUMN"
             }, {
                 "name": "chart2",
                 "title": "Title2",
                 "dataSetCode": "dataSetCode2",
+                "displayPosition": 2,
                 "type": "LINE"
             }, {
                 "name": "chart3 Notifications",
                 "title": "Title1",
                 "dataSetCode": "dataSetCode1",
+                "displayPosition": null,
                 "type": "STACKED_COLUMN"
             }];
 
@@ -351,6 +355,7 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
             var expectedChartData = [{
                 "title": "Title1",
                 "dataSetCode": "dataSetCode1",
+                "displayPosition": 1,
                 "type": "STACKED_COLUMN",
                 "data": [{
                     "key": "5-14 years",
@@ -404,6 +409,7 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
             }, {
                 "title": "Title2",
                 "dataSetCode": "dataSetCode2",
+                "displayPosition": 2,
                 "type": "LINE",
                 "data": [{
                     "key": "Total Consultations 1-23 months Pediatric OPD",

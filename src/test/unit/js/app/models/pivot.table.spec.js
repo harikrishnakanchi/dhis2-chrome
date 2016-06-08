@@ -109,5 +109,17 @@ define(['pivotTable'], function(PivotTable) {
                expect(pivotTable.title).toEqual('');
            });
        });
+
+       describe('displayPosition', function() {
+           it('should parse the display position from the pivot table name', function() {
+               pivotTable = PivotTable.create({ name: '[FieldApp - someDataSetCode] 88 SomePivotTableTitle' });
+               expect(pivotTable.displayPosition).toEqual(88);
+           });
+
+           it('should return false if the pivot table name is malformed', function() {
+               pivotTable = PivotTable.create({ name: 'some malformed pivot table name' });
+               expect(pivotTable.displayPosition).toBeNull();
+           });
+       });
    });
 });

@@ -55,6 +55,34 @@ define(["chartRepository", "angularMocks", "utils", "lodash"], function(ChartRep
                 });
                 scope.$apply();
             });
+
+            describe('displayPosition', function() {
+                it('should parse the position from the chart name', function() {
+                    var allCharts = [{
+                        'id': 'chart1',
+                        'name': '[FieldApp - someDataSetCode] 88 Name'
+                    }];
+                    mockStore.getAll.and.returnValue(utils.getPromise(q, allCharts));
+
+                    chartRepository.getAll().then(function(chartsFromRepository) {
+                        expect(chartsFromRepository[0].displayPosition).toEqual(88);
+                    });
+                    scope.$apply();
+                });
+
+                it('should be null if the chart name is malformed', function() {
+                    var allCharts = [{
+                        'id': 'chart1',
+                        'name': 'some malformed chart name'
+                    }];
+                    mockStore.getAll.and.returnValue(utils.getPromise(q, allCharts));
+
+                    chartRepository.getAll().then(function(chartsFromRepository) {
+                        expect(chartsFromRepository[0].displayPosition).toBeNull();
+                    });
+                    scope.$apply();
+                });
+            });
         });
         it('should upsert the charts', function() {
             var chartsToUpsert = [{

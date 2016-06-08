@@ -16,7 +16,7 @@
                 <div ng-hide="selectedDataset.isReportsAvailable">
                     <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
                 </div>
-                <div ng-repeat="chart in chartData | filter: {dataSetCode: selectedDataset.code} | orderBy: 'name'" ng-if="chart.data.length &gt; 0">
+                <div ng-repeat="chart in chartData | filter: {dataSetCode: selectedDataset.code} | orderBy: 'displayPosition'" ng-if="chart.data.length &gt; 0">
                     <div>
                         <div class="row chart-title">
                             <h3 class="col-md-6 col-md-offset-3 text-center">{{chart.title}}</h3>
@@ -47,7 +47,7 @@
                                 <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
                             </div>
                             <div class="exp-coll-group" ng-if="selectedDataset.isWeeklyPivotTablesAvailable">
-                                <div ng-if="table.definition.weeklyReport && table.isTableDataAvailable" ng-repeat="table in pivotTables | filter: {dataSetCode: selectedDataset.code} | orderBy: 'name'" class="exportCSV-container">
+                                <div ng-if="table.definition.weeklyReport && table.isTableDataAvailable" ng-repeat="table in pivotTables | filter: {dataSetCode: selectedDataset.code} | orderBy: 'definition.displayPosition'" class="exportCSV-container">
                                     <accordion close-others="false">
                                         <accordion-group is-open="status.open">
                                             <accordion-heading>
@@ -77,7 +77,7 @@
                                 <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isReportOpen, 'glyphicon-chevron-right': !isReportOpen}"></i>
                             </accordion-heading>
                             <div class="exp-coll-group">
-                                <div ng-if="table.definition.monthlyReport && table.isTableDataAvailable" ng-repeat="table in pivotTables | filter: {dataSetCode: selectedDataset.code} | orderBy: 'name'" class="exportCSV-container">
+                                <div ng-if="table.definition.monthlyReport && table.isTableDataAvailable" ng-repeat="table in pivotTables | filter: {dataSetCode: selectedDataset.code} | orderBy: 'definition.displayPosition'" class="exportCSV-container">
                                     <accordion close-others="false">
                                         <accordion-group is-open="status.open">
                                             <accordion-heading>

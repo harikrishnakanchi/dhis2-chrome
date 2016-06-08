@@ -23,11 +23,17 @@ define(['lodash'], function (_) {
         this.weeklyReport = !this.monthlyReport;
 
         this.title = parseTitle(this.name);
+        this.displayPosition = parseDisplayPosition(this.name);
     };
 
     var parseTitle = function(pivotTableName) {
         var matches = FIELD_APP_TITLE_REGEX.exec(pivotTableName);
         return (matches && matches[3]) ? matches[3] : "";
+    };
+
+    var parseDisplayPosition = function(pivotTableName) {
+        var matches = FIELD_APP_TITLE_REGEX.exec(pivotTableName);
+        return (matches && matches[2]) ? parseInt(matches[2]) : null;
     };
 
     var isMonthlyReport = function (relativePeriods) {

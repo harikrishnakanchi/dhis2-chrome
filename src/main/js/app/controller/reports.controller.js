@@ -215,6 +215,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     return {
                         "title": chart.title,
                         "dataSetCode": chart.dataSetCode,
+                        "displayPosition": chart.displayPosition,
                         "type": chart.type,
                         "data": transformedChartData
                     };
