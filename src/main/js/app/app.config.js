@@ -115,6 +115,7 @@ require.config({
         "referralLocationsRepository": "app/repository/referral.locations.repository",
         "excludedDataElementsRepository": "app/repository/excluded.dataelements.repository",
         "pivotTableRepository": "app/repository/pivot.table.repository",
+        "dataSyncFailureRepository": "app/repository/data.sync.failure.repository",
 
         //Models
         "pivotTable": "app/models/pivot.table",
