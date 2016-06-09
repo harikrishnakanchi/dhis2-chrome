@@ -149,8 +149,6 @@ define(['moment', 'lodash'],
                 };
 
                 var clearFailedToSyncFlags = function () {
-                    var dataValueOrgUnitIds = _.unique(_.pluck(moduleDataBlock.dataValues, 'orgUnit'));
-
                     if(moduleDataBlock.failedToSync) {
                         return dataSyncFailureRepository.delete(moduleDataBlock.moduleId, moduleDataBlock.period);
                     } else {
