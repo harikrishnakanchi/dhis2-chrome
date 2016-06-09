@@ -274,7 +274,6 @@ define([], function() {
 
     var create_data_sync_failure = function(db) {
         var dataSyncFailureStore = create_store_with_key("dataSyncFailure", ["moduleId", "period"], db);
-        create_index(dataSyncFailureStore, "by_moduleId_period", ["moduleId", "period"], false);
     };
 
     return [add_object_stores,
@@ -313,6 +312,6 @@ define([], function() {
         update_translations_store,
         change_role_to_projectadmin,
         delete_keys_chart_and_reports_from_changelog,
-        create_data_sync_failure,
+        create_data_sync_failure
     ];
 });
