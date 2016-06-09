@@ -107,7 +107,13 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                             migrator.run(event.oldVersion, db, tx, migrations);
                         });
 
-                    $hustleProvider.init("hustle", 1, ["dataValues"]);
+                    var jobComparator = function (itemToBeCompared, itemComparedWith) {
+                        var typeEquals = _.isEqual(itemComparedWith.type, itemToBeCompared.type);
+                        var dataEquals = _.isEqual(itemComparedWith.data, itemToBeCompared.data);
+                        return typeEquals && dataEquals;
+                    };
+
+                    $hustleProvider.init("hustle", 1, ["dataValues"], jobComparator);
 
                     $tooltipProvider.setTriggers({
                         "click": "mouseleave"
