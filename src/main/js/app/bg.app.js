@@ -63,7 +63,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         if (!dhisMonitor.isOnline())
                             return;
 
-                        $hustle.publish({
+                        $hustle.publishOnce({
                             "type": "downloadMetadata",
                             "data": []
                         }, "dataValues");
@@ -74,7 +74,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         if (!dhisMonitor.isOnline())
                             return;
 
-                        $hustle.publish({
+                        $hustle.publishOnce({
                             "type": "downloadProjectData",
                             "data": []
                         }, "dataValues");

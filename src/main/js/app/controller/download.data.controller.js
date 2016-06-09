@@ -6,12 +6,12 @@ define(["moment", "properties", "lodash", "chromeUtils"], function(moment, prope
                 chromeUtils.createNotification($scope.resourceBundle.downloadDataFromDhis, $scope.resourceBundle.syncScheduled);
             };
 
-            var downloadMetadata = $hustle.publish({
+            var downloadMetadata = $hustle.publishOnce({
                 "type": "downloadMetadata",
                 "data": []
             }, "dataValues");
 
-            var downloadProjectData = $hustle.publish({
+            var downloadProjectData = $hustle.publishOnce({
                 "type": "downloadProjectData",
                 "data": []
             }, "dataValues");

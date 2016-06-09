@@ -60,7 +60,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, {}));
 
-            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+            spyOn(hustle, "publishOnce").and.returnValue(utils.getPromise(q, {}));
 
             checkVersionCompatibility = CheckVersionCompatibility(systemSettingRepository);
             loginController = new LoginController(rootScope, scope, location, q, sessionHelper, hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility, translationsService);
@@ -279,7 +279,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             scope.login();
             scope.$apply();
 
-            expect(hustle.publish).toHaveBeenCalledWith({
+            expect(hustle.publishOnce).toHaveBeenCalledWith({
                 "type": "downloadProjectData",
                 "data": []
             }, "dataValues");
@@ -329,7 +329,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             scope.login();
             scope.$apply();
 
-            expect(hustle.publish).toHaveBeenCalledWith({
+            expect(hustle.publishOnce).toHaveBeenCalledWith({
                 "type": "downloadProjectData",
                 "data": []
             }, "dataValues");

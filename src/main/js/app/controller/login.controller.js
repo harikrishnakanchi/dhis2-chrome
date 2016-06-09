@@ -108,7 +108,7 @@ define(["md5", "properties", "lodash"], function(md5, properties, _) {
                 var projectChanged = !_.isEqual(previousUserProjects, currentUserProjects);
 
                 if (projectChanged || roleChanged) {
-                    $hustle.publish({
+                    $hustle.publishOnce({
                         "type": "downloadProjectData",
                         "data": []
                     }, "dataValues");

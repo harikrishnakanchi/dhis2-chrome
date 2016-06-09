@@ -14,7 +14,7 @@ define(["downloadDataController", "angularMocks", "utils", "lodash", "chromeUtil
 
                 scope.resourceBundle = {};
 
-                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+                spyOn(hustle, "publishOnce").and.returnValue(utils.getPromise(q, {}));
                 spyOn(chromeUtils, "createNotification").and.returnValue(utils.getPromise(q, {}));
 
                 rootScope.hasRoles = function(args) {
@@ -45,9 +45,9 @@ define(["downloadDataController", "angularMocks", "utils", "lodash", "chromeUtil
                     }, "dataValues"];
                 });
 
-                expect(hustle.publish.calls.count()).toEqual(syncableTypes.length);
+                expect(hustle.publishOnce.calls.count()).toEqual(syncableTypes.length);
                 _.forEach(syncableTypes, function(type, i) {
-                    expect(hustle.publish.calls.argsFor(i)).toEqual(expectedHustleArgs[i]);
+                    expect(hustle.publishOnce.calls.argsFor(i)).toEqual(expectedHustleArgs[i]);
                 });
                 expect(chromeUtils.createNotification).toHaveBeenCalled();
             });
