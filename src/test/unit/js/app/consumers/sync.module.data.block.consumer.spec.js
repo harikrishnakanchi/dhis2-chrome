@@ -2,7 +2,7 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
     function (SyncModuleDataBlockConsumer, DataSetRepository, ApprovalService, OrgUnitRepository, ModuleDataBlockFactory, DataService, ModuleDataBlockMerger, ChangeLogRepository, utils, mocks) {
         var syncModuleDataBlockConsumer, moduleDataBlockFactory, dataSetRepository, dataService, approvalService, orgUnitRepository, moduleDataBlockMerger, changeLogRepository,
             scope, q,
-            mockModule, mockPeriod, message, aggregateDataSet, mockOriginOrgUnits;
+            mockModule, mockPeriod, message, aggregateDataSet, mockOriginOrgUnits, lineListDataSet;
 
         describe('syncModuleDataBlockConsumer', function() {
             beforeEach(mocks.inject(function($rootScope, $q) {
@@ -25,6 +25,11 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
                 aggregateDataSet = {
                     id: 'someAggregateDataSet',
                     isLineListService: false
+                };
+
+                lineListDataSet = {
+                    id: 'someLineListDataSet',
+                    isLineListService: true
                 };
 
                 mockOriginOrgUnits = [{
@@ -72,14 +77,32 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
                 expect(dataService.downloadData).toHaveBeenCalledWith(mockModule.id, [aggregateDataSet.id], mockPeriod, null);
             });
 
+            it('should not download data values for line list data sets', function() {
+                dataSetRepository.getAll.and.returnValue(utils.getPromise(q, [aggregateDataSet, lineListDataSet]));
+                runConsumer();
+                expect(dataService.downloadData).toHaveBeenCalledWith(mockModule.id, [aggregateDataSet.id], mockPeriod, null);
+            });
+
             it('should download completion data from DHIS for one module', function () {
                 runConsumer();
                 expect(approvalService.getCompletionData).toHaveBeenCalledWith(mockModule.id, mockOriginOrgUnits, [aggregateDataSet.id], [mockPeriod]);
             });
 
+            it('should download completion data from DHIS for lineList data sets', function () {
+                dataSetRepository.getAll.and.returnValue(utils.getPromise(q, [aggregateDataSet, lineListDataSet]));
+                runConsumer();
+                expect(approvalService.getCompletionData).toHaveBeenCalledWith(mockModule.id, mockOriginOrgUnits, [aggregateDataSet.id, lineListDataSet.id], [mockPeriod]);
+            });
+
             it('should download approval data from DHIS for one module', function () {
                 runConsumer();
                 expect(approvalService.getApprovalData).toHaveBeenCalledWith(mockModule.id, [aggregateDataSet.id], [mockPeriod]);
+            });
+
+            it('should download approval data from DHIS for lineList data sets', function () {
+                dataSetRepository.getAll.and.returnValue(utils.getPromise(q, [aggregateDataSet, lineListDataSet]));
+                runConsumer();
+                expect(approvalService.getApprovalData).toHaveBeenCalledWith(mockModule.id, [aggregateDataSet.id, lineListDataSet.id], [mockPeriod]);
             });
 
             it('should merge and save module data block', function() {

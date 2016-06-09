@@ -91,6 +91,28 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 expect(dataService.downloadData).toHaveBeenCalledWith(mockModule.id, [aggregateDataSet.id], periodRange, someMomentInTime);
             });
 
+            it('should download completion data from DHIS for linelist summary datasets', function() {
+                var lineListSummaryDataSet = {
+                    id: 'lineListDataSetId',
+                    isLineListService: true
+                };
+                datasetRepository.getAll.and.returnValue(utils.getPromise(q, [aggregateDataSet, lineListSummaryDataSet]));
+
+                runConsumer();
+                expect(approvalService.getCompletionData).toHaveBeenCalledWith(mockModule.id, mockOriginOrgUnits, [aggregateDataSet.id, lineListSummaryDataSet.id], periodRange);
+            });
+
+            it('should download approval data from DHIS for linelist summary datasets', function() {
+                var lineListSummaryDataSet = {
+                    id: 'lineListDataSetId',
+                    isLineListService: true
+                };
+                datasetRepository.getAll.and.returnValue(utils.getPromise(q, [aggregateDataSet, lineListSummaryDataSet]));
+
+                runConsumer();
+                expect(approvalService.getApprovalData).toHaveBeenCalledWith(mockModule.id, [aggregateDataSet.id, lineListSummaryDataSet.id], periodRange);
+            });
+
             it('should instantiate module data blocks for each module', function() {
                 runConsumer();
                 expect(moduleDataBlockFactory.createForModule).toHaveBeenCalledWith(mockModule.id, periodRange);

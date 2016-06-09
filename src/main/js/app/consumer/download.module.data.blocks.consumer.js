@@ -20,24 +20,25 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
             return dateUtils.getPeriodRange(numberOfWeeks);
         };
 
-        var recursivelyDownloadMergeAndSaveModules = function(modules, dataSetIds, periodRange, lastUpdatedTimestamp, atLeastOneModuleHasFailed) {
+        var recursivelyDownloadMergeAndSaveModules = function(modules, aggregateDataSetIds, allDataSetIds, periodRange, lastUpdatedTimestamp, atLeastOneModuleHasFailed) {
             if (_.isEmpty(modules)) {
                 var allModulesSyncedSuccessfully = !atLeastOneModuleHasFailed;
                 return $q.when(allModulesSyncedSuccessfully);
             }
 
             var onSuccess = function() {
-                return recursivelyDownloadMergeAndSaveModules(modules, dataSetIds, periodRange, lastUpdatedTimestamp, atLeastOneModuleHasFailed);
+                return recursivelyDownloadMergeAndSaveModules(modules, aggregateDataSetIds, allDataSetIds, periodRange, lastUpdatedTimestamp, atLeastOneModuleHasFailed);
             };
 
             var onFailure = function() {
                 atLeastOneModuleHasFailed = true;
-                return recursivelyDownloadMergeAndSaveModules(modules, dataSetIds, periodRange, lastUpdatedTimestamp, atLeastOneModuleHasFailed);
+                return recursivelyDownloadMergeAndSaveModules(modules, aggregateDataSetIds, allDataSetIds, periodRange, lastUpdatedTimestamp, atLeastOneModuleHasFailed);
             };
 
             return getModuleDataBlocks({
                 moduleId: modules.pop().id,
-                dataSetIds: dataSetIds,
+                aggregateDataSetIds: aggregateDataSetIds,
+                allDataSetIds: allDataSetIds,
                 periodRange: periodRange,
                 lastUpdatedTimestamp: lastUpdatedTimestamp
             })
@@ -61,7 +62,7 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
             });
         };
         var getIndexedDataValuesFromDhis = function(data) {
-            return dataService.downloadData(data.moduleId, data.dataSetIds, data.periodRange, data.lastUpdatedTimestamp)
+            return dataService.downloadData(data.moduleId, data.aggregateDataSetIds, data.periodRange, data.lastUpdatedTimestamp)
                 .then(function (dataValues) {
                     var indexedDataValues = _.groupBy(dataValues, function(dataValue) {
                         return dataValue.period + data.moduleId;
@@ -71,7 +72,7 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
         };
 
         var getIndexedCompletionsFromDhis = function (data) {
-            return approvalService.getCompletionData(data.moduleId, data.originOrgUnits, data.dataSetIds, data.periodRange).then(function(allCompletionData) {
+            return approvalService.getCompletionData(data.moduleId, data.originOrgUnits, data.allDataSetIds, data.periodRange).then(function(allCompletionData) {
                 var indexedCompletions = _.indexBy(allCompletionData, function(completionData) {
                     return completionData.period + completionData.orgUnit;
                 });
@@ -80,7 +81,7 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
         };
 
         var getIndexedApprovalsFromDhis = function (data) {
-            return approvalService.getApprovalData(data.moduleId, data.dataSetIds, data.periodRange).then(function (allApprovalData) {
+            return approvalService.getApprovalData(data.moduleId, data.allDataSetIds, data.periodRange).then(function (allApprovalData) {
                 var indexedApprovals = _.indexBy(allApprovalData, function(approvalData) {
                     return approvalData.period + approvalData.orgUnit;
                 });
@@ -101,7 +102,8 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
 
         this.run = function () {
             return datasetRepository.getAll().then(function (allDataSets) {
-                var aggregateDataSetIds = getAggregateDataSetIds(allDataSets);
+                var aggregateDataSetIds = getAggregateDataSetIds(allDataSets),
+                    allDataSetIds = _.pluck(allDataSets, 'id');
 
                 return userPreferenceRepository.getCurrentUsersProjectIds().then(function (currentUserProjectIds) {
                     return getLastUpdatedTime(currentUserProjectIds).then(function(projectLastUpdatedTimestamp) {
@@ -109,7 +111,7 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
 
                         return orgUnitRepository.getAllModulesInOrgUnits(currentUserProjectIds)
                             .then(function (allModules) {
-                                return recursivelyDownloadMergeAndSaveModules(allModules, aggregateDataSetIds, periodRange, projectLastUpdatedTimestamp);
+                                return recursivelyDownloadMergeAndSaveModules(allModules, aggregateDataSetIds, allDataSetIds, periodRange, projectLastUpdatedTimestamp);
                             })
                             .then(function(allModulesSyncedSuccessfully) {
                                 if(allModulesSyncedSuccessfully) {

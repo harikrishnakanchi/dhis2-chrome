@@ -12,14 +12,14 @@ define([], function () {
         };
 
         var getDataValuesFromDhis = function(data) {
-            return dataService.downloadData(data.moduleId, data.dataSetIds, data.period, null).then(function (dataValues) {
+            return dataService.downloadData(data.moduleId, data.aggregateDataSetIds, data.period, null).then(function (dataValues) {
                 return _.merge({ dhisDataValues: dataValues }, data);
             });
         };
 
         var getCompletionFromDhis = function (data) {
             return orgUnitRepository.findAllByParent([data.moduleId]).then(function (originOrgUnits) {
-                return approvalService.getCompletionData(data.moduleId, originOrgUnits, data.dataSetIds, [data.period]).then(function (allCompletionData) {
+                return approvalService.getCompletionData(data.moduleId, originOrgUnits, data.allDataSetIds, [data.period]).then(function (allCompletionData) {
                     var completionData = _.find(allCompletionData, { orgUnit: data.moduleId, period: data.period });
                     return _.merge({ dhisCompletion: completionData }, data);
                 });
@@ -27,7 +27,7 @@ define([], function () {
         };
 
         var getApprovalFromDhis = function (data) {
-            return approvalService.getApprovalData(data.moduleId, data.dataSetIds, [data.period]).then(function (allApprovalData) {
+            return approvalService.getApprovalData(data.moduleId, data.allDataSetIds, [data.period]).then(function (allApprovalData) {
                 var approvalData = _.find(allApprovalData, { orgUnit: data.moduleId, period: data.period });
                 return _.merge({ dhisApproval: approvalData }, data);
             });
@@ -47,12 +47,14 @@ define([], function () {
             var messageData = message.data.data;
 
             return datasetRepository.getAll().then(function (allDataSets) {
-                var aggregateDataSetIds = getAggregateDataSetIds(allDataSets);
+                var aggregateDataSetIds = getAggregateDataSetIds(allDataSets),
+                    allDataSetIds = _.pluck(allDataSets, 'id');
 
                 return getModuleDataBlock({
                     moduleId: messageData.moduleId,
                     period: messageData.period,
-                    dataSetIds: aggregateDataSetIds
+                    aggregateDataSetIds: aggregateDataSetIds,
+                    allDataSetIds: allDataSetIds
                 })
                 .then(getDataValuesFromDhis)
                 .then(getCompletionFromDhis)
