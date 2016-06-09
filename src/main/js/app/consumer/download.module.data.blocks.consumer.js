@@ -20,27 +20,27 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
             return dateUtils.getPeriodRange(numberOfWeeks);
         };
 
-        var recursivelyDownloadMergeAndSaveModules = function(modules, aggregateDataSetIds, allDataSetIds, periodRange, lastUpdatedTimestamp, atLeastOneModuleHasFailed) {
-            if (_.isEmpty(modules)) {
-                var allModulesSyncedSuccessfully = !atLeastOneModuleHasFailed;
+        var recursivelyDownloadMergeAndSaveModules = function(options) {
+            if (_.isEmpty(options.modules)) {
+                var allModulesSyncedSuccessfully = !options.atLeastOneModuleHasFailed;
                 return $q.when(allModulesSyncedSuccessfully);
             }
 
             var onSuccess = function() {
-                return recursivelyDownloadMergeAndSaveModules(modules, aggregateDataSetIds, allDataSetIds, periodRange, lastUpdatedTimestamp, atLeastOneModuleHasFailed);
+                return recursivelyDownloadMergeAndSaveModules(options);
             };
 
             var onFailure = function() {
-                atLeastOneModuleHasFailed = true;
-                return recursivelyDownloadMergeAndSaveModules(modules, aggregateDataSetIds, allDataSetIds, periodRange, lastUpdatedTimestamp, atLeastOneModuleHasFailed);
+                options.atLeastOneModuleHasFailed = true;
+                return recursivelyDownloadMergeAndSaveModules(options);
             };
 
             return getModuleDataBlocks({
-                moduleId: modules.pop().id,
-                aggregateDataSetIds: aggregateDataSetIds,
-                allDataSetIds: allDataSetIds,
-                periodRange: periodRange,
-                lastUpdatedTimestamp: lastUpdatedTimestamp
+                moduleId: options.modules.pop().id,
+                aggregateDataSetIds: options.aggregateDataSetIds,
+                allDataSetIds: options.allDataSetIds,
+                periodRange: options.periodRange,
+                lastUpdatedTimestamp: options.lastUpdatedTimestamp
             })
             .then(getOriginsForModule)
             .then(getIndexedDataValuesFromDhis)
@@ -111,7 +111,13 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
 
                         return orgUnitRepository.getAllModulesInOrgUnits(currentUserProjectIds)
                             .then(function (allModules) {
-                                return recursivelyDownloadMergeAndSaveModules(allModules, aggregateDataSetIds, allDataSetIds, periodRange, projectLastUpdatedTimestamp);
+                                return recursivelyDownloadMergeAndSaveModules({
+                                    modules: allModules,
+                                    aggregateDataSetIds: aggregateDataSetIds,
+                                    allDataSetIds: allDataSetIds,
+                                    periodRange: periodRange,
+                                    lastUpdatedTimestamp: projectLastUpdatedTimestamp
+                                });
                             })
                             .then(function(allModulesSyncedSuccessfully) {
                                 if(allModulesSyncedSuccessfully) {
