@@ -198,7 +198,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, currentPeriod, $scope.currentUser.userCredentials.username);
 
             var publishToDhis = function() {
-                return $hustle.publish({
+                return $hustle.publishOnce({
                     data: {
                         moduleId: $scope.selectedModule.id,
                         period: currentPeriod

@@ -153,6 +153,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 spyOn(translationsService, "translateReferralLocations").and.returnValue([]);
 
                 spyOn(hustle, "publish");
+                spyOn(hustle, "publishOnce");
 
                 moduleDataBlockFactory = new ModuleDataBlockFactory();
                 spyOn(moduleDataBlockFactory, "create").and.returnValue(utils.getPromise(q, {}));
@@ -203,7 +204,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
 
                 expect(approvalDataRepository.markAsComplete).toHaveBeenCalledWith(periodAndOrgUnit, storedBy);
 
-                expect(hustle.publish).toHaveBeenCalledWith({
+                expect(hustle.publishOnce).toHaveBeenCalledWith({
                     "data": {
                         moduleId: scope.selectedModule.id,
                         period: selectedPeriod
@@ -355,7 +356,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 scope.$apply();
 
                 expect(approvalDataRepository.markAsApproved).toHaveBeenCalledWith(periodAndOrgUnit, approvedBy);
-                expect(hustle.publish).toHaveBeenCalledWith({
+                expect(hustle.publishOnce).toHaveBeenCalledWith({
                     "data": {
                         period: selectedPeriod,
                         moduleId: scope.selectedModule.id

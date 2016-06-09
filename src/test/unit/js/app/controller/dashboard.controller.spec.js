@@ -48,6 +48,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                 spyOn(chromeUtils, "getPraxisVersion").and.returnValue('5.1');
 
                 spyOn(hustle, "publish");
+                spyOn(hustle, "publishOnce");
 
                 spyOn(dateUtils, "getPeriodRange").and.returnValue([]);
 
@@ -146,8 +147,9 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                         "period": "2014W02"
                     }], rootScope.currentUser.userCredentials.username);
 
-                    expect(hustle.publish.calls.count()).toEqual(3);
-                    expect(hustle.publish.calls.argsFor(0)[0]).toEqual({
+                    expect(hustle.publish.calls.count()).toEqual(1);
+                    expect(hustle.publishOnce.calls.count()).toEqual(2);
+                    expect(hustle.publishOnce.calls.argsFor(0)[0]).toEqual({
                         "data": {
                             "moduleId": "mod2",
                             "period": "2014W01"
@@ -156,7 +158,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                         "locale": "en",
                         "desc": scope.resourceBundle.syncModuleDataBlockDesc + " 2014W01"
                     });
-                    expect(hustle.publish.calls.argsFor(1)[0]).toEqual({
+                    expect(hustle.publishOnce.calls.argsFor(1)[0]).toEqual({
                         "data": {
                             "moduleId": "mod3",
                             "period": "2014W02"
@@ -165,7 +167,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                         "locale": "en",
                         "desc": scope.resourceBundle.syncModuleDataBlockDesc + " 2014W02"
                     });
-                    expect(hustle.publish.calls.argsFor(2)[0]).toEqual({
+                    expect(hustle.publish.calls.argsFor(0)[0]).toEqual({
                         "data": [{
                             "orgUnit": "mod4",
                             "period": "2014W02"
@@ -232,8 +234,9 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                         "period": "2014W02"
                     }], "dataentryuser");
 
-                    expect(hustle.publish.calls.count()).toEqual(3);
-                    expect(hustle.publish.calls.argsFor(0)[0]).toEqual({
+                    expect(hustle.publish.calls.count()).toEqual(1);
+                    expect(hustle.publishOnce.calls.count()).toEqual(2);
+                    expect(hustle.publishOnce.calls.argsFor(0)[0]).toEqual({
                         "data": {
                             "moduleId": "mod2",
                             "period": "2014W01"
@@ -242,7 +245,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                         "locale": "en",
                         "desc": scope.resourceBundle.syncModuleDataBlockDesc + " 2014W01"
                     });
-                    expect(hustle.publish.calls.argsFor(1)[0]).toEqual({
+                    expect(hustle.publishOnce.calls.argsFor(1)[0]).toEqual({
                         "data": {
                             "moduleId": "mod3",
                             "period": "2014W02"
@@ -251,7 +254,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                         "locale": "en",
                         "desc": scope.resourceBundle.syncModuleDataBlockDesc + " 2014W02"
                     });
-                    expect(hustle.publish.calls.argsFor(2)[0]).toEqual({
+                    expect(hustle.publish.calls.argsFor(0)[0]).toEqual({
                         "data": [{
                             "orgUnit": "mod4",
                             "period": "2014W02"

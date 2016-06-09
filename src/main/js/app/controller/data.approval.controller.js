@@ -151,7 +151,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                     }, "dataValues");
                 }
                 else {
-                    return $hustle.publish({
+                    return $hustle.publishOnce({
                         "data": {
                             period: currentPeriod,
                             moduleId: $scope.selectedModule.id
@@ -210,7 +210,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                     }, "dataValues");
                 }
                 else {
-                    return $hustle.publish({
+                    return $hustle.publishOnce({
                         "data": {
                         moduleId: $scope.selectedModule.id,
                             period: currentPeriod

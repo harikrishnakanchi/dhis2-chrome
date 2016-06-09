@@ -116,7 +116,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 spyOn(dataRepository, "save").and.returnValue(utils.getPromise(q, {}));
                 spyOn(dataRepository, "saveAsDraft").and.returnValue(utils.getPromise(q, {}));
 
-                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+                spyOn(hustle, "publishOnce").and.returnValue(utils.getPromise(q, {}));
 
                 datasetRepository = new DatasetRepository();
                 spyOn(datasetRepository, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
@@ -426,7 +426,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.$apply();
 
                 expect(dataRepository.save).toHaveBeenCalled();
-                expect(hustle.publish).toHaveBeenCalledWith({
+                expect(hustle.publishOnce).toHaveBeenCalledWith({
                     data: {
                         moduleId: scope.selectedModule.id,
                         period: selectedPeriod
@@ -448,7 +448,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.$apply();
 
                 expect(dataRepository.saveAsDraft).toHaveBeenCalled();
-                expect(hustle.publish).not.toHaveBeenCalled();
+                expect(hustle.publishOnce).not.toHaveBeenCalled();
                 expect(scope.submitSuccess).toBe(false);
                 expect(scope.saveSuccess).toBe(true);
                 expect(scope.submitError).toBe(false);
@@ -483,7 +483,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.$apply();
 
                 expect(dataRepository.save).toHaveBeenCalled();
-                expect(hustle.publish).not.toHaveBeenCalled();
+                expect(hustle.publishOnce).not.toHaveBeenCalled();
                 expect(scope.submitSuccess).toBe(false);
                 expect(scope.saveSuccess).toBe(false);
                 expect(scope.submitError).toBe(true);
@@ -753,8 +753,8 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.$apply();
 
                 expect(approvalDataRepository.markAsApproved).toHaveBeenCalledWith(periodAndOrgUnit, rootScope.currentUser.userCredentials.username, {});
-                expect(hustle.publish).toHaveBeenCalledTimes(1);
-                expect(hustle.publish).toHaveBeenCalledWith({
+                expect(hustle.publishOnce).toHaveBeenCalledTimes(1);
+                expect(hustle.publishOnce).toHaveBeenCalledWith({
                     data: {
                         moduleId: periodAndOrgUnit.orgUnit,
                         period: periodAndOrgUnit.period

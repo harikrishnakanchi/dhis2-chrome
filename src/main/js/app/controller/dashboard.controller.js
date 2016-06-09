@@ -80,7 +80,7 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                                 desc: $scope.resourceBundle[descriptionKey] + moduleDataBlock.period
                             }, "dataValues");
                         } else {
-                            return $hustle.publish({
+                            return $hustle.publishOnce({
                                 data: {
                                     moduleId: moduleDataBlock.moduleId,
                                     period: moduleDataBlock.period
