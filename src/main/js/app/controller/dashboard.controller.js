@@ -1,5 +1,5 @@
 define(["properties", "moment", "dateUtils", "lodash"], function(properties, moment, dateUtils, _) {
-    return function($scope, $hustle, $q, $rootScope, $modal, $timeout, $location, approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility) {
+    return function($scope, $hustle, $q, $rootScope, $modal, $timeout, $location, approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility, dataSyncFailureRepository) {
 
         $scope.formatPeriods = function(period) {
             m = moment(period, "GGGG[W]W");
@@ -94,10 +94,21 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                     return $q.all(publishPromises);
                 };
 
+                var clearFailedToSync = function (){
+                    var resetModuleFailedToSync = _.map(moduleDataBlocksToBeApproved, function(moduleDataBlock) {
+                        return dataSyncFailureRepository.delete(moduleDataBlock.moduleId, moduleDataBlock.period);
+                    });
+                    return $q.all(resetModuleFailedToSync);
+                };
+
                 if ($rootScope.hasRoles(['Project Level Approver']))
-                    return approvalDataRepository.markAsComplete(periodsAndOrgUnitsToBeApproved, currentUsersUsername).then(publishToDhis);
+                    return approvalDataRepository.markAsComplete(periodsAndOrgUnitsToBeApproved, currentUsersUsername)
+                        .then(clearFailedToSync)
+                        .then(publishToDhis);
                 if ($rootScope.hasRoles(['Coordination Level Approver']))
-                    return approvalDataRepository.markAsApproved(periodsAndOrgUnitsToBeApproved, currentUsersUsername).then(publishToDhis);
+                    return approvalDataRepository.markAsApproved(periodsAndOrgUnitsToBeApproved, currentUsersUsername)
+                        .then(clearFailedToSync)
+                        .then(publishToDhis);
             };
 
             var modalMessages = {

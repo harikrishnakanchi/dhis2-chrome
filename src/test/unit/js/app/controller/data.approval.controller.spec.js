@@ -1,10 +1,10 @@
 /*global Date:true*/
-define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "excludedDataElementsRepository", "datasetRepository", "programRepository", "referralLocationsRepository", "translationsService", "moduleDataBlockFactory"],
-    function(DataApprovalController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, ExcludedDataElementsRepository, DatasetRepository, ProgramRepository, ReferralLocationsRepository, TranslationsService, ModuleDataBlockFactory) {
+define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "excludedDataElementsRepository", "datasetRepository", "programRepository", "referralLocationsRepository", "translationsService", "moduleDataBlockFactory", "dataSyncFailureRepository"],
+    function(DataApprovalController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, ExcludedDataElementsRepository, DatasetRepository, ProgramRepository, ReferralLocationsRepository, TranslationsService, ModuleDataBlockFactory, DataSyncFailureRepository) {
         describe("dataApprovalController ", function() {
             var scope, routeParams, q, location, anchorScroll, dataApprovalController, rootScope,
                 saveSuccessPromise, saveErrorPromise, parentProject, getDataValuesSpy, getLocalStatusSpy, selectedPeriod,
-                window, getOrgUnitSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository, excludedDataElementsRepository, origin1, origin2, translationsService, moduleDataBlockFactory, programRepository;
+                window, getOrgUnitSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository, excludedDataElementsRepository, origin1, origin2, translationsService, moduleDataBlockFactory, programRepository, dataSyncFailureRepository;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $anchorScroll, $location, $window, $timeout) {
@@ -157,7 +157,9 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 moduleDataBlockFactory = new ModuleDataBlockFactory();
                 spyOn(moduleDataBlockFactory, "create").and.returnValue(utils.getPromise(q, {}));
 
-                dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, dataRepository, excludedDataElementsRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory);
+                dataSyncFailureRepository = new DataSyncFailureRepository();
+                spyOn(dataSyncFailureRepository, "delete").and.returnValue(utils.getPromise(q, undefined));
+                dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, dataRepository, excludedDataElementsRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository);
                 scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
             }));
 

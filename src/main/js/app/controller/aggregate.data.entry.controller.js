@@ -1,6 +1,6 @@
 define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], function(_, dataValuesMapper, orgUnitMapper, moment, properties) {
     return function($scope, $routeParams, $q, $hustle, $anchorScroll, $location, $modal, $rootScope, $window, $timeout,
-        dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory) {
+        dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository) {
 
         var currentPeriod, currentPeriodAndOrgUnit;
         var removeReferral = false;
@@ -209,6 +209,10 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                 }, "dataValues");
             };
 
+            var clearFailedToSync = function () {
+                return dataSyncFailureRepository.delete($scope.selectedModule.id, currentPeriod);
+            };
+
             if(options.saveAsDraft) {
                 return dataRepository.saveAsDraft(payload);
             } else if(options.autoApprove) {
@@ -216,10 +220,12 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
 
                 return dataRepository.save(payload)
                     .then(_.partial(approvalDataRepository.markAsApproved, currentPeriodAndOrgUnit, completedAndApprovedBy))
+                    .then(clearFailedToSync)
                     .then(publishToDhis);
             } else {
                 return dataRepository.save(payload)
                     .then(_.partial(approvalDataRepository.clearApprovals, currentPeriodAndOrgUnit))
+                    .then(clearFailedToSync)
                     .then(publishToDhis);
             }
         };

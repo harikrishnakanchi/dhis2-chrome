@@ -1,6 +1,6 @@
 define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransformer", "properties"], function(_, dataValuesMapper, orgUnitMapper, moment, datasetTransformer, properties) {
     return function($scope, $routeParams, $q, $hustle, dataRepository, excludedDataElementsRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
-        $timeout, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory) {
+        $timeout, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository) {
 
         $scope.rowTotal = {};
         var currentPeriod, currentPeriodAndOrgUnit;
@@ -137,6 +137,10 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
         $scope.firstLevelApproval = function() {
             var completedBy = $scope.currentUser.userCredentials.username;
 
+            var clearFailedToSync = function(){
+                dataSyncFailureRepository.delete($scope.selectedModule.id, currentPeriod);
+            };
+
             var publishToDhis = function() {
                 if ($scope.isLineListModule) {
                     return $hustle.publish({
@@ -171,12 +175,18 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             };
 
             approvalDataRepository.markAsComplete(currentPeriodAndOrgUnit, completedBy)
+                .then(clearFailedToSync)
                 .then(publishToDhis)
                 .then(onSuccess, onError)
                 .finally(scrollToTop);
         };
 
         $scope.secondLevelApproval = function() {
+
+            var clearFailedToSync = function(){
+                dataSyncFailureRepository.delete($scope.selectedModule.id, currentPeriod);
+            };
+
             var onSuccess = function() {
                 $scope.secondLevelApproveSuccess = true;
                 $scope.approveError = false;
@@ -216,6 +226,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             var approvedBy = $scope.currentUser.userCredentials.username;
 
             approvalDataRepository.markAsApproved(currentPeriodAndOrgUnit, approvedBy)
+                .then(clearFailedToSync)
                 .then(publishToDhis)
                 .then(onSuccess, onError)
                 .finally(scrollToTop);
