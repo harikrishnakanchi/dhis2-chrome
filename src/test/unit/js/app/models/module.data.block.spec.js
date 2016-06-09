@@ -1,6 +1,6 @@
 define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(ModuleDataBlock, CustomAttributes, moment, timecop) {
     describe('ModuleDataBlock', function () {
-        var moduleDataBlock, orgUnit, period, aggregateDataValues, lineListEvents, approvalData, someMomentInTime, isLineListService, failedToSync;
+        var moduleDataBlock, orgUnit, period, aggregateDataValues, lineListEvents, approvalData, someMomentInTime, isLineListService, failedToSyncData;
 
         beforeEach(function() {
             isLineListService = false;
@@ -14,12 +14,12 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             aggregateDataValues = undefined;
             lineListEvents = undefined;
             approvalData = undefined;
-            failedToSync = false;
+            failedToSyncData = {};
             someMomentInTime = moment('2016-05-18T00:00:00.000Z');
         });
 
         var createModuleDataBlock = function() {
-            return ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData, failedToSync);
+            return ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData, failedToSyncData);
         };
 
         var createMockDataValue = function(options) {
@@ -413,7 +413,7 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             it('should be waiting at dataEntryLevel if data has been submitted but failed to sync', function() {
                 aggregateDataValues = [createMockDataValuesObject()];
 
-                failedToSync = true;
+                failedToSyncData = {"moduleId": "someModuleId", "period": "somePeriod"};
                 moduleDataBlock = createModuleDataBlock();
 
                 expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(true);
@@ -423,10 +423,9 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
 
             it('should be waiting at projectLevel if data has been submitted, approved at project level, but failed to sync', function() {
                 aggregateDataValues = [createMockDataValuesObject()];
-                failedToSync = true;
+                failedToSyncData = {"moduleId": "someModuleId", "period": "period"};
                 approvalData = {
                     isComplete: true,
-                    failedToSync: true
                 };
 
                 moduleDataBlock = createModuleDataBlock();
@@ -438,11 +437,10 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
 
             it('should be waiting at coordinationLevel if data has been submitted, approved at project and coordination level, but failed to sync', function() {
                 aggregateDataValues = [createMockDataValuesObject()];
-                failedToSync = true;
+                failedToSyncData = {"moduleId": "someModuleId", "period": "period"};
                 approvalData = {
                     isComplete: true,
                     isApproved: true,
-                    failedToSync: true
                 };
 
                 moduleDataBlock = createModuleDataBlock();

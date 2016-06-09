@@ -63,16 +63,10 @@ define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
 
             var getIndexedFailedSyncStatus = function (mapOfPeriodsToModuleIds) {
                 return dataSyncFailureRepository.getAll().then(function (failedModules) {
-                    var moduleSyncStatus = [];
                     var indexedFailedModules = _.indexBy(failedModules, function(module){
                         return module.period + module.moduleId;
                     });
-                    _.each(moduleIds, function (moduleId) {
-                        _.each(periodRange, function (period) {
-                            moduleSyncStatus[period + moduleId] = indexedFailedModules[period + moduleId] ? true : false;
-                        });
-                    });
-                    return moduleSyncStatus;
+                    return indexedFailedModules;
                 });
             };
 
@@ -94,8 +88,8 @@ define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
                         var aggregateDataValues = indexedAggregateData[period + moduleOrgUnit.id] || [];
                         var lineListData = indexedLineListData[period + moduleOrgUnit.id] || [];
                         var approvalData = indexedApprovalData[period + moduleOrgUnit.id] || {};
-                        var failedToSync = indexedFailedSyncStatus[period + moduleOrgUnit.id];
-                        return ModuleDataBlock.create(moduleOrgUnit, period, aggregateDataValues, lineListData, approvalData, failedToSync);
+                        var failedToSyncData = indexedFailedSyncStatus[period + moduleOrgUnit.id] || {};
+                        return ModuleDataBlock.create(moduleOrgUnit, period, aggregateDataValues, lineListData, approvalData, failedToSyncData);
                     });
                 });
                 return _.flatten(allModuleDataBlocks);

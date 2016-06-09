@@ -1,5 +1,5 @@
 define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, CustomAttributes, moment, properties) {
-    var ModuleDataBlock = function (orgUnit, period, aggregateDataValues, lineListEvents, approvalData, failedToSync) {
+    var ModuleDataBlock = function (orgUnit, period, aggregateDataValues, lineListEvents, approvalData, failedToSyncData) {
         this.moduleId = orgUnit.id;
         this.period = period;
         this.moduleName = parseModuleName(orgUnit);
@@ -18,17 +18,18 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         this.approvedAtCoordinationLevelBy = this.approvedAtCoordinationLevel ? approvalData.approvedBy : null;
         this.approvedAtCoordinationLevelAt = this.approvedAtCoordinationLevel ? moment(approvalData.approvedOn) : null;
 
-        this.failedToSync = isFailedToSync(this.lineListService, aggregateDataValues, failedToSync);
+        this.failedToSync = isFailedToSync(this.lineListService, aggregateDataValues, failedToSyncData);
 
         this.awaitingActionAtDataEntryLevel = isWaitingForActionAtDataEntryLevel(this.submitted, this.approvedAtProjectLevel, this.approvedAtCoordinationLevel, this.failedToSync);
         this.awaitingActionAtProjectLevelApprover = isWaitingForActionAtProjectLevel(this.submitted, this.approvedAtProjectLevel, this.approvedAtCoordinationLevel, this.failedToSync);
         this.awaitingActionAtCoordinationLevelApprover = isWaitingForActionAtCoordinationLevel(this.submitted, this.approvedAtProjectLevel, this.approvedAtCoordinationLevel, this.failedToSync);
     };
 
-    var isFailedToSync = function(lineListService, aggregateDataValues, failedToSync) {
+    var isFailedToSync = function(lineListService, aggregateDataValues, failedToSyncData) {
 
         //This can be removed after v6.0 has been released
         var aggregateDataValuesFailedToSyncAsPerDeprecatedLocalStatus = !!aggregateDataValues && _.any(aggregateDataValues, { localStatus: 'FAILED_TO_SYNC' });
+        var failedToSync = !_.isEmpty(failedToSyncData);
 
         return !lineListService && (failedToSync || aggregateDataValuesFailedToSyncAsPerDeprecatedLocalStatus);
     };
