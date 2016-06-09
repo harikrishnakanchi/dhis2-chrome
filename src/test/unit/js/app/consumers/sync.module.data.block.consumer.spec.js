@@ -2,7 +2,7 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
     function (SyncModuleDataBlockConsumer, DataSetRepository, ApprovalService, OrgUnitRepository, ModuleDataBlockFactory, DataService, ModuleDataBlockMerger, ChangeLogRepository, utils, mocks) {
         var syncModuleDataBlockConsumer, moduleDataBlockFactory, dataSetRepository, dataService, approvalService, orgUnitRepository, moduleDataBlockMerger, changeLogRepository,
             scope, q,
-            mockModule, mockPeriod, message, aggregateDataSet, mockOriginOrgUnits, mockOriginOrgUnitIds;
+            mockModule, mockPeriod, message, aggregateDataSet, mockOriginOrgUnits;
 
         describe('syncModuleDataBlockConsumer', function() {
             beforeEach(mocks.inject(function($rootScope, $q) {
@@ -30,7 +30,6 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
                 mockOriginOrgUnits = [{
                     id: 'someOriginId'
                 }];
-                mockOriginOrgUnitIds = _.pluck(mockOriginOrgUnits, 'id');
 
                 dataSetRepository = new DataSetRepository();
                 spyOn(dataSetRepository, 'getAll').and.returnValue(utils.getPromise(q, [aggregateDataSet]));
@@ -75,7 +74,7 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
 
             it('should download completion data from DHIS for one module', function () {
                 runConsumer();
-                expect(approvalService.getCompletionData).toHaveBeenCalledWith(mockModule.id, mockOriginOrgUnitIds, [aggregateDataSet.id], [mockPeriod]);
+                expect(approvalService.getCompletionData).toHaveBeenCalledWith(mockModule.id, mockOriginOrgUnits, [aggregateDataSet.id], [mockPeriod]);
             });
 
             it('should download approval data from DHIS for one module', function () {

@@ -6,7 +6,7 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
         var downloadModuleDataBlocksConsumer, dataService, approvalService,
             userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository,
             moduleDataBlockFactory, moduleDataBlockMerger,
-            q, scope, aggregateDataSet, periodRange, projectIds, mockModule, mockOriginOrgUnits, mockOriginOrgUnitIds, someMomentInTime;
+            q, scope, aggregateDataSet, periodRange, projectIds, mockModule, mockOriginOrgUnits, someMomentInTime;
 
         describe('downloadModuleDataBlocksConsumer', function() {
             beforeEach(mocks.inject(function($rootScope, $q) {
@@ -19,7 +19,6 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 mockOriginOrgUnits = [{
                     id: 'someOriginId'
                 }];
-                mockOriginOrgUnitIds = _.pluck(mockOriginOrgUnits, 'id');
                 projectIds = ['projectId'];
                 aggregateDataSet = {
                     id: 'someAggregateDataSetId',
@@ -73,7 +72,7 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
 
             it('should download completion data from DHIS for each module', function () {
                 runConsumer();
-                expect(approvalService.getCompletionData).toHaveBeenCalledWith(mockModule.id, mockOriginOrgUnitIds, [aggregateDataSet.id], periodRange);
+                expect(approvalService.getCompletionData).toHaveBeenCalledWith(mockModule.id, mockOriginOrgUnits, [aggregateDataSet.id], periodRange);
             });
 
             it('should download approval data from DHIS for each module', function () {
@@ -125,7 +124,7 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                     mockModuleDataBlockA = { moduleId: mockModule.id, period: periodA, moduleName: 'someModuleName' },
                     mockModuleDataBlockB = { moduleId: mockModule.id, period: periodB, moduleName: 'someModuleName' },
                     mockDhisDataValueA   = { orgUnit: mockModule.id, period: periodA, value: 'someValue' },
-                    mockDhisDataValueB   = { orgUnit: mockOriginOrgUnitIds[0], period: periodB, value: 'someValue' };
+                    mockDhisDataValueB   = { orgUnit: _.first(mockOriginOrgUnits).id, period: periodB, value: 'someValue' };
 
                 moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, [mockModuleDataBlockA, mockModuleDataBlockB]));
                 dataService.downloadData.and.returnValue(utils.getPromise(q, [mockDhisDataValueA, mockDhisDataValueB]));
