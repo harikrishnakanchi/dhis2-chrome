@@ -72,7 +72,7 @@
                         <ul class="list-unstyled">
                             <li ng-repeat="item in items | orderBy: 'period'" ng-if="item.active">
                                 <a ng-if="hasRoles(['Data entry user'])" ng-class="{ 'error-label': item.failedToSync }" ng-href="{{getTemplateUrl(item)}}">{{formatPeriods(item.period)}}</a>
-                                <span ng-if="!hasRoles(['Data entry user'])" ng-class="{ 'error-label': item.failedToSync }">{{formatPeriods(item.period)}}</span>
+                                <span ng-if="!hasRoles(['Data entry user'])">{{formatPeriods(item.period)}}</span>
                             </li>
                         </ul>
                     </td>
@@ -99,8 +99,8 @@
                     <td>
                         <ul class="list-unstyled">
                             <li ng-repeat="item in items | orderBy: 'period'">
-                                <a ng-if="hasRoles(['Data entry user', 'Observer'])" ng-class="{ 'error-label': item.failedToSync }" ng-href="{{getTemplateUrl(item)}}">{{formatPeriods(item.period)}}</a>
-                                <span ng-if="!hasRoles(['Data entry user','Observer'])" ng-class="{ 'error-label': item.failedToSync }">{{formatPeriods(item.period)}}</span>
+                                <a ng-if="hasRoles(['Data entry user', 'Observer'])"  ng-href="{{getTemplateUrl(item)}}">{{formatPeriods(item.period)}}</a>
+                                <span ng-if="!hasRoles(['Data entry user','Observer'])">{{formatPeriods(item.period)}}</span>
                             </li>
                         </ul>
                     </td>
