@@ -10,8 +10,8 @@
 
                 <div ng-if="hasRoles(['Project Level Approver'])">
                     <div ng-if="!syncError || moduleDataBlock.awaitingActionAtCoordinationLevelApprover">
-                        <div ng-show="isCompleted && !isApproved" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
-                        <div ng-show="isApproved" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
+                        <div ng-show="isCompleted && (!isApproved || moduleDataBlock.awaitingActionAtCoordinationLevelApprover)" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
+                        <div ng-show="isApproved && !moduleDataBlock.awaitingActionAtCoordinationLevelApprover" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
                         <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
                         <div class="alert alert-danger" ng-if="!isSubmitted">{{resourceBundle.noDataForApproval}}</div>
                     </div>

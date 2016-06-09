@@ -5,9 +5,9 @@
 
             <div ng-if="!(syncError && moduleDataBlock.awaitingActionAtDataEntryLevel)">
                 <div class="alert alert-success" ng-show="saveSuccess" >{{resourceBundle.dataSaveSuccess}}</div>
-                <div class="alert alert-success" ng-show="isSubmitted &amp;&amp; !isCompleted &amp;&amp; !isApproved &amp;&amp; !submitAndApprovalSuccess">{{resourceBundle.dataSubmittedForApproval}}</div>
-                <div class="alert alert-success" ng-show="isCompleted &amp;&amp; !isApproved">{{resourceBundle.firstLevelApproveSuccess}}</div>
-                <div class="alert alert-success" ng-show="isApproved &amp;&amp; !submitAndApprovalSuccess">{{resourceBundle.secondLevelApproveSuccess}}</div>
+                <div class="alert alert-success" ng-show="isSubmitted && (!isCompleted || moduleDataBlock.awaitingActionAtProjectLevelApprover) && !isApproved && !submitAndApprovalSuccess">{{resourceBundle.dataSubmittedForApproval}}</div>
+                <div class="alert alert-success" ng-show="isCompleted && (!isApproved || moduleDataBlock.awaitingActionAtCoordinationLevelApprover) && !moduleDataBlock.awaitingActionAtProjectLevelApprover">{{resourceBundle.firstLevelApproveSuccess}}</div>
+                <div class="alert alert-success" ng-show="isApproved && !submitAndApprovalSuccess && !moduleDataBlock.awaitingActionAtCoordinationLevelApprover">{{resourceBundle.secondLevelApproveSuccess}}</div>
                 <div class="alert alert-success" ng-show="submitAndApprovalSuccess">{{resourceBundle.dataSubmitAndApproved}}</div>
             </div>
 
