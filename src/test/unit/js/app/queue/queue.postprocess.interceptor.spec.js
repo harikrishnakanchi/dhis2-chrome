@@ -30,7 +30,7 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
                 }))
             };
 
-            queuePostProcessInterceptor = new QueuePostProcessInterceptor($log, ngI18nResourceBundle, dataRepository, approvalDataRepository, orgUnitRepository, dataSyncFailureRepository);
+            queuePostProcessInterceptor = new QueuePostProcessInterceptor($log, ngI18nResourceBundle, dataRepository, dataSyncFailureRepository);
         }));
 
         it('should return true for retry if number of releases is less than max retries', function() {
@@ -203,7 +203,7 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
             expect(dataRepository.setLocalStatus).not.toHaveBeenCalled();
         });
 
-        it("should flag that datavalues and approvalData failed to sync after maxretries", function() {
+        it("should mark the failed to sync module by period after maxretries", function() {
             var job = {
                 data: {
                     type: "syncModuleDataBlock",
@@ -222,7 +222,6 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
             queuePostProcessInterceptor.shouldRetry(job, {});
             scope.$apply();
 
-            expect(orgUnitRepository.findAllByParent).toHaveBeenCalledWith('someModuleId');
             expect(dataSyncFailureRepository.add).toHaveBeenCalledWith('someModuleId','somePeriod');
         });
     });

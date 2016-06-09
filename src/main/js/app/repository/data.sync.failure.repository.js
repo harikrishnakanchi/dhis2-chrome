@@ -7,12 +7,12 @@ define([], function () {
                 moduleId: moduleId,
                 period: period
             };
-            dataSyncFailureStore.upsert(payload);
+            return dataSyncFailureStore.upsert(payload);
         };
 
         this.delete = function (moduleId, period) {
             var dataSyncFailureStore = db.objectStore(DATA_SYNC_FAILURE_STORE);
-            dataSyncFailureStore.delete([moduleId, period]);
+            return dataSyncFailureStore.delete([moduleId, period]);
         };
 
         this.getAll = function () {
