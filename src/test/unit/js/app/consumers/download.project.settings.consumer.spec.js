@@ -10,7 +10,8 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 excludedDataElementsRepository,
                 q,
                 scope,
-                mergeBy;
+                mergeBy,
+                message;
 
             beforeEach(mocks.inject(function($q, $rootScope, $log) {
 
@@ -36,21 +37,22 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
 
                 mergeBy = new MergeBy($log);
 
+                message = {data: {data: []}};
+
                 consumer = new DownloadProjectSettingsConsumer(q, systemSettingService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository, excludedDataElementsRepository, mergeBy);
             }));
 
-            it("should download project settings for current user projects", function() {
-                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1', 'prj2']));
+            it("should download project settings for specified projects", function() {
+                message.data.data =  ['prj1', 'prj2'];
 
-                consumer.run();
+                consumer.run(message);
                 scope.$apply();
 
                 expect(systemSettingService.getProjectSettings).toHaveBeenCalledWith(['prj1', 'prj2']);
             });
 
             it("should download project settings and save referral locations", function() {
-                var userCurrentProjects = ['prj', 'prjWithNoReferralLocations'];
-                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, userCurrentProjects));
+                message.data.data = ['prj', 'prjWithNoReferralLocations'];
 
                 var projectSettingsFromDhis = {
                     "prjWithNoReferralLocations": {
@@ -76,7 +78,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 referralLocationsRepository.findAll.and.returnValue(utils.getPromise(q, refferalLocationFromLocalDb));
                 systemSettingService.getProjectSettings.and.returnValue(utils.getPromise(q, projectSettingsFromDhis));
 
-                consumer.run();
+                consumer.run(message);
                 scope.$apply();
 
                 var expectedPayload = [{
@@ -95,8 +97,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
             });
 
             it("should merge referral locations based on clientLastUpdated time", function() {
-                var userCurrentProjects = ['prj', 'prjWithNoReferralLocations'];
-                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, userCurrentProjects));
+                message.data.data = ['prj', 'prjWithNoReferralLocations'];
 
                 var projectSettingsFromDhis = {
                     "prjWithNoReferralLocations": {
@@ -143,7 +144,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 referralLocationsRepository.findAll.and.returnValue(utils.getPromise(q, refferalLocationFromLocalDb));
                 systemSettingService.getProjectSettings.and.returnValue(utils.getPromise(q, projectSettingsFromDhis));
 
-                consumer.run();
+                consumer.run(message);
                 scope.$apply();
 
                 var expectedPayload = [{
@@ -173,8 +174,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
             });
 
             it("should download project settings and save patient origin details", function() {
-                var userCurrentProjects = ['prj', 'prjWithNoPatientOriginDetails'];
-                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, userCurrentProjects));
+                message.data.data = ['prj', 'prjWithNoPatientOriginDetails'];
 
                 var projectSettingsFromDhis = {
                     "prjWithNoPatientOriginDetails": {
@@ -195,7 +195,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 };
                 systemSettingService.getProjectSettings.and.returnValue(utils.getPromise(q, projectSettingsFromDhis));
 
-                consumer.run();
+                consumer.run(message);
                 scope.$apply();
 
                 var expectedPayload = [{
@@ -212,8 +212,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
             });
 
             it("should merge patient origin details with local patient origin details based on clientLastUpdated time", function() {
-                var userCurrentProjects = ['prj'];
-                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, userCurrentProjects));
+                message.data.data = ['prj'];
 
                 var projectSettingsFromDhis = {
                     "prj": {
@@ -255,7 +254,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 systemSettingService.getProjectSettings.and.returnValue(utils.getPromise(q, projectSettingsFromDhis));
                 patientOriginRepository.get.and.returnValues(utils.getPromise(q, patientDetailsFromLocalDb), utils.getPromise(q, undefined));
 
-                consumer.run();
+                consumer.run(message);
                 scope.$apply();
 
                 var expectedPayload = [{
@@ -287,8 +286,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
             });
 
             it("should download project settings and save excluded data element details", function() {
-                var userCurrentProjects = ['prj', 'prjWithNoExcludedDataElements'];
-                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, userCurrentProjects));
+                message.data.data = ['prj', 'prjWithNoExcludedDataElements'];
 
                 var projectSettingsFromDhis = {
                     "prjWithNoExcludedDataElements": {
@@ -309,7 +307,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 };
                 systemSettingService.getProjectSettings.and.returnValue(utils.getPromise(q, projectSettingsFromDhis));
 
-                consumer.run();
+                consumer.run(message);
                 scope.$apply();
 
                 var expectedPayload = [{
@@ -325,10 +323,10 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 expect(excludedDataElementsRepository.upsert).toHaveBeenCalledWith(expectedPayload);
             });
 
-            it("should not fail if current user projects are not available", function() {
-                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, undefined));
+            it("should not download project settings or fail, if no projectIds were specified in job and no last login user", function() {
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, []));
 
-                consumer.run();
+                consumer.run(message);
                 scope.$apply();
 
                 expect(systemSettingService.getProjectSettings).not.toHaveBeenCalled();
@@ -336,5 +334,15 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 expect(patientOriginRepository.upsert).not.toHaveBeenCalled();
                 expect(excludedDataElementsRepository.upsert).not.toHaveBeenCalled();
             });
+
+            it('should get current user project ids if no projects were specified', function() {
+                var currentUserProjectIds = ["project1", "project2"];
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, currentUserProjectIds));
+
+                consumer.run(message);
+                scope.$apply();
+                expect(systemSettingService.getProjectSettings).toHaveBeenCalledWith(currentUserProjectIds);
+            });
+
         });
     });
