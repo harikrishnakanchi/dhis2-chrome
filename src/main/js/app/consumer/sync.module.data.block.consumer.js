@@ -6,6 +6,24 @@ define([], function () {
             });
         };
 
+        var getOriginOrgUnits = function(data) {
+            return orgUnitRepository.findAllByParent([data.moduleId]).then(function(originOrgUnits){
+                return _.merge({ originOrgUnits: originOrgUnits }, data);
+            });
+        };
+
+        var getDataSetsForModulesAndOrigins = function (data) {
+            var originOrgUnitIds = _.pluck(data.originOrgUnits, 'id');
+
+            return datasetRepository.findAllForOrgUnits(originOrgUnitIds.concat(data.moduleId)).then(function(allDataSets) {
+                var aggregateDataSetIds = getAggregateDataSetIds(allDataSets);
+                return _.merge({
+                    allDataSetIds: _.pluck(allDataSets, 'id'),
+                    aggregateDataSetIds: aggregateDataSetIds
+                }, data);
+            });
+        };
+
         var getAggregateDataSetIds = function(allDataSets) {
             var aggregateDataSets = _.filter(allDataSets, { isLineListService: false });
             return _.pluck(aggregateDataSets, 'id');
@@ -18,11 +36,9 @@ define([], function () {
         };
 
         var getCompletionFromDhis = function (data) {
-            return orgUnitRepository.findAllByParent([data.moduleId]).then(function (originOrgUnits) {
-                return approvalService.getCompletionData(data.moduleId, originOrgUnits, data.allDataSetIds, [data.period]).then(function (allCompletionData) {
-                    var completionData = _.find(allCompletionData, { orgUnit: data.moduleId, period: data.period });
-                    return _.merge({ dhisCompletion: completionData }, data);
-                });
+            return approvalService.getCompletionData(data.moduleId, data.originOrgUnits, data.allDataSetIds, [data.period]).then(function (allCompletionData) {
+                var completionData = _.find(allCompletionData, { orgUnit: data.moduleId, period: data.period });
+                return _.merge({ dhisCompletion: completionData }, data);
             });
         };
 
@@ -46,23 +62,18 @@ define([], function () {
         this.run = function(message) {
             var messageData = message.data.data;
 
-            return datasetRepository.getAll().then(function (allDataSets) {
-                var aggregateDataSetIds = getAggregateDataSetIds(allDataSets),
-                    allDataSetIds = _.pluck(allDataSets, 'id');
-
-                return getModuleDataBlock({
-                    moduleId: messageData.moduleId,
-                    period: messageData.period,
-                    aggregateDataSetIds: aggregateDataSetIds,
-                    allDataSetIds: allDataSetIds
-                })
+            return getModuleDataBlock({
+                moduleId: messageData.moduleId,
+                period: messageData.period
+            })
+                .then(getOriginOrgUnits)
+                .then(getDataSetsForModulesAndOrigins)
                 .then(getDataValuesFromDhis)
                 .then(getCompletionFromDhis)
                 .then(getApprovalFromDhis)
                 .then(mergeAndSaveModuleDataBlock)
                 .then(getModuleDataBlock)
                 .then(uploadModuleDataBlockToDhis);
-            });
         };
     };
 });

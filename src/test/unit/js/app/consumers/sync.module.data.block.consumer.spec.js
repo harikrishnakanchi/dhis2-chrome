@@ -37,7 +37,7 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
                 }];
 
                 dataSetRepository = new DataSetRepository();
-                spyOn(dataSetRepository, 'getAll').and.returnValue(utils.getPromise(q, [aggregateDataSet]));
+                spyOn(dataSetRepository, 'findAllForOrgUnits').and.returnValue(utils.getPromise(q, [aggregateDataSet]));
 
                 moduleDataBlockFactory = new ModuleDataBlockFactory();
                 spyOn(moduleDataBlockFactory, 'create').and.returnValue(utils.getPromise(q, {}));
@@ -78,7 +78,7 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
             });
 
             it('should not download data values for line list data sets', function() {
-                dataSetRepository.getAll.and.returnValue(utils.getPromise(q, [aggregateDataSet, lineListDataSet]));
+                dataSetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [aggregateDataSet, lineListDataSet]));
                 runConsumer();
                 expect(dataService.downloadData).toHaveBeenCalledWith(mockModule.id, [aggregateDataSet.id], mockPeriod, null);
             });
@@ -89,7 +89,7 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
             });
 
             it('should download completion data from DHIS for lineList data sets', function () {
-                dataSetRepository.getAll.and.returnValue(utils.getPromise(q, [aggregateDataSet, lineListDataSet]));
+                dataSetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [aggregateDataSet, lineListDataSet]));
                 runConsumer();
                 expect(approvalService.getCompletionData).toHaveBeenCalledWith(mockModule.id, mockOriginOrgUnits, [aggregateDataSet.id, lineListDataSet.id], [mockPeriod]);
             });
@@ -100,9 +100,14 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
             });
 
             it('should download approval data from DHIS for lineList data sets', function () {
-                dataSetRepository.getAll.and.returnValue(utils.getPromise(q, [aggregateDataSet, lineListDataSet]));
+                dataSetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [aggregateDataSet, lineListDataSet]));
                 runConsumer();
                 expect(approvalService.getApprovalData).toHaveBeenCalledWith(mockModule.id, [aggregateDataSet.id, lineListDataSet.id], [mockPeriod]);
+            });
+
+            it('should download data and approval only for dataSets associated with each module and origin', function(){
+                runConsumer();
+                expect(dataSetRepository.findAllForOrgUnits).toHaveBeenCalledWith(_.pluck(mockOriginOrgUnits, 'id').concat(mockModule.id));
             });
 
             it('should merge and save module data block', function() {
