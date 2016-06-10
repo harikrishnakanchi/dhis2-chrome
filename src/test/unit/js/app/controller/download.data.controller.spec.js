@@ -33,22 +33,16 @@ define(["downloadDataController", "angularMocks", "utils", "lodash", "chromeUtil
                 scope.$apply();
                 timeout.flush();
 
-                var syncableTypes = [
-                    "downloadMetadata",
-                    "downloadProjectData"
-                ];
-
-                var expectedHustleArgs = _.map(syncableTypes, function(type) {
-                    return [{
+                var getHustleMessage = function(type) {
+                    return {
                         "type": type,
                         "data": []
-                    }, "dataValues"];
-                });
+                    };
+                };
 
-                expect(hustle.publishOnce.calls.count()).toEqual(syncableTypes.length);
-                _.forEach(syncableTypes, function(type, i) {
-                    expect(hustle.publishOnce.calls.argsFor(i)).toEqual(expectedHustleArgs[i]);
-                });
+                expect(hustle.publishOnce.calls.count()).toEqual(2);
+                expect(hustle.publishOnce.calls.argsFor(0)).toEqual([getHustleMessage("downloadMetadata"), "dataValues"]);
+                expect(hustle.publishOnce.calls.argsFor(1)).toEqual([getHustleMessage("downloadProjectData"), "dataValues"]);
                 expect(chromeUtils.createNotification).toHaveBeenCalled();
             });
         });
