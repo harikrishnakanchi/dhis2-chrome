@@ -41,7 +41,7 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 spyOn(orgUnitRepository, 'findAllByParent').and.returnValue(utils.getPromise(q, mockOriginOrgUnits));
 
                 datasetRepository = new DataSetRepository();
-                spyOn(datasetRepository, 'getAll').and.returnValue(utils.getPromise(q, [aggregateDataSet]));
+                spyOn(datasetRepository, 'findAllForOrgUnits').and.returnValue(utils.getPromise(q, [aggregateDataSet]));
 
                 userPreferenceRepository = new UserPreferenceRepository();
                 spyOn(userPreferenceRepository, 'getCurrentUsersProjectIds').and.returnValue(utils.getPromise(q, projectIds));
@@ -85,7 +85,7 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                     id: 'lineListDataSetId',
                     isLineListService: true
                 };
-                datasetRepository.getAll.and.returnValue(utils.getPromise(q, [aggregateDataSet, lineListSummaryDataSet]));
+                datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [aggregateDataSet, lineListSummaryDataSet]));
 
                 runConsumer();
                 expect(dataService.downloadData).toHaveBeenCalledWith(mockModule.id, [aggregateDataSet.id], periodRange, someMomentInTime);
@@ -96,7 +96,7 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                     id: 'lineListDataSetId',
                     isLineListService: true
                 };
-                datasetRepository.getAll.and.returnValue(utils.getPromise(q, [aggregateDataSet, lineListSummaryDataSet]));
+                datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [aggregateDataSet, lineListSummaryDataSet]));
 
                 runConsumer();
                 expect(approvalService.getCompletionData).toHaveBeenCalledWith(mockModule.id, mockOriginOrgUnits, [aggregateDataSet.id, lineListSummaryDataSet.id], periodRange);
@@ -107,11 +107,29 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                     id: 'lineListDataSetId',
                     isLineListService: true
                 };
-                datasetRepository.getAll.and.returnValue(utils.getPromise(q, [aggregateDataSet, lineListSummaryDataSet]));
+                datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [aggregateDataSet, lineListSummaryDataSet]));
 
                 runConsumer();
                 expect(approvalService.getApprovalData).toHaveBeenCalledWith(mockModule.id, [aggregateDataSet.id, lineListSummaryDataSet.id], periodRange);
             });
+
+            it('should download data and approvals only for dataSets assosciated with each module and its origins', function () {
+                var mockModuleA = { id: 'mockModuleIdA' },
+                    mockModuleB = { id: 'mockModuleIdB' },
+                    mockOriginForA = { id: 'mockOriginA' },
+                    mockOriginForB = { id: 'mockOriginB' };
+
+                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [mockModuleA, mockModuleB]));
+                orgUnitRepository.findAllByParent.and.callFake(function(moduleIds) {
+                    var originToReturn = _.first(moduleIds) == mockModuleA.id ? mockOriginForA : mockOriginForB;
+                    return utils.getPromise(q, [originToReturn]);
+                });
+
+                runConsumer();
+
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockOriginForA.id, mockModuleA.id]);
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockOriginForB.id, mockModuleB.id]);
+           });
 
             it('should instantiate module data blocks for each module', function() {
                 runConsumer();

@@ -37,12 +37,11 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
 
             return getModuleDataBlocks({
                 moduleId: options.modules.pop().id,
-                aggregateDataSetIds: options.aggregateDataSetIds,
-                allDataSetIds: options.allDataSetIds,
                 periodRange: options.periodRange,
                 lastUpdatedTimestamp: options.lastUpdatedTimestamp
             })
             .then(getOriginsForModule)
+            .then(getDataSetsForModuleAndOrigins)
             .then(getIndexedDataValuesFromDhis)
             .then(getIndexedCompletionsFromDhis)
             .then(getIndexedApprovalsFromDhis)
@@ -61,6 +60,20 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
                 return _.merge({ originOrgUnits: originOrgUnits }, data);
             });
         };
+
+        var getDataSetsForModuleAndOrigins = function(data) {
+            var originOrgUnitIds = _.pluck(data.originOrgUnits, 'id');
+
+            return datasetRepository.findAllForOrgUnits(originOrgUnitIds.concat(data.moduleId)).then(function(dataSets){
+                var aggregatedDataSetIds = getAggregateDataSetIds(dataSets);
+
+                return _.merge({
+                    allDataSetIds: _.pluck(dataSets, 'id'),
+                    aggregateDataSetIds: aggregatedDataSetIds
+                }, data);
+            });
+        };
+
         var getIndexedDataValuesFromDhis = function(data) {
             return dataService.downloadData(data.moduleId, data.aggregateDataSetIds, data.periodRange, data.lastUpdatedTimestamp)
                 .then(function (dataValues) {
@@ -101,32 +114,25 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
         };
 
         this.run = function () {
-            return datasetRepository.getAll().then(function (allDataSets) {
-                var aggregateDataSetIds = getAggregateDataSetIds(allDataSets),
-                    allDataSetIds = _.pluck(allDataSets, 'id');
+            return userPreferenceRepository.getCurrentUsersProjectIds().then(function (currentUserProjectIds) {
+                return getLastUpdatedTime(currentUserProjectIds).then(function(projectLastUpdatedTimestamp) {
+                    var periodRange = getPeriodRangeToDownload(projectLastUpdatedTimestamp);
 
-                return userPreferenceRepository.getCurrentUsersProjectIds().then(function (currentUserProjectIds) {
-                    return getLastUpdatedTime(currentUserProjectIds).then(function(projectLastUpdatedTimestamp) {
-                        var periodRange = getPeriodRangeToDownload(projectLastUpdatedTimestamp);
-
-                        return orgUnitRepository.getAllModulesInOrgUnits(currentUserProjectIds)
-                            .then(function (allModules) {
-                                return recursivelyDownloadMergeAndSaveModules({
-                                    modules: allModules,
-                                    aggregateDataSetIds: aggregateDataSetIds,
-                                    allDataSetIds: allDataSetIds,
-                                    periodRange: periodRange,
-                                    lastUpdatedTimestamp: projectLastUpdatedTimestamp
-                                });
-                            })
-                            .then(function(allModulesSyncedSuccessfully) {
-                                if(allModulesSyncedSuccessfully) {
-                                    return updateLastUpdatedTime(currentUserProjectIds);
-                                }
+                    return orgUnitRepository.getAllModulesInOrgUnits(currentUserProjectIds)
+                        .then(function (allModules) {
+                            return recursivelyDownloadMergeAndSaveModules({
+                                modules: allModules,
+                                periodRange: periodRange,
+                                lastUpdatedTimestamp: projectLastUpdatedTimestamp
                             });
-                    });
+                        })
+                        .then(function(allModulesSyncedSuccessfully) {
+                            if(allModulesSyncedSuccessfully) {
+                                return updateLastUpdatedTime(currentUserProjectIds);
+                            }
+                        });
                 });
-            });
+                });
         };
     };
 });
