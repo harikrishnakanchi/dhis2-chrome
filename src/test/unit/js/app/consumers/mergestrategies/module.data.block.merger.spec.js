@@ -510,34 +510,6 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         expect(dataService.save).toHaveBeenCalled();
                     });
                 });
-
-                describe('sync job has previously failed', function() {
-                    it('should remove the entry from dataSyncFailure store', function() {
-                        var moduleDataValue = createMockDataValue({ orgUnit: 'someModuleId' }),
-                            originDataValue = createMockDataValue({ orgUnit: 'someOriginId' });
-
-                        moduleDataBlock = createMockModuleDataBlock({
-                            failedToSync: true,
-                            dataValues: [moduleDataValue, originDataValue]
-                        });
-
-                        performUpload();
-
-                        expect(dataSyncFailureRepository.delete).toHaveBeenCalledWith(moduleDataValue.orgUnit, moduleDataBlock.period);
-                    });
-                });
-
-                describe('sync job did not previously fail', function() {
-                    it('should not remove the entry from dataSyncFailure store', function() {
-                        moduleDataBlock = createMockModuleDataBlock({
-                            failedToSync: false
-                        });
-
-                        performUpload();
-
-                        expect(dataSyncFailureRepository.delete).not.toHaveBeenCalled();
-                    });
-                });
             });
         });
     });
