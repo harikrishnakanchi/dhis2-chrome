@@ -1,12 +1,12 @@
-define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'datasetRepository', 'userPreferenceRepository', 'changeLogRepository', 'orgUnitRepository', 'moduleDataBlockFactory',
+define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'datasetRepository', 'changeLogRepository', 'orgUnitRepository', 'moduleDataBlockFactory',
         'moduleDataBlockMerger', 'angularMocks', 'dateUtils', 'utils', 'timecop'],
-    function(DownloadModuleDataBlocksConsumer, DataService, ApprovalService, DataSetRepository, UserPreferenceRepository, ChangeLogRepository, OrgUnitRepository, ModuleDataBlockFactory,
+    function(DownloadModuleDataBlocksConsumer, DataService, ApprovalService, DataSetRepository, ChangeLogRepository, OrgUnitRepository, ModuleDataBlockFactory,
              ModuleDataBlockMerger, mocks, dateUtils, utils, timecop) {
         
         var downloadModuleDataBlocksConsumer, dataService, approvalService,
             userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository,
             moduleDataBlockFactory, moduleDataBlockMerger,
-            q, scope, aggregateDataSet, periodRange, projectIds, mockModule, mockOriginOrgUnits, someMomentInTime;
+            q, scope, aggregateDataSet, periodRange, projectIds, mockModule, mockOriginOrgUnits, someMomentInTime, message;
 
         describe('downloadModuleDataBlocksConsumer', function() {
             beforeEach(mocks.inject(function($rootScope, $q) {
@@ -20,6 +20,11 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                     id: 'someOriginId'
                 }];
                 projectIds = ['projectId'];
+                message = {
+                    data : {
+                        data: projectIds
+                    }
+                };
                 aggregateDataSet = {
                     id: 'someAggregateDataSetId',
                     isLineListService: false
@@ -43,9 +48,6 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 datasetRepository = new DataSetRepository();
                 spyOn(datasetRepository, 'findAllForOrgUnits').and.returnValue(utils.getPromise(q, [aggregateDataSet]));
 
-                userPreferenceRepository = new UserPreferenceRepository();
-                spyOn(userPreferenceRepository, 'getCurrentUsersProjectIds').and.returnValue(utils.getPromise(q, projectIds));
-
                 changeLogRepository =  new ChangeLogRepository();
                 spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, someMomentInTime));
                 spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
@@ -57,11 +59,11 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 spyOn(moduleDataBlockMerger, 'mergeAndSaveToLocalDatabase').and.returnValue(utils.getPromise(q, {}));
 
                 downloadModuleDataBlocksConsumer = new DownloadModuleDataBlocksConsumer(dataService, approvalService, datasetRepository,
-                    userPreferenceRepository, changeLogRepository, orgUnitRepository, moduleDataBlockFactory, moduleDataBlockMerger, q);
+                    changeLogRepository, orgUnitRepository, moduleDataBlockFactory, moduleDataBlockMerger, q);
             }));
 
             var runConsumer = function() {
-                downloadModuleDataBlocksConsumer.run();
+                downloadModuleDataBlocksConsumer.run(message);
                 scope.$apply();
             };
 

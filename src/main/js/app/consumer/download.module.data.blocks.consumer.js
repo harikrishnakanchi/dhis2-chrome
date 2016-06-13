@@ -1,5 +1,5 @@
 define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _, dateUtils, moment) {
-    return function (dataService, approvalService, datasetRepository, userPreferenceRepository, changeLogRepository, orgUnitRepository,
+    return function (dataService, approvalService, datasetRepository, changeLogRepository, orgUnitRepository,
                      moduleDataBlockFactory, moduleDataBlockMerger, $q) {
 
         var getAggregateDataSetIds = function(allDataSets) {
@@ -113,26 +113,25 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
             return $q.all(mergePromises);
         };
 
-        this.run = function () {
-            return userPreferenceRepository.getCurrentUsersProjectIds().then(function (currentUserProjectIds) {
-                return getLastUpdatedTime(currentUserProjectIds).then(function(projectLastUpdatedTimestamp) {
-                    var periodRange = getPeriodRangeToDownload(projectLastUpdatedTimestamp);
+        this.run = function (message) {
+            var projectIds = message.data.data;
+            return getLastUpdatedTime(projectIds).then(function (projectLastUpdatedTimestamp) {
+                var periodRange = getPeriodRangeToDownload(projectLastUpdatedTimestamp);
 
-                    return orgUnitRepository.getAllModulesInOrgUnits(currentUserProjectIds)
-                        .then(function (allModules) {
-                            return recursivelyDownloadMergeAndSaveModules({
-                                modules: allModules,
-                                periodRange: periodRange,
-                                lastUpdatedTimestamp: projectLastUpdatedTimestamp
-                            });
-                        })
-                        .then(function(allModulesSyncedSuccessfully) {
-                            if(allModulesSyncedSuccessfully) {
-                                return updateLastUpdatedTime(currentUserProjectIds);
-                            }
+                return orgUnitRepository.getAllModulesInOrgUnits(projectIds)
+                    .then(function (allModules) {
+                        return recursivelyDownloadMergeAndSaveModules({
+                            modules: allModules,
+                            periodRange: periodRange,
+                            lastUpdatedTimestamp: projectLastUpdatedTimestamp
                         });
-                });
-                });
+                    })
+                    .then(function (allModulesSyncedSuccessfully) {
+                        if (allModulesSyncedSuccessfully) {
+                            return updateLastUpdatedTime(projectIds);
+                        }
+                    });
+            });
         };
     };
 });
