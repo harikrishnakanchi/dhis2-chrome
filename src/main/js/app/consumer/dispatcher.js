@@ -24,19 +24,24 @@ define(["lodash"], function(_) {
                     return downloadProjectSettingsConsumer.run(message)
                         .then(userPreferenceRepository.getCurrentUsersUsername)
                         .then(function(currentUsersUsername) {
-                            if(currentUsersUsername == 'superadmin' || currentUsersUsername == 'projectadmin' || currentUsersUsername === null) {
+                            if(_.isEmpty(message.data.data) && (currentUsersUsername == 'superadmin' || currentUsersUsername == 'projectadmin' || currentUsersUsername === null)) {
                                 $log.info('Project data sync complete');
                                 return;
                             }
-                            return downloadModuleDataBlocksConsumer.run()
-                                .then(_.partial(downloadEventDataConsumer.run, message))
-                                .then(_.partial(downloadChartsConsumer.run, message))
-                                .then(_.partial(downloadChartDataConsumer.run, message))
-                                .then(_.partial(downloadPivotTablesConsumer.run, message))
-                                .then(_.partial(downloadPivotTableDataConsumer.run, message))
-                                .then(function() {
-                                    $log.info('Project data sync complete');
-                                });
+                            // TODO: Refactor the backward compatability code after 6.0 release, no need of currentUser username and projectIds, as this job is not expected to be called for admin users
+                            var currentUserProjectIds = !_.isEmpty(message.data.data) ? $q.when(message.data.data) : userPreferenceRepository.getCurrentUsersProjectIds();
+                            return currentUserProjectIds.then(function(projectIds){
+                                message.data.data = projectIds;
+                                return downloadModuleDataBlocksConsumer.run(message)
+                                    .then(_.partial(downloadEventDataConsumer.run, message))
+                                    .then(_.partial(downloadChartsConsumer.run, message))
+                                    .then(_.partial(downloadChartDataConsumer.run, message))
+                                    .then(_.partial(downloadPivotTablesConsumer.run, message))
+                                    .then(_.partial(downloadPivotTableDataConsumer.run, message))
+                                    .then(function() {
+                                        $log.info('Project data sync complete');
+                                    });
+                            });
                         });
 
                 case "downloadProjectDataForAdmin":

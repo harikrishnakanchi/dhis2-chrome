@@ -97,7 +97,8 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
                 'run': jasmine.createSpy("downloadPivotTablesConsumer")
             };
             userPreferenceRepository = {
-                'getCurrentUsersUsername': jasmine.createSpy("userPreferenceRepository")
+                'getCurrentUsersUsername': jasmine.createSpy("userPreferenceRepository"),
+                'getCurrentUsersProjectIds': jasmine.createSpy("userPreferenceRepository")
             };
 
             downloadModuleDataBlocksConsumer = {
@@ -164,14 +165,20 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
         });
 
         describe('downloadProjectData job', function() {
-            var message = {
-                'data': {
-                    'data': {},
-                    'type': 'downloadProjectData'
-                }
-            };
+            var message;
 
-            it("should call all project-data-related download consumers", function() {
+            beforeEach(function () {
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, []));
+                message = {
+                    'data': {
+                        'data': [],
+                        'type': 'downloadProjectData'
+                    }
+                };
+            });
+
+            it("should call all project-data-related download consumers for specified project ids", function() {
+                message.data.data = ['proj1'];
                 dispatcher.run(message);
                 scope.$apply();
 
@@ -194,6 +201,40 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
                 expect(downloadDataConsumer.run).not.toHaveBeenCalled();
             });
 
+            it('should call all project-data-related download consumers if message data contains projectIds and current user is admin', function() {
+                userPreferenceRepository.getCurrentUsersUsername.and.returnValue(utils.getPromise(q, 'projectadmin'));
+
+                message.data.data = ["proj1"];
+                dispatcher.run(message);
+                scope.$apply();
+
+                expect(downloadModuleDataBlocksConsumer.run).toHaveBeenCalledWith(message);
+            });
+
+            it('should call all project-data-related download consumers if message data does not contains projectIds and current user is not admin', function() {
+                var currentUserProjectIds = ["proj1"];
+                var expectedMessage = {
+                    data: {
+                        "data": currentUserProjectIds,
+                        "type": "downloadProjectData"
+                    }
+                };
+
+                userPreferenceRepository.getCurrentUsersUsername.and.returnValue(utils.getPromise(q, 'deu'));
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, currentUserProjectIds));
+
+                dispatcher.run(message);
+                scope.$apply();
+
+                expect(downloadModuleDataBlocksConsumer.run).toHaveBeenCalledWith(expectedMessage);
+                expect(downloadModuleDataBlocksConsumer.run).toHaveBeenCalled();
+                expect(downloadEventDataConsumer.run).toHaveBeenCalledWith(expectedMessage, {});
+                expect(downloadChartsConsumer.run).toHaveBeenCalledWith(expectedMessage, {});
+                expect(downloadPivotTableDataConsumer.run).toHaveBeenCalledWith(expectedMessage, {});
+                expect(downloadChartDataConsumer.run).toHaveBeenCalledWith(expectedMessage, {});
+                expect(downloadPivotTablesConsumer.run).toHaveBeenCalledWith(expectedMessage, {});
+            });
+
             it('should only call project settings download consumer if no user has ever logged in', function() {
                 userPreferenceRepository.getCurrentUsersUsername.and.returnValue(utils.getPromise(q, null));
 
@@ -201,7 +242,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
                 scope.$apply();
 
                 expect(downloadProjectSettingsConsumer.run).toHaveBeenCalledWith(message);
-                expect(downloadDataConsumer.run).not.toHaveBeenCalled();
+                expect(downloadModuleDataBlocksConsumer.run).not.toHaveBeenCalled();
             });
 
         });
