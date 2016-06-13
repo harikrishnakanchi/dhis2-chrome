@@ -61,6 +61,12 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 }, {
                     "id": "OrgDs1",
                     "isOriginDataset": true
+                }, {
+                    "id": "refDs",
+                    "isReferralDataset": true
+                }, {
+                    "id": "popDs",
+                    "isPopulationDataset": true
                 }];
 
                 datasetRepository = new DatasetRepository();
@@ -699,7 +705,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 scope.$apply();
 
                 expect(originOrgunitCreator.create).toHaveBeenCalledWith(enrichedModule);
-                expect(hustle.publish.calls.count()).toEqual(5);
+                expect(hustle.publish.calls.count()).toEqual(6);
                 expect(hustle.publish.calls.argsFor(2)).toEqual([{
                     "data": originOrgUnit,
                     "type": "upsertOrgUnit",

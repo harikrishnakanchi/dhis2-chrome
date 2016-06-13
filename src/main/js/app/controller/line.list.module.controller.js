@@ -213,6 +213,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
             $scope.save = function(module) {
                 var enrichedModule = {};
+                var populationDatasetId, referralDatasetId;
 
                 var associateToProgram = function(program, originOrgUnits) {
                     return programRepository.associateOrgUnits(program, originOrgUnits).then(function() {
@@ -225,6 +226,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     return datasetRepository.getAll().then(function(allDatasets) {
 
                         var originDatasetIds = _.pluck(_.filter(allDatasets, "isOriginDataset"), "id");
+                        referralDatasetId = _.find(allDatasets, "isReferralDataset").id;
+                        populationDatasetId = _.find(allDatasets, "isPopulationDataset").id;
 
                         var summaryDatasetId = _.find($scope.program.attributeValues, {
                             "attribute": {
@@ -267,11 +270,24 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     });
                 };
 
+                var associateMandatoryDatasetsToModule = function() {
+                    var datasetIds = [populationDatasetId, referralDatasetId];
+                    return datasetRepository.associateOrgUnits(datasetIds, [enrichedModule]).then(function() {
+                        var orgunitIdsAndDatasetIds = {
+                            "orgUnitIds": [enrichedModule.id],
+                            "dataSetIds": datasetIds
+                        };
+                        return publishMessage(orgunitIdsAndDatasetIds, "associateOrgUnitToDataset",
+                            $scope.resourceBundle.associateOrgUnitToDatasetDesc + enrichedModule.displayName);
+                    });
+                };
+
                 $scope.loading = true;
                 return getEnrichedModule($scope.module)
                     .then(createModule)
                     .then(_.partial(saveExcludedDataElements, enrichedModule))
                     .then(createOriginOrgUnitsAndGroups)
+                    .then(associateMandatoryDatasetsToModule)
                     .then(_.partial(onSuccess, enrichedModule), onError)
                     .finally(function() {
                         $scope.loading = false;
