@@ -48,7 +48,7 @@ require.config({
         //Controllers
         "controllers": "app/controller/controllers",
         "dashboardController": "app/controller/dashboard.controller",
-        "dataEntryController": "app/controller/data.entry.controller",
+        "moduleWeekSelectorController": "app/controller/module.week.selector.controller",
         "dataApprovalController": "app/controller/data.approval.controller",
         "aggregateDataEntryController": "app/controller/aggregate.data.entry.controller",
         "lineListDataEntryController": "app/controller/line.list.data.entry.controller",
