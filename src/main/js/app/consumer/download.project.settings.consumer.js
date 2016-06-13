@@ -1,33 +1,21 @@
 define(["lodash"], function(_) {
     return function($q, systemSettingService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository, excludedDataElementsRepository, mergeBy) {
-        this.run = function(message) {
-            var projectIds = message.data.data;
-            return getProjectIds(projectIds)
-                .then(downloadAndSaveProjectSettings);
+        this.run = function() {
+            return getUserProjectIds()
+                .then(downloadedProjectSettings)
+                .then(function(projectSettings) {
+                    return $q.all([saveReferrals(projectSettings), mergeAndSavePatientOriginDetails(projectSettings), saveExcludedDataElements(projectSettings)]);
+                });
         };
 
         var getUserProjectIds = function() {
             return userPreferenceRepository.getCurrentUsersProjectIds();
         };
 
-        var getProjectIds = function (projectIds) {
+        var downloadedProjectSettings = function(projectIds) {
             if (_.isEmpty(projectIds))
-                return getUserProjectIds();
-            return $q.when(projectIds);
-        };
+                return;
 
-        var downloadAndSaveProjectSettings = function (projectIds){
-            if(_.isEmpty(projectIds)){
-                return $q.when();
-            }
-
-            return downloadProjectSettings(projectIds)
-                .then(function (projectSettings) {
-                    return $q.all([saveReferrals(projectSettings), mergeAndSavePatientOriginDetails(projectSettings), saveExcludedDataElements(projectSettings)]);
-                });
-        };
-
-        var downloadProjectSettings = function(projectIds) {
             return systemSettingService.getProjectSettings(projectIds);
         };
 
