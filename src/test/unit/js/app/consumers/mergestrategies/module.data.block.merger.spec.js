@@ -36,9 +36,10 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                 spyOn(approvalService, 'markAsIncomplete').and.returnValue(utils.getPromise(q, {}));
                 spyOn(approvalService, 'markAsUnapproved').and.returnValue(utils.getPromise(q, {}));
 
-                mergeBy = new MergeBy($log);
                 dataSyncFailureRepository = new DataSyncFailureRepository();
                 spyOn(dataSyncFailureRepository, 'delete').and.returnValue(utils.getPromise(q, undefined));
+
+                mergeBy = new MergeBy($log);
 
                 moduleDataBlockMerger = new ModuleDataBlockMerger(dataRepository, approvalRepository, mergeBy, dataService, q, datasetRepository, approvalService, dataSyncFailureRepository);
 
@@ -91,6 +92,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                     period: 'somePeriod',
                     moduleId: 'someModuleId',
                     lineListService: false,
+                    failedToSync: false,
                     approvalData: null,
                     dataValues: [],
                     dataValuesHaveBeenModifiedLocally: false,
@@ -326,6 +328,26 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         expect(approvalRepository.invalidateApproval).not.toHaveBeenCalled();
                         expect(approvalRepository.saveApprovalsFromDhis).not.toHaveBeenCalled();
                     });
+                });
+
+                describe('module data block has previously failed to sync', function() {
+                    describe('merged data is the same as existing data on DHIS but not Praxis', function() {
+                        it('should delete the data sync failure', function() {
+                            var dhisDataValue = createMockDataValue({ value: 'newValue', lastUpdated: someMomentInTime }),
+                                localDataValue = createMockDataValue({ value: 'oldValue', clientLastUpdated: someMomentInTime.subtract(1, 'hour') });
+
+                            dhisDataValues = [dhisDataValue];
+                            moduleDataBlock = createMockModuleDataBlock({
+                                dataValues: [localDataValue],
+                                failedToSync: true
+                            });
+
+                            performMerge();
+
+                            expect(dataSyncFailureRepository.delete).toHaveBeenCalledWith(moduleDataBlock.moduleId, moduleDataBlock.period);
+                        });
+                    });
+
                 });
             });
 

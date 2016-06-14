@@ -48,7 +48,11 @@ define(['moment', 'lodash'],
                     }
                 };
 
-                var mergeAndSaveCompletionAndApproval = function() {
+                var mergeAndSaveApprovals = function() {
+                    return moduleDataBlock.lineListService ? mergeAndSaveCompletionAndApprovalForLineLists() : mergeAndSaveCompletionAndApprovalForAggregates();
+                };
+
+                var mergeAndSaveCompletionAndApprovalForAggregates = function() {
                     var mergedDhisApprovalAndCompletion = _.merge({}, dhisCompletion, dhisApproval),
                         dhisApprovalOrCompletionExists = !_.isEmpty(mergedDhisApprovalAndCompletion),
                         localApprovalsExist = (moduleDataBlock.approvedAtProjectLevel || moduleDataBlock.approvedAtCoordinationLevel);
@@ -83,9 +87,13 @@ define(['moment', 'lodash'],
                     }
                 };
 
-                return mergeAndSaveDataValues().then(function () {
-                    return moduleDataBlock.lineListService ? mergeAndSaveCompletionAndApprovalForLineLists() : mergeAndSaveCompletionAndApproval();
-                });
+                var resetDataSyncFailure = function () {
+                    return dataSyncFailureRepository.delete(moduleDataBlock.moduleId, moduleDataBlock.period);
+                };
+
+                return mergeAndSaveDataValues()
+                    .then(mergeAndSaveApprovals)
+                    .then(resetDataSyncFailure);
             };
 
 
