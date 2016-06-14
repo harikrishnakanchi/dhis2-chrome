@@ -88,13 +88,17 @@ define(['moment', 'lodash'],
                 };
 
                 var resetDataSyncFailure = function () {
-                    var mergedDataIsEqualToPraxisDataButNotDhis = mergedDataValuesAreEqualToExistingPraxisDataValues() && !mergedDataValuesAreEqualToDhisDataValues(),
-                        approvedAtProjectLevelOnlyOnPraxis = moduleDataBlock.approvedAtProjectLevel && !dhisCompletion,
+                    var approvedAtProjectLevelOnlyOnPraxis = moduleDataBlock.approvedAtProjectLevel && !dhisCompletion,
                         approvedAtCoordinationLevelOnlyOnPraxis = moduleDataBlock.approvedAtCoordinationLevel && !dhisApproval;
 
-                    if(moduleDataBlock.failedToSync && !mergedDataIsEqualToPraxisDataButNotDhis &&
-                       !approvedAtProjectLevelOnlyOnPraxis && !approvedAtCoordinationLevelOnlyOnPraxis) {
-                        return dataSyncFailureRepository.delete(moduleDataBlock.moduleId, moduleDataBlock.period);
+                    if(moduleDataBlock.failedToSync) {
+                        if(mergedDataValuesAreEqualToExistingPraxisDataValues() && mergedDataValuesAreEqualToDhisDataValues()) {
+                            if(!approvedAtProjectLevelOnlyOnPraxis && !approvedAtCoordinationLevelOnlyOnPraxis) {
+                                return dataSyncFailureRepository.delete(moduleDataBlock.moduleId, moduleDataBlock.period);
+                            }
+                        } else if (mergedDataValuesAreEqualToDhisDataValues()) {
+                            return dataSyncFailureRepository.delete(moduleDataBlock.moduleId, moduleDataBlock.period);
+                        }
                     }
                 };
 
