@@ -304,5 +304,6 @@
     "weeklyReports": "",
     "monthlyReports": "",
     "aggregateDataSyncError": "",
-    "dataApprovalSyncError": ""
+    "dataApprovalSyncError": "",
+    "deleteLabel" : ""
 }
