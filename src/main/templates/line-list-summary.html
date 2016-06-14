@@ -1,8 +1,8 @@
-<div class="dataentrypage parent-margin">
+<div class="line-list dataentrypage parent-margin {{layoutDirection.direction}}">
     <div class="loading" ng-show="loading || loadingResults">
         <img src="img/ajax-loader.gif" class="spinner" />
     </div>
-    <div class="text-right" ng-if="!viewRegistrationBook">
+    <div ng-class="layoutDirection.direction == 'rtl' ? 'text-left' : 'text-right'" ng-if="!viewRegistrationBook">
         <input type="button" class="printRegistrationBookBtn" ng-click="showRegistrationBook()" value="{{resourceBundle.viewRegistrationBook}}"></input>
     </div>
     <div ng-if="viewRegistrationBook">
@@ -39,8 +39,9 @@
                     <accordion-heading>
                         <span>{{ program.name}}</span>
                     </accordion-heading>
-                    <div class="row sub-nav">
-                        <div class="col-md-8">
+                    <div class="sub-nav clearfix">
+                        <ul class="list-inline">
+                            <li>
                             <ul class="list-inline">
                                 <li><a href="#/line-list-summary/{{selectedModuleId}}/caseNumber" ng-class="{'active': (filterBy === 'caseNumber' || filterBy === 'dateRange')}">{{resourceBundle.findCases}}</a></li>
                                 <li>|</li>
@@ -50,10 +51,11 @@
                                 <li>|</li>
                                 <li><a href="#/line-list-summary/{{selectedModuleId}}/eventSummary" ng-class="{'active': (filterBy === 'eventSummary')}">{{resourceBundle.caseSummary}}</a></li>
                             </ul>
-                        </div>
-                        <div class="col-md-4 text-right">
-                            <a ng-href="#/line-list-data-entry/{{selectedModuleId}}/new?returnTo={{currentUrl}}" class="btn btn-primary">{{resourceBundle.newCaseBtnValue}}</a>
-                        </div>
+                        </li>
+                        <li class="new-case-btn" ng-class="layoutDirection.direction == 'rtl' ? 'text-left' : 'text-right'">
+                           <a ng-href="#/line-list-data-entry/{{selectedModuleId}}/new?returnTo={{currentUrl}}" class="btn btn-primary">{{resourceBundle.newCaseBtnValue}}</a>
+                        </li>
+                        </ul>
                     </div>
                     <div>
                         <div class="row form-inline event-search-form" ng-if="filterBy === 'caseNumber' || filterBy === 'dateRange'">

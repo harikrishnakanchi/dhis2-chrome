@@ -388,6 +388,7 @@ body {
                 a {
                     padding: 0px 6px;
                 }
+
                 a.active {
                     text-decoration: underline;
                     pointer-events: none;
@@ -500,9 +501,7 @@ body {
         }
     }
     .printRegistrationBookBtn {
-        margin-bottom: 10px;
-        margin-top: 10px;
-        margin-right: 10px;
+        margin: 10px;
     }
     .registrationBook {
         button {
@@ -1083,6 +1082,15 @@ input[type="checkbox"].dashboard-form-checkbox {
     }
 }
 
+.line-list{
+    .new-case-btn {
+        float: right;
+        a {
+            padding: 6px 12px;
+        }
+    }
+}
+
 .rtl {
     direction: rtl;
 
@@ -1102,6 +1110,16 @@ input[type="checkbox"].dashboard-form-checkbox {
             }
         }
     }
+
+    &.line-list{
+        .list-inline{
+            padding-right: 0;
+        }
+        .new-case-btn {
+            float: left;
+        }
+    }
+
 }
 
 .linelistSummary {
