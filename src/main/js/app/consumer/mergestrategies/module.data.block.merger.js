@@ -88,7 +88,14 @@ define(['moment', 'lodash'],
                 };
 
                 var resetDataSyncFailure = function () {
-                    return dataSyncFailureRepository.delete(moduleDataBlock.moduleId, moduleDataBlock.period);
+                    var mergedDataIsEqualToPraxisDataButNotDhis = mergedDataValuesAreEqualToExistingPraxisDataValues() && !mergedDataValuesAreEqualToDhisDataValues(),
+                        approvedAtProjectLevelOnlyOnPraxis = moduleDataBlock.approvedAtProjectLevel && !dhisCompletion,
+                        approvedAtCoordinationLevelOnlyOnPraxis = moduleDataBlock.approvedAtCoordinationLevel && !dhisApproval;
+
+                    if(moduleDataBlock.failedToSync && !mergedDataIsEqualToPraxisDataButNotDhis &&
+                       !approvedAtProjectLevelOnlyOnPraxis && !approvedAtCoordinationLevelOnlyOnPraxis) {
+                        return dataSyncFailureRepository.delete(moduleDataBlock.moduleId, moduleDataBlock.period);
+                    }
                 };
 
                 return mergeAndSaveDataValues()
