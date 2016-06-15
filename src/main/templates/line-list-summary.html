@@ -3,7 +3,7 @@
         <img src="img/ajax-loader.gif" class="spinner" />
     </div>
     <div ng-class="layoutDirection.direction == 'rtl' ? 'text-left' : 'text-right'" ng-if="!viewRegistrationBook">
-        <input type="button" class="printRegistrationBookBtn" ng-click="showRegistrationBook()" value="{{resourceBundle.viewRegistrationBook}}"></input>
+        <input type="button" class="printRegistrationBookBtn btn btn-primary btn-sm" ng-click="showRegistrationBook()" value="{{resourceBundle.viewRegistrationBook}}"></input>
     </div>
     <div ng-if="viewRegistrationBook">
         <section class="panel panel-default">
@@ -26,8 +26,8 @@
             </div>
         </section>
         <div>
-            <input type="button" class="printRegistrationBookBtn" ng-click="printWindow()" value="{{resourceBundle.printRegistrationBook}}"></input>
-            <input type="button" class="printRegistrationBookBtn" ng-click="back()" value="{{resourceBundle.backBtnValue}}"></input>
+            <input type="button" class="printRegistrationBookBtn btn btn-primary btn-sm" ng-click="printWindow()" value="{{resourceBundle.printRegistrationBook}}"></input>
+            <input type="button" class="printRegistrationBookBtn btn btn-primary btn-sm" ng-click="back()" value="{{resourceBundle.backBtnValue}}"></input>
         </div>
     </div>
     <section ng-if="!viewRegistrationBook" class="panel tab-panel">
