@@ -60,9 +60,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
             it('should download pivot table data for relevant modules and datasets', function() {
                 var usersModules = [{
                     'id': 'module1'
-                }], originOrgUnit = {
-                    'id': 'mockOriginId'
-                }, pivotTableForDataSetA = {
+                }], pivotTableForDataSetA = {
                     id: "mockTableId",
                     name: "[Field App - dataSetA]"
                 }, pivotTableForDataSetB = {
@@ -73,7 +71,6 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                     code: 'dataSetA'
                 };
 
-                orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, [originOrgUnit]));
                 pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [pivotTableForDataSetA, pivotTableForDataSetB]));
                 datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [dataSetA]));
                 userPreferenceRepository.getCurrentUsersModules.and.returnValue(utils.getPromise(q, usersModules));
@@ -82,9 +79,25 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
-                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(['module1', originOrgUnit.id]);
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(['module1']);
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(pivotTableForDataSetA, 'module1');
                 expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(pivotTableForDataSetA.name, 'module1', 'pivotTableData');
+            });
+
+            it('should retrieve dataSets for both module and its origins', function() {
+                var mockModule = {
+                    'id': 'mockModuleId'
+                }, mockOrigin = {
+                    'id': 'mockOriginId'
+                };
+                userPreferenceRepository.getCurrentUsersModules.and.returnValue(utils.getPromise(q, [mockModule]));
+                orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, [mockOrigin]));
+
+                downloadPivotTableDataConsumer.run();
+                scope.$apply();
+
+                expect(orgUnitRepository.findAllByParent).toHaveBeenCalledWith([mockModule.id]);
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModule.id, mockOrigin.id]);
             });
 
             it('should retrieve then update the lastUpdated time in the changeLog', function () {

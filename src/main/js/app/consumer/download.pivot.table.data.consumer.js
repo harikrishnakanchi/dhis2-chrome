@@ -38,17 +38,19 @@ define(["lodash", "moment"], function(_, moment) {
                 };
 
                 var getDatasetsRelevantToEachModule = function() {
-                    var moduleIdsAndOrigins = _.reduce(userModuleIds, function(mapOfModuleIdsToOrigins, moduleId) {
+                    var moduleIdsAndOrigins = _.transform(userModuleIds, function(mapOfModuleIdsToOrigins, moduleId) {
                         mapOfModuleIdsToOrigins[moduleId] = orgUnitRepository.findAllByParent([moduleId]);
-                        return mapOfModuleIdsToOrigins;
                     }, {});
 
                     var getAllDataSetsUnderModule = function(moduleIdAndOrigins) {
-                        var modulesAndAllDataSets = _.reduce(moduleIdAndOrigins, function(mapOfModuleIdsToDataSets, origins, moduleId) {
-                            var firstOriginId = _.pluck(origins, "id")[0];
-                            mapOfModuleIdsToDataSets[moduleId] = datasetRepository.findAllForOrgUnits([moduleId, firstOriginId]);
-                            return mapOfModuleIdsToDataSets;
+                        var modulesAndAllDataSets = _.transform(moduleIdAndOrigins, function(mapOfModuleIdsToDataSets, origins, moduleId) {
+                            var orgUnitIds = [moduleId];
+                            if(!_.isEmpty(origins)) {
+                                orgUnitIds.push(_.first(origins).id);
+                            }
+                            mapOfModuleIdsToDataSets[moduleId] = datasetRepository.findAllForOrgUnits(orgUnitIds);
                         }, {});
+
                         return $q.all(modulesAndAllDataSets);
                     };
 
