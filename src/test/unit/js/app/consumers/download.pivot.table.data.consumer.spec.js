@@ -3,7 +3,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
         describe('Download Pivot Table Data Consumer', function() {
             var downloadPivotTableDataConsumer,
                 reportService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository,
-                scope, q, currentTime, pivotTables;
+                scope, q, currentTime, pivotTables, dataSets;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
                 scope = $rootScope;
@@ -13,17 +13,14 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                     'id': 'someModuleId'
                 }];
 
-                var dataSets = [{
-                    "id": "ds1",
-                    "code": "dataSetCode1"
+                dataSets = [{
+                    id: 'mockDataSetId',
+                    code: 'mockDataSetCode'
                 }];
 
                 pivotTables = [{
-                    "id": "table1",
-                    "name": "[Field App - dataSetCode1]"
-                }, {
-                    "id": "table2",
-                    "name": "[Field App - dataSetCode2]"
+                    id: "mockTableId",
+                    name: "[Field App - mockDataSetCode]"
                 }];
 
                 datasetRepository = new DatasetRepository();
@@ -46,7 +43,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
 
                 orgUnitRepository = new OrgUnitRepository();
-                spyOn(orgUnitRepository, 'findAllByParent').and.returnValue(utils.getPromise(q, {}));
+                spyOn(orgUnitRepository, 'findAllByParent').and.returnValue(utils.getPromise(q, []));
 
                 currentTime = moment('2016-02-29T02:03:00.000Z');
                 Timecop.install();
@@ -63,16 +60,31 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
             it('should download pivot table data for relevant modules and datasets', function() {
                 var usersModules = [{
                     'id': 'module1'
-                }];
+                }], originOrgUnit = {
+                    'id': 'mockOriginId'
+                }, pivotTableForDataSetA = {
+                    id: "mockTableId",
+                    name: "[Field App - dataSetA]"
+                }, pivotTableForDataSetB = {
+                    id: "mockTableId",
+                    name: "[Field App - dataSetB]"
+                }, dataSetA = {
+                    id: 'dataSetAId',
+                    code: 'dataSetA'
+                };
 
+                orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, [originOrgUnit]));
+                pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [pivotTableForDataSetA, pivotTableForDataSetB]));
+                datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [dataSetA]));
                 userPreferenceRepository.getCurrentUsersModules.and.returnValue(utils.getPromise(q, usersModules));
                 reportService.getReportDataForOrgUnit.and.returnValue(utils.getPromise(q, 'pivotTableData'));
 
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
-                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(pivotTables[0], 'module1');
-                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(pivotTables[0].name, 'module1', 'pivotTableData');
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(['module1', originOrgUnit.id]);
+                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(pivotTableForDataSetA, 'module1');
+                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(pivotTableForDataSetA.name, 'module1', 'pivotTableData');
             });
 
             it('should retrieve then update the lastUpdated time in the changeLog', function () {
