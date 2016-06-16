@@ -3,15 +3,17 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
         describe('Download Pivot Table Data Consumer', function() {
             var downloadPivotTableDataConsumer,
                 reportService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository,
-                scope, q, currentTime, pivotTables, dataSets;
+                scope, q, currentTime, pivotTables, dataSets, mockModule;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
                 scope = $rootScope;
                 q = $q;
 
-                var usersModules = [{
+                mockModule = {
                     'id': 'someModuleId'
-                }];
+                };
+
+                var usersModules = [mockModule];
 
                 dataSets = [{
                     id: 'mockDataSetId',
@@ -58,30 +60,56 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
             });
 
             it('should download pivot table data for relevant modules and datasets', function() {
-                var usersModules = [{
-                    'id': 'module1'
-                }], pivotTableForDataSetA = {
+                var dataSet = {
+                    id: 'dataSetId',
+                    code: 'dataSetCode'
+                }, pivotTableRelevantToDataSet = {
                     id: "mockTableId",
-                    name: "[Field App - dataSetA]"
-                }, pivotTableForDataSetB = {
+                    name: "[Field App - dataSetCode]"
+                }, someOtherPivotTable = {
                     id: "mockTableId",
-                    name: "[Field App - dataSetB]"
-                }, dataSetA = {
-                    id: 'dataSetAId',
-                    code: 'dataSetA'
+                    name: "[Field App - someOtherDataSetCode]"
                 };
 
-                pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [pivotTableForDataSetA, pivotTableForDataSetB]));
-                datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [dataSetA]));
-                userPreferenceRepository.getCurrentUsersModules.and.returnValue(utils.getPromise(q, usersModules));
-                reportService.getReportDataForOrgUnit.and.returnValue(utils.getPromise(q, 'pivotTableData'));
+                datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [dataSet]));
+                pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [pivotTableRelevantToDataSet, someOtherPivotTable]));
 
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
-                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(['module1']);
-                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(pivotTableForDataSetA, 'module1');
-                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(pivotTableForDataSetA.name, 'module1', 'pivotTableData');
+                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(pivotTableRelevantToDataSet, mockModule.id);
+            });
+
+            it('should upsert pivot Table data', function(){
+                var pivotTableForDataSetA = {
+                    id: "mockTableId",
+                    name: "[Field App - mockDataSetCode]"
+                }, mockPivotTableData = {
+                    some: 'data'
+                };
+
+                reportService.getReportDataForOrgUnit.and.returnValue(utils.getPromise(q, mockPivotTableData));
+
+                downloadPivotTableDataConsumer.run();
+                scope.$apply();
+
+                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(pivotTableForDataSetA.name, mockModule.id, mockPivotTableData);
+            });
+
+            it('should retrieve dataSets for each module', function () {
+                var mockModuleA = {
+                    id:'mockModuleIdA'
+                }, mockModuleB = {
+                    id:'mockModuleIdB'
+                };
+
+                userPreferenceRepository.getCurrentUsersModules.and.returnValue(utils.getPromise(q, [mockModuleA, mockModuleB]));
+
+                downloadPivotTableDataConsumer.run();
+                scope.$apply();
+
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModuleA.id]);
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModuleB.id]);
             });
 
             it('should retrieve dataSets for both module and its origins', function() {
