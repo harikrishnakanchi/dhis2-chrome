@@ -60,16 +60,15 @@ define(["lodash", "moment"], function(_, moment) {
 
                 var filterPivotTablesForModules = function(datasetsByModule) {
                     var modulesAndPivotTables = [];
-                    _.forEach(userModuleIds, function(userModuleId) {
-                        var dataSetCodesForModule = _.pluck(datasetsByModule[userModuleId], "code");
-                        _.forEach(pivotTables, function(pivotTable) {
-                            _.forEach(dataSetCodesForModule, function(datasetCode) {
-                                if (_.contains(pivotTable.name, datasetCode)) {
-                                    modulesAndPivotTables.push({
-                                        orgUnitId: userModuleId,
-                                        pivotTable: pivotTable
-                                    });
-                                }
+
+                    _.forEach(userModuleIds, function(moduleId) {
+                        _.forEach(datasetsByModule[moduleId], function(dataSet) {
+                            var pivotTablesForDataSet = _.filter(pivotTables, { dataSetCode: dataSet.code });
+                            _.forEach(pivotTablesForDataSet, function(pivotTable) {
+                                modulesAndPivotTables.push({
+                                    orgUnitId: moduleId,
+                                    pivotTable: pivotTable
+                                });
                             });
                         });
                     });
