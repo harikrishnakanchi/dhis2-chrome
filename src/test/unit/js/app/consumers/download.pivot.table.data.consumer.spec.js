@@ -3,17 +3,16 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
         describe('Download Pivot Table Data Consumer', function() {
             var downloadPivotTableDataConsumer,
                 reportService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository,
-                scope, q, currentTime, mockModule, mockDataSet, mockPivotTable;
+                scope, q, currentTime, mockProjectId, mockModule, mockDataSet, mockPivotTable;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
                 scope = $rootScope;
                 q = $q;
 
+                mockProjectId = 'mockProjectId';
                 mockModule = {
                     'id': 'someModuleId'
                 };
-
-                var usersModules = [mockModule];
 
                 mockDataSet = {
                     id: 'mockDataSetId',
@@ -30,8 +29,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 spyOn(datasetRepository, 'findAllForOrgUnits').and.returnValue(utils.getPromise(q, [mockDataSet]));
 
                 userPreferenceRepository = new UserPreferenceRepository();
-                spyOn(userPreferenceRepository, 'getCurrentUsersProjectIds').and.returnValue(utils.getPromise(q, []));
-                spyOn(userPreferenceRepository, 'getCurrentUsersModules').and.returnValue(utils.getPromise(q, usersModules));
+                spyOn(userPreferenceRepository, 'getCurrentUsersProjectIds').and.returnValue(utils.getPromise(q, [mockProjectId]));
                 spyOn(userPreferenceRepository, 'getCurrentUsersOriginOrgUnitIds').and.returnValue(utils.getPromise(q, {}));
 
                 reportService = new ReportService();
@@ -47,6 +45,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
 
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, 'findAllByParent').and.returnValue(utils.getPromise(q, []));
+                spyOn(orgUnitRepository, 'getAllModulesInOrgUnits').and.returnValue(utils.getPromise(q, [mockModule]));
 
                 currentTime = moment('2016-02-29T02:03:00.000Z');
                 Timecop.install();
@@ -92,6 +91,18 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(mockPivotTable.name, mockModule.id, mockPivotTableData);
             });
 
+            it('should retrieve modules for each project', function () {
+                var mockProjectIds = ['mockProjectIdA', 'mockProjectIdB'];
+
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValues(utils.getPromise(q, mockProjectIds));
+
+                downloadPivotTableDataConsumer.run();
+                scope.$apply();
+
+                expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['mockProjectIdB']);
+                expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['mockProjectIdA']);
+            });
+
             it('should retrieve dataSets for each module', function () {
                 var mockModuleA = {
                     id:'mockModuleIdA'
@@ -99,7 +110,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                     id:'mockModuleIdB'
                 };
 
-                userPreferenceRepository.getCurrentUsersModules.and.returnValue(utils.getPromise(q, [mockModuleA, mockModuleB]));
+                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [mockModuleA, mockModuleB]));
 
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();
@@ -109,12 +120,9 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
             });
 
             it('should retrieve dataSets for both module and its origins', function() {
-                var mockModule = {
-                    'id': 'mockModuleId'
-                }, mockOrigin = {
+                var mockOrigin = {
                     'id': 'mockOriginId'
                 };
-                userPreferenceRepository.getCurrentUsersModules.and.returnValue(utils.getPromise(q, [mockModule]));
                 orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, [mockOrigin]));
 
                 downloadPivotTableDataConsumer.run();
@@ -145,7 +153,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                     "id": "module3"
                 }];
 
-                userPreferenceRepository.getCurrentUsersModules.and.returnValue(utils.getPromise(q, userModules));
+                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, userModules));
                 reportService.getReportDataForOrgUnit.and.callFake(function(table, moduleId) {
                     if (table === mockPivotTable && moduleId === "module1")
                         return utils.getPromise(q, "data1");
@@ -167,7 +175,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
             });
 
             it('should not download pivot table data if user has no modules', function() {
-                userPreferenceRepository.getCurrentUsersModules.and.returnValue(utils.getPromise(q, []));
+                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, []));
 
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();

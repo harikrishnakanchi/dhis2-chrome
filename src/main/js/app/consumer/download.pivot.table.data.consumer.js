@@ -15,7 +15,7 @@ define(["lodash", "moment"], function(_, moment) {
                 });
             };
 
-            var downloadRelevantPivotTableData = function(pivotTables, projectIds, userModuleIds, changeLogKey) {
+            var downloadRelevantPivotTableData = function(pivotTables, projectId, userModuleIds, changeLogKey) {
                 var downloadOfAtLeastOneReportFailed = false;
 
                 var recursivelyDownloadAndUpsertPivotTableData = function(orgUnitsAndTables) {
@@ -76,16 +76,13 @@ define(["lodash", "moment"], function(_, moment) {
                 };
 
                 var addProjectLevelPivotTables = function(orgUnitsAndTables){
-
-                    _.forEach(projectIds, function(projectId) {
-                        _.forEach(pivotTables, function(pivotTable) {
-                            if(_.contains(pivotTable.name, "ProjectReport")) {
-                                orgUnitsAndTables.push({
-                                    orgUnitId: projectId,
-                                    pivotTable: pivotTable
-                                });
-                            }
-                        });
+                    _.forEach(pivotTables, function(pivotTable) {
+                        if(_.contains(pivotTable.name, "ProjectReport")) {
+                            orgUnitsAndTables.push({
+                                orgUnitId: projectId,
+                                pivotTable: pivotTable
+                            });
+                        }
                     });
 
                     return $q.when(orgUnitsAndTables);
@@ -102,25 +99,37 @@ define(["lodash", "moment"], function(_, moment) {
                     });
             };
 
-            return loadUserProjectsAndModuleIds().then(function(data) {
-                var projectIds = data.usersProjectIds,
-                    moduleIds = data.usersModuleIds,
-                    changeLogKey = "pivotTableData:" + projectIds.join(';');
+            var downloadPivotTableDataForProject = function(projectId) {
+                return orgUnitRepository.getAllModulesInOrgUnits([projectId]).then(function(modules) {
+                    var moduleIds = _.pluck(modules, 'id'),
+                        changeLogKey = "pivotTableData:" + projectId;
 
-                if (_.isEmpty(moduleIds))
-                    return;
-
-                return changeLogRepository.get(changeLogKey).then(function(lastDownloadedTime) {
-                    if (lastDownloadedTime && moment().isSame(lastDownloadedTime, 'day')) {
+                    if (_.isEmpty(moduleIds))
                         return;
-                    }
 
-                    return pivotTableRepository.getAll().then(function(pivotTables) {
-                        return downloadRelevantPivotTableData(pivotTables, projectIds, moduleIds, changeLogKey);
+                    return changeLogRepository.get(changeLogKey).then(function(lastDownloadedTime) {
+                        if (lastDownloadedTime && moment().isSame(lastDownloadedTime, 'day')) {
+                            return;
+                        }
+
+                        return pivotTableRepository.getAll().then(function(pivotTables) {
+                            return downloadRelevantPivotTableData(pivotTables, projectId, moduleIds, changeLogKey);
+                        });
                     });
                 });
+            };
 
-            });
+            var recursivelyLoopThroughProjects = function(projectIds) {
+                if(_.isEmpty(projectIds)) {
+                    return $q.when();
+                }
+
+                return downloadPivotTableDataForProject(projectIds.pop()).then(function() {
+                    return recursivelyLoopThroughProjects(projectIds);
+                });
+            };
+
+            return userPreferenceRepository.getCurrentUsersProjectIds().then(recursivelyLoopThroughProjects);
         };
     };
 });
