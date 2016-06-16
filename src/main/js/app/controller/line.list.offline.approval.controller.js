@@ -1,5 +1,5 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function($scope, $q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, datasetRepository, referralLocationsRepository, excludedDataElementsRepository) {
+    return function($scope, $q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, datasetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService) {
 
         $scope.isGenderFilterApplied = false;
         $scope.isAgeFilterApplied = false;
@@ -109,7 +109,7 @@ define(["lodash", "moment"], function(_, moment) {
                 return 0;
 
             var optionId = _.find($scope.referralOptions, {
-                "name": locationName
+                "displayName": locationName
             }).id;
             return _.filter($scope.dataValues._referralLocations, {
                 "value": optionId
@@ -126,6 +126,17 @@ define(["lodash", "moment"], function(_, moment) {
 
         $scope.showSummary = function() {
             return $scope.showFilters && ($scope.showOfflineSummaryForViewOnly || ($scope.isCompleted && hasRoles(['Coordination Level Approver', 'Observer'])) || (hasRoles(['Project Level Approver', 'Observer'])));
+        };
+
+        var getDescriptionsForProceduresPerformed = function () {
+            var proceduresPerformed = _.uniq($scope.dataValues._procedures, 'formName');
+            proceduresPerformed =  _.map(proceduresPerformed, function (procedurePerformed) {
+                return {
+                    "title" : procedurePerformed.formName,
+                    "description": procedurePerformed.description
+                };
+            });
+            $scope.proceduresPerformed = _.groupBy(proceduresPerformed, 'description');
         };
 
         $scope.shouldShowProceduresInOfflineSummary = function() {
@@ -156,7 +167,8 @@ define(["lodash", "moment"], function(_, moment) {
 
             var getProgram = function(excludedDataElements) {
                 return programRepository.get($scope.associatedProgramId, excludedDataElements).then(function(program) {
-                    $scope.program = program;
+                    var translatedProgram = translationsService.translate([program]);
+                    $scope.program = translatedProgram[0];
                 });
             };
 
@@ -164,9 +176,12 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         var getOptionSetMapping = function() {
-            return optionSetRepository.getOptionSetMapping($scope.resourceBundle, $scope.selectedModule.parent.id).then(function(data) {
-                $scope.optionSetMapping = data.optionSetMap;
-                $scope.optionMapping = data.optionMap;
+            return optionSetRepository.getOptionSetMapping($scope.selectedModule.parent.id).then(function(data) {
+                var translatedOptionSetMap = translationsService.translateOptionSetMap(data.optionSetMap);
+                $scope.optionSetMapping = translatedOptionSetMap;
+
+                var translatedOptionMap = translationsService.translateOptionMap(data.optionMap);
+                $scope.optionMapping = translatedOptionMap;
             });
         };
 
@@ -225,7 +240,8 @@ define(["lodash", "moment"], function(_, moment) {
 
         var getAssociatedDataSets = function() {
             return datasetRepository.findAllForOrgUnits([$scope.originOrgUnits[0].id]).then(function(data) {
-                $scope.associatedDataSets = data;
+                var translatedDataset = translationsService.translate(data);
+                $scope.associatedDataSets = translatedDataset;
             });
         };
 
@@ -253,6 +269,7 @@ define(["lodash", "moment"], function(_, moment) {
                     loadGroupedDataValues(submittedEvents);
                     setShowFilterFlag();
                     getAssociatedDataSets();
+                    getDescriptionsForProceduresPerformed();
                 });
             });
         };

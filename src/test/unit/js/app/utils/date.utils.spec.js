@@ -33,5 +33,21 @@ define(["dateUtils", "moment", "timecop"], function(dateUtils, moment, timecop) 
             var actualResult = dateUtils.subtractWeeks(8);
             expect(actualResult).toEqual("2014-04-04");
         });
+
+        describe("getPeriodRange", function() {
+            beforeEach(function() {
+                Timecop.freeze(new Date("2016-01-13T12:34:56.789Z"));
+            });
+
+            it("should return period range for the current week", function() {
+                var actualResult = dateUtils.getPeriodRange(1);
+                expect(actualResult).toEqual(["2016W02"]);
+            });
+
+            it('should return period range for the last X weeks including the current week', function() {
+                var actualResult = dateUtils.getPeriodRange(3);
+                expect(actualResult).toEqual(["2015W53", "2016W01", "2016W02"]);
+            });
+        });
     });
 });

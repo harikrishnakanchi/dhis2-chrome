@@ -1,7 +1,8 @@
-define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtils", "utils", "dataRepository"], function(QueuePostProcessInterceptor, mocks, properties, chromeUtils, utils, DataRepository) {
+define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtils", "utils", "dataRepository", "approvalDataRepository", "orgUnitRepository", "dataSyncFailureRepository"],
+    function(QueuePostProcessInterceptor, mocks, properties, chromeUtils, utils, DataRepository, ApprovalDataRepository, OrgUnitRepository, DataSyncFailureRepository) {
     describe('queuePostProcessInterceptor', function() {
 
-        var hustle, queuePostProcessInterceptor, q, rootScope, ngI18nResourceBundle, scope, dataRepository;
+        var queuePostProcessInterceptor, q, rootScope, ngI18nResourceBundle, scope, dataRepository, approvalDataRepository, orgUnitRepository, dataSyncFailureRepository;
 
         beforeEach(mocks.inject(function($q, $rootScope, $log) {
             q = $q;
@@ -9,17 +10,27 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
             scope = $rootScope.$new();
 
             dataRepository = new DataRepository();
+            spyOn(dataRepository, "setLocalStatus").and.returnValue(utils.getPromise(q, {}));
+            spyOn(dataRepository, "flagAsFailedToSync").and.returnValue(utils.getPromise(q, {}));
+
+            approvalDataRepository = new ApprovalDataRepository();
+            spyOn(approvalDataRepository, "flagAsFailedToSync").and.returnValue(utils.getPromise(q, {}));
+
+            orgUnitRepository = new OrgUnitRepository();
+            spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, []));
 
             spyOn(chromeUtils, "sendMessage");
             spyOn(chromeUtils, "createNotification");
 
+            dataSyncFailureRepository = new DataSyncFailureRepository();
+            spyOn(dataSyncFailureRepository, "add").and.returnValue(utils.getPromise(q, undefined));
             ngI18nResourceBundle = {
                 "get": jasmine.createSpy("ngI18nResourceBundle").and.returnValue(utils.getPromise(q, {
                     "data": {}
                 }))
             };
 
-            queuePostProcessInterceptor = new QueuePostProcessInterceptor($log, ngI18nResourceBundle, dataRepository);
+            queuePostProcessInterceptor = new QueuePostProcessInterceptor($log, ngI18nResourceBundle, dataRepository, dataSyncFailureRepository);
         }));
 
         it('should return true for retry if number of releases is less than max retries', function() {
@@ -162,10 +173,9 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
                     "type": "uploadDataValues",
                     "data": periodAndOrgUnit
                 },
-                "releases": 6
+                "releases": properties.queue.maxretries + 1
             };
 
-            spyOn(dataRepository, "setLocalStatus");
             queuePostProcessInterceptor.shouldRetry(job, {});
 
             scope.$apply();
@@ -184,15 +194,35 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
                     "type": "NOTUploadDataValues",
                     "data": periodsAndOrgUnits
                 },
-                "releases": 6
+                "releases": properties.queue.maxretries + 1
             };
 
-            spyOn(dataRepository, "setLocalStatus");
             queuePostProcessInterceptor.shouldRetry(job, {});
-
             scope.$apply();
 
             expect(dataRepository.setLocalStatus).not.toHaveBeenCalled();
+        });
+
+        it("should mark the failed to sync module by period after maxretries", function() {
+            var job = {
+                data: {
+                    type: "syncModuleDataBlock",
+                    data: {
+                        moduleId: 'someModuleId',
+                        period: 'somePeriod'
+                    }
+                },
+                releases: properties.queue.maxretries + 1
+            }, originOrgUnits = [{
+                id: 'someOriginId'
+            }];
+
+            orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, originOrgUnits));
+
+            queuePostProcessInterceptor.shouldRetry(job, {});
+            scope.$apply();
+
+            expect(dataSyncFailureRepository.add).toHaveBeenCalledWith('someModuleId','somePeriod');
         });
     });
 });

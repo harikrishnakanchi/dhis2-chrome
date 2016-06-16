@@ -25,9 +25,7 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
                 }]
             };
 
-            scope.currentUser = {
-                "locale": "en"
-            };
+            scope.locale = "en";
 
             scope.resourceBundle = {
                 "createUserDesc": "create user ",

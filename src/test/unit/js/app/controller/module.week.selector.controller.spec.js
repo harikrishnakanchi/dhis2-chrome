@@ -1,6 +1,6 @@
-define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "dataRepository", "orgUnitRepository"],
-    function(DataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, DataRepository, OrgUnitRepository) {
-        describe("dataEntryController ", function() {
+define(["moduleWeekSelectorController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "dataRepository", "orgUnitRepository"],
+    function(ModuleWeekSelectorController, testData, mocks, _, utils, orgUnitMapper, moment, DataRepository, OrgUnitRepository) {
+        describe("moduleWeekSelectorController ", function() {
 
             var scope, rootScope, q, location, window, orgUnitRepository, routeParams, modules;
 
@@ -21,7 +21,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                         "username": "dataentryuser",
                         "userRoles": [{
                             "id": "hxNB8lleCsl",
-                            "name": 'Superuser'
+                            "name": 'Projectadmin'
                         }, {
                             "id": "hxNB8lleCsl",
                             "name": 'blah'
@@ -110,7 +110,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     }]
                 }];
 
-                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository);
+                moduleWeekSelectorController = new ModuleWeekSelectorController(scope, routeParams, q, location, rootScope, orgUnitRepository);
                 scope.$apply();
 
                 expect(scope.modules).toEqual(expectedModules);
@@ -157,7 +157,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     }]
                 }];
 
-                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository);
+                moduleWeekSelectorController = new ModuleWeekSelectorController(scope, routeParams, q, location, rootScope, orgUnitRepository);
                 scope.$apply();
 
                 expect(scope.modules).toEqual(expectedModules);
@@ -172,7 +172,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 scope.resourceBundle = {
                     "openingDateInFutureError": "openingDateInFutureError"
                 };
-                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository);
+                moduleWeekSelectorController = new ModuleWeekSelectorController(scope, routeParams, q, location, rootScope, orgUnitRepository);
                 scope.$apply();
 
                 expect(scope.week).toEqual({

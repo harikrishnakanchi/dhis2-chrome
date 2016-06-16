@@ -46,7 +46,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 return $hustle.publish({
                     "data": data,
                     "type": "upsertOrgUnit",
-                    "locale": $scope.currentUser.locale,
+                    "locale": $scope.locale,
                     "desc": $scope.resourceBundle.upsertOrgUnitDesc + data[0].name
                 }, "dataValues").then(function() {
                     return data;

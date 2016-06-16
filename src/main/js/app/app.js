@@ -1,12 +1,12 @@
-define(["angular", "Q", "services", "directives", "dbutils", "controllers", "repositories", "migrator", "migrations", "properties", "queuePostProcessInterceptor", "monitors", "helpers", "indexedDBLogger", "authenticationUtils",
+define(["angular", "Q", "services", "directives", "dbutils", "controllers", "repositories", "factories", "migrator", "migrations", "properties", "queuePostProcessInterceptor", "monitors", "helpers", "indexedDBLogger", "authenticationUtils", "transformers",
         "angular-route", "ng-i18n", "angular-indexedDB", "hustleModule", "angular-ui-tabs", "angular-ui-accordion", "angular-ui-collapse", "angular-ui-transition", "angular-ui-weekselector",
         "angular-treeview", "angular-ui-modal", "angular-multiselect", "angular-ui-notin", "angular-ui-equals", "angular-ui-dropdown", "angular-filter", "angucomplete-alt", "angular-nvd3", "angular-ui-tooltip",
         "angular-ui-bindHtml", "angular-ui-position", "angular-sanitize", "ng-csv"
 
     ],
-    function(angular, Q, services, directives, dbutils, controllers, repositories, migrator, migrations, properties, queuePostProcessInterceptor, monitors, helpers, indexedDBLogger, authenticationUtils) {
+    function(angular, Q, services, directives, dbutils, controllers, repositories, factories, migrator, migrations, properties, queuePostProcessInterceptor, monitors, helpers, indexedDBLogger, authenticationUtils, transformers) {
         var init = function() {
-            var app = angular.module('DHIS2', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs", "ui.bootstrap.transition", "ui.bootstrap.collapse",
+            var app = angular.module('PRAXIS', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs", "ui.bootstrap.transition", "ui.bootstrap.collapse",
                 "ui.bootstrap.accordion", "ui.weekselector", "angularTreeview", "ui.bootstrap.modal", "ui.bootstrap.dropdown",
                 "ui.multiselect", "ui.notIn", "ui.equals", "hustle", "angular.filter", "angucomplete-alt", "nvd3", "ui.bootstrap.tooltip", "ui.bootstrap.position", "ui.bootstrap.bindHtml",
                 "ngSanitize", "ngCsv"
@@ -14,11 +14,13 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
 
             services.init(app);
             repositories.init(app);
+            factories.init(app);
             monitors.init(app);
             helpers.init(app);
             dbutils.init(app);
             controllers.init(app);
             directives.init(app);
+            transformers.init(app);
 
             app.factory('queuePostProcessInterceptor', ['$log', 'ngI18nResourceBundle', queuePostProcessInterceptor]);
 
@@ -105,7 +107,13 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                             migrator.run(event.oldVersion, db, tx, migrations);
                         });
 
-                    $hustleProvider.init("hustle", 1, ["dataValues"]);
+                    var jobComparator = function (itemToBeCompared, itemComparedWith) {
+                        var typeEquals = _.isEqual(itemComparedWith.type, itemToBeCompared.type);
+                        var dataEquals = _.isEqual(itemComparedWith.data, itemToBeCompared.data);
+                        return typeEquals && dataEquals;
+                    };
+
+                    $hustleProvider.init("hustle", 1, ["dataValues"], jobComparator);
 
                     $tooltipProvider.setTriggers({
                         "click": "mouseleave"
@@ -113,13 +121,12 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                 }
             ]);
             app.value('ngI18nConfig', {
-                defaultLocale: 'en',
                 supportedLocales: ['en', 'fr', 'ar'],
                 basePath: "/js/app/i18n"
             });
 
-            app.run(['dhisMonitor', 'hustleMonitor', 'queuePostProcessInterceptor', '$rootScope', '$location', '$hustle', '$document', 'systemSettingRepository',
-                function(dhisMonitor, hustleMonitor, queuePostProcessInterceptor, $rootScope, $location, $hustle, $document, systemSettingRepository) {
+            app.run(['dhisMonitor', 'hustleMonitor', 'queuePostProcessInterceptor', '$rootScope', '$location', '$hustle', '$document', 'systemSettingRepository', 'translationsService',
+                function(dhisMonitor, hustleMonitor, queuePostProcessInterceptor, $rootScope, $location, $hustle, $document, systemSettingRepository, translationsService) {
 
                     $document.on('keydown', function(e) {
                         disableBackspaceKey(e);
@@ -161,6 +168,15 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
 
                     systemSettingRepository.loadProductKey();
 
+                    $rootScope.setLocale = function(locale) {
+                        translationsService.setLocale(locale);
+                        $rootScope.locale = locale;
+
+                        $rootScope.layoutDirection = locale == 'ar' ? { 'direction': 'rtl' } : {};
+                    };
+
+                    systemSettingRepository.getLocale().then($rootScope.setLocale);
+
                     $rootScope.hasRoles = function(allowedRoles) {
                         if ($rootScope.currentUser === undefined)
                             return false;
@@ -193,7 +209,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
 
         var bootstrap = function(app) {
             var deferred = Q.defer();
-            var injector = angular.bootstrap(angular.element(document.querySelector('#dhis2')), ['DHIS2']);
+            var injector = angular.bootstrap(angular.element(document.querySelector('#praxis')), ['PRAXIS']);
             deferred.resolve([injector, app]);
             return deferred.promise;
         };

@@ -1,6 +1,6 @@
 define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, properties, orgUnitMapper) {
     return function($scope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, programRepository, programEventRepository, excludedDataElementsRepository,
-        orgUnitRepository, approvalDataRepository, referralLocationsRepository) {
+        orgUnitRepository, approvalDataRepository, referralLocationsRepository, translationsService) {
 
         $scope.filterParams = {};
         $scope.currentUrl = $location.path();
@@ -54,8 +54,9 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 $scope.eventListTitle = $scope.resourceBundle.incompleteEventsTitle;
                 $scope.noCasesMsg = $scope.resourceBundle.noIncompleteEventsFound;
 
-                return programEventRepository.getDraftEventsFor($scope.program.id, _.pluck($scope.originOrgUnits, "id")).then(function(data) {
-                    $scope.events = data;
+                return programEventRepository.getDraftEventsFor($scope.program.id, _.pluck($scope.originOrgUnits, "id")).then(function(events) {
+                    var translatedEvents = translationsService.translate(events);
+                    $scope.events = translatedEvents;
                 });
             }
             if ($scope.filterBy === "readyToSubmit") {
@@ -73,7 +74,8 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                                 acc.push(event);
                         }
                     });
-                    $scope.events = acc;
+                    var translatedEvents = translationsService.translate(acc);
+                    $scope.events = translatedEvents;
                 });
             }
             if ($scope.filterBy === "dateRange") {
@@ -83,7 +85,8 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 $scope.filterParams.endDate = moment(endDate).endOf('day').toDate();
 
                 return programEventRepository.findEventsByDateRange($scope.program.id, _.pluck($scope.originOrgUnits, "id"), startDate, endDate).then(function(events) {
-                    $scope.events = events;
+                    var translatedEvents = translationsService.translate(events);
+                    $scope.events = translatedEvents;
                 });
             }
 
@@ -144,8 +147,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 var option = _.find(dataValue.optionSet.options, function(o) {
                     return o.code === dataValue.value;
                 });
-
-                return $scope.resourceBundle[option.id] || option.name;
+                return option ? option.name : "";
             } else {
                 return dataValue.value;
             }
@@ -169,7 +171,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     return $hustle.publish({
                         "type": "uploadProgramEvents",
                         "data": _.pluck(submitableEvents, 'event'),
-                        "locale": $scope.currentUser.locale,
+                        "locale": $scope.locale,
                         "desc": $scope.resourceBundle.uploadProgramEventsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
                     }, "dataValues");
                 };
@@ -178,7 +180,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     return $hustle.publish({
                         "data": periodsAndOrgUnits,
                         "type": "deleteApprovals",
-                        "locale": $scope.currentUser.locale,
+                        "locale": $scope.locale,
                         "desc": $scope.resourceBundle.deleteApprovalsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
                     }, "dataValues");
                 };
@@ -218,7 +220,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     return $hustle.publish({
                         "data": periodsAndOrgUnits,
                         "type": "deleteApprovals",
-                        "locale": $scope.currentUser.locale,
+                        "locale": $scope.locale,
                         "desc": $scope.resourceBundle.deleteApprovalsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
                     }, "dataValues");
                 };
@@ -227,7 +229,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     return $hustle.publish({
                         "type": "uploadProgramEvents",
                         "data": _.pluck(submitableEvents, "event"),
-                        "locale": $scope.currentUser.locale,
+                        "locale": $scope.locale,
                         "desc": $scope.resourceBundle.uploadProgramEventsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
                     }, "dataValues");
                 };
@@ -236,7 +238,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     return $hustle.publish({
                         "data": periodsAndOrgUnits,
                         "type": "uploadCompletionData",
-                        "locale": $scope.currentUser.locale,
+                        "locale": $scope.locale,
                         "desc": $scope.resourceBundle.uploadCompletionDataDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
                     }, "dataValues");
                 };
@@ -245,7 +247,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     return $hustle.publish({
                         "data": periodsAndOrgUnits,
                         "type": "uploadApprovalData",
-                        "locale": $scope.currentUser.locale,
+                        "locale": $scope.locale,
                         "desc": $scope.resourceBundle.uploadApprovalDataDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
                     }, "dataValues");
                 };
@@ -284,14 +286,14 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 var deleteEventPromise = $hustle.publish({
                     "data": eventId,
                     "type": "deleteEvent",
-                    "locale": $scope.currentUser.locale,
+                    "locale": $scope.locale,
                     "desc": $scope.resourceBundle.deleteEventDesc
                 }, "dataValues");
 
                 var deleteApprovalsPromise = $hustle.publish({
                     "data": periodAndOrgUnit,
                     "type": "deleteApprovals",
-                    "locale": $scope.currentUser.locale,
+                    "locale": $scope.locale,
                     "desc": $scope.resourceBundle.deleteApprovalsDesc + periodAndOrgUnit.period + ", Module: " + $scope.selectedModuleName
                 }, "dataValues");
 
@@ -327,7 +329,8 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
         $scope.filterByCaseNumber = function() {
             $scope.loadingResults = true;
             programEventRepository.findEventsByCode($scope.program.id, _.pluck($scope.originOrgUnits, "id"), $scope.filterParams.caseNumber).then(function(events) {
-                $scope.events = events;
+                var translatedEvents = translationsService.translate(events);
+                $scope.events = translatedEvents;
                 $scope.loadingResults = false;
             });
 
@@ -339,7 +342,8 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             var endDate = moment($scope.filterParams.endDate).format("YYYY-MM-DD");
 
             programEventRepository.findEventsByDateRange($scope.program.id, _.pluck($scope.originOrgUnits, "id"), startDate, endDate).then(function(events) {
-                $scope.events = events;
+                var translatedEvents = translationsService.translate(events);
+                $scope.events = translatedEvents;
                 $scope.loadingResults = false;
             });
 
@@ -383,8 +387,9 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 var getProgram = function(excludedDataElements) {
                     return programRepository.getProgramForOrgUnit($scope.originOrgUnits[0].id).then(function(program) {
                         return programRepository.get(program.id, excludedDataElements).then(function(program) {
-                            $scope.program = program;
-                            $scope.associatedProgramId = program.id;
+                            var translatedProgram = translationsService.translate([program]);
+                            $scope.program = translatedProgram[0];
+                            $scope.associatedProgramId = translatedProgram[0].id;
                         });
                     });
                 };

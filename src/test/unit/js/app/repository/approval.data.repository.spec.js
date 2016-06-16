@@ -1,13 +1,13 @@
 define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"], function(ApprovalDataRepository, mocks, utils, timecop, moment) {
-    describe("approval data repo", function() {
-        var approvalDataRepository, q, scope;
+    describe("approval data repository", function() {
+        var approvalDataRepository, q, scope, db, mockDB, mockStore, thisMoment;
 
         beforeEach(mocks.inject(function($injector) {
             q = $injector.get('$q');
             scope = $injector.get("$rootScope");
             thisMoment = moment("2014-01-03T00:00:00.000+0000");
 
-            var mockDB = utils.getMockDB(q);
+            mockDB = utils.getMockDB(q);
             db = mockDB.db;
             mockStore = mockDB.objectStore;
 
@@ -247,6 +247,67 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
 
             expect(db.objectStore).toHaveBeenCalledWith("approvals");
             expect(mockStore.upsert).toHaveBeenCalledWith(dataFromDhis);
+        });
+
+        describe('flagAsFailedToSync', function() {
+            it("should set the failedToSync flag for specified period and orgUnit", function () {
+                var approvalObject = {
+                    orgUnit: "orgUnitA",
+                    period: "2016W01",
+                    someApprovalState: true
+                };
+
+                mockStore.find.and.returnValue(utils.getPromise(q, approvalObject));
+
+                approvalDataRepository.flagAsFailedToSync(approvalObject.orgUnit, approvalObject.period);
+                scope.$apply();
+
+                var expectedObjectToUpsert = _.merge({ failedToSync: true }, approvalObject);
+
+                expect(mockStore.find).toHaveBeenCalledWith([approvalObject.period, approvalObject.orgUnit]);
+                expect(mockStore.upsert).toHaveBeenCalledWith(expectedObjectToUpsert);
+            });
+
+            it('should handle approval object not existing for specified org unit and period', function() {
+                mockStore.find.and.returnValue(utils.getPromise(q, undefined));
+
+                approvalDataRepository.flagAsFailedToSync('someOrgUnitId', 'somePeriod');
+                scope.$apply();
+
+                expect(mockStore.find).toHaveBeenCalled();
+                expect(mockStore.upsert).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('clearFailedToSync', function() {
+            it("should clear the failedToSync flag for specified period and orgUnit", function () {
+                var approvalObject = {
+                    orgUnit: "orgUnitA",
+                    period: "2016W01",
+                    someApprovalState: true,
+                    failedToSync: true
+                };
+
+                mockStore.find.and.returnValue(utils.getPromise(q, approvalObject));
+
+                approvalDataRepository.clearFailedToSync(approvalObject.orgUnit, approvalObject.period);
+                scope.$apply();
+
+                var expectedObjectToUpsert = _.omit(approvalObject, 'failedToSync');
+
+                expect(mockStore.find).toHaveBeenCalledWith([approvalObject.period, approvalObject.orgUnit]);
+                expect(mockStore.upsert).toHaveBeenCalledWith(expectedObjectToUpsert);
+            });
+
+            it('should handle approval object not existing for specified org unit and period', function() {
+                mockStore.find.and.returnValue(utils.getPromise(q, undefined));
+
+                approvalDataRepository.clearFailedToSync('someOrgUnitId', 'somePeriod');
+                scope.$apply();
+
+                expect(mockStore.find).toHaveBeenCalled();
+                expect(mockStore.upsert).not.toHaveBeenCalled();
+            });
         });
     });
 });

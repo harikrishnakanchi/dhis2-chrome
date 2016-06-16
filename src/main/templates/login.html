@@ -1,26 +1,30 @@
-<div class="login-form">
+<div class="login-form {{ layoutDirection.direction }}">
     <form name="loginForm" role="form" ng-submit="login()" class="form-horizontal">
         <p class='alert alert-danger' ng-show='invalidCredentials' id="loginFailedMsg">{{ resourceBundle.loginFailed }}</p>
         <p class='alert alert-danger' ng-show='invalidAccess' id="invalidAccessMsg">{{ resourceBundle.invalidAccess }}</p>
         <p class='alert alert-danger' ng-show='disabledCredentials' id="userDisabledMsg">{{ resourceBundle.disabledCredentials }}</p>
-        <ul>
-            <li class="form-group">
-                <label for="username" class="col-sm-4 control-label">{{ resourceBundle.usernameLabel }}</label>
-                <div class="col-sm-8 col-md-8">
-                    <input type="text" class="form-control" id="username" ng-model="username" placeholder="{{ resourceBundle.usernameLabel }}" autofocus required>
-                </div>
-            </li>
-            <li class="form-group">
-                <label for="password" class="col-sm-4 control-label">{{ resourceBundle.passwordLabel }}</label>
-                <div class="col-sm-8 col-md-8">
-                    <input type="password" class="form-control" id="password" ng-model="password" placeholder="{{ resourceBundle.passwordLabel }}" required>
-                </div>
-            </li>
-            <li class="form-group">
-                <div class=" col-sm-offset-4 col-md-offset-4 col-sm-8">
-                    <input type="submit" ng-disabled="loginForm.$invalid" value="{{ resourceBundle.loginBtn }}" class="btn btn-primary" id="loginButton">
-                </div>
-            </li>
-        </ul>
+        <p class='alert alert-danger' ng-show='compatibilityInfo.incompatibleVersion'>
+            {{ resourceBundle.incompatiblePraxisVersion }}<br>
+            {{ resourceBundle.contactSupport }} ({{ support_email }})
+        </p>
+        <p class='alert alert-info' ng-show="compatibilityInfo.newerVersionAvailable">
+            {{ resourceBundle.praxis + ' ' + compatibilityInfo.newerVersionNumber + ' ' + resourceBundle.newUpgradeAvailable }}
+        </p>
+        <div class="well">
+            <div class="form-group">
+                <label for="username">{{ resourceBundle.usernameLabel }}</label>
+                <input type="text" class="form-control" id="username" ng-model="username" placeholder="{{ resourceBundle.usernameLabel }}" autofocus required ng-disabled="compatibilityInfo.incompatibleVersion">
+            </div>
+            <div class="form-group">
+                <label for="password">{{ resourceBundle.passwordLabel }}</label>
+                <input type="password" class="form-control" id="password" ng-model="password" placeholder="{{ resourceBundle.passwordLabel }}" required ng-disabled="compatibilityInfo.incompatibleVersion">
+            </div>
+            <div class="form-group">
+                <button type="submit" id="loginButton" ng-disabled="loginForm.$invalid || compatibilityInfo.incompatibleVersion" class="btn btn-block btn-primary">
+                    {{ resourceBundle.loginBtn }}
+                </button>
+            </div>
+        </div>
     </form>
+    <div ng-include="'templates/partials/select-language.html'"></div>
 </div>

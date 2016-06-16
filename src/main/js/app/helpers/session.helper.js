@@ -3,7 +3,6 @@ define(["moment"], function(moment) {
         var saveSessionState = function() {
             var userPreferences = {
                 "username": $rootScope.currentUser.userCredentials.username,
-                "locale": $rootScope.currentUser.locale,
                 "organisationUnits": $rootScope.currentUser.organisationUnits,
                 "selectedProject": $rootScope.currentUser.selectedProject,
                 "lastUpdated": moment().toISOString(),
@@ -25,12 +24,10 @@ define(["moment"], function(moment) {
             };
 
             var setUserPreferences = function(userPreferences) {
-                $rootScope.currentUser.locale = userPreferences.locale;
                 $rootScope.currentUser.selectedProject = userPreferences.selectedProject;
             };
 
             var setDefaultPreferences = function() {
-                $rootScope.currentUser.locale = "en";
                 $rootScope.currentUser.selectedProject = _.isEmpty($rootScope.currentUser.organisationUnits) ? undefined : $rootScope.currentUser.organisationUnits[0];
             };
 
@@ -38,7 +35,7 @@ define(["moment"], function(moment) {
                 var getUserOrgUnits = function() {
                     if ($rootScope.hasRoles(["Coordination Level Approver"])) {
                         return orgUnitRepository.findAllByParent(user.organisationUnits[0].id);
-                    } else if($rootScope.hasRoles(["Superuser"])) {
+                    } else if($rootScope.hasRoles(["Projectadmin"])) {
                         return userPreferences ? $q.when(userPreferences.organisationUnits) : $q.when(undefined);
                     } else {
                         return $q.when(user.organisationUnits);

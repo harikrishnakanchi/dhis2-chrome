@@ -1,5 +1,5 @@
 define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
-    return function($scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository) {
+    return function($scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService) {
 
         var formatYAxisTicks = function(datum) {
             var isFraction = function(x) { return x % 1 !== 0; };
@@ -36,7 +36,11 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 },
                 "yAxis": {
                     "tickFormat": formatYAxisTicks
-                }
+                },
+                "legend": {
+                    "maxKeyLength": 50
+                },
+                "reduceXTicks": false
             }
         };
 
@@ -68,7 +72,11 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 },
                 "yAxis": {
                     "tickFormat": formatYAxisTicks
-                }
+                },
+                "legend": {
+                    "maxKeyLength": 50
+                },
+                "reduceXTicks": false
             }
         };
 
@@ -100,6 +108,9 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 },
                 "yAxis": {
                     "tickFormat": formatYAxisTicks
+                },
+                "legend": {
+                    "maxKeyLength": 50
                 }
             }
         };
@@ -113,30 +124,6 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
 
         $scope.downloadChartAsPng = function(event) {
             saveSvgAsPng(event.currentTarget.parentElement.parentElement.getElementsByTagName("svg")[0], "chart.png");
-        };
-
-        $scope.isMonthlyReport = function(definition) {
-            return _.contains(_.findKey(definition.relativePeriods, function(obj) {
-                return obj;
-            }), "Month");
-        };
-
-        $scope.getTableName = function(tableName) {
-            var regex = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]([0-9\s]*)([a-zA-Z0-9-\s]+)/;
-            var match = regex.exec(tableName);
-            if (match) {
-                var parsedTableName = match[3];
-                return parsedTableName;
-            } else {
-                return "";
-            }
-        };
-
-        $scope.showTable = function(data) {
-            if (_.isUndefined(data))
-                return false;
-            var showTable = data.rows.length === 0 ? false : true;
-            return showTable;
         };
 
         var loadChartData = function() {
@@ -180,6 +167,13 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                         var dimensionIndex = _.findIndex(chartData.headers, {
                             "name": "dx"
                         });
+
+                        var dataElementsIds = chartData.metaData.dx;
+                        _.each(dataElementsIds, function (id) {
+                            var legendName = chartData.metaData.names[id];
+                            chartData.metaData.names[id] = legendName.split(" - ")[0];
+                        });
+
                         var categoryIndex = _.findIndex(chartData.headers, function(item) {
                             return item.name !== "dx" && item.name !== "pe" && item.name !== "value";
                         });
@@ -221,6 +215,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     return {
                         "title": chart.title,
                         "dataSetCode": chart.dataSetCode,
+                        "displayPosition": chart.displayPosition,
                         "type": chart.type,
                         "data": transformedChartData
                     };
@@ -251,9 +246,12 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
 
             var loadDatasetsForModules = function(orgUnits) {
                 return datasetRepository.findAllForOrgUnits(_.pluck(orgUnits, "id")).then(function(dataSets) {
-                    $scope.datasets = _.filter(dataSets, function(ds) {
+                    var filteredDataSets = _.filter(dataSets, function(ds) {
                         return !(ds.isOriginDataset || ds.isPopulationDataset || ds.isReferralDataset);
                     });
+                    
+                    var translatedDataSets = translationsService.translate(filteredDataSets);
+                    $scope.datasets = translatedDataSets;
                 });
             };
 
@@ -287,25 +285,27 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             });
         };
 
-        var getDataForTableForOrgUnit = function(table, orgunit) {
-            return pivotTableRepository.getDataForPivotTable(table.name, orgunit);
-        };
-
         var transformTables = function(tables) {
-            return $q.all(_.map(tables, function(table) {
-                return getDataForTableForOrgUnit(table, $routeParams.orgUnit).then(function(data) {
+            return $q.all(_.map(tables, function(tableDefinition) {
+                return pivotTableRepository.getDataForPivotTable(tableDefinition.name, $routeParams.orgUnit).then(function(data) {
                     return {
-                        'table': table,
-                        'data': data,
-                        'dataSetCode': table.dataSetCode
+                        definition: tableDefinition,
+                        data: data,
+                        dataSetCode: tableDefinition.dataSetCode,
+                        isTableDataAvailable: !!(data && data.rows && data.rows.length > 0)
                     };
                 });
             }));
         };
 
+        var translatePivotTables = function (pivotTables) {
+            return translationsService.translateReports(pivotTables);
+        };
+
         var loadPivotTables = function() {
             return pivotTableRepository.getAll()
                 .then(transformTables)
+                .then(translatePivotTables)
                 .then(function(pivotTables) {
                     $scope.pivotTables = pivotTables;
                 });
@@ -315,27 +315,23 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             _.each($scope.datasets, function(eachDataSet) {
 
                 var filteredCharts = _.filter($scope.chartData, {
-                    "dataSetCode": eachDataSet.code
+                    dataSetCode: eachDataSet.code
                 });
 
                 var filteredPivotTables = _.filter($scope.pivotTables, {
-                    "dataSetCode": eachDataSet.code
+                    dataSetCode: eachDataSet.code
                 });
 
                 eachDataSet.isChartsAvailable = _.any(filteredCharts, function(chart) {
-                    return chart.data && chart.data.length !== 0;
+                    return chart.data && chart.data.length > 0;
                 });
 
                 eachDataSet.isWeeklyPivotTablesAvailable = _.any(filteredPivotTables, function(table) {
-                    if (table.data && table.data.rows)
-                        return table.data.rows.length !== 0 && !$scope.isMonthlyReport(table.table);
-                    return false;
+                    return table.definition.weeklyReport && table.isTableDataAvailable;
                 });
 
                 eachDataSet.isMonthlyPivotTablesAvailable = _.any(filteredPivotTables, function(table) {
-                    if (table.data && table.data.rows)
-                        return table.data.rows.length !== 0 && $scope.isMonthlyReport(table.table);
-                    return false;
+                    return table.definition.monthlyReport && table.isTableDataAvailable;
                 });
 
                 eachDataSet.isReportsAvailable = eachDataSet.isChartsAvailable || eachDataSet.isMonthlyPivotTablesAvailable || eachDataSet.isWeeklyPivotTablesAvailable;
@@ -343,10 +339,6 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
 
             $scope.datasets = _.sortBy($scope.datasets, "name").reverse();
             $scope.datasets = _.sortBy($scope.datasets, "isReportsAvailable").reverse();
-
-            _.each($scope.datasets, function(ds) {
-                ds.displayName = $scope.resourceBundle[ds.id] ? $scope.resourceBundle[ds.id] : ds.name;
-            });
 
             if (!_.isEmpty($scope.datasets))
                 $scope.selectedDataset = $scope.datasets[0];

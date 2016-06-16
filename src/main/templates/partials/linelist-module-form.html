@@ -33,7 +33,23 @@
                     <li class="form-group">
                         <label for="program" class="col-sm-4 col-md-4 control-label required">{{resourceBundle.selectProgramLabel}}</label>
                         <div class="col-sm-6 col-md-6">
-                            <div disable-input="!isNewMode" angucomplete-alt="" name="program" form-name="form" id="ex9" placeholder="{{ resourceBundle.startTypingLabel }}" pause="100" selected-object="onProgramSelect" local-data="allPrograms" search-fields="name" title-field="name" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" initial-value="{{program.name}}" class="ng-isolate-scope">
+                            <div disable-input="!isNewMode"
+                                 angucomplete-alt=""
+                                 name="program"
+                                 form-name="form"
+                                 id="ex9"
+                                 placeholder="{{ resourceBundle.startTypingLabel }}"
+                                 pause="100"
+                                 selected-object="onProgramSelect"
+                                 local-data="allPrograms"
+                                 search-fields="name"
+                                 title-field="name"
+                                 minlength="0"
+                                 input-class="form-control form-control-small"
+                                 match-class="highlight"
+                                 field-required="true"
+                                 initial-value="{{program.name}}"
+                                 class="ng-isolate-scope">
                             </div>
                         </div>
                         <div>
@@ -46,13 +62,19 @@
                                     <div ng-repeat="programStage in enrichedProgram.programStages" ng-if="enrichedProgram !== undefined">
                                         <div ng-repeat="section in programStage.programStageSections">
                                             <div class="collapse-head">
-                                                <h5 ng-click="changeCollapsed(section.id)">{{resourceBundle[section.id] || section.name}}</h5>
+                                                <h5 ng-click="changeCollapsed(section.id)">{{section.name}}</h5>
                                             </div>
                                             <div collapse="getCollapsed(section.id)" class="collapse-body">
                                                 <ul>
                                                     <li ng-repeat="de in section.programStageDataElements">
                                                         <label>
-                                                            <input type="checkbox" ng-disabled="de.compulsory || isDisabled==true" ng-model="de.dataElement.isIncluded">{{resourceBundle[de.dataElement.id] || de.dataElement.formName}}
+                                                            <input type="checkbox" ng-disabled="de.compulsory || isDisabled==true" ng-model="de.dataElement.isIncluded">
+                                                            <a class="changeColor"
+                                                               description-popup
+                                                               dp-title="{{ de.dataElement.formName }}"
+                                                               dp-desc="{{ de.dataElement.description }}">
+                                                            {{de.dataElement.formName}}
+                                                            </a>
                                                         </label>
                                                     </li>
                                                 </ul>

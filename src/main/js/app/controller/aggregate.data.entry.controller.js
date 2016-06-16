@@ -1,6 +1,6 @@
 define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], function(_, dataValuesMapper, orgUnitMapper, moment, properties) {
     return function($scope, $routeParams, $q, $hustle, $anchorScroll, $location, $modal, $rootScope, $window, $timeout,
-        dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository) {
+        dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository) {
 
         var currentPeriod, currentPeriodAndOrgUnit;
         var removeReferral = false;
@@ -174,7 +174,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             return _.last(headers).length;
         };
 
-        var save = function(asDraft) {
+        var save = function(options) {
             var updateDataValuesWithPopulationData = function() {
                 var currentModuleId = $scope.selectedModule.id;
                 var populationDataset = _.find($scope.dataSets, {
@@ -196,42 +196,36 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
 
             updateDataValuesWithPopulationData();
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, currentPeriod, $scope.currentUser.userCredentials.username);
-            var periodsAndOrgUnits = _.map(_.uniq(_.pluck(payload, "orgUnit")), function(orgUnit) {
-                return {
-                    orgUnit: orgUnit,
-                    period: currentPeriod
-                };
-            });
 
             var publishToDhis = function() {
-
-                var deleteApprovals = function() {
-                    return $hustle.publish({
-                        "data": currentPeriodAndOrgUnit,
-                        "type": "deleteApprovals",
-                        "locale": $scope.currentUser.locale,
-                        "desc": $scope.resourceBundle.deleteApprovalsDesc + currentPeriod + ", " + $scope.selectedModule.name
-                    }, "dataValues");
-                };
-
-                var uploadDataValues = function() {
-                    return $hustle.publish({
-                        "data": periodsAndOrgUnits,
-                        "type": "uploadDataValues",
-                        "locale": $scope.currentUser.locale,
-                        "desc": $scope.resourceBundle.uploadDataValuesDesc + currentPeriod + ", " + $scope.selectedModule.name
-                    }, "dataValues");
-                };
-
-                return deleteApprovals()
-                    .then(uploadDataValues);
+                return $hustle.publishOnce({
+                    data: {
+                        moduleId: $scope.selectedModule.id,
+                        period: currentPeriod
+                    },
+                    type: "syncModuleDataBlock",
+                    locale: $scope.locale,
+                    desc: $scope.resourceBundle.syncModuleDataBlockDesc + currentPeriod + ", " + $scope.selectedModule.name
+                }, "dataValues");
             };
 
-            if (asDraft) {
+            var clearFailedToSync = function () {
+                return dataSyncFailureRepository.delete($scope.selectedModule.id, currentPeriod);
+            };
+
+            if(options.saveAsDraft) {
                 return dataRepository.saveAsDraft(payload);
+            } else if(options.autoApprove) {
+                var completedAndApprovedBy = $scope.currentUser.userCredentials.username;
+
+                return dataRepository.save(payload)
+                    .then(_.partial(approvalDataRepository.markAsApproved, currentPeriodAndOrgUnit, completedAndApprovedBy))
+                    .then(clearFailedToSync)
+                    .then(publishToDhis);
             } else {
                 return dataRepository.save(payload)
                     .then(_.partial(approvalDataRepository.clearApprovals, currentPeriodAndOrgUnit))
+                    .then(clearFailedToSync)
                     .then(publishToDhis);
             }
         };
@@ -251,7 +245,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                 scrollToTop();
             };
 
-            save(true).then(successPromise, errorPromise);
+            save({ saveAsDraft: true }).then(successPromise, errorPromise);
         };
 
         $scope.submit = function() {
@@ -274,14 +268,11 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                 "confirmationMessage": $scope.resourceBundle.reapprovalConfirmationMessage
             };
 
-            confirmAndProceed(_.partial(save, false), modalMessages, !($scope.isCompleted || $scope.isApproved))
+            confirmAndProceed(_.partial(save, false), modalMessages, !$scope.moduleDataBlock.approvedAtProjectLevel && !$scope.moduleDataBlock.approvedAtCoordinationLevel)
                 .then(successPromise, errorPromise);
         };
 
         $scope.submitAndApprove = function() {
-
-            var completedAndApprovedBy = $scope.currentUser.userCredentials.username;
-
             var successPromise = function() {
                 $scope.saveSuccess = false;
                 $scope.submitAndApprovalSuccess = true;
@@ -297,40 +288,11 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                 scrollToTop();
             };
 
-            var publishToDhis = function() {
-                var uploadCompletion = function() {
-                    return $hustle.publish({
-                        "data": [currentPeriodAndOrgUnit],
-                        "type": "uploadCompletionData",
-                        "locale": $scope.currentUser.locale,
-                        "desc": $scope.resourceBundle.uploadCompletionDataDesc + currentPeriod + ", " + $scope.selectedModule.name
-                    }, "dataValues");
-                };
-
-                var uploadApproval = function() {
-                    return $hustle.publish({
-                        "data": [currentPeriodAndOrgUnit],
-                        "type": "uploadApprovalData",
-                        "locale": $scope.currentUser.locale,
-                        "desc": $scope.resourceBundle.uploadApprovalDataDesc + currentPeriod + ", " + $scope.selectedModule.name
-                    }, "dataValues");
-                };
-
-                return uploadCompletion()
-                    .then(uploadApproval);
-            };
-
-            var upsertAndPushToDhis = function() {
-                save(false)
-                    .then(_.partial(approvalDataRepository.markAsApproved, currentPeriodAndOrgUnit, completedAndApprovedBy))
-                    .then(publishToDhis);
-            };
-
-            var modalMessages = {
+            var modalMessage = {
                 "confirmationMessage": $scope.resourceBundle.reapprovalConfirmationMessage
             };
 
-            confirmAndProceed(upsertAndPushToDhis, modalMessages, !($scope.isCompleted || $scope.isApproved))
+            confirmAndProceed(_.partial(save, { autoApprove: true }), modalMessage, !($scope.isCompleted || $scope.isApproved))
                 .then(successPromise, errorPromise);
         };
 
@@ -419,24 +381,42 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                                 return dataset;
                             });
                         });
-                        return $q.all(dataSetPromises).then(function(datasets) {
-                            if (removeReferral)
-                                $scope.dataSets = _.filter(datasets, {
-                                    "isReferralDataset": false
-                                });
-                            else
-                                $scope.dataSets = datasets;
-                        });
-                    });
 
-                var loadDataValuesPromise = dataRepository.getDataValues(currentPeriod, $scope.moduleAndOriginOrgUnitIds).then(function(dataValues) {
-                    dataValues = dataValues || [];
-                    var isDraft = !_.some(dataValues, {
-                        "isDraft": true
+                        var translateDatasets = function (dataSets) {
+                            var partitionDatasets = _.partition(dataSets, {
+                                "isReferralDataset": false
+                            });
+
+                            var translatedOtherDatasets = translationsService.translate(partitionDatasets[0]);
+                            var translatedReferralDatasets = translationsService.translateReferralLocations(partitionDatasets[1]);
+                            return translatedOtherDatasets.concat(translatedReferralDatasets);
+                        };
+
+                        var filterDatasets = function (datasets) {
+                            if (removeReferral)
+                                return _.filter(datasets, { "isReferralDataset": false });
+                            return datasets;
+                        };
+
+                        var setTotalsDisplayPreferencesforDataSetSections = function (dataSets) {
+                            _.each(dataSets, function (dataSet) {
+                                _.each(dataSet.sections, function (dataSetSection) {
+                                    dataSetSection.shouldDisplayRowTotals = dataSetSection.categoryOptionComboIds.length > 1;
+                                    dataSetSection.shouldDisplayColumnTotals = (_.filter(dataSetSection.dataElements, {isIncluded: true}).length > 1 && !(dataSetSection.shouldHideTotals));
+                                });
+                            });
+                        };
+                        var setDatasets = function (datasets) {
+                            $scope.dataSets = datasets;
+                            return $scope.dataSets;
+                        };
+
+                        return $q.all(dataSetPromises)
+                            .then(filterDatasets)
+                            .then(translateDatasets)
+                            .then(setDatasets)
+                            .then(setTotalsDisplayPreferencesforDataSetSections);
                     });
-                    $scope.dataValues = dataValuesMapper.mapToView(dataValues);
-                    $scope.isSubmitted = (!_.isEmpty(dataValues) && isDraft);
-                });
 
                 var loadProjectPromise = orgUnitRepository.getParentProject($scope.selectedModule.id).then(function(orgUnit) {
                     $scope.projectIsAutoApproved = _.any(orgUnit.attributeValues, {
@@ -448,19 +428,19 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                     $scope.projectPopulationDetails = extractPopulationDetails(orgUnit.attributeValues);
                 });
 
-                var loadApprovalDataPromise = approvalDataRepository.getApprovalData(currentPeriodAndOrgUnit).then(function(data) {
-                    $scope.isCompleted = !_.isEmpty(data) && data.isComplete;
-                    $scope.isApproved = !_.isEmpty(data) && data.isApproved;
-                });
-
-                var loadSyncStatusForPeriodAndOrgunitPromise = dataRepository.getLocalStatus(currentPeriodAndOrgUnit.period, currentPeriodAndOrgUnit.orgUnit)
-                    .then(function(status) {
-                        $scope.syncError = status == 'FAILED_TO_SYNC';
+                var loadModuleDataBlock = moduleDataBlockFactory.create($scope.selectedModule.id, currentPeriod)
+                    .then(function(moduleDataBlock) {
+                        $scope.moduleDataBlock = moduleDataBlock;
+                        $scope.syncError = moduleDataBlock.failedToSync;
+                        $scope.dataValues = dataValuesMapper.mapToView(moduleDataBlock.dataValues);
+                        $scope.isSubmitted = moduleDataBlock.submitted;
+                        $scope.isCompleted = moduleDataBlock.approvedAtProjectLevel;
+                        $scope.isApproved = moduleDataBlock.approvedAtCoordinationLevel;
                     });
 
                 if ($scope.dataentryForm !== undefined)
                     $scope.dataentryForm.$setPristine();
-                return $q.all([loadDataSetsPromise, loadDataValuesPromise, loadProjectPromise, loadApprovalDataPromise, loadSyncStatusForPeriodAndOrgunitPromise]);
+                return $q.all([loadDataSetsPromise, loadModuleDataBlock, loadProjectPromise]);
 
             }).finally(function() {
                 $scope.loading = false;

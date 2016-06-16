@@ -34,9 +34,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, {}));
             spyOn(patientOriginRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
 
-            scope.currentUser = {
-                "locale": "en"
-            };
+            scope.locale = "en";
 
             scope.resourceBundle = {
                 "uploadPatientOriginDetailsDesc": "create patient origin ",

@@ -1,10 +1,11 @@
-define(["pivotTable", "angularMocks", "utils", "pivotTableController"], function(PivotTable, mocks, utils, PivotTableController) {
+define(["pivotTableDirective", "angularMocks", "utils", "pivotTableController", "translationsService"], function(PivotTable, mocks, utils, PivotTableController, TranslationsService) {
+
     describe("Pivot Table Directive", function() {
-        var pivotTableController, tableData, tableDefinition;
+        var pivotTableController, tableData, tableDefinition, translationsService;
         beforeEach(function() {
             var app = angular.module("cc", []);
             app.directive("pivotTable", PivotTable);
-            app.controller("pivotTableController", ['$scope', PivotTableController]);
+            app.controller("pivotTableController", ['$scope',  '$rootScope', 'translationsService', PivotTableController]);
             module("cc");
             module("templates/pivot-table/pivot.table.html");
 
@@ -153,15 +154,32 @@ define(["pivotTable", "angularMocks", "utils", "pivotTableController"], function
                 ],
                 "width": 4
             };
+            translationsService = new TranslationsService();
+            spyOn(translationsService, "translate").and.returnValue([]);
         });
 
-        it("should transform the data to the correct form", mocks.inject(function($rootScope, $filter) {
+        it("should transform the data to the correct form", mocks.inject(function($rootScope) {
             rootScope = $rootScope;
             scope = $rootScope.$new();
-            filter = $filter;
+            rootScope.resourceBundle = {
+                "January": "January",
+                "February": "February",
+                "March": "March",
+                "April": "April",
+                "May": "May",
+                "June": "June",
+                "July": "July",
+                "August": "August",
+                "September": "September",
+                "October": "October",
+                "November": "November",
+                "December": "December"
+            };
             scope.data = tableData;
             scope.definition = tableDefinition;
-            pivotTableController = PivotTableController(scope, rootScope, filter);
+            translationsService.translate.and.returnValue(scope.definition.categoryDimensions[0].categoryOptions);
+
+            pivotTableController = PivotTableController(scope, rootScope, translationsService);
             scope.$apply();
 
             expect(scope.dataMap).toEqual([{
@@ -229,6 +247,7 @@ define(["pivotTable", "angularMocks", "utils", "pivotTableController"], function
             expect(scope.viewMap).toEqual([{
                 dataElement: 'a0e7d3973e3',
                 dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric',
+                dataElementDescription: '',
                 dataElementIndex: 1,
                 sortKey_201410: 0,
                 sortKey_201411: 0,
@@ -245,6 +264,7 @@ define(["pivotTable", "angularMocks", "utils", "pivotTableController"], function
             }, {
                 dataElement: 'a67aa742313',
                 dataElementName: 'Follow-up Consultations - Consultations - Out Patient Department - Pediatric',
+                dataElementDescription: '',
                 dataElementIndex: 2,
                 sortKey_201410: 0,
                 sortKey_201411: 0,
@@ -261,13 +281,29 @@ define(["pivotTable", "angularMocks", "utils", "pivotTableController"], function
             }]);
         }));
 
-        it("should get the correct value to be displayed", mocks.inject(function($rootScope, $filter) {
+        it("should get the correct value to be displayed", mocks.inject(function($rootScope) {
             rootScope = $rootScope;
             scope = $rootScope.$new();
-            filter = $filter;
+            rootScope.resourceBundle = {
+                "January": "January",
+                "February": "February",
+                "March": "March",
+                "April": "April",
+                "May": "May",
+                "June": "June",
+                "July": "July",
+                "August": "August",
+                "September": "September",
+                "October": "October",
+                "November": "November",
+                "December": "December"
+            };
             scope.data = tableData;
             scope.definition = tableDefinition;
-            pivotTableController = PivotTableController(scope, rootScope, filter);
+
+            translationsService.translate.and.returnValue(scope.definition.categoryDimensions[0].categoryOptions);
+
+            pivotTableController = PivotTableController(scope, rootScope, translationsService);
             scope.$apply();
 
             expect(scope.getValue('abf819dca06', 'a67aa742313', '201507')).toEqual(6433);

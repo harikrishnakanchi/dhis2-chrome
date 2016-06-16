@@ -232,6 +232,9 @@ body {
     }
     .info-error-section {
         padding-top: 15px;
+        .alert {
+            margin-bottom: 0;
+        }
     }
     .template-selection {
         margin: 10px;
@@ -304,6 +307,11 @@ body {
         }
     }
     //data entry
+    .description-popup-icon {
+        max-width: 10px;
+        display: inline !important;
+    }
+
     .dataentrypage {
         &.parent-margin {
             margin-top: -10px;
@@ -407,7 +415,7 @@ body {
             font-size: 20px;
         }
     }
-    .errorHref {
+    .error-label {
         .text-danger;
         .font-bold;
     }
@@ -668,6 +676,10 @@ body {
         margin: 30px auto;
         width: 400px;
     }
+    .login-form .well {
+        padding: 30px 50px;
+    }
+
     //orgunits
     a.disabled-link {
         pointer-events: none;
@@ -966,9 +978,11 @@ input[type="checkbox"].dashboard-form-checkbox {
     margin-bottom: 10px;
 }
 
-.dataentrypage .module-select {
-    margin-top: 0;
-    margin-bottom: 0;
+.module-week-selector {
+    margin: 0px 20px;
+    .module-select {
+        margin: 0;
+    }
 }
 
 .display-print {
@@ -1016,6 +1030,10 @@ input[type="checkbox"].dashboard-form-checkbox {
     margin-bottom: 5px;
 }
 
+.description-popup {
+    display: inline-block;
+}
+
 .m-top-30 {
     margin-top: 30px;
 }
@@ -1046,4 +1064,88 @@ input[type="checkbox"].dashboard-form-checkbox {
             background: #EAEAEA;
         }
     }
+}
+.selectLanguage a
+{
+    padding: 0 10px 0 0;
+}
+.underline
+{
+    text-decoration: underline;
+}
+
+.filter {
+    div {
+        display: inline-block;
+    }
+    input {
+        margin: 5px;
+    }
+}
+
+.rtl {
+    direction: rtl;
+
+    i {
+        margin-left: 10px;
+    }
+
+    .module-select {
+        .form {
+            float: right;
+            li {
+                float: right;
+                label {
+                    margin-left: 10px;
+                    float: right;
+                }
+            }
+        }
+    }
+}
+
+.linelistSummary {
+    .error-data-entry {
+        margin: 20px 0 0 0;
+    }
+    section {
+        padding: 0;
+    }
+    .module-week-selector {
+        margin: 0;
+    }
+}
+
+.popupDialog.rtl {
+    .modal-footer {
+        text-align: left;
+    }
+}
+
+
+.dashboardpage {
+    .select-all-checkbox {
+        margin: 1px 0 0 5px;
+    }
+    &.rtl {
+        .list-unstyled {
+            padding-right: 0;
+        }
+        input[type="checkbox"].dashboard-form-checkbox {
+            margin-right: 0;
+        }
+    }
+}
+
+/* change color of anchor tag while showing description for data elements and indicators */
+.changeColor {
+    color: black;
+    cursor: pointer;
+    :hover {
+        color: #428bca !important;
+    }
+}
+
+.closeLabelToLeft {
+    float: left;
 }

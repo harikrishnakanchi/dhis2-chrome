@@ -1,7 +1,7 @@
 define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
     function(_, orgUnitMapper, moment, systemSettingsTransformer) {
         return function($scope, $hustle, orgUnitRepository, excludedDataElementsRepository, $q, $modal,
-            programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator) {
+            programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService) {
 
             $scope.module = {};
             $scope.isExpanded = {};
@@ -77,7 +77,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
                 var getEnrichedProgram = function(progId) {
                     return programRepository.get(progId, $scope.excludedDataElements).then(function(data) {
-                        $scope.enrichedProgram = data;
+                        var translatedEnrichedProgram = translationsService.translate([data]);
+                        $scope.enrichedProgram = translatedEnrichedProgram[0];
                         resetCollapse();
                     });
                 };
@@ -103,22 +104,27 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     $scope.updateDisabled = $scope.isDisabled;
                 };
 
-                var setPrograms = function(data) {
-                    $scope.allPrograms = _.sortBy(data[0], function(program) {
+                var setPrograms = function(programs) {
+                    $scope.allPrograms = _.sortBy(programs, function(program) {
                         return program.name;
                     });
+                };
 
-                    $scope.allPrograms = _.map($scope.allPrograms, function(program) {
-                        program.name = $scope.resourceBundle[program.id] || program.name;
-                        return program;
-                    });
+                var translatePrograms = function (allPrograms) {
+                    return translationsService.translate(allPrograms[0]);
                 };
 
                 var getPrograms = function() {
                     return $q.all([programRepository.getAll()]);
                 };
 
-                initModule().then(getPrograms).then(setPrograms).then(getAllModules).then(getExcludedDataElements).then(getAssociatedProgram).then(setUpModule);
+                initModule().then(getPrograms)
+                    .then(translatePrograms)
+                    .then(setPrograms)
+                    .then(getAllModules)
+                    .then(getExcludedDataElements)
+                    .then(getAssociatedProgram)
+                    .then(setUpModule);
             };
 
             $scope.changeCollapsed = function(sectionId) {
@@ -137,7 +143,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 return $hustle.publish({
                     "data": data,
                     "type": action,
-                    "locale": $scope.currentUser.locale,
+                    "locale": $scope.locale,
                     "desc": desc
                 }, "dataValues");
             };
@@ -207,6 +213,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
             $scope.save = function(module) {
                 var enrichedModule = {};
+                var populationDatasetId, referralDatasetId;
 
                 var associateToProgram = function(program, originOrgUnits) {
                     return programRepository.associateOrgUnits(program, originOrgUnits).then(function() {
@@ -219,6 +226,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     return datasetRepository.getAll().then(function(allDatasets) {
 
                         var originDatasetIds = _.pluck(_.filter(allDatasets, "isOriginDataset"), "id");
+                        referralDatasetId = _.find(allDatasets, "isReferralDataset").id;
+                        populationDatasetId = _.find(allDatasets, "isPopulationDataset").id;
 
                         var summaryDatasetId = _.find($scope.program.attributeValues, {
                             "attribute": {
@@ -261,11 +270,24 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     });
                 };
 
+                var associateMandatoryDatasetsToModule = function() {
+                    var datasetIds = [populationDatasetId, referralDatasetId];
+                    return datasetRepository.associateOrgUnits(datasetIds, [enrichedModule]).then(function() {
+                        var orgunitIdsAndDatasetIds = {
+                            "orgUnitIds": [enrichedModule.id],
+                            "dataSetIds": datasetIds
+                        };
+                        return publishMessage(orgunitIdsAndDatasetIds, "associateOrgUnitToDataset",
+                            $scope.resourceBundle.associateOrgUnitToDatasetDesc + enrichedModule.displayName);
+                    });
+                };
+
                 $scope.loading = true;
                 return getEnrichedModule($scope.module)
                     .then(createModule)
                     .then(_.partial(saveExcludedDataElements, enrichedModule))
                     .then(createOriginOrgUnitsAndGroups)
+                    .then(associateMandatoryDatasetsToModule)
                     .then(_.partial(onSuccess, enrichedModule), onError)
                     .finally(function() {
                         $scope.loading = false;

@@ -1,0 +1,16 @@
+<div class="{{ layoutDirection.direction }} popupDialog">
+    <div class="modal-header">
+        <button type="button" ng-class="{closeLabelToLeft: layoutDirection.direction == 'rtl'}" class="close" data-dismiss="modal" aria-label="Close" ng-click="ok()"><span aria-hidden="true">&times;</span></button>
+        <h4>{{notificationTitle}}</h4>
+    </div>
+    <div class="modal-body">
+        <div ng-if="!isDataPresent">{{ notificationMessage }}</div>
+        <div ng-if="isDataPresent" ng-repeat="(key, value) in data">
+            <span ng-repeat="names in value">
+                <b ng-show="!$last"> {{ names.title }}, </b>
+                <b ng-show="$last"> {{ names.title }}: </b>
+            </span>
+            {{ key }}
+        </div>
+    </div>
+</div>

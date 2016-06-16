@@ -133,7 +133,8 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
         };
 
         var showNotification = function(message) {
-            $scope.notificationMessages = message;
+            $scope.description = message.notificationMessage;
+            $scope.title = message.notificationTitle;
             var modalInstance = $modal.open({
                 templateUrl: 'templates/notification-dialog.html',
                 controller: 'notificationDialogController',

@@ -1,89 +1,21 @@
-define(["selectLanguageController", "angularMocks", "utils"],
-    function(SelectLanguageController, mocks, utils) {
+define(["selectLanguageController", "angularMocks"],
+    function(SelectLanguageController, mocks) {
         describe("selectLanguageController", function() {
-            var rootScope, selectLanguageController, scope, i18nResourceBundle, getResourceBundleSpy, db, frenchResourceBundle,
-                translationStore;
+            var rootScope, selectLanguageController, translationsService, scope;
 
-            beforeEach(mocks.inject(function($rootScope, $q, $location) {
+            beforeEach(mocks.inject(function($rootScope) {
                 scope = $rootScope.$new();
-                q = $q;
-                rootScope = $rootScope;
-
-                i18nResourceBundle = {
-                    get: function() {}
+                rootScope = {
+                    setLocale: jasmine.createSpy('setLocale')
                 };
 
-                var queryBuilder = function() {
-                    this.$index = function() {
-                        return this;
-                    };
-                    this.$eq = function(v) {
-                        return this;
-                    };
-                    this.compile = function() {
-                        return "blah";
-                    };
-                    return this;
-                };
-                db = {
-                    "objectStore": function() {},
-                    "queryBuilder": queryBuilder
-                };
-
-                var getMockStore = function(data) {
-                    var upsert = function() {};
-                    var find = function() {};
-                    var each = function() {};
-
-                    return {
-                        upsert: upsert,
-                        find: find,
-                        each: each,
-                    };
-                };
-
-                getResourceBundleSpy = spyOn(i18nResourceBundle, "get");
-                getResourceBundleSpy.and.returnValue(utils.getPromise(q, {
-                    "data": {}
-                }));
-
-                translationStore = getMockStore("translations");
-
-                spyOn(translationStore, "each").and.returnValue(utils.getPromise(q, {}));
-                spyOn(db, 'objectStore').and.callFake(function(storeName) {
-                    return translationStore;
-                });
-
-                selectLanguageController = new SelectLanguageController(scope, rootScope, db, i18nResourceBundle);
+                selectLanguageController = new SelectLanguageController(scope, rootScope);
             }));
 
-            it("should change resourceBundle if locale changes", function() {
-                rootScope.currentUser = {
-                    "userCredentials": {
-                        "username": "1"
-                    },
-                    "organisationUnits": [{
-                        "id": "123"
-                    }],
-                    "selectedProject": {
-                        "id": "prj1"
-                    }
-                };
+            it("should call setLocale method of translations service with selected locale", function() {
 
-                frenchResourceBundle = {
-                    "data": {
-                        "login": "french"
-                    }
-                };
-                getResourceBundleSpy.and.returnValue(utils.getPromise(q, frenchResourceBundle));
-
-                scope.changeLanguagePreference("fr");
-                scope.$apply();
-
-                expect(i18nResourceBundle.get).toHaveBeenCalledWith({
-                    "locale": "fr"
-                });
-                expect(rootScope.resourceBundle).toEqual(frenchResourceBundle.data);
+                scope.changeLanguagePreference('fr');
+                expect(rootScope.setLocale).toHaveBeenCalledWith('fr');
             });
         });
     });

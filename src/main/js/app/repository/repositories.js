@@ -1,10 +1,11 @@
 define(["dataRepository", "datasetRepository", "userPreferenceRepository", "orgUnitRepository", "systemSettingRepository", "patientOriginRepository",
         "userRepository", "approvalDataRepository", "programRepository", "programEventRepository", "dataElementRepository", "excludedDataElementsRepository",
-        "orgUnitGroupRepository", "changeLogRepository", "metadataRepository", "orgUnitGroupSetRepository", "optionSetRepository", "chartRepository", "referralLocationsRepository", "pivotTableRepository"
+        "orgUnitGroupRepository", "changeLogRepository", "metadataRepository", "orgUnitGroupSetRepository", "optionSetRepository", "chartRepository", "referralLocationsRepository", "pivotTableRepository",
+        "dataSyncFailureRepository"
     ],
     function(dataRepository, datasetRepository, userPreferenceRepository, orgUnitRepository, systemSettingRepository, patientOriginRepository,
         userRepository, approvalDataRepository, programRepository, programEventRepository, dataElementRepository, excludedDataElementsRepository,
-        orgUnitGroupRepository, changeLogRepository, metadataRepository, orgUnitGroupSetRepository, optionSetRepository, chartRepository, referralLocationsRepository, pivotTableRepository) {
+        orgUnitGroupRepository, changeLogRepository, metadataRepository, orgUnitGroupSetRepository, optionSetRepository, chartRepository, referralLocationsRepository, pivotTableRepository, dataSyncFailureRepository) {
         var init = function(app) {
             app.service('dataRepository', ['$q', '$indexedDB', dataRepository]);
             app.service('approvalDataRepository', ['$indexedDB', '$q', approvalDataRepository]);
@@ -26,6 +27,7 @@ define(["dataRepository", "datasetRepository", "userPreferenceRepository", "orgU
             app.service('referralLocationsRepository', ['$indexedDB', '$q', referralLocationsRepository]);
             app.service('excludedDataElementsRepository', ['$indexedDB', '$q', excludedDataElementsRepository]);
             app.service('pivotTableRepository', ['$indexedDB', '$q', pivotTableRepository]);
+            app.service('dataSyncFailureRepository', ['$indexedDB', dataSyncFailureRepository]);
         };
         return {
             init: init

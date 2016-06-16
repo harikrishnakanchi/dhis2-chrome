@@ -181,6 +181,12 @@ define(["lodash"], function(_) {
                 "id": "HjaBYio5UFK",
                 "code": "mandatory"
             }
+        },{
+            "value": "true",
+            "attribute": {
+                "id": "HjaBYio5SDK",
+                "code": "hideAggregateDataSetSectionTotals"
+            }
         }]
     }, {
         "id": "DE2",

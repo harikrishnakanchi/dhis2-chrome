@@ -1,11 +1,13 @@
-define(["referralLocationsController", "angularMocks", "utils", "lodash", "referralLocationsRepository", "moment", "timecop"],
-    function(ReferralLocationsController, mocks, utils, _, ReferralLocationsRepository, moment, timecop) {
+define(["referralLocationsController", "angularMocks", "utils", "lodash", "referralLocationsRepository", "datasetRepository", "translationsService", "moment", "timecop"],
+    function(ReferralLocationsController, mocks, utils, _, ReferralLocationsRepository, DatasetRepository, TranslationsService, moment, timecop) {
         describe("referral locations controller", function() {
             var scope,
                 referralLocationsController,
                 db,
                 q,
                 referralLocationsRepository,
+                datasetRepository,
+                translationsService,
                 hustle,
                 moment,
                 fakeModal,
@@ -22,9 +24,8 @@ define(["referralLocationsController", "angularMocks", "utils", "lodash", "refer
                         "id": "some_parent_id"
                     }
                 };
-                scope.currentUser = {
-                    "locale": "en"
-                };
+                scope.locale = "en";
+
                 scope.resourceBundle = {
                     "uploadReferralLocationsDesc": "upsert referral Locations for op unit",
                 };
@@ -46,6 +47,59 @@ define(["referralLocationsController", "angularMocks", "utils", "lodash", "refer
                 q = $q;
                 referralLocationsRepository = new ReferralLocationsRepository();
                 spyOn(referralLocationsRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
+
+                var referralDataset = {
+                    sections: [{
+                        id: "a1a2e60f28d"
+                    }]
+                };
+
+                var enrichedReferralDataset = [{
+                    "id": "affb600f0a8",
+                    "name": "Referral Location",
+                    "shortName": "Referral Location",
+                    "code": "ReferralLocation",
+                    "sections": [{
+                        "id": "a1a2e60f28d",
+                        "name": "Referral",
+                        "dataElements": [{
+                            "formName": "MSF Facility 1"
+                        }, {
+                            "formName": "MSF Facility 2"
+                        }, {
+                            "formName": "MSF Facility 3"
+                        }, {
+                            "formName": "MoH Facility 1"
+                        }, {
+                            "formName": "MoH Facility 2"
+                        }, {
+                            "formName": "MoH Facility 3"
+                        }, {
+                            "formName": "Private Facility 1"
+                        }, {
+                            "formName": "Private Facility 2"
+                        }, {
+                            "formName": "Other Facility 1"
+                        }, {
+                            "formName": "Other Facility 2"
+                        }, {
+                            "formName": "Other Facility 3"
+                        }, {
+                            "formName": "Other Facility 4"
+                        }],
+                        "isIncluded": true,
+                        "shouldHideTotals": false
+                    }]
+                }];
+                datasetRepository = new DatasetRepository();
+                spyOn(datasetRepository, "getAll").and.returnValue(utils.getPromise(q, referralDataset));
+                spyOn(datasetRepository, "includeDataElements").and.returnValue(utils.getPromise(q, enrichedReferralDataset));
+
+                translationsService = new TranslationsService();
+                spyOn(translationsService, 'translate').and.callFake(function(args) {
+                    return args;
+                });
+
             }));
 
             afterEach(function() {
@@ -63,14 +117,15 @@ define(["referralLocationsController", "angularMocks", "utils", "lodash", "refer
                 };
                 spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, existingReferralLocations));
 
-                referralLocationsController = new ReferralLocationsController(scope, hustle, fakeModal, referralLocationsRepository);
+                referralLocationsController = new ReferralLocationsController(scope, hustle, fakeModal, referralLocationsRepository, datasetRepository, translationsService);
                 scope.$apply();
 
                 var expectedReferralLocation = {
                     "genericName": "MSF Facility 1",
                     "aliasName": "Some alias",
                     "hasExistingName": true,
-                    "isDisabled": false
+                    "isDisabled": false,
+                    "translatedName": 'MSF Facility 1'
                 };
                 expect(scope.referralLocations[0]).toEqual(expectedReferralLocation);
             });
@@ -105,7 +160,7 @@ define(["referralLocationsController", "angularMocks", "utils", "lodash", "refer
                 };
                 spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, existingReferralLocations));
 
-                referralLocationsController = new ReferralLocationsController(scope, hustle, fakeModal, referralLocationsRepository);
+                referralLocationsController = new ReferralLocationsController(scope, hustle, fakeModal, referralLocationsRepository, datasetRepository, translationsService);
                 scope.$apply();
 
                 expect(scope.hasDuplicateReferralLocations).toBeTruthy();
@@ -114,10 +169,10 @@ define(["referralLocationsController", "angularMocks", "utils", "lodash", "refer
             it("should initialize referral locations when there are no existing referral locations", function() {
                 spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, undefined));
 
-                referralLocationsController = new ReferralLocationsController(scope, hustle, fakeModal, referralLocationsRepository);
+                referralLocationsController = new ReferralLocationsController(scope, hustle, fakeModal, referralLocationsRepository, datasetRepository, translationsService);
                 scope.$apply();
 
-                expect(scope.referralLocations.length).toEqual(9);
+                expect(scope.referralLocations.length).toEqual(12);
                 expect(scope.referralLocations[0].aliasName).toEqual("");
             });
 
@@ -126,24 +181,21 @@ define(["referralLocationsController", "angularMocks", "utils", "lodash", "refer
                 scope.$parent.closeNewForm = jasmine.createSpy();
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
-                referralLocationsController = new ReferralLocationsController(scope, hustle, fakeModal, referralLocationsRepository);
+                referralLocationsController = new ReferralLocationsController(scope, hustle, fakeModal, referralLocationsRepository, datasetRepository, translationsService);
                 scope.$apply();
 
                 scope.referralLocations = [{
                     "genericName": "MSF Facility 1",
                     "aliasName": "Some alias",
-                    "isDisabled": false,
-                    "displayOrder": 0,
+                    "isDisabled": false
                 }, {
                     "genericName": "MSF Facility 2",
                     "aliasName": "",
-                    "isDisabled": false,
-                    "displayOrder": 1
+                    "isDisabled": false
                 }, {
                     "genericName": "MSF Facility 3",
                     "aliasName": "Some other alias",
-                    "isDisabled": true,
-                    "displayOrder": 2
+                    "isDisabled": true
                 }];
 
                 var expectedPayload = {

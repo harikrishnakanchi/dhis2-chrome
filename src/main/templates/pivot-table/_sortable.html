@@ -7,10 +7,10 @@
             ng-click="$parent.$index == 0 && sortByColumn(subHeader)"
             ng-class="{ 'cursorPointer' : $parent.$index == 0 }"
             colspan="{{ maxColumnsHeader.headers.length / header.headers.length}}">
-            <div ng-class="{ 'header-cell-with-weeks' : showWeeks == 'true' }">
+            <div ng-class="{ 'header-cell-with-weeks' : showWeeks }">
                 <span class="name">
                     {{ subHeader.name }}
-                    <p ng-if="$parent.$index == 0 && showWeeks == 'true'" class="small weeks">{{ '[' + subHeader.numberOfISOWeeks + ' weeks]' }}</p>
+                    <p ng-if="$parent.$index == 0 && showWeeks" class="small weeks">[{{ subHeader.numberOfISOWeeks + ' ' + resourceBundle.weeksLabel}}]</p>
                 </span>
                 <span class="icon" ng-class="{ 'text-danger' : selectedSortKey == subHeader.sortKey }" ng-if="$parent.$index == 0">
                     <i class="fa fa-sort-desc" ng-show="definition.sortDescending"></i>
@@ -22,7 +22,15 @@
     </thead>
     <tbody>
     <tr ng-repeat="datum in viewMap | orderBy : orderBySortKeys">
-        <td>{{getDataElementName(data.metaData.names[datum.dataElement])}}</td>
+       <td>
+           <a id="elementId_{{$index}}"
+              class="changeColor"
+              description-popup
+              dp-title="{{getDataElementName(data.metaData.names[datum.dataElement])}}"
+              dp-desc="{{datum.dataElementDescription}}">
+           {{getDataElementName(data.metaData.names[datum.dataElement])}}
+           </a>
+       </td>
         <td ng-class="{ 'info' : selectedSortKey == subHeader.sortKey }" ng-repeat="subHeader in maxColumnsHeader.headers" ng-show="periodBasedValues[subHeader.period] !== undefined">
             <span ng-class="{'font-bold':selectedSortKey==subHeader.sortKey}"> {{getValue(subHeader.category, datum.dataElement, subHeader.period)}}</span>
         </td>

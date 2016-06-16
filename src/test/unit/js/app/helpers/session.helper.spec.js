@@ -45,9 +45,9 @@ define(["sessionHelper", "angularMocks", "utils", "userPreferenceRepository", "o
             });
 
             it("should logout user, save user preferences and invalidate session", function() {
+                rootScope.locale = "en";
                 rootScope.currentUser = {
                     "userCredentials": user.userCredentials,
-                    "locale": "en",
                     "orgunits": [],
                     "selectedProject": undefined
                 };
@@ -64,7 +64,6 @@ define(["sessionHelper", "angularMocks", "utils", "userPreferenceRepository", "o
             it("should login user and load session with default locale 'en' if user is logging in for first time", function() {
                 var expectedUser = {
                     "userCredentials": user.userCredentials,
-                    "locale": "en",
                     "organisationUnits": [],
                     "selectedProject": undefined
                 };
@@ -91,7 +90,6 @@ define(["sessionHelper", "angularMocks", "utils", "userPreferenceRepository", "o
 
                 var expectedUser = {
                     "userCredentials": user.userCredentials,
-                    "locale": "en",
                     "organisationUnits": projects,
                     "selectedProject": projects[0]
                 };
@@ -115,7 +113,6 @@ define(["sessionHelper", "angularMocks", "utils", "userPreferenceRepository", "o
 
                 var expectedUser = {
                     "userCredentials": user.userCredentials,
-                    "locale": "en",
                     "organisationUnits": user.organisationUnits,
                     "selectedProject": user.organisationUnits[0]
                 };
@@ -148,7 +145,6 @@ define(["sessionHelper", "angularMocks", "utils", "userPreferenceRepository", "o
 
                 var expectedUser = {
                     "userCredentials": user.userCredentials,
-                    "locale": "en",
                     "organisationUnits": preferences.organisationUnits,
                     "selectedProject": orgUnit
                 };
@@ -165,14 +161,13 @@ define(["sessionHelper", "angularMocks", "utils", "userPreferenceRepository", "o
 
             it("should save session state", function() {
                 rootScope.currentUser = user;
-                rootScope.currentUser.locale = "en";
+                rootScope.locale = "en";
                 rootScope.$apply();
 
                 sessionHelper.saveSessionState();
 
                 var expectedState = {
                     "username": "coordination@approver.level",
-                    "locale": "en",
                     "organisationUnits": [{
                         "id": 123,
                         "name": "Some Country"

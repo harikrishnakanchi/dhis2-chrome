@@ -1,5 +1,5 @@
 define(["properties", "chromeUtils", "moment", "lodash"], function(properties, chromeUtils, moment, _) {
-    return function($log, ngI18nResourceBundle, dataRepository) {
+    return function($log, ngI18nResourceBundle, dataRepository, dataSyncFailureRepository) {
         var getResourceBundle = function(locale) {
             return ngI18nResourceBundle.get({
                 "locale": locale
@@ -68,8 +68,16 @@ define(["properties", "chromeUtils", "moment", "lodash"], function(properties, c
                 }
 
                 $log.warn("Buried job", job);
+                //CAN BE REMOVED AFTER V6.0 HAS BEEN RELEASED
                 if(job.data.type == 'uploadDataValues') {
                     dataRepository.setLocalStatus(job.data.data, "FAILED_TO_SYNC");
+                }
+                if(job.data.type == 'syncModuleDataBlock') {
+                    var jobParameters = job.data.data;
+
+                    dataSyncFailureRepository.add(jobParameters.moduleId, jobParameters.period).then(function (){
+                        $log.warn("Flagged that sync failed for: ", [jobParameters.moduleId, jobParameters.period]);
+                    });
                 }
                 return false;
             },

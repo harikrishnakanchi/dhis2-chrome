@@ -1,5 +1,5 @@
 define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, moment, dhisId, dateUtils, properties) {
-    return function($scope, $rootScope, $routeParams, $location, $anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository) {
+    return function($scope, $rootScope, $routeParams, $location, $anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService) {
 
         var resetForm = function() {
             $scope.form = $scope.form || {};
@@ -99,6 +99,10 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
 
         $scope.setCurrentDate = function(dataElementId) {
             $scope.dataValues[dataElementId] = moment().set('millisecond', 0).set('second', 0).toDate();
+        };
+
+        $scope.isReferralLocationOptionSet = function(optionSet) {
+          return _.endsWith(optionSet.code, '_referralLocations');
         };
 
         $scope.loadEventsView = function() {
@@ -214,7 +218,8 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                                     });
                                 });
                             });
-                            $scope.program = program;
+                            var translatedProgram = translationsService.translate([program]);
+                            $scope.program = translatedProgram[0];
                         });
                     });
                 };
@@ -229,8 +234,9 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
 
             var loadOptionSets = function() {
                 var isNewCase = $routeParams.eventId ? false : true;
-                return optionSetRepository.getOptionSetMapping($scope.resourceBundle, $scope.opUnitId, isNewCase).then(function(data) {
-                    $scope.optionSetMapping = data.optionSetMap;
+                return optionSetRepository.getOptionSetMapping($scope.opUnitId, isNewCase).then(function(data) {
+                    var translatedOptionSetMap = translationsService.translateOptionSetMap(data.optionSetMap);
+                    $scope.optionSetMapping = translatedOptionSetMap;
                 });
             };
 

@@ -292,6 +292,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 "id": "Sec1",
                 "name": "Section 1",
                 "sortOrder": 0,
+                "shouldHideTotals" : true,
                 "isIncluded": true,
                 "dataElements": [{
                     "id": "DE1",
@@ -300,6 +301,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                     "subSection": "Default",
                     "isIncluded": true,
                     "formName": "DE1",
+                    "shouldHideTotals" : true,
                     "isMandatory": true,
                     "description": "some desc1",
                     "categoryCombo": {
@@ -314,6 +316,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                     "subSection": "Default",
                     "formName": "DE2",
                     "isMandatory": false,
+                    "shouldHideTotals" : false,
                     "description": "some desc2",
                     "categoryCombo": {
                         "id": "CC2",
@@ -326,6 +329,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                     "isIncluded": true,
                     "subSection": "Default",
                     "isMandatory": false,
+                    "shouldHideTotals" : false,
                     "formName": "DE4",
                     "categoryCombo": {
                         "id": "CC2",
@@ -337,12 +341,14 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 "name": "Section 2",
                 "sortOrder": 1,
                 "isIncluded": true,
+                "shouldHideTotals" : true,
                 "dataElements": [{
                     "id": "DE1",
                     "code": "DE1_code",
                     "name": "DE1 - ITFC",
                     "subSection": "Default",
                     "isIncluded": true,
+                    "shouldHideTotals" : true,
                     "isMandatory": true,
                     "formName": "DE1",
                     "description": "some desc1",
@@ -358,12 +364,14 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 "name": "Section 3",
                 "sortOrder": 0,
                 "isIncluded": false,
+                "shouldHideTotals" : false,
                 "dataElements": [{
                     "id": "DE3",
                     "code": "DE3_code",
                     "subSection": "Default",
                     "isMandatory": false,
                     "name": "DE3 - ITFC",
+                    "shouldHideTotals" : false,
                     "isIncluded": false,
                     "formName": "DE3",
                     "description": "some desc3",

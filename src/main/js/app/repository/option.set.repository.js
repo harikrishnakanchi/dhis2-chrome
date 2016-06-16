@@ -6,7 +6,7 @@ define(['lodash'], function(_) {
             return store.getAll();
         };
 
-        this.getOptionSetMapping = function(resourceBundle, moduleId, rejectDisabled) {
+        this.getOptionSetMapping = function(moduleId, rejectDisabled) {
             var referralLocations;
 
             var buildMapForReferralOptionSet = function(optionSet, optionMapping, optionSetMapping, options) {
@@ -42,8 +42,7 @@ define(['lodash'], function(_) {
                         } else {
                             options = _.compact(optionSet.options);
                             _.each(options, function(o) {
-                                o.displayName = resourceBundle[o.id] || o.name;
-                                optionMapping[o.id] = o.displayName;
+                                optionMapping[o.id] = o.name;
                             });
                             optionSetMapping[optionSet.id] = _.sortBy(options, 'name');
                         }

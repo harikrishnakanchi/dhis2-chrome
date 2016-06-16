@@ -1,10 +1,9 @@
-/*global Date:true*/
-define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "excludedDataElementsRepository", "datasetRepository", "programRepository", "referralLocationsRepository"],
-    function(AggregateDataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, ExcludedDataElementsRepository, DatasetRepository, ProgramRepository, ReferralLocationsRepository) {
+define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "excludedDataElementsRepository", "datasetRepository", "programRepository", "referralLocationsRepository", "translationsService", "moduleDataBlockFactory", "dataSyncFailureRepository"],
+    function(AggregateDataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, ExcludedDataElementsRepository, DatasetRepository, ProgramRepository, ReferralLocationsRepository, TranslationsService, ModuleDataBlockFactory, DataSyncFailureRepository) {
         describe("aggregateDataEntryController ", function() {
-            var scope, routeParams, db, q, location, anchorScroll, aggregateDataEntryController, rootScope,
-                saveSuccessPromise, saveErrorPromise, dataEntryFormMock, parentProject, getDataValuesSpy,
-                orgUnits, window, getOrgUnitSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository, excludedDataElementsRepository, origin1, origin2;
+            var scope, routeParams, q, location, anchorScroll, aggregateDataEntryController, rootScope, parentProject, fakeModal,
+                window, hustle, timeout, origin1, origin2, mockModuleDataBlock, selectedPeriod,
+                dataRepository, approvalDataRepository, programRepository, orgUnitRepository, datasetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $anchorScroll, $location, $window, $timeout) {
@@ -16,17 +15,17 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 anchorScroll = $anchorScroll;
                 rootScope = $rootScope;
                 routeParams = {};
+                scope = $rootScope.$new();
 
                 Timecop.install();
                 Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
-
-                scope = $rootScope.$new();
 
                 scope.year = 2014;
                 scope.week = {
                     "weekNumber": 14,
                     "weekYear": 2014
                 };
+                selectedPeriod = '2014W14';
                 scope.selectedModule = {
                     'id': 'mod1',
                     'name': 'Mod1',
@@ -58,19 +57,15 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     }
                 };
 
-                scope.resourceBundle = {
-                    "dataApprovalConfirmationMessage": ""
-                };
-
+                rootScope.locale = "en";
                 rootScope.currentUser = {
                     "firstName": "test1",
                     "lastName": "test1last",
-                    "locale": "en",
                     "userCredentials": {
                         "username": "dataentryuser",
                         "userRoles": [{
                             "id": "hxNB8lleCsl",
-                            "name": 'Superuser'
+                            "name": 'Projectadmin'
                         }, {
                             "id": "hxNB8lleCsl",
                             "name": 'blah'
@@ -89,39 +84,22 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 };
 
                 scope.resourceBundle = {
-                    "uploadDataValuesDesc": "upload data for ",
-                    "uploadApprovalDataDesc": "approve data at coordination level for ",
-                    "uploadCompletionDataDesc": "approve data at project level for ",
-                    "deleteApprovalsDesc": "restart approval process for "
+                    "syncModuleDataBlockDesc": "some description"
                 };
 
-                fakeModal = {
-                    close: function() {
-                        this.result.confirmCallBack();
-                    },
-                    dismiss: function(type) {
-                        this.result.cancelCallback(type);
-                    },
-                    open: function(object) {}
-                };
-
-                saveSuccessPromise = utils.getPromise(q, {
-                    "ok": "ok"
+                fakeModal = { open: function() {} };
+                spyOn(fakeModal, "open").and.returnValue({
+                    result: utils.getPromise(q, {})
                 });
 
-                saveErrorPromise = utils.getRejectedPromise(q, {
-                    "ok": "ok"
-                });
+                scope.dataentryForm = { $setPristine: function() {} };
+                spyOn(scope.dataentryForm, '$setPristine');
 
-                scope.dataentryForm = {
-                    $setPristine: function() {}
-                };
 
                 spyOn(location, "hash");
 
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, "getParentProject").and.returnValue(utils.getPromise(q, parentProject));
-                spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
                 spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, [origin1, origin2]));
 
                 programRepository = new ProgramRepository();
@@ -131,15 +109,14 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 spyOn(excludedDataElementsRepository, "get").and.returnValue(utils.getPromise(q, {}));
 
                 approvalDataRepository = new ApprovalDataRepository();
-                spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, {}));
                 spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, {}));
+                spyOn(approvalDataRepository, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
 
                 dataRepository = new DataRepository();
-                getDataValuesSpy = spyOn(dataRepository, "getDataValues");
-                spyOn(dataRepository, "getLocalStatus").and.returnValue(utils.getPromise(q, 'FAILED_TO_SYNC'));
-                getDataValuesSpy.and.returnValue(utils.getPromise(q, undefined));
+                spyOn(dataRepository, "save").and.returnValue(utils.getPromise(q, {}));
+                spyOn(dataRepository, "saveAsDraft").and.returnValue(utils.getPromise(q, {}));
 
-                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+                spyOn(hustle, "publishOnce").and.returnValue(utils.getPromise(q, {}));
 
                 datasetRepository = new DatasetRepository();
                 spyOn(datasetRepository, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
@@ -149,7 +126,22 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 referralLocationsRepository = new ReferralLocationsRepository();
                 spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, []));
 
-                aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, anchorScroll, location, fakeModal, rootScope, window, timeout, dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository);
+                translationsService = new TranslationsService();
+                spyOn(translationsService, "translate").and.returnValue([]);
+                spyOn(translationsService, "translateReferralLocations").and.returnValue([]);
+
+                mockModuleDataBlock = {
+                    approvedAtProjectLevel: false,
+                    approvedAtCoordinationLevel: false
+                };
+                scope.moduleDataBlock = mockModuleDataBlock;
+                moduleDataBlockFactory = new ModuleDataBlockFactory();
+                spyOn(moduleDataBlockFactory, "create").and.returnValue(utils.getPromise(q, mockModuleDataBlock));
+
+                dataSyncFailureRepository = new DataSyncFailureRepository();
+                spyOn(dataSyncFailureRepository, "delete").and.returnValue(utils.getPromise(q, undefined));
+
+                aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, anchorScroll, location, fakeModal, rootScope, window, timeout, dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository);
 
                 scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
             }));
@@ -180,7 +172,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it("should return the sum of valid values ", function() {
-
                 scope.$apply();
                 var list = {
                     "option1": {
@@ -201,7 +192,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it("should return true if number of origins are greater than 1 ", function() {
-
                 scope.$apply();
                 scope.moduleAndOriginOrgUnitIds = ["a3439134495", "a469d3ba630", "aff112d79b4"];
                 var dataSet = {id: "a339b7fa9eb",
@@ -253,7 +243,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 };
                 expect(scope.sum(list, "de1", ['option1', 'option3', 'option4'])).toBe(8);
             });
-
 
             it("should return the sum of the same option for all data elements in a section ", function() {
                 scope.$apply();
@@ -433,41 +422,18 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it("should submit data values to indexeddb and dhis", function() {
-                spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
-                spyOn(scope.dataentryForm, '$setPristine');
-
-                scope.dataValues = {
-                    "mod1": {
-                        "dataElement1": {
-                            "catCombo1": {
-                                "value": "1+9"
-                            }
-                        }
-                    },
-                    "origin1": {
-                        "dataElement2": {
-                            "catCombo2": {
-                                "value": "67"
-                            }
-                        }
-                    }
-                };
-
                 scope.submit();
                 scope.$apply();
 
                 expect(dataRepository.save).toHaveBeenCalled();
-                expect(hustle.publish).toHaveBeenCalledWith({
-                    data: [{
-                        orgUnit: "mod1",
-                        period: "2014W14"
-                    }, {
-                        orgUnit: "origin1",
-                        period: "2014W14"
-                    }],
-                    type: 'uploadDataValues',
+                expect(hustle.publishOnce).toHaveBeenCalledWith({
+                    data: {
+                        moduleId: scope.selectedModule.id,
+                        period: selectedPeriod
+                    },
+                    type: 'syncModuleDataBlock',
                     locale: 'en',
-                    desc: 'upload data for 2014W14, Mod1'
+                    desc: scope.resourceBundle.syncModuleDataBlockDesc + selectedPeriod + ', ' + scope.selectedModule.name
                 }, 'dataValues');
 
                 expect(scope.submitSuccess).toBe(true);
@@ -477,64 +443,12 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(scope.dataentryForm.$setPristine).toHaveBeenCalled();
             });
 
-            it("should not include orgUnits which doesn't have any dataValues in hustle message", function() {
-                spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
-                spyOn(scope.dataentryForm, '$setPristine');
-
-                scope.dataValues = {
-                    "mod1": {
-                        "dataElement1": {
-                            "catCombo1": {
-                                "value": "10",
-                                "formula": "1+9"
-                            }
-                        }
-                    },
-                    "origin1": {
-                        "dataElement2": {
-                            "catCombo2": {
-                                "value": "67",
-                                "formula": "67"
-                            }
-                        }
-                    },
-                    "origin2": {
-                        "dataElement2": {
-                            "catCombo2": {
-                                "value": "",
-                                "formula": ""
-                            }
-                        }
-                    }
-                };
-
-                scope.submit();
-                scope.$apply();
-
-                expect(hustle.publish).toHaveBeenCalledWith({
-                    data: [{
-                        orgUnit: "mod1",
-                        period: "2014W14"
-                    }, {
-                        orgUnit: "origin1",
-                        period: "2014W14"
-                    }],
-                    type: 'uploadDataValues',
-                    locale: 'en',
-                    desc: 'upload data for 2014W14, Mod1'
-                }, 'dataValues');
-            });
-
             it("should save data values as draft to indexeddb", function() {
-
-                spyOn(dataRepository, "saveAsDraft").and.returnValue(saveSuccessPromise);
-                spyOn(scope.dataentryForm, '$setPristine');
-
                 scope.saveAsDraft();
                 scope.$apply();
 
                 expect(dataRepository.saveAsDraft).toHaveBeenCalled();
-                expect(hustle.publish).not.toHaveBeenCalled();
+                expect(hustle.publishOnce).not.toHaveBeenCalled();
                 expect(scope.submitSuccess).toBe(false);
                 expect(scope.saveSuccess).toBe(true);
                 expect(scope.submitError).toBe(false);
@@ -542,15 +456,19 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(scope.dataentryForm.$setPristine).toHaveBeenCalled();
             });
 
-            it("should warn the user when data will have to be reapproved", function() {
-                approvalDataRepository.getApprovalData.and.returnValue(utils.getPromise(q, {
-                    "isComplete": "true",
-                    "isApproved": "true"
-                }));
+            it("should create module data block for current module and period", function() {
+                moduleDataBlockFactory.create.and.returnValue(utils.getPromise(q, 'someMockModuleDataBlock'));
+                scope.$apply();
 
-                spyOn(fakeModal, "open").and.returnValue({
-                    result: utils.getPromise(q, {})
-                });
+                expect(moduleDataBlockFactory.create).toHaveBeenCalledWith(scope.selectedModule.id, selectedPeriod);
+                expect(scope.moduleDataBlock).toBe('someMockModuleDataBlock');
+            });
+
+            it("should warn the user when data will have to be reapproved", function() {
+                moduleDataBlockFactory.create.and.returnValue(utils.getPromise(q, {
+                    approvedAtProjectLevel: true,
+                    approvedAtCoordinationLevel: true
+                }));
 
                 scope.$apply();
                 scope.submit();
@@ -559,14 +477,13 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it("should let the user know of failures when saving the data to indexedDB ", function() {
-
-                spyOn(dataRepository, "save").and.returnValue(saveErrorPromise);
+                dataRepository.save.and.returnValue(utils.getRejectedPromise(q, {}));
 
                 scope.submit();
                 scope.$apply();
 
                 expect(dataRepository.save).toHaveBeenCalled();
-                expect(hustle.publish).not.toHaveBeenCalled();
+                expect(hustle.publishOnce).not.toHaveBeenCalled();
                 expect(scope.submitSuccess).toBe(false);
                 expect(scope.saveSuccess).toBe(false);
                 expect(scope.submitError).toBe(true);
@@ -574,18 +491,12 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it("should set syncError to true when selected orgUnit and period data failed to sync to DHIS", function() {
+                moduleDataBlockFactory.create.and.returnValue(utils.getPromise(q, {
+                    failedToSync: true
+                }));
+
                 scope.$apply();
                 expect(scope.syncError).toBe(true);
-            });
-
-            it("should set syncError to false when user resubmits the data for approval", function() {
-                dataRepository.getLocalStatus.and.returnValue(utils.getPromise(q, 'WAITING_TO_SYNC'));
-                spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
-
-                scope.submit();
-                scope.$apply();
-
-                expect(scope.syncError).toBeFalsy();
             });
 
             it("should fetch max length to calculate col span for category options", function() {
@@ -641,36 +552,34 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it("should fetch empty data if no data exists for the given period", function() {
-                scope.year = 2014;
-                scope.week = {
-                    "weekNumber": 14,
-                    "weekYear": 2014
-                };
+                moduleDataBlockFactory.create.and.returnValue(utils.getPromise(q, {
+                    dataValues: []
+                }));
+
                 scope.$apply();
 
-                expect(dataRepository.getDataValues).toHaveBeenCalledWith('2014W14', ['mod1', 'origin1', 'origin2']);
                 expect(scope.dataValues).toEqual({});
             });
 
             it("should display data for the given period", function() {
-
-                getDataValuesSpy.and.returnValue(utils.getPromise(q, [{
-                    "dataElement": "DE_Oedema",
-                    "categoryOptionCombo": "32",
-                    "value": "3",
-                    "dataset": "abbc",
-                    "orgUnit": "mod1"
-                }, {
-                    "dataElement": "DE_Oedema",
-                    "categoryOptionCombo": "33",
-                    "value": "12",
-                    "dataset": "abbc",
-                    "orgUnit": "mod1"
-                }]));
+                moduleDataBlockFactory.create.and.returnValue(utils.getPromise(q, {
+                    dataValues: [{
+                        "dataElement": "DE_Oedema",
+                        "categoryOptionCombo": "32",
+                        "value": "3",
+                        "dataset": "abbc",
+                        "orgUnit": "mod1"
+                    }, {
+                        "dataElement": "DE_Oedema",
+                        "categoryOptionCombo": "33",
+                        "value": "12",
+                        "dataset": "abbc",
+                        "orgUnit": "mod1"
+                    }]
+                }));
 
                 scope.$apply();
 
-                expect(dataRepository.getDataValues).toHaveBeenCalledWith("2014W14", ["mod1", "origin1", "origin2"]);
                 expect(scope.dataValues).toEqual({
                     "mod1": {
                         "DE_Oedema": {
@@ -690,7 +599,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it("should display the correct submit option for auto approved projects", function() {
-
                 orgUnitRepository.getParentProject.and.returnValue(utils.getPromise(q, {
                     "id": "proj1",
                     "attributeValues": [{
@@ -708,17 +616,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                         'value': 'Project'
                     }]
                 }));
-
-                scope.week = {
-                    "weekNumber": 14,
-                    "weekYear": 2014
-                };
-                scope.currentModule = {
-                    'id': 'mod1',
-                    parent: {
-                        id: 'parent'
-                    }
-                };
 
                 scope.$apply();
 
@@ -755,17 +652,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                         'value': '30'
                     }]
                 }));
-
-                scope.week = {
-                    "weekNumber": 14,
-                    "weekYear": 2014
-                };
-                scope.currentModule = {
-                    'id': 'mod1',
-                    parent: {
-                        id: 'parent'
-                    }
-                };
 
                 scope.$apply();
 
@@ -846,117 +732,42 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(window.print).toHaveBeenCalled();
             });
 
-            it("should show not-ready-for-approval message if no data has been saved or submitted", function() {
-                scope.$apply();
-
-                expect(scope.isSubmitted).toBe(false);
-            });
-
-            it("should show not-ready-for-approval message if data has been saved as draft", function() {
-                getDataValuesSpy.and.returnValue(utils.getPromise(q, [{
-                    "dataElement": "b9634a78271",
-                    "period": "2014W14",
-                    "orgUnit": "mod2",
-                    "categoryOptionCombo": "h48rgCOjDTg",
-                    "value": "12",
-                    "isDraft": true,
-                    "storedBy": "service.account",
-                    "followUp": false
-                }, {
-                    "dataElement": "b9634a78271",
-                    "period": "2014W14",
-                    "orgUnit": "mod2",
-                    "categoryOptionCombo": "h48rgCOjDTg",
-                    "value": "13",
-                    "isDraft": true,
-                    "storedBy": "service.account",
-                    "followUp": false
-                }]));
+            it("should set submitted flag based on state of module data block", function() {
+                moduleDataBlockFactory.create.and.returnValue(utils.getPromise(q, {
+                    submitted: false
+                }));
 
                 scope.$apply();
 
                 expect(scope.isSubmitted).toBe(false);
-            });
-
-            it("should show ready-for-approval message if data has already been submitted for approval", function() {
-                getDataValuesSpy.and.returnValue(utils.getPromise(q, [{
-                    "dataElement": "b9634a78271",
-                    "period": "2014W14",
-                    "orgUnit": "mod2",
-                    "categoryOptionCombo": "h48rgCOjDTg",
-                    "value": "12",
-                    "storedBy": "service.account",
-                    "followUp": false
-                }, {
-                    "dataElement": "b9634a78271",
-                    "period": "2014W14",
-                    "orgUnit": "mod2",
-                    "categoryOptionCombo": "h48rgCOjDTg",
-                    "value": "13",
-                    "storedBy": "service.account",
-                    "followUp": false
-                }]));
-
-                scope.$apply();
-
-                expect(scope.isSubmitted).toBe(true);
             });
 
             it("should submit data for auto approval", function() {
-                approvalDataRepository.getApprovalData.and.callFake(function() {
-                    return utils.getPromise(q, undefined);
-                });
-
-                spyOn(fakeModal, "open").and.returnValue({
-                    result: utils.getPromise(q, {})
-                });
-
-                spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
-
                 var periodAndOrgUnit = {
-                    "period": '2014W14',
-                    "orgUnit": 'mod1',
-                };
-
-                var approvedAndCompletedBy = "dataentryuser";
-
-                spyOn(approvalDataRepository, "markAsApproved").and.callFake(function() {
-                    return utils.getPromise(q, {
-                        "blah": "moreBlah"
-                    });
-                });
-
-                scope.currentModule = {
-                    id: 'mod1',
-                    name: "Mod1",
-                    parent: {
-                        id: 'parent'
-                    }
+                    period: selectedPeriod,
+                    orgUnit: scope.selectedModule.id
                 };
                 scope.$apply();
 
                 scope.submitAndApprove();
                 scope.$apply();
 
-                expect(approvalDataRepository.markAsApproved.calls.argsFor(0)[0]).toEqual(periodAndOrgUnit);
-                expect(hustle.publish).toHaveBeenCalledWith({
-                    "data": [periodAndOrgUnit],
-                    "type": "uploadCompletionData",
-                    "locale": "en",
-                    "desc": "approve data at project level for 2014W14, Mod1"
-                }, "dataValues");
-                expect(hustle.publish).toHaveBeenCalledWith({
-                    "data": [periodAndOrgUnit],
-                    "type": "uploadApprovalData",
-                    "locale": "en",
-                    "desc": "approve data at coordination level for 2014W14, Mod1"
-                }, "dataValues");
-                expect(scope.submitAndApprovalSuccess).toBe(true);
+                expect(approvalDataRepository.markAsApproved).toHaveBeenCalledWith(periodAndOrgUnit, rootScope.currentUser.userCredentials.username, {});
+                expect(hustle.publishOnce).toHaveBeenCalledTimes(1);
+                expect(hustle.publishOnce).toHaveBeenCalledWith({
+                    data: {
+                        moduleId: periodAndOrgUnit.orgUnit,
+                        period: periodAndOrgUnit.period
+                    },
+                    type: 'syncModuleDataBlock',
+                    locale: 'en',
+                    desc: scope.resourceBundle.syncModuleDataBlockDesc + selectedPeriod + ', ' + scope.selectedModule.name
+                }, 'dataValues');
             });
 
-            it("should show a message if data is already complete", function() {
-                approvalDataRepository.getApprovalData.and.returnValue(utils.getPromise(q, {
-                    "isComplete": true
+            it("should set isCompleted flag based on whether moduleDataBlock is approved at project level", function() {
+                moduleDataBlockFactory.create.and.returnValue(utils.getPromise(q, {
+                    approvedAtProjectLevel: true
                 }));
 
                 scope.$apply();
@@ -964,37 +775,14 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(scope.isCompleted).toBeTruthy();
             });
 
-            it("should show a message if data is already approved", function() {
-                approvalDataRepository.getApprovalData.and.returnValue(utils.getPromise(q, {
-                    "isComplete": true,
-                    'isApproved': true
+            it("should set isApproved flag based on whether moduleDataBlock is approved at coordination level", function() {
+                moduleDataBlockFactory.create.and.returnValue(utils.getPromise(q, {
+                    approvedAtCoordinationLevel: true
                 }));
 
                 scope.$apply();
 
                 expect(scope.isApproved).toBeTruthy();
-            });
-
-            it("should delete approvals if data is edited", function() {
-                spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
-                scope.$apply();
-
-                scope.submit();
-                scope.$apply();
-
-                var periodAndOrgUnit = {
-                    "period": "2014W14",
-                    "orgUnit": "mod1"
-                };
-
-                expect(dataRepository.save).toHaveBeenCalled();
-                expect(approvalDataRepository.clearApprovals.calls.argsFor(0)[0]).toEqual(periodAndOrgUnit);
-                expect(hustle.publish).toHaveBeenCalledWith({
-                    "data": periodAndOrgUnit,
-                    "type": "deleteApprovals",
-                    "locale": "en",
-                    "desc": "restart approval process for 2014W14, Mod1"
-                }, "dataValues");
             });
         });
     });

@@ -179,6 +179,10 @@ define([], function () {
                     if(rows[0]) {
                         rows[0].querySelector('th').style.width = table.querySelectorAll('thead tr th')[0].getBoundingClientRect().width + 'px';
                     }
+
+                    angular.element(freezedColumnTableEl).bind('click', function (event) {
+                        return event.target.id && angular.element(originalTable.querySelector('#'+ event.target.id)).triggerHandler('click');
+                    });
                     return freezedColumnTableEl;
                 }
 

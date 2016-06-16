@@ -1,6 +1,6 @@
-define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUnitMapper", "timecop", "orgUnitGroupHelper", "properties", "approvalDataRepository", "orgUnitGroupSetRepository"], function(ProjectController, mocks, utils, _, moment, orgUnitMapper, timecop, OrgUnitGroupHelper, properties, ApprovalDataRepository, OrgUnitGroupSetRepository) {
+define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUnitMapper", "timecop", "orgUnitGroupHelper", "properties", "approvalDataRepository", "orgUnitGroupSetRepository", "translationsService"], function(ProjectController, mocks, utils, _, moment, orgUnitMapper, timecop, OrgUnitGroupHelper, properties, ApprovalDataRepository, OrgUnitGroupSetRepository, TranslationsService) {
     describe("project controller tests", function() {
-        var scope, q, userRepository, parent, fakeModal, orgUnitRepo, hustle, rootScope, approvalDataRepository, orgUnitGroupSetRepository, orgUnitGroupSets;
+        var scope, q, userRepository, parent, fakeModal, orgUnitRepo, hustle, rootScope, approvalDataRepository, orgUnitGroupSetRepository, orgUnitGroupSets, translationsService;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle) {
@@ -17,6 +17,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             approvalDataRepository = new ApprovalDataRepository();
             orgUnitGroupSetRepository = new OrgUnitGroupSetRepository();
+            translationsService = new TranslationsService();
 
             userRepository = {
                 "upsert": function() {
@@ -44,9 +45,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 "uploadCompletionDataDesc": "approve data at project level for "
             };
 
-            scope.currentUser = {
-                "locale": "en"
-            };
+            scope.locale = "en";
 
             Timecop.install();
             Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
@@ -57,10 +56,12 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 "id": "a9ca3d1ed93",
                 "organisationUnitGroups": [{
                     "id": "a560238bc90",
+                    "englishName": "Direct operation",
                     "name": "Direct operation"
                 }, {
                     "id": "a92cee050b0",
-                    "name": "Remote operation"
+                    "name": "Remote operation",
+                    "englishName": "Remote operation"
                 }]
             }, {
                 "name": "Model Of Management",
@@ -68,7 +69,8 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 "id": "a2d4a1dee27",
                 "organisationUnitGroups": [{
                     "id": "a11a7a5d55a",
-                    "name": "Collaboration"
+                    "name": "Collaboration",
+                    "englishName": "Collaboration"
                 }]
             }, {
                 "name": "Reason For Intervention",
@@ -76,7 +78,8 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 "id": "a86f66f29d4",
                 "organisationUnitGroups": [{
                     "id": "a8014cfca5c",
-                    "name": "Natural Disaster"
+                    "name": "Natural Disaster",
+                    "englishName": "Natural Disaster"
                 }]
             }, {
                 "name": "Type of Population",
@@ -84,10 +87,12 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 "id": "a8a579d5fab",
                 "organisationUnitGroups": [{
                     "id": "a35778ed565",
-                    "name": "Most-at-risk Population"
+                    "name": "Most-at-risk Population",
+                    "englishName": "Most-at-risk Population"
                 }, {
                     "id": "a48f665185e",
-                    "name": "Refugee"
+                    "name": "Refugee",
+                    "englishName": "Refugee"
                 }]
             }, {
                 "name": "Context",
@@ -95,17 +100,70 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 "id": "a5c18ef7277",
                 "organisationUnitGroups": [{
                     "id": "a16b4a97ce4",
-                    "name": "Post-conflict"
+                    "name": "Post-conflict",
+                    "englishName": "Post-conflict"
                 }]
             }, {
                 "name": "Project Type",
                 "code": "project_type",
                 "organisationUnitGroups": [{
-                    "name": "Some Type"
+                    "name": "Some Type",
+                    "englishName": "Some Type"
                 }]
             }];
             spyOn(orgUnitGroupSetRepository, "getAll").and.returnValue(utils.getPromise(q, orgUnitGroupSets));
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository);
+            spyOn(translationsService, "translate").and.callFake(function(projectFields) {
+                if(projectFields[0].name == "Post-conflict") {
+                    return [{
+                        "id": "a16b4a97ce4",
+                        "name": "Post-conflict",
+                        "englishName": "Post-conflict"
+                    }];
+                }
+                if(projectFields[0].name == "Most-at-risk Population") {
+                    return [{
+                        "id": "a35778ed565",
+                        "name": "Most-at-risk Population",
+                        "englishName": "Most-at-risk Population"
+                    }, {
+                        "id": "a48f665185e",
+                        "name": "Refugee",
+                        "englishName": "Refugee"
+                    }];
+                }
+                if(projectFields[0].name == "Natural Disaster") {
+                    return [{
+                        "id": "a8014cfca5c",
+                        "name": "Natural Disaster",
+                        "englishName": "Natural Disaster"
+                    }];
+                }
+                if(projectFields[0].name == "Direct operation") {
+                    return [{
+                        "id": "a560238bc90",
+                        "name": "Direct operation",
+                        "englishName": "Direct operation"
+                    }, {
+                        "id": "a92cee050b0",
+                        "name": "Remote operation",
+                        "englishName": "Remote operation"
+                    }];
+                }
+                if(projectFields[0].name == "Collaboration") {
+                    return [{
+                        "id": "a11a7a5d55a",
+                        "name": "Collaboration",
+                        "englishName": "Collaboration"
+                    }];
+                }
+                if(projectFields[0].name == "Some Type") {
+                    return [{
+                        'name': 'Some Type',
+                        "englishName": "Some Type"
+                    }];
+                }
+            });
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository, translationsService);
         }));
 
         afterEach(function() {
@@ -118,29 +176,36 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             expect(scope.allContexts).toEqual([{
                 "id": "a16b4a97ce4",
-                "name": "Post-conflict"
+                "name": "Post-conflict",
+                "englishName": "Post-conflict"
             }]);
             expect(scope.allPopTypes).toEqual([{
                 "id": "a35778ed565",
-                "name": "Most-at-risk Population"
+                "name": "Most-at-risk Population",
+                "englishName": "Most-at-risk Population"
             }, {
                 "id": "a48f665185e",
-                "name": "Refugee"
+                "name": "Refugee",
+                "englishName": "Refugee"
             }]);
             expect(scope.reasonForIntervention).toEqual([{
                 "id": "a8014cfca5c",
-                "name": "Natural Disaster"
+                "name": "Natural Disaster",
+                "englishName": "Natural Disaster"
             }]);
             expect(scope.modeOfOperation).toEqual([{
                 "id": "a560238bc90",
-                "name": "Direct operation"
+                "name": "Direct operation",
+                "englishName": "Direct operation"
             }, {
                 "id": "a92cee050b0",
-                "name": "Remote operation"
+                "name": "Remote operation",
+                "englishName": "Remote operation"
             }]);
             expect(scope.modelOfManagement).toEqual([{
                 "id": "a11a7a5d55a",
-                "name": "Collaboration"
+                "name": "Collaboration",
+                "englishName": "Collaboration"
             }]);
         });
 
@@ -324,7 +389,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 }, {
                     "attribute": {
                         "code": "projectType",
-                        "name": "Project Type",
+                        "name": "Project Type"
                     },
                     "value": "Some Type"
                 }, {
@@ -358,29 +423,35 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 'openingDate': moment("2010-01-01").toDate(),
                 'context': {
                     "id": "a16b4a97ce4",
-                    "name": "Post-conflict"
+                    "name": "Post-conflict",
+                    "englishName": "Post-conflict"
                 },
                 'location': "val3",
                 'endDate': moment("2011-01-01").toDate(),
                 'populationType': {
                     "id": "a35778ed565",
-                    "name": "Most-at-risk Population"
+                    "name": "Most-at-risk Population",
+                    "englishName": "Most-at-risk Population"
                 },
                 'projectCode': 'RU118',
                 'reasonForIntervention': {
                     "id": "a8014cfca5c",
-                    "name": "Natural Disaster"
+                    "name": "Natural Disaster",
+                    "englishName": "Natural Disaster"
                 },
                 'modeOfOperation': {
                     "id": "a560238bc90",
-                    "name": 'Direct operation'
+                    "name": 'Direct operation',
+                    "englishName": 'Direct operation'
                 },
                 'modelOfManagement': {
                     "id": "a11a7a5d55a",
-                    "name": 'Collaboration'
+                    "name": 'Collaboration',
+                    "englishName": 'Collaboration'
                 },
                 'projectType': {
-                    'name': 'Some Type'
+                    'name': 'Some Type',
+                    'englishName': 'Some Type'
                 },
                 "estimatedTargetPopulation": 1000,
                 "estPopulationLessThan1Year": 11,
@@ -393,7 +464,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             scope.orgUnit.parent = {
                 "id": "parentId"
             };
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository, translationsService);
             scope.$apply();
 
             expect(scope.newOrgUnit).toEqual(expectedNewOrgUnit);
@@ -413,7 +484,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             orgUnitRepo.getAllProjects.and.returnValue(utils.getPromise(q, [project1]));
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository, translationsService);
             scope.$apply();
 
             expect(scope.existingProjectCodes).toEqual(["AF101"]);
@@ -433,7 +504,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             orgUnitRepo.findAllByParent.and.returnValue(utils.getPromise(q, [project1]));
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository, translationsService);
             scope.$apply();
 
             expect(scope.peerProjects).toEqual(["Kabul-AF101"]);
@@ -453,7 +524,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 return;
             });
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository, translationsService);
 
             scope.closeForm(parentOrgUnit);
 

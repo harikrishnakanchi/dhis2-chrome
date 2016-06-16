@@ -2,7 +2,7 @@
     <div class="loading" ng-show="loading">
         <img src="img/ajax-loader.gif" class="spinner" />
     </div>
-    <div class="top-actions" ng-if="!isNewMode &amp;&amp; hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver', 'Data entry user', 'Superuser'])">
+    <div class="top-actions" ng-if="!isNewMode &amp;&amp; hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver', 'Data entry user', 'Projectadmin'])">
         <input type="button" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.createOperationUnitBtnLabel }}" ng-click="openInNewMode('Operation Unit')" />
         <input type="button" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.createUserLabel }}" ng-click="openInNewMode('User')" />
     </div>
@@ -38,7 +38,20 @@
                     <li class="form-group">
                         <label for="newOrgUnitProjType" class="col-sm-4 col-md-4 control-label">{{ resourceBundle.projectTypeLabel }}</label>
                         <div class="col-sm-6 col-md-6">
-                            <div angucomplete-alt="" name="newOrgUnitProjType" form-name="createForm" placeholder="{{ resourceBundle.startTypingLabel }}" pause="100" selected-object="newOrgUnit.projectType" local-data="allProjectTypes" search-fields="name" title-field="name" initial-value="{{newOrgUnit.projectType.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" class="ng-isolate-scope">
+                            <div angucomplete-alt=""
+                                 name="newOrgUnitProjType"
+                                 form-name="createForm"
+                                 placeholder="{{ resourceBundle.startTypingLabel }}"
+                                 pause="100"
+                                 selected-object="newOrgUnit.projectType"
+                                 local-data="allProjectTypes"
+                                 search-fields="name"
+                                 title-field="name"
+                                 initial-value="{{newOrgUnit.projectType.name}}"
+                                 minlength="0"
+                                 input-class="form-control form-control-small"
+                                 match-class="highlight"
+                                 class="ng-isolate-scope">
                             </div>
                         </div>
                     </li>
@@ -51,14 +64,40 @@
                     <li class="form-group">
                         <label for="newOrgUnitContext" class="col-sm-4 col-md-4 control-label">{{ resourceBundle.contextLabel }}</label>
                         <div class="col-sm-6 col-md-6">
-                            <div angucomplete-alt="" name="newOrgUnitContext" form-name="createForm" placeholder="{{ resourceBundle.startTypingLabel }}" pause="100" selected-object="newOrgUnit.context" local-data="allContexts" search-fields="name" title-field="name" initial-value="{{newOrgUnit.context.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" class="ng-isolate-scope">
+                            <div angucomplete-alt=""
+                                 name="newOrgUnitContext"
+                                 form-name="createForm"
+                                 placeholder="{{ resourceBundle.startTypingLabel }}"
+                                 pause="100"
+                                 selected-object="newOrgUnit.context"
+                                 local-data="allContexts"
+                                 search-fields="name"
+                                 title-field="name"
+                                 initial-value="{{newOrgUnit.context.name}}"
+                                 minlength="0"
+                                 input-class="form-control form-control-small"
+                                 match-class="highlight"
+                                 class="ng-isolate-scope">
                             </div>
                         </div>
                     </li>
                     <li class="form-group">
                         <label for="newOrgUnitPopType" class="col-sm-4 col-md-4 control-label">{{ resourceBundle.typeOfPopulationLabel }}</label>
                         <div class="col-sm-6 col-md-6">
-                            <div angucomplete-alt="" name="newOrgUnitPopType" form-name="createForm" placeholder="{{ resourceBundle.startTypingLabel }}" pause="100" selected-object="newOrgUnit.populationType" local-data="allPopTypes" search-fields="name" title-field="name" initial-value="{{newOrgUnit.populationType.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" class="ng-isolate-scope">
+                            <div angucomplete-alt=""
+                                 name="newOrgUnitPopType"
+                                 form-name="createForm"
+                                 placeholder="{{ resourceBundle.startTypingLabel }}"
+                                 pause="100"
+                                 selected-object="newOrgUnit.populationType"
+                                 local-data="allPopTypes"
+                                 search-fields="name"
+                                 title-field="name"
+                                 initial-value="{{newOrgUnit.populationType.name}}"
+                                 minlength="0"
+                                 input-class="form-control form-control-small"
+                                 match-class="highlight"
+                                 class="ng-isolate-scope">
                             </div>
                         </div>
                     </li>
@@ -101,7 +140,21 @@
                     <li class="form-group">
                         <label for="newOrgUnitReasonForIntervention" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.reasonForInterventionLabel }}</label>
                         <div class="col-sm-6 col-md-6">
-                            <div angucomplete-alt="" name="newOrgUnitReasonForIntervention" form-name="createForm" placeholder="{{ resourceBundle.startTypingLabel }}" pause="100" selected-object="newOrgUnit.reasonForIntervention" local-data="reasonForIntervention" search-fields="name" title-field="name" initial-value="{{newOrgUnit.reasonForIntervention.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" class="ng-isolate-scope">
+                            <div angucomplete-alt=""
+                                 name="newOrgUnitReasonForIntervention"
+                                 form-name="createForm"
+                                 placeholder="{{ resourceBundle.startTypingLabel }}"
+                                 pause="100"
+                                 selected-object="newOrgUnit.reasonForIntervention"
+                                 local-data="reasonForIntervention"
+                                 search-fields="name"
+                                 title-field="name"
+                                 initial-value="{{newOrgUnit.reasonForIntervention.name}}"
+                                 minlength="0"
+                                 input-class="form-control form-control-small"
+                                 match-class="highlight"
+                                 field-required="true"
+                                 class="ng-isolate-scope">
                             </div>
                             <div ng-show="createForm.newOrgUnitReasonForIntervention.$dirty &amp;&amp; createForm.newOrgUnitReasonForIntervention.$invalid">
                                 <span ng-show="createForm.newOrgUnitReasonForIntervention.$error.required" class="errortxt">{{resourceBundle.reasonForInterventionValidation}}</span>
@@ -111,14 +164,41 @@
                     <li class="form-group">
                         <label for="newOrgUnitModeOfOperation" class="col-sm-4 col-md-4 control-label">{{ resourceBundle.modeOfOperationLabel }}</label>
                         <div class="col-sm-6 col-md-6">
-                            <div angucomplete-alt="" name="newOrgUnitModeOfOperation" form-name="createForm" placeholder="{{ resourceBundle.startTypingLabel }}" pause="100" selected-object="newOrgUnit.modeOfOperation" local-data="modeOfOperation" search-fields="name" title-field="name" initial-value="{{newOrgUnit.modeOfOperation.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" class="ng-isolate-scope">
+                            <div angucomplete-alt=""
+                                 name="newOrgUnitModeOfOperation"
+                                 form-name="createForm"
+                                 placeholder="{{ resourceBundle.startTypingLabel }}"
+                                 pause="100"
+                                 selected-object="newOrgUnit.modeOfOperation"
+                                 local-data="modeOfOperation"
+                                 search-fields="name"
+                                 title-field="name"
+                                 initial-value="{{newOrgUnit.modeOfOperation.name}}"
+                                 minlength="0"
+                                 input-class="form-control form-control-small"
+                                 match-class="highlight"
+                                 class="ng-isolate-scope">
                             </div>
                         </div>
                     </li>
                     <li class="form-group">
                         <label for="newOrgUnitModelOfManagement" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.modelOfManagementLabel }}</label>
                         <div class="col-sm-6 col-md-6">
-                            <div angucomplete-alt="" name="newOrgUnitModelOfManagement" form-name="createForm" placeholder="{{ resourceBundle.startTypingLabel }}" pause="100" selected-object="newOrgUnit.modelOfManagement" local-data="modelOfManagement" search-fields="name" title-field="name" initial-value="{{newOrgUnit.modelOfManagement.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" class="ng-isolate-scope">
+                            <div angucomplete-alt=""
+                                 name="newOrgUnitModelOfManagement"
+                                 form-name="createForm"
+                                 placeholder="{{ resourceBundle.startTypingLabel }}"
+                                 pause="100"
+                                 selected-object="newOrgUnit.modelOfManagement"
+                                 local-data="modelOfManagement"
+                                 search-fields="name"
+                                 title-field="name"
+                                 initial-value="{{newOrgUnit.modelOfManagement.name}}"
+                                 minlength="0"
+                                 input-class="form-control form-control-small"
+                                 match-class="highlight"
+                                 field-required="true"
+                                 class="ng-isolate-scope">
                             </div>
                             <div ng-show="createForm.newOrgUnitModelOfManagement.$dirty &amp;&amp; createForm.newOrgUnitModelOfManagement.$invalid">
                                 <span ng-show="createForm.newOrgUnitModelOfManagement.$error.required" class="errortxt">{{resourceBundle.modelOfManagementValidation}}</span>

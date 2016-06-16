@@ -29,34 +29,12 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             return !systemSettingRepository.isKeyGeneratedFromProd();
         };
 
-        var deregisterCurrentUserLocaleWatcher = $rootScope.$watch("currentUser.locale", function() {
-            var getResourceBundle = function(locale, shouldFetchTranslations) {
-                var fetchResourceBundleFromDb = function() {
-                    var store = db.objectStore('translations');
-                    var query = db.queryBuilder().$index('by_locale').$eq($rootScope.currentUser.locale).compile();
-                    return store.each(query).then(function(translations) {
-                        _.transform(translations, function(acc, translation) {
-                            if (translation.className === "DataElement" && translation.property !== "formName")
-                                return;
-                            acc[translation.objectId] = translation.value;
-                        }, $rootScope.resourceBundle);
-                    });
-                };
-
-                var getTranslationsForCurrentLocale = function() {
-                    if (!$rootScope.currentUser.locale) $rootScope.currentUser.locale = "en";
-                    fetchResourceBundleFromDb();
-                };
-
-                ngI18nResourceBundle.get({
-                    "locale": locale
-                }).then(function(data) {
-                    $rootScope.resourceBundle = data.data;
-                    if (shouldFetchTranslations) getTranslationsForCurrentLocale();
-                });
-            };
-
-            return $rootScope.currentUser ? getResourceBundle($rootScope.currentUser.locale, true) : getResourceBundle("en", false);
+        var buildResourceBundle = $rootScope.$watch("locale", function() {
+            ngI18nResourceBundle.get({
+                "locale": $rootScope.locale
+            }).then(function(data) {
+                $rootScope.resourceBundle = data.data;
+            });
         });
 
         var loadProjects = function() {
@@ -126,7 +104,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
 
         $scope.$on('$destroy', function() {
             deregisterUserPreferencesListener();
-            deregisterCurrentUserLocaleWatcher();
+            buildResourceBundle();
         });
 
         var checkConnectionQuality = function() {

@@ -156,7 +156,7 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                 var expectedQueryParamsForUpdatedCharts = 'fields=id&filter=name:like:%5BFieldApp+-+&filter=lastUpdated:gte:' + lastUpdatedTime + '&paging=false';
                 httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedQueryParamsForUpdatedCharts).respond(200, updatedChartsResponse);
 
-                var expectedQueryParamsForChartDetails = 'fields=id,name,title,type,sortOrder,columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D';
+                var expectedQueryParamsForChartDetails = 'fields=id,name,title,type,sortOrder,columns%5Bdimension,filter,items%5Bid,name,description%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D';
                 httpBackend.expectGET(properties.dhis.url + '/api/charts/chart1.json?' + expectedQueryParamsForChartDetails).respond(200, chart1DetailsResponse);
                 httpBackend.expectGET(properties.dhis.url + '/api/charts/chart2.json?' + expectedQueryParamsForChartDetails).respond(200, chart2DetailsResponse);
                 httpBackend.flush();
@@ -224,7 +224,7 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                 var expectedQueryParamsForUpdatedPivotTables = 'fields=id&filter=name:like:%5BFieldApp+-+&filter=lastUpdated:gte:' + lastUpdatedTime + '&paging=false';
                 httpBackend.expectGET(properties.dhis.url + '/api/reportTables.json?' + expectedQueryParamsForUpdatedPivotTables).respond(200, updatedPivotTablesResponse);
 
-                var expectedQueryParamsForPivotTableDetails = 'fields=id,name,title,type,sortOrder,categoryDimensions%5BdataElementCategory,categoryOptions%5B:identifiable%5D%5D,dataElements,indicators,dataDimensionItems,relativePeriods,columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D';
+                var expectedQueryParamsForPivotTableDetails = 'fields=id,name,sortOrder,categoryDimensions%5BdataElementCategory,categoryOptions%5B:identifiable%5D%5D,dataElements,indicators,dataDimensionItems,relativePeriods,columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name,description%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D';
                 httpBackend.expectGET(properties.dhis.url + '/api/reportTables/pivotTable1.json?' + expectedQueryParamsForPivotTableDetails).respond(200, pivotTable1DetailsResponse);
                 httpBackend.expectGET(properties.dhis.url + '/api/reportTables/pivotTable2.json?' + expectedQueryParamsForPivotTableDetails).respond(200, pivotTable2DetailsResponse);
                 httpBackend.flush();

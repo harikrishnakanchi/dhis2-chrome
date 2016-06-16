@@ -1,7 +1,7 @@
 define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
     function(_, orgUnitMapper, moment, systemSettingsTransformer) {
         return function($scope, $hustle, orgUnitRepository, datasetRepository, systemSettingRepository, excludedDataElementsRepository, db, $location, $q, $modal,
-            orgUnitGroupHelper, originOrgunitCreator) {
+            orgUnitGroupHelper, originOrgunitCreator, translationsService) {
 
             $scope.originalDatasets = [];
             $scope.isExpanded = {};
@@ -130,9 +130,10 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
                 var getDatasets = function() {
                     return getAllAggregateDatasets().then(getEnrichedDataSets).then(function(datasets) {
-                        $scope.originalDatasets = datasets;
 
-                        var partitionedDatasets = _.partition(datasets, function(ds) {
+                        var translatedDatasets = translationsService.translate(datasets);
+
+                        var partitionedDatasets = _.partition(translatedDatasets, function(ds) {
                             if ($scope.module.id)
                                 return _.any(ds.organisationUnits, "id", $scope.module.id);
                             return false;
@@ -195,7 +196,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 return $hustle.publish({
                     "data": data,
                     "type": action,
-                    "locale": $scope.currentUser.locale,
+                    "locale": $scope.locale,
                     "desc": desc
                 }, "dataValues");
             };
@@ -389,7 +390,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     return;
                 }
                 return getEnrichedDataSets([item]).then(function(datasets) {
-                    $scope.selectedDataset = dataSetWithEnrichedSections(datasets[0]);
+                    var translatedDatasets = translationsService.translate(datasets);
+                    $scope.selectedDataset = dataSetWithEnrichedSections(translatedDatasets[0]);
                     setSelectedTemplate($scope.selectedDataset.id);
                     $scope.enrichedDatasets[$scope.selectedDataset.id] = $scope.selectedDataset;
                     _.each($scope.selectedDataset.sections, function(section) {

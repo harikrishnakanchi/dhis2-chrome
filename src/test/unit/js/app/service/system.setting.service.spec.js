@@ -21,10 +21,16 @@ define(["systemSettingService", "angularMocks", "utils", "dhisUrl"], function(Sy
                         "ds1": {}
                     },
                     "anotherSetting": "foo"
+                },
+                "versionCompatibilityInfo": {
+                    "compatiblePraxisVersions": [
+                        "5.0",
+                        "6.0"
+                    ]
                 }
             };
 
-            httpBackend.expectGET(dhisUrl.systemSettings + "?key=fieldAppSettings").respond(200, systemSettingsFromDhis);
+            httpBackend.expectGET(dhisUrl.systemSettings + "?key=fieldAppSettings,versionCompatibilityInfo").respond(200, systemSettingsFromDhis);
 
             var actualResult;
             service.getSystemSettings().then(function(result) {
@@ -40,6 +46,9 @@ define(["systemSettingService", "angularMocks", "utils", "dhisUrl"], function(Sy
             }, {
                 "key": "anotherSetting",
                 "value": "foo"
+            }, {
+                "key": "compatiblePraxisVersions",
+                "value":["5.0", "6.0"]
             }];
 
             expect(actualResult).toEqual(expectedSystemSettings);

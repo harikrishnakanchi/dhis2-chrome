@@ -1,17 +1,10 @@
 define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
     return function(db, $q) {
-        var self = this;
-
-        var modifiedPayload = function(payload) {
-            payload = _.isArray(payload) ? payload : [payload];
-            return _.map(payload, function(datum) {
-                datum.period = moment(datum.period, "GGGG[W]W").format("GGGG[W]WW");
-                return datum;
-            });
-        };
+        var APPROVAL_DATA_STORE_NAME = 'approvals',
+            self = this;
 
         this.getApprovalData = function(periodsAndOrgUnits) {
-            var store = db.objectStore('approvals');
+            var store = db.objectStore(APPROVAL_DATA_STORE_NAME);
 
             if (!_.isArray(periodsAndOrgUnits))
                 return store.find([dateUtils.getFormattedPeriod(periodsAndOrgUnits.period), periodsAndOrgUnits.orgUnit]);
@@ -26,7 +19,7 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
         };
 
         this.getApprovalDataForPeriodsOrgUnits = function(startPeriod, endPeriod, orgUnits) {
-            var store = db.objectStore('approvals');
+            var store = db.objectStore(APPROVAL_DATA_STORE_NAME);
             var query = db.queryBuilder().$between(dateUtils.getFormattedPeriod(startPeriod), dateUtils.getFormattedPeriod(endPeriod)).$index("by_period").compile();
             return store.each(query).then(function(approvalData) {
                 return _.filter(approvalData, function(ad) {
@@ -49,7 +42,7 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
                 };
             });
 
-            var store = db.objectStore("approvals");
+            var store = db.objectStore(APPROVAL_DATA_STORE_NAME);
             return store.upsert(payload);
         };
 
@@ -59,7 +52,7 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
             var getApprovals = function() {
                 var periods = _.uniq(_.pluck(periodsAndOrgUnits, "period"));
                 var query = db.queryBuilder().$index("by_period").$in(periods).compile();
-                var store = db.objectStore("approvals");
+                var store = db.objectStore(APPROVAL_DATA_STORE_NAME);
                 var newApprovals = [];
                 return store.each(query).then(function(allApprovalsForPeriods) {
                     return _.transform(periodsAndOrgUnits, function(acc, periodAndOrgUnit) {
@@ -95,7 +88,7 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
             };
 
             var saveToIdb = function(approvals) {
-                var store = db.objectStore("approvals");
+                var store = db.objectStore(APPROVAL_DATA_STORE_NAME);
                 store.upsert(approvals);
             };
 
@@ -116,12 +109,12 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
                 };
             });
 
-            var store = db.objectStore("approvals");
+            var store = db.objectStore(APPROVAL_DATA_STORE_NAME);
             return store.upsert(payload);
         };
 
         this.invalidateApproval = function(period, orgUnit) {
-            var store = db.objectStore("approvals");
+            var store = db.objectStore(APPROVAL_DATA_STORE_NAME);
             return store.delete([dateUtils.getFormattedPeriod(period), orgUnit]);
         };
 
@@ -135,9 +128,30 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
                 "period": period,
                 "orgUnit": orgUnit
             };
-            var store = db.objectStore("approvals");
+            var store = db.objectStore(APPROVAL_DATA_STORE_NAME);
             return self.getApprovalData(periodAndOrgUnit).then(function(approvalFromDb) {
                 return store.upsert(_.omit(approvalFromDb, "status"));
+            });
+        };
+
+        this.flagAsFailedToSync = function(orgUnitId, period) {
+            var store = db.objectStore(APPROVAL_DATA_STORE_NAME);
+
+            return store.find([period, orgUnitId]).then(function (approvalObject) {
+                if(approvalObject) {
+                    approvalObject.failedToSync = true;
+                    return store.upsert(approvalObject);
+                }
+            });
+        };
+
+        this.clearFailedToSync = function(orgUnitId, period) {
+            var store = db.objectStore(APPROVAL_DATA_STORE_NAME);
+
+            return store.find([period, orgUnitId]).then(function (approvalObject) {
+                if(approvalObject) {
+                    return store.upsert(_.omit(approvalObject, 'failedToSync'));
+                }
             });
         };
     };

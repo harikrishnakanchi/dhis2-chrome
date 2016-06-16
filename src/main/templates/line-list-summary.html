@@ -14,11 +14,11 @@
                         <table class="table">
                             <tr>
                                 <th>
-                                    {{resourceBundle[section.id] || section.name}}
+                                    {{ section.name}}
                                 </th>
                             </tr>
                             <tr ng-repeat="psde in section.programStageDataElements">
-                                <td ng-if="psde.dataElement.isIncluded">{{resourceBundle[psde.dataElement.id] || psde.dataElement.formName}}</td>
+                                <td ng-if="psde.dataElement.isIncluded">{{psde.dataElement.formName}}</td>
                             </tr>
                         </table>
                     </div>
@@ -37,7 +37,7 @@
             <div ng-class="'dataset-acc-wrapper'">
                 <accordion-group is-open="true">
                     <accordion-heading>
-                        <span>{{ resourceBundle[program.id] || program.name}}</span>
+                        <span>{{ program.name}}</span>
                     </accordion-heading>
                     <div class="row sub-nav">
                         <div class="col-md-8">
@@ -94,7 +94,7 @@
                                             <th>{{ resourceBundle.eventDateLabel }}</th>
                                             <th ng-if="showPatientOriginInSummaryTable()">{{ resourceBundle.patientOriginLabel }}</th>
                                             <th ng-repeat="dataValue in events[0].dataValues" ng-if="dataValue.showInEventSummary">
-                                                {{ resourceBundle[dataValue.dataElement] || dataValue.formName }}
+                                                {{ dataValue.formName }}
                                             </th>
                                             <th></th>
                                             <th></th>
@@ -138,8 +138,8 @@
                             </div>
                         </div>
                     </div>
-                    <div ng-if="filterBy === 'eventSummary'">
-                        <div ng-include=" 'templates/partials/data-entry.html'"></div>
+                    <div ng-if="filterBy === 'eventSummary'"  class="linelistSummary">
+                        <div ng-include=" 'templates/partials/module-week-selector.html'"></div>
                         <div ng-if="!loading &amp;&amp; week &amp;&amp; selectedModule" ng-include="'templates/partials/line-list-offline-approval.html'">
                         </div>
                     </div>

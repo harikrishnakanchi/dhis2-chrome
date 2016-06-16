@@ -1,8 +1,8 @@
 <div>
-    <button ng-if="showDownload" class="col-md-2 exportCSV-btn btn btn-xs btn-primary" ng-csv="getData()" csv-header="getHeaders()" filename="{{getCsvFileName()}}">
+    <button ng-if="showDownloadButton" class="col-md-2 exportCSV-btn btn btn-xs btn-primary" ng-csv="getData()" csv-header="getHeaders()" filename="{{getCsvFileName()}}">
         {{resourceBundle.exportAsCsv}}
     </button>
-    <div ng-class="{ 'm-top-30' : showDownload}">
+    <div ng-class="{ 'm-top-30' : showDownloadButton }">
         <ng-include ng-if="definition.sortable" src="'templates/pivot-table/_sortable.html'"></ng-include>
         <ng-include ng-if="!definition.sortable" src="'templates/pivot-table/_unsortable.html'"></ng-include>
     </div>

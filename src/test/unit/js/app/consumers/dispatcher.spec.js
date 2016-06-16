@@ -5,7 +5,8 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer, downloadDatasetConsumer, updateDatasetConsumer,
             downloadSystemSettingConsumer, uploadPatientOriginConsumer, uploadExcludedDataElementsConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
             uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer,
-            uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadOrgUnitConsumer, downloadOrgUnitGroupConsumer, userPreferenceRepository;
+            uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadOrgUnitConsumer, downloadOrgUnitGroupConsumer, userPreferenceRepository, downloadModuleDataBlocksConsumer,
+            syncModuleDataBlockConsumer;
 
         beforeEach(mocks.inject(function($q, $log, $rootScope) {
             uploadApprovalDataConsumer = {
@@ -98,6 +99,15 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             userPreferenceRepository = {
                 'getCurrentUsersUsername': jasmine.createSpy("userPreferenceRepository")
             };
+
+            downloadModuleDataBlocksConsumer = {
+                'run': jasmine.createSpy("downloadModuleDataBlocksConsumer")
+            };
+
+            syncModuleDataBlockConsumer = {
+                'run': jasmine.createSpy("syncModuleDataBlockConsumer")
+            };
+
             message = {};
             q = $q;
             log = $log;
@@ -118,11 +128,14 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadChartsConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadPivotTablesConsumer.run.and.returnValue(utils.getPromise(q, {}));
             userPreferenceRepository.getCurrentUsersUsername.and.returnValue(utils.getPromise(q, 'someUsername'));
+            downloadModuleDataBlocksConsumer.run.and.returnValue(utils.getPromise(q, {}));
+            syncModuleDataBlockConsumer.run.and.returnValue(utils.getPromise(q, {}));
 
             dispatcher = new Dispatcher(q, log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, updateDatasetConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
                 deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer,
-                downloadChartDataConsumer, uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository);
+                downloadChartDataConsumer, uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
+                downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer);
         }));
 
         it("should call upload data consumer for uploading data values", function() {
@@ -138,6 +151,18 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             expect(uploadDataConsumer.run).toHaveBeenCalledWith(message, {});
         });
 
+        it("should call syncModuleDataBlock consumer for syncing moduleDataBlock", function() {
+            message.data = {
+                "data": {},
+                "type": "syncModuleDataBlock"
+            };
+
+            dispatcher.run(message);
+            scope.$apply();
+
+            expect(syncModuleDataBlockConsumer.run).toHaveBeenCalledWith(message);
+        });
+
         describe('downloadProjectData job', function() {
             var message = {
                 'data': {
@@ -151,8 +176,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
                 scope.$apply();
 
                 expect(downloadProjectSettingsConsumer.run).toHaveBeenCalledWith(message);
-                expect(downloadDataConsumer.run).toHaveBeenCalledWith(message);
-                expect(downloadApprovalConsumer.run).toHaveBeenCalledWith(message, {});
+                expect(downloadModuleDataBlocksConsumer.run).toHaveBeenCalled();
                 expect(downloadEventDataConsumer.run).toHaveBeenCalledWith(message, {});
                 expect(downloadChartsConsumer.run).toHaveBeenCalledWith(message, {});
                 expect(downloadPivotTableDataConsumer.run).toHaveBeenCalledWith(message, {});

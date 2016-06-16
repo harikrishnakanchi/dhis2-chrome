@@ -46,7 +46,7 @@
                                 </div>
                                 <div class="details" ng-show="selectedDataset.sections.length > 0">
                                     <span ng-hide="areDataElementsSelectedForSection()">{{resourceBundle.selectDatasetSection}}</span>
-                                    <h4 ng-class="{cur: true}">{{resourceBundle[selectedDataset.id] || selectedDataset.name}}</h4>
+                                    <h4 ng-class="{cur: true}">{{ selectedDataset.name}}</h4>
                                     <div class="template-selection">
                                         <label>
                                             <input type="radio" ng-model="selectedTemplate[selectedDataset.id]" value="Default" ng-change="onTemplateSelect()" /> {{resourceBundle.defaultTemplateLabel}}
@@ -62,7 +62,7 @@
                                         <div class="collapse-head">
                                             <h5 ng-click="isExpanded[section.id] = !isExpanded[section.id]">
                                                 <span class="glyphicon"
-                                                        ng-class="{'glyphicon-chevron-right':!isExpanded[section.id], 'glyphicon-chevron-down':isExpanded[section.id]}" aria-hidden="true"></span>  {{resourceBundle[section.id] || section.name}}
+                                                        ng-class="{'glyphicon-chevron-right':!isExpanded[section.id], 'glyphicon-chevron-down':isExpanded[section.id]}" aria-hidden="true"></span> {{ section.name}}
                                             </h5>
                                             <input type="checkbox" ng-disabled="isDisabled==true" ng-change="changeDataElementSelection(section)" ng-model="getSection(selectedDataset, section.id)['isIncluded']">
                                         </div>
@@ -72,7 +72,7 @@
                                                     <div class="collapse-head">
                                                         <h5 ng-click="isSubSectionExpanded[section.id][subSection.name] = !isSubSectionExpanded[section.id][subSection.name]">
                                                             <span class="glyphicon"
-                                                            ng-class="{'glyphicon-chevron-right':!isSubSectionExpanded[section.id][subSection.name], 'glyphicon-chevron-down':isSubSectionExpanded[section.id][subSection.name]}" aria-hidden="true"></span>  {{resourceBundle[subSection.id] || subSection.name}}
+                                                            ng-class="{'glyphicon-chevron-right':!isSubSectionExpanded[section.id][subSection.name], 'glyphicon-chevron-down':isSubSectionExpanded[section.id][subSection.name]}" aria-hidden="true"></span>  {{ subSection.name}}
                                                         </h5>
                                                         <input type="checkbox" ng-disabled="isDisabled==true" ng-change="changeDataElementSelectionInSubSection(subSection, section)" ng-model="subSection.isIncluded">
                                                     </div>
@@ -80,7 +80,13 @@
                                                         <ul>
                                                             <li ng-repeat="element in subSection.dataElements">
                                                                 <label>
-                                                                    <input type="checkbox" ng-disabled="isDisabled || element.isMandatory" ng-model="element.isIncluded" ng-change="changeSubSectionSelection(subSection, section)">{{resourceBundle[element.id] || element.formName}}
+                                                                    <input type="checkbox" ng-disabled="isDisabled || element.isMandatory" ng-model="element.isIncluded" ng-change="changeSubSectionSelection(subSection, section)">
+                                                                    <a class="changeColor"
+                                                                       description-popup
+                                                                       dp-title="{{ element.formName}}"
+                                                                       dp-desc="{{ element.description }}">
+                                                                        {{ element.formName}}
+                                                                    </a>
                                                                 </label>
                                                             </li>
                                                         </ul>
@@ -88,7 +94,13 @@
                                                 </li>
                                                 <li ng-repeat="element in section.unGroupedDataElements">
                                                     <label>
-                                                        <input type="checkbox" ng-disabled="isDisabled || element.isMandatory" ng-model="element.isIncluded" ng-change="changeSectionSelection(section)">{{resourceBundle[element.id] || element.formName}}
+                                                        <input type="checkbox" ng-disabled="isDisabled || element.isMandatory" ng-model="element.isIncluded" ng-change="changeSectionSelection(section)">
+                                                        <a class="changeColor"
+                                                           description-popup
+                                                           dp-title="{{ element.formName}}"
+                                                           dp-desc="{{ element.description }}">
+                                                        {{ element.formName}}
+                                                        </a>
                                                     </label>
                                                 </li>
                                             </ul>

@@ -47,6 +47,17 @@ require.config({
         "chartRepository": "app/repository/chart.repository",
         "referralLocationsRepository": "app/repository/referral.locations.repository",
         "pivotTableRepository": "app/repository/pivot.table.repository",
+        "dataSyncFailureRepository": "app/repository/data.sync.failure.repository",
+
+        //Models
+        "pivotTable": "app/models/pivot.table",
+        "moduleDataBlock": "app/models/module.data.block",
+        "customAttributes": "app/models/custom.attributes",
+
+        //Factories
+        "factories":"app/factories/factories",
+        "moduleDataBlockFactory": "app/factories/module.data.block.factory",
+        "checkVersionCompatibility": "app/factories/check.version.compatibility",
 
         //Transformers
         "datasetTransformer": "app/transformers/dataset.transformer",
@@ -92,11 +103,14 @@ require.config({
         "downloadChartsConsumer": "app/consumer/download.charts.consumer",
         "downloadChartDataConsumer": "app/consumer/download.chart.data.consumer",
         "uploadReferralLocationsConsumer": "app/consumer/upload.referral.locations.consumer",
+        "downloadModuleDataBlocksConsumer": "app/consumer/download.module.data.blocks.consumer",
+        "syncModuleDataBlockConsumer": "app/consumer/sync.module.data.block.consumer",
 
         //merge strategies
         "mergeBy": "app/consumer/mergestrategies/merge.by",
         "mergeByUnion": "app/consumer/mergestrategies/merge.by.union",
         "mergeByLastUpdated": "app/consumer/mergestrategies/merge.by.lastupdated",
+        "moduleDataBlockMerger": "app/consumer/mergestrategies/module.data.block.merger",
 
         "angular-indexedDB": "lib/angular-indexedDB/indexeddb",
 

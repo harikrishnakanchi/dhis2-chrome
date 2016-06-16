@@ -1,7 +1,7 @@
-define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEventRepository", "orgUnitRepository", "programRepository", "optionSetRepository", "datasetRepository", "referralLocationsRepository", "excludedDataElementsRepository"],
-    function(LineListOfflineApprovalController, mocks, utils, ProgramEventRepository, OrgUnitRepository, ProgramRepository, OptionSetRepository, DatasetRepository, ReferralLocationsRepository, ExcludedDataElementsRepository) {
+define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEventRepository", "orgUnitRepository", "programRepository", "optionSetRepository", "datasetRepository", "referralLocationsRepository", "excludedDataElementsRepository", "translationsService"],
+    function(LineListOfflineApprovalController, mocks, utils, ProgramEventRepository, OrgUnitRepository, ProgramRepository, OptionSetRepository, DatasetRepository, ReferralLocationsRepository, ExcludedDataElementsRepository, TranslationsService) {
         describe("lineListOfflineApprovalController", function() {
-            var lineListOfflineApprovalController, scope, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, q, origins, program, optionSetMapping, events, origin1, origin2, origin3, origin4, dataSetRepository, associatedDataSets, referralLocationsRepository, excludedDataElementsRepository;
+            var lineListOfflineApprovalController, scope, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, q, origins, program, optionSetMapping, events, origin1, origin2, origin3, origin4, dataSetRepository, associatedDataSets, referralLocationsRepository, excludedDataElementsRepository, translationsService;
 
             beforeEach(mocks.inject(function($rootScope, $q) {
                 scope = $rootScope.$new();
@@ -76,6 +76,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
+                        "formName": "Procedure performed 1",
+                        "description": "Procedure performed 1 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         }
@@ -83,6 +85,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 2",
+                        "formName": "Procedure performed 2",
+                        "description": "Procedure performed 2 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         }
@@ -118,6 +122,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
+                        "formName": "Procedure performed 1",
+                        "description": "Procedure performed 1 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         }
@@ -125,6 +131,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 2",
                         "dataElement": "Procedure performed 2",
+                        "formName": "Procedure performed 2",
+                        "description": "Procedure performed 2 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         }
@@ -161,6 +169,10 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 excludedDataElementsRepository = new ExcludedDataElementsRepository();
                 spyOn(excludedDataElementsRepository, "get").and.returnValue(utils.getPromise(q, []));
 
+                translationsService = new TranslationsService();
+                spyOn(translationsService, "translate").and.returnValue([program]);
+                spyOn(translationsService, "translateOptionSetMap").and.returnValue(optionSetMapping);
+
                 optionSetRepository = new OptionSetRepository();
                 spyOn(optionSetRepository, "getOptionSetMapping").and.returnValue(utils.getPromise(q, {
                     "optionSetMap": optionSetMapping
@@ -185,13 +197,19 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 };
                 scope.associatedProgramId = "Emergency Department";
 
-                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository);
+                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService);
                 scope.$apply();
             }));
 
             it("should initialize", function() {
                 expect(scope.originOrgUnits).toEqual([origin2, origin1, origin4, origin3]);
                 expect(scope.program).toEqual(program);
+
+                translationsService.translate.and.returnValue(associatedDataSets);
+                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService);
+
+                scope.$apply();
+
                 expect(scope.optionSetMapping).toEqual(optionSetMapping);
                 expect(scope.dataValues).toEqual({
                     "_showInOfflineSummary": [{
@@ -239,6 +257,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
+                        "formName": "Procedure performed 1",
+                        "description": "Procedure performed 1 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         },
@@ -247,6 +267,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 2",
+                        "formName": "Procedure performed 2",
+                        "description": "Procedure performed 2 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         },
@@ -255,6 +277,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
+                        "formName": "Procedure performed 1",
+                        "description": "Procedure performed 1 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         },
@@ -263,6 +287,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 2",
                         "dataElement": "Procedure performed 2",
+                        "formName": "Procedure performed 2",
+                        "description": "Procedure performed 2 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         },
@@ -293,6 +319,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
+                        "formName": "Procedure performed 1",
+                        "description": "Procedure performed 1 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         },
@@ -301,6 +329,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 2",
+                        "formName": "Procedure performed 2",
+                        "description": "Procedure performed 2 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         },
@@ -309,6 +339,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
+                        "formName": "Procedure performed 1",
+                        "description": "Procedure performed 1 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         },
@@ -318,6 +350,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 2",
                         "dataElement": "Procedure performed 2",
+                        "formName": "Procedure performed 2",
+                        "description": "Procedure performed 2 - desc",
                         "optionSet": {
                             "id": "proc_id"
                         },
@@ -340,7 +374,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
 
             it("should return set showFilters to false if there are no events", function() {
                 programEventRepository.getEventsForPeriod.and.returnValue(utils.getPromise(q, []));
-                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository);
+                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService);
                 scope.$apply();
 
                 expect(scope.showFilters).toEqual(false);
@@ -352,7 +386,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
 
             it("should return false if there are no procedure data values", function() {
                 programEventRepository.getEventsForPeriod.and.returnValue(utils.getPromise(q, []));
-                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository);
+                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService);
                 scope.$apply();
 
                 expect(scope.shouldShowProceduresInOfflineSummary()).toEqual(false);

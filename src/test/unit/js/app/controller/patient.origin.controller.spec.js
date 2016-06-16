@@ -28,9 +28,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 "name": "Unknown"
             }];
 
-            scope.currentUser = {
-                "locale": "en"
-            };
+            scope.locale ="en";
 
             scope.resourceBundle = {
                 "uploadPatientOriginDetailsDesc": "create patient origin ",

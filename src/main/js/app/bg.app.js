@@ -1,8 +1,9 @@
-define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "queuePostProcessInterceptor", "monitors", "logRequestReponseInterceptor", "indexedDBLogger", "chromeUtils", "angular-indexedDB", "ng-i18n"],
-    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, queuePostProcessInterceptor, monitors, logRequestReponseInterceptor, indexedDBLogger, chromeUtils) {
+define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "queuePostProcessInterceptor", "monitors", "logRequestReponseInterceptor", "indexedDBLogger", "chromeUtils", "factories", "angular-indexedDB", "ng-i18n"],
+    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, queuePostProcessInterceptor, monitors, logRequestReponseInterceptor, indexedDBLogger, chromeUtils, factories) {
         var init = function() {
-            var app = angular.module('DHIS2', ["xc.indexedDB", "hustle", "ngI18n"]);
+            var app = angular.module('PRAXIS', ["xc.indexedDB", "hustle", "ngI18n"]);
             services.init(app);
+            factories.init(app);
             consumers.init(app);
             repositories.init(app);
             monitors.init(app);
@@ -11,7 +12,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
             app.factory('cleanupPayloadInterceptor', [cleanupPayloadInterceptor]);
             app.factory('handleTimeoutInterceptor', ['$q', '$injector', '$timeout', handleTimeoutInterceptor]);
             app.factory('logRequestReponseInterceptor', ['$log', '$q', logRequestReponseInterceptor]);
-            app.factory('queuePostProcessInterceptor', ['$log', 'ngI18nResourceBundle', 'dataRepository', queuePostProcessInterceptor]);
+            app.factory('queuePostProcessInterceptor', ['$log', 'ngI18nResourceBundle', 'dataRepository','dataSyncFailureRepository', queuePostProcessInterceptor]);
 
             app.config(['$indexedDBProvider', '$httpProvider', '$hustleProvider', '$provide',
                 function($indexedDBProvider, $httpProvider, $hustleProvider, $provide) {
@@ -41,7 +42,6 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
             ]);
 
             app.value('ngI18nConfig', {
-                defaultLocale: 'en',
                 supportedLocales: ['en', 'fr', 'ar'],
                 basePath: "/js/app/i18n"
             });
@@ -63,7 +63,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         if (!dhisMonitor.isOnline())
                             return;
 
-                        $hustle.publish({
+                        $hustle.publishOnce({
                             "type": "downloadMetadata",
                             "data": []
                         }, "dataValues");
@@ -74,7 +74,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         if (!dhisMonitor.isOnline())
                             return;
 
-                        $hustle.publish({
+                        $hustle.publishOnce({
                             "type": "downloadProjectData",
                             "data": []
                         }, "dataValues");
@@ -143,7 +143,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
 
         var bootstrap = function(appInit) {
             var deferred = Q.defer();
-            var injector = angular.bootstrap(angular.element(document.querySelector('#dhis2')), ['DHIS2']);
+            var injector = angular.bootstrap(angular.element(document.querySelector('#praxis')), ['PRAXIS']);
             deferred.resolve([injector, appInit]);
             return deferred.promise;
         };

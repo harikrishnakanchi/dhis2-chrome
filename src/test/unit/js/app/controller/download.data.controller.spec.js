@@ -1,7 +1,7 @@
 define(["downloadDataController", "angularMocks", "utils", "lodash", "chromeUtils"],
     function(DownloadDataController, mocks, utils, _, chromeUtils) {
         describe("downloadDataController", function() {
-            var q, rootScope, hustle, downloadDataController, timeout;
+            var q, rootScope, hustle, downloadDataController, timeout, scope;
 
             beforeEach(module("hustle"));
 
@@ -12,15 +12,13 @@ define(["downloadDataController", "angularMocks", "utils", "lodash", "chromeUtil
                 rootScope = $rootScope;
                 timeout = $timeout;
 
-                scope.resourceBundle = {
-                    "syncRunning": "syncRunning"
-                };
+                scope.resourceBundle = {};
 
-                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+                spyOn(hustle, "publishOnce").and.returnValue(utils.getPromise(q, {}));
                 spyOn(chromeUtils, "createNotification").and.returnValue(utils.getPromise(q, {}));
 
                 rootScope.hasRoles = function(args) {
-                    if (args[0] === "Superuser")
+                    if (args[0] === "Projectadmin")
                         return false;
                     else
                         return true;
@@ -35,22 +33,16 @@ define(["downloadDataController", "angularMocks", "utils", "lodash", "chromeUtil
                 scope.$apply();
                 timeout.flush();
 
-                var syncableTypes = [
-                    "downloadMetadata",
-                    "downloadProjectData"
-                ];
-
-                var expectedHustleArgs = _.map(syncableTypes, function(type) {
-                    return [{
+                var getHustleMessage = function(type) {
+                    return {
                         "type": type,
                         "data": []
-                    }, "dataValues"];
-                });
+                    };
+                };
 
-                expect(hustle.publish.calls.count()).toEqual(syncableTypes.length);
-                _.forEach(syncableTypes, function(type, i) {
-                    expect(hustle.publish.calls.argsFor(i)).toEqual(expectedHustleArgs[i]);
-                });
+                expect(hustle.publishOnce.calls.count()).toEqual(2);
+                expect(hustle.publishOnce.calls.argsFor(0)).toEqual([getHustleMessage("downloadMetadata"), "dataValues"]);
+                expect(hustle.publishOnce.calls.argsFor(1)).toEqual([getHustleMessage("downloadProjectData"), "dataValues"]);
                 expect(chromeUtils.createNotification).toHaveBeenCalled();
             });
         });

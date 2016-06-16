@@ -1,5 +1,5 @@
 <div ng-controller="lineListOfflineApprovalController">
-    <section class="panel tab-panel">
+    <section class="panel tab-panel {{ layoutDirection.direction }}">
         <div class="alert alert-danger" ng-hide="showOfflineSummaryForViewOnly || (showFilters &amp;&amp; ((isCompleted &amp;&amp; hasRoles(['Coordination Level Approver','Observer'])) || (hasRoles(['Project Level Approver','Observer'])) ))">{{resourceBundle.noDataForApproval}}</div>
         <div class="alert alert-info" ng-show="showOfflineSummaryForViewOnly &amp;&amp; !showFilters"> {{ resourceBundle.noCasesToSummarize}}</div>
         <div ng-show="isCompleted &amp;&amp; !isApproved &amp;&amp; !hasRoles(['Coordination Level Approver'])" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
@@ -10,18 +10,19 @@
                 <div ng-class="'dataset-acc-wrapper'">
                     <accordion-group ng-repeat="dataSet in associatedDataSets | filter:{ isOriginDataset: false }" is-open="true">
                         <accordion-heading>
-                            <span>{{ resourceBundle[dataSet.id] || dataSet.name}}</span>
-                            <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-right': !isDatasetOpen[dataSet.id]}"></i>
+                            <span>{{dataSet.name}}</span>
+                            <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-right': !isDatasetOpen[dataSet.id]}"></i>
+                            <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-left': !isDatasetOpen[dataSet.id]}"></i>
                         </accordion-heading>
                         <div class="filter">
                             <label>{{resourceBundle.filterBy}}</label>
-                            <div class="checkbox-inline">
-                                <label>
-                                    <input type="checkbox" ng-model="isGenderFilterApplied" />{{resourceBundle.gender}}</label>
+                            <div>
+                                <label for="genderCheckbox">{{resourceBundle.gender}}</label>
+                                <input type="checkbox" ng-model="isGenderFilterApplied" id="genderCheckbox" ng-class="layoutDirection.direction == 'rtl' ? 'pull-right' : 'pull-left'" />
                             </div>
-                            <div class="checkbox-inline">
-                                <label>
-                                    <input type="checkbox" ng-model="isAgeFilterApplied" />{{resourceBundle.age}}</label>
+                            <div>
+                                <label for="ageCheckbox">{{resourceBundle.age}}</label>
+                                <input type="checkbox" ng-model="isAgeFilterApplied" id="ageCheckbox" ng-class="layoutDirection.direction == 'rtl' ? 'pull-right' : 'pull-left'" />
                             </div>
                         </div>
                         <div class="exp-coll-group" ng-if="!isGenderFilterApplied &amp;&amp; !isAgeFilterApplied">
@@ -32,8 +33,18 @@
                                             <div class="spacing-div-accordian" class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) && psde.dataElement.isIncluded">
                                                 <accordion-group is-open="status.open">
                                                     <accordion-heading>
-                                                        <span>{{resourceBundle[psde.dataElement.id] || psde.dataElement.formName}}</span>
-                                                        <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                                         <div class="description-popup">
+                                                            {{psde.dataElement.formName}}
+                                                             <a class="description-popup-icon"
+                                                                description-popup
+                                                                dp-title="{{psde.dataElement.formName}}"
+                                                                dp-desc="{{psde.dataElement.description}}"
+                                                                >
+                                                                  <i class="fa fa-info-circle" tooltip-placement="top"></i>
+                                                             </a>
+                                                             <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                                             <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
+                                                         </div>
                                                     </accordion-heading>
                                                     <table locked-table-header class="table table-bordered">
                                                         <thead>
@@ -43,7 +54,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]">
-                                                            <td>{{option.displayName}}</td>
+                                                            <td>{{option.name}}</td>
                                                             <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.id)}}</td>
                                                         </tr>
                                                     </table>
@@ -57,8 +68,17 @@
                                 <accordion close-others="false">
                                     <accordion-group>
                                         <accordion-heading>
-                                            <span>{{resourceBundle.proceduresPerformed}}</span>
-                                            <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                            <div class="description-popup">
+                                                {{resourceBundle.proceduresPerformed}}
+                                                <a class="description-popup-icon"
+                                                   description-popup
+                                                   dp-title="{{resourceBundle.proceduresPerformed}}"
+                                                   dp-data = "proceduresPerformed">
+                                                    <i class="fa fa-info-circle" tooltip-placement="top"></i>
+                                                </a>
+                                                <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                                <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
+                                            </div>
                                         </accordion-heading>
                                         <table locked-table-header class="table table-bordered">
                                             <thead>
@@ -84,19 +104,29 @@
                                             <div class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) && psde.dataElement.isIncluded">
                                                 <accordion-group is-open="status.open">
                                                     <accordion-heading>
-                                                        <span>{{psde.dataElement.formName}}</span>
-                                                        <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                                        <div class="description-popup">
+                                                            {{psde.dataElement.formName}}
+                                                            <a class="description-popup-icon"
+                                                               description-popup
+                                                               dp-title="{{psde.dataElement.formName}}"
+                                                               dp-desc="{{psde.dataElement.description}}"
+                                                               >
+                                                                <i class="fa fa-info-circle" tooltip-placement="top"></i>
+                                                            </a>
+                                                            <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                                            <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
+                                                        </div>
                                                     </accordion-heading>
                                                     <table locked-table-header class="table table-bordered">
                                                         <thead>
                                                             <tr>
                                                                 <th>{{resourceBundle.optionName}}</th>
-                                                                <th ng-repeat="genderOption in genderOptions"> {{genderOption.displayName}}
+                                                                <th ng-repeat="genderOption in genderOptions"> {{genderOption.name}}
                                                                 </th>
                                                             </tr>
                                                         </thead>
                                                         <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]">
-                                                            <td>{{option.displayName}}</td>
+                                                            <td>{{option.name}}</td>
                                                             <td ng-repeat="genderOption in genderOptions">{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.id, genderOption.id)}}</td>
                                                         </tr>
                                                     </table>
@@ -110,14 +140,24 @@
                                 <accordion close-others="false">
                                     <accordion-group is-open="status.open">
                                         <accordion-heading>
-                                            <span>{{resourceBundle.proceduresPerformed}}</span>
-                                            <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                            <div class="description-popup">
+                                                {{resourceBundle.proceduresPerformed}}
+                                                <a class="description-popup-icon"
+                                                   description-popup
+                                                   dp-title="{{resourceBundle.proceduresPerformed}}"
+                                                   dp-desc="{{ getDescriptionsForProceduresPerformed() }}"
+                                                   >
+                                                    <i class="fa fa-info-circle" tooltip-placement="top"></i>
+                                                </a>
+                                                <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                                <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
+                                            </div>
                                         </accordion-heading>
                                         <table locked-table-header class="table table-bordered">
                                             <thead>
                                                 <tr>
                                                     <th>{{resourceBundle.optionName}}</th>
-                                                    <th ng-repeat="genderOption in genderOptions"> {{genderOption.displayName}}
+                                                    <th ng-repeat="genderOption in genderOptions"> {{genderOption.name}}
                                                     </th>
                                                 </tr>
                                             </thead>
@@ -138,8 +178,17 @@
                                             <div class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) && psde.dataElement.isIncluded">
                                                 <accordion-group is-open="status.open">
                                                     <accordion-heading>
-                                                        <span>{{psde.dataElement.formName}}</span>
-                                                        <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                                        <div class="description-popup">
+                                                            {{psde.dataElement.formName}}
+                                                            <a class="description-popup-icon"
+                                                               description-popup
+                                                               dp-title="{{psde.dataElement.formName}}"
+                                                               dp-desc="{{psde.dataElement.description}}">
+                                                                <i class="fa fa-info-circle" tooltip-placement="top"></i>
+                                                            </a>
+                                                            <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                                            <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
+                                                        </div>
                                                     </accordion-heading>
                                                     <table locked-table-header class="table table-bordered">
                                                         <thead>
@@ -151,7 +200,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]">
-                                                            <td>{{option.displayName}}</td>
+                                                            <td>{{option.name}}</td>
                                                             <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [0,5])}}</td>
                                                             <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [4,15])}}</td>
                                                             <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [14, 9999])}}</td>
@@ -167,8 +216,17 @@
                                 <accordion close-others="false">
                                     <accordion-group is-open="status.open">
                                         <accordion-heading>
-                                            <span>{{resourceBundle.proceduresPerformed}}</span>
-                                            <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                            <div class="description-popup">
+                                                {{resourceBundle.proceduresPerformed}}
+                                                <a class="description-popup-icon"
+                                                   description-popup
+                                                   dp-title="{{resourceBundle.proceduresPerformed}}"
+                                                   dp-desc="{{ getDescriptionsForProceduresPerformed() }}">
+                                                    <i class="fa fa-info-circle" tooltip-placement="top"></i>
+                                                </a>
+                                                <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                                <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
+                                            </div>
                                         </accordion-heading>
                                         <table locked-table-header class="table table-bordered">
                                             <thead>
@@ -198,14 +256,23 @@
                                             <div class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) && psde.dataElement.isIncluded">
                                                 <accordion-group is-open="status.open">
                                                     <accordion-heading>
-                                                        <span>{{psde.dataElement.formName}}</span>
-                                                        <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                                        <div class="description-popup">
+                                                            {{psde.dataElement.formName}}
+                                                            <a class="description-popup-icon"
+                                                               description-popup
+                                                               dp-title="{{psde.dataElement.formName}}"
+                                                               dp-desc="{{psde.dataElement.description}}">
+                                                                <i class="fa fa-info-circle" tooltip-placement="top"></i>
+                                                            </a>
+                                                            <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                                            <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
+                                                        </div>
                                                     </accordion-heading>
                                                     <table locked-table-header class="table table-bordered">
                                                         <thead>
                                                             <tr>
                                                                 <th rowspan="2">{{resourceBundle.optionName}}</th>
-                                                                <th colspan="3" ng-repeat="genderOption in genderOptions"> {{genderOption.displayName}}
+                                                                <th colspan="3" ng-repeat="genderOption in genderOptions"> {{genderOption.name}}
                                                                 </th>
                                                             </tr>
                                                             <tr>
@@ -221,7 +288,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]">
-                                                            <td>{{option.displayName}}</td>
+                                                            <td>{{option.name}}</td>
                                                             <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [0,5])}}</td>
                                                             <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [4,15])}}</td>
                                                             <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [14, 9999])}}</td>
@@ -243,14 +310,23 @@
                                 <accordion close-others="false">
                                     <accordion-group is-open="status.open">
                                         <accordion-heading>
-                                            <span>{{resourceBundle.proceduresPerformed}}</span>
-                                            <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                            <div class="description-popup">
+                                                {{resourceBundle.proceduresPerformed}}
+                                                <a class="description-popup-icon"
+                                                   description-popup
+                                                   dp-title="{{resourceBundle.proceduresPerformed}}"
+                                                   dp-desc="{{ getDescriptionsForProceduresPerformed() }}">
+                                                    <i class="fa fa-info-circle" tooltip-placement="top"></i>
+                                                </a>
+                                                <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                                <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
+                                            </div>
                                         </accordion-heading>
                                         <table locked-table-header class="table table-bordered">
                                             <thead>
                                                 <tr>
                                                     <th rowspan="2">{{resourceBundle.optionName}}</th>
-                                                    <th colspan="3" ng-repeat="genderOption in genderOptions"> {{genderOption.displayName}}
+                                                    <th colspan="3" ng-repeat="genderOption in genderOptions"> {{genderOption.name}}
                                                     </th>
                                                 </tr>
                                                 <tr>
@@ -287,15 +363,17 @@
                 <div ng-class="'dataset-acc-wrapper'">
                     <accordion-group ng-repeat="dataSet in associatedDataSets | filter:{ isOriginDataset: true }" is-open="true">
                         <accordion-heading>
-                            <span>{{ resourceBundle[dataSet.id] || dataSet.name}}</span>
-                            <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-right': !isDatasetOpen[dataSet.id]}"></i>
+                            <span>{{ dataSet.name}}</span>
+                            <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-right': !isDatasetOpen[dataSet.id]}"></i>
+                            <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-left': !isDatasetOpen[dataSet.id]}"></i>
                         </accordion-heading>
                         <div class="exp-coll-group">
                             <accordion close-others="false">
                                 <accordion-group is-open="origins.open">
                                     <accordion-heading>
                                         <span>{{resourceBundle.originsCountTitle}}</span>
-                                        <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': origins.open, 'glyphicon-chevron-right': !origins.open}"></i>
+                                        <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': origins.open, 'glyphicon-chevron-right': !origins.open}"></i>
+                                        <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': origins.open, 'glyphicon-chevron-left': !origins.open}"></i>
                                     </accordion-heading>
                                     <table locked-table-header class="table table-bordered">
                                         <thead>
@@ -321,7 +399,8 @@
                         <accordion-group is-open="status.open">
                             <accordion-heading>
                                 <span>{{ resourceBundle.referralLocationLabel }}</span>
-                                <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
                             </accordion-heading>
                             <table locked-table-header class="table table-bordered">
                                 <thead>

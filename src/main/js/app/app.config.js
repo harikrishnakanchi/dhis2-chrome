@@ -47,8 +47,8 @@ require.config({
 
         //Controllers
         "controllers": "app/controller/controllers",
-        "dataEntryApprovalDashboardController": "app/controller/data.entry.approval.dashboard.controller",
-        "dataEntryController": "app/controller/data.entry.controller",
+        "dashboardController": "app/controller/dashboard.controller",
+        "moduleWeekSelectorController": "app/controller/module.week.selector.controller",
         "dataApprovalController": "app/controller/data.approval.controller",
         "aggregateDataEntryController": "app/controller/aggregate.data.entry.controller",
         "lineListDataEntryController": "app/controller/line.list.data.entry.controller",
@@ -115,6 +115,17 @@ require.config({
         "referralLocationsRepository": "app/repository/referral.locations.repository",
         "excludedDataElementsRepository": "app/repository/excluded.dataelements.repository",
         "pivotTableRepository": "app/repository/pivot.table.repository",
+        "dataSyncFailureRepository": "app/repository/data.sync.failure.repository",
+
+        //Models
+        "pivotTable": "app/models/pivot.table",
+        "moduleDataBlock": "app/models/module.data.block",
+        "customAttributes": "app/models/custom.attributes",
+
+        //Factories
+        "factories": "app/factories/factories",
+        "moduleDataBlockFactory": "app/factories/module.data.block.factory",
+        "checkVersionCompatibility": "app/factories/check.version.compatibility",
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",
@@ -125,6 +136,8 @@ require.config({
         "systemSettingsTransformer": "app/transformers/system.settings.transformer",
         "datasetTransformer": "app/transformers/dataset.transformer",
         "programTransformer": "app/transformers/program.transformer",
+        "translationsService": "app/transformers/translations.service",
+        "transformers": "app/transformers/transformers",
 
         //Database Utilities
         "dbutils": "app/dbutils/dbutils",
@@ -159,8 +172,9 @@ require.config({
 
         //Directives
         "directives": "app/directives/directives",
-        "pivotTable": "app/directives/pivot.table",
-        "lockedTableHeader": "app/directives/locked.table.header"
+        "pivotTableDirective": "app/directives/pivot.table",
+        "lockedTableHeader": "app/directives/locked.table.header",
+        "descriptionPopup": "app/directives/description.popup"
     },
     shim: {
         "ng-i18n": {

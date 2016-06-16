@@ -1,5 +1,5 @@
-define(["md5", "lodash"], function(md5, _) {
-    return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository) {
+define(["md5", "properties", "lodash"], function(md5, properties, _) {
+    return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility, translationsService) {
         var loadUserData = function(loginUsername) {
             var existingUserProjects = userPreferenceRepository.getCurrentUsersProjectIds();
             var previousUser = userPreferenceRepository.getCurrentUsersUsername().then(function (username) {
@@ -33,7 +33,7 @@ define(["md5", "lodash"], function(md5, _) {
 
             var productKeyLevel = systemSettingRepository.getProductKeyLevel();
 
-            if (isRole(user, "Superuser"))
+            if (isRole(user, "Projectadmin"))
                 return data;
 
             var userOrgUnitIds = _.pluck(user.organisationUnits, "id");
@@ -97,7 +97,7 @@ define(["md5", "lodash"], function(md5, _) {
         var startProjectDataSync = function(data) {
             var previousUserProjects = data[2];
             var isAdminUser = function(user) {
-                return !!(isRole(user, 'Superuser') || isRole(user, 'Superadmin'));
+                return !!(isRole(user, 'Projectadmin') || isRole(user, 'Superadmin'));
             };
 
             userPreferenceRepository.getCurrentUsersProjectIds().then(function(currentUserProjects) {
@@ -108,7 +108,7 @@ define(["md5", "lodash"], function(md5, _) {
                 var projectChanged = !_.isEqual(previousUserProjects, currentUserProjects);
 
                 if (projectChanged || roleChanged) {
-                    $hustle.publish({
+                    $hustle.publishOnce({
                         "type": "downloadProjectData",
                         "data": []
                     }, "dataValues");
@@ -119,10 +119,14 @@ define(["md5", "lodash"], function(md5, _) {
         };
 
         var redirect = function() {
-            if ($rootScope.hasRoles(['Superadmin', 'Superuser']))
+            if ($rootScope.hasRoles(['Superadmin', 'Projectadmin']))
                 $location.path("/orgUnits");
             else
                 $location.path("/dashboard");
+        };
+
+        var refreshTranslations = function() {
+            systemSettingRepository.getLocale().then($rootScope.setLocale);
         };
 
         $scope.login = function() {
@@ -132,7 +136,17 @@ define(["md5", "lodash"], function(md5, _) {
                 .then(authenticateUser)
                 .then(login)
                 .then(startProjectDataSync)
+                .then(refreshTranslations)
                 .then(redirect);
         };
+
+        var init = function() {
+            $scope.support_email = properties.support_email;
+            $scope.compatibilityInfo = {};
+            checkVersionCompatibility($scope.compatibilityInfo);
+        };
+
+        init();
+
     };
 });

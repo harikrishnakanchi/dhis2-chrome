@@ -8,7 +8,7 @@ define(["lodash"], function(_) {
                 $rootScope.currentUser.selectedProject = $scope.selectedProject.originalObject;
                 $rootScope.currentUser.organisationUnits = userPreference.organisationUnits;
                 return userPreferenceRepository.save(userPreference).then(function(data) {
-                    $hustle.publish({
+                    $hustle.publishOnce({
                         "type": "downloadProjectDataForAdmin",
                         "data": []
                     }, "dataValues");

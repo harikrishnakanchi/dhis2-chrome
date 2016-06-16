@@ -30,7 +30,7 @@ module.exports = function(config) {
         },
         autoWatch: true,
         frameworks: ['jasmine', 'requirejs'],
-        reporters: ['dots', 'coverage'],
+        reporters: ['dots', 'coverage', 'html'],
         preprocessors: {
             'main/js/app/**/*.js': ['coverage'],
             '**/*.html': ['ng-html2js']

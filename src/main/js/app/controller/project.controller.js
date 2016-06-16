@@ -1,6 +1,6 @@
 define(["moment", "orgUnitMapper", "properties", "lodash"], function(moment, orgUnitMapper, properties, _) {
 
-    return function($scope, $rootScope, $hustle, orgUnitRepository, $q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository) {
+    return function($scope, $rootScope, $hustle, orgUnitRepository, $q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository, translationsService) {
 
         $scope.openOpeningDate = function($event) {
             $event.preventDefault();
@@ -32,7 +32,7 @@ define(["moment", "orgUnitMapper", "properties", "lodash"], function(moment, org
             return $hustle.publish({
                 "data": data,
                 "type": action,
-                "locale": $scope.currentUser.locale,
+                "locale": $scope.locale,
                 "desc": desc
             }, "dataValues").then(function() {
                 return data;
@@ -154,13 +154,32 @@ define(["moment", "orgUnitMapper", "properties", "lodash"], function(moment, org
         };
 
         var init = function() {
-            orgUnitGroupSetRepository.getAll().then(function(data) {
-                $scope.allContexts = _.sortBy(_.find(data, "code", "context").organisationUnitGroups, "name");
-                $scope.allPopTypes = _.sortBy(_.find(data, "code", "type_of_population").organisationUnitGroups, "name");
-                $scope.reasonForIntervention = _.sortBy(_.find(data, "code", "reason_for_intervention").organisationUnitGroups, "name");
-                $scope.modeOfOperation = _.sortBy(_.find(data, "code", "mode_of_operation").organisationUnitGroups, "name");
-                $scope.modelOfManagement = _.sortBy(_.find(data, "code", "model_of_management").organisationUnitGroups, "name");
-                $scope.allProjectTypes = _.sortBy(_.find(data, "code", "project_type").organisationUnitGroups, "name");
+
+            orgUnitGroupSetRepository.getAll().then(function(orgUnitGroupSets) {
+
+                var addDefaultNameToAttribute = function (orgUnitGroups) {
+                    return _.map(orgUnitGroups, function (orgUnitGroup) {
+                        var defaultName = {
+                            englishName : orgUnitGroup.name
+                        };
+
+                        return _.assign(orgUnitGroup, defaultName);
+                    });
+                };
+
+                var getTranslations = function (code) {
+                    var orgUnitGroups = _.find(orgUnitGroupSets, "code", code).organisationUnitGroups;
+                    orgUnitGroups = addDefaultNameToAttribute(orgUnitGroups);
+
+                    return translationsService.translate(orgUnitGroups);
+                };
+
+                $scope.allContexts = _.sortBy(getTranslations("context"), "name");
+                $scope.allPopTypes = _.sortBy(getTranslations("type_of_population"), "name");
+                $scope.reasonForIntervention = _.sortBy(getTranslations("reason_for_intervention"), "name");
+                $scope.modeOfOperation = _.sortBy(getTranslations("mode_of_operation"), "name");
+                $scope.modelOfManagement = _.sortBy(getTranslations("model_of_management"), "name");
+                $scope.allProjectTypes = _.sortBy(getTranslations("project_type"), "name");
 
                 if ($scope.isNewMode)
                     prepareNewForm();

@@ -1,10 +1,12 @@
-<div class="modal-header">
-	<h4>{{modalTitle}}</h4>
-</div>
-<div class="modal-body">
-	<p>{{confirmationMessage}}</p>
-</div>
-<div class="modal-footer">
-	<button class="btn btn-main" ng-click="ok()">{{okLabel}}</button>
-	<button class="btn" ng-click="cancel()">{{cancelLabel}}</button>
+<div class="{{ layoutDirection.direction }} popupDialog">
+	<div class="modal-header">
+		<h4>{{modalTitle}}</h4>
+	</div>
+	<div class="modal-body">
+		<p>{{confirmationMessage}}</p>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-main" ng-click="ok()">{{okLabel}}</button>
+		<button class="btn" ng-click="cancel()">{{cancelLabel}}</button>
+	</div>
 </div>

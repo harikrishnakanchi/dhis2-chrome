@@ -1,9 +1,10 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function($scope, $rootScope) {
+    return function($scope, $rootScope, translationsService) {
         $scope.resourceBundle = $rootScope.resourceBundle;
         var DEFAULT_SORT_KEY = 'dataElementIndex';
 
-        $scope.showDownload = angular.isDefined($scope.showDownload) ? $scope.showDownload : true;
+        $scope.showDownloadButton = $scope.disableDownload != 'true';
+
         $scope.getCsvFileName = function() {
             var regex = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]\s([a-zA-Z0-9\s]+)/;
             var match = regex.exec($scope.definition.name);
@@ -34,7 +35,7 @@ define(["lodash", "moment"], function(_, moment) {
                     _.each(getSortedCategories(), function(category) {
                         var value = {};
                         value["Data Element"] = $scope.getDataElementName($scope.data.metaData.names[datum.dataElement]);
-                        value.Category = $scope.data.metaData.names[category.id];
+                        value.Category = category.name;
                         _.each($scope.periods, function(period) {
                             value[$scope.data.metaData.names[period]] = $scope.getValue(category.id, datum.dataElement, period);
                         });
@@ -54,16 +55,19 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         $scope.getHeaders = function() {
-            var headers = ["Data Element"];
+            var headers = [$scope.resourceBundle.dataElement];
             if ($scope.isCategoryPresent)
-                headers.push("Category");
+                headers.push($scope.resourceBundle.category);
             _.each($scope.periods, function (period) {
-                var month = $scope.data.metaData.names[period];
-                if ($scope.showWeeks == 'true') {
+                var month = $scope.resourceBundle[$scope.data.metaData.names[period].split(' ')[0]];
+                var year = $scope.data.metaData.names[period].split(' ')[1];
+                var name = _.isUndefined(month) ? $scope.data.metaData.names[period] : month + ' ' + year;
+
+                if ($scope.showWeeks) {
                     var numberofWeeks = getNumberOfISOWeeksInMonth(period);
-                    headers.push(month + " (" + numberofWeeks + " weeks)");
+                    headers.push(name + " (" + numberofWeeks + " " + $scope.resourceBundle.weeksLabel + ")");
                 } else {
-                    headers.push(month);
+                    headers.push(name);
                 }
             });
             return headers;
@@ -173,14 +177,20 @@ define(["lodash", "moment"], function(_, moment) {
             $scope.periodBasedValues = {};
             $scope.periods = $scope.data.metaData.pe;
             $scope.isCategoryPresent = $scope.data.width === 4;
+            $scope.showWeeks = $scope.definition.monthlyReport;
+            var items = $scope.definition.rows[0].items;
+            $scope.elements = _.groupBy(items, 'id');
             var dataElements;
 
             var periodsForHeader = _.map($scope.periods, function(pe) {
+                var month = $scope.resourceBundle[$scope.data.metaData.names[pe].split(' ')[0]];
+                var year = $scope.data.metaData.names[pe].split(' ')[1];
+                var name = _.isUndefined(month) ? $scope.data.metaData.names[pe] : month + ' ' + year;
                 return {
                     "period": pe,
-                    "name": $scope.data.metaData.names[pe],
+                    "name": name,
                     "sortKey": "sortKey_" + pe,
-                    "numberOfISOWeeks": $scope.showWeeks == 'true' ? getNumberOfISOWeeksInMonth(pe) : ''
+                    "numberOfISOWeeks": $scope.showWeeks ? getNumberOfISOWeeksInMonth(pe) : ''
                 };
             });
             $scope.headersForTable = [{
@@ -189,17 +199,20 @@ define(["lodash", "moment"], function(_, moment) {
             }];
 
             var getSortedCategories = function() {
-                return _.map($scope.definition.categoryDimensions[0].categoryOptions, function(categoryOption, index) {
+                var translatedCategoryOptions = translationsService.translate($scope.definition.categoryDimensions[0].categoryOptions);
+                return _.map(translatedCategoryOptions, function(categoryOption, index) {
                     return {
                         "name": categoryOption.name,
                         "sortOrder": index + 1,
-                        "id": categoryOption.id
+                        "id": categoryOption.id,
+                        "code": categoryOption.code
                     };
                 });
             };
 
             if ($scope.isCategoryPresent) {
                 var sortedCategories = getSortedCategories();
+                var indexedSortedCategories = _.indexBy(sortedCategories, 'id');
 
                 $scope.hasOnlyOneCategory = sortedCategories.length === 1;
                 var sortedCategoryNamesForDisplay = [];
@@ -225,6 +238,7 @@ define(["lodash", "moment"], function(_, moment) {
 
             dataElements = _.uniq(_.pluck($scope.dataMap, "dataElement"));
 
+
             _.each(dataElements, function(dataElementId) {
 
                 var sortKeysAndValues = {};
@@ -232,7 +246,14 @@ define(["lodash", "moment"], function(_, moment) {
                     var filteredObjects = _.filter($scope.dataMap, function(data) {
                          return data.dataElement === dataElementId && data.period === period;
                     });
-                    var dataValues = _.map(filteredObjects, function (dataValue) {
+                    var filteredExcludedCategoryOptions = _.filter(filteredObjects, function(data){
+                        if(data.category) {
+                         var categoryOption = indexedSortedCategories[data.category];
+                         return !(categoryOption && categoryOption.code && categoryOption.code.indexOf("_excludeFromTotal") > -1);
+                        }
+                        return true;
+                    });
+                    var dataValues = _.map(filteredExcludedCategoryOptions, function (dataValue) {
                         return dataValue.value;
                     });
                     sortKeysAndValues['sortKey_' + period] = _.reduce(dataValues, function(previous, current) {
@@ -240,9 +261,11 @@ define(["lodash", "moment"], function(_, moment) {
                     }, 0);
                 });
 
+                var element = _.first($scope.elements[dataElementId]);
                 var dataElementInfo = {
                     "dataElement": dataElementId,
-                    "dataElementName": $scope.data.metaData.names[dataElementId]
+                    "dataElementName": $scope.data.metaData.names[dataElementId],
+                    "dataElementDescription": (element && element.description) ? element.description : ''
                 };
                 dataElementInfo[DEFAULT_SORT_KEY] = getDefaultSortOrder(dataElementId);
 

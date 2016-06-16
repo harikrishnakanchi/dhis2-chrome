@@ -54,148 +54,192 @@ define(["userPreferenceRepository", "angularMocks", "utils", "moment", "orgUnitR
         });
 
         describe('getCurrentUsersModules', function() {
-            it('should get current users modules', function() {
-                var userModulesInRepo = [{
-                    'id': 'mod1'
-                }, {
-                    'id': 'mod2'
-                }, {
-                    'id': 'mod3'
+            it('should return modules for current user', function() {
+                var userPreference = {
+                    username: 'someUsername',
+                    lastUpdated: moment('2016-06-01').toISOString(),
+                    organisationUnits: [{
+                        id: 'someProjectId'
+                    }]
+                }, modules = [{
+                    'id': 'someModuleId'
                 }];
-                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, userModulesInRepo));
+                mockStore.getAll.and.returnValue(utils.getPromise(q, [userPreference]));
+                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
 
-                var actualUserModules;
-                userPreferenceRepository.getCurrentUsersModules().then(function(data) {
-                    actualUserModules = data;
+                var result;
+                userPreferenceRepository.getCurrentUsersModules().then(function(repositoryResponse) {
+                    result = repositoryResponse;
                 });
                 scope.$apply();
 
-                expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['proj1']);
-                expect(actualUserModules).toEqual(userModulesInRepo);
+                expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(_.pluck(userPreference.organisationUnits, 'id'));
+                expect(result).toEqual(modules);
             });
         });
 
         describe('getCurrentUsersOriginOrgUnitIds', function() {
-            it('should get all patient origin org units for users modules', function() {
-                var userModules = [{
-                    'id': 'mod1'
-                }, {
-                    'id': 'mod2'
+            it('should return all patient origin org units for current user', function() {
+                var modules = [{
+                    'id': 'someModuleId'
+                }], originOrgUnits = [{
+                    'id': 'someOriginId'
                 }];
 
-                var originOrgUnits = [{
-                    'id': 'o1',
-                    'name': 'o1'
-                }, {
-                    'id': 'o2',
-                    'name': 'o2'
-                }];
-
-                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, userModules));
+                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
                 orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, originOrgUnits));
 
-                var actualResult;
-                userPreferenceRepository.getCurrentUsersOriginOrgUnitIds().then(function(data) {
-                    actualResult = data;
+                var result;
+                userPreferenceRepository.getCurrentUsersOriginOrgUnitIds().then(function(repositoryResponse) {
+                    result = repositoryResponse;
                 });
                 scope.$apply();
 
-                expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['proj1']);
-                expect(orgUnitRepository.findAllByParent).toHaveBeenCalledWith(['mod1', 'mod2']);
-                expect(actualResult).toEqual(['o1', 'o2']);
+                expect(orgUnitRepository.findAllByParent).toHaveBeenCalledWith(_.pluck(modules, 'id'));
+                expect(result).toEqual(_.pluck(originOrgUnits, 'id'));
             });
         });
 
         describe('getCurrentUserPreferences', function() {
-            it('should get current user preferences', function() {
-                var userPrefs = [{
-                    'username': 'msfadmin',
-                    'lastUpdated': '',
-                    'organisationUnits': []
-                }, {
-                    'username': 'new_user',
-                    'lastUpdated': moment('2015-08-24').toISOString(),
-                    'organisationUnits': [{
-                        'id': 'proj1'
-                    }]
-                }, {
-                    'username': 'new2_user',
-                    'lastUpdated': moment('2015-08-23').toISOString(),
-                    'organisationUnits': [{
-                        'id': 'proj2'
-                    }]
-                }];
+            it('should return most recently updated user preference', function() {
+                var userPreferenceA = {
+                    username: 'someUsername',
+                    lastUpdated: moment('2016-06-01').toISOString()
+                }, userPreferenceB = {
+                    username: 'someOtherUsername',
+                    lastUpdated: moment('2016-06-08').toISOString()
+                };
+                mockStore.getAll.and.returnValue(utils.getPromise(q, [userPreferenceA, userPreferenceB]));
 
-                mockStore.getAll.and.returnValue(utils.getPromise(q, userPrefs));
-                var actualUserPreferences;
-                userPreferenceRepository.getCurrentUsersPreferences().then(function(data) {
-                    actualUserPreferences = data;
+                var result;
+                userPreferenceRepository.getCurrentUsersPreferences().then(function(repositoryResponse) {
+                    result = repositoryResponse;
                 });
                 scope.$apply();
 
-                expect(actualUserPreferences).toEqual(userPrefs[1]);
+                expect(result).toEqual(userPreferenceB);
+            });
+
+            it('should return null if no user preferences exist', function() {
+                mockStore.getAll.and.returnValue(utils.getPromise(q, []));
+
+                var result;
+                userPreferenceRepository.getCurrentUsersPreferences().then(function(repositoryResponse) {
+                    result = repositoryResponse;
+                });
+                scope.$apply();
+
+                expect(result).toBeNull();
+            });
+
+            it('should ignore user preferences whose lastUpdated value is an empty string', function() {
+                var userPreference = {
+                    username: 'someOtherUsername',
+                    lastUpdated: ''
+                };
+                mockStore.getAll.and.returnValue(utils.getPromise(q, [userPreference]));
+
+                var result;
+                userPreferenceRepository.getCurrentUsersPreferences().then(function(repositoryResponse) {
+                    result = repositoryResponse;
+                });
+                scope.$apply();
+
+                expect(result).toBeNull();
+            });
+
+            it('should ignore user preferences that do not have a lastUpdated value', function() {
+                var userPreference = {
+                    username: 'someOtherUsername'
+                };
+                mockStore.getAll.and.returnValue(utils.getPromise(q, [userPreference]));
+
+                var result;
+                userPreferenceRepository.getCurrentUsersPreferences().then(function(repositoryResponse) {
+                    result = repositoryResponse;
+                });
+                scope.$apply();
+
+                expect(result).toBeNull();
             });
         });
 
         describe('getCurrentUsersProjectIds', function() {
-            it('should get current user projects', function() {
-                var userPrefs = [{
-                    'username': 'msfadmin',
-                    'lastUpdated': '',
-                    'organisationUnits': []
-                }, {
-                    'username': 'new_user',
-                    'lastUpdated': moment('2015-08-24').toISOString(),
-                    'organisationUnits': [{
-                        'id': 'proj1'
+            it('should return organisation unit ids of current user', function() {
+                var userPreference = {
+                    username: 'someUsername',
+                    lastUpdated: moment('2016-06-01').toISOString(),
+                    organisationUnits: [{
+                        id: 'someProjectId'
                     }]
-                }, {
-                    'username': 'new2_user',
-                    'lastUpdated': moment('2015-08-23').toISOString(),
-                    'organisationUnits': [{
-                        'id': 'proj2'
-                    }]
-                }];
+                };
+                mockStore.getAll.and.returnValue(utils.getPromise(q, [userPreference]));
 
-                mockStore.getAll.and.returnValue(utils.getPromise(q, userPrefs));
-                var actualUserProjects;
-                userPreferenceRepository.getCurrentUsersProjectIds().then(function(data) {
-                    actualUserProjects = data;
+                var result;
+                userPreferenceRepository.getCurrentUsersProjectIds().then(function(repositoryResponse) {
+                    result = repositoryResponse;
                 });
                 scope.$apply();
 
-                expect(actualUserProjects).toEqual(["proj1"]);
+                expect(result).toEqual(_.pluck(userPreference.organisationUnits, 'id'));
+            });
+
+            it('should return empty array if no user preferences exist', function() {
+                mockStore.getAll.and.returnValue(utils.getPromise(q, []));
+
+                var result;
+                userPreferenceRepository.getCurrentUsersProjectIds().then(function(repositoryResponse) {
+                    result = repositoryResponse;
+                });
+                scope.$apply();
+
+                expect(result).toEqual([]);
+            });
+
+            it('should return empty array if user preference has no organisation units', function() {
+                var userPreference = {
+                    username: 'someUsername',
+                    lastUpdated: moment('2016-06-01').toISOString()
+                };
+                mockStore.getAll.and.returnValue(utils.getPromise(q, [userPreference]));
+
+                var result;
+                userPreferenceRepository.getCurrentUsersProjectIds().then(function(repositoryResponse) {
+                    result = repositoryResponse;
+                });
+                scope.$apply();
+
+                expect(result).toEqual([]);
             });
         });
 
         describe('getCurrentUsersUsername', function() {
-            it('should get current users username', function() {
-                var userPrefs = [{
-                    'username': 'msfadmin',
-                    'lastUpdated': ''
-                }, {
-                    'username': 'new_user',
-                    'lastUpdated': moment('2015-08-24').toISOString()
-                }, {
-                    'username': 'new2_user',
-                    'lastUpdated': moment('2015-08-23').toISOString()
-                }];
+            it('should return username of current user', function() {
+                var userPreference = {
+                    username: 'someUsername',
+                    lastUpdated: moment('2016-06-01').toISOString()
+                };
+                mockStore.getAll.and.returnValue(utils.getPromise(q, [userPreference]));
 
-                mockStore.getAll.and.returnValue(utils.getPromise(q, userPrefs));
-
+                var result;
                 userPreferenceRepository.getCurrentUsersUsername().then(function(repositoryResponse) {
-                    expect(repositoryResponse).toEqual('new_user');
+                    result = repositoryResponse;
                 });
                 scope.$apply();
+
+                expect(result).toEqual(userPreference.username);
             });
 
-            it('should return null if current user is not defined', function() {
+            it('should return null if no user preferences exists', function() {
                 mockStore.getAll.and.returnValue(utils.getPromise(q, []));
 
+                var result;
                 userPreferenceRepository.getCurrentUsersUsername().then(function(repositoryResponse) {
-                    expect(repositoryResponse).toBeNull();
+                    result = repositoryResponse;
                 });
                 scope.$apply();
+
+                expect(result).toBeNull();
             });
         });
     });

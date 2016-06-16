@@ -1,8 +1,8 @@
-<div ng-controller="dataEntryController">
-    <div class="dataentrypage child-margin">
+<div ng-controller="moduleWeekSelectorController">
+    <div class="module-week-selector dataentrypage child-margin {{ layoutDirection.direction }}">
         <div ng-hide="week" class="alert alert-info">{{resourceBundle.chooseWeek}}</div>
         <div class="module-select week-selector-gradient">
-            <weekselector year="year" month="month" week="week" labels="resourceBundle" language="currentUser.locale" on-change="resetForm()" start-date="organisationUnit.openingDate"></weekselector>
+            <weekselector year="year" month="month" week="week" labels="resourceBundle" locale="locale" on-change="resetForm()" start-date="organisationUnit.openingDate"></weekselector>
             <ul class="form" ng-hide="showOfflineSummaryForViewOnly">
                 <li class="form-group">
                     <label for="module">{{resourceBundle.moduleLabel}}</label>

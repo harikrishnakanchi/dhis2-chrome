@@ -1,6 +1,6 @@
-define(["orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "timecop"], function(OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, timecop) {
+define(["orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "translationsService", "timecop", "orgUnitGroupSetRepository", "systemSettingRepository"], function(OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, TranslationsService, timecop, OrgUnitGroupSetRepository, SystemSettingRepository) {
     describe("projectReportController", function() {
-        var scope, rootScope, projectReportController, orgUnitRepository, pivotTableRepository, pivotTables, data, q;
+        var scope, rootScope, projectReportController, orgUnitRepository, pivotTableRepository, translationsService, pivotTables, data, q, orgUnitGroupSetRepository, systemSettingRepository;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             rootScope = $rootScope;
@@ -25,55 +25,64 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
                 "attributeValues": [
                     {
                         "attribute": {
-                            "name": "Context"
+                            "name": "Context",
+                            "code" : "prjCon"
                         },
                         "value": "Cross-border instability"
                     },
                     {
                         "attribute": {
-                            "name": "Project Code"
+                            "name": "Project Code",
+                            "code": "projCode"
                         },
                         "value": "SS153"
                     },
                     {
                         "attribute": {
-                            "name": "Mode Of Operation"
+                            "name": "Mode Of Operation",
+                            "code": "modeOfOperation"
                         },
                         "value": "Direct operation"
                     },
                     {
                         "attribute": {
-                            "name": "Project Type"
+                            "name": "Project Type",
+                            "code": "projectType"
                         },
                         "value": "Regular Project"
                     },
                     {
                         "attribute": {
-                            "name": "Model Of Management"
+                            "name": "Model Of Management",
+                            "code": "modelOfManagement"
                         },
                         "value": "Collaboration"
                     },
                     {
                         "attribute": {
-                            "name": "Type"
+                            "name": "Type",
+                            "code": "Type"
                         },
                         "value": "Project"
                     },
                     {
                         "attribute": {
-                            "name": "Type of population"
+                            "name": "Type of population",
+                            "code": "prjPopType"
                         },
                         "value": "General Population"
                     },
                     {
                         "attribute": {
-                            "name": "Reason For Intervention"
+                            "name": "Reason For Intervention",
+                            "code": "reasonForIntervention"
                         },
                         "value": "Access to health care"
                     },
                     {
                         "attribute": {
-                            "name": "Location"
+                            "name": "Location",
+                            "code": "prjLoc"
                         },
                         "value": "Northern Bar El Ghazal"
                     }
@@ -87,54 +96,12 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
                 }
             };
             pivotTables = [{
-                "name": "[FieldApp - ProjectReport] 2 Hospitalization",
-                "id": "prEqldr6Juk",
-                "sortOrder": 0,
-                "columns": [
-                {
-                    "dimension": "pe",
-                    "items": [
-                        {
-                            "name": "LAST_12_MONTHS",
-                            "id": "LAST_12_MONTHS"
-                        }
-                    ]
-                }
-            ],
-                "filters": [
-                {
-                    "dimension": "ou",
-                    "items": [
-                        {
-                            "name": "Aweil - SS153",
-                            "id": "a3f1fcbc237"
-                        }
-                    ]
-                }
-            ],
-                "rows": [
-                {
-                    "dimension": "dx",
-                    "items": [
-                        {
-                            "name": "Average bed occupation rate (%) - Adult IPD Ward",
-                            "id": "adf6cf9405c"
-                        },
-                        {
-                            "name": "Average length of bed use (days) - Adult IPD Ward",
-                            "id": "ae70aadc5cf"
-                        }
-                    ]
-                }
-            ],
-                "categoryDimensions": [],
-                "sortAscending": false,
-                "sortDescending": false,
-                "sortable": false,
-                "dataSetCode": "ProjectReport"
-        }, {
-                    id: "xVYnmknNChg",
-                    name: "[FieldApp - AdultIPDWard] Previous 12 weeks of all cases"
+                id: 'pivotTable1',
+                projectReport: true,
+                title: 'Hospitalization'
+            }, {
+                id: 'pivotTable2',
+                projectReport: false
             }];
             data = {
                 "headers": [{
@@ -176,16 +143,167 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
             };
 
             scope.resourceBundle = {
-                projectInformationLabel: "Project Information"
+                country: 'Country',
+                nameLabel: 'Name',
+                projectInformationLabel: 'Project Information',
+                projectCodeLabel: 'Project Code',
+                projectTypeLabel: 'Project Type',
+                contextLabel: 'Context',
+                typeOfPopulationLabel: 'Type of population',
+                reasonForInterventionLabel: 'Reason For Intervention',
+                modeOfOperationLabel: 'Mode Of Operation',
+                modelOfManagementLabel: 'Model Of Management',
+                openingDateLabel: 'Opening Date',
+                endDateLabel: 'End Date'
             };
 
             orgUnitRepository = new OrgUnitRepository();
-            pivotTableRepository = new PivotTableRepository();
             spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise($q, projectBasicInfo));
+
+            pivotTableRepository = new PivotTableRepository();
             spyOn(pivotTableRepository, "getAll").and.returnValue(utils.getPromise($q, pivotTables));
             spyOn(pivotTableRepository, "getDataForPivotTable").and.returnValue(utils.getPromise($q, data));
 
-            projectReportController = new ProjectReportController(rootScope, $q, scope, orgUnitRepository, pivotTableRepository);
+            var translatedReport = [
+                {"definition": {
+                    "id":"pivotTable1",
+                    "projectReport":true,
+                    "title":"Hospitalization"},
+                    "data":{
+                        "headers":[{"name":"dx","column":"Data"},{"name":"pe","column":"Period"},{"name":"value","column":"Value"}],
+                        "metaData":{
+                            "names":{"201511":"November 2015",
+                                "201512":"December 2015",
+                                "adf6cf9405c":"Average bed occupation rate (%) - Adult IPD Ward",
+                                "ae70aadc5cf":"Average length of bed use (days) - Adult IPD Ward",
+                                "dx":"Data","pe":"Period"},
+                            "dx":["adf6cf9405c","ae70aadc5cf"],
+                            "pe":["201511","201512"]},
+                        "rows":[
+                            ["adf6cf9405c","201511","1.1"],
+                            ["adf6cf9405c","201512","1.2"],
+                            ["ae70aadc5cf","201511","2.1"],
+                            ["ae70aadc5cf","201512","2.2"]],
+                        "height":132,
+                        "width":3},
+                    "isTableDataAvailable":true
+                }];
+
+            var mockDB = utils.getMockDB($q);
+            mockStore = mockDB.objectStore;
+
+            var translationResponse = [{
+                objectId: 'a16b4a97ce4',
+                name:'hello'
+            }, {
+                objectId: 'ac606ebc28f'
+            }];
+
+
+            var ngI18nResourceBundle = {
+                get: jasmine.createSpy("get").and.returnValue(utils.getPromise(q, {}))
+            };
+
+            systemSettingRepository = new SystemSettingRepository();
+            spyOn(systemSettingRepository, 'upsertLocale');
+            translationsService = new TranslationsService(q, mockDB.db, rootScope, ngI18nResourceBundle, systemSettingRepository);
+            mockStore.each.and.returnValue(utils.getPromise(q, translationResponse));
+
+            spyOn(translationsService, "translateReports").and.returnValue(utils.getPromise(q, translatedReport));
+
+            var orgUnitGroupSets = [{
+                "code": "project_type",
+                "id": "D6yNgLkqIKR",
+                "name": "Project Type",
+                "organisationUnitGroups": [{
+                    "id": "koFDuOVZsoU",
+                    "name": "Regular Project"
+                }, {
+                    "id": "vxKtTBwL2S2",
+                    "name": "Emergency Project"
+                }, {
+                    "id": "I97gskdFUWe",
+                    "name": "Vaccination Campaign"
+                }]
+            }, {
+                "code": "model_of_management",
+                "id": "a2d4a1dee27",
+                "name": "Model Of Management",
+                "organisationUnitGroups": [{
+                    "id": "aa9a24c9126",
+                    "name": "MSF Management"
+                }, {
+                    "id": "a11a7a5d55a",
+                    "name": "Collaboration"
+                }]
+            }, {
+                "code": "context",
+                "id": "a5c18ef7277",
+                "name": "Context",
+                "organisationUnitGroups": [{
+                    "id": "a16b4a97ce4",
+                    "name": "Post-conflict"
+                }, {
+                    "id": "ac606ebc28f",
+                    "name": "Internal Instability"
+                }, {
+                    "id": "abfef86a4b6",
+                    "name": "Cross-border instability"
+                }, {
+                    "id": "af40faf6384",
+                    "name": "Stable"
+                }]
+            }, {
+                "code": "reason_for_intervention",
+                "id": "a86f66f29d4",
+                "name": "Reason For Intervention",
+                "organisationUnitGroups": [{
+                    "id": "ab4b1006371",
+                    "name": "Armed Conflict"
+                }, {
+                    "id": "a9e29c075cc",
+                    "name": "Epidemic"
+                }, {
+                    "id": "a8014cfca5c",
+                    "name": "Natural Disaster"
+                }, {
+                    "id": "a559915efe5",
+                    "name": "Access to health care"
+                }]
+            }, {
+                "code": "type_of_population",
+                "id": "a8a579d5fab",
+                "name": "Type of Population",
+                "organisationUnitGroups": [{
+                    "id": "a35778ed565",
+                    "name": "Most-at-risk Population"
+                }, {
+                    "id": "afbdf5ffe08",
+                    "name": "General Population"
+                }, {
+                    "id": "a48f665185e",
+                    "name": "Refugee"
+                }, {
+                    "id": "a969403a997",
+                    "name": "Internally Displaced People"
+                }]
+            }, {
+                "code": "mode_of_operation",
+                "id": "a9ca3d1ed93",
+                "name": "Mode Of Operation",
+                "organisationUnitGroups": [{
+                    "id": "a92cee050b0",
+                    "name": "Remote operation"
+                }, {
+                    "id": "a560238bc90",
+                    "name": "Direct operation"
+                }]
+            }];
+
+            orgUnitGroupSetRepository = new OrgUnitGroupSetRepository();
+            spyOn(orgUnitGroupSetRepository, 'getAll').and.returnValue(utils.getPromise(q, orgUnitGroupSets));
+
+            projectReportController = new ProjectReportController(rootScope, $q, scope, orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository);
         }));
 
         it("should get csv file name in expected format", function() {
@@ -214,24 +332,18 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
                 ['Average length of bed use (days) - Adult IPD Ward', '2.1', '2.2'],
                 []
             ];
+
+            translationsService.setLocale('fr');
             scope.$apply();
-            scope.pivotTables[0].dataDimensionItems = ["adf6cf9405c", "ae70aadc5cf"];
-            expect(scope.getData()).toEqual(expectedData);
-        });
-
-        it('should get table name if it is present', function() {
-            var tableName = '[FieldApp - ProjectReport] 1 Consultations';
-            expect(scope.getTableName(tableName)).toEqual("Consultations");
-        });
-
-        it('should get empty string if table name is not present', function() {
-            var tableName = '[FieldApp - ProjectReport]';
-            expect(scope.getTableName(tableName)).toEqual("");
+            scope.pivotTables[0].currentOrderOfItems = ["adf6cf9405c", "ae70aadc5cf"];
+            expect(scope.getCsvFileData()).toEqual(expectedData);
         });
 
         it('should filter out project report tables from pivot tables', function() {
+
+            translationsService.setLocale('fr');
             scope.$apply();
-            expect(scope.pivotTables[0].table).toEqual(pivotTables[0]);
+            expect(scope.pivotTables[0].definition).toEqual(pivotTables[0]);
             expect(scope.pivotTables[0].data).toEqual(data);
         });
 
@@ -277,9 +389,11 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
                     value: ""
                 }
             ];
+
+            translationsService.setLocale('fr');
             scope.$apply();
             expect(orgUnitRepository.get).toHaveBeenCalledWith("xyz");
-            expect(_.isEqual(scope.projectAttributes, expectedProjectAttributes)).toBe(true);
+            expect(scope.projectAttributes).toEqual(expectedProjectAttributes);
         });
     });
 });

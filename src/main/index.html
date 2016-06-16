@@ -12,14 +12,14 @@
 
 <body>
     <a id="top"></a>
-    <div id="dhis2" name="dhis2" ng-csp ng-controller="mainController" ng-cloak>
+    <div id="praxis" name="praxis" ng-csp ng-controller="mainController" ng-cloak>
         <header>
             <div class="container">
                 <nav class="navbar">
                     <div class="container-fluid">
                         <div class="navbar-header">
-                            <img src="img/logo.png" alt="" title="DHIS" id="logoImg" class="navbar-brand" tabindex="-1" ng-if="!showTestLogo()">
-                            <img src="img/logo-test.png" alt="" title="DHIS" id="logoImg" class="navbar-brand" tabindex="-1" ng-if="showTestLogo()">
+                            <img src="img/logo.png" alt="" title="PRAXIS" id="logoImg" class="navbar-brand" tabindex="-1" ng-if="!showTestLogo()">
+                            <img src="img/logo-test.png" alt="" title="PRAXIS" id="logoImg" class="navbar-brand" tabindex="-1" ng-if="showTestLogo()">
                         </div>
                         <div class="nav navbar-nav navbar-right">
                             <p class="text-right login-message">
@@ -40,11 +40,10 @@
                                         </button>
                                         <ul class="dropdown-menu" role="menu" ng-if="isLoggedIn">
                                             <li ng-include="'templates/partials/download-data.html'"> </li>
-                                            <li><a href="#/selectProjectPreference" ng-if="hasRoles(['Superuser'])" tabindex="-1">{{resourceBundle.changeProject}}</a></li>
+                                            <li><a href="#/selectProjectPreference" ng-if="hasRoles(['Projectadmin'])" tabindex="-1">{{resourceBundle.changeProject}}</a></li>
                                             <li class="divider"></li>
                                             <li><a href="" ng-click="gotoProductKeyPage()" tabindex="-1">{{ resourceBundle.updateProductKeyMenuLabel }}</a></li>
                                             <li class="dropdown-submenu pull-left" ng-include="'templates/partials/clone.html'"></li>
-                                            <li class="dropdown-submenu pull-left" ng-include="'templates/partials/select-language.html'"></li>
                                             <li class="divider"></li>
                                         </ul>
                                         <ul class="dropdown-menu" role="menu" ng-if="!isLoggedIn">
@@ -132,7 +131,7 @@
                         {{ resourceBundle.countryLabel }}
                     </a>
                 </li>
-                <li role="presentation" ng-class="{ active: isActive('\/orgUnits$')}" ng-if="hasRoles(['Superuser'])">
+                <li role="presentation" ng-class="{ active: isActive('\/orgUnits$')}" ng-if="hasRoles(['Projectadmin'])">
                     <a href="#/orgUnits">
                         <i class="fa fa-gear"></i>
                         {{ resourceBundle.projectsLabel }}
@@ -155,7 +154,7 @@
             </div>
         </div>
         <footer>
-            <div class="container text-right small text-muted">
+            <div class="container text-right small text-muted hide-from-print">
                 <p>{{ getConnectedToMessage() }}</p>
             </div>
         </footer>

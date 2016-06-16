@@ -1,6 +1,7 @@
-define(["loginController", "angularMocks", "utils", "sessionHelper", "userPreferenceRepository", "orgUnitRepository", "systemSettingRepository", "userRepository"], function (LoginController, mocks, utils, SessionHelper, UserPreferenceRepository, OrgUnitRepository, SystemSettingRepository, UserRepository) {
+define(["loginController", "angularMocks", "utils", "sessionHelper", "userPreferenceRepository", "orgUnitRepository", "systemSettingRepository", "userRepository", "chromeUtils", "checkVersionCompatibility", "translationsService"],
+    function (LoginController, mocks, utils, SessionHelper, UserPreferenceRepository, OrgUnitRepository, SystemSettingRepository, UserRepository, chromeUtils, CheckVersionCompatibility, TranslationsService) {
     describe("login controller", function () {
-        var rootScope, loginController, scope, location, q, fakeUserStore, fakeUserCredentialsStore, fakeUserStoreSpy, sessionHelper, hustle, userPreferenceRepository, systemSettingRepository, userRepository, orgUnitRepository;
+        var rootScope, loginController, scope, location, q, fakeUserStore, fakeUserCredentialsStore, fakeUserStoreSpy, sessionHelper, hustle, userPreferenceRepository, systemSettingRepository, userRepository, orgUnitRepository, checkVersionCompatibility, translationsService;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function ($rootScope, $location, $q, $hustle) {
@@ -48,13 +49,21 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             systemSettingRepository = new SystemSettingRepository();
             spyOn(systemSettingRepository, "getAllowedOrgUnits").and.returnValue([]);
             spyOn(systemSettingRepository, "getProductKeyLevel").and.returnValue("");
+            spyOn(systemSettingRepository, "get").and.returnValue(utils.getPromise(q, ["5.1", "6.0"]));
+            spyOn(systemSettingRepository, "getLocale").and.returnValue(utils.getPromise(q, "en"));
+
+            translationsService = new TranslationsService();
+            spyOn(translationsService, "setLocale");
+
+            spyOn(chromeUtils, "getPraxisVersion").and.returnValue("5.1");
 
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, {}));
 
-            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+            spyOn(hustle, "publishOnce").and.returnValue(utils.getPromise(q, {}));
 
-            loginController = new LoginController(rootScope, scope, location, q, sessionHelper, hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository);
+            checkVersionCompatibility = CheckVersionCompatibility(systemSettingRepository);
+            loginController = new LoginController(rootScope, scope, location, q, sessionHelper, hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility, translationsService);
         }));
 
         it("should set invalid access as true when their is project level product key and there is no common org unit", function () {
@@ -168,7 +177,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
                 "username": "projectadmin",
                 "password": "5f4dcc3b5aa765d61d8327deb882cf99",
                 "userRoles": [{
-                    "name": "Superuser"
+                    "name": "Projectadmin"
                 }]
             }));
 
@@ -264,13 +273,13 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
                 "username": "projectadmin",
                 "password": "5f4dcc3b5aa765d61d8327deb882cf99",
                 "userRoles": [{
-                    "name": "Superuser"
+                    "name": "Projectadmin"
                 }]
             }));
             scope.login();
             scope.$apply();
 
-            expect(hustle.publish).toHaveBeenCalledWith({
+            expect(hustle.publishOnce).toHaveBeenCalledWith({
                 "type": "downloadProjectData",
                 "data": []
             }, "dataValues");
@@ -320,10 +329,31 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             scope.login();
             scope.$apply();
 
-            expect(hustle.publish).toHaveBeenCalledWith({
+            expect(hustle.publishOnce).toHaveBeenCalledWith({
                 "type": "downloadProjectData",
                 "data": []
             }, "dataValues");
+        });
+
+        it("should refresh translations after login", function () {
+            scope.username = "projectadmin";
+            scope.password = "password";
+
+            userRepository.getUserCredentials.and.returnValue(utils.getPromise(q, {
+                "username": "projectadmin",
+                "password": "5f4dcc3b5aa765d61d8327deb882cf99",
+                "userRoles": [{
+                    "name": "Projectadmin"
+                }]
+            }));
+
+            rootScope.hasRoles.and.returnValue(true);
+            rootScope.setLocale = jasmine.createSpy('setLocale');
+
+            scope.login();
+            scope.$apply();
+
+            expect(rootScope.setLocale).toHaveBeenCalledWith("en");
         });
     });
 });

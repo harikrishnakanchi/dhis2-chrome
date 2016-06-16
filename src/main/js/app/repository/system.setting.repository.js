@@ -45,6 +45,14 @@ define(["lodash", "cipherUtils", "properties", "dhisId"], function(_, cipherUtil
 
         };
 
+        var upsertLocale = function (locale) {
+            var localeJson = {"key": "locale", "value": locale};
+            var store = db.objectStore("systemSettings");
+            return store.upsert(localeJson).then(function () {
+                return localeJson;
+            });
+        };
+
         var get = function(key) {
             var store = db.objectStore("systemSettings");
             return store.find(key).then(function(setting) {
@@ -70,6 +78,14 @@ define(["lodash", "cipherUtils", "properties", "dhisId"], function(_, cipherUtil
             if (properties.devMode && _.isUndefined($rootScope.productKeyLevel))
                 $rootScope.productKeyLevel = properties.dhis.productKeyLevel;
             return $rootScope.productKeyLevel;
+        };
+
+        var getLocale = function () {
+            var returnLocale = function(locale) {
+                return locale || 'en';
+            };
+            var catchBlock = returnLocale;
+            return get("locale").then(returnLocale, catchBlock);
         };
 
         var getAllowedOrgUnits = function() {
@@ -115,9 +131,11 @@ define(["lodash", "cipherUtils", "properties", "dhisId"], function(_, cipherUtil
         return {
             "upsert": upsert,
             "upsertProductKey": upsertProductKey,
+            "upsertLocale": upsertLocale,
             "get": get,
             "getDhisUrl": getDhisUrl,
             "getAuthHeader": getAuthHeader,
+            "getLocale": getLocale,
             "isKeyGeneratedFromProd": isKeyGeneratedFromProd,
             "isProductKeySet": isProductKeySet,
             "loadProductKey": loadProductKey,
