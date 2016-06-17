@@ -26,27 +26,26 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                     weeklyReport: true
                 };
 
-                datasetRepository = new DatasetRepository();
-                spyOn(datasetRepository, 'findAllForOrgUnits').and.returnValue(utils.getPromise(q, [mockDataSet]));
-
                 userPreferenceRepository = new UserPreferenceRepository();
                 spyOn(userPreferenceRepository, 'getCurrentUsersProjectIds').and.returnValue(utils.getPromise(q, [mockProjectId]));
-                spyOn(userPreferenceRepository, 'getCurrentUsersOriginOrgUnitIds').and.returnValue(utils.getPromise(q, {}));
 
-                reportService = new ReportService();
-                spyOn(reportService, 'getReportDataForOrgUnit').and.returnValue(utils.getPromise(q, {}));
+                orgUnitRepository = new OrgUnitRepository();
+                spyOn(orgUnitRepository, 'findAllByParent').and.returnValue(utils.getPromise(q, []));
+                spyOn(orgUnitRepository, 'getAllModulesInOrgUnits').and.returnValue(utils.getPromise(q, [mockModule]));
+
+                datasetRepository = new DatasetRepository();
+                spyOn(datasetRepository, 'findAllForOrgUnits').and.returnValue(utils.getPromise(q, [mockDataSet]));
 
                 pivotTableRepository = new PivotTableRepository();
                 spyOn(pivotTableRepository, 'getAll').and.returnValue(utils.getPromise(q, [mockPivotTable]));
                 spyOn(pivotTableRepository, 'upsertPivotTableData').and.returnValue(utils.getPromise(q, {}));
 
+                reportService = new ReportService();
+                spyOn(reportService, 'getReportDataForOrgUnit').and.returnValue(utils.getPromise(q, {}));
+
                 changeLogRepository = new ChangeLogRepository();
                 spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, null));
                 spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
-
-                orgUnitRepository = new OrgUnitRepository();
-                spyOn(orgUnitRepository, 'findAllByParent').and.returnValue(utils.getPromise(q, []));
-                spyOn(orgUnitRepository, 'getAllModulesInOrgUnits').and.returnValue(utils.getPromise(q, [mockModule]));
 
                 currentTime = moment('2016-02-29T02:03:00.000Z');
                 Timecop.install();
@@ -79,6 +78,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 scope.$apply();
 
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(pivotTableRelevantToDataSet, mockModule.id);
+                expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalledWith(someOtherPivotTable, mockModule.id);
             });
 
             it('should upsert pivot Table data', function(){
@@ -173,9 +173,6 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
-                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(mockPivotTable, "module1");
-                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(mockPivotTable, "module2");
-                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(mockPivotTable, "module3");
                 expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(mockPivotTable.name, 'module1', "data1");
                 expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalledWith(mockPivotTable.name, 'module2', "data2");
                 expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(mockPivotTable.name, 'module3', "data3");
@@ -189,7 +186,6 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 scope.$apply();
 
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
-                expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalled();
             });
 
             it('should not download weekly pivot table data if it has already been downloaded that same day', function() {
@@ -206,7 +202,6 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 scope.$apply();
 
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
-                expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalled();
                 expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('weeklyPivotTableDataForProject:' + mockProjectId, currentTime.toISOString());
             });
 
@@ -224,7 +219,6 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 scope.$apply();
 
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
-                expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalled();
                 expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('monthlyPivotTableDataForProject:' + mockProjectId, currentTime.toISOString());
             });
         });
