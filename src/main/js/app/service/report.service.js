@@ -97,7 +97,7 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
         };
 
         this.getUpdatedCharts = function(lastUpdatedTime) {
-            var requiredFields = 'id,name,title,type,columns[dimension,filter,items[id,name,description]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]]';
+            var requiredFields = 'id,name,title,relativePeriods,type,columns[dimension,filter,items[id,name,description]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]]';
             return getResourceIds(dhisUrl.charts, 'charts', lastUpdatedTime).then(_.partial(getResourceDetails, dhisUrl.charts, requiredFields));
         };
 

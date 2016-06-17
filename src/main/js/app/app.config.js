@@ -118,6 +118,7 @@ require.config({
         "dataSyncFailureRepository": "app/repository/data.sync.failure.repository",
 
         //Models
+        "chart": "app/models/chart",
         "pivotTable": "app/models/pivot.table",
         "moduleDataBlock": "app/models/module.data.block",
         "customAttributes": "app/models/custom.attributes",
