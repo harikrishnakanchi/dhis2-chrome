@@ -2,17 +2,11 @@ define(["lodash", "moment"], function(_, moment) {
     return function(reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, $q) {
 
         this.run = function() {
-            var updateChangeLog = function(changeLogKey) {
-                return changeLogRepository.upsert(changeLogKey, moment().toISOString());
-            };
-
-            var loadUserProjectsAndModuleIds = function() {
-                return $q.all({
-                    usersProjectIds: userPreferenceRepository.getCurrentUsersProjectIds(),
-                    usersModuleIds: userPreferenceRepository.getCurrentUsersModules().then(function(modules) {
-                        return _.pluck(modules, 'id');
-                    })
+            var updateChangeLogs = function(changeLogKeys) {
+                var upsertPromises = _.map(changeLogKeys, function (changeLogKey) {
+                    return changeLogRepository.upsert(changeLogKey, moment().toISOString());
                 });
+                return $q.all(upsertPromises);
             };
 
             var downloadRelevantChartData = function(charts, userModuleIds) {
@@ -83,20 +77,26 @@ define(["lodash", "moment"], function(_, moment) {
             };
 
             var applyDownloadFrequencyStrategy = function(projectId, charts) {
-                var changeLogKey = "chartData:" + projectId;
+                var weeklyChangeLogKey = "weeklyChartData:" + projectId,
+                    monthlyChangeLogKey = "monthlyChartData:" + projectId,
+                    changeLogKeys = [weeklyChangeLogKey, monthlyChangeLogKey];
 
-                return changeLogRepository.get(changeLogKey).then(function(lastDownloadedTime) {
-                    if (lastDownloadedTime && moment().isSame(lastDownloadedTime, 'day')) {
-                        return $q.when({
-                            charts: [],
-                            changeLogKey: []
-                        });
+                return $q.all({
+                    weeklyChartsLastDownloaded: changeLogRepository.get(weeklyChangeLogKey),
+                    monthlyChartsLastDownloaded: changeLogRepository.get(monthlyChangeLogKey)
+                }).then(function(data) {
+                    if (data.weeklyChartsLastDownloaded && moment().isSame(data.weeklyChartsLastDownloaded, 'day')) {
+                        _.remove(charts, { weeklyChart: true });
+                        _.pull(changeLogKeys, weeklyChangeLogKey);
+                    }
+                    if(data.monthlyChartsLastDownloaded && moment().diff(data.monthlyChartsLastDownloaded, 'days') < 7) {
+                        _.remove(charts, { monthlyChart: true});
+                        _.pull(changeLogKeys, monthlyChangeLogKey);
                     }
                     return $q.when({
                         charts: charts,
-                        changeLogKey: changeLogKey
+                        changeLogKeys: changeLogKeys
                     });
-
                 });
             };
 
@@ -109,11 +109,11 @@ define(["lodash", "moment"], function(_, moment) {
 
                     return applyDownloadFrequencyStrategy(projectId, data.charts).then(function(strategyResult) {
                         var chartsToDownload = strategyResult.charts,
-                            changeLogKeyToUpdate = strategyResult.changeLogKey;
+                            changeLogKeysToUpdate = strategyResult.changeLogKeys;
 
                         return downloadRelevantChartData(chartsToDownload, moduleIds).then(function(allDownloadsWereSuccessful) {
                             if(allDownloadsWereSuccessful) {
-                                return updateChangeLog(changeLogKeyToUpdate);
+                                return updateChangeLogs(changeLogKeysToUpdate);
                             }
                         });
                     });

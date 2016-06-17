@@ -71,14 +71,16 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 downloadChartDataConsumer.run();
                 scope.$apply();
 
-                expect(changeLogRepository.get).toHaveBeenCalledWith('chartData:' + mockProjectId);
+                expect(changeLogRepository.get).toHaveBeenCalledWith('weeklyChartData:' + mockProjectId);
+                expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyChartData:' + mockProjectId);
             });
 
             it('should update the lastUpdated time in the changeLog', function() {
                 downloadChartDataConsumer.run();
                 scope.$apply();
 
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith('chartData:' + mockProjectId, currentTime.toISOString());
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('weeklyChartData:' + mockProjectId, currentTime.toISOString());
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyChartData:' + mockProjectId, currentTime.toISOString());
             });
 
             it('should retrieve dataSets for each module', function() {
@@ -174,13 +176,36 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
             });
 
-            it('should not download chart data if it has already been downloaded that same day', function() {
+            it('should not download weekly chart data if it has already been downloaded that same day', function() {
+                var mockWeeklyChart = {
+                    id: 'someChartId',
+                    name: 'FieldApp - someDataSetCode',
+                    weeklyChart: true
+                };
+                chartRepository.getAll.and.returnValue(utils.getPromise(q, [mockWeeklyChart]));
                 changeLogRepository.get.and.returnValue(utils.getPromise(q, moment(currentTime).subtract(1, 'hour').toISOString()));
 
                 downloadChartDataConsumer.run();
                 scope.$apply();
 
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
+                expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('weeklyChartData:' + mockProjectId, currentTime.toISOString());
+            });
+
+            it('should not download monthly chart data if it has already been downloaded in the last 7 days', function() {
+                var mockMonthlyChart = {
+                    id: 'someChartId',
+                    name: 'FieldApp - someDataSetCode',
+                    monthlyChart: true
+                };
+                chartRepository.getAll.and.returnValue(utils.getPromise(q, [mockMonthlyChart]));
+                changeLogRepository.get.and.returnValue(utils.getPromise(q, moment(currentTime).subtract(2, 'days').toISOString()));
+
+                downloadChartDataConsumer.run();
+                scope.$apply();
+
+                expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
+                expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('monthlyChartData:' + mockProjectId, currentTime.toISOString());
             });
         });
     });
