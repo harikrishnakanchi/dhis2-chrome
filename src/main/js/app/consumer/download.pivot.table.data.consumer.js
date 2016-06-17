@@ -6,15 +6,6 @@ define(["lodash", "moment"], function(_, moment) {
                 return changeLogRepository.upsert(changeLogKey, moment().toISOString());
             };
 
-            var loadUserProjectsAndModuleIds = function() {
-                return $q.all({
-                    usersProjectIds: userPreferenceRepository.getCurrentUsersProjectIds(),
-                    usersModuleIds: userPreferenceRepository.getCurrentUsersModules().then(function(modules) {
-                        return _.pluck(modules, 'id');
-                    })
-                });
-            };
-
             var downloadRelevantPivotTableData = function(pivotTables, projectId, userModuleIds, changeLogKey) {
                 var downloadOfAtLeastOneReportFailed = false;
 
