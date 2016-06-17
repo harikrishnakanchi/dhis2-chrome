@@ -28,10 +28,10 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
 
                 userPreferenceRepository = new UserPreferenceRepository();
                 spyOn(userPreferenceRepository, 'getCurrentUsersProjectIds').and.returnValue(utils.getPromise(q, [mockProjectId]));
-                spyOn(userPreferenceRepository, 'getCurrentUsersModules').and.returnValue(utils.getPromise(q, [mockModule]));
 
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, 'findAllByParent').and.returnValue(utils.getPromise(q, []));
+                spyOn(orgUnitRepository, 'getAllModulesInOrgUnits').and.returnValue(utils.getPromise(q, [mockModule]));
 
                 chartRepository = new ChartRepository();
                 spyOn(chartRepository, 'getAll').and.returnValue(utils.getPromise(q, [mockChart]));
@@ -56,11 +56,15 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 Timecop.uninstall();
             });
 
-            it('should retrieve the current users modules', function() {
+            it('should retrieve the modules for each project', function() {
+                var mockProjectIds = ['projectIdA', 'projectIdB'];
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, mockProjectIds));
+
                 downloadChartDataConsumer.run();
                 scope.$apply();
 
-                expect(userPreferenceRepository.getCurrentUsersModules).toHaveBeenCalled();
+                expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['projectIdA']);
+                expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['projectIdB']);
             });
 
             it('should retrieve the lastUpdated time from the changeLog', function() {
@@ -83,7 +87,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 }, mockModuleB = {
                     id: 'mockModuleIdB'
                 };
-                userPreferenceRepository.getCurrentUsersModules.and.returnValue(utils.getPromise(q, [mockModuleA, mockModuleB]));
+                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [mockModuleA, mockModuleB]));
 
                 downloadChartDataConsumer.run();
                 scope.$apply();
@@ -143,7 +147,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                     id: 'Mod3'
                 }];
 
-                userPreferenceRepository.getCurrentUsersModules.and.returnValue(utils.getPromise(q, usersModules));
+                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, usersModules));
                 reportService.getReportDataForOrgUnit.and.callFake(function(chart, moduleId) {
                     if (moduleId === 'Mod1')
                         return utils.getPromise(q, 'data1');
@@ -162,7 +166,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
             });
 
             it('should not download chart data if user has no modules', function() {
-                userPreferenceRepository.getCurrentUsersModules.and.returnValue(utils.getPromise(q, []));
+                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, []));
 
                 downloadChartDataConsumer.run();
                 scope.$apply();
