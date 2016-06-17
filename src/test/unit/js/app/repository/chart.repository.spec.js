@@ -1,4 +1,4 @@
-define(["chartRepository", "angularMocks", "utils", "lodash"], function(ChartRepository, mocks, utils, _) {
+define(["chartRepository", "chart", "angularMocks", "utils", "lodash"], function(ChartRepository, Chart, mocks, utils, _) {
     describe('Chart Repository', function() {
         var mockStore, chartRepository, q, mockDB;
 
@@ -12,13 +12,11 @@ define(["chartRepository", "angularMocks", "utils", "lodash"], function(ChartRep
         }));
 
         describe('getAll', function() {
-            it('should get all the charts', function() {
+            it('should return all the charts', function() {
                 var allCharts = [{
-                    'id': 'chart1',
-                    'name': '[FieldApp - dataSetCode] # Name'
+                    id: 'chart1'
                 }, {
-                    'id': 'chart2',
-                    'name': '[FieldApp - dataSetCode] # Name'
+                    id: 'chart2'
                 }];
                 mockStore.getAll.and.returnValue(utils.getPromise(q, allCharts));
 
@@ -30,60 +28,16 @@ define(["chartRepository", "angularMocks", "utils", "lodash"], function(ChartRep
                 expect(mockStore.getAll).toHaveBeenCalled();
             });
 
-            it('should parse the dataSet code from the chart name', function() {
-                var allCharts = [{
-                    'id': 'chart1',
-                    'name': '[FieldApp - someDataSetCode] # Name'
-                }];
-                mockStore.getAll.and.returnValue(utils.getPromise(q, allCharts));
+            it('should return instances of the Chart model', function() {
+                mockStore.getAll.and.returnValue(utils.getPromise(q, [{ id: 'chartId' }]));
 
                 chartRepository.getAll().then(function(chartsFromRepository) {
-                    expect(chartsFromRepository[0].dataSetCode).toEqual('someDataSetCode');
+                    expect(_.first(chartsFromRepository)).toEqual(jasmine.any(Chart));
                 });
                 scope.$apply();
-            });
-
-            it('should leave the dataSet code as null if the chart name is malformed', function() {
-                var allCharts = [{
-                    'id': 'chart1',
-                    'name': 'some malformed chart name'
-                }];
-                mockStore.getAll.and.returnValue(utils.getPromise(q, allCharts));
-
-                chartRepository.getAll().then(function(chartsFromRepository) {
-                    expect(chartsFromRepository[0].dataSetCode).toBeNull();
-                });
-                scope.$apply();
-            });
-
-            describe('displayPosition', function() {
-                it('should parse the position from the chart name', function() {
-                    var allCharts = [{
-                        'id': 'chart1',
-                        'name': '[FieldApp - someDataSetCode] 88 Name'
-                    }];
-                    mockStore.getAll.and.returnValue(utils.getPromise(q, allCharts));
-
-                    chartRepository.getAll().then(function(chartsFromRepository) {
-                        expect(chartsFromRepository[0].displayPosition).toEqual(88);
-                    });
-                    scope.$apply();
-                });
-
-                it('should be null if the chart name is malformed', function() {
-                    var allCharts = [{
-                        'id': 'chart1',
-                        'name': 'some malformed chart name'
-                    }];
-                    mockStore.getAll.and.returnValue(utils.getPromise(q, allCharts));
-
-                    chartRepository.getAll().then(function(chartsFromRepository) {
-                        expect(chartsFromRepository[0].displayPosition).toBeNull();
-                    });
-                    scope.$apply();
-                });
             });
         });
+
         it('should upsert the charts', function() {
             var chartsToUpsert = [{
                 'id': 'newChartId',
