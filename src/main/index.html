@@ -57,8 +57,8 @@
                 </nav>
             </div>
         </header>
-        <div class="container hide-from-print" style="padding-top:10px;" ng-if="isLoggedIn">
-            <ul class="nav nav-tabs">
+        <div class="container hide-from-print {{layoutDirection.direction}}" style="padding-top:10px;" ng-if="isLoggedIn">
+            <ul class="nav nav-tabs main-menu">
                 <li role="presentation" ng-class="{ active: isActive('\/dashboard$')}" ng-if="hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver', 'Data entry user'])">
                     <a href="#/dashboard">
                         <i class="fa fa-home"></i>
@@ -102,9 +102,10 @@
                         <i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu multi-level" role="menu">
-                        <li class="dropdown-submenu" ng-repeat="opUnitWithModule in allOpUnitsWithModules | orderBy: 'opUnitName' ">
+                        <li class="dropdown-submenu" ng-repeat="opUnitWithModule in allOpUnitsWithModules | orderBy: 'opUnitName' " ng-class="{'pull-left': layoutDirection.direction == 'rtl' }">
                             <a class="dropdown-toggle">
                                 {{ opUnitWithModule.opUnitName }}
+                                <i class="fa" ng-class="layoutDirection.direction == 'rtl' ? 'fa-caret-left' : 'fa-caret-right'"></i>
                             </a>
                             <ul class="dropdown-menu">
                                 <li ng-repeat="module in opUnitWithModule.modules | orderBy:'name'">
@@ -112,6 +113,7 @@
                                 </li>
                             </ul>
                         </li>
+                        <li class="clearfix"></li>
                         <li class="divider"></li>
                         <li>
                             <a class="dropdown-toggle" href="#/projectReport">
