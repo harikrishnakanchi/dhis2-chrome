@@ -22,7 +22,8 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 mockPivotTable = {
                     id: 'mockTableId',
                     name: 'someTableName',
-                    dataSetCode: mockDataSet.code
+                    dataSetCode: mockDataSet.code,
+                    weeklyReport: true
                 };
 
                 datasetRepository = new DatasetRepository();
@@ -63,11 +64,13 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 var pivotTableRelevantToDataSet = {
                     id: 'mockTableId',
                     name: 'mockTableName',
-                    dataSetCode: mockDataSet.code
+                    dataSetCode: mockDataSet.code,
+                    weeklyReport: true
                 }, someOtherPivotTable = {
                     id: 'mockTableId',
                     name: 'mockTableName',
-                    dataSetCode: 'someOtherDataSetCode'
+                    dataSetCode: 'someOtherDataSetCode',
+                    weeklyReport: true
                 };
 
                 pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [pivotTableRelevantToDataSet, someOtherPivotTable]));
@@ -132,16 +135,20 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModule.id, mockOrigin.id]);
             });
 
-            it('should retrieve then update the lastUpdated time in the changeLog', function () {
-                var usersProjectIds = ['project1'];
-
-                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, usersProjectIds));
-
+            it('should retrieve the lastUpdated time in the changeLog', function () {
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
-                expect(changeLogRepository.get).toHaveBeenCalledWith('pivotTableData:project1');
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith('pivotTableData:project1', currentTime.toISOString());
+                expect(changeLogRepository.get).toHaveBeenCalledWith('weeklyPivotTableDataForProject:' + mockProjectId);
+                expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyPivotTableDataForProject:' + mockProjectId);
+            });
+
+            it('should update the lastUpdated time in the changeLog', function () {
+                downloadPivotTableDataConsumer.run();
+                scope.$apply();
+
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('weeklyPivotTableDataForProject:' + mockProjectId, currentTime.toISOString());
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyPivotTableDataForProject:' + mockProjectId, currentTime.toISOString());
             });
 
             it('should continue downloading remaining pivot table data even if one call fails', function() {
@@ -185,14 +192,40 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalled();
             });
 
-            it('should not download pivot table data if it has already been downloaded that same day', function() {
-                changeLogRepository.get.and.returnValue(utils.getPromise(q, currentTime.subtract(1, 'hour').toISOString()));
+            it('should not download weekly pivot table data if it has already been downloaded that same day', function() {
+                var mockWeeklyPivotTable = {
+                    id: 'someId',
+                    weeklyReport: true,
+                    dataSetCode: mockDataSet.code
+                };
+
+                pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [mockWeeklyPivotTable]));
+                changeLogRepository.get.and.returnValue(utils.getPromise(q, moment(currentTime).subtract(1, 'hour').toISOString()));
 
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
                 expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalled();
+                expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('weeklyPivotTableDataForProject:' + mockProjectId, currentTime.toISOString());
+            });
+
+            it('should not download monthly pivot table data if it has already been downloaded in the last 7 days', function () {
+                var mockMonthlyPivotTable = {
+                    id: 'someId',
+                    monthlyReport: true,
+                    dataSetCode: mockDataSet.code
+                };
+
+                pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [mockMonthlyPivotTable]));
+                changeLogRepository.get.and.returnValue(utils.getPromise(q, moment(currentTime).subtract(2, 'days').toISOString()));
+
+                downloadPivotTableDataConsumer.run();
+                scope.$apply();
+
+                expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
+                expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalled();
+                expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('monthlyPivotTableDataForProject:' + mockProjectId, currentTime.toISOString());
             });
         });
     });

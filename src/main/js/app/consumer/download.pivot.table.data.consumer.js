@@ -2,8 +2,11 @@ define(["lodash", "moment"], function(_, moment) {
     return function(reportService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, $q) {
 
         this.run = function(message) {
-            var updateChangeLog = function(changeLogKey) {
-                return changeLogRepository.upsert(changeLogKey, moment().toISOString());
+            var updateChangeLog = function(changeLogKeys) {
+                var upsertPromises = _.map(changeLogKeys, function(changeLogKey) {
+                    return changeLogRepository.upsert(changeLogKey, moment().toISOString());
+                });
+                return $q.all(upsertPromises);
             };
 
             var downloadPivotTableDataForProject = function(pivotTables, projectId, userModuleIds) {
@@ -91,20 +94,35 @@ define(["lodash", "moment"], function(_, moment) {
             var updatePivotTableDataForProject = function(projectId) {
                 return orgUnitRepository.getAllModulesInOrgUnits([projectId]).then(function(modules) {
                     var moduleIds = _.pluck(modules, 'id'),
-                        changeLogKey = "pivotTableData:" + projectId;
+                        weeklyChangeLogKey = "weeklyPivotTableDataForProject:" + projectId,
+                        monthlyChangeLogKey = "monthlyPivotTableDataForProject:" + projectId;
 
-                    if (_.isEmpty(moduleIds))
-                        return;
-
-                    return changeLogRepository.get(changeLogKey).then(function(lastDownloadedTime) {
-                        if (lastDownloadedTime && moment().isSame(lastDownloadedTime, 'day')) {
-                            return;
-                        }
+                    return $q.all({
+                        weeklyReportsLastUpdated: changeLogRepository.get(weeklyChangeLogKey),
+                        monthlyReportsLastUpdated: changeLogRepository.get(monthlyChangeLogKey)
+                    }).then(function(data) {
+                        var weeklyReportsLastUpdated = data.weeklyReportsLastUpdated,
+                            monthlyReportsLastUpdated = data.monthlyReportsLastUpdated,
+                            downloadWeeklyReports = !weeklyReportsLastUpdated || !moment().isSame(weeklyReportsLastUpdated, 'day'),
+                            downloadMonthlyReports = !monthlyReportsLastUpdated || moment().diff(monthlyReportsLastUpdated, 'day') >= 7;
 
                         return pivotTableRepository.getAll().then(function(pivotTables) {
-                            return downloadPivotTableDataForProject(pivotTables, projectId, moduleIds).then(function(allDownloadsWereSuccessful) {
+                            var pivotTablesToDownload = [],
+                                changeLogKeysToUpdate = [];
+                            if(downloadWeeklyReports) {
+                                var weeklyReports = _.filter(pivotTables, { weeklyReport: true });
+                                pivotTablesToDownload = pivotTablesToDownload.concat(weeklyReports);
+                                changeLogKeysToUpdate.push(weeklyChangeLogKey);
+                            }
+                            if(downloadMonthlyReports) {
+                                var monthlyReports = _.filter(pivotTables, { monthlyReport: true });
+                                pivotTablesToDownload = pivotTablesToDownload.concat(monthlyReports);
+                                changeLogKeysToUpdate.push(monthlyChangeLogKey);
+                            }
+
+                            return downloadPivotTableDataForProject(pivotTablesToDownload, projectId, moduleIds).then(function(allDownloadsWereSuccessful) {
                                 if(allDownloadsWereSuccessful){
-                                    return updateChangeLog(changeLogKey);
+                                    return updateChangeLog(changeLogKeysToUpdate);
                                 }
                             });
                         });
