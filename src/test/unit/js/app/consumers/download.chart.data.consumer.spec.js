@@ -88,8 +88,8 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 downloadChartDataConsumer.run();
                 scope.$apply();
 
-                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModuleA.id, undefined]);
-                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModuleB.id, undefined]);
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModuleA.id]);
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModuleB.id]);
             });
 
             it('should retrieve dataSets for module and its origins', function() {
