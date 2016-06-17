@@ -6,8 +6,8 @@ define(["lodash", "moment"], function(_, moment) {
                 return changeLogRepository.upsert(changeLogKey, moment().toISOString());
             };
 
-            var downloadRelevantPivotTableData = function(pivotTables, projectId, userModuleIds, changeLogKey) {
-                var downloadOfAtLeastOneReportFailed = false;
+            var downloadPivotTableDataForProject = function(pivotTables, projectId, userModuleIds) {
+                var allDownloadsWereSuccessful = true;
 
                 var recursivelyDownloadAndUpsertPivotTableData = function(orgUnitsAndTables) {
                     var onSuccess = function(data) {
@@ -17,7 +17,7 @@ define(["lodash", "moment"], function(_, moment) {
                     };
 
                     var onFailure = function() {
-                        downloadOfAtLeastOneReportFailed = true;
+                        allDownloadsWereSuccessful = false;
                         return recursivelyDownloadAndUpsertPivotTableData(orgUnitsAndTables);
                     };
 
@@ -28,7 +28,7 @@ define(["lodash", "moment"], function(_, moment) {
                     return reportService.getReportDataForOrgUnit(datum.pivotTable, datum.orgUnitId).then(onSuccess, onFailure);
                 };
 
-                var getDatasetsRelevantToEachModule = function() {
+                var getDatasetsForEachModuleAndItsOrigins = function() {
                     var moduleIdsAndOrigins = _.transform(userModuleIds, function(mapOfModuleIdsToOrigins, moduleId) {
                         mapOfModuleIdsToOrigins[moduleId] = orgUnitRepository.findAllByParent([moduleId]);
                     }, {});
@@ -49,7 +49,7 @@ define(["lodash", "moment"], function(_, moment) {
                         .then(getAllDataSetsUnderModule);
                };
 
-                var filterPivotTablesForModules = function(datasetsByModule) {
+                var filterPivotTablesForEachModule = function(datasetsByModule) {
                     var modulesAndPivotTables = [];
 
                     _.forEach(userModuleIds, function(moduleId) {
@@ -66,7 +66,7 @@ define(["lodash", "moment"], function(_, moment) {
                     return $q.when(modulesAndPivotTables);
                 };
 
-                var addProjectLevelPivotTables = function(orgUnitsAndTables){
+                var addProjectReportPivotTables = function(orgUnitsAndTables){
                     _.forEach(pivotTables, function(pivotTable) {
                         if(_.contains(pivotTable.name, "ProjectReport")) {
                             orgUnitsAndTables.push({
@@ -79,18 +79,16 @@ define(["lodash", "moment"], function(_, moment) {
                     return $q.when(orgUnitsAndTables);
                 };
 
-                return getDatasetsRelevantToEachModule()
-                    .then(filterPivotTablesForModules)
-                    .then(addProjectLevelPivotTables)
+                return getDatasetsForEachModuleAndItsOrigins()
+                    .then(filterPivotTablesForEachModule)
+                    .then(addProjectReportPivotTables)
                     .then(recursivelyDownloadAndUpsertPivotTableData)
                     .then(function() {
-                        if (!downloadOfAtLeastOneReportFailed) {
-                            return updateChangeLog(changeLogKey);
-                        }
+                        return $q.when(allDownloadsWereSuccessful);
                     });
             };
 
-            var downloadPivotTableDataForProject = function(projectId) {
+            var updatePivotTableDataForProject = function(projectId) {
                 return orgUnitRepository.getAllModulesInOrgUnits([projectId]).then(function(modules) {
                     var moduleIds = _.pluck(modules, 'id'),
                         changeLogKey = "pivotTableData:" + projectId;
@@ -104,7 +102,11 @@ define(["lodash", "moment"], function(_, moment) {
                         }
 
                         return pivotTableRepository.getAll().then(function(pivotTables) {
-                            return downloadRelevantPivotTableData(pivotTables, projectId, moduleIds, changeLogKey);
+                            return downloadPivotTableDataForProject(pivotTables, projectId, moduleIds).then(function(allDownloadsWereSuccessful) {
+                                if(allDownloadsWereSuccessful){
+                                    return updateChangeLog(changeLogKey);
+                                }
+                            });
                         });
                     });
                 });
@@ -115,7 +117,7 @@ define(["lodash", "moment"], function(_, moment) {
                     return $q.when();
                 }
 
-                return downloadPivotTableDataForProject(projectIds.pop()).then(function() {
+                return updatePivotTableDataForProject(projectIds.pop()).then(function() {
                     return recursivelyLoopThroughProjects(projectIds);
                 });
             };
