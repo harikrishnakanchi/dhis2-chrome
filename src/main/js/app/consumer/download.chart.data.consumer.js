@@ -54,14 +54,13 @@ define(["lodash", "moment"], function(_, moment) {
                 var filterChartsForModules = function(datasetsByModule) {
                     var modulesAndCharts = [];
                     _.forEach(userModuleIds, function(userModuleId) {
-                        var dataSetCodesForModule = _.pluck(datasetsByModule[userModuleId], "code");
-                        _.forEach(charts, function(chart) {
-                            _.forEach(dataSetCodesForModule, function(datasetCode) {
-                                if (chart.dataSetCode === datasetCode)
-                                    modulesAndCharts.push({
-                                        moduleId: userModuleId,
-                                        chart: chart
-                                    });
+                        _.forEach(datasetsByModule[userModuleId], function (dataSet) {
+                            var filteredCharts = _.filter(charts, {dataSetCode: dataSet.code});
+                            _.forEach(filteredCharts, function (chart) {
+                                modulesAndCharts.push({
+                                    moduleId: userModuleId,
+                                    chart: chart
+                                });
                             });
                         });
                     });
