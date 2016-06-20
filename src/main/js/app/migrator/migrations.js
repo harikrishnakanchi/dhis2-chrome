@@ -276,6 +276,10 @@ define([], function() {
         var dataSyncFailureStore = create_store_with_key("dataSyncFailure", ["moduleId", "period"], db);
     };
 
+    var delete_org_unit_level_data_store = function(db) {
+        db.deleteObjectStore("organisationUnitLevels");
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -312,6 +316,7 @@ define([], function() {
         update_translations_store,
         change_role_to_projectadmin,
         delete_keys_chart_and_reports_from_changelog,
-        create_data_sync_failure
+        create_data_sync_failure,
+        delete_org_unit_level_data_store
     ];
 });

@@ -109,7 +109,7 @@ gulp.task('watch', function() {
 });
 
 gulp.task('download-metadata', function() {
-    return download(baseIntUrl + "/api/metadata.json?assumeTrue=false&categories=true&categoryCombos=true&categoryOptionCombos=true&categoryOptions=true&dataElementGroups=true&dataElements=true&optionSets=true&organisationUnitGroupSets=true&organisationUnitLevels=true&sections=true&translations=true&users=true&organisationUnits=true&organisationUnitGroups=true", auth)
+    return download(baseIntUrl + "/api/metadata.json?assumeTrue=false&categories=true&categoryCombos=true&categoryOptionCombos=true&categoryOptions=true&dataElementGroups=true&dataElements=true&optionSets=true&organisationUnitGroupSets=true&sections=true&translations=true&users=true&organisationUnits=true&organisationUnitGroups=true", auth)
         .pipe(rename("metadata.json"))
         .pipe(gulp.dest(path.dirname("src/main/data/metadata.json")));
 });

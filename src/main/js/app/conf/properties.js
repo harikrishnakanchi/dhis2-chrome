@@ -12,7 +12,6 @@ define(['lodash', 'overrides'], function(_, overrides) {
                 "categoryOptions",
                 "dataElements",
                 "sections",
-                "organisationUnitLevels",
                 "users",
                 "optionSets",
                 "translations",
