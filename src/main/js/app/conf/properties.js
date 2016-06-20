@@ -5,8 +5,19 @@ define(['lodash', 'overrides'], function(_, overrides) {
             "sync": {
                 "intervalInMinutes": 720,
             },
-            "types": ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements",
-                "sections", "organisationUnitLevels", "users", "optionSets", "translations", "organisationUnitGroupSets", "dataElementGroups"
+            "types": [
+                "categories",
+                "categoryCombos",
+                "categoryOptionCombos",
+                "categoryOptions",
+                "dataElements",
+                "sections",
+                "organisationUnitLevels",
+                "users",
+                "optionSets",
+                "translations",
+                "organisationUnitGroupSets",
+                "dataElementGroups"
             ]
         },
         "http": {
