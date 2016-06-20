@@ -213,10 +213,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     transformedChartData = insertMissingPeriods(transformedChartData, periodsForXAxis);
 
                     return {
-                        "title": chart.title,
-                        "dataSetCode": chart.dataSetCode,
-                        "displayPosition": chart.displayPosition,
-                        "type": chart.type,
+                        "definition": chart,
                         "data": transformedChartData
                     };
                 };
@@ -315,7 +312,9 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             _.each($scope.datasets, function(eachDataSet) {
 
                 var filteredCharts = _.filter($scope.chartData, {
-                    dataSetCode: eachDataSet.code
+                    definition: {
+                        dataSetCode: eachDataSet.code
+                    }
                 });
 
                 var filteredPivotTables = _.filter($scope.pivotTables, {

@@ -16,22 +16,22 @@
                 <div ng-hide="selectedDataset.isReportsAvailable">
                     <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
                 </div>
-                <div ng-repeat="chart in chartData | filter: {dataSetCode: selectedDataset.code} | orderBy: 'displayPosition'" ng-if="chart.data.length &gt; 0">
+                <div ng-repeat="chart in chartData | filter: {definition: {dataSetCode: selectedDataset.code}} | orderBy: 'definition.displayPosition'" ng-if="chart.data.length &gt; 0">
                     <div>
                         <div class="row chart-title">
-                            <h3 class="col-md-6 col-md-offset-3 text-center">{{chart.title}}</h3>
+                            <h3 class="col-md-6 col-md-offset-3 text-center">{{chart.definition.title}}</h3>
                             <a class="col-md-1 col-md-offset-2" href="" title="Download Chart" ng-click="downloadChartAsPng($event)">
                                 <span class="glyphicon glyphicon-download-alt"></span>
                             </a>
                         </div>
                         <!-- ToDo - Remove chart type non-capitalized after dhis 2.22 upgrade -->
-                        <p ng-if="chart.type === 'LINE' || chart.type === 'line'" class="lineChart-container">
+                        <p ng-if="chart.definition.type === 'LINE' || chart.definition.type === 'line'" class="lineChart-container">
                             <nvd3 options="lineChartOptions" data="chart.data"></nvd3>
                         </p>
-                        <p ng-if="chart.type === 'COLUMN' || chart.type === 'column'">
+                        <p ng-if="chart.definition.type === 'COLUMN' || chart.definition.type === 'column'">
                             <nvd3 options="barChartOptions" data="chart.data"></nvd3>
                         </p>
-                        <p ng-if="chart.type === 'STACKED_COLUMN' || chart.type === 'stackedcolumn'">
+                        <p ng-if="chart.definition.type === 'STACKED_COLUMN' || chart.definition.type === 'stackedcolumn'">
                             <nvd3 options="stackedBarChartOptions" data="chart.data"></nvd3>
                         </p>
                     </div>

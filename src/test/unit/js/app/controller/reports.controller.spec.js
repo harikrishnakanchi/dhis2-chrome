@@ -353,10 +353,13 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
             };
 
             var expectedChartData = [{
-                "title": "Title1",
-                "dataSetCode": "dataSetCode1",
-                "displayPosition": 1,
-                "type": "STACKED_COLUMN",
+                "definition":{
+                    "name": "chart1",
+                    "title": "Title1",
+                    "dataSetCode": "dataSetCode1",
+                    "displayPosition": 1,
+                    "type": "STACKED_COLUMN"
+                },
                 "data": [{
                     "key": "5-14 years",
                     "values": [{
@@ -407,10 +410,13 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                     }]
                 }]
             }, {
-                "title": "Title2",
-                "dataSetCode": "dataSetCode2",
-                "displayPosition": 2,
-                "type": "LINE",
+                "definition": {
+                    "name": "chart2",
+                    "title": "Title2",
+                    "dataSetCode": "dataSetCode2",
+                    "displayPosition": 2,
+                    "type": "LINE"
+                },
                 "data": [{
                     "key": "Total Consultations 1-23 months Pediatric OPD",
                     "values": [{
