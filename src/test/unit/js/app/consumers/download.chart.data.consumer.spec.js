@@ -20,7 +20,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 };
                 mockChart = {
                     id: 'someChartId',
-                    name: 'FieldApp - someDataSetCode'
+                    dataSetCode: 'someDataSetCode'
                 };
 
                 datasetRepository = new DatasetRepository();
@@ -126,10 +126,10 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
             it('should download chart data for relevant modules and datasets', function() {
                 var chartRelevantToDataSet = {
                     id: 'mockChartId',
-                    name: 'FieldApp - ' + mockDataSet.code
+                    dataSetCode: mockDataSet.code
                 }, someOtherChart = {
                     id: 'mockChartId',
-                    name: 'FieldApp - someOtherDataSetCode'
+                    dataSetCode: 'someOtherDataSetCode'
                 };
                 chartRepository.getAll.and.returnValue(utils.getPromise(q, [chartRelevantToDataSet, someOtherChart]));
 
@@ -179,7 +179,6 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
             it('should not download weekly chart data if it has already been downloaded that same day', function() {
                 var mockWeeklyChart = {
                     id: 'someChartId',
-                    name: 'FieldApp - someDataSetCode',
                     weeklyChart: true
                 };
                 chartRepository.getAll.and.returnValue(utils.getPromise(q, [mockWeeklyChart]));
@@ -195,7 +194,6 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
             it('should not download monthly chart data if it has already been downloaded in the same week', function() {
                 var mockMonthlyChart = {
                     id: 'someChartId',
-                    name: 'FieldApp - someDataSetCode',
                     monthlyChart: true
                 };
 
@@ -216,8 +214,8 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
             it('should download monthly chart data if it has not been downloaded in the same week', function() {
                 var mockMonthlyChart = {
                     id: 'someChartId',
-                    name: 'FieldApp - someDataSetCode',
-                    monthlyChart: true
+                    monthlyChart: true,
+                    dataSetCode: 'someDataSetCode'
                 };
 
                 var lastDownloadedTime = moment('2014-10-01T12:00:00.000Z').toISOString();
@@ -237,8 +235,8 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
             it('should download monthly chart data if it has not been downloaded in the same month', function() {
                 var mockMonthlyChart = {
                     id: 'someChartId',
-                    name: 'FieldApp - someDataSetCode',
-                    monthlyChart: true
+                    monthlyChart: true,
+                    dataSetCode: 'someDataSetCode'
                 };
 
                 var lastDownloadedTime = moment('2014-09-30T12:00:00.000Z').toISOString();

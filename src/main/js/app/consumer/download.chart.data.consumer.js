@@ -57,7 +57,7 @@ define(["lodash", "moment"], function(_, moment) {
                         var dataSetCodesForModule = _.pluck(datasetsByModule[userModuleId], "code");
                         _.forEach(charts, function(chart) {
                             _.forEach(dataSetCodesForModule, function(datasetCode) {
-                                if (_.contains(chart.name, datasetCode))
+                                if (chart.dataSetCode === datasetCode)
                                     modulesAndCharts.push({
                                         moduleId: userModuleId,
                                         chart: chart
