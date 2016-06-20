@@ -1,4 +1,4 @@
-<div class="dataentrypage parent-margin">
+<div class="dataentrypage parent-margin approval-page">
     <div ng-include=" 'templates/partials/module-week-selector.html'"></div>
     <div ng-show="!approveError">
         <div ng-if="!isLineListModule &amp;&amp; !loading &amp;&amp; week &amp;&amp; selectedModule">
@@ -39,7 +39,7 @@
 
                 <form name="dataentryForm" id="dataentry" ng-if="showForm()">
                     <accordion close-others="false">
-                        <div ng-class="'dataset-acc-wrapper'">
+                        <div class="dataset-acc-wrapper">
                             <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: false, isPopulationDataset: false }" is-open="getDatasetState(dataSet.id, $first)[dataSet.id]">
                                 <accordion-heading>
                                     <span>{{ dataSet.name}}</span>
@@ -114,8 +114,8 @@
                                 </div>
                             </accordion-group>
                         </div>
-                        <div ng-if="!isLineListModule" ng-class="'dataset-acc-wrapper'">
-                            <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: true }" is-open="getDatasetState(dataSet.id, false)[dataSet.id]">
+                        <div class="dataset-acc-wrapper">
+                            <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: true }" is-open="getDatasetState(dataSet.id, false)[dataSet.id]" class="originDataset">
                                 <accordion-heading>
                                     <span>{{ dataSet.name}}</span>
                                     <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-right': !isDatasetOpen[dataSet.id]}"></i>

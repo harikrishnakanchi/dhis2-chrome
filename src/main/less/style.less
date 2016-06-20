@@ -254,6 +254,9 @@ body {
             background-color: #afe6ee;
             border: 0;
             border-radius: 0;
+            a {
+                color: #000 !important;
+            }
         }
         .glyphicon {
             font-size: 11px;
@@ -276,7 +279,7 @@ body {
             }
         }
         .panel-group .panel {
-            border-radius: 0px;
+            border-radius: 0;
         }
         .panel-default {
             border: 0;
@@ -314,16 +317,8 @@ body {
         .panel-title {
             font-weight: 400;
             a {
-                color: #fff;
                 .glyphicon {
                     margin-right: 10px;
-                }
-            }
-        }
-        .panel-body {
-            .panel-title {
-                a {
-                    color: #000;
                 }
             }
         }
@@ -401,6 +396,9 @@ body {
             background-color: #afe6ee;
             border: 0;
             border-radius: 0;
+            a {
+                color: #000 !important;
+            }
         }
         .submitted {
             font-size: 20px;
@@ -490,9 +488,6 @@ body {
             float: right;
         }
     }
-    .printRegistrationBookBtn {
-        margin: 10px;
-    }
     .registrationBook {
         button {
             margin-left: 20px;
@@ -556,11 +551,15 @@ body {
         .panel-heading {
             position: relative;
             background: @msf-green;
+            padding: 0;
             &:extend(.clearfix all);
             .panel-title {
-                color: #000;
                 a {
                     display: block;
+                    text-decoration: none;
+                    color: #fff;
+                    padding: 10px 15px;
+                    cursor: pointer;
                 }
             }
             .actions {
@@ -572,9 +571,6 @@ body {
     }
     .panel-body {
         border-top: none!important;
-    }
-    .panel-group .panel {
-        border-radius: 0px;
     }
     .well {
         position: relative;
@@ -747,6 +743,7 @@ body {
         }
         .panel-default .panel-heading .panel-title {
             color: #fff;
+            padding: 10px;
         }
     }
     //spinner
@@ -890,7 +887,7 @@ body {
 
 .msf-table {
     tr th {
-        background-color: #3d9282;
+        background-color: @msf-green;
         color: #fff;
     }
     tr:nth-child(even) td {
@@ -1202,6 +1199,9 @@ header .hamburger-menu {
     .module-week-selector {
         margin: 0;
     }
+    .panel-group .dataset-acc-wrapper + .dataset-acc-wrapper {
+        padding-top: 5px;
+    }
 }
 
 .popupDialog.rtl {
@@ -1236,4 +1236,14 @@ header .hamburger-menu {
 
 .closeLabelToLeft {
     float: left;
+}
+
+.approval-page {
+    .panel-group .dataset-acc-wrapper + .dataset-acc-wrapper {
+        padding-top: 5px;
+    }
+}
+
+.viewRegistrationBookBtn {
+    margin: -2px -7px 0;
 }
