@@ -78,7 +78,7 @@ body {
     }
     .dropdown-submenu.pull-left>.dropdown-menu {
         left: -100%;
-        margin-left: 10px;
+        margin-left: 1px;
         width: 100%;
         -webkit-border-radius: 6px 0 6px 6px;
         -moz-border-radius: 6px 0 6px 6px;
@@ -204,7 +204,6 @@ body {
     .login-message {
         margin-top: 10px;
         margin-bottom: 0;
-        margin-right: 12px;
     }
     .dhis-status {
         padding: 8px 0px;
@@ -1157,7 +1156,7 @@ li.dropdown-submenu {
             margin-right: 0;
         }
         ul.dropdown-menu {
-            margin-left: 1px;
+            margin-left: -1px;
         }
         &.pull-left {
             .dropdown-menu {
@@ -1175,6 +1174,21 @@ li.dropdown-submenu {
         &:first-child{
             margin-left: 10px;
         }
+    }
+
+    .navbar-nav > li {
+        float: right;
+    }
+    .hamburger-menu {
+        padding-left: 0;
+        padding-right: 12px;
+    }
+}
+
+header .hamburger-menu {
+    padding-right: 0;
+    i {
+        margin-left: 0;
     }
 }
 

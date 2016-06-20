@@ -16,26 +16,26 @@
         <header>
             <div class="container">
                 <nav class="navbar">
-                    <div class="container-fluid">
-                        <div class="navbar-header">
+                    <div class="{{layoutDirection.direction}}">
+                        <div class="navbar-header" ng-class="{'navbar-right': layoutDirection.direction == 'rtl'}">
                             <img src="img/logo.png" alt="" title="PRAXIS" id="logoImg" class="navbar-brand" tabindex="-1" ng-if="!showTestLogo()">
                             <img src="img/logo-test.png" alt="" title="PRAXIS" id="logoImg" class="navbar-brand" tabindex="-1" ng-if="showTestLogo()">
                         </div>
-                        <div class="nav navbar-nav navbar-right">
+                        <div class="nav navbar-nav" ng-class="{'navbar-right': layoutDirection.direction != 'rtl'}" >
                             <p class="text-right login-message">
                                 <span ng-show="isLoggedIn">
                                     <strong>{{currentUser.userCredentials.username}}</strong> |
                                     <a ng-click="logout()" href="#/login" tabindex="-1">{{ resourceBundle.logoutLabel }}</a>
                                 </span>
                             </p>
-                            <ul class="nav navbar-nav navbar-right">
+                            <ul class="nav navbar-nav" ng-class="{'navbar-right': layoutDirection.direction != 'rtl'}">
                                 <li>
                                     <span class="glyphicon dhis-status" ng-class="{'glyphicon-cloud':!msgInQueue, 'glyphicon-cloud-upload':msgInQueue, 'dhis-online':isDhisOnline &amp;&amp; !poorConnection, 'dhis-poor-connection': poorConnection, 'dhis-offline':!isDhisOnline}" ng-attr-title="{{isDhisOnline &amp;&amp; !msgInQueue &amp;&amp; resourceBundle.connectedNoPendingRequests || isDhisOnline &amp;&amp; msgInQueue &amp;&amp; resourceBundle.connectedWithPendingRequests
                                         || !isDhisOnline &amp;&amp; !msgInQueue &amp;&amp; resourceBundle.notConnectedNoPendingRequests || !isDhisOnline &amp;&amp; msgInQueue &amp;&amp; resourceBundle.notConnectedWithPendingRequests}}"></span>
                                 </li>
                                 <li>
-                                    <div class="btn-group" dropdown>
-                                        <button type="button" class="btn btn-link dropdown-toggle" dropdown-toggle ng-disabled="disabled">
+                                    <div dropdown>
+                                        <button type="button" class="btn btn-link dropdown-toggle hamburger-menu" dropdown-toggle ng-disabled="disabled">
                                             <i class="fa fa-bars" ng-attr-title="{{resourceBundle.menu}}"></i>
                                         </button>
                                         <ul class="dropdown-menu" role="menu" ng-if="isLoggedIn">
@@ -43,8 +43,7 @@
                                             <li><a href="#/selectProjectPreference" ng-if="hasRoles(['Projectadmin'])" tabindex="-1">{{resourceBundle.changeProject}}</a></li>
                                             <li class="divider"></li>
                                             <li><a href="" ng-click="gotoProductKeyPage()" tabindex="-1">{{ resourceBundle.updateProductKeyMenuLabel }}</a></li>
-                                            <li class="dropdown-submenu pull-left" ng-include="'templates/partials/clone.html'"></li>
-                                            <li class="divider"></li>
+                                            <li class="dropdown-submenu" ng-class="{'pull-left': layoutDirection.direction != 'rtl'}" ng-include="'templates/partials/clone.html'"></li>
                                         </ul>
                                         <ul class="dropdown-menu" role="menu" ng-if="!isLoggedIn">
                                             <li><a href="" ng-click="gotoProductKeyPage()" tabindex="-1">{{ resourceBundle.updateProductKeyMenuLabel }}</a></li>
@@ -139,7 +138,7 @@
                         {{ resourceBundle.projectsLabel }}
                     </a>
                 </li>
-                <li ng-show="canChangeProject(isLoggedIn, hasRoles(['Coordination Level Approver']))" style="float:right;">
+                <li ng-show="canChangeProject(isLoggedIn, hasRoles(['Coordination Level Approver']))" ng-class="layoutDirection.direction == 'rtl' ? 'pull-left' : 'pull-right'">
                     <select name="project" class="select_project input-sm" ng-model="selectedProject" ng-options="p.name for p in projects | orderBy:'name'" ng-change="setSelectedProject(selectedProject)">
                     </select>
                 </li>
@@ -156,7 +155,7 @@
             </div>
         </div>
         <footer>
-            <div class="container text-right small text-muted hide-from-print">
+            <div class="container small text-muted hide-from-print" ng-class="{'text-right': layoutDirection.direction != 'rtl'}">
                 <p>{{ getConnectedToMessage() }}</p>
             </div>
         </footer>
