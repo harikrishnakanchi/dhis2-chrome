@@ -157,17 +157,23 @@ define(["lodash"], function(_) {
         };
 
         var getChartData = function(userModules) {
+            var chartDataPromises = [];
             _.forEach(userModules, function(module) {
                 _.forEach(allCharts, function(chart) {
-                    loadChartData(chart, module.id).then(function(chartData) {
+                    var chartDataPromise = loadChartData(chart, module.id).then(function(chartData) {
                         getDataElementValues(chart, chartData, module);
                     });
+                    chartDataPromises.push(chartDataPromise);
                 });
             });
+            return $q.all(chartDataPromises);
         };
 
         var init = function() {
-            return getAllCharts().then(getUserModules).then(getChartData);
+            $scope.loading = true;
+            return getAllCharts().then(getUserModules).then(getChartData).then(function () {
+                $scope.loading = false;
+            });
         };
 
         init();

@@ -45,14 +45,9 @@ define(['chart', 'lodash'], function(Chart, _) {
         };
 
         this.getDataForChart = function(chartName, orgUnitId) {
-            var query = db.queryBuilder().$eq(chartName).$index("by_chart").compile();
             var store = db.objectStore(CHART_DATA_STORE_NAME);
-
-            return store.each(query).then(function(data) {
-                var output = _(data).filter({
-                    orgUnit: orgUnitId
-                }).map('data').first();
-                return output;
+            return store.find([chartName, orgUnitId]).then(function (chartData) {
+                return !!chartData && chartData.data;
             });
         };
     };
