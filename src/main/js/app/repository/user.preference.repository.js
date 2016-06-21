@@ -1,4 +1,4 @@
-define(["lodash"], function(_) {
+define(["lodash", "customAttributes"], function(_, CustomAttributes) {
     return function(db, orgUnitRepository) {
         var get = function(username) {
             var store = db.objectStore('userPreferences');
@@ -44,12 +44,29 @@ define(["lodash"], function(_) {
         };
 
         var getCurrentUsersOriginOrgUnitIds = function() {
-            return getCurrentUsersModules().then(function(modules) {
-                var moduleIds = _.pluck(modules, "id");
-                return orgUnitRepository.findAllByParent(moduleIds).then(function(originOrgUnits) {
-                    return _.pluck(originOrgUnits, "id");
-                });
+            return getFilteredCurrentUsersOriginOrgUnitIds(function(module){
+                return true;
             });
+        };
+
+        var getCurrentUsersLineListOriginOrgUnitIds = function() {
+            return getFilteredCurrentUsersOriginOrgUnitIds(function (module) {
+                return CustomAttributes.parseAttribute(module.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
+            });
+        };
+
+        var getFilteredCurrentUsersOriginOrgUnitIds = function(filterModules) {
+            var getFilteredModules = function (modules) {
+                return _.filter(modules, filterModules);
+            };
+            return getCurrentUsersModules()
+                .then(getFilteredModules)
+                .then(function (modules) {
+                    var moduleIds = _.pluck(modules, "id");
+                    return orgUnitRepository.findAllByParent(moduleIds).then(function (originOrgUnits) {
+                        return _.pluck(originOrgUnits, "id");
+                    });
+                });
         };
 
         return {
@@ -59,6 +76,7 @@ define(["lodash"], function(_) {
             'getCurrentUsersProjectIds': getCurrentUsersProjectIds,
             'getCurrentUsersModules': getCurrentUsersModules,
             'getCurrentUsersOriginOrgUnitIds': getCurrentUsersOriginOrgUnitIds,
+            'getCurrentUsersLineListOriginOrgUnitIds': getCurrentUsersLineListOriginOrgUnitIds,
             'getCurrentUsersPreferences': getCurrentUsersPreferences
         };
     };

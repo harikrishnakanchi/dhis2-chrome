@@ -84,7 +84,7 @@ define(["moment", "properties", "dateUtils", "lodash"], function(moment, propert
         };
 
         this.run = function() {
-            return userPreferenceRepository.getCurrentUsersOriginOrgUnitIds().then(function(originOrgUnitIds) {
+            return userPreferenceRepository.getCurrentUsersLineListOriginOrgUnitIds().then(function(originOrgUnitIds) {
                 return $q.all([downloadEventsData(_.clone(originOrgUnitIds, true)), getLocalData(originOrgUnitIds)]).then(mergeAndSave);
             });
         };
