@@ -1,7 +1,7 @@
-define(["mainController", "angularMocks", "utils", "sessionHelper", "chromeUtils", "orgUnitRepository", "systemSettingRepository", "dhisMonitor"],
-    function(MainController, mocks, utils, SessionHelper, chromeUtils, OrgUnitRepository, SystemSettingRepository, DhisMonitor) {
-        describe("main controller", function() {
-            var rootScope, mainController, scope, q, timeout, db,
+define(["headerController", "angularMocks", "utils", "sessionHelper", "chromeUtils", "orgUnitRepository", "systemSettingRepository", "dhisMonitor"],
+    function(HeaderController, mocks, utils, SessionHelper, chromeUtils, OrgUnitRepository, SystemSettingRepository, DhisMonitor) {
+        describe("headerController", function() {
+            var rootScope, headerController, scope, q, timeout, db,
                 translationStore, location, sessionHelper, orgUnitRepository, hustle, systemSettingRepository;
 
             beforeEach(module('hustle'));
@@ -71,7 +71,7 @@ define(["mainController", "angularMocks", "utils", "sessionHelper", "chromeUtils
 
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
-                mainController = new MainController(q, scope, location, rootScope, hustle, timeout, db, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor);
+                headerController = new HeaderController(q, scope, location, rootScope, hustle, timeout, db, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor);
             }));
 
             it("should logout user", function() {

@@ -58,7 +58,6 @@ require.config({
         "aggregateModuleController": "app/controller/aggregate.module.controller",
         "lineListModuleController": "app/controller/line.list.module.controller",
         "lineListOfflineApprovalController": "app/controller/line.list.offline.approval.controller",
-        "mainController": "app/controller/main.controller",
         "projectController": "app/controller/project.controller",
         "loginController": "app/controller/login.controller",
         "countryController": "app/controller/country.controller",
@@ -77,6 +76,7 @@ require.config({
         "pivotTableController": "app/controller/pivot.table.controller",
         "selectProjectPreferenceController": "app/controller/select.project.preference.controller",
         "projectReportController": "app/controller/project.report.controller",
+        "headerController": "app/controller/header.controller",
         "footerController": "app/controller/footer.controller",
 
         //Services
