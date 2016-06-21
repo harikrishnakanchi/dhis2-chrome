@@ -1,6 +1,8 @@
-var runTest = function() {
+var runTest = function(testNumber) {
     var STORE_NAME = 'organisationUnits',
         req, transaction, objectStore;
+
+    var PARENT_IDS = ["a0f9b7ceb46", "a4113d91a74", "a8549a1f334", "a87c87ab3aa", "a2b5312f50c", "a6e473b1bc9", "a92f69580e8", "ab31ea68dca", "a69cc45b4b4", "a8fcd3619d8", "a9437a0828c", "ad272fbcb70", "a329cd98589", "a6fbd65eccf", "a74f119e557", "abd19473a1d", "a24d00fde4a", "a3e5a22bcd0", "a8f472b5d40", "acd5b3f9503", "a2937f49aea", "a3103f88b25", "a4bf24606fe", "a4c1b6d17ac", "a4e705cc3c3", "a563a821021", "a5740b2e6c9", "a7db412f24f", "ab47122e0cd", "ae62ff677bb"];
 
     var openDb = function(dbName, successFn) {
         if(!("indexedDB" in window)) {
@@ -76,11 +78,11 @@ var runTest = function() {
         };
     };
 
-    var testCursorWithKeyRangeOnly = function(db) {
+    var testGetWithCursorAndKeyRangeOnly = function(db) {
         transaction = db.transaction(STORE_NAME, "readwrite");
         objectStore = transaction.objectStore(STORE_NAME);
 
-        console.time('testCursorWithKeyRangeOnly');
+        console.time('testGetWithCursorAndKeyRangeOnly');
         var orgUnits = [];
         req = objectStore.openCursor(IDBKeyRange.only('ac942b0f314'));
         req.onsuccess = function(e) {
@@ -89,17 +91,17 @@ var runTest = function() {
                 orgUnits.push(cursor.value);
                 cursor.continue();
             } else {
-                console.timeEnd('testCursorWithKeyRangeOnly');
+                console.timeEnd('testGetWithCursorAndKeyRangeOnly');
                 console.log('orgUnits: ', orgUnits.length);
             }
         };
     };
 
-    var testCursorWithKeyRangeBound = function(db) {
+    var testGetWithCursorAndKeyRangeBound = function(db) {
         transaction = db.transaction(STORE_NAME, "readwrite");
         objectStore = transaction.objectStore(STORE_NAME);
 
-        console.time('testCursorWithKeyRangeBound');
+        console.time('testGetWithCursorAndKeyRangeBound');
         var orgUnits = [];
         req = objectStore.openCursor(IDBKeyRange.bound('ac942b0f314', 'ac942b0f314'));
         req.onsuccess = function(e) {
@@ -108,20 +110,19 @@ var runTest = function() {
                 orgUnits.push(cursor.value);
                 cursor.continue();
             } else {
-                console.timeEnd('testCursorWithKeyRangeBound');
+                console.timeEnd('testGetWithCursorAndKeyRangeBound');
                 console.log('orgUnits: ', orgUnits.length);
             }
         };
     };
 
     var testFindAllWithCursor = function(db) {
-        var parentIds = ["a0f9b7ceb46", "a4113d91a74", "a8549a1f334", "a87c87ab3aa", "a2b5312f50c", "a6e473b1bc9", "a92f69580e8", "ab31ea68dca", "a69cc45b4b4", "a8fcd3619d8", "a9437a0828c", "ad272fbcb70", "a329cd98589", "a6fbd65eccf", "a74f119e557", "abd19473a1d", "a24d00fde4a", "a3e5a22bcd0", "a8f472b5d40", "acd5b3f9503", "a2937f49aea", "a3103f88b25", "a4bf24606fe", "a4c1b6d17ac", "a4e705cc3c3", "a563a821021", "a5740b2e6c9", "a7db412f24f", "ab47122e0cd", "ae62ff677bb"];
         transaction = db.transaction(STORE_NAME, "readwrite");
         objectStore = transaction.objectStore(STORE_NAME);
 
         console.time('testFindAllWithCursor');
         req = objectStore.index('by_parent').openCursor(null, 'next');
-        var sortedParentIds = parentIds.sort();
+        var sortedParentIds = PARENT_IDS.sort();
         var orgUnits = [];
         req.onsuccess = function(e) {
             var foundAMatch = function() {
@@ -160,7 +161,7 @@ var runTest = function() {
 
         console.time('testFindAllWithCursorWithHalfArray');
         req = objectStore.index('by_parent').openCursor(null, 'next');
-        var sortedParentIds = parentIds.sort().slice(0,15);
+        var sortedParentIds = PARENT_IDS.sort().slice(0,15);
         var orgUnits = [];
         req.onsuccess = function(e) {
             var foundAMatch = function() {
@@ -198,7 +199,7 @@ var runTest = function() {
         objectStore = transaction.objectStore(STORE_NAME);
 
         console.time('testFindAllWithCursorAndKeyRange');
-        var sortedParentIds = parentIds.sort();
+        var sortedParentIds = PARENT_IDS.sort();
         var orgUnits = [];
         req = objectStore.index('by_parent').openCursor(IDBKeyRange.bound(sortedParentIds[0], sortedParentIds[sortedParentIds.length - 1]), 'next');
         req.onsuccess = function(e) {
@@ -279,9 +280,9 @@ var runTest = function() {
         objectStore = transaction.objectStore(STORE_NAME);
 
         console.time('testFindAllWithCursorInBatches');
-        var sortedParentIds = parentIds.sort();
+        var sortedParentIds = PARENT_IDS.sort();
 
-        var BATCH_SIZE = 2;
+        var BATCH_SIZE = 3;
         for(i = 0; i < sortedParentIds.length; i += BATCH_SIZE) {
             var batchOfIds = sortedParentIds.slice(i, i + BATCH_SIZE);
             executeRequestForBatch(batchOfIds, function() {
@@ -293,19 +294,21 @@ var runTest = function() {
 
     var init = function() {
         openDb('msf', function(db) {
-            //testGetAll(db);
-            //testGetAllWithReadWriteTransaction(db);
-            //testGetAllWithCursor(db);
-            //testGet(db);
-            //testCursorWithKeyRangeOnly(db);
-            //testCursorWithKeyRangeBound(db);
-            //testFindAllWithCursor(db);
-            //testFindAllWithCursorWithHalfArray(db);
-            //testFindAllWithCursorAndKeyRange(db);
-            testFindAllWithCursorInBatches(db);
+            var tests = [
+                testGetAll,
+                testGetAllWithReadWriteTransaction,
+                testGetAllWithCursor,
+                testGet,
+                testGetWithCursorAndKeyRangeOnly,
+                testGetWithCursorAndKeyRangeBound,
+                testFindAllWithCursor,
+                testFindAllWithCursorWithHalfArray,
+                testFindAllWithCursorAndKeyRange,
+                testFindAllWithCursorInBatches
+            ]
+            tests[testNumber](db);
         });
     };
 
     init();
 };
-runTest();
