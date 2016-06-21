@@ -1,5 +1,5 @@
-define(["chromeUtils", "lodash"], function(chromeUtils, _) {
-    return function($q, $scope, $location, $rootScope, $hustle, $timeout, db, packagedDataImporter, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor) {
+define(["lodash"], function(_) {
+    return function($q, $scope, $location, $rootScope, $hustle, $timeout, db, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor) {
         $scope.projects = [];
 
         $scope.canChangeProject = function(hasUserLoggedIn, isCoordinationApprover) {
@@ -76,16 +76,12 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             $location.path("/dashboard");
         };
 
-        var deregisterUserPreferencesListener = $rootScope.$on('userPreferencesUpdated', function() {
+        $rootScope.$on('userPreferencesUpdated', function() {
             loadProjects();
             if ($rootScope.currentUser && $rootScope.currentUser.selectedProject) {
                 loadUserLineListModules();
                 loadReportOpunitAndModules();
             }
-        });
-
-        $scope.$on('$destroy', function() {
-            deregisterUserPreferencesListener();
         });
 
         var checkConnectionQuality = function() {
@@ -101,22 +97,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
         };
 
         var init = function() {
-
-            var validateAndContinue = function(isProductKeySet) {
-                if (!isProductKeySet) {
-                    $location.path("/productKeyPage");
-                } else {
-                    chromeUtils.sendMessage("dbReady");
-                    $location.path("/login");
-                }
-            };
-
             checkConnectionQuality();
-
-            $scope.allUserLineListModules = [];
-            packagedDataImporter.run()
-                .then(systemSettingRepository.isProductKeySet)
-                .then(validateAndContinue);
         };
 
         init();

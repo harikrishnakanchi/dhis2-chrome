@@ -1,8 +1,8 @@
-define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sessionHelper", "chromeUtils", "orgUnitRepository", "systemSettingRepository", "dhisMonitor"],
-    function(MainController, mocks, utils, PackagedDataImporter, SessionHelper, chromeUtils, OrgUnitRepository, SystemSettingRepository, DhisMonitor) {
+define(["mainController", "angularMocks", "utils", "sessionHelper", "chromeUtils", "orgUnitRepository", "systemSettingRepository", "dhisMonitor"],
+    function(MainController, mocks, utils, SessionHelper, chromeUtils, OrgUnitRepository, SystemSettingRepository, DhisMonitor) {
         describe("main controller", function() {
             var rootScope, mainController, scope, q, timeout, db,
-                translationStore, location, packagedDataImporter, sessionHelper, orgUnitRepository, hustle, systemSettingRepository;
+                translationStore, location, sessionHelper, orgUnitRepository, hustle, systemSettingRepository;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $location, $hustle, $timeout) {
@@ -15,7 +15,6 @@ define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sess
                 spyOn(chromeUtils, "sendMessage");
                 spyOn(chromeUtils, "addListener");
 
-                packagedDataImporter = new PackagedDataImporter();
                 sessionHelper = new SessionHelper();
                 orgUnitRepository = new OrgUnitRepository();
                 systemSettingRepository = new SystemSettingRepository();
@@ -70,17 +69,10 @@ define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sess
                     return translationStore;
                 });
 
-                spyOn(packagedDataImporter, "run").and.returnValue(utils.getPromise(q, {}));
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
-                mainController = new MainController(q, scope, location, rootScope, hustle, timeout, db, packagedDataImporter, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor);
+                mainController = new MainController(q, scope, location, rootScope, hustle, timeout, db, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor);
             }));
-
-            it("should import metadata triggering db migrations in the process", function() {
-                scope.$apply();
-
-                expect(packagedDataImporter.run).toHaveBeenCalled();
-            });
 
             it("should logout user", function() {
                 scope.logout();
@@ -103,14 +95,6 @@ define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sess
                 var result = scope.hasSelectedProject();
 
                 expect(result).toEqual(true);
-            });
-
-            it("should redirect to login page", function() {
-                spyOn(location, "path");
-
-                scope.$apply();
-
-                expect(location.path).toHaveBeenCalledWith("/login");
             });
 
             it("should reset projects on current user's org units changes", function() {
