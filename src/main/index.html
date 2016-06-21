@@ -155,7 +155,7 @@
             </div>
         </div>
         <footer>
-            <div class="container small text-muted hide-from-print" ng-class="{'text-right': layoutDirection.direction != 'rtl'}">
+            <div class="container small text-muted hide-from-print" ng-class="layoutDirection.direction != 'rtl' ? 'text-right' : 'rtl text-left'">
                 <p>{{ getConnectedToMessage() }}</p>
             </div>
         </footer>

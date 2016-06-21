@@ -1,12 +1,13 @@
 define(["chromeUtils", "lodash"], function(chromeUtils, _) {
-    return function($q, $scope, $location, $rootScope, $hustle, $timeout, ngI18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor) {
+    return function($q, $scope, $location, $rootScope, $hustle, $timeout, $interpolate, ngI18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor) {
         $scope.projects = [];
 
         $scope.getConnectedToMessage = function() {
-            var praxisVersionMessage = 'Version ' + chromeUtils.getPraxisVersion() + ' ';
-            var dhisUrl = systemSettingRepository.getDhisUrl();
-            var message = $scope.resourceBundle ? $scope.resourceBundle.connectedTo + " " + dhisUrl : "";
-            return dhisUrl ? praxisVersionMessage + message : praxisVersionMessage;
+            var connectToExpression = $interpolate($scope.resourceBundle.connectedToMessage, false, null, true);
+            return connectToExpression({
+                praxis_version: chromeUtils.getPraxisVersion(),
+                dhis_url: systemSettingRepository.getDhisUrl()
+            });
         };
 
         $scope.canChangeProject = function(hasUserLoggedIn, isCoordinationApprover) {

@@ -262,7 +262,7 @@
     "tabularReports": "Rapports tabulaires",
     "exportAsCsv": "Telecharger rapport",
     "invalidAccess": "L'utilisateur n'a pas de droit d'acces a cette version de Praxis",
-    "connectedTo": "connecte a ",
+    "connectedToMessage": "Version {{praxis_version}} connecté à {{dhis_url}}",
     "selectServiceNameLabel": "Sélectionner un service",
     "toLabel": "a",
     "weeklyReports": "Rapports hebdomadaires",
