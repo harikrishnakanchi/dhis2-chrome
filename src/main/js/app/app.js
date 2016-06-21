@@ -125,8 +125,8 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                 basePath: "/js/app/i18n"
             });
 
-            app.run(['dhisMonitor', 'hustleMonitor', 'queuePostProcessInterceptor', '$rootScope', '$location', '$hustle', '$document', 'systemSettingRepository', 'translationsService',
-                function(dhisMonitor, hustleMonitor, queuePostProcessInterceptor, $rootScope, $location, $hustle, $document, systemSettingRepository, translationsService) {
+            app.run(['dhisMonitor', 'hustleMonitor', 'queuePostProcessInterceptor', '$rootScope', '$location', '$hustle', '$document', 'ngI18nResourceBundle', 'systemSettingRepository', 'translationsService',
+                function(dhisMonitor, hustleMonitor, queuePostProcessInterceptor, $rootScope, $location, $hustle, $document, ngI18nResourceBundle, systemSettingRepository, translationsService) {
 
                     $document.on('keydown', function(e) {
                         disableBackspaceKey(e);
@@ -171,8 +171,11 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     $rootScope.setLocale = function(locale) {
                         translationsService.setLocale(locale);
                         $rootScope.locale = locale;
-
                         $rootScope.layoutDirection = locale == 'ar' ? { 'direction': 'rtl' } : {};
+
+                        ngI18nResourceBundle.get({ "locale": locale }).then(function(resourceBundle) {
+                            $rootScope.resourceBundle = resourceBundle.data;
+                        });
                     };
 
                     systemSettingRepository.getLocale().then($rootScope.setLocale);

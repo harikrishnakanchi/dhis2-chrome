@@ -1,7 +1,7 @@
 define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sessionHelper", "chromeUtils", "orgUnitRepository", "systemSettingRepository", "dhisMonitor"],
     function(MainController, mocks, utils, PackagedDataImporter, SessionHelper, chromeUtils, OrgUnitRepository, SystemSettingRepository, DhisMonitor) {
         describe("main controller", function() {
-            var rootScope, mainController, scope, q, timeout, i18nResourceBundle, getResourceBundleSpy, db,
+            var rootScope, mainController, scope, q, timeout, db,
                 translationStore, location, packagedDataImporter, sessionHelper, orgUnitRepository, hustle, systemSettingRepository;
 
             beforeEach(module('hustle'));
@@ -28,10 +28,6 @@ define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sess
 
                 spyOn(systemSettingRepository, "isProductKeySet").and.returnValue(utils.getPromise(q, true));
                 spyOn(systemSettingRepository, "isKeyGeneratedFromProd").and.returnValue(utils.getPromise(q, true));
-
-                i18nResourceBundle = {
-                    get: function() {}
-                };
 
                 var queryBuilder = function() {
                     this.$index = function() {
@@ -63,11 +59,6 @@ define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sess
                     };
                 };
 
-                getResourceBundleSpy = spyOn(i18nResourceBundle, "get");
-                getResourceBundleSpy.and.returnValue(utils.getPromise(q, {
-                    "data": {}
-                }));
-
                 translationStore = getMockStore("translations");
 
                 spyOn(sessionHelper, "logout");
@@ -82,11 +73,10 @@ define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sess
                 spyOn(packagedDataImporter, "run").and.returnValue(utils.getPromise(q, {}));
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
-                mainController = new MainController(q, scope, location, rootScope, hustle, timeout, i18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor);
+                mainController = new MainController(q, scope, location, rootScope, hustle, timeout, db, packagedDataImporter, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor);
             }));
 
             it("should import metadata triggering db migrations in the process", function() {
-                mainController = new MainController(q, scope, location, rootScope, hustle, timeout, i18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor);
                 scope.$apply();
 
                 expect(packagedDataImporter.run).toHaveBeenCalled();

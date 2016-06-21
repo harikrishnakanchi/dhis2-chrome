@@ -1,5 +1,5 @@
 define(["chromeUtils", "lodash"], function(chromeUtils, _) {
-    return function($q, $scope, $location, $rootScope, $hustle, $timeout, ngI18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor) {
+    return function($q, $scope, $location, $rootScope, $hustle, $timeout, db, packagedDataImporter, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor) {
         $scope.projects = [];
 
         $scope.canChangeProject = function(hasUserLoggedIn, isCoordinationApprover) {
@@ -18,14 +18,6 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
         $scope.showTestLogo = function() {
             return !systemSettingRepository.isKeyGeneratedFromProd();
         };
-
-        var buildResourceBundle = $rootScope.$watch("locale", function() {
-            ngI18nResourceBundle.get({
-                "locale": $rootScope.locale
-            }).then(function(data) {
-                $rootScope.resourceBundle = data.data;
-            });
-        });
 
         var loadProjects = function() {
             if ($rootScope.currentUser && $rootScope.currentUser.organisationUnits) {
@@ -94,7 +86,6 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
 
         $scope.$on('$destroy', function() {
             deregisterUserPreferencesListener();
-            buildResourceBundle();
         });
 
         var checkConnectionQuality = function() {
