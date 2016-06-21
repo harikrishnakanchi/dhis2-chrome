@@ -78,7 +78,7 @@
     "caseNumber": "",
     "dateRange": "",
     "search": "",
-    "connectedToMessage": "نسخة {{praxis_version}} متصلة {{dhis_url}}",
+    "versionAndConnectionMessage": "نسخة {{praxis_version}} متصلة {{dhis_url}}",
     "projectReportLabel": "",
     "projectInformationLabel": "",
     "selectServiceNameLabel": "",

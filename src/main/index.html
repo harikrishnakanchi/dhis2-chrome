@@ -154,9 +154,9 @@
             <div ng-view="ng-view">
             </div>
         </div>
-        <footer>
+        <footer ng-controller="footerController">
             <div class="container small text-muted hide-from-print" ng-class="layoutDirection.direction != 'rtl' ? 'text-right' : 'rtl text-left'">
-                <p>{{ getConnectedToMessage() }}</p>
+                <p>{{ versionAndConnectionMessage }}</p>
             </div>
         </footer>
     </div>

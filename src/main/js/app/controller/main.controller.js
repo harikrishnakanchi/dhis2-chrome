@@ -1,14 +1,6 @@
 define(["chromeUtils", "lodash"], function(chromeUtils, _) {
-    return function($q, $scope, $location, $rootScope, $hustle, $timeout, $interpolate, ngI18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor) {
+    return function($q, $scope, $location, $rootScope, $hustle, $timeout, ngI18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor) {
         $scope.projects = [];
-
-        $scope.getConnectedToMessage = function() {
-            var connectToExpression = $interpolate($scope.resourceBundle.connectedToMessage, false, null, true);
-            return connectToExpression({
-                praxis_version: chromeUtils.getPraxisVersion(),
-                dhis_url: systemSettingRepository.getDhisUrl()
-            });
-        };
 
         $scope.canChangeProject = function(hasUserLoggedIn, isCoordinationApprover) {
             return hasUserLoggedIn && isCoordinationApprover;
@@ -20,10 +12,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
         };
 
         $scope.hasSelectedProject = function() {
-            if (_.isUndefined($rootScope.currentUser.selectedProject))
-                return false;
-
-            return true;
+            return !!$rootScope.currentUser.selectedProject;
         };
 
         $scope.showTestLogo = function() {

@@ -77,6 +77,7 @@ require.config({
         "pivotTableController": "app/controller/pivot.table.controller",
         "selectProjectPreferenceController": "app/controller/select.project.preference.controller",
         "projectReportController": "app/controller/project.report.controller",
+        "footerController": "app/controller/footer.controller",
 
         //Services
         "services": "app/service/services",
