@@ -44,9 +44,7 @@ define(["lodash", "customAttributes"], function(_, CustomAttributes) {
         };
 
         var getCurrentUsersOriginOrgUnitIds = function() {
-            return getFilteredCurrentUsersOriginOrgUnitIds(function(module){
-                return true;
-            });
+            return getFilteredCurrentUsersOriginOrgUnitIds();
         };
 
         var getCurrentUsersLineListOriginOrgUnitIds = function() {
@@ -57,7 +55,10 @@ define(["lodash", "customAttributes"], function(_, CustomAttributes) {
 
         var getFilteredCurrentUsersOriginOrgUnitIds = function(filterModules) {
             var getFilteredModules = function (modules) {
-                return _.filter(modules, filterModules);
+                if (filterModules) {
+                    return _.filter(modules, filterModules);
+                }
+                return modules;
             };
             return getCurrentUsersModules()
                 .then(getFilteredModules)
