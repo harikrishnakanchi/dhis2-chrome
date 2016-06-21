@@ -280,6 +280,20 @@ define([], function() {
         db.deleteObjectStore("organisationUnitLevels");
     };
 
+    var delete_pivot_table_data_and_chart_data_changelog = function (db, tx) {
+        var changeLogStore = tx.objectStore("changeLog");
+        changeLogStore.openCursor().onsuccess = function (e) {
+            var cursor = e.target.result;
+            if (cursor) {
+                var type = cursor.value.type;
+                if (_.startsWith(type, "chartData:") || _.startsWith(type, "pivotTableData:")) {
+                    cursor.delete();
+                }
+                cursor.continue();
+            }
+        };
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -317,6 +331,7 @@ define([], function() {
         change_role_to_projectadmin,
         delete_keys_chart_and_reports_from_changelog,
         create_data_sync_failure,
-        delete_org_unit_level_data_store
+        delete_org_unit_level_data_store,
+        delete_pivot_table_data_and_chart_data_changelog
     ];
 });
