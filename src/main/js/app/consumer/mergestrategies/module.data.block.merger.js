@@ -1,6 +1,6 @@
 define(['moment', 'lodash'],
     function(moment, _) {
-        return function(dataRepository, approvalDataRepository, mergeBy, dataService, $q, datasetRepository, approvalService, dataSyncFailureRepository, programEventRepository) {
+        return function(dataRepository, approvalDataRepository, mergeBy, dataService, $q, datasetRepository, approvalService, dataSyncFailureRepository, programEventRepository, eventService) {
 
             var mergeAndSaveToLocalDatabase = function(moduleDataBlock, updatedDhisDataValues, dhisCompletion, dhisApproval) {
                 var updatedDhisDataValuesExist = updatedDhisDataValues && updatedDhisDataValues.length > 0;
@@ -167,12 +167,35 @@ define(['moment', 'lodash'],
                   return $q.when({});
                 };
 
+                var uploadEventData = function () {
+
+                    var changeEventLocalStatus = function(events) {
+                        var updatedEvents = _.map(events, function(ev) {
+                            return _.omit(ev, ["localStatus", "clientLastUpdated"]);
+                        });
+
+                        return programEventRepository.upsert(updatedEvents);
+                    };
+
+                    if (moduleDataBlock.shouldSyncEvents) {
+                        var eventsPayload = {
+                            'events': moduleDataBlock.eventsToSync
+                        };
+                        return eventService.upsertEvents(eventsPayload).then(function () {
+                            return moduleDataBlock.eventsToSync;
+                        }).then(changeEventLocalStatus);
+                    }
+                    return $q.when({});
+
+                };
+
                 return datasetRepository.getAll().then(function (allDataSet) {
                     var dataSetIds = _.pluck(allDataSet, 'id');
 
                     return deleteApproval(dataSetIds)
                         .then(_.partial(deleteCompletion, dataSetIds))
                         .then(uploadDataValues)
+                        .then(uploadEventData)
                         .then(_.partial(uploadCompletionData, dataSetIds))
                         .then(_.partial(uploadApprovalData, dataSetIds));
 

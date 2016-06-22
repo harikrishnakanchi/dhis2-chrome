@@ -1,9 +1,9 @@
-define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'datasetRepository', 'dataService', 'approvalService', 'angularMocks', 'utils', 'moment', 'lodash', 'mergeBy', 'dataSyncFailureRepository', 'programEventRepository'],
-    function(ModuleDataBlockMerger, DataRepository, ApprovalDataRepository, DatasetRepository, DataService, ApprovalService, mocks, utils, moment, _ , MergeBy, DataSyncFailureRepository, ProgramEventRepository) {
+define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'datasetRepository', 'dataService', 'approvalService', 'angularMocks', 'utils', 'moment', 'lodash', 'mergeBy', 'dataSyncFailureRepository', 'programEventRepository', 'eventService'],
+    function(ModuleDataBlockMerger, DataRepository, ApprovalDataRepository, DatasetRepository, DataService, ApprovalService, mocks, utils, moment, _ , MergeBy, DataSyncFailureRepository, ProgramEventRepository, EventService) {
         describe('moduleDataBlockMerger', function() {
             var q, scope, moduleDataBlockMerger,
                 dataRepository, approvalRepository, datasetRepository, dataService, approvalService, mergeBy,
-                dhisDataValues, dhisCompletion, dhisApproval, moduleDataBlock, someMomentInTime, dataSets, dataSetIds, periodAndOrgUnit, dataSyncFailureRepository, programEventRepository;
+                dhisDataValues, dhisCompletion, dhisApproval, moduleDataBlock, someMomentInTime, dataSets, dataSetIds, periodAndOrgUnit, dataSyncFailureRepository, programEventRepository, eventService;
 
             beforeEach(mocks.inject(function($q, $rootScope, $log) {
                 q = $q;
@@ -42,7 +42,8 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                 mergeBy = new MergeBy($log);
                 programEventRepository = new ProgramEventRepository();
 
-                moduleDataBlockMerger = new ModuleDataBlockMerger(dataRepository, approvalRepository, mergeBy, dataService, q, datasetRepository, approvalService, dataSyncFailureRepository, programEventRepository);
+                eventService = new EventService();
+                moduleDataBlockMerger = new ModuleDataBlockMerger(dataRepository, approvalRepository, mergeBy, dataService, q, datasetRepository, approvalService, dataSyncFailureRepository, programEventRepository, eventService);
 
                 moduleDataBlock = createMockModuleDataBlock();
                 dhisDataValues = undefined;
@@ -680,6 +681,48 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         expect(approvalService.markAsIncomplete).not.toHaveBeenCalled();
                         expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(dataSetIds, [periodAndOrgUnit]);
                         expect(dataService.save).toHaveBeenCalled();
+                    });
+                });
+
+                describe('events in Praxis', function() {
+                    it('should be synced to DHIS', function(){
+                        var eventsToSync = [{
+                            event: 'someEventId',
+                            eventDate: '2016W15'
+                        }];
+                        var eventsPayload = {
+                            'events': eventsToSync
+                        };
+
+                        moduleDataBlock = createMockModuleDataBlock({eventsToSync: eventsToSync, shouldSyncEvents: true});
+                        spyOn(eventService, 'upsertEvents').and.returnValue(utils.getPromise(q,undefined));
+                        spyOn(programEventRepository, 'upsert').and.returnValue(utils.getPromise(q,undefined));
+
+                        moduleDataBlockMerger.uploadToDHIS(moduleDataBlock, dhisCompletion, dhisApproval);
+                        scope.$apply();
+
+                        expect(eventService.upsertEvents).toHaveBeenCalledWith(eventsPayload);
+                    });
+
+                    it('should mark event as uploaded after successful sync', function(){
+                        var eventsToSync = [{
+                            event: 'someEventId',
+                            eventDate: '2016W15'
+                        }];
+                        var eventsPayload = {
+                            'events': eventsToSync
+                        };
+                        moduleDataBlock = createMockModuleDataBlock({eventsToSync: eventsToSync, shouldSyncEvents: true});
+                        spyOn(eventService, 'upsertEvents').and.returnValue(utils.getPromise(q,undefined));
+                        spyOn(programEventRepository, 'upsert').and.returnValue(utils.getPromise(q,undefined));
+
+                        moduleDataBlockMerger.uploadToDHIS(moduleDataBlock, dhisCompletion, dhisApproval);
+                        scope.$apply();
+
+                        var updatedEvents = _.map(moduleDataBlock.eventsToSync, function(event) {
+                            return _.omit(event, ["localStatus", "clientLastUpdated"]);
+                        });
+                        expect(programEventRepository.upsert).toHaveBeenCalledWith(updatedEvents);
                     });
                 });
             });

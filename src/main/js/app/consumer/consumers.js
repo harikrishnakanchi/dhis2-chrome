@@ -15,7 +15,7 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
 
         var init = function(app) {
             app.service('mergeBy', ['$log', mergeBy]);
-            app.service('moduleDataBlockMerger', ["dataRepository", "approvalDataRepository", "mergeBy", "dataService", "$q", "datasetRepository", "approvalService", "dataSyncFailureRepository", "programEventRepository", moduleDataBlockMerger]);
+            app.service('moduleDataBlockMerger', ["dataRepository", "approvalDataRepository", "mergeBy", "dataService", "$q", "datasetRepository", "approvalService", "dataSyncFailureRepository", "programEventRepository", "eventService", moduleDataBlockMerger]);
             app.service("downloadDataConsumer", ["dataService", "dataRepository", "datasetRepository", "userPreferenceRepository", "$q", "approvalDataRepository", "mergeBy", "changeLogRepository", downloadDataConsumer]);
             app.service("downloadApprovalConsumer", ["datasetRepository", "userPreferenceRepository", "orgUnitRepository", "$q", "approvalService", "approvalDataRepository", downloadApprovalConsumer]);
             app.service("uploadDataConsumer", ["dataService", "dataRepository", uploadDataConsumer]);
