@@ -1,5 +1,7 @@
 define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(properties, moment, dhisUrl, _, dateUtils) {
     return function($http, db, $q) {
+        var APPROVED_STATES = ['APPROVED_ABOVE', 'APPROVED_HERE', 'ACCEPTED_HERE'];
+
         this.markAsComplete = function(dataSets, periodsAndOrgUnits, completedBy, completedOn) {
             var payload = [];
             _.each(periodsAndOrgUnits, function(periodAndOrgUnit) {
@@ -153,43 +155,25 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
         this.getApprovalData = function(orgUnit, dataSets, periodRange) {
 
             var transform = function(response) {
-                if (!response.data.dataApprovalStateResponses)
-                    return [];
-
-                var approvalStatusOrder = {
-                    "UNAPPROVABLE": -1,
-                    "UNAPPROVED_READY": 0,
-                    "UNAPPROVED_ABOVE": 0,
-                    "APPROVED_ABOVE": 1,
-                    "APPROVED_HERE": 1,
-                    "ACCEPTED_HERE": 2
-                };
-
-                var approvalDataGroupedByPeriodAndOu = _.groupBy(response.data.dataApprovalStateResponses, function(approvalData) {
+                var groupedApprovalResponses = _.groupBy(response.data.dataApprovalStateResponses, function(approvalData) {
                     return [approvalData.period.id, approvalData.organisationUnit.id];
                 });
 
-                return _.transform(approvalDataGroupedByPeriodAndOu, function(acc, groupedItems) {
-                    var isApproved = false;
+                return _.transform(groupedApprovalResponses, function(results, approvalResponses) {
+                    var allResponsesAreApproved = _.all(approvalResponses, function(approvalResponse) {
+                        return _.includes(APPROVED_STATES, approvalResponse.state);
+                    });
 
-                    var itemAtLowestApprovalLevel = _.minWhile(groupedItems, "state", approvalStatusOrder);
-
-                    switch (itemAtLowestApprovalLevel.state) {
-                        case "APPROVED_ABOVE":
-                        case "APPROVED_HERE":
-                        case "ACCEPTED_HERE":
-                            isApproved = true;
-                            break;
-                    }
-
-                    if (isApproved)
-                        acc.push({
-                            'period': dateUtils.getFormattedPeriod(_.pluck(groupedItems, 'period')[0].id),
-                            'orgUnit': _.pluck(groupedItems, 'organisationUnit')[0].id,
-                            "isApproved": isApproved,
-                            "approvedBy": _.pluck(groupedItems, 'createdByUsername')[0],
-                            "approvedOn": _.pluck(groupedItems, 'createdDate')[0],
+                    if (allResponsesAreApproved) {
+                        var oneApprovalResponse = _.first(approvalResponses);
+                        results.push({
+                            period: dateUtils.getFormattedPeriod(oneApprovalResponse.period.id),
+                            orgUnit: oneApprovalResponse.organisationUnit.id,
+                            isApproved: true,
+                            approvedBy: oneApprovalResponse.createdByUsername,
+                            approvedOn: oneApprovalResponse.createdDate
                         });
+                    }
                 }, []);
             };
 
