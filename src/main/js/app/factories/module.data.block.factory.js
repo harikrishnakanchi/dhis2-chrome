@@ -1,9 +1,9 @@
 define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
     return function ($q, orgUnitRepository, dataRepository, programEventRepository, approvalDataRepository, dataSyncFailureRepository) {
 
-        var create = function (moduleId, period) {
+        var create = function (moduleId, period, eventsToSync) {
             return orgUnitRepository.findAll([moduleId])
-                .then(_.partial(createForModules, _, [period]))
+                .then(_.partial(createForModules, _, [period], eventsToSync))
                 .then(function(moduleDataBlocks) {
                     return _.first(moduleDataBlocks);
                 });
@@ -17,7 +17,7 @@ define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
             return orgUnitRepository.findAll([moduleId]).then(_.partial(createForModules, _, periodRange));
         };
 
-        var createForModules = function (moduleOrgUnits, periodRange) {
+        var createForModules = function (moduleOrgUnits, periodRange, eventsToSync) {
             var moduleIds = _.pluck(moduleOrgUnits, 'id');
 
             var getIndexedAggregateData = function (mapOfOriginIdsToModuleIds) {
@@ -89,7 +89,7 @@ define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
                         var lineListData = indexedLineListData[period + moduleOrgUnit.id] || [];
                         var approvalData = indexedApprovalData[period + moduleOrgUnit.id] || {};
                         var failedToSyncData = indexedFailedSyncStatus[period + moduleOrgUnit.id] || {};
-                        return ModuleDataBlock.create(moduleOrgUnit, period, aggregateDataValues, lineListData, approvalData, failedToSyncData);
+                        return ModuleDataBlock.create(moduleOrgUnit, period, aggregateDataValues, lineListData, approvalData, failedToSyncData, eventsToSync);
                     });
                 });
                 return _.flatten(allModuleDataBlocks);
