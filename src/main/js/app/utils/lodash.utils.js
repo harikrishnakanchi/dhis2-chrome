@@ -35,57 +35,6 @@ define(["lodash"], function(_) {
         return obj || defaultValue;
     };
 
-    _.minWhile = function(collection, key, customOrder) {
-        var verifyCustomOrder = function() {
-            var verifyAllKeysArePresent = function(customOrderKeys) {
-                var keysWithUnknownOrder = _.difference(_.pluck(collection, key), customOrderKeys);
-                if (keysWithUnknownOrder.length > 0) {
-                    throw "Custom order is not known for [" + keysWithUnknownOrder + "]";
-                }
-            };
-
-            var verifyAllValuesAreInt = function() {
-                var areAllValuesInt = _.every(_.values(customOrder), _.isNumber);
-                if (!areAllValuesInt) {
-                    throw "Custom order values should be integers";
-                }
-            };
-
-            if (_.isArray(customOrder)) {
-                verifyAllKeysArePresent(customOrder);
-            } else if (_.isPlainObject(customOrder)) {
-                verifyAllValuesAreInt();
-                verifyAllKeysArePresent(_.keys(customOrder));
-            } else {
-                throw "Unsupported custom order type";
-            }
-        };
-
-        var mapCustomOrder = function() {
-            verifyCustomOrder();
-            return _.zipObject(customOrder, _.range(0, customOrder.length));
-        };
-
-        if (!customOrder) {
-            return _.min(collection, key);
-        }
-
-        verifyCustomOrder();
-        var keyOrder = _.isArray(customOrder) ? mapCustomOrder() : customOrder;
-
-        var minValue = Infinity;
-        var result;
-
-        _.forEach(collection, function(obj) {
-            if (keyOrder[obj[key]] < minValue) {
-                minValue = keyOrder[obj[key]];
-                result = obj;
-            }
-        });
-
-        return result;
-    };
-
     _.differenceBy = function(list1, list2, key) {
         return _.transform(list1, function(acc, object) {
             if (!_.containsBy(list2, object, key)) acc.push(object);
