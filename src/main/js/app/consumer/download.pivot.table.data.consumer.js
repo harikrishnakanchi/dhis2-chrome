@@ -100,7 +100,7 @@ define(["lodash", "moment"], function(_, moment) {
                     weeklyReportsLastUpdated: changeLogRepository.get(weeklyChangeLogKey),
                     monthlyReportsLastUpdated: changeLogRepository.get(monthlyChangeLogKey)
                 }).then(function(data) {
-                    var isDownloadedInSameWeekAndMonth = moment().isSame(data.monthlyReportsLastUpdated, 'week') && moment().isSame(data.monthlyReportsLastUpdated, 'month');
+                    var isDownloadedInSameWeekAndMonth = moment().isSame(data.monthlyReportsLastUpdated, 'isoWeek') && moment().isSame(data.monthlyReportsLastUpdated, 'month');
                     var isDownloadedSameDay = moment().isSame(data.weeklyReportsLastUpdated, 'day');
                     if(data.weeklyReportsLastUpdated && isDownloadedSameDay) {
                         _.remove(pivotTables, { weeklyReport: true });
