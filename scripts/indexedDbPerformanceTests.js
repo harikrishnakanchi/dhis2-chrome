@@ -548,6 +548,56 @@ var runTest = function(testNumber) {
         }
     };
 
+    var orgUnitTree = window.orgUnitTree = window.orgUnitTree || {};
+
+    var loadOrgUnits = function(db) {
+        var buildOrgUnitTree = function(orgUnits) {
+            console.time('buildOrgUnitTree');
+            //First pass to populate tree
+            orgUnits.forEach(function(orgUnit) {
+                orgUnitTree[orgUnit.id] = {
+                    i: orgUnit.id,
+                    n: orgUnit.name,
+                    l: orgUnit.level,
+                    pi: orgUnit.parentId,
+                    p: null,
+                    c: []
+                };
+            });
+            //Second pass to populate children array
+            orgUnits.forEach(function(orgUnit) {
+                var orgUnitNode = orgUnitTree[orgUnit.id],
+                    parentNode = orgUnitTree[orgUnitNode.pi];
+                if(parentNode) parentNode.c.push(orgUnitNode);
+            });
+            console.timeEnd('buildOrgUnitTree');
+        };
+
+        transaction = db.transaction(STORE_NAME, "readonly");
+        objectStore = transaction.objectStore(STORE_NAME);
+
+        console.time('loadOrgUnits: getAll()');
+        req = objectStore.getAll();
+        req.onsuccess = req.onerror = function(e) {
+            console.timeEnd('loadOrgUnits: getAll()');
+            var orgUnits = e.target.result;
+            console.log('orgUnits: ', orgUnits.length);
+            buildOrgUnitTree(orgUnits);
+        };
+    };
+
+    var testFindAllKeysWithOrgUnitTree = function() {
+        console.time('testFindAllKeysWithOrgUnitTree');
+        var orgUnits = [];
+        PARENT_IDS.forEach(function(parentId) {
+            var parentNode = orgUnitTree[parentId];
+            orgUnits.push(parentNode.c);
+        });
+        console.timeEnd('testFindAllKeysWithOrgUnitTree');
+        orgUnits = _.flatten(orgUnits);
+        console.log('orgUnits: ', orgUnits.length, orgUnits[0]);
+    };
+
     var init = function() {
         openDb('msf', function(db) {
             var tests = [
@@ -557,17 +607,19 @@ var runTest = function(testNumber) {
                 testGet,
                 testGetWithCursorAndKeyRangeOnly,
                 testGetWithCursorAndKeyRangeBound, //5
-                testFindAllWithCursor,
+                testFindAllWithCursor, //6 - Current approach
                 testFindAllWithCursorWithHalfArray,
                 testFindAllWithCursorWithOneElement,
                 testFindAllWithCursorAndKeyRange,
-                testFindAllWithCursorInBatches, //10
+                testFindAllWithCursorInBatches, //10 - Current approach with batching
                 testFindAllKeysWithCursorInBatches,
-                testFindAllKeysWithCursor,
+                testFindAllKeysWithCursor, //12 - Only retrieving ids
                 testFindAllKeysWithKeyCursor,
                 testFindAllWithGetAllAndQueryAndOneElement,
                 testFindAllWithGetAllAndQueryInBatches, //15
-                testFindAllKeysWithGetAllAndQueryInBatches
+                testFindAllKeysWithGetAllAndQueryInBatches, //16 - Only retrieving ids and using getAll()
+                loadOrgUnits,
+                testFindAllKeysWithOrgUnitTree //18
             ]
             tests[testNumber](db);
         });
