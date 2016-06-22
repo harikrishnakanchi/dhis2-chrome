@@ -15,7 +15,7 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
 
         var init = function(app) {
             app.service('mergeBy', ['$log', mergeBy]);
-            app.service('moduleDataBlockMerger', ["dataRepository", "approvalDataRepository", "mergeBy", "dataService", "$q", "datasetRepository", "approvalService", "dataSyncFailureRepository", moduleDataBlockMerger]);
+            app.service('moduleDataBlockMerger', ["dataRepository", "approvalDataRepository", "mergeBy", "dataService", "$q", "datasetRepository", "approvalService", "dataSyncFailureRepository", "programEventRepository", moduleDataBlockMerger]);
             app.service("downloadDataConsumer", ["dataService", "dataRepository", "datasetRepository", "userPreferenceRepository", "$q", "approvalDataRepository", "mergeBy", "changeLogRepository", downloadDataConsumer]);
             app.service("downloadApprovalConsumer", ["datasetRepository", "userPreferenceRepository", "orgUnitRepository", "$q", "approvalService", "approvalDataRepository", downloadApprovalConsumer]);
             app.service("uploadDataConsumer", ["dataService", "dataRepository", uploadDataConsumer]);
@@ -34,7 +34,7 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
             app.service("consumerRegistry", ["$hustle", "$q", "$log", "dispatcher", consumerRegistry]);
             app.service("uploadProgramConsumer", ["programService", "programRepository", "$q", uploadProgramConsumer]);
             app.service("downloadProgramConsumer", ["programService", "programRepository", "changeLogRepository", "$q", "mergeBy", downloadProgramConsumer]);
-            app.service("downloadEventDataConsumer", ["eventService", "programEventRepository", "userPreferenceRepository", "$q", downloadEventDataConsumer]);
+            app.service("downloadEventDataConsumer", ["eventService", "programEventRepository", "userPreferenceRepository", "moduleDataBlockMerger", "$q", downloadEventDataConsumer]);
             app.service("uploadEventDataConsumer", ["eventService", "programEventRepository", "$q", uploadEventDataConsumer]);
             app.service("deleteEventConsumer", ["eventService", "programEventRepository", "$q", deleteEventConsumer]);
             app.service("downloadMetadataConsumer", ["metadataService", "metadataRepository", "changeLogRepository", downloadMetadataConsumer]);

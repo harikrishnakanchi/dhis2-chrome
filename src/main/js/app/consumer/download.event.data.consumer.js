@@ -1,49 +1,10 @@
 define(["moment", "properties", "dateUtils", "lodash"], function(moment, properties, dateUtils, _) {
-    return function(eventService, programEventRepository, userPreferenceRepository, $q) {
+    return function(eventService, programEventRepository, userPreferenceRepository, moduleDataBlockMerger, $q) {
         var mergeAndSave = function(response) {
             var dhisEventList = response[0];
             var dbEventList = response[1];
 
-            var getNewEvents = function() {
-                return _.reject(dhisEventList, function(dhisEvent) {
-                    return _.any(dbEventList, {
-                        "event": dhisEvent.event
-                    });
-                });
-            };
-
-            if (_.isEmpty(dhisEventList) && _.isEmpty(dbEventList))
-                return;
-
-            var eventsToUpsert = [];
-            var eventsToDelete = [];
-
-            _.each(dbEventList, function(dbEvent) {
-                if (!_.isEmpty(dbEvent.localStatus))
-                    return;
-
-                var dhisEvent = _.find(dhisEventList, {
-                    "event": dbEvent.event
-                });
-
-                if (dhisEvent) {
-                    eventsToUpsert.push(dhisEvent);
-                } else {
-                    eventsToDelete.push(dbEvent);
-                }
-            });
-
-            var newEvents = getNewEvents();
-            eventsToUpsert = eventsToUpsert.concat(newEvents);
-            _.map(eventsToUpsert, function(ev) {
-                ev.eventDate = moment(ev.eventDate).toISOString();
-            });
-
-            var upsertPromise = programEventRepository.upsert(eventsToUpsert);
-
-            var deletePromise = programEventRepository.delete(_.pluck(eventsToDelete, 'event'));
-
-            return $q.all([upsertPromise, deletePromise]);
+            return moduleDataBlockMerger.mergeAndSaveEventsToLocalDatabase(dbEventList, dhisEventList);
         };
 
         var downloadEventsData = function(orgUnitIds) {

@@ -1,6 +1,6 @@
 define(['moment', 'lodash'],
     function(moment, _) {
-        return function(dataRepository, approvalDataRepository, mergeBy, dataService, $q, datasetRepository, approvalService, dataSyncFailureRepository) {
+        return function(dataRepository, approvalDataRepository, mergeBy, dataService, $q, datasetRepository, approvalService, dataSyncFailureRepository, programEventRepository) {
 
             var mergeAndSaveToLocalDatabase = function(moduleDataBlock, updatedDhisDataValues, dhisCompletion, dhisApproval) {
                 var updatedDhisDataValuesExist = updatedDhisDataValues && updatedDhisDataValues.length > 0;
@@ -179,8 +179,52 @@ define(['moment', 'lodash'],
                 });
             };
 
+            var mergeAndSaveEventsToLocalDatabase = function (localEvents, dhisEvents) {
+                if (_.isEmpty(dhisEvents) && _.isEmpty(localEvents))
+                    return;
+
+                var getNewEvents = function() {
+                    return _.reject(dhisEvents, function(dhisEvent) {
+                        return _.any(localEvents, {
+                            "event": dhisEvent.event
+                        });
+                    });
+                };
+
+                var eventsToUpsert = [];
+                var eventsToDelete = [];
+
+                _.each(localEvents, function(dbEvent) {
+                    if (!_.isEmpty(dbEvent.localStatus))
+                        return;
+
+                    var dhisEvent = _.find(dhisEvents, {
+                        "event": dbEvent.event
+                    });
+
+                    if (dhisEvent) {
+                        eventsToUpsert.push(dhisEvent);
+                    } else {
+                        eventsToDelete.push(dbEvent);
+                    }
+                });
+
+                var newEvents = getNewEvents();
+                eventsToUpsert = eventsToUpsert.concat(newEvents);
+                _.map(eventsToUpsert, function(ev) {
+                    ev.eventDate = moment(ev.eventDate).toISOString();
+                });
+
+                var upsertPromise = programEventRepository.upsert(eventsToUpsert);
+
+                var deletePromise = programEventRepository.delete(_.pluck(eventsToDelete, 'event'));
+
+                return $q.all([upsertPromise, deletePromise]);
+            };
+
             return {
                 mergeAndSaveToLocalDatabase: mergeAndSaveToLocalDatabase,
+                mergeAndSaveEventsToLocalDatabase: mergeAndSaveEventsToLocalDatabase,
                 uploadToDHIS: uploadToDHIS
             };
         };

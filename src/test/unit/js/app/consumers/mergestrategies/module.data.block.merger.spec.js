@@ -1,9 +1,9 @@
-define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'datasetRepository', 'dataService', 'approvalService', 'angularMocks', 'utils', 'moment', 'lodash', 'mergeBy', 'dataSyncFailureRepository'],
-    function(ModuleDataBlockMerger, DataRepository, ApprovalDataRepository, DatasetRepository, DataService, ApprovalService, mocks, utils, moment, _ , MergeBy, DataSyncFailureRepository) {
+define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'datasetRepository', 'dataService', 'approvalService', 'angularMocks', 'utils', 'moment', 'lodash', 'mergeBy', 'dataSyncFailureRepository', 'programEventRepository'],
+    function(ModuleDataBlockMerger, DataRepository, ApprovalDataRepository, DatasetRepository, DataService, ApprovalService, mocks, utils, moment, _ , MergeBy, DataSyncFailureRepository, ProgramEventRepository) {
         describe('moduleDataBlockMerger', function() {
             var q, scope, moduleDataBlockMerger,
                 dataRepository, approvalRepository, datasetRepository, dataService, approvalService, mergeBy,
-                dhisDataValues, dhisCompletion, dhisApproval, moduleDataBlock, someMomentInTime, dataSets, dataSetIds, periodAndOrgUnit, dataSyncFailureRepository;
+                dhisDataValues, dhisCompletion, dhisApproval, moduleDataBlock, someMomentInTime, dataSets, dataSetIds, periodAndOrgUnit, dataSyncFailureRepository, programEventRepository;
 
             beforeEach(mocks.inject(function($q, $rootScope, $log) {
                 q = $q;
@@ -40,8 +40,9 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                 spyOn(dataSyncFailureRepository, 'delete').and.returnValue(utils.getPromise(q, undefined));
 
                 mergeBy = new MergeBy($log);
+                programEventRepository = new ProgramEventRepository();
 
-                moduleDataBlockMerger = new ModuleDataBlockMerger(dataRepository, approvalRepository, mergeBy, dataService, q, datasetRepository, approvalService, dataSyncFailureRepository);
+                moduleDataBlockMerger = new ModuleDataBlockMerger(dataRepository, approvalRepository, mergeBy, dataService, q, datasetRepository, approvalService, dataSyncFailureRepository, programEventRepository);
 
                 moduleDataBlock = createMockModuleDataBlock();
                 dhisDataValues = undefined;
@@ -681,6 +682,115 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         expect(dataService.save).toHaveBeenCalled();
                     });
                 });
+            });
+
+            describe('mergeAndSaveEventsToLocalDB', function () {
+
+                var localEvents, dhisEvents;
+
+                beforeEach(function(){
+                   spyOn(programEventRepository, 'upsert').and.returnValue(utils.getPromise(q,undefined));
+                   spyOn(programEventRepository, 'delete').and.returnValue(utils.getPromise(q,undefined));
+                });
+
+                it('should save DHIS events to database if events exist only on DHIS', function () {
+                    localEvents = [];
+                    dhisEvents = [
+                        {
+                            'event': 'event1',
+                            'eventDate': '2014-09-28'
+                        },
+                        {
+                            'event': 'event2',
+                            'eventDate': '2014-09-28'
+                        },
+                        {
+                            'event': 'event3',
+                            'eventDate': '2014-09-28'
+                        }
+                    ];
+                    moduleDataBlockMerger.mergeAndSaveEventsToLocalDatabase(localEvents, dhisEvents);
+
+                    expect(programEventRepository.upsert).toHaveBeenCalledWith(dhisEvents);
+                });
+
+                describe('events exist only on Praxis', function(){
+                    it('should delete events from database', function () {
+                        localEvents = [
+                            {
+                                'event': 'event1',
+                                'eventDate': '2014-09-28'
+                            },
+                            {
+                                'event': 'event2',
+                                'eventDate': '2014-09-28'
+                            },
+                            {
+                                'event': 'event3',
+                                'eventDate': '2014-09-28'
+                            }
+                        ];
+                        dhisEvents = [{
+                            'event': 'event1',
+                            'eventDate': '2014-09-28'
+                        }];
+
+                        moduleDataBlockMerger.mergeAndSaveEventsToLocalDatabase(localEvents, dhisEvents);
+
+                        var eventsToBeDeleted= ['event2','event3'];
+                        expect(programEventRepository.delete).toHaveBeenCalledWith(eventsToBeDeleted);
+                    });
+
+                    it('should not delete the locally modified event from database', function () {
+                        localEvents = [
+                            {
+                                'event': 'event1',
+                                'eventDate': '2014-09-28'
+                            },
+                            {
+                                'event': 'event2',
+                                'localStatus': 'READY_FOR_DHIS',
+                                'eventDate': '2014-09-28'
+                            }
+                        ];
+                        dhisEvents = [{
+                            'event': 'event1',
+                            'eventDate': '2014-09-28'
+                        }];
+
+                        moduleDataBlockMerger.mergeAndSaveEventsToLocalDatabase(localEvents, dhisEvents);
+
+                        var eventsToBeDeleted= [];
+                        expect(programEventRepository.delete).toHaveBeenCalledWith(eventsToBeDeleted);
+                    });
+
+                });
+
+                it('should update events in Database if events exist in both DHIS and Praxis', function () {
+                    localEvents = [
+                        {
+                            'event': 'event1',
+                            'eventDate': '2014-09-28'
+                        },
+                        {
+                            'event': 'event2',
+                            'eventDate': '2014-09-28'
+                        },
+                        {
+                            'event': 'event3',
+                            'eventDate': '2014-09-28'
+                        }
+                    ];
+                    dhisEvents = [{
+                        'event': 'event1',
+                        'eventDate': '2014-09-28'
+                    }];
+
+                    moduleDataBlockMerger.mergeAndSaveEventsToLocalDatabase(localEvents, dhisEvents);
+
+                    expect(programEventRepository.upsert).toHaveBeenCalledWith(dhisEvents);
+                });
+
             });
         });
     });
