@@ -341,6 +341,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status" +
                     "?ds=" + dataSetId +
                     "&endDate=" + expectedEndDate +
+                    "&fields=dataSet%5Bid,name%5D,period%5Bid%5D,organisationUnit%5Bid,name%5D,state,createdByUsername,createdDate" +
                     "&ou=" + orgUnitId +
                     "&pe=Weekly" +
                     "&startDate=" + expectedStartDate

@@ -189,11 +189,12 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
 
             return $http.get(dhisUrl.approvalStatus, {
                 "params": {
-                    "ds": dataSets,
-                    "startDate": startDate,
-                    "endDate": endDate,
-                    "ou": orgUnit,
-                    "pe": "Weekly"
+                    ds: dataSets,
+                    startDate: startDate,
+                    endDate: endDate,
+                    ou: orgUnit,
+                    pe: 'Weekly',
+                    fields: 'dataSet[id,name],period[id],organisationUnit[id,name],state,createdByUsername,createdDate'
                 }
             }).then(transform);
         };
