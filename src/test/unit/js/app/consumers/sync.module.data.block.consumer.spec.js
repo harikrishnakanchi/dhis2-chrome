@@ -69,7 +69,7 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
 
             it('should instantiate a module data block for one module', function() {
                 runConsumer();
-                expect(moduleDataBlockFactory.create).toHaveBeenCalledWith(mockModule.id, mockPeriod);
+                expect(moduleDataBlockFactory.create).toHaveBeenCalledWith(mockModule.id, mockPeriod, undefined);
             });
 
             it('should download data values from DHIS for one module', function() {
@@ -150,6 +150,28 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
                 runConsumer();
                 expect(moduleDataBlockMerger.uploadToDHIS).toHaveBeenCalledWith(mockModuleDataBlockAfterDownstreamSync, mockDhisCompletion, mockDhisApproval);
             });
+
+            it('should instantiate a module data block with eventsToSync if there are any', function() {
+                var eventsToSync = [
+                    {
+                        event: 'someEventId',
+                        eventDate: 'someDate'
+                    }
+                ];
+                message = {
+                    data: {
+                        data: {
+                            moduleId: mockModule.id,
+                            period: mockPeriod,
+                            eventsToSync: eventsToSync
+                        }
+                    }
+                };
+                runConsumer();
+
+                expect(moduleDataBlockFactory.create).toHaveBeenCalledWith(mockModule.id, mockPeriod, eventsToSync);
+            });
+
         });
     });
 
