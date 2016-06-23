@@ -116,7 +116,8 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
             return recursivelyDownloadEventsForOrigins(originOrgUnitIds, []).then(function() {
                 var events = _.flatten(eventResponses),
                     groupedEvents = _.groupBy(events, function(event) {
-                        return event.eventDate + data.moduleId;
+                        var period = moment(event.eventDate).format('GGGG[W]WW');
+                        return period + data.moduleId;
                     });
 
                 return _.merge({ indexedDhisEvents: groupedEvents }, data);

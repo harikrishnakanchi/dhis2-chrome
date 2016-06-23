@@ -1,7 +1,7 @@
 define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'datasetRepository', 'userPreferenceRepository', 'changeLogRepository', 'orgUnitRepository', 'moduleDataBlockFactory',
-        'moduleDataBlockMerger', 'eventService', 'angularMocks', 'dateUtils', 'utils', 'timecop'],
+        'moduleDataBlockMerger', 'eventService', 'angularMocks', 'dateUtils', 'utils', 'timecop', 'moment'],
     function(DownloadModuleDataBlocksConsumer, DataService, ApprovalService, DataSetRepository, UserPreferenceRepository, ChangeLogRepository, OrgUnitRepository, ModuleDataBlockFactory,
-             ModuleDataBlockMerger, EventService, mocks, dateUtils, utils, timecop) {
+             ModuleDataBlockMerger, EventService, mocks, dateUtils, utils, timecop, moment) {
         
         var downloadModuleDataBlocksConsumer, dataService, approvalService,
             userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository,
@@ -226,7 +226,7 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
             it('should merge and save line list events', function() {
                 var mockEvent = {
                     some: 'Event',
-                    eventDate: mockLineListModuleDataBlock.period
+                    eventDate: moment(mockLineListModuleDataBlock.period, 'GGGG[W]WW').toISOString()
                 };
                 eventService.getEvents.and.returnValue(utils.getPromise(q, [mockEvent]));
                 moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, [mockLineListModuleDataBlock]));
@@ -240,8 +240,8 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                     periodB = '2016W21',
                     mockModuleDataBlockA = { moduleId: mockModule.id, period: periodA, moduleName: 'someModuleNameA', lineListService:true },
                     mockModuleDataBlockB = { moduleId: mockModule.id, period: periodB, moduleName: 'someModuleNameB', lineListService:true},
-                    mockEventA = { eventDate: periodA },
-                    mockEventB = { eventDate: periodB };
+                    mockEventA = { eventDate: moment(periodA, 'GGGG[W]WW').toISOString() },
+                    mockEventB = { eventDate: moment(periodB, 'GGGG[W]WW').toISOString() };
 
                 moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, [mockModuleDataBlockA, mockModuleDataBlockB]));
                 eventService.getEvents.and.returnValue(utils.getPromise(q, [mockEventA, mockEventB]));
