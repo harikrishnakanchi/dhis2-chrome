@@ -105,23 +105,27 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
             var transform = function(response) {
                 var indexedOriginOrgUnits = _.indexBy(originOrgUnits, "id");
 
-                return _.transform(response.data.completeDataSetRegistrations, function(results, registration) {
+                var completionResponses = response.data.completeDataSetRegistrations;
 
-                    var period = dateUtils.getFormattedPeriod(registration.period.id);
-                    var orgUnit = registration.organisationUnit.id;
-                    if (indexedOriginOrgUnits[orgUnit])
-                        orgUnit = indexedOriginOrgUnits[orgUnit].parent.id;
+                _.forEach(completionResponses, function (completionResponse) {
+                    if(indexedOriginOrgUnits[completionResponse.organisationUnit.id])
+                        completionResponse.organisationUnit.id = indexedOriginOrgUnits[completionResponse.organisationUnit.id].parent.id;
+                });
 
-                    if (!_.any(results, {"period": period, "orgUnit": orgUnit })) {
-                        results.push({
-                            'period': period,
-                            'orgUnit': orgUnit,
-                            'completedBy': registration.storedBy,
-                            'completedOn': registration.date,
-                            'isComplete': true
-                        });
-                    }
-                }, []);
+                var groupedCompletionResonses = _.groupBy(completionResponses, function (completion) {
+                    return [completion.period.id, completion.organisationUnit.id];
+                });
+
+                return _.map(groupedCompletionResonses, function (groupCompletionResponse) {
+                    var oneCompletionResponse = _.first(groupCompletionResponse);
+                    return {
+                        period: dateUtils.getFormattedPeriod(oneCompletionResponse.period.id),
+                        orgUnit: oneCompletionResponse.organisationUnit.id,
+                        completedBy: oneCompletionResponse.storedBy,
+                        completedOn: oneCompletionResponse.date,
+                        isComplete: true
+                    };
+                });
             };
 
             var startDate,

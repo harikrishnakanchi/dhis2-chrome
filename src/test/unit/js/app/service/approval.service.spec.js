@@ -182,7 +182,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 httpBackend.flush();
             });
 
-            it('should get completion data for parent orgUnit when orgin orgUnits is given', function() {
+            it('should get completion data for parent orgUnit when origin orgUnits is given', function() {
                 var originOrgunits = [{
                     "id": "someOriginOrgUnitId",
                     "parent": {
@@ -190,12 +190,15 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                     }
                 }];
 
-                var mockDhisCompletion = createMockDhisCompletionData({ organisationUnit: { id: 'someOriginOrgUnitId' } });
+                var mockDhisCompletionA = createMockDhisCompletionData({ organisationUnit: { id: 'someOriginOrgUnitId' } }),
+                    mockDhisCompletionB = createMockDhisCompletionData({ organisationUnit: { id: 'someModuleId' } }),
+                    mockDhisCompletionC = createMockDhisCompletionData({ organisationUnit: { id: 'someOtherModuleId' } });
 
-                httpBackend.expectGET(/.*/).respond(200, { completeDataSetRegistrations: [mockDhisCompletion] });
+                httpBackend.expectGET(/.*/).respond(200, { completeDataSetRegistrations: [mockDhisCompletionA, mockDhisCompletionB, mockDhisCompletionC] });
 
                 approvalService.getCompletionData([], originOrgunits).then(function(serviceResponse) {
-                    expect(_.first(serviceResponse).orgUnit).toEqual('someModuleId');
+                    expect(serviceResponse[0].orgUnit).toEqual('someModuleId');
+                    expect(serviceResponse[1].orgUnit).toEqual('someOtherModuleId');
                 });
                 httpBackend.flush();
             });
