@@ -152,8 +152,8 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
 
             it("should get completion data for specified period range", function() {
                 var periodRange = ["2014W01", "2014W02", "2014W05"],
-                    expectedStartDate = moment(_.first(periodRange), 'YYYY[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
-                    expectedEndDate = moment(_.last(periodRange), 'YYYY[W]WW').endOf('isoWeek').format('YYYY-MM-DD'),
+                    expectedStartDate = moment(_.first(periodRange), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
+                    expectedEndDate = moment(_.last(periodRange), 'GGGG[W]WW').endOf('isoWeek').format('YYYY-MM-DD'),
                     dataSetId = 'someDataSetId',
                     orgUnitId = 'someOrgUnitId',
                     originOrgUnits = [];
@@ -278,8 +278,8 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
 
             it("should get approval data for specified period range", function() {
                 var periodRange = ["2014W01", "2014W02", "2014W05"],
-                    expectedStartDate = moment(_.first(periodRange), 'YYYY[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
-                    expectedEndDate = moment(_.last(periodRange), 'YYYY[W]WW').endOf('isoWeek').format('YYYY-MM-DD');
+                    expectedStartDate = moment(_.first(periodRange), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
+                    expectedEndDate = moment(_.last(periodRange), 'GGGG[W]WW').endOf('isoWeek').format('YYYY-MM-DD');
 
                 httpBackend.expectGET(new RegExp('endDate=' + expectedEndDate + '.*startDate=' + expectedStartDate)).respond(200, {});
 

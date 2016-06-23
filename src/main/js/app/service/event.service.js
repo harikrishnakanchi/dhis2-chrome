@@ -2,8 +2,8 @@ define(["moment", "dhisUrl"], function(moment, dhisUrl) {
     return function($http, $q) {
 
         this.getEvents = function(orgUnitId, periodRange) {
-            var startDate = moment(_.first(periodRange), 'YYYY[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
-                endDate = moment(_.last(periodRange), 'YYYY[W]WW').endOf('isoWeek').format('YYYY-MM-DD');
+            var startDate = moment(_.first(periodRange), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
+                endDate = moment(_.last(periodRange), 'GGGG[W]WW').endOf('isoWeek').format('YYYY-MM-DD');
 
             return $http.get(dhisUrl.events, {
                 "params": {

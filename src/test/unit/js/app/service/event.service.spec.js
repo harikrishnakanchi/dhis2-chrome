@@ -19,8 +19,8 @@ define(["eventService", "angularMocks", "properties", "moment"], function(EventS
             it('should get events for the specified orgUnit and period range', function() {
                 var orgUnitId = 'someOrgUnitId',
                     periodRange = ['2016W18', '2016W19'],
-                    expectedEndDate = moment(_.last(periodRange), 'YYYY[W]WW').endOf('isoWeek').format('YYYY-MM-DD'),
-                    expectedStartDate = moment(_.first(periodRange), 'YYYY[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
+                    expectedEndDate = moment(_.last(periodRange), 'GGGG[W]WW').endOf('isoWeek').format('YYYY-MM-DD'),
+                    expectedStartDate = moment(_.first(periodRange), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
                     mockDhisResponse = {
                         events: ['mockEventA', 'mockEventB']
                     };
