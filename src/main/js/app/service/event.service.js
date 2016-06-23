@@ -1,5 +1,24 @@
 define(["moment", "dhisUrl"], function(moment, dhisUrl) {
     return function($http, $q) {
+
+        this.getEvents = function(orgUnitId, periodRange) {
+            var startDate = moment(_.first(periodRange), 'YYYY[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
+                endDate = moment(_.last(periodRange), 'YYYY[W]WW').endOf('isoWeek').format('YYYY-MM-DD');
+
+            return $http.get(dhisUrl.events, {
+                "params": {
+                    "startDate": startDate,
+                    "endDate": endDate,
+                    "skipPaging": true,
+                    "orgUnit": orgUnitId,
+                    "ouMode": "DESCENDANTS",
+                    "fields": ":all,dataValues[value,dataElement,providedElsewhere,storedBy]"
+                }
+            }).then(function(response) {
+                return response.data.events || [];
+            });
+        };
+
         this.getRecentEvents = function(startDate, orgUnitId) {
             var onSuccess = function(response) {
                 return response.data;

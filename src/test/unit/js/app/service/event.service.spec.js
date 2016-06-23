@@ -15,27 +15,41 @@ define(["eventService", "angularMocks", "properties", "moment"], function(EventS
             httpBackend.verifyNoOutstandingRequest();
         });
 
-        it("should get all events from the start date", function() {
-            var expectedEvents = {
-                "events": [{
-                    "event": "Event1",
-                    "eventDate": "2014-10-06 00:00:00.0",
-                }, {
-                    "event": "Event2",
-                    "eventDate": "2014-11-17 00:00:00.0",
-                }]
-            };
+        describe('getEvents', function() {
+            it('should get events for the specified orgUnit and period range', function() {
+                var orgUnitId = 'someOrgUnitId',
+                    periodRange = ['2016W18', '2016W19'],
+                    expectedEndDate = moment(_.last(periodRange), 'YYYY[W]WW').endOf('isoWeek').format('YYYY-MM-DD'),
+                    expectedStartDate = moment(_.first(periodRange), 'YYYY[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
+                    mockDhisResponse = {
+                        events: ['mockEventA', 'mockEventB']
+                    };
 
-            var orgUnitId = "ou1";
-            var endDate = moment().add(1, 'days').format("YYYY-MM-DD");
-            var startDate = '2014-09-25';
-            httpBackend.expectGET(properties.dhis.url + "/api/events?endDate=" + endDate + "&fields=:all,dataValues%5Bvalue,dataElement,providedElsewhere,storedBy%5D&orgUnit=ou1&ouMode=DESCENDANTS&skipPaging=true&startDate=" + startDate).respond(200, expectedEvents);
+                httpBackend.expectGET(properties.dhis.url + '/api/events' +
+                    '?endDate=' + expectedEndDate +
+                    '&fields=:all,dataValues%5Bvalue,dataElement,providedElsewhere,storedBy%5D' +
+                    '&orgUnit=' + orgUnitId +
+                    '&ouMode=DESCENDANTS' +
+                    '&skipPaging=true' +
+                    '&startDate=' + expectedStartDate
+                ).respond(200, mockDhisResponse);
 
-            eventService.getRecentEvents(startDate, orgUnitId).then(function(response) {
-                expect(response).toEqual(expectedEvents);
+                eventService.getEvents(orgUnitId, periodRange).then(function(response) {
+                    expect(response).toEqual(mockDhisResponse.events);
+                });
+
+                httpBackend.flush();
             });
 
-            httpBackend.flush();
+            it('should return an empty array if response is empty', function() {
+                httpBackend.expectGET(/.*/).respond(200, {});
+
+                eventService.getEvents('someOrgUnitId', ['2016W25']).then(function(response) {
+                    expect(response).toEqual([]);
+                });
+
+                httpBackend.flush();
+            });
         });
 
         it("should save events", function() {
