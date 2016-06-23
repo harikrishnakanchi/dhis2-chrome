@@ -465,6 +465,7 @@
                      */
                     "each": function(options) {
                         var d = $q.defer();
+                        var startTime = new Date();
                         return this.internalObjectStore(this.storeName, READWRITE).then(function(store) {
                             var req, keysToFilter;
                             var myOptions = options || defaultQueryOptions;
@@ -484,6 +485,13 @@
                                 };
 
                                 var onfinish = function() {
+                                    var endTime = new Date(),
+                                        duration = endTime - startTime;
+
+                                    if(duration > 10) {
+                                        console.log('ObjectStore.each duration: ' + duration + 'ms (store: ' + store.name + ', records: ' + results.length + ', filteredKeys: ' + (keysToFilter || []).length + ')');
+                                    }
+
                                     d.resolve(results);
                                 };
 
