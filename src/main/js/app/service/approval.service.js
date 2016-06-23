@@ -101,11 +101,8 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
             return $q.all(markAsUnapprovedPromises);
         };
 
-        this.getCompletionData = function(orgUnits, originOrgUnits, dataSets, periodRange) {
+        this.getCompletionData = function(orgUnits, originOrgUnits, dataSetsIds, periodRange) {
             var transform = function(response) {
-                if (!response.data.completeDataSetRegistrations)
-                    return [];
-
                 var indexedOriginOrgUnits = _.indexBy(originOrgUnits, "id");
 
                 return _.transform(response.data.completeDataSetRegistrations, function(results, registration) {
@@ -115,10 +112,7 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                     if (indexedOriginOrgUnits[orgUnit])
                         orgUnit = indexedOriginOrgUnits[orgUnit].parent.id;
 
-                    if (!_.any(results, {
-                            "period": period,
-                            "orgUnit": orgUnit
-                        })) {
+                    if (!_.any(results, {"period": period, "orgUnit": orgUnit })) {
                         results.push({
                             'period': period,
                             'orgUnit': orgUnit,
@@ -143,7 +137,7 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
 
             return $http.get(dhisUrl.approvalL1, {
                 "params": {
-                    "dataSet": dataSets,
+                    "dataSet": dataSetsIds,
                     "startDate": startDate,
                     "endDate": endDate,
                     "orgUnit": orgUnits,
