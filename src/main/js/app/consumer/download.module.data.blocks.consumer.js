@@ -1,6 +1,6 @@
 define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _, dateUtils, moment) {
     return function (dataService, approvalService, datasetRepository, userPreferenceRepository, changeLogRepository, orgUnitRepository,
-                     moduleDataBlockFactory, moduleDataBlockMerger, $q) {
+                     moduleDataBlockFactory, moduleDataBlockMerger, eventService, $q) {
 
         var getAggregateDataSetIds = function(allDataSets) {
             var aggregateDataSets = _.filter(allDataSets, { isLineListService: false });
@@ -42,7 +42,7 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
             })
             .then(getOriginsForModule)
             .then(getDataSetsForModuleAndOrigins)
-            .then(getIndexedDataValuesFromDhis)
+            .then(getModuleDataFromDhis)
             .then(getIndexedCompletionsFromDhis)
             .then(getIndexedApprovalsFromDhis)
             .then(mergeAndSaveModuleDataBlocks)
@@ -74,6 +74,16 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
             });
         };
 
+        var getModuleDataFromDhis = function (data) {
+            var isLineListService = _.first(data.moduleDataBlocks).lineListService;
+
+            if (isLineListService) {
+                return getEventsFromDhis(data);
+            } else {
+                return getIndexedDataValuesFromDhis(data);
+            }
+        };
+
         var getIndexedDataValuesFromDhis = function(data) {
             return dataService.downloadData(data.moduleId, data.aggregateDataSetIds, data.periodRange, data.lastUpdatedTimestamp)
                 .then(function (dataValues) {
@@ -82,6 +92,35 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
                     });
                     return _.merge({ indexedDhisDataValues: indexedDataValues }, data);
                 });
+        };
+
+        var getEventsFromDhis = function(data) {
+            var originOrgUnitIds = _.pluck(data.originOrgUnits, 'id'),
+                eventResponses = [];
+
+            var downloadEvents = function(originOrgUnitId) {
+                return eventService.getEvents(originOrgUnitId, data.periodRange).then(function(events) {
+                    eventResponses.push(events);
+                });
+            };
+
+            var recursivelyDownloadEventsForOrigins = function(originOrgUnitIds, events) {
+                if(_.isEmpty(originOrgUnitIds)){
+                    return $q.when();
+                }
+                return downloadEvents(originOrgUnitIds.pop()).then(function(){
+                    return recursivelyDownloadEventsForOrigins(originOrgUnitIds);
+                });
+            };
+
+            return recursivelyDownloadEventsForOrigins(originOrgUnitIds, []).then(function() {
+                var events = _.flatten(eventResponses),
+                    groupedEvents = _.groupBy(events, function(event) {
+                        return event.eventDate + data.moduleId;
+                    });
+
+                return _.merge({ indexedDhisEvents: groupedEvents }, data);
+            });
         };
 
         var getIndexedCompletionsFromDhis = function (data) {
@@ -104,11 +143,12 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
 
         var mergeAndSaveModuleDataBlocks = function (data) {
             var mergePromises = _.map(data.moduleDataBlocks, function(moduleDataBlock) {
-                var dhisDataValues = data.indexedDhisDataValues[moduleDataBlock.period + moduleDataBlock.moduleId],
+                var dhisDataValues = data.indexedDhisDataValues && data.indexedDhisDataValues[moduleDataBlock.period + moduleDataBlock.moduleId],
                     dhisCompletion = data.indexedDhisCompletions[moduleDataBlock.period + moduleDataBlock.moduleId],
-                    dhisApproval = data.indexedDhisApprovals[moduleDataBlock.period + moduleDataBlock.moduleId];
+                    dhisApproval = data.indexedDhisApprovals[moduleDataBlock.period + moduleDataBlock.moduleId],
+                    dhisEvents = data.indexedDhisEvents && data.indexedDhisEvents[moduleDataBlock.period + moduleDataBlock.moduleId];
 
-                return moduleDataBlockMerger.mergeAndSaveToLocalDatabase(moduleDataBlock, dhisDataValues, dhisCompletion, dhisApproval);
+                return moduleDataBlockMerger.mergeAndSaveToLocalDatabase(moduleDataBlock, dhisDataValues, dhisCompletion, dhisApproval, dhisEvents);
             });
             return $q.all(mergePromises);
         };
