@@ -136,12 +136,13 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
             }
 
             return $http.get(dhisUrl.approvalL1, {
-                "params": {
-                    "dataSet": dataSetsIds,
-                    "startDate": startDate,
-                    "endDate": endDate,
-                    "orgUnit": orgUnits,
-                    "children": true
+                params: {
+                    dataSet: dataSetsIds,
+                    startDate: startDate,
+                    endDate: endDate,
+                    orgUnit: orgUnits,
+                    children: true,
+                    fields: 'period[id],organisationUnit[id,name],storedBy,dataSet[id,name],date'
                 }
             }).then(transform);
         };

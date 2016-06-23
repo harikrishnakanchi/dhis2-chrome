@@ -141,6 +141,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                     "?children=" +  true +
                     "&dataSet=" + dataSetId +
                     "&endDate=" + expectedEndDate +
+                    "&fields=period%5Bid%5D,organisationUnit%5Bid,name%5D,storedBy,dataSet%5Bid,name%5D,date" +
                     "&orgUnit=" + orgUnitId +
                     "&startDate=" + expectedStartDate
                 ).respond(200, {});
