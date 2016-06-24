@@ -1,9 +1,10 @@
 define(['moment', 'lodash'],
     function(moment, _) {
-        return function(dataRepository, approvalDataRepository, mergeBy, dataService, $q, datasetRepository, approvalService, dataSyncFailureRepository, programEventRepository, eventService) {
+        return function(dataRepository, approvalDataRepository, mergeBy, dataService, $q, datasetRepository, approvalService, dataSyncFailureRepository, programEventRepository, eventService, aggregateDataValuesMerger) {
 
             var mergeAndSaveToLocalDatabase = function(moduleDataBlock, updatedDhisDataValues, dhisCompletion, dhisApproval) {
                 var updatedDhisDataValuesExist = updatedDhisDataValues && updatedDhisDataValues.length > 0;
+                var mergedAggregateValues = aggregateDataValuesMerger.create(moduleDataBlock.dataValues, updatedDhisDataValues);
 
                 var dataValuesEquals = function(dv1, dv2) {
                     return dv1.dataElement === dv2.dataElement &&
@@ -41,8 +42,8 @@ define(['moment', 'lodash'],
                 };
 
                 var mergeAndSaveDataValues = function() {
-                    if(updatedDhisDataValuesExist) {
-                        return dataRepository.saveDhisData(mergedDataValues());
+                    if(mergedAggregateValues.updatedDhisDataValuesExist) {
+                        return dataRepository.saveDhisData(mergedAggregateValues.mergedData);
                     } else {
                         return $q.when([]);
                     }
