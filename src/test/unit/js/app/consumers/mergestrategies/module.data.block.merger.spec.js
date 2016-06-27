@@ -4,7 +4,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
             var q, scope, moduleDataBlockMerger,
                 dataRepository, approvalRepository, datasetRepository, dataService, approvalService, mergeBy,
                 dhisDataValues, dhisCompletion, dhisApproval, moduleDataBlock, someMomentInTime, dataSets, dataSetIds, periodAndOrgUnit, dataSyncFailureRepository, programEventRepository,
-                eventService, aggregateDataValuesMerger;
+                eventService, aggregateDataValuesMerger, mockAggregateMergedData;
 
             beforeEach(mocks.inject(function($q, $rootScope, $log) {
                 q = $q;
@@ -108,7 +108,8 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                     approvedAtProjectLevelAt: null,
                     approvedAtCoordinationLevel: false,
                     approvedAtCoordinationLevelBy: null,
-                    approvedAtCoordinationLevelAt: null
+                    approvedAtCoordinationLevelAt: null,
+                    approvedAtAnyLevel: false
                 }, options);
             };
 
@@ -138,7 +139,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                 describe('aggregate data values', function() {
                     it('should be saved if updatedDhisDataValuesExist', function() {
-                        var mockAggregateMergedData = createMockAggregateDataValuesMerger({
+                        mockAggregateMergedData = createMockAggregateDataValuesMerger({
                             mergedData: ['someData'],
                             updatedDhisDataValuesExist: true
                         });
@@ -159,6 +160,145 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         performMerge();
 
                         expect(dataRepository.saveDhisData).not.toHaveBeenCalled();
+                    });
+                });
+
+                describe('when praxisAndDhisAreBothUpToDate', function() {
+                    beforeEach(function() {
+                        mockAggregateMergedData = createMockAggregateDataValuesMerger({
+                            praxisAndDhisAreBothUpToDate: true
+                        });
+                        aggregateDataValuesMerger.create.and.returnValue(mockAggregateMergedData);
+                    });
+
+                    it('should save DHIS completion to database', function() {
+                        dhisCompletion = createMockCompletion();
+
+                        performMerge();
+
+                        expect(approvalRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(dhisCompletion);
+                    });
+
+                    it('should save DHIS approval to database', function() {
+                        dhisApproval = createMockApproval();
+
+                        performMerge();
+
+                        expect(approvalRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(dhisApproval);
+                    });
+
+                    it('should merge and save DHIS completion and approval to database', function() {
+                        dhisCompletion = createMockCompletion();
+                        dhisApproval = createMockApproval();
+
+                        performMerge();
+
+                        var expectedPayload = _.merge({}, dhisCompletion, dhisApproval);
+                        expect(approvalRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(expectedPayload);
+                    });
+
+                    it('should merge Praxis and DHIS approval', function() {
+                        dhisApproval = createMockApproval();
+                        moduleDataBlock = createMockModuleDataBlock({
+                            approvalData: _.merge({ somePraxisInfo: 'someData' }, createMockCompletion())
+                        });
+
+                        performMerge();
+
+                        var expectedPayload = _.merge({}, moduleDataBlock.approvalData, dhisApproval);
+                        expect(approvalRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(expectedPayload);
+                    });
+
+                    it('should not re-save approval if approval is up-to-date', function() {
+                        dhisCompletion = createMockCompletion();
+                        dhisApproval = createMockApproval();
+                        moduleDataBlock = createMockModuleDataBlock({
+                            approvalData: _.merge({ somePraxisInfo: 'someData' }, dhisCompletion, dhisApproval)
+                        });
+
+                        performMerge();
+
+                        expect(approvalRepository.saveApprovalsFromDhis).not.toHaveBeenCalled();
+                    });
+                });
+
+                describe('when dhisIsUpToDateAndPraxisIsOutOfDate', function() {
+                    beforeEach(function() {
+                        mockAggregateMergedData = createMockAggregateDataValuesMerger({
+                            dhisIsUpToDateAndPraxisIsOutOfDate: true
+                        });
+                        aggregateDataValuesMerger.create.and.returnValue(mockAggregateMergedData);
+                    });
+
+                    it('should save DHIS completion to database', function() {
+                        dhisCompletion = createMockCompletion();
+
+                        performMerge();
+
+                        expect(approvalRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(dhisCompletion);
+                    });
+
+                    it('should save DHIS approval to database', function() {
+                        dhisApproval = createMockApproval();
+
+                        performMerge();
+
+                        expect(approvalRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(dhisApproval);
+                    });
+
+                    it('should merge and save DHIS completion and approval to database', function() {
+                        dhisCompletion = createMockCompletion();
+                        dhisApproval = createMockApproval();
+
+                        performMerge();
+
+                        var expectedPayload = _.merge({}, dhisCompletion, dhisApproval);
+                        expect(approvalRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(expectedPayload);
+                    });
+
+                    it('should invalidate Praxis approvals if DHIS has no completion or approval', function() {
+                        moduleDataBlock = createMockModuleDataBlock({
+                            approvedAtAnyLevel: true
+                        });
+
+                        performMerge();
+
+                        expect(approvalRepository.invalidateApproval).toHaveBeenCalledWith(moduleDataBlock.period, moduleDataBlock.moduleId);
+                    });
+
+                    it('should not invalidate Praxis approval if it does not exist', function() {
+                        moduleDataBlock = createMockModuleDataBlock();
+
+                        performMerge();
+
+                        expect(approvalRepository.invalidateApproval).not.toHaveBeenCalled();
+                    });
+                });
+
+                describe('when praxisAndDhisAreBothOutOfDate', function() {
+                    beforeEach(function() {
+                        mockAggregateMergedData = createMockAggregateDataValuesMerger({
+                            praxisAndDhisAreBothOutOfDate: true
+                        });
+                        aggregateDataValuesMerger.create.and.returnValue(mockAggregateMergedData);
+                    });
+
+                    it('should invalidate Praxis approval', function() {
+                        moduleDataBlock = createMockModuleDataBlock({
+                            approvedAtAnyLevel: true
+                        });
+
+                        performMerge();
+
+                        expect(approvalRepository.invalidateApproval).toHaveBeenCalledWith(moduleDataBlock.period, moduleDataBlock.moduleId);
+                    });
+
+                    it('should not invalidate Praxis approval if it does not exist', function() {
+                        moduleDataBlock = createMockModuleDataBlock();
+
+                        performMerge();
+
+                        expect(approvalRepository.invalidateApproval).not.toHaveBeenCalled();
                     });
                 });
 

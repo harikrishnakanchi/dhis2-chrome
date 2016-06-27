@@ -338,6 +338,46 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
         });
 
+        describe('approvedAtAnyLevel', function() {
+            it('should be false if approvalData is not present', function() {
+                approvalData = undefined;
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvedAtAnyLevel).toEqual(false);
+            });
+
+            it('should be true if completed status is true', function() {
+                approvalData = {
+                    isComplete: true
+                };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvedAtAnyLevel).toEqual(true);
+            });
+
+            it('should be false if completed status is false', function() {
+                approvalData = {
+                    isComplete: false
+                };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvedAtAnyLevel).toEqual(false);
+            });
+
+            it('should be true if approved status is true', function() {
+                approvalData = {
+                    isApproved: true
+                };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvedAtAnyLevel).toEqual(true);
+            });
+
+            it('should be false if approved status is false', function() {
+                approvalData = {
+                    isApproved: false
+                };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvedAtAnyLevel).toEqual(false);
+            });
+        });
+
         describe('awaitingActionAt DataEntryLevel, ProjectLevelApprover, CoordinationLevelApprover', function() {
             it('should be waiting at dataEntryLevel if data has not been submitted', function() {
                 aggregateDataValues = null;

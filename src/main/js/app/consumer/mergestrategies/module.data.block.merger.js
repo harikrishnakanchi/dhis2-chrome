@@ -4,7 +4,7 @@ define(['moment', 'lodash'],
 
             var mergeAndSaveToLocalDatabase = function(moduleDataBlock, updatedDhisDataValues, dhisCompletion, dhisApproval) {
                 var updatedDhisDataValuesExist = updatedDhisDataValues && updatedDhisDataValues.length > 0;
-                var mergedAggregateValues = aggregateDataValuesMerger.create(moduleDataBlock.dataValues, updatedDhisDataValues);
+                var dataMerger = aggregateDataValuesMerger.create(moduleDataBlock.dataValues, updatedDhisDataValues);
 
                 var dataValuesEquals = function(dv1, dv2) {
                     return dv1.dataElement === dv2.dataElement &&
@@ -42,8 +42,8 @@ define(['moment', 'lodash'],
                 };
 
                 var mergeAndSaveDataValues = function() {
-                    if(mergedAggregateValues.updatedDhisDataValuesExist) {
-                        return dataRepository.saveDhisData(mergedAggregateValues.mergedData);
+                    if(dataMerger.updatedDhisDataValuesExist) {
+                        return dataRepository.saveDhisData(dataMerger.mergedData);
                     } else {
                         return $q.when([]);
                     }
@@ -54,23 +54,36 @@ define(['moment', 'lodash'],
                 };
 
                 var mergeAndSaveCompletionAndApprovalForAggregates = function() {
-                    var mergedDhisApprovalAndCompletion = _.merge({}, dhisCompletion, dhisApproval),
-                        dhisApprovalOrCompletionExists = !_.isEmpty(mergedDhisApprovalAndCompletion),
-                        localApprovalsExist = (moduleDataBlock.approvedAtProjectLevel || moduleDataBlock.approvedAtCoordinationLevel);
+                    var mergeDhisAndPraxisApprovals = function() {
+                        var mergedApproval = _.merge({}, moduleDataBlock.approvalData, dhisCompletion, dhisApproval),
+                            mergedApprovalIsDifferent = !_.isEqual(mergedApproval, moduleDataBlock.approvalData);
 
-                    if(mergedDataValuesAreEqualToExistingPraxisDataValues() && mergedDataValuesAreEqualToDhisDataValues()) {
-                        var mergedApproval = _.merge({}, moduleDataBlock.approvalData, dhisCompletion, dhisApproval);
-                        if(!_.isEqual(mergedApproval, moduleDataBlock.approvalData)) {
-                            return approvalDataRepository.saveApprovalsFromDhis(mergedApproval);
-                        }
-                    } else if (mergedDataValuesAreEqualToDhisDataValues()) {
-                        if(dhisApprovalOrCompletionExists) {
+                        return mergedApprovalIsDifferent ? approvalDataRepository.saveApprovalsFromDhis(mergedApproval) : $q.when();
+                    };
+
+                    var saveDhisApprovals = function() {
+                        var mergedDhisApprovalAndCompletion = _.merge({}, dhisCompletion, dhisApproval),
+                            dhisApprovalOrCompletionExists = !_.isEmpty(mergedDhisApprovalAndCompletion);
+
+                        if (dhisApprovalOrCompletionExists) {
                             return approvalDataRepository.saveApprovalsFromDhis(mergedDhisApprovalAndCompletion);
-                        } else if(localApprovalsExist) {
+                        } else if(moduleDataBlock.approvedAtAnyLevel) {
                             return approvalDataRepository.invalidateApproval(moduleDataBlock.period, moduleDataBlock.moduleId);
+                        } else {
+                            return $q.when();
                         }
-                    } else if(!mergedDataValuesAreEqualToExistingPraxisDataValues() && localApprovalsExist) {
-                        return approvalDataRepository.invalidateApproval(moduleDataBlock.period, moduleDataBlock.moduleId);
+                    };
+
+                    var invalidatePraxisApprovals = function() {
+                        return moduleDataBlock.approvedAtAnyLevel ? approvalDataRepository.invalidateApproval(moduleDataBlock.period, moduleDataBlock.moduleId) : $q.when();
+                    };
+
+                    if (dataMerger.praxisAndDhisAreBothUpToDate) {
+                        return mergeDhisAndPraxisApprovals();
+                    } else if (dataMerger.dhisIsUpToDateAndPraxisIsOutOfDate) {
+                        return saveDhisApprovals();
+                    } else if(dataMerger.praxisAndDhisAreBothOutOfDate) {
+                        return invalidatePraxisApprovals();
                     }
                 };
 

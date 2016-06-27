@@ -18,6 +18,7 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         this.approvedAtCoordinationLevel = !!(approvalData && approvalData.isApproved);
         this.approvedAtCoordinationLevelBy = this.approvedAtCoordinationLevel ? approvalData.approvedBy : null;
         this.approvedAtCoordinationLevelAt = this.approvedAtCoordinationLevel ? moment(approvalData.approvedOn) : null;
+        this.approvedAtAnyLevel = this.approvedAtProjectLevel || this.approvedAtCoordinationLevel;
         this.shouldSyncEvents = this.eventsToSync && this.eventsToSync.length;
 
         this.failedToSync = isFailedToSync(this.lineListService, aggregateDataValues, failedToSyncData);
