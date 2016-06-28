@@ -1,6 +1,6 @@
 define(['moment', 'lodash'],
     function(moment, _) {
-        return function(dataRepository, approvalDataRepository, mergeBy, dataService, $q, datasetRepository, approvalService, dataSyncFailureRepository, programEventRepository, eventService,
+        return function(dataRepository, approvalDataRepository, dataService, $q, datasetRepository, approvalService, dataSyncFailureRepository, programEventRepository, eventService,
                         aggregateDataValuesMerger, lineListEventsMerger) {
 
             var mergeAndSaveToLocalDatabase = function(moduleDataBlock, updatedDhisDataValues, dhisCompletion, dhisApproval, updatedDhisEvents) {

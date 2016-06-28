@@ -1,12 +1,12 @@
-define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'datasetRepository', 'dataService', 'approvalService', 'angularMocks', 'utils', 'moment', 'lodash', 'mergeBy', 'dataSyncFailureRepository', 'programEventRepository', 'eventService', 'aggregateDataValuesMerger', 'lineListEventsMerger'],
-    function(ModuleDataBlockMerger, DataRepository, ApprovalDataRepository, DatasetRepository, DataService, ApprovalService, mocks, utils, moment, _ , MergeBy, DataSyncFailureRepository, ProgramEventRepository, EventService, AggregateDataValuesMerger, LineListEventsMerger) {
+define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'datasetRepository', 'dataService', 'approvalService', 'angularMocks', 'utils', 'moment', 'lodash', 'dataSyncFailureRepository', 'programEventRepository', 'eventService', 'aggregateDataValuesMerger', 'lineListEventsMerger'],
+    function(ModuleDataBlockMerger, DataRepository, ApprovalDataRepository, DatasetRepository, DataService, ApprovalService, mocks, utils, moment, _, DataSyncFailureRepository, ProgramEventRepository, EventService, AggregateDataValuesMerger, LineListEventsMerger) {
         describe('moduleDataBlockMerger', function() {
             var q, scope, moduleDataBlockMerger,
-                dataRepository, approvalRepository, datasetRepository, dataService, approvalService, mergeBy,
+                dataRepository, approvalRepository, datasetRepository, dataService, approvalService,
                 dhisDataValues, dhisCompletion, dhisApproval, moduleDataBlock, someMomentInTime, dataSets, dataSetIds, periodAndOrgUnit, dataSyncFailureRepository, programEventRepository,
                 eventService, aggregateDataValuesMerger, lineListEventsMerger, mockAggregateMergedData, dhisEvents;
 
-            beforeEach(mocks.inject(function($q, $rootScope, $log) {
+            beforeEach(mocks.inject(function($q, $rootScope) {
                 q = $q;
                 scope = $rootScope.$new();
 
@@ -40,7 +40,6 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                 dataSyncFailureRepository = new DataSyncFailureRepository();
                 spyOn(dataSyncFailureRepository, 'delete').and.returnValue(utils.getPromise(q, undefined));
 
-                mergeBy = new MergeBy($log);
                 programEventRepository = new ProgramEventRepository();
                 spyOn(programEventRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
 
@@ -52,7 +51,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                 lineListEventsMerger = new LineListEventsMerger();
                 spyOn(lineListEventsMerger, 'create').and.returnValue({});
 
-                moduleDataBlockMerger = new ModuleDataBlockMerger(dataRepository, approvalRepository, mergeBy, dataService, q, datasetRepository, approvalService,
+                moduleDataBlockMerger = new ModuleDataBlockMerger(dataRepository, approvalRepository, dataService, q, datasetRepository, approvalService,
                                                                   dataSyncFailureRepository, programEventRepository, eventService, aggregateDataValuesMerger,
                                                                   lineListEventsMerger);
 
