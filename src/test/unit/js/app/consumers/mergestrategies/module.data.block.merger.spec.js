@@ -349,57 +349,6 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                     });
                 });
 
-                xdescribe('approval functionality for linelist modules', function() {
-                    it('should remove approvals from Praxis if it does not exist in DHIS', function() {
-                        dhisCompletion = undefined;
-                        dhisApproval = undefined;
-                        moduleDataBlock = createMockModuleDataBlock({ lineListService: true });
-
-                        performMerge();
-
-                        expect(approvalRepository.invalidateApproval).toHaveBeenCalledWith(moduleDataBlock.period, moduleDataBlock.moduleId);
-                    });
-
-                    it('should save approvals to Praxis if they exist in DHIS', function() {
-                        dhisCompletion = createMockCompletion();
-                        dhisApproval = createMockApproval();
-                        moduleDataBlock = createMockModuleDataBlock({ lineListService: true });
-
-                        performMerge();
-
-                        var expectedPayload = _.merge({}, dhisCompletion, dhisApproval);
-                        expect(approvalRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(expectedPayload);
-                    });
-
-                    it('should not save or remove approvals from Praxis if local approval is marked as new', function() {
-                        moduleDataBlock = createMockModuleDataBlock({
-                            lineListService: true,
-                            approvalData: {
-                                status: 'NEW'
-                            }
-                        });
-
-                        performMerge();
-
-                        expect(approvalRepository.invalidateApproval).not.toHaveBeenCalled();
-                        expect(approvalRepository.saveApprovalsFromDhis).not.toHaveBeenCalled();
-                    });
-
-                    it('should not save or remove approvals from Praxis if local approval is marked as deleted', function() {
-                        moduleDataBlock = createMockModuleDataBlock({
-                            lineListService: true,
-                            approvalData: {
-                                status: 'DELETED'
-                            }
-                        });
-
-                        performMerge();
-
-                        expect(approvalRepository.invalidateApproval).not.toHaveBeenCalled();
-                        expect(approvalRepository.saveApprovalsFromDhis).not.toHaveBeenCalled();
-                    });
-                });
-
                 describe('module data block has previously failed to sync', function() {
                     describe('when praxisAndDhisAreBothUpToDate', function() {
                         beforeEach(function() {

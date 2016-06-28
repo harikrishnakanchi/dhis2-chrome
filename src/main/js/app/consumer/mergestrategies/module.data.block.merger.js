@@ -25,10 +25,6 @@ define(['moment', 'lodash'],
                 };
 
                 var mergeAndSaveApprovals = function() {
-                    return moduleDataBlock.lineListService ? mergeAndSaveCompletionAndApprovalForLineLists() : mergeAndSaveCompletionAndApprovalForAggregates();
-                };
-
-                var mergeAndSaveCompletionAndApprovalForAggregates = function() {
                     var mergeDhisAndPraxisApprovals = function() {
                         var mergedApproval = _.merge({}, moduleDataBlock.approvalData, dhisCompletion, dhisApproval),
                             mergedApprovalIsDifferent = !_.isEqual(mergedApproval, moduleDataBlock.approvalData);
@@ -59,20 +55,6 @@ define(['moment', 'lodash'],
                         return saveDhisApprovals();
                     } else if(dataMerger.praxisAndDhisAreBothOutOfDate) {
                         return invalidatePraxisApprovals();
-                    }
-                };
-
-                var mergeAndSaveCompletionAndApprovalForLineLists = function () {
-                    var mergedDhisApprovalAndCompletion = _.merge({}, dhisCompletion, dhisApproval),
-                        dhisApprovalOrCompletionExists = !_.isEmpty(mergedDhisApprovalAndCompletion);
-
-                    // Can be removed once approval logic for line list modules is integrated properly into ModuleDataBlockMerger
-                    if(moduleDataBlock.approvalData && (moduleDataBlock.approvalData.status == 'NEW' || moduleDataBlock.approvalData.status == 'DELETED')) {
-                        //DO NOTHING
-                    } else if(dhisApprovalOrCompletionExists) {
-                        return approvalDataRepository.saveApprovalsFromDhis(mergedDhisApprovalAndCompletion);
-                    } else {
-                        return approvalDataRepository.invalidateApproval(moduleDataBlock.period, moduleDataBlock.moduleId);
                     }
                 };
 
