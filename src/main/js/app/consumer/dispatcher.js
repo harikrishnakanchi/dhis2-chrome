@@ -1,7 +1,7 @@
 define(["lodash"], function(_) {
     return function($q, $log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, updateDatasetConsumer,
         createUserConsumer, updateUserConsumer, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer,
-        downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer,
+        downloadProgramConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer,
         downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
         uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
         downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer) {
@@ -29,7 +29,6 @@ define(["lodash"], function(_) {
                                 return;
                             }
                             return downloadModuleDataBlocksConsumer.run()
-                                .then(_.partial(downloadEventDataConsumer.run, message))
                                 .then(_.partial(downloadChartsConsumer.run, message))
                                 .then(_.partial(downloadChartDataConsumer.run, message))
                                 .then(_.partial(downloadPivotTablesConsumer.run, message))

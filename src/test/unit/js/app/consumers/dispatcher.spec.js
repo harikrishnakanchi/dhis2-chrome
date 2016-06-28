@@ -1,7 +1,7 @@
 define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, utils) {
     describe("dispatcher", function() {
         var uploadCompletionDataConsumer, uploadDataConsumer, downloadDataConsumer, uploadApprovalDataConsumer, dispatcher, message, q, log, scope,
-            createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
+            createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer, uploadEventDataConsumer,
             deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer, downloadDatasetConsumer, updateDatasetConsumer,
             downloadSystemSettingConsumer, uploadPatientOriginConsumer, uploadExcludedDataElementsConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
             uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer,
@@ -50,9 +50,6 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             };
             uploadProgramConsumer = {
                 'run': jasmine.createSpy("uploadProgramConsumer")
-            };
-            downloadEventDataConsumer = {
-                'run': jasmine.createSpy("downloadEventDataConsumer")
             };
             uploadEventDataConsumer = {
                 'run': jasmine.createSpy("uploadEventDataConsumer")
@@ -115,7 +112,6 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
 
             downloadMetadataConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
-            downloadEventDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadApprovalConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadOrgUnitConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadOrgUnitGroupConsumer.run.and.returnValue(utils.getPromise(q, {}));
@@ -132,7 +128,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             syncModuleDataBlockConsumer.run.and.returnValue(utils.getPromise(q, {}));
 
             dispatcher = new Dispatcher(q, log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, updateDatasetConsumer, createUserConsumer, updateUserConsumer,
-                downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
+                downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer, uploadEventDataConsumer,
                 deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer,
                 downloadChartDataConsumer, uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
                 downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer);
@@ -177,7 +173,6 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
 
                 expect(downloadProjectSettingsConsumer.run).toHaveBeenCalledWith(message);
                 expect(downloadModuleDataBlocksConsumer.run).toHaveBeenCalled();
-                expect(downloadEventDataConsumer.run).toHaveBeenCalledWith(message, {});
                 expect(downloadChartsConsumer.run).toHaveBeenCalledWith(message, {});
                 expect(downloadPivotTableDataConsumer.run).toHaveBeenCalledWith(message, {});
                 expect(downloadChartDataConsumer.run).toHaveBeenCalledWith(message, {});
