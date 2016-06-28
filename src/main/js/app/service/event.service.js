@@ -19,24 +19,6 @@ define(["moment", "dhisUrl"], function(moment, dhisUrl) {
             });
         };
 
-        this.getRecentEvents = function(startDate, orgUnitId) {
-            var onSuccess = function(response) {
-                return response.data;
-            };
-
-            return $http.get(dhisUrl.events, {
-                "params": {
-                    "startDate": startDate,
-                    "endDate": moment().add(1, 'days').format("YYYY-MM-DD"),
-                    "skipPaging": true,
-                    "orgUnit": orgUnitId,
-                    "ouMode": "DESCENDANTS",
-                    "fields": ":all,dataValues[value,dataElement,providedElsewhere,storedBy]"
-                }
-            }).then(onSuccess);
-
-        };
-
         this.upsertEvents = function(eventsPayload) {
             var updatedEventsPayload = function() {
                 return _.map(eventsPayload.events, function(eventPayload) {
