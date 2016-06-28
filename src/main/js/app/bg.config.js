@@ -113,6 +113,7 @@ require.config({
         "mergeByLastUpdated": "app/consumer/mergestrategies/merge.by.lastupdated",
         "moduleDataBlockMerger": "app/consumer/mergestrategies/module.data.block.merger",
         "aggregateDataValuesMerger": "app/consumer/mergestrategies/aggregate.data.values.merger",
+        "lineListEventsMerger": "app/consumer/mergestrategies/line.list.events.merger",
 
         "angular-indexedDB": "lib/angular-indexedDB/indexeddb",
 
