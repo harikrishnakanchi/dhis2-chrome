@@ -3,43 +3,7 @@ define(['moment', 'lodash'],
         return function(dataRepository, approvalDataRepository, mergeBy, dataService, $q, datasetRepository, approvalService, dataSyncFailureRepository, programEventRepository, eventService, aggregateDataValuesMerger) {
 
             var mergeAndSaveToLocalDatabase = function(moduleDataBlock, updatedDhisDataValues, dhisCompletion, dhisApproval) {
-                var updatedDhisDataValuesExist = updatedDhisDataValues && updatedDhisDataValues.length > 0;
                 var dataMerger = aggregateDataValuesMerger.create(moduleDataBlock.dataValues, updatedDhisDataValues);
-
-                var dataValuesEquals = function(dv1, dv2) {
-                    return dv1.dataElement === dv2.dataElement &&
-                           dv1.period === dv2.period &&
-                           dv1.orgUnit === dv2.orgUnit &&
-                           dv1.categoryOptionCombo === dv2.categoryOptionCombo;
-                };
-
-                var dataValuesAreEqual = function(originalDataValues, mergedDataValues) {
-                    return originalDataValues.length === mergedDataValues.length && _.all(originalDataValues, function(dv) {
-                            return _.any(mergedDataValues, function(mergedDv) {
-                                return dataValuesEquals(dv, mergedDv) && dv.value === mergedDv.value;
-                            });
-                        });
-                };
-
-                var mergeDataValues = function(dhisDataValues, localDataValues) {
-                    return mergeBy.lastUpdated({
-                        eq: dataValuesEquals
-                    }, dhisDataValues, localDataValues);
-                };
-
-                var mergedDataValues = function() {
-                    return updatedDhisDataValuesExist ? mergeDataValues(updatedDhisDataValues, moduleDataBlock.dataValues) : moduleDataBlock.dataValues;
-                };
-
-                var mergedDataValuesAreEqualToExistingPraxisDataValues = function() {
-                    return updatedDhisDataValuesExist ? dataValuesAreEqual(moduleDataBlock.dataValues, mergedDataValues()) : true;
-                };
-
-                var mergedDataValuesAreEqualToDhisDataValues = function() {
-                    return _.all(mergedDataValues(), function(mergedDataValue) {
-                        return !mergedDataValue.clientLastUpdated;
-                    });
-                };
 
                 var mergeAndSaveDataValues = function() {
                     if(dataMerger.updatedDhisDataValuesExist) {
@@ -106,11 +70,11 @@ define(['moment', 'lodash'],
                         approvedAtCoordinationLevelOnlyOnPraxis = moduleDataBlock.approvedAtCoordinationLevel && !dhisApproval;
 
                     if(moduleDataBlock.failedToSync) {
-                        if(mergedDataValuesAreEqualToExistingPraxisDataValues() && mergedDataValuesAreEqualToDhisDataValues()) {
+                        if(dataMerger.praxisAndDhisAreBothUpToDate) {
                             if(!approvedAtProjectLevelOnlyOnPraxis && !approvedAtCoordinationLevelOnlyOnPraxis) {
                                 return dataSyncFailureRepository.delete(moduleDataBlock.moduleId, moduleDataBlock.period);
                             }
-                        } else if (mergedDataValuesAreEqualToDhisDataValues()) {
+                        } else if (dataMerger.dhisIsUpToDateAndPraxisIsOutOfDate) {
                             return dataSyncFailureRepository.delete(moduleDataBlock.moduleId, moduleDataBlock.period);
                         }
                     }

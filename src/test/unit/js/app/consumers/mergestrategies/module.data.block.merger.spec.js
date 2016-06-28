@@ -353,14 +353,17 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                     });
                 });
 
-                xdescribe('module data block has previously failed to sync', function() {
-                    describe('merged data is the same as existing data on DHIS and Praxis', function() {
-                        it('deletes the data sync failure if data but not approvals was submitted on Praxis', function() {
-                            var mockDataValue = createMockDataValue();
+                describe('module data block has previously failed to sync', function() {
+                    describe('when praxisAndDhisAreBothUpToDate', function() {
+                        beforeEach(function() {
+                            mockAggregateMergedData = createMockAggregateDataValuesMerger({
+                                praxisAndDhisAreBothUpToDate: true
+                            });
+                            aggregateDataValuesMerger.create.and.returnValue(mockAggregateMergedData);
+                        });
 
-                            dhisDataValues = [mockDataValue];
+                        it('deletes the data sync failure if there are no approvals on Praxis', function() {
                             moduleDataBlock = createMockModuleDataBlock({
-                                dataValues: [mockDataValue],
                                 failedToSync: true
                             });
 
@@ -370,11 +373,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         });
 
                         it('retains data sync failure if data has been approved at project level only on Praxis', function() {
-                            var mockDataValue = createMockDataValue();
-
-                            dhisDataValues = [mockDataValue];
                             moduleDataBlock = createMockModuleDataBlock({
-                                dataValues: [mockDataValue],
                                 approvedAtProjectLevel: true,
                                 failedToSync: true
                             });
@@ -385,12 +384,8 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         });
 
                         it('deletes the data sync failure if data has been approved at project level on both DHIS and Praxis', function() {
-                            var mockDataValue = createMockDataValue();
-
-                            dhisDataValues = [mockDataValue];
                             dhisCompletion = createMockCompletion();
                             moduleDataBlock = createMockModuleDataBlock({
-                                dataValues: [mockDataValue],
                                 approvedAtProjectLevel: true,
                                 failedToSync: true
                             });
@@ -401,12 +396,8 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         });
 
                         it('retains data sync failure if data has been approved at coordination level only on Praxis', function() {
-                            var mockDataValue = createMockDataValue();
-
-                            dhisDataValues = [mockDataValue];
                             dhisCompletion = createMockCompletion();
                             moduleDataBlock = createMockModuleDataBlock({
-                                dataValues: [mockDataValue],
                                 approvedAtProjectLevel: true,
                                 approvedAtCoordinationLevel: true,
                                 failedToSync: true
@@ -418,13 +409,9 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         });
 
                         it('deletes the data sync failure if data has been approved at coordination level on both DHIS and Praxis', function() {
-                            var mockDataValue = createMockDataValue();
-
-                            dhisDataValues = [mockDataValue];
                             dhisCompletion = createMockCompletion();
                             dhisApproval = createMockApproval();
                             moduleDataBlock = createMockModuleDataBlock({
-                                dataValues: [mockDataValue],
                                 approvedAtProjectLevel: true,
                                 approvedAtCoordinationLevel: true,
                                 failedToSync: true
@@ -436,83 +423,26 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         });
                     });
 
-                    describe('merged data is the same as existing data on DHIS but not Praxis', function() {
-                        it('deletes the data sync failure if data but not approvals was submitted on Praxis', function() {
-                            var dhisDataValue = createMockDataValue({ value: 'newValue', lastUpdated: someMomentInTime }),
-                                localDataValue = createMockDataValue({ value: 'oldValue', clientLastUpdated: someMomentInTime.subtract(1, 'hour') });
-
-                            dhisDataValues = [dhisDataValue];
+                    describe('when dhisIsUpToDateAndPraxisIsOutOfDate', function() {
+                        it('deletes the data sync failure', function() {
+                            mockAggregateMergedData = createMockAggregateDataValuesMerger({
+                                dhisIsUpToDateAndPraxisIsOutOfDate: true
+                            });
+                            aggregateDataValuesMerger.create.and.returnValue(mockAggregateMergedData);
                             moduleDataBlock = createMockModuleDataBlock({
-                                dataValues: [localDataValue],
                                 failedToSync: true
                             });
 
                             performMerge();
 
                             expect(dataSyncFailureRepository.delete).toHaveBeenCalledWith(moduleDataBlock.moduleId, moduleDataBlock.period);
-                        });
-
-                        it('deletes the data sync failure if data has been approved at project level only on Praxis', function() {
-                            var dhisDataValue = createMockDataValue({ value: 'newValue', lastUpdated: someMomentInTime }),
-                                localDataValue = createMockDataValue({ value: 'oldValue', clientLastUpdated: someMomentInTime.subtract(1, 'hour') });
-
-                            dhisDataValues = [dhisDataValue];
-                            moduleDataBlock = createMockModuleDataBlock({
-                                dataValues: [localDataValue],
-                                approvedAtProjectLevel: true,
-                                failedToSync: true
-                            });
-
-                            performMerge();
-
-                            expect(dataSyncFailureRepository.delete).toHaveBeenCalledWith(moduleDataBlock.moduleId, moduleDataBlock.period);
-                        });
-
-                        it('deletes the data sync failure if data has been approved at coordination level only on Praxis', function() {
-                            var dhisDataValue = createMockDataValue({ value: 'newValue', lastUpdated: someMomentInTime }),
-                                localDataValue = createMockDataValue({ value: 'oldValue', clientLastUpdated: someMomentInTime.subtract(1, 'hour') });
-
-                            dhisDataValues = [dhisDataValue];
-                            dhisCompletion = createMockCompletion();
-                            moduleDataBlock = createMockModuleDataBlock({
-                                dataValues: [localDataValue],
-                                approvedAtProjectLevel: true,
-                                approvedAtCoordinationLevel: true,
-                                failedToSync: true
-                            });
-
-                            performMerge();
-
-                            expect(dataSyncFailureRepository.delete).toHaveBeenCalledWith(moduleDataBlock.moduleId, moduleDataBlock.period);
-                        });
-                    });
-
-                    describe('merged data is the same as existing data on Praxis but not DHIS', function() {
-                        it('retains the data sync failure', function() {
-                            var dhisDataValue = createMockDataValue({ value: 'oldValue', lastUpdated: someMomentInTime.subtract(1, 'hour') }),
-                                localDataValue = createMockDataValue({ value: 'newValue', clientLastUpdated: someMomentInTime });
-
-                            dhisDataValues = [dhisDataValue];
-                            moduleDataBlock = createMockModuleDataBlock({
-                                dataValues: [localDataValue],
-                                failedToSync: true
-                            });
-
-                            performMerge();
-
-                            expect(dataSyncFailureRepository.delete).not.toHaveBeenCalled();
                         });
                     });
                 });
 
-                xdescribe('module data block has not previously failed to sync', function() {
+                describe('module data block has not previously failed to sync', function() {
                     it('does not delete any data sync failures', function() {
-                        var dhisDataValue = createMockDataValue({ value: 'newValue', lastUpdated: someMomentInTime }),
-                            localDataValue = createMockDataValue({ value: 'oldValue', clientLastUpdated: someMomentInTime.subtract(1, 'hour') });
-
-                        dhisDataValues = [dhisDataValue];
                         moduleDataBlock = createMockModuleDataBlock({
-                            dataValues: [localDataValue],
                             failedToSync: false
                         });
 
