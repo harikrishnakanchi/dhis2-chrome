@@ -59,6 +59,7 @@ require.config({
         "factories":"app/factories/factories",
         "moduleDataBlockFactory": "app/factories/module.data.block.factory",
         "checkVersionCompatibility": "app/factories/check.version.compatibility",
+        "initializationRoutine": "app/factories/initialization.routine",
 
         //Transformers
         "datasetTransformer": "app/transformers/dataset.transformer",
