@@ -36,14 +36,9 @@ define(["lodash", "pivotTable"], function(_, PivotTableModel) {
         };
 
         this.getDataForPivotTable = function(pivotTableName, orgUnitId) {
-            var query = db.queryBuilder().$eq(pivotTableName).$index("by_pivot_table").compile();
             var store = db.objectStore(PIVOT_TABLE_DATA_STORE_NAME);
-
-            return store.each(query).then(function(data) {
-                var output = _(data).filter({
-                    orgUnit: orgUnitId
-                }).map('data').first();
-                return output;
+            return store.find([pivotTableName, orgUnitId]).then(function (pivotTableData) {
+                return !!pivotTableData && pivotTableData.data;
             });
         };
     };
