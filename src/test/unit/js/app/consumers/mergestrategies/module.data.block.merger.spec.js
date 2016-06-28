@@ -1,10 +1,10 @@
-define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'datasetRepository', 'dataService', 'approvalService', 'angularMocks', 'utils', 'moment', 'lodash', 'mergeBy', 'dataSyncFailureRepository', 'programEventRepository', 'eventService', 'aggregateDataValuesMerger'],
-    function(ModuleDataBlockMerger, DataRepository, ApprovalDataRepository, DatasetRepository, DataService, ApprovalService, mocks, utils, moment, _ , MergeBy, DataSyncFailureRepository, ProgramEventRepository, EventService, AggregateDataValuesMerger) {
+define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'datasetRepository', 'dataService', 'approvalService', 'angularMocks', 'utils', 'moment', 'lodash', 'mergeBy', 'dataSyncFailureRepository', 'programEventRepository', 'eventService', 'aggregateDataValuesMerger', 'lineListEventsMerger'],
+    function(ModuleDataBlockMerger, DataRepository, ApprovalDataRepository, DatasetRepository, DataService, ApprovalService, mocks, utils, moment, _ , MergeBy, DataSyncFailureRepository, ProgramEventRepository, EventService, AggregateDataValuesMerger, LineListEventsMerger) {
         describe('moduleDataBlockMerger', function() {
             var q, scope, moduleDataBlockMerger,
                 dataRepository, approvalRepository, datasetRepository, dataService, approvalService, mergeBy,
                 dhisDataValues, dhisCompletion, dhisApproval, moduleDataBlock, someMomentInTime, dataSets, dataSetIds, periodAndOrgUnit, dataSyncFailureRepository, programEventRepository,
-                eventService, aggregateDataValuesMerger, mockAggregateMergedData;
+                eventService, aggregateDataValuesMerger, lineListEventsMerger, mockAggregateMergedData, dhisEvents;
 
             beforeEach(mocks.inject(function($q, $rootScope, $log) {
                 q = $q;
@@ -42,13 +42,19 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                 mergeBy = new MergeBy($log);
                 programEventRepository = new ProgramEventRepository();
+                spyOn(programEventRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
 
                 eventService = new EventService();
 
                 aggregateDataValuesMerger = new AggregateDataValuesMerger();
                 spyOn(aggregateDataValuesMerger, 'create').and.returnValue({});
 
-                moduleDataBlockMerger = new ModuleDataBlockMerger(dataRepository, approvalRepository, mergeBy, dataService, q, datasetRepository, approvalService, dataSyncFailureRepository, programEventRepository, eventService, aggregateDataValuesMerger);
+                lineListEventsMerger = new LineListEventsMerger();
+                spyOn(lineListEventsMerger, 'create').and.returnValue({});
+
+                moduleDataBlockMerger = new ModuleDataBlockMerger(dataRepository, approvalRepository, mergeBy, dataService, q, datasetRepository, approvalService,
+                                                                  dataSyncFailureRepository, programEventRepository, eventService, aggregateDataValuesMerger,
+                                                                  lineListEventsMerger);
 
                 moduleDataBlock = createMockModuleDataBlock();
                 dhisDataValues = undefined;
@@ -71,6 +77,13 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                     categoryOptionCombo: 'someCategoryOptionComboId',
                     lastUpdated: '2016-05-04T09:00:00.000Z',
                     value: 'someValue'
+                }, options);
+            };
+
+            var createMockEvent = function(options) {
+                return _.merge({
+                    event: 'someEventId',
+                    lastUpdated: '2016-05-04T09:00:00.000Z'
                 }, options);
             };
 
@@ -125,7 +138,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
             describe('mergeAndSaveToLocalDatabase', function() {
                 var performMerge = function() {
-                    moduleDataBlockMerger.mergeAndSaveToLocalDatabase(moduleDataBlock, dhisDataValues, dhisCompletion, dhisApproval);
+                    moduleDataBlockMerger.mergeAndSaveToLocalDatabase(moduleDataBlock, dhisDataValues, dhisCompletion, dhisApproval, dhisEvents);
                     scope.$apply();
                 };
 
@@ -135,6 +148,15 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                     performMerge();
 
                     expect(aggregateDataValuesMerger.create).toHaveBeenCalledWith(moduleDataBlock.dataValues, dhisDataValues);
+                });
+
+                it('should create a lineListEventsMerger for a linelist module', function () {
+                    moduleDataBlock = createMockModuleDataBlock({ lineListService: true });
+                    dhisEvents = [createMockEvent()];
+
+                    performMerge();
+
+                    expect(lineListEventsMerger.create).toHaveBeenCalledWith(moduleDataBlock.events, dhisEvents);
                 });
 
                 describe('aggregate data values', function() {
@@ -160,6 +182,31 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         performMerge();
 
                         expect(dataRepository.saveDhisData).not.toHaveBeenCalled();
+                    });
+                });
+
+                describe('linelist events', function () {
+                    it('should be saved if there are eventsToUpsert', function() {
+                        var mockLineListEventsMerger = {
+                            eventsToUpsert: ['someEvent']
+                        };
+                        lineListEventsMerger.create.and.returnValue(mockLineListEventsMerger);
+                        moduleDataBlock = createMockModuleDataBlock({ lineListService: true });
+
+                        performMerge();
+
+                        expect(programEventRepository.upsert).toHaveBeenCalledWith(mockLineListEventsMerger.eventsToUpsert);
+                    });
+
+                    it('should not be saved if there are no eventsToUpsert', function () {
+                        lineListEventsMerger.create.and.returnValue({
+                            eventsToUpsert: []
+                        });
+                        moduleDataBlock = createMockModuleDataBlock({ lineListService: true });
+
+                        performMerge();
+
+                        expect(programEventRepository.upsert).not.toHaveBeenCalled();
                     });
                 });
 
@@ -647,7 +694,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                         moduleDataBlock = createMockModuleDataBlock({eventsToSync: eventsToSync, shouldSyncEvents: true});
                         spyOn(eventService, 'upsertEvents').and.returnValue(utils.getPromise(q,undefined));
-                        spyOn(programEventRepository, 'upsert').and.returnValue(utils.getPromise(q,undefined));
+                        programEventRepository.upsert.and.returnValue(utils.getPromise(q,undefined));
 
                         moduleDataBlockMerger.uploadToDHIS(moduleDataBlock, dhisCompletion, dhisApproval);
                         scope.$apply();
@@ -665,7 +712,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         };
                         moduleDataBlock = createMockModuleDataBlock({eventsToSync: eventsToSync, shouldSyncEvents: true});
                         spyOn(eventService, 'upsertEvents').and.returnValue(utils.getPromise(q,undefined));
-                        spyOn(programEventRepository, 'upsert').and.returnValue(utils.getPromise(q,undefined));
+                        programEventRepository.upsert.and.returnValue(utils.getPromise(q,undefined));
 
                         moduleDataBlockMerger.uploadToDHIS(moduleDataBlock, dhisCompletion, dhisApproval);
                         scope.$apply();
@@ -683,7 +730,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                 var localEvents, dhisEvents;
 
                 beforeEach(function(){
-                   spyOn(programEventRepository, 'upsert').and.returnValue(utils.getPromise(q,undefined));
+                   programEventRepository.upsert.and.returnValue(utils.getPromise(q,undefined));
                    spyOn(programEventRepository, 'delete').and.returnValue(utils.getPromise(q,undefined));
                 });
 

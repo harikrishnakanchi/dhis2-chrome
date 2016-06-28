@@ -1,15 +1,26 @@
 define(['moment', 'lodash'],
     function(moment, _) {
-        return function(dataRepository, approvalDataRepository, mergeBy, dataService, $q, datasetRepository, approvalService, dataSyncFailureRepository, programEventRepository, eventService, aggregateDataValuesMerger) {
+        return function(dataRepository, approvalDataRepository, mergeBy, dataService, $q, datasetRepository, approvalService, dataSyncFailureRepository, programEventRepository, eventService,
+                        aggregateDataValuesMerger, lineListEventsMerger) {
 
-            var mergeAndSaveToLocalDatabase = function(moduleDataBlock, updatedDhisDataValues, dhisCompletion, dhisApproval) {
-                var dataMerger = aggregateDataValuesMerger.create(moduleDataBlock.dataValues, updatedDhisDataValues);
+            var mergeAndSaveToLocalDatabase = function(moduleDataBlock, updatedDhisDataValues, dhisCompletion, dhisApproval, updatedDhisEvents) {
+                var dataMerger;
 
-                var mergeAndSaveDataValues = function() {
-                    if(dataMerger.updatedDhisDataValuesExist) {
-                        return dataRepository.saveDhisData(dataMerger.mergedData);
+                var mergeAndSaveDataForModule = function() {
+                    var saveAggregateData = function() {
+                        return dataMerger.updatedDhisDataValuesExist ? dataRepository.saveDhisData(dataMerger.mergedData) : $q.when();
+                    };
+
+                    var saveLineListEvents = function () {
+                        return !_.isEmpty(dataMerger.eventsToUpsert) ? programEventRepository.upsert(dataMerger.eventsToUpsert) : $q.when();
+                    };
+
+                    if(moduleDataBlock.lineListService) {
+                        dataMerger = lineListEventsMerger.create(moduleDataBlock.events, updatedDhisEvents);
+                        return saveLineListEvents();
                     } else {
-                        return $q.when([]);
+                        dataMerger = aggregateDataValuesMerger.create(moduleDataBlock.dataValues, updatedDhisDataValues);
+                        return saveAggregateData();
                     }
                 };
 
@@ -80,7 +91,7 @@ define(['moment', 'lodash'],
                     }
                 };
 
-                return mergeAndSaveDataValues()
+                return mergeAndSaveDataForModule()
                     .then(mergeAndSaveApprovals)
                     .then(resetDataSyncFailure);
             };

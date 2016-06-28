@@ -8,6 +8,7 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
 
         this.dataValues = getAggregateDataValues(aggregateDataValues);
         this.dataValuesHaveBeenModifiedLocally = dataValuesHaveBeenModifiedLocally(this.dataValues);
+        this.events = lineListEvents || [];
         this.approvalData = approvalData || null;
         this.eventsToSync = eventsToSync;
 

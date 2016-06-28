@@ -184,6 +184,22 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
         });
 
+        describe('events', function() {
+            it('should return empty array if lineListEvents is undefined', function() {
+                lineListEvents = undefined;
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.events).toEqual([]);
+            });
+
+            it('should return lineListEvents', function() {
+                lineListEvents = [{
+                    event: 'someEvent'
+                }];
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.events).toEqual(lineListEvents);
+            });
+        });
+
         describe('approvalData', function() {
             it('should return null if approvalData is undefined', function() {
                 moduleDataBlock = createModuleDataBlock();
