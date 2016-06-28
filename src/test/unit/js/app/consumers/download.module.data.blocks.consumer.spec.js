@@ -223,18 +223,6 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockB, [mockDhisDataValueB], undefined, undefined, undefined);
             });
 
-            it('should merge and save line list events', function() {
-                var mockEvent = {
-                    some: 'Event',
-                    eventDate: moment(mockLineListModuleDataBlock.period, 'GGGG[W]WW').toISOString()
-                };
-                eventService.getEvents.and.returnValue(utils.getPromise(q, [mockEvent]));
-                moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, [mockLineListModuleDataBlock]));
-
-                runConsumer();
-                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockLineListModuleDataBlock, undefined, undefined, undefined, [mockEvent]);
-            });
-
             it('should merge and save line list events for each period', function (){
                 var periodA = '2016W20',
                     periodB = '2016W21',
