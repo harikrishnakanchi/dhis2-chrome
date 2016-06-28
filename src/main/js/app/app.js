@@ -167,10 +167,6 @@ define(["angular", "Q", "services", "directives", "dbutils", "chromeUtils", "con
                         translationsService.setLocale(locale);
                         $rootScope.locale = locale;
                         $rootScope.layoutDirection = locale == 'ar' ? { 'direction': 'rtl' } : {};
-
-                        ngI18nResourceBundle.get({ "locale": locale }).then(function(resourceBundle) {
-                            $rootScope.resourceBundle = resourceBundle.data;
-                        });
                     };
 
                     $rootScope.hasRoles = function(allowedRoles) {
