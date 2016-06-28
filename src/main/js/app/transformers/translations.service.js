@@ -4,18 +4,21 @@ define(['lodash'], function(_){
             translatableProperties = ["name", "description", "formName", "shortName", "displayName"],
             translations, _locale, self = this;
 
-        var setResourceBundleLocale = function (locale) {
-            return ngI18nResourceBundle.get({
-                "locale": locale
-            }).then(function (data) {
+        var refreshResourceBundle = function () {
+            return ngI18nResourceBundle.get({ locale: _locale }).then(function (data) {
                 $rootScope.resourceBundle = data.data;
-                return systemSettingRepository.upsertLocale($rootScope.locale);
             });
+        };
+
+        var updateLocaleInSystemSettings = function() {
+            return systemSettingRepository.upsertLocale(_locale);
         };
 
         this.setLocale = function(locale){
             _locale = locale;
-            setResourceBundleLocale(locale);
+
+            refreshResourceBundle();
+            updateLocaleInSystemSettings();
             
             var store = db.objectStore('translations');
             var query = db.queryBuilder().$index('by_locale').$eq(locale).compile();
