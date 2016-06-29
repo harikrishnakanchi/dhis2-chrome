@@ -95,27 +95,8 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
         };
 
         var getEventsFromDhis = function(data) {
-            var originOrgUnitIds = _.pluck(data.originOrgUnits, 'id'),
-                eventResponses = [];
-
-            var downloadEvents = function(originOrgUnitId) {
-                return eventService.getEvents(originOrgUnitId, data.periodRange).then(function(events) {
-                    eventResponses.push(events);
-                });
-            };
-
-            var recursivelyDownloadEventsForOrigins = function(originOrgUnitIds, events) {
-                if(_.isEmpty(originOrgUnitIds)){
-                    return $q.when();
-                }
-                return downloadEvents(originOrgUnitIds.pop()).then(function(){
-                    return recursivelyDownloadEventsForOrigins(originOrgUnitIds);
-                });
-            };
-
-            return recursivelyDownloadEventsForOrigins(originOrgUnitIds, []).then(function() {
-                var events = _.flatten(eventResponses),
-                    groupedEvents = _.groupBy(events, function(event) {
+            return eventService.getEvents(data.moduleId, data.periodRange).then(function(events) {
+                var groupedEvents = _.groupBy(events, function(event) {
                         var period = moment(event.eventDate).format('GGGG[W]WW');
                         return period + data.moduleId;
                     });

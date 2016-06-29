@@ -109,17 +109,11 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 expect(approvalService.getApprovalData).toHaveBeenCalledWith(mockModule.id, [aggregateDataSet.id], periodRange);
             });
 
-            it('should download event data from DHIS for each line list module origin', function () {
-                var mockOriginA = { id: 'mockIriginIdA' },
-                    mockOriginB = { id: 'mockIriginIdB' };
-
-                orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, [mockOriginA, mockOriginB]));
+            it('should download event data from DHIS for each line list module', function () {
                 moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, [mockLineListModuleDataBlock]));
 
                 runConsumer();
-                expect(eventService.getEvents).toHaveBeenCalledWith(mockOriginA.id, periodRange);
-                expect(eventService.getEvents).toHaveBeenCalledWith(mockOriginB.id, periodRange);
-                expect(eventService.getEvents).toHaveBeenCalledTimes(2);
+                expect(eventService.getEvents).toHaveBeenCalledWith(mockModule.id, periodRange);
             });
 
             it('should not download event data from DHIS for aggregate modules', function () {
