@@ -95,7 +95,7 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
         };
 
         var getEventsFromDhis = function(data) {
-            return eventService.getEvents(data.moduleId, data.periodRange).then(function(events) {
+            return eventService.getEvents(data.moduleId, data.periodRange, data.lastUpdatedTimestamp).then(function(events) {
                 var groupedEvents = _.groupBy(events, function(event) {
                         var period = moment(event.eventDate).format('GGGG[W]WW');
                         return period + data.moduleId;

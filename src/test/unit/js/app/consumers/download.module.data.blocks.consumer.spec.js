@@ -113,7 +113,7 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, [mockLineListModuleDataBlock]));
 
                 runConsumer();
-                expect(eventService.getEvents).toHaveBeenCalledWith(mockModule.id, periodRange);
+                expect(eventService.getEvents).toHaveBeenCalledWith(mockModule.id, periodRange, someMomentInTime);
             });
 
             it('should not download event data from DHIS for aggregate modules', function () {
