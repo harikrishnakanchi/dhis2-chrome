@@ -8,112 +8,75 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
 
         $scope.isReportOpen = false;
 
-        $scope.barChartOptions = {
-            "chart": {
-                "type": "multiBarChart",
-                "height": 450,
-                "margin": {
-                    "top": 20,
-                    "right": 20,
-                    "bottom": 60,
-                    "left": 45
-                },
-                "clipEdge": true,
-                "staggerLabels": false,
-                "transitionDuration": 500,
-
-                "x": function(d) {
-                    return d.label;
-                },
-                "y": function(d) {
-                    return d.value;
-                },
-                "xAxis": {
-                    "axisLabel": "Period",
-                    "tickFormat": function(d) {
-                        return moment.unix(d).format('GGGG[W]W');
-                    }
-                },
-                "yAxis": {
-                    "tickFormat": formatYAxisTicks
-                },
-                "legend": {
-                    "maxKeyLength": 50
-                },
-                "reduceXTicks": false
-            }
-        };
-
-        $scope.stackedBarChartOptions = {
-            "chart": {
-                "type": "multiBarChart",
-                "height": 450,
-                "margin": {
-                    "top": 20,
-                    "right": 20,
-                    "bottom": 60,
-                    "left": 45
-                },
-                "stacked": true,
-                "clipEdge": true,
-                "staggerLabels": false,
-                "transitionDuration": 500,
-                "x": function(d) {
-                    return d.label;
-                },
-                "y": function(d) {
-                    return d.value;
-                },
-                "xAxis": {
-                    "axisLabel": "Period",
-                    "tickFormat": function(d) {
-                        return moment.unix(d).format('GGGG[W]W');
-                    }
-                },
-                "yAxis": {
-                    "tickFormat": formatYAxisTicks
-                },
-                "legend": {
-                    "maxKeyLength": 50
-                },
-                "reduceXTicks": false
-            }
-        };
-
-        $scope.lineChartOptions = {
-            "chart": {
-                "type": "lineChart",
-                "height": 450,
-                "margin": {
-                    "top": 20,
-                    "right": 45,
-                    "bottom": 60,
-                    "left": 45
-                },
-                "useInteractiveGuideline": true,
-                "x": function(d) {
-                    return d.label;
-                },
-                "y": function(d) {
-                    return d.value;
-                },
-                "xAxis": {
-                    "axisLabel": "Period",
-                    "tickFormat": function(d) {
-                        return moment.unix(d).format('GGGG[W]W');
+        var getChartOptions = function (chartOptions) {
+            var defaultChartOptions = {
+                chart: {
+                    height: 450,
+                    margin: {top: 20, right: 20, bottom: 60, left: 45},
+                    x: function (d) {
+                        return d.label;
                     },
-                    "tickValues": function(d) {
-                        return _.pluck(d[0].values, 'label');
-                    }
-                },
-                "yAxis": {
-                    "tickFormat": formatYAxisTicks
-                },
-                "legend": {
-                    "maxKeyLength": 50
+                    y: function (d) {
+                        return d.value;
+                    },
+                    xAxis: {
+                        axisLabel: $scope.resourceBundle.xAxisLabel,
+                        tickFormat: function (d) {
+                            return moment.unix(d).format('GGGG[W]W');
+                        }
+                    },
+                    yAxis: {tickFormat: formatYAxisTicks},
+                    legend: {maxKeyLength: 50}
+                }
+            };
+
+            return _.merge(defaultChartOptions, chartOptions);
+        };
+
+        var barChartOptions = {
+            chart: {
+                type: 'multiBarChart',
+                clipEdge: true,
+                staggerLabels: false,
+                transitionDuration: 500,
+                reduceXTicks: false,
+                controlLabels: {
+                    grouped: $scope.resourceBundle.grouped,
+                    stacked: $scope.resourceBundle.stacked
                 }
             }
         };
+
+        var stackedBarChartOptions = {
+            chart: {
+                type: 'multiBarChart',
+                clipEdge: true,
+                staggerLabels: false,
+                transitionDuration: 500,
+                reduceXTicks: false,
+                stacked: true,
+                controlLabels: {
+                    grouped: $scope.resourceBundle.grouped,
+                    stacked: $scope.resourceBundle.stacked
+                }
+            }
+        };
+
+        var lineChartOptions = {
+            chart: {
+                type: 'lineChart',
+                useInteractiveGuideline: true,
+                xAxis: {
+                    tickValues: function(d) {
+                        return _.pluck(d[0].values, 'label');
+                    }
+                }
+            }
+        };
+
+        $scope.barChartOptions = getChartOptions(barChartOptions);
+        $scope.stackedBarChartOptions = getChartOptions(stackedBarChartOptions);
+        $scope.lineChartOptions = getChartOptions(lineChartOptions);
 
         $scope.isMonthlyPivotTablesAvailable = false;
         $scope.isWeeklyPivotTablesAvailable = false;
@@ -224,8 +187,10 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
 
                 var getChartDataPromises = _.map(charts, function(chart) {
                     return chartRepository.getDataForChart(chart.name, $scope.orgUnit.id).then(function(chartData) {
-                        if (!_.isEmpty(chartData))
+                        if (!_.isEmpty(chartData)) {
+                            translationsService.translateCharts(chartData);
                             return transform(chart, chartData);
+                        }
                     });
                 });
 

@@ -299,5 +299,9 @@
     "monthlyReports": "",
     "aggregateDataSyncError": "",
     "dataApprovalSyncError": "",
-    "deleteLabel": ""
+    "deleteLabel": "",
+    "grouped": "",
+    "stacked": "",
+    "xAxisLabel": "",
+    "downloadChart": ""
 }

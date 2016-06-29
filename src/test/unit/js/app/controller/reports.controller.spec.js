@@ -8,6 +8,8 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
             scope = $rootScope.$new();
             q = $q;
 
+            rootScope.resourceBundle = {};
+
             datasetRepository = new DatasetRepository();
             spyOn(datasetRepository, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
 

@@ -44,6 +44,20 @@ define(['lodash'], function(_){
             });
         };
 
+        this.translateCharts = function (chartData) {
+            if(_locale == 'en') {
+                return chartData;
+            }
+
+            var dataElementIndicatorIds = chartData.metaData.dx;
+            _.each(dataElementIndicatorIds, function (id) {
+                var translationObject = _.find(translations[id], { property: 'shortName' });
+                if(translations[id] && translationObject)
+                    chartData.metaData.names[id] = translationObject.value;
+            });
+            return chartData;
+        };
+
         this.translateReferralLocations = function(arrayOfObjectsToBeTranslated) {
             if(_locale == 'en' && !_.isUndefined(arrayOfObjectsToBeTranslated)) {
                 return arrayOfObjectsToBeTranslated;
