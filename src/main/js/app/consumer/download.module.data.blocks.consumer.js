@@ -20,35 +20,6 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
             return dateUtils.getPeriodRange(numberOfWeeks);
         };
 
-        var recursivelyDownloadMergeAndSaveModules = function(options) {
-            if (_.isEmpty(options.modules)) {
-                var allModulesSyncedSuccessfully = !options.atLeastOneModuleHasFailed;
-                return $q.when(allModulesSyncedSuccessfully);
-            }
-
-            var onSuccess = function() {
-                return recursivelyDownloadMergeAndSaveModules(options);
-            };
-
-            var onFailure = function() {
-                options.atLeastOneModuleHasFailed = true;
-                return recursivelyDownloadMergeAndSaveModules(options);
-            };
-
-            return getModuleDataBlocks({
-                moduleId: options.modules.pop().id,
-                periodRange: options.periodRange,
-                lastUpdatedTimestamp: options.lastUpdatedTimestamp
-            })
-            .then(getOriginsForModule)
-            .then(getDataSetsForModuleAndOrigins)
-            .then(getModuleDataFromDhis)
-            .then(getIndexedCompletionsFromDhis)
-            .then(getIndexedApprovalsFromDhis)
-            .then(mergeAndSaveModuleDataBlocks)
-            .then(onSuccess, onFailure);
-        };
-
         var getModuleDataBlocks = function(data) {
             return moduleDataBlockFactory.createForModule(data.moduleId, data.periodRange).then(function(moduleDataBlocks) {
                 return _.merge({ moduleDataBlocks: moduleDataBlocks }, data);
@@ -140,6 +111,35 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
                 return moduleDataBlockMerger.mergeAndSaveToLocalDatabase(moduleDataBlock, dhisDataValues, dhisCompletion, dhisApproval, dhisEvents, dhisEventIds);
             });
             return $q.all(mergePromises);
+        };
+
+        var recursivelyDownloadMergeAndSaveModules = function(options) {
+            if (_.isEmpty(options.modules)) {
+                var allModulesSyncedSuccessfully = !options.atLeastOneModuleHasFailed;
+                return $q.when(allModulesSyncedSuccessfully);
+            }
+
+            var onSuccess = function() {
+                return recursivelyDownloadMergeAndSaveModules(options);
+            };
+
+            var onFailure = function() {
+                options.atLeastOneModuleHasFailed = true;
+                return recursivelyDownloadMergeAndSaveModules(options);
+            };
+
+            return getModuleDataBlocks({
+                moduleId: options.modules.pop().id,
+                periodRange: options.periodRange,
+                lastUpdatedTimestamp: options.lastUpdatedTimestamp
+            })
+                .then(getOriginsForModule)
+                .then(getDataSetsForModuleAndOrigins)
+                .then(getModuleDataFromDhis)
+                .then(getIndexedCompletionsFromDhis)
+                .then(getIndexedApprovalsFromDhis)
+                .then(mergeAndSaveModuleDataBlocks)
+                .then(onSuccess, onFailure);
         };
 
         this.run = function () {
