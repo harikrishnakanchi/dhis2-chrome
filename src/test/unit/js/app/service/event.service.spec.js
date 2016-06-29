@@ -1,4 +1,4 @@
-define(["eventService", "angularMocks", "properties", "moment"], function(EventService, mocks, properties, moment) {
+define(["eventService", "angularMocks", "properties", "moment", "lodash"], function(EventService, mocks, properties, moment, _) {
     describe("eventService", function() {
         var httpBackend, http, eventService;
 
@@ -48,6 +48,106 @@ define(["eventService", "angularMocks", "properties", "moment"], function(EventS
                     expect(response).toEqual([]);
                 });
 
+                httpBackend.flush();
+            });
+        });
+
+        describe('getEventIds', function() {
+            var orgUnitId, periodRange;
+
+            beforeEach(function() {
+                orgUnitId = 'someOrgUnitId';
+                periodRange = ['2016W18', '2016W19'];
+            });
+
+            it('should download the event ids for specified orgUnit and period range', function() {
+                var expectedEndDate = moment(_.last(periodRange), 'GGGG[W]WW').endOf('isoWeek').format('YYYY-MM-DD'),
+                    expectedStartDate = moment(_.first(periodRange), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD');
+
+                httpBackend.expectGET(properties.dhis.url + '/api/events' +
+                    '?endDate=' + expectedEndDate +
+                    '&fields=event' +
+                    '&orgUnit=' + orgUnitId +
+                    '&ouMode=DESCENDANTS' +
+                    '&page=1' +
+                    '&pageSize=1000' +
+                    '&startDate=' + expectedStartDate +
+                    '&totalPages=true'
+                ).respond(200, {});
+
+                eventService.getEventIds(orgUnitId, periodRange);
+                httpBackend.flush();
+            });
+
+            it('should return the event ids from the response', function() {
+                var mockResponse = {
+                    events: [
+                        { event: 'eventIdA' },
+                        { event: 'eventIdB' }
+                    ]
+                };
+                httpBackend.expectGET(/.*/).respond(200, mockResponse);
+
+                eventService.getEventIds(orgUnitId, periodRange).then(function (response) {
+                    expect(response).toEqual(_.pluck(mockResponse.events, 'event'));
+                });
+
+                httpBackend.flush();
+            });
+
+            it('should return an empty array if response is empty', function() {
+                httpBackend.expectGET(/.*/).respond(200, {});
+
+                eventService.getEventIds(orgUnitId, periodRange).then(function(response) {
+                    expect(response).toEqual([]);
+                });
+
+                httpBackend.flush();
+            });
+
+            it('should download each page of results', function() {
+                var mockResponses = {
+                    page1: {
+                        events: [
+                            { event: 'eventIdA' }
+                        ],
+                        pageCount: 2
+                    },
+                    page2: {
+                        events: [
+                            { event: 'eventIdB' }
+                        ],
+                        pageCount: 2
+                    }
+                };
+                httpBackend.expectGET(/.*&page=1.*/).respond(200, mockResponses.page1);
+                httpBackend.expectGET(/.*&page=2.*/).respond(200, mockResponses.page2);
+
+                eventService.getEventIds(orgUnitId, periodRange);
+                httpBackend.flush();
+            });
+
+            it('should not make more than the configured number of recursive requests', function() {
+                var mockResponse = { pageCount: 99, events: ['mockEvent']},
+                    numberOfRequests = 0;
+
+                httpBackend.whenGET(/.*/).respond(function () {
+                    numberOfRequests++;
+                    return [200, mockResponse];
+                });
+
+                eventService.getEventIds(orgUnitId, periodRange);
+                httpBackend.flush();
+
+                expect(numberOfRequests).toEqual(20);
+            });
+
+            it('should not make any further requests if events response is empty', function() {
+                var mockResponse = { pageCount: 99 , events: [] };
+
+                httpBackend.expectGET(/.*&page=1.*/).respond(200, mockResponse);
+
+                eventService.getEventIds(orgUnitId, periodRange);
                 httpBackend.flush();
             });
         });
