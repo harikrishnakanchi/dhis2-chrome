@@ -125,13 +125,11 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                 }, options);
             };
 
-            var createMockAggregateDataValuesMerger = function(options) {
+            var createMockDataMerger = function(options) {
                 return _.merge({
-                    mergedData: [],
                     praxisAndDhisAreBothUpToDate: false,
                     dhisIsUpToDateAndPraxisIsOutOfDate: false,
-                    praxisAndDhisAreBothOutOfDate: false,
-                    updatedDhisDataValuesExist: false
+                    praxisAndDhisAreBothOutOfDate: false
                 }, options);
             };
 
@@ -160,7 +158,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                 describe('aggregate data values', function() {
                     it('should be saved if updatedDhisDataValuesExist', function() {
-                        mockAggregateMergedData = createMockAggregateDataValuesMerger({
+                        mockAggregateMergedData = createMockDataMerger({
                             mergedData: ['someData'],
                             updatedDhisDataValuesExist: true
                         });
@@ -172,11 +170,10 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                     });
 
                     it('should not be saved if no updatedDhisDataValuesExist', function() {
-                        var mockAggregateMergedData = createMockAggregateDataValuesMerger({
+                        aggregateDataValuesMerger.create.and.returnValue(createMockDataMerger({
                             mergedData: ['someData'],
                             updatedDhisDataValuesExist: false
-                        });
-                        aggregateDataValuesMerger.create.and.returnValue(mockAggregateMergedData);
+                        }));
 
                         performMerge();
 
@@ -186,9 +183,9 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                 describe('linelist events', function () {
                     it('should be saved if there are eventsToUpsert', function() {
-                        var mockLineListEventsMerger = {
+                        var mockLineListEventsMerger = createMockDataMerger({
                             eventsToUpsert: ['someEvent']
-                        };
+                        });
                         lineListEventsMerger.create.and.returnValue(mockLineListEventsMerger);
                         moduleDataBlock = createMockModuleDataBlock({ lineListService: true });
 
@@ -198,9 +195,9 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                     });
 
                     it('should not be saved if there are no eventsToUpsert', function () {
-                        lineListEventsMerger.create.and.returnValue({
+                        lineListEventsMerger.create.and.returnValue(createMockDataMerger({
                             eventsToUpsert: []
-                        });
+                        }));
                         moduleDataBlock = createMockModuleDataBlock({ lineListService: true });
 
                         performMerge();
@@ -211,7 +208,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                 describe('when praxisAndDhisAreBothUpToDate', function() {
                     beforeEach(function() {
-                        mockAggregateMergedData = createMockAggregateDataValuesMerger({
+                        mockAggregateMergedData = createMockDataMerger({
                             praxisAndDhisAreBothUpToDate: true
                         });
                         aggregateDataValuesMerger.create.and.returnValue(mockAggregateMergedData);
@@ -270,7 +267,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                 describe('when dhisIsUpToDateAndPraxisIsOutOfDate', function() {
                     beforeEach(function() {
-                        mockAggregateMergedData = createMockAggregateDataValuesMerger({
+                        mockAggregateMergedData = createMockDataMerger({
                             dhisIsUpToDateAndPraxisIsOutOfDate: true
                         });
                         aggregateDataValuesMerger.create.and.returnValue(mockAggregateMergedData);
@@ -323,7 +320,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                 describe('when praxisAndDhisAreBothOutOfDate', function() {
                     beforeEach(function() {
-                        mockAggregateMergedData = createMockAggregateDataValuesMerger({
+                        mockAggregateMergedData = createMockDataMerger({
                             praxisAndDhisAreBothOutOfDate: true
                         });
                         aggregateDataValuesMerger.create.and.returnValue(mockAggregateMergedData);
@@ -351,7 +348,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                 describe('module data block has previously failed to sync', function() {
                     describe('when praxisAndDhisAreBothUpToDate', function() {
                         beforeEach(function() {
-                            mockAggregateMergedData = createMockAggregateDataValuesMerger({
+                            mockAggregateMergedData = createMockDataMerger({
                                 praxisAndDhisAreBothUpToDate: true
                             });
                             aggregateDataValuesMerger.create.and.returnValue(mockAggregateMergedData);
@@ -420,7 +417,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                     describe('when dhisIsUpToDateAndPraxisIsOutOfDate', function() {
                         it('deletes the data sync failure', function() {
-                            mockAggregateMergedData = createMockAggregateDataValuesMerger({
+                            mockAggregateMergedData = createMockDataMerger({
                                 dhisIsUpToDateAndPraxisIsOutOfDate: true
                             });
                             aggregateDataValuesMerger.create.and.returnValue(mockAggregateMergedData);
