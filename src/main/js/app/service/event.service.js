@@ -28,7 +28,7 @@ define(["dhisUrl", "moment", "lodash"], function(dhisUrl, moment, _) {
             });
         };
 
-        this.getEvents = function(orgUnitId, periodRange) {
+        this.getEvents = function(orgUnitId, periodRange, lastUpdated) {
             var startDate = moment(_.first(periodRange), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
                 endDate = moment(_.last(periodRange), 'GGGG[W]WW').endOf('isoWeek').format('YYYY-MM-DD'),
                 maximumPageRequests = MAX_NUMBER_OF_EVENTS / EVENT_DATA_PAGE_SIZE;
@@ -39,6 +39,7 @@ define(["dhisUrl", "moment", "lodash"], function(dhisUrl, moment, _) {
                 orgUnit: orgUnitId,
                 ouMode: "DESCENDANTS",
                 fields: ":all,dataValues[value,dataElement,providedElsewhere,storedBy]",
+                lastUpdated: lastUpdated,
                 pageSize: EVENT_DATA_PAGE_SIZE
             }, maximumPageRequests);
         };

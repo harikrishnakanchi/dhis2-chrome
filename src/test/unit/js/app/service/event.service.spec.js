@@ -42,6 +42,14 @@ define(["eventService", "angularMocks", "properties", "moment", "lodash"], funct
                 httpBackend.flush();
             });
 
+            it('should download events that have been updated after specified timestamp', function () {
+                var lastUpdated = 'someMomentInTime';
+                httpBackend.expectGET(new RegExp('.*lastUpdated=' + lastUpdated + '.*')).respond(200, {});
+
+                eventService.getEvents(orgUnitId, periodRange, lastUpdated);
+                httpBackend.flush();
+            });
+
             it('should return events from the response', function() {
                 var mockDhisResponse = {
                         events: ['mockEventA', 'mockEventB']
