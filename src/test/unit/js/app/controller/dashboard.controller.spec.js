@@ -284,10 +284,12 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                 it('should filter items awaiting at data entry level', function() {
                     var moduleDataBlockA = {
                         "moduleId": "moduleA",
+                        "moduleName": "moduleAName",
                         "awaitingActionAtDataEntryLevel": true,
                         "notSynced": true
                     }, moduleDataBlockB = {
                         "moduleId": "moduleB",
+                        "moduleName": "moduleBName",
                         "awaitingActionAtDataEntryLevel": false,
                         "notSynced": false
                     };
@@ -297,16 +299,18 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                     dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility, dataSyncFailureRepository);
                     scope.$apply();
 
-                    expect(scope.itemsAwaitingSubmission).toEqual([moduleDataBlockA]);
+                    expect(scope.itemsAwaitingSubmission).toEqual({ moduleAName: [moduleDataBlockA] });
                 });
 
                 it('should filter items awaiting action at project level approval', function() {
                     var moduleDataBlockA = {
                         "moduleId": "moduleA",
-                        awaitingActionAtProjectLevelApprover: false,
+                        "moduleName": "moduleAName",
+                        "awaitingActionAtProjectLevelApprover": false,
                         "notSynced": false
                     }, moduleDataBlockB = {
                         "moduleId": "moduleB",
+                        "moduleName": "moduleBName",
                         "awaitingActionAtProjectLevelApprover": true,
                         "notSynced": false
                     };
@@ -316,16 +320,18 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                     dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility, dataSyncFailureRepository);
                     scope.$apply();
 
-                    expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual([moduleDataBlockB]);
+                    expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual({ moduleBName: [moduleDataBlockB] });
                 });
 
                 it('should filter items awaiting action at coordination level approval', function() {
                     var moduleDataBlockA = {
                         "moduleId": "moduleA",
-                        awaitingActionAtCoordinationLevelApprover: false,
+                        "moduleName": "moduleAName",
+                        "awaitingActionAtCoordinationLevelApprover": false,
                         "notSynced": false
                     }, moduleDataBlockB = {
                         "moduleId": "moduleB",
+                        "moduleName": "moduleBName",
                         "awaitingActionAtCoordinationLevelApprover": true,
                         "notSynced": false
                     };
@@ -335,7 +341,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                     dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility, dataSyncFailureRepository);
                     scope.$apply();
 
-                    expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual([moduleDataBlockB]);
+                    expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual({ moduleBName: [moduleDataBlockB] });
                 });
             });
 

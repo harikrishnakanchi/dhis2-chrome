@@ -18,27 +18,29 @@
             </div>
         </div>
         <form name="approvalForm">
-            <table class="table table-bordered msf-table" ng-if="itemsAwaitingApprovalAtUserLevel.length > 0">
+            <table class="table table-bordered msf-table" ng-if="itemsArePresent(itemsAwaitingApprovalAtUserLevel)">
                 <caption class="msf-table-caption">{{resourceBundle.itemsAwaitingApprovalAtUserLevelLabel}}</caption>
                 <thead>
                 <tr>
                     <th>{{resourceBundle.moduleLabel}}</th>
                     <th ng-model="weeks">
                         <input type="checkbox" class="dashboard-form-checkbox select-all-checkbox"
-                               ng-change="toggleSelectAll(selectedAllItemsForApproval)"
-                               ng-model="selectedAllItemsForApproval"
-                               ng-checked="(itemsAwaitingApprovalAtUserLevel | filter : { 'selectedForApproval': true}).length === itemsAwaitingApprovalAtUserLevel.length">{{resourceBundle.weekLabelForApproval}}
+                               ng-click="toggleSelectAll()"
+                               ng-checked="selectedAllItemsForApproval" />
+                        {{resourceBundle.weekLabelForApproval}}
                     </th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="(moduleId, items) in ::itemsAwaitingApprovalAtUserLevel | groupBy: 'moduleId' | toArray">
-                    <td>{{items[0].moduleName}}</td>
+                <tr ng-repeat="(moduleName, items) in itemsAwaitingApprovalAtUserLevel">
+                    <td>{{moduleName}}</td>
                     <td>
                         <ul class="list-unstyled">
                             <li ng-repeat="item in items | orderBy: 'period'">
                                 <input type="checkbox" class="dashboard-form-checkbox"
-                                       ng-model="item.selectedForApproval"/>
+                                       ng-model="item.selectedForApproval"
+                                       ng-change="toggleWeek()"
+                                />
                                 <a ng-href="{{ getTemplateUrl(item) }}" ng-class="{ 'error-label': item.failedToSync }">{{formatPeriods(item.period)}}</a>
                             </li>
                         </ul>
@@ -57,7 +59,7 @@
             </table>
         </form>
         <form>
-            <table class="table table-bordered msf-table" ng-if="itemsAwaitingSubmission.length > 0">
+            <table class="table table-bordered msf-table" ng-if="itemsArePresent(itemsAwaitingSubmission)">
                 <caption class="msf-table-caption">{{resourceBundle.itemsAwaitingDataSubmissionLabel}}</caption>
                 <thead>
                 <tr>
@@ -66,8 +68,8 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="(moduleId, items) in ::itemsAwaitingSubmission | groupBy: 'moduleId' | toArray">
-                    <td>{{items[0].moduleName}}</td>
+                <tr ng-repeat="(moduleName, items) in itemsAwaitingSubmission">
+                    <td>{{moduleName}}</td>
                     <td>
                         <ul class="list-unstyled">
                             <li ng-repeat="item in items | orderBy: 'period'" ng-if="item.active">
@@ -79,7 +81,7 @@
                 </tr>
                 </tbody>
             </table>
-            <table class="table table-bordered msf-table" ng-if="itemsAwaitingApprovalAtOtherLevels.length > 0">
+            <table class="table table-bordered msf-table" ng-if="itemsArePresent(itemsAwaitingApprovalAtOtherLevels)">
                 <caption class="msf-table-caption" ng-if="!hasRoles(['Data entry user'])">
                     {{resourceBundle.itemsAwaitingApprovalAtOtherLevelLabel}}
                 </caption>
@@ -94,8 +96,8 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="(moduleId, items) in ::itemsAwaitingApprovalAtOtherLevels | groupBy: 'moduleId' | toArray">
-                    <td>{{items[0].moduleName}}</td>
+                <tr ng-repeat="(moduleName, items) in itemsAwaitingApprovalAtOtherLevels">
+                    <td>{{moduleName}}</td>
                     <td>
                         <ul class="list-unstyled">
                             <li ng-repeat="item in items | orderBy: 'period'">
