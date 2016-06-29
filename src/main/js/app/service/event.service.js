@@ -13,7 +13,7 @@ define(["dhisUrl", "moment", "lodash"], function(dhisUrl, moment, _) {
 
             return $http.get(dhisUrl.events, { params: queryParams }).then(function(response) {
                 var eventsResponse = response.data.events || [],
-                    totalPages = response.data.pageCount || 0,
+                    totalPages = (response.data.pager && response.data.pager.pageCount) || 0,
                     lastPageReached = queryParams.page >= totalPages,
                     pageLimitReached = queryParams.page >= maximumPageRequests;
 

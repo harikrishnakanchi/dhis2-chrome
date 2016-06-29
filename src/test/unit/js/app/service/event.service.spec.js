@@ -24,9 +24,7 @@ define(["eventService", "angularMocks", "properties", "moment", "lodash"], funct
             });
 
             it('should download events for the specified orgUnit and period range', function () {
-                var orgUnitId = 'someOrgUnitId',
-                    periodRange = ['2016W18', '2016W19'],
-                    expectedEndDate = moment(_.last(periodRange), 'GGGG[W]WW').endOf('isoWeek').format('YYYY-MM-DD'),
+                var expectedEndDate = moment(_.last(periodRange), 'GGGG[W]WW').endOf('isoWeek').format('YYYY-MM-DD'),
                     expectedStartDate = moment(_.first(periodRange), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD');
 
                 httpBackend.expectGET(properties.dhis.url + '/api/events' +
@@ -74,13 +72,17 @@ define(["eventService", "angularMocks", "properties", "moment", "lodash"], funct
                         events: [
                             { event: 'eventIdA' }
                         ],
-                        pageCount: 2
+                        pager: {
+                            pageCount: 2
+                        }
                     },
                     page2: {
                         events: [
                             { event: 'eventIdB' }
                         ],
-                        pageCount: 2
+                        pager: {
+                            pageCount: 2
+                        }
                     }
                 };
                 httpBackend.expectGET(/.*&page=1.*/).respond(200, mockResponses.page1);
@@ -91,7 +93,7 @@ define(["eventService", "angularMocks", "properties", "moment", "lodash"], funct
             });
 
             it('should not make more than the configured number of recursive requests', function() {
-                var mockResponse = { pageCount: 99, events: ['mockEvent']},
+                var mockResponse = { pager: { pageCount: 99 }, events: ['mockEvent'] },
                     numberOfRequests = 0;
 
                 httpBackend.whenGET(/.*/).respond(function () {
@@ -106,7 +108,7 @@ define(["eventService", "angularMocks", "properties", "moment", "lodash"], funct
             });
 
             it('should not make any further requests if events response is empty', function() {
-                var mockResponse = { pageCount: 99 , events: [] };
+                var mockResponse = { pager: { pageCount: 99 }, events: [] };
 
                 httpBackend.expectGET(/.*&page=1.*/).respond(200, mockResponse);
 
@@ -174,13 +176,17 @@ define(["eventService", "angularMocks", "properties", "moment", "lodash"], funct
                         events: [
                             { event: 'eventIdA' }
                         ],
-                        pageCount: 2
+                        pager: {
+                            pageCount: 2
+                        }
                     },
                     page2: {
                         events: [
                             { event: 'eventIdB' }
                         ],
-                        pageCount: 2
+                        pager: {
+                            pageCount: 2
+                        }
                     }
                 };
                 httpBackend.expectGET(/.*&page=1.*/).respond(200, mockResponses.page1);
@@ -191,7 +197,7 @@ define(["eventService", "angularMocks", "properties", "moment", "lodash"], funct
             });
 
             it('should not make more than the configured number of recursive requests', function() {
-                var mockResponse = { pageCount: 99, events: ['mockEvent']},
+                var mockResponse = { pager: { pageCount: 99 }, events: ['mockEvent'] },
                     numberOfRequests = 0;
 
                 httpBackend.whenGET(/.*/).respond(function () {
@@ -206,7 +212,7 @@ define(["eventService", "angularMocks", "properties", "moment", "lodash"], funct
             });
 
             it('should not make any further requests if events response is empty', function() {
-                var mockResponse = { pageCount: 99 , events: [] };
+                var mockResponse = { pager: { pageCount: 99 }, events: [] };
 
                 httpBackend.expectGET(/.*&page=1.*/).respond(200, mockResponse);
 
