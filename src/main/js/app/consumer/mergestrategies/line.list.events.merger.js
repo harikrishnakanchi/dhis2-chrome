@@ -1,12 +1,12 @@
 define(['moment', 'lodash'], function (moment, _) {
     return function () {
 
-        var getEventsToDelete = function(praxisEvents, eventIdsFromDhis) {
-            var indexedDhisEventIds = _.indexBy(eventIdsFromDhis, function(eventId) { return eventId; });
-
-            return _.reject(praxisEvents, function(praxisEvent) {
+        var getEventIdsToDelete = function(praxisEvents, eventIdsFromDhis) {
+            var indexedDhisEventIds = _.indexBy(eventIdsFromDhis, function(eventId) { return eventId; }),
+                eventsToDelete = _.reject(praxisEvents, function(praxisEvent) {
                 return praxisEvent.localStatus || indexedDhisEventIds[praxisEvent.event];
             });
+            return _.pluck(eventsToDelete, 'event');
         };
 
         var getEventsToUpsert = function (praxisEvents, updatedEventsFromDhis) {
@@ -40,7 +40,7 @@ define(['moment', 'lodash'], function (moment, _) {
             eventIdsFromDhis = eventIdsFromDhis || [];
 
             var eventsToUpsert = getEventsToUpsert(praxisEvents, updatedEventsFromDhis),
-                eventsToDelete = getEventsToDelete(praxisEvents, eventIdsFromDhis),
+                eventIdsToDelete = getEventIdsToDelete(praxisEvents, eventIdsFromDhis),
                 mergedEvents = getMergedEvents(praxisEvents, eventsToUpsert);
 
             var praxisEventsAreUpToDate = _.isEmpty(eventsToUpsert);
@@ -48,7 +48,7 @@ define(['moment', 'lodash'], function (moment, _) {
 
             return {
                 eventsToUpsert: eventsToUpsert,
-                eventsToDelete: eventsToDelete,
+                eventIdsToDelete: eventIdsToDelete,
                 praxisAndDhisAreBothUpToDate: praxisEventsAreUpToDate && dhisEventsAreUpToDate,
                 dhisIsUpToDateAndPraxisIsOutOfDate: dhisEventsAreUpToDate && !praxisEventsAreUpToDate,
                 praxisAndDhisAreBothOutOfDate: !praxisEventsAreUpToDate && !dhisEventsAreUpToDate

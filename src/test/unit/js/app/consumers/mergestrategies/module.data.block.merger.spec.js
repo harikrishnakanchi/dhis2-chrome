@@ -42,6 +42,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                 programEventRepository = new ProgramEventRepository();
                 spyOn(programEventRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
+                spyOn(programEventRepository, 'delete').and.returnValue(utils.getPromise(q, {}));
 
                 eventService = new EventService();
 
@@ -205,6 +206,29 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         performMerge();
 
                         expect(programEventRepository.upsert).not.toHaveBeenCalled();
+                    });
+
+                    it('should be deleted if there are eventIdsToDelete', function () {
+                        var mockLineistEventsMerger = createMockDataMerger({
+                            eventIdsToDelete: ['someEventId']
+                        });
+                        lineListEventsMerger.create.and.returnValue(mockLineistEventsMerger);
+                        moduleDataBlock = createMockModuleDataBlock({ lineListService: true });
+
+                        performMerge();
+
+                        expect(programEventRepository.delete).toHaveBeenCalledWith(mockLineistEventsMerger.eventIdsToDelete);
+                    });
+
+                    it('should not be deleted if there are no eventIdsToDelete', function () {
+                        lineListEventsMerger.create.and.returnValue(createMockDataMerger({
+                            eventIdsToDelete: []
+                        }));
+                        moduleDataBlock = createMockModuleDataBlock({ lineListService: true });
+
+                        performMerge();
+
+                        expect(programEventRepository.delete).not.toHaveBeenCalled();
                     });
                 });
 

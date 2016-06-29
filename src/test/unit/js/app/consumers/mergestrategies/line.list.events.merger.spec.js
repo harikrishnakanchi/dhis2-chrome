@@ -117,12 +117,12 @@ define(['lineListEventsMerger', 'angularMocks', 'moment'], function (LineListEve
                 eventModifiedOnPraxis = createMockEvent({ event: 'newEventId', localStatus: 'SOME_STATUS_THAT_WE_WILL_NOT_SPEAK_OF' });
             });
 
-            it('should return the Praxis events that need to be deleted', function () {
+            it('should return the Praxis event ids that need to be deleted', function () {
                 eventIdsFromDhis = [anotherEvent.event];
                 praxisEvents = [eventThatWasDeletedOnDhis, anotherEvent];
                 merger = createMerger();
 
-                expect(merger.eventsToDelete).toEqual([eventThatWasDeletedOnDhis]);
+                expect(merger.eventIdsToDelete).toEqual([eventThatWasDeletedOnDhis.event]);
             });
 
             it('should not return events that have been modified on Praxis', function () {
@@ -130,7 +130,7 @@ define(['lineListEventsMerger', 'angularMocks', 'moment'], function (LineListEve
                 praxisEvents = [eventModifiedOnPraxis, anotherEvent];
                 merger = createMerger();
 
-                expect(merger.eventsToDelete).toEqual([]);
+                expect(merger.eventIdsToDelete).toEqual([]);
             });
 
             it('should indicate that praxisAndDhisAreBothUpToDate', function () {

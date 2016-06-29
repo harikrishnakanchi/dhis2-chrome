@@ -15,9 +15,13 @@ define(['moment', 'lodash'],
                         return !_.isEmpty(dataMerger.eventsToUpsert) ? programEventRepository.upsert(dataMerger.eventsToUpsert) : $q.when();
                     };
 
+                    var deleteLineListEvents = function () {
+                        return !_.isEmpty(dataMerger.eventIdsToDelete) ? programEventRepository.delete(dataMerger.eventIdsToDelete) : $q.when();
+                    };
+
                     if(moduleDataBlock.lineListService) {
                         dataMerger = lineListEventsMerger.create(moduleDataBlock.events, updatedDhisEvents, dhisEventIds);
-                        return saveLineListEvents();
+                        return saveLineListEvents().then(deleteLineListEvents);
                     } else {
                         dataMerger = aggregateDataValuesMerger.create(moduleDataBlock.dataValues, updatedDhisDataValues);
                         return saveAggregateData();
