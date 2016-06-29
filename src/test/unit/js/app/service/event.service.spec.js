@@ -16,23 +16,40 @@ define(["eventService", "angularMocks", "properties", "moment", "lodash"], funct
         });
 
         describe('getEvents', function() {
-            it('should get events for the specified orgUnit and period range', function() {
+            var orgUnitId, periodRange;
+
+            beforeEach(function() {
+                orgUnitId = 'someOrgUnitId';
+                periodRange = ['2016W18', '2016W19'];
+            });
+
+            it('should download events for the specified orgUnit and period range', function () {
                 var orgUnitId = 'someOrgUnitId',
                     periodRange = ['2016W18', '2016W19'],
                     expectedEndDate = moment(_.last(periodRange), 'GGGG[W]WW').endOf('isoWeek').format('YYYY-MM-DD'),
-                    expectedStartDate = moment(_.first(periodRange), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
-                    mockDhisResponse = {
-                        events: ['mockEventA', 'mockEventB']
-                    };
+                    expectedStartDate = moment(_.first(periodRange), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD');
 
                 httpBackend.expectGET(properties.dhis.url + '/api/events' +
                     '?endDate=' + expectedEndDate +
                     '&fields=:all,dataValues%5Bvalue,dataElement,providedElsewhere,storedBy%5D' +
                     '&orgUnit=' + orgUnitId +
                     '&ouMode=DESCENDANTS' +
-                    '&skipPaging=true' +
-                    '&startDate=' + expectedStartDate
-                ).respond(200, mockDhisResponse);
+                    '&page=1' +
+                    '&pageSize=200' +
+                    '&startDate=' + expectedStartDate +
+                    '&totalPages=true'
+                ).respond(200, {});
+
+                eventService.getEvents(orgUnitId, periodRange);
+                httpBackend.flush();
+            });
+
+            it('should return events from the response', function() {
+                var mockDhisResponse = {
+                        events: ['mockEventA', 'mockEventB']
+                    };
+
+                httpBackend.expectGET(/.*/).respond(200, mockDhisResponse);
 
                 eventService.getEvents(orgUnitId, periodRange).then(function(response) {
                     expect(response).toEqual(mockDhisResponse.events);
@@ -48,6 +65,52 @@ define(["eventService", "angularMocks", "properties", "moment", "lodash"], funct
                     expect(response).toEqual([]);
                 });
 
+                httpBackend.flush();
+            });
+
+            it('should download each page of results', function() {
+                var mockResponses = {
+                    page1: {
+                        events: [
+                            { event: 'eventIdA' }
+                        ],
+                        pageCount: 2
+                    },
+                    page2: {
+                        events: [
+                            { event: 'eventIdB' }
+                        ],
+                        pageCount: 2
+                    }
+                };
+                httpBackend.expectGET(/.*&page=1.*/).respond(200, mockResponses.page1);
+                httpBackend.expectGET(/.*&page=2.*/).respond(200, mockResponses.page2);
+
+                eventService.getEvents(orgUnitId, periodRange);
+                httpBackend.flush();
+            });
+
+            it('should not make more than the configured number of recursive requests', function() {
+                var mockResponse = { pageCount: 99, events: ['mockEvent']},
+                    numberOfRequests = 0;
+
+                httpBackend.whenGET(/.*/).respond(function () {
+                    numberOfRequests++;
+                    return [200, mockResponse];
+                });
+
+                eventService.getEvents(orgUnitId, periodRange);
+                httpBackend.flush();
+
+                expect(numberOfRequests).toEqual(50);
+            });
+
+            it('should not make any further requests if events response is empty', function() {
+                var mockResponse = { pageCount: 99 , events: [] };
+
+                httpBackend.expectGET(/.*&page=1.*/).respond(200, mockResponse);
+
+                eventService.getEvents(orgUnitId, periodRange);
                 httpBackend.flush();
             });
         });
@@ -139,7 +202,7 @@ define(["eventService", "angularMocks", "properties", "moment", "lodash"], funct
                 eventService.getEventIds(orgUnitId, periodRange);
                 httpBackend.flush();
 
-                expect(numberOfRequests).toEqual(20);
+                expect(numberOfRequests).toEqual(10);
             });
 
             it('should not make any further requests if events response is empty', function() {

@@ -1,20 +1,21 @@
 define(["dhisUrl", "moment", "lodash"], function(dhisUrl, moment, _) {
     return function($http, $q) {
-        var EVENT_ID_PAGE_SIZE = 1000,
-            EVENT_ID_PAGE_REQUESTS_MAX_LIMIT = 20,
+        var MAX_NUMBER_OF_EVENTS = 10000,
+            EVENT_ID_PAGE_SIZE = 1000,
+            EVENT_DATA_PAGE_SIZE = 200,
             DEFAULT_PAGE_REQUESTS_MAX_LIMIT = 99;
 
-        var recursivelyDownloadPagedEvents = function(queryParams, pageRequestsMaxLimit, eventsResponses) {
+        var recursivelyDownloadPagedEvents = function(queryParams, maximumPageRequests, eventsResponses) {
             queryParams.totalPages = true;
             queryParams.page = queryParams.page || 1;
             eventsResponses = eventsResponses || [];
-            pageRequestsMaxLimit = pageRequestsMaxLimit || DEFAULT_PAGE_REQUESTS_MAX_LIMIT;
+            maximumPageRequests = maximumPageRequests || DEFAULT_PAGE_REQUESTS_MAX_LIMIT;
 
             return $http.get(dhisUrl.events, { params: queryParams }).then(function(response) {
                 var eventsResponse = response.data.events || [],
                     totalPages = response.data.pageCount || 0,
                     lastPageReached = queryParams.page >= totalPages,
-                    pageLimitReached = queryParams.page >= pageRequestsMaxLimit;
+                    pageLimitReached = queryParams.page >= maximumPageRequests;
 
                 eventsResponses.push(eventsResponse);
 
@@ -22,32 +23,30 @@ define(["dhisUrl", "moment", "lodash"], function(dhisUrl, moment, _) {
                     return $q.when(_.flatten(eventsResponses));
                 } else {
                     queryParams.page++;
-                    return recursivelyDownloadPagedEvents(queryParams, pageRequestsMaxLimit, eventsResponses);
+                    return recursivelyDownloadPagedEvents(queryParams, maximumPageRequests, eventsResponses);
                 }
             });
         };
 
         this.getEvents = function(orgUnitId, periodRange) {
             var startDate = moment(_.first(periodRange), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
-                endDate = moment(_.last(periodRange), 'GGGG[W]WW').endOf('isoWeek').format('YYYY-MM-DD');
+                endDate = moment(_.last(periodRange), 'GGGG[W]WW').endOf('isoWeek').format('YYYY-MM-DD'),
+                maximumPageRequests = MAX_NUMBER_OF_EVENTS / EVENT_DATA_PAGE_SIZE;
 
-            return $http.get(dhisUrl.events, {
-                "params": {
-                    "startDate": startDate,
-                    "endDate": endDate,
-                    "skipPaging": true,
-                    "orgUnit": orgUnitId,
-                    "ouMode": "DESCENDANTS",
-                    "fields": ":all,dataValues[value,dataElement,providedElsewhere,storedBy]"
-                }
-            }).then(function(response) {
-                return response.data.events || [];
-            });
+            return recursivelyDownloadPagedEvents({
+                startDate: startDate,
+                endDate: endDate,
+                orgUnit: orgUnitId,
+                ouMode: "DESCENDANTS",
+                fields: ":all,dataValues[value,dataElement,providedElsewhere,storedBy]",
+                pageSize: EVENT_DATA_PAGE_SIZE
+            }, maximumPageRequests);
         };
 
         this.getEventIds = function(orgUnitId, periodRange) {
             var startDate = moment(_.first(periodRange), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
-                endDate = moment(_.last(periodRange), 'GGGG[W]WW').endOf('isoWeek').format('YYYY-MM-DD');
+                endDate = moment(_.last(periodRange), 'GGGG[W]WW').endOf('isoWeek').format('YYYY-MM-DD'),
+                maximumPageRequests = MAX_NUMBER_OF_EVENTS / EVENT_ID_PAGE_SIZE;
 
             return recursivelyDownloadPagedEvents({
                 startDate: startDate,
@@ -56,7 +55,7 @@ define(["dhisUrl", "moment", "lodash"], function(dhisUrl, moment, _) {
                 ouMode: "DESCENDANTS",
                 fields: "event",
                 pageSize: EVENT_ID_PAGE_SIZE
-            }, EVENT_ID_PAGE_REQUESTS_MAX_LIMIT).then(function(events) {
+            }, maximumPageRequests).then(function(events) {
                 return _.pluck(events, 'event');
             });
         };
