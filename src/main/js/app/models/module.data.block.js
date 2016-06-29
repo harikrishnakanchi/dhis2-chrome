@@ -1,5 +1,5 @@
 define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, CustomAttributes, moment, properties) {
-    var ModuleDataBlock = function (orgUnit, period, aggregateDataValues, lineListEvents, approvalData, failedToSyncData, eventsToSync) {
+    var ModuleDataBlock = function (orgUnit, period, aggregateDataValues, lineListEvents, approvalData, failedToSyncData) {
         this.moduleId = orgUnit.id;
         this.period = period;
         this.moduleName = parseModuleName(orgUnit);
@@ -10,7 +10,6 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         this.dataValuesHaveBeenModifiedLocally = dataValuesHaveBeenModifiedLocally(this.dataValues);
         this.events = lineListEvents || [];
         this.approvalData = approvalData || null;
-        this.eventsToSync = eventsToSync;
 
         this.submitted = isSubmitted(this.dataValues, lineListEvents, this.lineListService);
         this.approvedAtProjectLevel = !!(approvalData && approvalData.isComplete);
@@ -20,7 +19,6 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         this.approvedAtCoordinationLevelBy = this.approvedAtCoordinationLevel ? approvalData.approvedBy : null;
         this.approvedAtCoordinationLevelAt = this.approvedAtCoordinationLevel ? moment(approvalData.approvedOn) : null;
         this.approvedAtAnyLevel = this.approvedAtProjectLevel || this.approvedAtCoordinationLevel;
-        this.shouldSyncEvents = this.eventsToSync && this.eventsToSync.length;
 
         this.failedToSync = isFailedToSync(this.lineListService, aggregateDataValues, failedToSyncData);
 

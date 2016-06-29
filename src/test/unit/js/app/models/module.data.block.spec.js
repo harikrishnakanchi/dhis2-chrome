@@ -1,6 +1,6 @@
 define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(ModuleDataBlock, CustomAttributes, moment, timecop) {
     describe('ModuleDataBlock', function () {
-        var moduleDataBlock, orgUnit, period, aggregateDataValues, lineListEvents, approvalData, someMomentInTime, isLineListService, failedToSyncData, eventsToSync;
+        var moduleDataBlock, orgUnit, period, aggregateDataValues, lineListEvents, approvalData, someMomentInTime, isLineListService, failedToSyncData;
 
         beforeEach(function() {
             isLineListService = false;
@@ -14,13 +14,12 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             aggregateDataValues = undefined;
             lineListEvents = undefined;
             approvalData = undefined;
-            eventsToSync = undefined;
             failedToSyncData = {};
             someMomentInTime = moment('2016-05-18T00:00:00.000Z');
         });
 
         var createModuleDataBlock = function() {
-            return ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData, failedToSyncData, eventsToSync);
+            return ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData, failedToSyncData);
         };
 
         var createMockDataValue = function(options) {
@@ -598,24 +597,6 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                 aggregateDataValues = [createMockDataValuesObject()];
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.dataValuesHaveBeenModifiedLocally).toEqual(false);
-            });
-        });
-
-        describe('shouldSyncEvents', function () {
-            it('should return true if there are events', function () {
-                eventsToSync = [{
-                        event: 'event1',
-                        'eventDate': 'someDate'
-                    },{
-                        event: 'event2',
-                        'eventDate': 'someOtherDate'
-                    }];
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.shouldSyncEvents).toBeTruthy();
-            });
-            it('should return false if there are no events', function(){
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.shouldSyncEvents).toBeFalsy();
             });
         });
     });
