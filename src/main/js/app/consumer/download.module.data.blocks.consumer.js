@@ -78,7 +78,7 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
             var isLineListService = _.first(data.moduleDataBlocks).lineListService;
 
             if (isLineListService) {
-                return getEventsFromDhis(data);
+                return getEventsFromDhis(data).then(getEventIdsFromDhis);
             } else {
                 return getIndexedDataValuesFromDhis(data);
             }
@@ -105,6 +105,12 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
             });
         };
 
+        var getEventIdsFromDhis = function(data) {
+            return eventService.getEventIds(data.moduleId, data.periodRange).then(function (eventIds) {
+                return _.merge({ eventIds: eventIds }, data);
+            });
+        };
+
         var getIndexedCompletionsFromDhis = function (data) {
             return approvalService.getCompletionData(data.moduleId, data.originOrgUnits, data.allDataSetIds, data.periodRange).then(function(allCompletionData) {
                 var indexedCompletions = _.indexBy(allCompletionData, function(completionData) {
@@ -128,9 +134,10 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
                 var dhisDataValues = data.indexedDhisDataValues && data.indexedDhisDataValues[moduleDataBlock.period + moduleDataBlock.moduleId],
                     dhisCompletion = data.indexedDhisCompletions[moduleDataBlock.period + moduleDataBlock.moduleId],
                     dhisApproval = data.indexedDhisApprovals[moduleDataBlock.period + moduleDataBlock.moduleId],
-                    dhisEvents = data.indexedDhisEvents && data.indexedDhisEvents[moduleDataBlock.period + moduleDataBlock.moduleId];
+                    dhisEvents = data.indexedDhisEvents && data.indexedDhisEvents[moduleDataBlock.period + moduleDataBlock.moduleId],
+                    dhisEventIds = data.eventIds;
 
-                return moduleDataBlockMerger.mergeAndSaveToLocalDatabase(moduleDataBlock, dhisDataValues, dhisCompletion, dhisApproval, dhisEvents);
+                return moduleDataBlockMerger.mergeAndSaveToLocalDatabase(moduleDataBlock, dhisDataValues, dhisCompletion, dhisApproval, dhisEvents, dhisEventIds);
             });
             return $q.all(mergePromises);
         };
