@@ -3,7 +3,7 @@ define(['moment', 'lodash'],
         return function(dataRepository, approvalDataRepository, dataService, $q, datasetRepository, approvalService, dataSyncFailureRepository, programEventRepository, eventService,
                         aggregateDataValuesMerger, lineListEventsMerger) {
 
-            var mergeAndSaveToLocalDatabase = function(moduleDataBlock, updatedDhisDataValues, dhisCompletion, dhisApproval, updatedDhisEvents) {
+            var mergeAndSaveToLocalDatabase = function(moduleDataBlock, updatedDhisDataValues, dhisCompletion, dhisApproval, updatedDhisEvents, dhisEventIds) {
                 var dataMerger;
 
                 var mergeAndSaveDataForModule = function() {
@@ -16,7 +16,7 @@ define(['moment', 'lodash'],
                     };
 
                     if(moduleDataBlock.lineListService) {
-                        dataMerger = lineListEventsMerger.create(moduleDataBlock.events, updatedDhisEvents);
+                        dataMerger = lineListEventsMerger.create(moduleDataBlock.events, updatedDhisEvents, dhisEventIds);
                         return saveLineListEvents();
                     } else {
                         dataMerger = aggregateDataValuesMerger.create(moduleDataBlock.dataValues, updatedDhisDataValues);

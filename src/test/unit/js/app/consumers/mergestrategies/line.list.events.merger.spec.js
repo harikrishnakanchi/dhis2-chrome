@@ -1,18 +1,19 @@
 define(['lineListEventsMerger', 'angularMocks', 'moment'], function (LineListEventsMerger, mocks, moment) {
     describe('LineListEventsMerger', function () {
         var lineListEventsMerger,
-            merger, updatedEventsFromDhis, praxisEvents, someMomentInTime, someOlderMomentInTime;
+            merger, updatedEventsFromDhis, eventIdsFromDhis, praxisEvents, someMomentInTime, someOlderMomentInTime;
 
         beforeEach(function () {
             praxisEvents = undefined;
             updatedEventsFromDhis = undefined;
+            eventIdsFromDhis = undefined;
             someMomentInTime = moment('2016-06-12T12:00:00.000Z');
             someOlderMomentInTime = moment('2016-05-12T12:00:00.000Z');
             lineListEventsMerger = new LineListEventsMerger();
         });
 
         var createMerger = function () {
-            return lineListEventsMerger.create(praxisEvents, updatedEventsFromDhis);
+            return lineListEventsMerger.create(praxisEvents, updatedEventsFromDhis, eventIdsFromDhis);
         };
 
         var createMockEvent = function (options) {
@@ -101,7 +102,39 @@ define(['lineListEventsMerger', 'angularMocks', 'moment'], function (LineListEve
             });
 
             it('should indicate that praxisAndDhisAreBothUpToDate', function () {
-               expect(merger.praxisAndDhisAreBothUpToDate).toEqual(true);
+                expect(merger.praxisAndDhisAreBothUpToDate).toEqual(true);
+                expect(merger.dhisIsUpToDateAndPraxisIsOutOfDate).toEqual(false);
+                expect(merger.praxisAndDhisAreBothOutOfDate).toEqual(false);
+            });
+        });
+
+        describe('events were deleted on DHIS', function () {
+            var eventThatWasDeletedOnDhis, anotherEvent, eventModifiedOnPraxis;
+
+            beforeEach(function () {
+                eventThatWasDeletedOnDhis = createMockEvent({ event: 'deletedEventId' });
+                anotherEvent = createMockEvent({ event: 'anotherEventId' });
+                eventModifiedOnPraxis = createMockEvent({ event: 'newEventId', localStatus: 'SOME_STATUS_THAT_WE_WILL_NOT_SPEAK_OF' });
+            });
+
+            it('should return the Praxis events that need to be deleted', function () {
+                eventIdsFromDhis = [anotherEvent.event];
+                praxisEvents = [eventThatWasDeletedOnDhis, anotherEvent];
+                merger = createMerger();
+
+                expect(merger.eventsToDelete).toEqual([eventThatWasDeletedOnDhis]);
+            });
+
+            it('should not return events that have been modified on Praxis', function () {
+                eventIdsFromDhis = [anotherEvent.event];
+                praxisEvents = [eventModifiedOnPraxis, anotherEvent];
+                merger = createMerger();
+
+                expect(merger.eventsToDelete).toEqual([]);
+            });
+
+            it('should indicate that praxisAndDhisAreBothUpToDate', function () {
+                expect(merger.praxisAndDhisAreBothUpToDate).toEqual(true);
                 expect(merger.dhisIsUpToDateAndPraxisIsOutOfDate).toEqual(false);
                 expect(merger.praxisAndDhisAreBothOutOfDate).toEqual(false);
             });

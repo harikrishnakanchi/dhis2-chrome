@@ -4,7 +4,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
             var q, scope, moduleDataBlockMerger,
                 dataRepository, approvalRepository, datasetRepository, dataService, approvalService,
                 dhisDataValues, dhisCompletion, dhisApproval, moduleDataBlock, someMomentInTime, dataSets, dataSetIds, periodAndOrgUnit, dataSyncFailureRepository, programEventRepository,
-                eventService, aggregateDataValuesMerger, lineListEventsMerger, mockAggregateMergedData, dhisEvents;
+                eventService, aggregateDataValuesMerger, lineListEventsMerger, mockAggregateMergedData, dhisEvents, dhisEventIds;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
                 q = $q;
@@ -59,6 +59,8 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                 dhisDataValues = undefined;
                 dhisCompletion = undefined;
                 dhisApproval = undefined;
+                dhisEvents = undefined;
+                dhisEventIds = undefined;
                 someMomentInTime = moment('2016-05-18T13:00:00.000Z');
             }));
 
@@ -135,7 +137,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
             describe('mergeAndSaveToLocalDatabase', function() {
                 var performMerge = function() {
-                    moduleDataBlockMerger.mergeAndSaveToLocalDatabase(moduleDataBlock, dhisDataValues, dhisCompletion, dhisApproval, dhisEvents);
+                    moduleDataBlockMerger.mergeAndSaveToLocalDatabase(moduleDataBlock, dhisDataValues, dhisCompletion, dhisApproval, dhisEvents, dhisEventIds);
                     scope.$apply();
                 };
 
@@ -153,7 +155,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                     performMerge();
 
-                    expect(lineListEventsMerger.create).toHaveBeenCalledWith(moduleDataBlock.events, dhisEvents);
+                    expect(lineListEventsMerger.create).toHaveBeenCalledWith(moduleDataBlock.events, dhisEvents, dhisEventIds);
                 });
 
                 describe('aggregate data values', function() {
