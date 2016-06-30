@@ -31,7 +31,7 @@ define(['moment', 'lodash'], function (moment, _) {
         };
 
         var isModifiedOnPraxis = function (event) {
-            return event.clientLastUpdated;
+            return _.contains(['READY_FOR_DHIS', 'DELETED'], event.localStatus);
         };
 
         this.create = function (praxisEvents, updatedEventsFromDhis, eventIdsFromDhis) {
@@ -43,7 +43,7 @@ define(['moment', 'lodash'], function (moment, _) {
                 eventIdsToDelete = getEventIdsToDelete(praxisEvents, eventIdsFromDhis),
                 mergedEvents = getMergedEvents(praxisEvents, eventsToUpsert);
 
-            var praxisEventsAreUpToDate = _.isEmpty(eventsToUpsert);
+            var praxisEventsAreUpToDate = _.isEmpty(eventsToUpsert) && _.isEmpty(eventIdsToDelete);
             var dhisEventsAreUpToDate = !_.any(mergedEvents, isModifiedOnPraxis);
 
             return {

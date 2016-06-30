@@ -41,9 +41,9 @@ define(['lineListEventsMerger', 'angularMocks', 'moment'], function (LineListEve
             });
         });
 
-        describe('updated events exist on Praxis', function () {
+        describe('submitted events exist on Praxis', function () {
             beforeEach(function () {
-                praxisEvents = [createMockEvent({ clientLastUpdated: someMomentInTime })];
+                praxisEvents = [createMockEvent({ clientLastUpdated: someMomentInTime, localStatus: 'READY_FOR_DHIS' })];
                 merger = createMerger();
             });
 
@@ -64,14 +64,37 @@ define(['lineListEventsMerger', 'angularMocks', 'moment'], function (LineListEve
             });
         });
 
-        describe('updated events exist on both DHIS and Praxis', function () {
+        describe('deleted events exist on Praxis', function () {
+            beforeEach(function () {
+                praxisEvents = [createMockEvent({ localStatus: 'DELETED' })];
+                merger = createMerger();
+            });
+
+            it('should return an empty array', function () {
+                expect(merger.eventsToUpsert).toEqual([]);
+            });
+
+            it('should not indicate that praxisAndDhisAreBothUpToDate', function () {
+                expect(merger.praxisAndDhisAreBothUpToDate).toEqual(false);
+            });
+
+            it('should not indicate that dhisIsUpToDateAndPraxisIsOutOfDate', function () {
+                expect(merger.dhisIsUpToDateAndPraxisIsOutOfDate).toEqual(false);
+            });
+
+            it('should not indicate that praxisAndDhisAreBothOutOfDate', function () {
+                expect(merger.praxisAndDhisAreBothOutOfDate).toEqual(false);
+            });
+        });
+
+        describe('updated events exist on DHIS and submitted events exist on Praxis', function () {
             var dhisEventA, dhisEventB, praxisEventA, praxisEventB;
 
             beforeEach(function () {
                 dhisEventA = createMockEvent({ event: 'eventIdA', lastUpdated: someMomentInTime });
                 dhisEventB = createMockEvent({ event: 'eventIdB', lastUpdated: someOlderMomentInTime });
-                praxisEventA = createMockEvent({ event: 'eventIdA', clientLastUpdated: someOlderMomentInTime });
-                praxisEventB = createMockEvent({ event: 'eventIdB', clientLastUpdated: someMomentInTime });
+                praxisEventA = createMockEvent({ event: 'eventIdA', clientLastUpdated: someOlderMomentInTime, localStatus: 'READY_FOR_DHIS' });
+                praxisEventB = createMockEvent({ event: 'eventIdB', clientLastUpdated: someMomentInTime, localStatus: 'READY_FOR_DHIS' });
 
                 updatedEventsFromDhis = [dhisEventA, dhisEventB];
                 praxisEvents = [praxisEventA, praxisEventB];
@@ -90,10 +113,12 @@ define(['lineListEventsMerger', 'angularMocks', 'moment'], function (LineListEve
             });
         });
 
-        describe('updated events do not exist', function () {
+        describe('updated and submitted events do not exist on DHIS and Praxis respectively', function () {
             beforeEach(function () {
-                praxisEvents = [createMockEvent({ lastUpdated: someMomentInTime })];
-                updatedEventsFromDhis = [createMockEvent({ lastUpdated: someMomentInTime })];
+                var mockEvent = createMockEvent({ lastUpdated: someMomentInTime });
+                praxisEvents = [mockEvent];
+                updatedEventsFromDhis = [mockEvent];
+                eventIdsFromDhis = [mockEvent.event];
                 merger = createMerger();
             });
 
@@ -133,9 +158,14 @@ define(['lineListEventsMerger', 'angularMocks', 'moment'], function (LineListEve
                 expect(merger.eventIdsToDelete).toEqual([]);
             });
 
-            it('should indicate that praxisAndDhisAreBothUpToDate', function () {
-                expect(merger.praxisAndDhisAreBothUpToDate).toEqual(true);
-                expect(merger.dhisIsUpToDateAndPraxisIsOutOfDate).toEqual(false);
+            it('should indicate that dhisIsUpToDateAndPraxisIsOutOfDate', function () {
+                eventIdsFromDhis = [anotherEvent.event];
+                praxisEvents = [eventThatWasDeletedOnDhis, anotherEvent];
+
+                merger = createMerger();
+
+                expect(merger.praxisAndDhisAreBothUpToDate).toEqual(false);
+                expect(merger.dhisIsUpToDateAndPraxisIsOutOfDate).toEqual(true);
                 expect(merger.praxisAndDhisAreBothOutOfDate).toEqual(false);
             });
         });
