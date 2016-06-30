@@ -106,6 +106,13 @@ define(['moment', 'lodash'],
                 };
 
                 var uploadDataValues = function () {
+                    var removeLocallyModifiedTimestamp = function() {
+                        var dataValuesWithoutLocalTimestamps = _.map(moduleDataBlock.dataValues, function(dataValue) {
+                            return _.omit(dataValue, 'clientLastUpdated');
+                        });
+                        return dataRepository.saveDhisData(dataValuesWithoutLocalTimestamps);
+                    };
+
                     if(moduleDataBlock.dataValuesHaveBeenModifiedLocally) {
                         return dataService.save(moduleDataBlock.dataValues).then(removeLocallyModifiedTimestamp);
                     } else {
@@ -113,11 +120,17 @@ define(['moment', 'lodash'],
                     }
                 };
 
-                var removeLocallyModifiedTimestamp = function() {
-                    var dataValuesWithoutLocalTimestamps = _.map(moduleDataBlock.dataValues, function(dataValue) {
-                        return _.omit(dataValue, 'clientLastUpdated');
-                    });
-                    return dataRepository.saveDhisData(dataValuesWithoutLocalTimestamps);
+                var uploadEventData = function () {
+                    var changeEventLocalStatus = function(events) {
+                        var updatedEvents = _.map(events, function(ev) {
+                            return _.omit(ev, ["localStatus", "clientLastUpdated"]);
+                        });
+                        return programEventRepository.upsert(updatedEvents);
+                    };
+
+                    var eventsToUpload = _.filter(moduleDataBlock.events, { localStatus: 'READY_FOR_DHIS'});
+
+                    return _.isEmpty(eventsToUpload) ? $q.when() : eventService.upsertEvents(eventsToUpload).then(_.partial(changeEventLocalStatus, eventsToUpload));
                 };
 
                 var uploadCompletionData = function (dataSetIds) {
@@ -139,19 +152,6 @@ define(['moment', 'lodash'],
                       return approvalService.markAsApproved(dataSetIds, [periodAndOrgUnit], approvedBy, approvedOn);
                   }
                   return $q.when({});
-                };
-
-                var uploadEventData = function () {
-                    var changeEventLocalStatus = function(events) {
-                        var updatedEvents = _.map(events, function(ev) {
-                            return _.omit(ev, ["localStatus", "clientLastUpdated"]);
-                        });
-                        return programEventRepository.upsert(updatedEvents);
-                    };
-
-                    var eventsToUpload = _.filter(moduleDataBlock.events, { localStatus: 'READY_FOR_DHIS'});
-
-                    return _.isEmpty(eventsToUpload) ? $q.when() : eventService.upsertEvents(eventsToUpload).then(_.partial(changeEventLocalStatus, eventsToUpload));
                 };
 
                 return datasetRepository.getAll().then(function (allDataSet) {
