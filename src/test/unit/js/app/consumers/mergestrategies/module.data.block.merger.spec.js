@@ -478,7 +478,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                     scope.$apply();
                 };
 
-                describe('data values have been entered and approved only on Praxis', function () {
+                describe('data values in Praxis have been modified locally', function () {
                     it('should upload data values to DHIS', function() {
                         var localDataValue = createMockDataValue();
                         moduleDataBlock = createMockModuleDataBlock({
@@ -503,6 +503,24 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         expect(dataRepository.saveDhisData).toHaveBeenCalledWith([dataValueWithoutLocalTimestamp]);
                     });
 
+                    it('should delete completion data from DHIS if it is present and upload data values to DHIS', function() {
+                        dhisCompletion = createMockCompletion();
+                        moduleDataBlock = createMockModuleDataBlock({ dataValuesHaveBeenModifiedLocally: true });
+                        periodAndOrgUnit = { period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId };
+
+                        performUpload();
+                        expect(approvalService.markAsIncomplete).toHaveBeenCalledWith(dataSetIds, [periodAndOrgUnit]);
+                    });
+
+                    it('should delete approval data from DHIS if it is present and upload data values to DHIS', function() {
+                        dhisApproval = createMockApproval();
+                        moduleDataBlock = createMockModuleDataBlock({ dataValuesHaveBeenModifiedLocally: true });
+                        periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId};
+
+                        performUpload();
+                        expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(dataSetIds, [periodAndOrgUnit]);
+                    });
+
                     it('should upload completion data from Praxis to DHIS', function() {
                         moduleDataBlock = createMockModuleDataBlock({
                             dataValuesHaveBeenModifiedLocally: true,
@@ -520,7 +538,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                             moduleDataBlock.approvedAtProjectLevelAt.toISOString());
                     });
 
-                    it('should upload approval data from Praxis to DHIS if data is approved at co-ordination level', function() {
+                    it('should upload approval data from Praxis to DHIS', function() {
                         moduleDataBlock = createMockModuleDataBlock({
                             dataValuesHaveBeenModifiedLocally: true,
                             approvedAtCoordinationLevel: true,
@@ -608,49 +626,6 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         expect(approvalService.markAsIncomplete).not.toHaveBeenCalled();
                         expect(approvalService.markAsComplete).toHaveBeenCalled();
                         expect(approvalService.markAsApproved).toHaveBeenCalled();
-                    });
-                });
-
-                describe('data values in Praxis have been modified locally', function() {
-                    it('should delete approval data and completion data from DHIS if it is present and upload data values to DHIS', function() {
-                        dhisCompletion = createMockCompletion();
-                        dhisApproval = createMockApproval();
-
-                        moduleDataBlock = createMockModuleDataBlock({ dataValuesHaveBeenModifiedLocally: true });
-
-                        periodAndOrgUnit = { period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId };
-
-                        performUpload();
-                        expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(dataSetIds, [periodAndOrgUnit]);
-                        expect(approvalService.markAsIncomplete).toHaveBeenCalledWith(dataSetIds, [periodAndOrgUnit]);
-                        expect(dataService.save).toHaveBeenCalled();
-                    });
-
-                    it('should delete completion data from DHIS if it is present and upload data values to DHIS', function() {
-                        dhisCompletion = createMockCompletion();
-
-                        moduleDataBlock = createMockModuleDataBlock({ dataValuesHaveBeenModifiedLocally: true });
-
-                        periodAndOrgUnit = { period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId };
-
-                        performUpload();
-
-                        expect(approvalService.markAsUnapproved).not.toHaveBeenCalled();
-                        expect(approvalService.markAsIncomplete).toHaveBeenCalledWith(dataSetIds, [periodAndOrgUnit]);
-                        expect(dataService.save).toHaveBeenCalled();
-                    });
-
-                    it('should delete approval data from DHIS if it is present and upload data values to DHIS', function() {
-                        dhisApproval = createMockApproval();
-
-                        moduleDataBlock = createMockModuleDataBlock({ dataValuesHaveBeenModifiedLocally: true });
-
-                        periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId};
-
-                        performUpload();
-                        expect(approvalService.markAsIncomplete).not.toHaveBeenCalled();
-                        expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(dataSetIds, [periodAndOrgUnit]);
-                        expect(dataService.save).toHaveBeenCalled();
                     });
                 });
 
