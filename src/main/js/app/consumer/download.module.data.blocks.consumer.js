@@ -7,12 +7,12 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
             return _.pluck(aggregateDataSets, 'id');
         };
 
-        var getLastUpdatedTime = function(userProjectIds) {
-            return changeLogRepository.get("dataValues:" + userProjectIds.join(';'));
+        var getLastUpdatedTime = function(projectId) {
+            return changeLogRepository.get("dataValues:" + projectId);
         };
 
-        var updateLastUpdatedTime = function(userProjectIds) {
-            return changeLogRepository.upsert("dataValues:" + userProjectIds.join(';'), moment().toISOString());
+        var updateLastUpdatedTime = function(projectId) {
+            return changeLogRepository.upsert("dataValues:" + projectId, moment().toISOString());
         };
 
         var getPeriodRangeToDownload = function(projectLastUpdatedTimestamp) {
@@ -142,26 +142,38 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
                 .then(onSuccess, onFailure);
         };
 
-        this.run = function () {
-            return userPreferenceRepository.getCurrentUsersProjectIds().then(function (currentUserProjectIds) {
-                return getLastUpdatedTime(currentUserProjectIds).then(function(projectLastUpdatedTimestamp) {
-                    var periodRange = getPeriodRangeToDownload(projectLastUpdatedTimestamp);
+        var downloadModuleDataForProject = function(projectId) {
+            return getLastUpdatedTime(projectId).then(function(projectLastUpdatedTimestamp) {
+                var periodRange = getPeriodRangeToDownload(projectLastUpdatedTimestamp);
 
-                    return orgUnitRepository.getAllModulesInOrgUnits(currentUserProjectIds)
-                        .then(function (allModules) {
-                            return recursivelyDownloadMergeAndSaveModules({
-                                modules: allModules,
-                                periodRange: periodRange,
-                                lastUpdatedTimestamp: projectLastUpdatedTimestamp
-                            });
-                        })
-                        .then(function(allModulesSyncedSuccessfully) {
-                            if(allModulesSyncedSuccessfully) {
-                                return updateLastUpdatedTime(currentUserProjectIds);
-                            }
+                return orgUnitRepository.getAllModulesInOrgUnits([projectId])
+                    .then(function (allModules) {
+                        return recursivelyDownloadMergeAndSaveModules({
+                            modules: allModules,
+                            periodRange: periodRange,
+                            lastUpdatedTimestamp: projectLastUpdatedTimestamp
                         });
-                });
-                });
+                    })
+                    .then(function(allModulesSyncedSuccessfully) {
+                        if(allModulesSyncedSuccessfully) {
+                            return updateLastUpdatedTime(projectId);
+                        }
+                    });
+            });
+        };
+
+        var recursivelyLoopThroughProjects = function(projectIds) {
+            if(_.isEmpty(projectIds)) {
+                return $q.when();
+            }
+
+            return downloadModuleDataForProject(projectIds.pop()).then(function() {
+                return recursivelyLoopThroughProjects(projectIds);
+            });
+        };
+
+        this.run = function () {
+            return userPreferenceRepository.getCurrentUsersProjectIds().then(recursivelyLoopThroughProjects);
         };
     };
 });

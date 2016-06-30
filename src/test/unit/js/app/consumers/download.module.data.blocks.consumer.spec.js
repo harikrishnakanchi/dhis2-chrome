@@ -6,7 +6,7 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
         var downloadModuleDataBlocksConsumer, dataService, approvalService,
             userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository,
             moduleDataBlockFactory, moduleDataBlockMerger,
-            q, scope, aggregateDataSet, periodRange, projectIds, mockModule, mockOriginOrgUnits, mockAggregateModuleDataBlock, mockLineListModuleDataBlock, someMomentInTime, eventService;
+            q, scope, aggregateDataSet, periodRange, mockProjectId, mockModule, mockOriginOrgUnits, mockAggregateModuleDataBlock, mockLineListModuleDataBlock, someMomentInTime, eventService;
 
         describe('downloadModuleDataBlocksConsumer', function() {
             beforeEach(mocks.inject(function($rootScope, $q) {
@@ -25,7 +25,7 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 mockOriginOrgUnits = [{
                     id: 'someOriginId'
                 }];
-                projectIds = ['projectId'];
+                mockProjectId = 'someProjectId';
                 aggregateDataSet = {
                     id: 'someAggregateDataSetId',
                     isLineListService: false
@@ -60,7 +60,7 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 spyOn(datasetRepository, 'findAllForOrgUnits').and.returnValue(utils.getPromise(q, [aggregateDataSet]));
 
                 userPreferenceRepository = new UserPreferenceRepository();
-                spyOn(userPreferenceRepository, 'getCurrentUsersProjectIds').and.returnValue(utils.getPromise(q, projectIds));
+                spyOn(userPreferenceRepository, 'getCurrentUsersProjectIds').and.returnValue(utils.getPromise(q, [mockProjectId]));
 
                 changeLogRepository =  new ChangeLogRepository();
                 spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, someMomentInTime));
@@ -85,6 +85,15 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 downloadModuleDataBlocksConsumer.run();
                 scope.$apply();
             };
+
+            it('should retrieve the modules for each project', function() {
+                var mockProjectIds = ['projectIdA', 'projectIdB'];
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, mockProjectIds));
+
+                runConsumer();
+                expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['projectIdA']);
+                expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['projectIdB']);
+            });
 
             it('should download data values from DHIS for each aggregate module', function() {
                 moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, [mockAggregateModuleDataBlock]));
@@ -263,7 +272,7 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
             });
 
             it('should update the change log after merging all data', function() {
-                var changeLogKey = 'dataValues:' + projectIds.join(';'),
+                var changeLogKey = 'dataValues:' + mockProjectId,
                     currentTime = '2016-05-21T00:00:00.000Z';
 
                 Timecop.install();
