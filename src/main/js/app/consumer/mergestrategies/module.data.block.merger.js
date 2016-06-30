@@ -142,25 +142,16 @@ define(['moment', 'lodash'],
                 };
 
                 var uploadEventData = function () {
-
                     var changeEventLocalStatus = function(events) {
                         var updatedEvents = _.map(events, function(ev) {
                             return _.omit(ev, ["localStatus", "clientLastUpdated"]);
                         });
-
                         return programEventRepository.upsert(updatedEvents);
                     };
 
-                    if (moduleDataBlock.shouldSyncEvents) {
-                        var eventsPayload = {
-                            'events': moduleDataBlock.eventsToSync
-                        };
-                        return eventService.upsertEvents(eventsPayload).then(function () {
-                            return moduleDataBlock.eventsToSync;
-                        }).then(changeEventLocalStatus);
-                    }
-                    return $q.when({});
+                    var eventsToUpload = _.filter(moduleDataBlock.events, { localStatus: 'READY_FOR_DHIS'});
 
+                    return _.isEmpty(eventsToUpload) ? $q.when() : eventService.upsertEvents(eventsToUpload).then(_.partial(changeEventLocalStatus, eventsToUpload));
                 };
 
                 return datasetRepository.getAll().then(function (allDataSet) {

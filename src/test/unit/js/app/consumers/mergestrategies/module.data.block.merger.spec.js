@@ -38,13 +38,14 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                 spyOn(approvalService, 'markAsUnapproved').and.returnValue(utils.getPromise(q, {}));
 
                 dataSyncFailureRepository = new DataSyncFailureRepository();
-                spyOn(dataSyncFailureRepository, 'delete').and.returnValue(utils.getPromise(q, undefined));
+                spyOn(dataSyncFailureRepository, 'delete').and.returnValue(utils.getPromise(q, {}));
 
                 programEventRepository = new ProgramEventRepository();
                 spyOn(programEventRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
                 spyOn(programEventRepository, 'delete').and.returnValue(utils.getPromise(q, {}));
 
                 eventService = new EventService();
+                spyOn(eventService, 'upsertEvents').and.returnValue(utils.getPromise(q, {}));
 
                 aggregateDataValuesMerger = new AggregateDataValuesMerger();
                 spyOn(aggregateDataValuesMerger, 'create').and.returnValue({});
@@ -653,45 +654,38 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                     });
                 });
 
-                describe('events in Praxis', function() {
-                    it('should be synced to DHIS', function(){
-                        var eventsToSync = [{
-                            event: 'someEventId',
-                            eventDate: '2016W15'
-                        }];
-                        var eventsPayload = {
-                            'events': eventsToSync
-                        };
+                describe('events have been submitted on Praxis', function() {
+                    var submittedEvent;
 
-                        moduleDataBlock = createMockModuleDataBlock({eventsToSync: eventsToSync, shouldSyncEvents: true});
-                        spyOn(eventService, 'upsertEvents').and.returnValue(utils.getPromise(q,undefined));
-                        programEventRepository.upsert.and.returnValue(utils.getPromise(q,undefined));
+                    beforeEach(function () {
+                        submittedEvent = createMockEvent({ localStatus: 'READY_FOR_DHIS' });
+                        moduleDataBlock = createMockModuleDataBlock({
+                            events: [submittedEvent]
+                        });
 
                         moduleDataBlockMerger.uploadToDHIS(moduleDataBlock, dhisCompletion, dhisApproval);
                         scope.$apply();
-
-                        expect(eventService.upsertEvents).toHaveBeenCalledWith(eventsPayload);
                     });
 
-                    it('should mark event as uploaded after successful sync', function(){
-                        var eventsToSync = [{
-                            event: 'someEventId',
-                            eventDate: '2016W15'
-                        }];
-                        var eventsPayload = {
-                            'events': eventsToSync
-                        };
-                        moduleDataBlock = createMockModuleDataBlock({eventsToSync: eventsToSync, shouldSyncEvents: true});
-                        spyOn(eventService, 'upsertEvents').and.returnValue(utils.getPromise(q,undefined));
-                        programEventRepository.upsert.and.returnValue(utils.getPromise(q,undefined));
+                    it('should upload submitted events to DHIS', function(){
+                        expect(eventService.upsertEvents).toHaveBeenCalledWith([submittedEvent]);
+                    });
+
+                    it('should remove local timestamp and status from submitted events', function(){
+                        expect(programEventRepository.upsert).toHaveBeenCalledWith([_.omit(submittedEvent, ["localStatus", "clientLastUpdated"])]);
+                    });
+                });
+
+                describe('events have not been submitted on Praxis', function() {
+                    it('should not upload events to DHIS', function(){
+                        moduleDataBlock = createMockModuleDataBlock({
+                            events: [createMockEvent()]
+                        });
 
                         moduleDataBlockMerger.uploadToDHIS(moduleDataBlock, dhisCompletion, dhisApproval);
                         scope.$apply();
 
-                        var updatedEvents = _.map(moduleDataBlock.eventsToSync, function(event) {
-                            return _.omit(event, ["localStatus", "clientLastUpdated"]);
-                        });
-                        expect(programEventRepository.upsert).toHaveBeenCalledWith(updatedEvents);
+                        expect(eventService.upsertEvents).not.toHaveBeenCalled();
                     });
                 });
             });
