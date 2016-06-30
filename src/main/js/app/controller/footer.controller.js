@@ -1,13 +1,14 @@
-define(['chromeUtils'], function(chromeUtils) {
+define(['chromeUtils', 'lodash'], function(chromeUtils, _) {
     return function ($rootScope, $scope, $interpolate, systemSettingRepository) {
-        $scope.$watch('resourceBundle.versionAndConnectionMessage', function (versionAndConnectionMessage) {
+        $scope.versionAndConnectionMessage = function () {
+            var versionAndConnectionMessage = _.get($scope.resourceBundle, 'versionAndConnectionMessage');
             if(!versionAndConnectionMessage) return;
 
             var interpolatedMessage = $interpolate(versionAndConnectionMessage, false, null, true);
-            $scope.versionAndConnectionMessage = interpolatedMessage({
+            return interpolatedMessage({
                 praxis_version: chromeUtils.getPraxisVersion(),
                 dhis_url: systemSettingRepository.getDhisUrl()
             });
-        });
+        };
     };
 });

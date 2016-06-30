@@ -27,7 +27,7 @@ define(['footerController', 'systemSettingRepository', 'chromeUtils', 'angularMo
 
                 scope.$apply();
 
-                expect(scope.versionAndConnectionMessage).toEqual('praxisVersion and dhisUrl');
+                expect(scope.versionAndConnectionMessage()).toEqual('praxisVersion and dhisUrl');
 
             });
 
@@ -36,7 +36,7 @@ define(['footerController', 'systemSettingRepository', 'chromeUtils', 'angularMo
 
                 scope.$apply();
 
-                expect(scope.versionAndConnectionMessage).toBeUndefined();
+                expect(scope.versionAndConnectionMessage()).toBeUndefined();
             });
 
             it('should not show version and connection message if resourceBundle is not loaded', function () {
@@ -44,7 +44,7 @@ define(['footerController', 'systemSettingRepository', 'chromeUtils', 'angularMo
 
                 scope.$apply();
 
-                expect(scope.versionAndConnectionMessage).toBeUndefined();
+                expect(scope.versionAndConnectionMessage()).toBeUndefined();
             });
         });
     });
