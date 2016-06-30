@@ -1,5 +1,5 @@
 define(['properties', 'dateUtils'], function (properties, dateUtils) {
-    return function (moduleDataBlockFactory, dataService, eventService, datasetRepository, approvalService, orgUnitRepository, moduleDataBlockMerger, $q) {
+    return function (moduleDataBlockFactory, dataService, eventService, datasetRepository, approvalService, orgUnitRepository, changeLogRepository, moduleDataBlockMerger, $q) {
         var getModuleDataBlock = function(data) {
             return moduleDataBlockFactory.create(data.moduleId, data.period).then(function (moduleDataBlock) {
                 return _.merge({ moduleDataBlock: moduleDataBlock }, data);
@@ -29,15 +29,23 @@ define(['properties', 'dateUtils'], function (properties, dateUtils) {
             });
         };
 
+        var getLastUpdatedTime = function(data) {
+            return orgUnitRepository.getParentProject(data.moduleId).then(function(projectOrgUnit) {
+                return changeLogRepository.get('dataValues:' + projectOrgUnit.id).then(function(lastUpdatedTime) {
+                    return _.merge({ lastUpdatedTime: lastUpdatedTime }, data);
+                });
+            });
+        };
+
         var getModuleDataFromDhis = function(data) {
             var getDataValuesFromDhis = function(data) {
-                return dataService.downloadData(data.moduleId, data.aggregateDataSetIds, data.period).then(function (dataValues) {
+                return dataService.downloadData(data.moduleId, data.aggregateDataSetIds, data.period, data.lastUpdatedTime).then(function (dataValues) {
                     return _.merge({ dhisDataValues: dataValues }, data);
                 });
             };
 
             var getEventsFromDhis = function(data) {
-                return eventService.getEvents(data.moduleId, [data.period]).then(function (events) {
+                return eventService.getEvents(data.moduleId, [data.period], data.lastUpdatedTime).then(function (events) {
                     return _.merge({ events: events }, data);
                 });
             };
@@ -85,6 +93,7 @@ define(['properties', 'dateUtils'], function (properties, dateUtils) {
             })
                 .then(getOriginOrgUnits)
                 .then(getDataSetsForModulesAndOrigins)
+                .then(getLastUpdatedTime)
                 .then(getModuleDataFromDhis)
                 .then(getCompletionFromDhis)
                 .then(getApprovalFromDhis)

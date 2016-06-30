@@ -2,18 +2,22 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
     function (SyncModuleDataBlockConsumer, DataSetRepository, ApprovalService, OrgUnitRepository, ModuleDataBlockFactory, DataService, EventService, ModuleDataBlockMerger, ChangeLogRepository, utils, mocks, dateUtils, properties) {
         var syncModuleDataBlockConsumer, moduleDataBlockFactory, dataSetRepository, dataService, eventService, approvalService, orgUnitRepository, moduleDataBlockMerger, changeLogRepository,
             scope, q,
-            mockModule, mockPeriod, message, aggregateDataSet, mockOriginOrgUnits, lineListDataSet, periodRange;
+            mockModule, mockPeriod, message, aggregateDataSet, mockOriginOrgUnits, lineListDataSet, periodRange, mockProject, someMomentInTime;
 
         describe('syncModuleDataBlockConsumer', function() {
             beforeEach(mocks.inject(function($rootScope, $q) {
                 scope = $rootScope.$new();
                 q = $q;
 
+                mockProject = {
+                    id: 'someProjectId'
+                };
                 mockModule = {
                     id: 'randomId',
                     name: 'randomName'
                 };
                 mockPeriod = '2016W20';
+                someMomentInTime = '2016-06-30T15:59:59.888Z';
                 message = {
                     data: {
                         data: {
@@ -47,7 +51,8 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
 
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, 'findAllByParent').and.returnValue(utils.getPromise(q, mockOriginOrgUnits));
-                
+                spyOn(orgUnitRepository, 'getParentProject').and.returnValue(utils.getPromise(q, mockProject));
+
                 dataService = new DataService();
                 spyOn(dataService, 'downloadData').and.returnValue(utils.getPromise(q, {}));
 
@@ -64,9 +69,9 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
                 spyOn(moduleDataBlockMerger, 'uploadToDHIS').and.returnValue(utils.getPromise(q, {}));
 
                 changeLogRepository =  new ChangeLogRepository();
-                spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
+                spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, someMomentInTime));
 
-                syncModuleDataBlockConsumer = new SyncModuleDataBlockConsumer(moduleDataBlockFactory, dataService, eventService, dataSetRepository, approvalService, orgUnitRepository, moduleDataBlockMerger, q);
+                syncModuleDataBlockConsumer = new SyncModuleDataBlockConsumer(moduleDataBlockFactory, dataService, eventService, dataSetRepository, approvalService, orgUnitRepository, changeLogRepository, moduleDataBlockMerger, q);
             }));
 
             var runConsumer = function () {
@@ -79,6 +84,11 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
                 expect(moduleDataBlockFactory.create).toHaveBeenCalledWith(mockModule.id, mockPeriod);
             });
 
+            it('should retrieve the lastUpdated time for the project', function () {
+                runConsumer();
+                expect(changeLogRepository.get).toHaveBeenCalledWith('dataValues:' + mockProject.id);
+            });
+
             describe('download data for an aggregate module', function () {
                 beforeEach(function () {
                     var mockAggregateModuleDataBlock = { lineListService: false };
@@ -87,13 +97,13 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
 
                 it('should download data values', function() {
                     runConsumer();
-                    expect(dataService.downloadData).toHaveBeenCalledWith(mockModule.id, [aggregateDataSet.id], mockPeriod);
+                    expect(dataService.downloadData).toHaveBeenCalledWith(mockModule.id, [aggregateDataSet.id], mockPeriod, someMomentInTime);
                 });
 
                 it('should not download data values for program summary dataSets', function() {
                     dataSetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [aggregateDataSet, lineListDataSet]));
                     runConsumer();
-                    expect(dataService.downloadData).toHaveBeenCalledWith(mockModule.id, [aggregateDataSet.id], mockPeriod);
+                    expect(dataService.downloadData).toHaveBeenCalledWith(mockModule.id, [aggregateDataSet.id], mockPeriod, someMomentInTime);
                 });
 
                 it('should not download events', function (){
@@ -118,7 +128,7 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
                 });
 
                 it('should download events', function (){
-                    expect(eventService.getEvents).toHaveBeenCalledWith(mockModule.id, [mockPeriod]);
+                    expect(eventService.getEvents).toHaveBeenCalledWith(mockModule.id, [mockPeriod], someMomentInTime);
                 });
 
                 it('should download all event ids for the specified number of weeks to sync', function () {
