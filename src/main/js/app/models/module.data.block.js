@@ -40,7 +40,7 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         if(failedToSync) {
             return submitted && !approvedAtProject && !approvedAtCoordination;
         } else {
-            return !submitted && !approvedAtCoordination;
+            return !submitted && !approvedAtProject && !approvedAtCoordination;
         }
     };
 

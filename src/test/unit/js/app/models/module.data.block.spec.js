@@ -453,6 +453,18 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                 expect(moduleDataBlock.awaitingActionAtCoordinationLevelApprover).toEqual(false);
             });
 
+            it('should not be waiting at any level if data has not been submitted but has been erroneously approved only at project level by auto-approve job', function() {
+                aggregateDataValues = null;
+                approvalData = {
+                    isComplete: true
+                };
+                moduleDataBlock = createModuleDataBlock();
+
+                expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(false);
+                expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
+                expect(moduleDataBlock.awaitingActionAtCoordinationLevelApprover).toEqual(false);
+            });
+
             it('should not be waiting at any level if data has been submitted, not approved at project level, but approved at coordination level by auto-approve job', function() {
                 aggregateDataValues = [createMockDataValuesObject()];
                 approvalData = {
