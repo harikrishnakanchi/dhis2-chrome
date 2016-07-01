@@ -49,7 +49,7 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
             app.service("uploadExcludedDataElementsConsumer", ["$q", "systemSettingService", "excludedDataElementsRepository", "orgUnitRepository", uploadExcludedDataElementsConsumer]);
             app.service("downloadModuleDataBlocksConsumer", ["dataService", "approvalService", "datasetRepository", "userPreferenceRepository", "changeLogRepository", "orgUnitRepository",
                 "moduleDataBlockFactory", "moduleDataBlockMerger", "eventService", "$q", downloadModuleDataBlocksConsumer]);
-            app.service("syncModuleDataBlockConsumer", ["moduleDataBlockFactory", "dataService", "eventService", "datasetRepository", "approvalService", "orgUnitRepository", "moduleDataBlockMerger", "$q", syncModuleDataBlockConsumer]);
+            app.service("syncModuleDataBlockConsumer", ["moduleDataBlockFactory", "dataService", "eventService", "datasetRepository", "approvalService", "orgUnitRepository", "changeLogRepository", "moduleDataBlockMerger", "$q", syncModuleDataBlockConsumer]);
             app.service("dispatcher", ["$q", "$log", "downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupConsumer", "downloadDatasetConsumer", "updateDatasetConsumer",
                 "createUserConsumer", "updateUserConsumer", "downloadDataConsumer", "uploadDataConsumer", "uploadCompletionDataConsumer", "uploadApprovalDataConsumer", "uploadProgramConsumer",
                 "downloadProgramConsumer", "uploadEventDataConsumer", "deleteEventConsumer", "downloadApprovalConsumer", "downloadMetadataConsumer",
