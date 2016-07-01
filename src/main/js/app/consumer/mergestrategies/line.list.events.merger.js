@@ -14,9 +14,10 @@ define(['moment', 'lodash'], function (moment, _) {
                 var matchingPraxisEvent = _.find(praxisEvents, { event: dhisEvent.event });
                 if(matchingPraxisEvent) {
                     var dhisEventLastUpdated = moment(dhisEvent.lastUpdated),
-                        praxisEventLastUpdated = moment(matchingPraxisEvent.clientLastUpdated || matchingPraxisEvent.lastUpdated);
+                        praxisEventLastUpdated = moment(matchingPraxisEvent.clientLastUpdated || matchingPraxisEvent.lastUpdated),
+                        praxisEventHasNoTimestamps = !matchingPraxisEvent.lastUpdated && !matchingPraxisEvent.clientLastUpdated;
 
-                    if(dhisEventLastUpdated.isAfter(praxisEventLastUpdated)) {
+                    if(praxisEventHasNoTimestamps || dhisEventLastUpdated.isAfter(praxisEventLastUpdated)) {
                         eventsToUpsert.push(dhisEvent);
                     }
                 } else {

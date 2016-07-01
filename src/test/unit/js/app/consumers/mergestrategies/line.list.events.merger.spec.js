@@ -41,6 +41,18 @@ define(['lineListEventsMerger', 'angularMocks', 'moment'], function (LineListEve
             });
         });
 
+        describe('event in Praxis has no timestamps', function () {
+            beforeEach(function () {
+                updatedEventsFromDhis = [createMockEvent({ lastUpdated: someMomentInTime })];
+                praxisEvents = [createMockEvent({ lastUpdated: null })];
+                merger = createMerger();
+            });
+
+            it('should return the updated DHIS event', function () {
+                expect(merger.eventsToUpsert).toEqual(updatedEventsFromDhis);
+            });
+        });
+
         describe('submitted events exist on Praxis', function () {
             beforeEach(function () {
                 praxisEvents = [createMockEvent({ clientLastUpdated: someMomentInTime, localStatus: 'READY_FOR_DHIS' })];
