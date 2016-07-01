@@ -4,8 +4,8 @@ define(['moment', 'lodash'], function (moment, _) {
         var getEventIdsToDelete = function(praxisEvents, eventIdsFromDhis) {
             var indexedDhisEventIds = _.indexBy(eventIdsFromDhis, function(eventId) { return eventId; }),
                 eventsToDelete = _.reject(praxisEvents, function(praxisEvent) {
-                return praxisEvent.localStatus || indexedDhisEventIds[praxisEvent.event];
-            });
+                    return praxisEvent.localStatus || indexedDhisEventIds[praxisEvent.event];
+                });
             return _.pluck(eventsToDelete, 'event');
         };
 
