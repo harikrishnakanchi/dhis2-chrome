@@ -25,13 +25,8 @@ define(["uploadEventDataConsumer", "angularMocks", "properties", "utils", "event
                 }];
 
                 spyOn(programEventRepository, 'getEventsForUpload').and.returnValue(utils.getPromise(q, events));
-
-                var dhisEventPayload = {
-                    'events': events
-                };
-
-                spyOn(eventService, 'upsertEvents').and.returnValue(utils.getPromise(q, dhisEventPayload));
-                spyOn(programEventRepository, 'upsert').and.returnValue(utils.getPromise(q, events));
+                spyOn(eventService, 'upsertEvents').and.returnValue(utils.getPromise(q, {}));
+                spyOn(programEventRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
 
                 var message = {
                     'data': {
@@ -42,19 +37,13 @@ define(["uploadEventDataConsumer", "angularMocks", "properties", "utils", "event
                 uploadEventDataConsumer.run(message);
                 scope.$apply();
 
-                expect(eventService.upsertEvents).toHaveBeenCalledWith(dhisEventPayload);
+                var expectedEventUpserts = _.map(events, function (event) {
+                    return _.omit(event, ['localStatus']);
+                });
 
-                var expectedEventUpserts = [{
-                    'event': 'ev1',
-                    'eventDate': '2014-09-28'
-                }, {
-                    'event': 'ev2',
-                    'eventDate': '2014-09-29'
-                }];
-
-                expect(programEventRepository.getEventsForUpload).toHaveBeenCalledWith(['ev1', 'ev2']);
+                expect(programEventRepository.getEventsForUpload).toHaveBeenCalledWith(message.data.data);
+                expect(eventService.upsertEvents).toHaveBeenCalledWith(events);
                 expect(programEventRepository.upsert).toHaveBeenCalledWith(expectedEventUpserts);
-
             });
         });
     });

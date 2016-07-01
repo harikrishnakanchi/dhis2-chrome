@@ -1,4 +1,4 @@
-define(["moment", "dateUtils", "properties"], function(moment, dateUtils, properties) {
+define(["lodash"], function(_) {
     return function(eventService, programEventRepository, $q) {
 
         var changeEventLocalStatus = function(events) {
@@ -10,10 +10,7 @@ define(["moment", "dateUtils", "properties"], function(moment, dateUtils, proper
         };
 
         var uploadEventData = function(events) {
-            var eventsPayload = {
-                'events': events
-            };
-            return eventService.upsertEvents(eventsPayload).then(function() {
+            return eventService.upsertEvents(events).then(function() {
                 return events;
             });
         };

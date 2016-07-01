@@ -61,26 +61,12 @@ define(["dhisUrl", "moment", "lodash"], function(dhisUrl, moment, _) {
             });
         };
 
-        this.upsertEvents = function(eventsPayload) {
-            var updatedEventsPayload = function() {
-                return _.map(eventsPayload.events, function(eventPayload) {
-                    return _.omit(eventPayload, ['period', 'localStatus', 'eventCode', 'clientLastUpdated']);
-                });
-            };
+        this.upsertEvents = function(events) {
+            var eventsToUpload = _.map(events, function(event) {
+                return _.omit(event, ['period', 'localStatus', 'eventCode', 'clientLastUpdated']);
+            });
 
-            var updatedPayload = {
-                "events": updatedEventsPayload()
-            };
-
-            var onSuccess = function(data) {
-                return eventsPayload;
-            };
-
-            var onFailure = function(data) {
-                return $q.reject(data);
-            };
-
-            return $http.post(dhisUrl.events, updatedPayload).then(onSuccess, onFailure);
+            return $http.post(dhisUrl.events, { events: eventsToUpload });
         };
 
         this.deleteEvent = function(eventId) {

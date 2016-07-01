@@ -229,58 +229,36 @@ define(["eventService", "angularMocks", "properties", "moment", "lodash"], funct
             });
         });
 
-        it("should save events", function() {
-            var eventsPayload = {
-                "events": [{
-                    "event": "Event1",
-                    "eventDate": "2001-01-01",
-                    "period": "2001W01",
-                    "localStatus": "NEW",
-                    "eventCode": "C1"
-                }]
-            };
+        describe('upsertEvents', function () {
+            it("should upload the events to DHIS", function() {
+                var events = [{
+                    event: 'someEventId'
+                }];
+                httpBackend.expectPOST(properties.dhis.url + '/api/events', { events: events }).respond(200, {});
 
-            var expectedPayload = {
-                "events": [{
-                    "event": "Event1",
-                    "eventDate": "2001-01-01"
-                }]
-            };
-
-
-            eventService.upsertEvents(eventsPayload);
-
-            httpBackend.expectPOST(properties.dhis.url + "/api/events", expectedPayload).respond(200, "ok");
-
-            httpBackend.flush();
-        });
-
-        it("should return rejected promise if save events fails", function() {
-            var eventsPayload = {
-                "events": [{
-                    "event": "Event1",
-                    "eventDate": "2001-01-01",
-                    "period": "2001W01",
-                    "localStatus": "NEW"
-                }]
-            };
-
-            var expectedPayload = {
-                "events": [{
-                    "event": "Event1",
-                    "eventDate": "2001-01-01"
-                }]
-            };
-            var status;
-
-            httpBackend.expectPOST(properties.dhis.url + "/api/events", expectedPayload).respond(500, "error");
-
-            eventService.upsertEvents(eventsPayload).then(undefined, function(data) {
-                status = data.status;
+                eventService.upsertEvents(events);
+                httpBackend.flush();
             });
 
-            httpBackend.flush();
-            expect(status).toEqual(500);
+            it('should remove the praxis specific properties from the event before uploading', function () {
+                var event = {
+                    event: 'someEventId',
+                    period: 'somePeriod',
+                    localStatus: 'someStatus',
+                    clientLastUpdated: 'someTime',
+                    eventCode: 'someCode'
+                }, expectedPayLoad = {
+                    events: [
+                        _.omit(event, ['period', 'localStatus', 'clientLastUpdated', 'eventCode'])
+                    ]
+                };
+
+                httpBackend.expectPOST(properties.dhis.url + '/api/events', expectedPayLoad).respond(200, {});
+
+                eventService.upsertEvents([event]);
+                httpBackend.flush();
+            });
+
         });
 
         it("should delete event", function() {
