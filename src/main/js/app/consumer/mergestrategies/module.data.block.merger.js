@@ -133,6 +133,30 @@ define(['moment', 'lodash'],
                     return _.isEmpty(eventsToUpload) ? $q.when() : eventService.upsertEvents(eventsToUpload).then(_.partial(changeEventLocalStatus, eventsToUpload));
                 };
 
+                var deleteEvents = function () {
+                    var deleteEvent = function(eventId) {
+                        var deleteEventLocally = function () {
+                            return programEventRepository.delete(eventId);
+                        };
+
+                        return eventService.deleteEvent(eventId).then(deleteEventLocally);
+                    };
+
+                    var recursivelyDeleteEvents = function(eventIds) {
+                        if(_.isEmpty(eventIds)) {
+                            return $q.when();
+                        }
+
+                        return deleteEvent(eventIds.pop()).then(function() {
+                            return recursivelyDeleteEvents(eventIds);
+                        });
+                    };
+
+                    var eventIdsToDelete = _.pluck(_.filter(moduleDataBlock.events, { localStatus: 'DELETED' }), 'event');
+
+                    return recursivelyDeleteEvents(eventIdsToDelete);
+                };
+
                 var uploadCompletionData = function (dataSetIds) {
                     if(moduleDataBlock.approvedAtProjectLevel && (dataOnDhisNotPreviouslyCompleted || dataHasBeenModifiedLocally)) {
                         var completedBy = moduleDataBlock.approvedAtProjectLevelBy;
@@ -161,6 +185,7 @@ define(['moment', 'lodash'],
                         .then(_.partial(deleteCompletion, dataSetIds))
                         .then(uploadDataValues)
                         .then(uploadEventData)
+                        .then(deleteEvents)
                         .then(_.partial(uploadCompletionData, dataSetIds))
                         .then(_.partial(uploadApprovalData, dataSetIds));
 

@@ -46,6 +46,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                 eventService = new EventService();
                 spyOn(eventService, 'upsertEvents').and.returnValue(utils.getPromise(q, {}));
+                spyOn(eventService, 'deleteEvent').and.returnValue(utils.getPromise(q, {}));
 
                 aggregateDataValuesMerger = new AggregateDataValuesMerger();
                 spyOn(aggregateDataValuesMerger, 'create').and.returnValue({});
@@ -582,6 +583,47 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         scope.$apply();
 
                         expect(eventService.upsertEvents).not.toHaveBeenCalled();
+                    });
+                });
+
+                describe('events have been deleted on Praxis', function () {
+                    var deletedEventA, deletedEventB;
+
+                    beforeEach(function () {
+                        deletedEventA = createMockEvent({ event: 'eventA', localStatus: 'DELETED' });
+                        deletedEventB = createMockEvent({ event: 'eventB', localStatus: 'DELETED' });
+                        moduleDataBlock = createMockModuleDataBlock({
+                            events: [deletedEventA, deletedEventB]
+                        });
+                    });
+
+                    it('should remove deleted events from DHIS', function(){
+                        performUpload();
+                        expect(eventService.deleteEvent).toHaveBeenCalledWith(deletedEventA.event);
+                        expect(eventService.deleteEvent).toHaveBeenCalledWith(deletedEventB.event);
+                    });
+
+                    it('should remove the deleted events from Praxis', function() {
+                        performUpload();
+                        expect(programEventRepository.delete).toHaveBeenCalledWith(deletedEventA.event);
+                        expect(programEventRepository.delete).toHaveBeenCalledWith(deletedEventB.event);
+                    });
+                });
+
+                describe('events have not been deleted on Praxis', function () {
+                    beforeEach(function () {
+                        moduleDataBlock = createMockModuleDataBlock({
+                            events: [createMockEvent()]
+                        });
+                        performUpload();
+                    });
+
+                    it('should not remove deleted events from DHIS', function(){
+                        expect(eventService.deleteEvent).not.toHaveBeenCalled();
+                    });
+
+                    it('should not remove deleted events from Praxis', function(){
+                        expect(programEventRepository.delete).not.toHaveBeenCalled();
                     });
                 });
 
