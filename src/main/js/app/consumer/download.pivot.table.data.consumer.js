@@ -92,8 +92,8 @@ define(["lodash", "moment"], function(_, moment) {
             };
 
             var applyDownloadFrequencyStrategy = function(projectId, pivotTables) {
-                var weeklyChangeLogKey = "weeklyPivotTableDataForProject:" + projectId,
-                    monthlyChangeLogKey = "monthlyPivotTableDataForProject:" + projectId,
+                var weeklyChangeLogKey = "weeklyPivotTableData:" + projectId,
+                    monthlyChangeLogKey = "monthlyPivotTableData:" + projectId,
                     changeLogKeys = [weeklyChangeLogKey, monthlyChangeLogKey];
 
                 return $q.all({

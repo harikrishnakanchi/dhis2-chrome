@@ -139,16 +139,16 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
-                expect(changeLogRepository.get).toHaveBeenCalledWith('weeklyPivotTableDataForProject:' + mockProjectId);
-                expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyPivotTableDataForProject:' + mockProjectId);
+                expect(changeLogRepository.get).toHaveBeenCalledWith('weeklyPivotTableData:' + mockProjectId);
+                expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyPivotTableData:' + mockProjectId);
             });
 
             it('should update the lastUpdated time in the changeLog', function () {
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith('weeklyPivotTableDataForProject:' + mockProjectId, currentTime.toISOString());
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyPivotTableDataForProject:' + mockProjectId, currentTime.toISOString());
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('weeklyPivotTableData:' + mockProjectId, currentTime.toISOString());
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyPivotTableData:' + mockProjectId, currentTime.toISOString());
             });
 
             it('should continue downloading remaining pivot table data even if one call fails', function() {
@@ -202,7 +202,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 scope.$apply();
 
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
-                expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('weeklyPivotTableDataForProject:' + mockProjectId, currentTime.toISOString());
+                expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('weeklyPivotTableData:' + mockProjectId, currentTime.toISOString());
             });
 
             it('should not download monthly pivot table data if it has already been downloaded in the same week', function () {
@@ -223,7 +223,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 scope.$apply();
 
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
-                expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('monthlyPivotTableDataForProject:' + mockProjectId, currentTime.toISOString());
+                expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('monthlyPivotTableData:' + mockProjectId, currentTime.toISOString());
             });
 
             it('should download monthly pivot table if it has not been downloaded in the current week', function() {
@@ -241,7 +241,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 scope.$apply();
 
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalled();
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyPivotTableDataForProject:' + mockProjectId, currentTime.toISOString());
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyPivotTableData:' + mockProjectId, currentTime.toISOString());
             });
 
             it('should download monthly pivot table if it has not been downloaded in the current month', function() {
@@ -262,7 +262,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 scope.$apply();
 
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalled();
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyPivotTableDataForProject:' + mockProjectId, currentTime.toISOString());
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyPivotTableData:' + mockProjectId, currentTime.toISOString());
             });
 
         });
