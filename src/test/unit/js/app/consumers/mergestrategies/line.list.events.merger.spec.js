@@ -87,6 +87,21 @@ define(['lineListEventsMerger', 'angularMocks', 'moment'], function (LineListEve
             });
         });
 
+        describe('deleted event exists on Praxis but was also updated on DHIS', function () {
+            var dhisEvent;
+
+            beforeEach(function () {
+                dhisEvent = createMockEvent({ event: 'eventA', lastUpdated: someMomentInTime });
+                updatedEventsFromDhis = [dhisEvent];
+                praxisEvents = [createMockEvent({ event: 'eventA', lastUpdated: someOlderMomentInTime, localStatus: 'DELETED' })];
+                merger = createMerger();
+            });
+
+            it('should return the updated DHIS event', function () {
+                expect(merger.eventsToUpsert).toEqual([dhisEvent]);
+            });
+        });
+
         describe('updated events exist on DHIS and submitted events exist on Praxis', function () {
             var dhisEventA, dhisEventB, praxisEventA, praxisEventB;
 
