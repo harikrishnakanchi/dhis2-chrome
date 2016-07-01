@@ -43,13 +43,14 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                 Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
 
                 scope.resourceBundle = {
+                    syncModuleDataBlockDesc: 'some description',
                     uploadProgramEventsDesc: 'submit cases for ',
                     deleteEventDesc: 'delete cases',
                     uploadApprovalDataDesc: 'approve data at coordination level for ',
                     uploadCompletionDataDesc: 'approve data at project level for ',
                     deleteApprovalsDesc: 'restart approval process for ',
-                    eventSubmitAndApproveSuccess: ' Event(s) submitted and auto-approved successfully.',
-                    eventSubmitSuccess: ' Event submitted succesfully'
+                    eventSubmitAndApproveSuccess: 'some success message',
+                    eventSubmitSuccess: 'some other success message'
                 };
 
                 scope.locale = "en";
@@ -164,6 +165,26 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                 Timecop.uninstall();
             });
 
+            var createMockEvent = function (options) {
+                return _.merge({
+                    event: 'someEventId',
+                    orgUnit: 'someOrgUnitId',
+                    period: '2016W26'
+                }, options);
+            };
+
+            var createMockHustleMessage = function (module, period) {
+                return {
+                    data: {
+                        period: period,
+                        moduleId: module.id
+                    },
+                    type: 'syncModuleDataBlock',
+                    locale: 'en',
+                    desc: scope.resourceBundle.syncModuleDataBlockDesc + period + ', ' + module.name
+                };
+            };
+
             it("should set projectIsAutoApproved on scope on init", function() {
                 scope.$apply();
                 expect(scope.projectIsAutoApproved).toEqual(true);
@@ -206,20 +227,9 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
             });
 
             it("should submit event details", function() {
-                mockEvent = {
-                    'event': 'event1',
-                    'orgUnit': 'o1',
-                    'period': '2014W44',
-                    'eventDate': '2014-12-29T05:06:30.950+0000',
-                    'localStatus': 'NEW_DRAFT',
-                    'dataValues': [{
-                        'dataElement': 'de1',
-                        'value': 'a11',
-                        'showInEventSummary': true,
-                        'name': 'dataElement1'
-                    }]
-                };
-                programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [mockEvent]));
+                var mockEventA = createMockEvent({ period: '2016W25', localStatus: 'NEW_DRAFT' }),
+                    mockEventB = createMockEvent({ period: '2016W26', localStatus: 'NEW_DRAFT' });
+                programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [mockEventA, mockEventB]));
 
                 routeParams.filterBy = 'readyToSubmit';
                 lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, excludedDataElementsRepository, orgUnitRepository, approvalDataRepository, referralLocationsRepository, translationsService);
@@ -228,49 +238,25 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                 scope.submit();
                 scope.$apply();
 
-                expect(programEventRepository.markEventsAsSubmitted).toHaveBeenCalledWith([mockEvent.event]);
+                expect(programEventRepository.markEventsAsSubmitted).toHaveBeenCalledWith([mockEventA.event, mockEventB.event]);
                 expect(approvalDataRepository.clearApprovals).toHaveBeenCalledWith([{
-                    "period": "2014W44",
-                    "orgUnit": "ou1"
+                    period: mockEventA.period,
+                    orgUnit: currentModule.id
+                }, {
+                    period: mockEventB.period,
+                    orgUnit: currentModule.id
                 }]);
 
-                expect(hustle.publish.calls.argsFor(0)[0]).toEqual({
-                    "data": [{
-                        "period": "2014W44",
-                        "orgUnit": "ou1"
-                    }],
-                    "type": "deleteApprovals",
-                    "locale": "en",
-                    "desc": "restart approval process for 2014W44, Module: Mod1"
-                }, "dataValues");
-
-                expect(hustle.publish.calls.argsFor(1)[0]).toEqual({
-                    type: 'uploadProgramEvents',
-                    data: ['event1'],
-                    locale: 'en',
-                    desc: 'submit cases for 2014W44, Module: Mod1'
-                }, 'dataValues');
-
-                expect(scope.resultMessageType).toEqual("success");
-                expect(scope.resultMessage).toEqual("1 Event submitted succesfully");
-
+                expect(hustle.publish).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEventA.period), 'dataValues');
+                expect(hustle.publish).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEventB.period), 'dataValues');
+                expect(scope.resultMessageType).toEqual('success');
+                expect(scope.resultMessage).toEqual('2' + scope.resourceBundle.eventSubmitSuccess);
             });
 
             it("should submit and auto approve event details", function() {
-                mockEvent = {
-                    'event': 'event1',
-                    'orgUnit': 'o1',
-                    'period': '2014W44',
-                    'eventDate': '2014-12-29T05:06:30.950+0000',
-                    'localStatus': 'NEW_DRAFT',
-                    'dataValues': [{
-                        'dataElement': 'de1',
-                        'value': 'a11',
-                        'showInEventSummary': true,
-                        'name': 'dataElement1',
-                    }]
-                };
-                programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [mockEvent]));
+                var mockEventA = createMockEvent({ period: '2016W25', localStatus: 'NEW_DRAFT' }),
+                    mockEventB = createMockEvent({ period: '2016W26', localStatus: 'NEW_DRAFT' });
+                programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [mockEventA, mockEventB]));
 
                 routeParams.filterBy = 'readyToSubmit';
                 lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, excludedDataElementsRepository, orgUnitRepository, approvalDataRepository, referralLocationsRepository, translationsService);
@@ -279,65 +265,24 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                 scope.submitAndApprove();
                 scope.$apply();
 
-                expect(programEventRepository.markEventsAsSubmitted).toHaveBeenCalledWith([mockEvent.event]);
+                expect(programEventRepository.markEventsAsSubmitted).toHaveBeenCalledWith([mockEventA.event, mockEventB.event]);
 
                 expect(approvalDataRepository.markAsApproved).toHaveBeenCalledWith([{
-                    'orgUnit': 'ou1',
-                    'period': '2014W44'
+                    period: mockEventA.period,
+                    orgUnit: currentModule.id
+                }, {
+                    period: mockEventB.period,
+                    orgUnit: currentModule.id
                 }], 'dataentryuser');
 
-                expect(hustle.publish.calls.argsFor(0)[0]).toEqual({
-                    "data": [{
-                        "period": "2014W44",
-                        "orgUnit": "ou1"
-                    }],
-                    "type": "deleteApprovals",
-                    "locale": "en",
-                    "desc": "restart approval process for 2014W44, Module: Mod1"
-                }, "dataValues");
-
-                expect(hustle.publish.calls.argsFor(1)[0]).toEqual({
-                    "data": ["event1"],
-                    "type": 'uploadProgramEvents',
-                    "locale": 'en',
-                    "desc": 'submit cases for 2014W44, Module: Mod1'
-                }, 'dataValues');
-
-                expect(hustle.publish.calls.argsFor(2)[0]).toEqual({
-                    "data": [{
-                        'orgUnit': 'ou1',
-                        'period': '2014W44'
-                    }],
-                    'locale': 'en',
-                    'desc': 'approve data at project level for 2014W44, Module: Mod1',
-                    "type": "uploadCompletionData"
-                }, "dataValues");
-
-                expect(hustle.publish.calls.argsFor(3)[0]).toEqual({
-                    "data": [{
-                        'orgUnit': 'ou1',
-                        'period': '2014W44'
-                    }],
-                    'locale': 'en',
-                    'desc': 'approve data at coordination level for 2014W44, Module: Mod1',
-                    "type": "uploadApprovalData"
-                }, "dataValues");
-
-                expect(scope.resultMessageType).toEqual("success");
-                expect(scope.resultMessage).toEqual("1 Event(s) submitted and auto-approved successfully.");
+                expect(hustle.publish).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEventA.period), 'dataValues');
+                expect(hustle.publish).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEventB.period), 'dataValues');
+                expect(scope.resultMessageType).toEqual('success');
+                expect(scope.resultMessage).toEqual('2' + scope.resourceBundle.eventSubmitAndApproveSuccess);
             });
 
-            it("should soft-delete event which is POSTed to DHIS", function() {
-                mockEvent = {
-                    'event': 'event1',
-                    'eventDate': '2014-12-29T05:06:30.950+0000',
-                    'dataValues': [{
-                        'dataElement': 'de1',
-                        'value': 'a11',
-                        'showInEventSummary': true,
-                        'name': 'dataElement1',
-                    }]
-                };
+            it("should soft-delete event which exists on DHIS", function() {
+                mockEvent = createMockEvent();
                 programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [mockEvent]));
 
                 routeParams.filterBy = 'readyToSubmit';
@@ -348,30 +293,16 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                 scope.$apply();
 
                 expect(fakeModal.open).toHaveBeenCalled();
-                expect(hustle.publish).toHaveBeenCalledWith({
-                    data: 'event1',
-                    type: 'deleteEvent',
-                    locale: 'en',
-                    desc: 'delete cases'
-                }, 'dataValues');
+                expect(hustle.publish).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEvent.period), 'dataValues');
+
                 expect(programEventRepository.upsert).toHaveBeenCalledWith(mockEvent);
-                expect(mockEvent.localStatus).toEqual("DELETED");
+                expect(mockEvent.localStatus).toEqual('DELETED');
                 expect(programEventRepository.getSubmitableEventsFor).toHaveBeenCalled();
                 expect(approvalDataRepository.clearApprovals).toHaveBeenCalled();
             });
 
-            it("should hard delete a local event", function() {
-                mockEvent = {
-                    'event': 'event1',
-                    'eventDate': '2014-12-29T05:06:30.950+0000',
-                    'localStatus': 'NEW_DRAFT',
-                    'dataValues': [{
-                        'dataElement': 'de1',
-                        'value': 'a11',
-                        'showInEventSummary': true,
-                        'name': 'dataElement1',
-                    }]
-                };
+            it("should hard delete new events which only exist on Praxis", function() {
+                mockEvent = createMockEvent({ localStatus: 'NEW_DRAFT' });
                 programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [mockEvent]));
 
                 routeParams.filterBy = 'readyToSubmit';
@@ -385,40 +316,6 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                 expect(programEventRepository.delete).toHaveBeenCalledWith(mockEvent.event);
                 expect(hustle.publish).not.toHaveBeenCalled();
                 expect(programEventRepository.getSubmitableEventsFor).toHaveBeenCalled();
-            });
-
-            it("should soft delete a locally updated event which is already submitted to DHIS", function() {
-                mockEvent = {
-                    'event': 'event1',
-                    'eventDate': '2014-12-29T05:06:30.950+0000',
-                    'localStatus': 'UPDATED_DRAFT',
-                    'dataValues': [{
-                        'dataElement': 'de1',
-                        'value': 'a11',
-                        'showInEventSummary': true,
-                        'name': 'dataElement1',
-                    }]
-                };
-                programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [mockEvent]));
-
-                routeParams.filterBy = 'readyToSubmit';
-                lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, excludedDataElementsRepository, orgUnitRepository, approvalDataRepository, referralLocationsRepository, translationsService);
-                scope.$apply();
-
-                scope.deleteEvent(mockEvent);
-                scope.$apply();
-
-                expect(fakeModal.open).toHaveBeenCalled();
-                expect(hustle.publish).toHaveBeenCalledWith({
-                    data: 'event1',
-                    type: 'deleteEvent',
-                    locale: 'en',
-                    desc: 'delete cases'
-                }, 'dataValues');
-                expect(programEventRepository.upsert).toHaveBeenCalledWith(mockEvent);
-                expect(mockEvent.localStatus).toEqual("DELETED");
-                expect(programEventRepository.getSubmitableEventsFor).toHaveBeenCalled();
-                expect(approvalDataRepository.clearApprovals).toHaveBeenCalled();
             });
 
             it("should get data value", function() {
@@ -449,9 +346,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
             });
 
             it("should filter events by case number", function() {
-                mockEvent = {
-                    'event': 'event1'
-                };
+                mockEvent = createMockEvent();
                 programEventRepository.findEventsByCode.and.returnValue(utils.getPromise(q, [mockEvent]));
                 scope.$apply();
 
@@ -464,9 +359,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
             });
 
             it("should filter events by date range", function() {
-                mockEvent = {
-                    'event': 'event1'
-                };
+                mockEvent = createMockEvent();
                 programEventRepository.findEventsByDateRange.and.returnValue(utils.getPromise(q, [mockEvent]));
                 scope.$apply();
 

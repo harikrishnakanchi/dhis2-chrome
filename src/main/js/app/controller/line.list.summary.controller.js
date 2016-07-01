@@ -44,7 +44,6 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             scrollToTop();
         };
 
-
         var loadEventsView = function() {
             $scope.eventForm = {
                 allEvents: []
@@ -109,16 +108,6 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             });
         };
 
-        var getPeriodsAndOrgUnits = function(events) {
-            var periods = _.uniq(_.pluck(events, "period"));
-            return _.map(periods, function(period) {
-                return {
-                    "period": period,
-                    "orgUnit": $scope.selectedModuleId
-                };
-            });
-        };
-
         $scope.back = function() {
             $scope.viewRegistrationBook = false;
         };
@@ -157,36 +146,39 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             return date ? moment(date).toDate().toLocaleDateString() : "";
         };
 
-        $scope.submit = function() {
+        var getPeriodsAndOrgUnits = function(periods) {
+            return _.map(periods, function(period) {
+                return {
+                    period: period,
+                    orgUnit: $scope.selectedModuleId
+                };
+            });
+        };
 
-            var submitableEvents = $scope.events;
-            var periodsAndOrgUnits = getPeriodsAndOrgUnits(submitableEvents);
+        var publishMessageToSyncModuleDataBlock = function (period) {
+            return $hustle.publish({
+                type: 'syncModuleDataBlock',
+                data: {
+                    moduleId: $scope.selectedModuleId,
+                    period: period
+                },
+                locale: $scope.locale,
+                desc: $scope.resourceBundle.syncModuleDataBlockDesc + period + ', ' + $scope.selectedModuleName
+            }, 'dataValues');
+        };
+
+        $scope.submit = function() {
+            var submitableEvents = $scope.events,
+                submitablePeriods = _.uniq(_.pluck(submitableEvents, 'period')),
+                periodsAndOrgUnits = getPeriodsAndOrgUnits(submitablePeriods);
 
             var clearAnyExisingApprovals = function() {
                 return approvalDataRepository.clearApprovals(periodsAndOrgUnits);
             };
 
             var publishToDhis = function() {
-                var uploadEvents = function() {
-                    return $hustle.publish({
-                        "type": "uploadProgramEvents",
-                        "data": _.pluck(submitableEvents, 'event'),
-                        "locale": $scope.locale,
-                        "desc": $scope.resourceBundle.uploadProgramEventsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
-                    }, "dataValues");
-                };
-
-                var deleteApprovals = function() {
-                    return $hustle.publish({
-                        "data": periodsAndOrgUnits,
-                        "type": "deleteApprovals",
-                        "locale": $scope.locale,
-                        "desc": $scope.resourceBundle.deleteApprovalsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
-                    }, "dataValues");
-                };
-
-                return deleteApprovals()
-                    .then(uploadEvents);
+                var publishPromises = _.map(submitablePeriods, publishMessageToSyncModuleDataBlock);
+                return $q.all(publishPromises);
             };
 
             var updateView = function() {
@@ -201,9 +193,9 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
         };
 
         $scope.submitAndApprove = function() {
-
-            var submitableEvents = getSubmitableEvents();
-            var periodsAndOrgUnits = getPeriodsAndOrgUnits(submitableEvents);
+            var submitableEvents = getSubmitableEvents(),
+                submittablePeriods = _.uniq(_.pluck(submitableEvents, 'period')),
+                periodsAndOrgUnits = getPeriodsAndOrgUnits(submittablePeriods);
 
             var clearAnyExisingApprovals = function() {
                 return approvalDataRepository.clearApprovals(periodsAndOrgUnits);
@@ -215,51 +207,12 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             };
 
             var publishToDhis = function() {
-
-                var deleteApprovals = function() {
-                    return $hustle.publish({
-                        "data": periodsAndOrgUnits,
-                        "type": "deleteApprovals",
-                        "locale": $scope.locale,
-                        "desc": $scope.resourceBundle.deleteApprovalsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
-                    }, "dataValues");
-                };
-
-                var uploadEvents = function() {
-                    return $hustle.publish({
-                        "type": "uploadProgramEvents",
-                        "data": _.pluck(submitableEvents, "event"),
-                        "locale": $scope.locale,
-                        "desc": $scope.resourceBundle.uploadProgramEventsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
-                    }, "dataValues");
-                };
-
-                var uploadCompletion = function() {
-                    return $hustle.publish({
-                        "data": periodsAndOrgUnits,
-                        "type": "uploadCompletionData",
-                        "locale": $scope.locale,
-                        "desc": $scope.resourceBundle.uploadCompletionDataDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
-                    }, "dataValues");
-                };
-
-                var uploadApproval = function() {
-                    return $hustle.publish({
-                        "data": periodsAndOrgUnits,
-                        "type": "uploadApprovalData",
-                        "locale": $scope.locale,
-                        "desc": $scope.resourceBundle.uploadApprovalDataDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
-                    }, "dataValues");
-                };
-
-                return deleteApprovals()
-                    .then(uploadEvents)
-                    .then(uploadCompletion)
-                    .then(uploadApproval);
+                var publishPromises = _.map(submittablePeriods, publishMessageToSyncModuleDataBlock);
+                return $q.all(publishPromises);
             };
 
             var updateView = function() {
-                showResultMessage("success", submitableEvents.length + $scope.resourceBundle.eventSubmitAndApproveSuccess);
+                showResultMessage('success', submitableEvents.length + $scope.resourceBundle.eventSubmitAndApproveSuccess);
                 loadEventsView();
             };
 
@@ -270,60 +223,34 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 .then(updateView);
         };
 
-        $scope.deleteEvent = function(ev) {
-            var eventId = ev.event;
-
-            var periodAndOrgUnit = {
-                "period": ev.period,
-                "orgUnit": $scope.selectedModuleId
-            };
-
-            var clearAnyExisingApprovals = function() {
-                return approvalDataRepository.clearApprovals(periodAndOrgUnit);
-            };
-
-            var publishToDhis = function() {
-                var deleteEventPromise = $hustle.publish({
-                    "data": eventId,
-                    "type": "deleteEvent",
-                    "locale": $scope.locale,
-                    "desc": $scope.resourceBundle.deleteEventDesc
-                }, "dataValues");
-
-                var deleteApprovalsPromise = $hustle.publish({
-                    "data": periodAndOrgUnit,
-                    "type": "deleteApprovals",
-                    "locale": $scope.locale,
-                    "desc": $scope.resourceBundle.deleteApprovalsDesc + periodAndOrgUnit.period + ", Module: " + $scope.selectedModuleName
-                }, "dataValues");
-
-                return $q.all([deleteEventPromise, deleteApprovalsPromise]);
-            };
-
+        $scope.deleteEvent = function(event) {
             var hardDelete = function() {
-                return programEventRepository.delete(eventId);
+                return programEventRepository.delete(event.event);
             };
 
             var softDelete = function() {
-                ev.localStatus = "DELETED";
-                return programEventRepository.upsert(ev)
-                    .then(clearAnyExisingApprovals)
-                    .then(publishToDhis);
+                var periodAndOrgUnit = {
+                    period: event.period,
+                    orgUnit: $scope.selectedModuleId
+                };
+                event.localStatus = 'DELETED';
+
+                return programEventRepository.upsert(event)
+                    .then(_.partial(approvalDataRepository.clearApprovals, periodAndOrgUnit))
+                    .then(_.partial(publishMessageToSyncModuleDataBlock, event.period));
             };
 
             var deleteOnConfirm = function() {
-                var deleteFunction = ev.localStatus === "NEW_DRAFT" || ev.localStatus === "NEW_INCOMPLETE_DRAFT" ? hardDelete : softDelete;
+                var deleteFunction = event.localStatus === 'NEW_DRAFT' || event.localStatus === 'NEW_INCOMPLETE_DRAFT' ? hardDelete : softDelete;
                 return deleteFunction.apply().then(function() {
-                    showResultMessage("success", $scope.resourceBundle.eventDeleteSuccess);
+                    showResultMessage('success', $scope.resourceBundle.eventDeleteSuccess);
                     loadEventsView();
                 });
             };
 
-            var modalMessages = {
+            confirmAndProceed(deleteOnConfirm, {
                 "confirmationMessage": $scope.resourceBundle.deleteEventConfirmation
-            };
-
-            confirmAndProceed(deleteOnConfirm, modalMessages);
+            });
         };
 
         $scope.filterByCaseNumber = function() {
