@@ -503,7 +503,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         expect(dataRepository.saveDhisData).toHaveBeenCalledWith([dataValueWithoutLocalTimestamp]);
                     });
 
-                    it('should delete completion data from DHIS if it is present and upload data values to DHIS', function() {
+                    it('should delete completion data from DHIS if it is present before uploading data values to DHIS', function() {
                         dhisCompletion = createMockCompletion();
                         moduleDataBlock = createMockModuleDataBlock({ dataValuesHaveBeenModifiedLocally: true });
                         periodAndOrgUnit = { period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId };
@@ -512,47 +512,13 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         expect(approvalService.markAsIncomplete).toHaveBeenCalledWith(dataSetIds, [periodAndOrgUnit]);
                     });
 
-                    it('should delete approval data from DHIS if it is present and upload data values to DHIS', function() {
+                    it('should delete approval data from DHIS if it is present before uploading data values to DHIS', function() {
                         dhisApproval = createMockApproval();
                         moduleDataBlock = createMockModuleDataBlock({ dataValuesHaveBeenModifiedLocally: true });
                         periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId};
 
                         performUpload();
                         expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(dataSetIds, [periodAndOrgUnit]);
-                    });
-
-                    it('should upload completion data from Praxis to DHIS', function() {
-                        moduleDataBlock = createMockModuleDataBlock({
-                            dataValuesHaveBeenModifiedLocally: true,
-                            approvedAtProjectLevel: true,
-                            approvedAtProjectLevelBy: 'Kuala',
-                            approvedAtProjectLevelAt: someMomentInTime
-                        });
-
-                        periodAndOrgUnit = { period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId };
-
-                        performUpload();
-                        expect(approvalService.markAsComplete).toHaveBeenCalledWith(dataSetIds,
-                            [periodAndOrgUnit],
-                            moduleDataBlock.approvedAtProjectLevelBy,
-                            moduleDataBlock.approvedAtProjectLevelAt.toISOString());
-                    });
-
-                    it('should upload approval data from Praxis to DHIS', function() {
-                        moduleDataBlock = createMockModuleDataBlock({
-                            dataValuesHaveBeenModifiedLocally: true,
-                            approvedAtCoordinationLevel: true,
-                            approvedAtCoordinationLevelBy: 'Kuala',
-                            approvedAtCoordinationLevelAt: someMomentInTime
-                        });
-
-                        periodAndOrgUnit = { period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId };
-
-                        performUpload();
-                        expect(approvalService.markAsApproved).toHaveBeenCalledWith(dataSetIds,
-                            [periodAndOrgUnit],
-                            moduleDataBlock.approvedAtCoordinationLevelBy,
-                            moduleDataBlock.approvedAtCoordinationLevelAt.toISOString());
                     });
                 });
 
@@ -562,70 +528,6 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                         performUpload();
                         expect(dataService.save).not.toHaveBeenCalled();
-                    });
-
-                    it('should upload completion data to DHIS', function() {
-                        moduleDataBlock = createMockModuleDataBlock({
-                            dataValuesHaveBeenModifiedLocally: false,
-                            approvedAtProjectLevel: true,
-                            approvedAtProjectLevelBy: 'Kuala',
-                            approvedAtProjectLevelAt: someMomentInTime
-                        });
-
-                        performUpload();
-                        expect(approvalService.markAsComplete).toHaveBeenCalled();
-                    });
-
-                    it('should upload approval data to DHIS', function() {
-                        moduleDataBlock = createMockModuleDataBlock({
-                            dataValuesHaveBeenModifiedLocally: false,
-                            approvedAtCoordinationLevel: true,
-                            approvedAtCoordinationLevelBy: 'Kuala',
-                            approvedAtCoordinationLevelAt: someMomentInTime
-                        });
-
-                        performUpload();
-                        expect(approvalService.markAsApproved).toHaveBeenCalled();
-                    });
-
-                    it('should not re-upload completion and approval data to DHIS', function() {
-                        dhisCompletion = createMockCompletion();
-                        dhisApproval = createMockApproval();
-                        moduleDataBlock = createMockModuleDataBlock({
-                            dataValuesHaveBeenModifiedLocally: false,
-                            approvedAtProjectLevel: true,
-                            approvedAtProjectLevelBy: 'Kuala',
-                            approvedAtProjectLevelAt: someMomentInTime,
-                            approvedAtCoordinationLevel: true,
-                            approvedAtCoordinationLevelBy: 'Kuala',
-                            approvedAtCoordinationLevelAt: someMomentInTime
-                        });
-
-                        performUpload();
-                        expect(approvalService.markAsUnapproved).not.toHaveBeenCalled();
-                        expect(approvalService.markAsIncomplete).not.toHaveBeenCalled();
-                        expect(approvalService.markAsComplete).not.toHaveBeenCalled();
-                        expect(approvalService.markAsApproved).not.toHaveBeenCalled();
-                    });
-
-                    it('should delete then re-upload approval data in DHIS if completion data needs to be uploaded', function() {
-                        dhisApproval = createMockApproval();
-
-                        moduleDataBlock = createMockModuleDataBlock({
-                            dataValuesHaveBeenModifiedLocally: false,
-                            approvedAtProjectLevel: true,
-                            approvedAtProjectLevelBy: 'Kuala',
-                            approvedAtProjectLevelAt: someMomentInTime,
-                            approvedAtCoordinationLevel: true,
-                            approvedAtCoordinationLevelBy: 'Kuala',
-                            approvedAtCoordinationLevelAt: someMomentInTime
-                        });
-
-                        performUpload();
-                        expect(approvalService.markAsUnapproved).toHaveBeenCalled();
-                        expect(approvalService.markAsIncomplete).not.toHaveBeenCalled();
-                        expect(approvalService.markAsComplete).toHaveBeenCalled();
-                        expect(approvalService.markAsApproved).toHaveBeenCalled();
                     });
                 });
 
@@ -661,6 +563,78 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         scope.$apply();
 
                         expect(eventService.upsertEvents).not.toHaveBeenCalled();
+                    });
+                });
+
+                describe('data has been approved on Praxis', function () {
+                    it('should upload completion data from Praxis to DHIS', function() {
+                        moduleDataBlock = createMockModuleDataBlock({
+                            approvedAtProjectLevel: true,
+                            approvedAtProjectLevelBy: 'Kuala',
+                            approvedAtProjectLevelAt: someMomentInTime
+                        });
+
+                        periodAndOrgUnit = { period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId };
+
+                        performUpload();
+                        expect(approvalService.markAsComplete).toHaveBeenCalledWith(dataSetIds,
+                            [periodAndOrgUnit],
+                            moduleDataBlock.approvedAtProjectLevelBy,
+                            moduleDataBlock.approvedAtProjectLevelAt.toISOString());
+                    });
+
+                    it('should upload approval data from Praxis to DHIS', function() {
+                        moduleDataBlock = createMockModuleDataBlock({
+                            approvedAtCoordinationLevel: true,
+                            approvedAtCoordinationLevelBy: 'Kuala',
+                            approvedAtCoordinationLevelAt: someMomentInTime
+                        });
+
+                        periodAndOrgUnit = { period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId };
+
+                        performUpload();
+                        expect(approvalService.markAsApproved).toHaveBeenCalledWith(dataSetIds,
+                            [periodAndOrgUnit],
+                            moduleDataBlock.approvedAtCoordinationLevelBy,
+                            moduleDataBlock.approvedAtCoordinationLevelAt.toISOString());
+                    });
+
+                    it('should not re-upload completion and approval data to DHIS', function() {
+                        dhisCompletion = createMockCompletion();
+                        dhisApproval = createMockApproval();
+                        moduleDataBlock = createMockModuleDataBlock({
+                            approvedAtProjectLevel: true,
+                            approvedAtProjectLevelBy: 'Kuala',
+                            approvedAtProjectLevelAt: someMomentInTime,
+                            approvedAtCoordinationLevel: true,
+                            approvedAtCoordinationLevelBy: 'Kuala',
+                            approvedAtCoordinationLevelAt: someMomentInTime
+                        });
+
+                        performUpload();
+                        expect(approvalService.markAsUnapproved).not.toHaveBeenCalled();
+                        expect(approvalService.markAsIncomplete).not.toHaveBeenCalled();
+                        expect(approvalService.markAsComplete).not.toHaveBeenCalled();
+                        expect(approvalService.markAsApproved).not.toHaveBeenCalled();
+                    });
+
+                    it('should delete and re-upload approval data to DHIS if completion data needs to be uploaded', function() {
+                        dhisApproval = createMockApproval();
+
+                        moduleDataBlock = createMockModuleDataBlock({
+                            approvedAtProjectLevel: true,
+                            approvedAtProjectLevelBy: 'Kuala',
+                            approvedAtProjectLevelAt: someMomentInTime,
+                            approvedAtCoordinationLevel: true,
+                            approvedAtCoordinationLevelBy: 'Kuala',
+                            approvedAtCoordinationLevelAt: someMomentInTime
+                        });
+
+                        performUpload();
+                        expect(approvalService.markAsUnapproved).toHaveBeenCalled();
+                        expect(approvalService.markAsIncomplete).not.toHaveBeenCalled();
+                        expect(approvalService.markAsComplete).toHaveBeenCalled();
+                        expect(approvalService.markAsApproved).toHaveBeenCalled();
                     });
                 });
             });
