@@ -49,22 +49,28 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                     locale: 'fr',
                     property: 'description'
                 },{
-                    objectId: 'id5',
-                    value: 'frenchDataElementDescription',
+                    objectId: 'id4',
+                    value: 'frenchReport',
                     locale: 'fr',
-                    property: 'description'
+                    property: 'shortName'
                 }, {
                     objectId: 'id4',
                     value: 'french name',
                     locale: 'fr',
                     property: 'name'
                 }, {
+                    objectId: 'id5',
+                    value: 'frenchDataElementDescription',
+                    locale: 'fr',
+                    property: 'description'
+                }, {
                     objectId: 'id6',
                     value: 'frenchHeader',
                     locale: 'fr',
                     property: 'name'
                 }
-                ];
+            ];
+
                 return utils.getPromise(q, result);
             });
         }));
@@ -329,6 +335,51 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                     }
                 }]
             }]);
+        });
+
+        describe('translate reports', function () {
+            var createMockReport = function() {
+                return {
+                    definition: {
+                        rows: [{
+                            items: [{
+                                id: 'id4',
+                                value: 'someName'
+                            }]
+                        }]
+                    },
+                    data: {
+                        metaData: {
+                            names: {}
+                        }
+                    }
+                };
+            };
+
+            beforeEach(function () {
+                var locale = 'fr';
+                translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
+                translationsService.setLocale(locale);
+            });
+
+            it('should translate the names for the rows in the reports', function () {
+                var mockReport = createMockReport();
+
+                scope.$apply();
+
+                var translatedReport = translationsService.translateReports([mockReport]);
+                expect(translatedReport[0].data.metaData.names).toEqual({ id4: 'frenchReport' });
+            });
+
+            it('should translate the description of the item if translation exists', function () {
+                var mockReport = createMockReport();
+                mockReport.definition.rows[0].items[0].description = 'someDescription';
+
+                scope.$apply();
+
+                var translatedReport = translationsService.translateReports([mockReport]);
+                expect(translatedReport[0].definition.rows[0].items[0].description).toEqual('french description');
+            });
         });
     });
 });

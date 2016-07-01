@@ -38,8 +38,12 @@ define(['lodash'], function(_){
                 var namesHash = report.data ? report.data.metaData.names : {};
                 return _.each(items, function (item) {
                     var translationObject = translations[item.id];
-                    var translationsByProperty = _.filter(translationObject, {property: "shortName"});
-                    namesHash[item.id] = translationsByProperty.length > 0 ? translationsByProperty[0].value : item.name;
+                    if(item.description) {
+                        var descriptionTranslation = _.find(translationObject, {property: "description"});
+                        item.description = descriptionTranslation ? descriptionTranslation.value : item.description;
+                    }
+                    var shortNameTranslation = _.find(translationObject, {property: "shortName"});
+                    namesHash[item.id] = shortNameTranslation ? shortNameTranslation.value : item.name;
                 });
             });
         };
