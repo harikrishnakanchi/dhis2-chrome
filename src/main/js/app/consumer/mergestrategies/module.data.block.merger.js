@@ -85,10 +85,11 @@ define(['moment', 'lodash'],
             var uploadToDHIS = function (moduleDataBlock, dhisCompletionData, dhisApprovalData) {
                 var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId},
                     eventsToUpload = _.filter(moduleDataBlock.events, { localStatus: 'READY_FOR_DHIS' }),
+                    eventIdsToDelete = _.pluck(_.filter(moduleDataBlock.events, { localStatus: 'DELETED' }), 'event'),
                     dataOnDhisNotPreviouslyCompleted = !dhisCompletionData,
                     dataOnDhisNotPreviouslyApproved = !dhisApprovalData,
                     dataHasBeenCompletedLocallyButNotOnDhis = moduleDataBlock.approvedAtProjectLevel && dataOnDhisNotPreviouslyCompleted,
-                    dataHasBeenModifiedLocally = moduleDataBlock.dataValuesHaveBeenModifiedLocally || !_.isEmpty(eventsToUpload);
+                    dataHasBeenModifiedLocally = moduleDataBlock.dataValuesHaveBeenModifiedLocally || !_.isEmpty(eventsToUpload) || !_.isEmpty(eventIdsToDelete);
 
 
                 var deleteApproval = function (dataSetIds) {
@@ -151,8 +152,6 @@ define(['moment', 'lodash'],
                             return recursivelyDeleteEvents(eventIds);
                         });
                     };
-
-                    var eventIdsToDelete = _.pluck(_.filter(moduleDataBlock.events, { localStatus: 'DELETED' }), 'event');
 
                     return recursivelyDeleteEvents(eventIdsToDelete);
                 };

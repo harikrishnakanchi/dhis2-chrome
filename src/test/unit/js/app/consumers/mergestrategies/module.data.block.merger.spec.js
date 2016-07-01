@@ -608,6 +608,20 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         expect(programEventRepository.delete).toHaveBeenCalledWith(deletedEventA.event);
                         expect(programEventRepository.delete).toHaveBeenCalledWith(deletedEventB.event);
                     });
+
+                    it('should delete completion data from DHIS if it is present before deleting events from DHIS', function() {
+                        dhisCompletion = createMockCompletion();
+
+                        performUpload();
+                        expect(approvalService.markAsIncomplete).toHaveBeenCalledWith(dataSetIds, [periodAndOrgUnit]);
+                    });
+
+                    it('should delete approval data from DHIS if it is present before deleting events from DHIS', function() {
+                        dhisApproval = createMockApproval();
+
+                        performUpload();
+                        expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(dataSetIds, [periodAndOrgUnit]);
+                    });
                 });
 
                 describe('events have not been deleted on Praxis', function () {
