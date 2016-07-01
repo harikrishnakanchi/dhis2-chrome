@@ -24,7 +24,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
 
                 spyOn(location, "path").and.returnValue(location);
                 spyOn(location, "search").and.returnValue("something");
-                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, ""));
+                spyOn(hustle, 'publishOnce').and.returnValue(utils.getPromise(q, {}));
 
                 fakeModal = {
                     close: function() {
@@ -247,8 +247,8 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                     orgUnit: currentModule.id
                 }]);
 
-                expect(hustle.publish).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEventA.period), 'dataValues');
-                expect(hustle.publish).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEventB.period), 'dataValues');
+                expect(hustle.publishOnce).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEventA.period), 'dataValues');
+                expect(hustle.publishOnce).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEventB.period), 'dataValues');
                 expect(scope.resultMessageType).toEqual('success');
                 expect(scope.resultMessage).toEqual('2' + scope.resourceBundle.eventSubmitSuccess);
             });
@@ -275,8 +275,8 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                     orgUnit: currentModule.id
                 }], 'dataentryuser');
 
-                expect(hustle.publish).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEventA.period), 'dataValues');
-                expect(hustle.publish).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEventB.period), 'dataValues');
+                expect(hustle.publishOnce).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEventA.period), 'dataValues');
+                expect(hustle.publishOnce).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEventB.period), 'dataValues');
                 expect(scope.resultMessageType).toEqual('success');
                 expect(scope.resultMessage).toEqual('2' + scope.resourceBundle.eventSubmitAndApproveSuccess);
             });
@@ -293,7 +293,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                 scope.$apply();
 
                 expect(fakeModal.open).toHaveBeenCalled();
-                expect(hustle.publish).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEvent.period), 'dataValues');
+                expect(hustle.publishOnce).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEvent.period), 'dataValues');
 
                 expect(programEventRepository.upsert).toHaveBeenCalledWith(mockEvent);
                 expect(mockEvent.localStatus).toEqual('DELETED');
@@ -314,7 +314,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
 
                 expect(fakeModal.open).toHaveBeenCalled();
                 expect(programEventRepository.delete).toHaveBeenCalledWith(mockEvent.event);
-                expect(hustle.publish).not.toHaveBeenCalled();
+                expect(hustle.publishOnce).not.toHaveBeenCalled();
                 expect(programEventRepository.getSubmitableEventsFor).toHaveBeenCalled();
             });
 

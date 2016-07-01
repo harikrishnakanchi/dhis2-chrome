@@ -156,7 +156,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
         };
 
         var publishMessageToSyncModuleDataBlock = function (period) {
-            return $hustle.publish({
+            return $hustle.publishOnce({
                 type: 'syncModuleDataBlock',
                 data: {
                     moduleId: $scope.selectedModuleId,
