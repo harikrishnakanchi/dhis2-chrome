@@ -2,7 +2,7 @@ define(['lodash'], function(_){
     return function($q, db, $rootScope, ngI18nResourceBundle, systemSettingRepository) {
         var translatableTypes = ["sections", "dataElements", "headers", "programStages", "programStageSections", "programStageDataElements", "dataElement", "optionSet", "options", "dataValues", "attribute"],
             translatableProperties = ["name", "description", "formName", "shortName", "displayName"],
-            translations, _locale, self = this;
+            translations, categoryOptionCombosAndOptions, _locale, self = this;
 
         var refreshResourceBundle = function () {
             return ngI18nResourceBundle.get({ locale: _locale }).then(function (data) {
@@ -14,11 +14,28 @@ define(['lodash'], function(_){
             return systemSettingRepository.upsertLocale(_locale);
         };
 
+        var buildCategoryOptionComboHash = function () {
+            if(categoryOptionCombosAndOptions) return;
+
+            var store = db.objectStore('categoryOptionCombos');
+            return store.getAll().then(function(categoryOptionCombos) {
+                categoryOptionCombosAndOptions = _.reduce(categoryOptionCombos, function (result, categoryOptionCombo) {
+                    var categoryOptions = categoryOptionCombo.name.split(", ");
+                    result[categoryOptionCombo.id] = _.map(categoryOptions, function (categoryOption) {
+                        var originalCategoryOption = _.find(categoryOptionCombo.categoryOptions, { name: categoryOption});
+                        return originalCategoryOption.id;
+                    });
+                    return result;
+                }, {});
+            });
+        };
+
         this.setLocale = function(locale){
             _locale = locale;
 
             refreshResourceBundle();
             updateLocaleInSystemSettings();
+            buildCategoryOptionComboHash();
             
             var store = db.objectStore('translations');
             var query = db.queryBuilder().$index('by_locale').$eq(locale).compile();
@@ -48,16 +65,29 @@ define(['lodash'], function(_){
             });
         };
 
+        var getTranslation = function (objectId, property) {
+            var translationObject = _.find(translations[objectId], { property: property });
+            return translationObject && translationObject.value;
+        };
+
         this.translateCharts = function (chartData) {
             if(_locale == 'en') {
                 return chartData;
             }
 
-            var dataElementIndicatorIds = chartData.metaData.dx;
-            _.each(dataElementIndicatorIds, function (id) {
-                var translationObject = _.find(translations[id], { property: 'shortName' });
-                if(translations[id] && translationObject)
-                    chartData.metaData.names[id] = translationObject.value;
+            var translatablePropertyIds = _.keys(chartData.metaData.names);
+            _.each(translatablePropertyIds, function (id) {
+                var isCategoryOptionCombo = _.get(categoryOptionCombosAndOptions, id);
+                if (isCategoryOptionCombo) {
+                    var translatedOptions = _.map(categoryOptionCombosAndOptions[id], function (categoryOptionId) {
+                        return getTranslation(categoryOptionId, 'shortName');
+                    });
+                    if(translatedOptions.length == _.compact(translatedOptions).length)
+                        chartData.metaData.names[id] = translatedOptions.join(', ');
+                } else {
+                    chartData.metaData.names[id] = getTranslation(id, 'shortName') || chartData.metaData.names[id];
+                }
+
             });
             return chartData;
         };
