@@ -58,6 +58,10 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                                                                   lineListEventsMerger);
 
                 moduleDataBlock = createMockModuleDataBlock();
+                periodAndOrgUnit = {
+                    period: moduleDataBlock.period,
+                    orgUnit: moduleDataBlock.moduleId
+                };
                 dhisDataValues = undefined;
                 dhisCompletion = undefined;
                 dhisApproval = undefined;
@@ -479,34 +483,28 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                 };
 
                 describe('data values in Praxis have been modified locally', function () {
-                    it('should upload data values to DHIS', function() {
-                        var localDataValue = createMockDataValue();
+                    var localDataValue;
+
+                    beforeEach(function () {
+                        localDataValue = createMockDataValue({ clientLastUpdated: someMomentInTime });
                         moduleDataBlock = createMockModuleDataBlock({
                             dataValuesHaveBeenModifiedLocally: true,
                             dataValues: [localDataValue]
                         });
+                    });
 
+                    it('should upload data values to DHIS', function() {
                         performUpload();
                         expect(dataService.save).toHaveBeenCalledWith([localDataValue]);
                     });
 
                     it('should remove locally-modified timestamps from local data', function() {
-                        var localDataValue = createMockDataValue({ clientLastUpdated: someMomentInTime }),
-                            dataValueWithoutLocalTimestamp = _.omit(localDataValue, 'clientLastUpdated');
-
-                        moduleDataBlock = createMockModuleDataBlock({
-                            dataValuesHaveBeenModifiedLocally: true,
-                            dataValues: [localDataValue]
-                        });
-
                         performUpload();
-                        expect(dataRepository.saveDhisData).toHaveBeenCalledWith([dataValueWithoutLocalTimestamp]);
+                        expect(dataRepository.saveDhisData).toHaveBeenCalledWith([_.omit(localDataValue, 'clientLastUpdated')]);
                     });
 
                     it('should delete completion data from DHIS if it is present before uploading data values to DHIS', function() {
                         dhisCompletion = createMockCompletion();
-                        moduleDataBlock = createMockModuleDataBlock({ dataValuesHaveBeenModifiedLocally: true });
-                        periodAndOrgUnit = { period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId };
 
                         performUpload();
                         expect(approvalService.markAsIncomplete).toHaveBeenCalledWith(dataSetIds, [periodAndOrgUnit]);
@@ -514,11 +512,14 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                     it('should delete approval data from DHIS if it is present before uploading data values to DHIS', function() {
                         dhisApproval = createMockApproval();
-                        moduleDataBlock = createMockModuleDataBlock({ dataValuesHaveBeenModifiedLocally: true });
-                        periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId};
 
                         performUpload();
                         expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(dataSetIds, [periodAndOrgUnit]);
+                    });
+
+                    it('should not upload events to DHIS', function () {
+                        performUpload();
+                        expect(eventService.upsertEvents).not.toHaveBeenCalled();
                     });
                 });
 
@@ -539,17 +540,35 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         moduleDataBlock = createMockModuleDataBlock({
                             events: [submittedEvent]
                         });
-
-                        moduleDataBlockMerger.uploadToDHIS(moduleDataBlock, dhisCompletion, dhisApproval);
-                        scope.$apply();
                     });
 
                     it('should upload submitted events to DHIS', function(){
+                        performUpload();
                         expect(eventService.upsertEvents).toHaveBeenCalledWith([submittedEvent]);
                     });
 
                     it('should remove local timestamp and status from submitted events', function(){
+                        performUpload();
                         expect(programEventRepository.upsert).toHaveBeenCalledWith([_.omit(submittedEvent, ["localStatus", "clientLastUpdated"])]);
+                    });
+
+                    it('should delete completion data from DHIS if it is present before uploading events to DHIS', function() {
+                        dhisCompletion = createMockCompletion();
+
+                        performUpload();
+                        expect(approvalService.markAsIncomplete).toHaveBeenCalledWith(dataSetIds, [periodAndOrgUnit]);
+                    });
+
+                    it('should delete approval data from DHIS if it is present before uploading events to DHIS', function() {
+                        dhisApproval = createMockApproval();
+
+                        performUpload();
+                        expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(dataSetIds, [periodAndOrgUnit]);
+                    });
+
+                    it('should not upload data values to DHIS', function () {
+                        performUpload();
+                        expect(dataService.save).not.toHaveBeenCalled();
                     });
                 });
 
@@ -574,8 +593,6 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                             approvedAtProjectLevelAt: someMomentInTime
                         });
 
-                        periodAndOrgUnit = { period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId };
-
                         performUpload();
                         expect(approvalService.markAsComplete).toHaveBeenCalledWith(dataSetIds,
                             [periodAndOrgUnit],
@@ -589,8 +606,6 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                             approvedAtCoordinationLevelBy: 'Kuala',
                             approvedAtCoordinationLevelAt: someMomentInTime
                         });
-
-                        periodAndOrgUnit = { period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId };
 
                         performUpload();
                         expect(approvalService.markAsApproved).toHaveBeenCalledWith(dataSetIds,

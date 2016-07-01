@@ -84,13 +84,15 @@ define(['moment', 'lodash'],
 
             var uploadToDHIS = function (moduleDataBlock, dhisCompletionData, dhisApprovalData) {
                 var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId},
+                    eventsToUpload = _.filter(moduleDataBlock.events, { localStatus: 'READY_FOR_DHIS' }),
                     dataOnDhisNotPreviouslyCompleted = !dhisCompletionData,
                     dataOnDhisNotPreviouslyApproved = !dhisApprovalData,
-                    dataHasBeenCompletedLocallyButNotOnDhis = moduleDataBlock.approvedAtProjectLevel && dataOnDhisNotPreviouslyCompleted;
+                    dataHasBeenCompletedLocallyButNotOnDhis = moduleDataBlock.approvedAtProjectLevel && dataOnDhisNotPreviouslyCompleted,
+                    dataHasBeenModifiedLocally = moduleDataBlock.dataValuesHaveBeenModifiedLocally || !_.isEmpty(eventsToUpload);
 
 
                 var deleteApproval = function (dataSetIds) {
-                    if(dhisApprovalData && (moduleDataBlock.dataValuesHaveBeenModifiedLocally || dataHasBeenCompletedLocallyButNotOnDhis)) {
+                    if(dhisApprovalData && (dataHasBeenModifiedLocally || dataHasBeenCompletedLocallyButNotOnDhis)) {
                         return approvalService.markAsUnapproved(dataSetIds, [periodAndOrgUnit]);
                     } else {
                         return $q.when({});
@@ -98,7 +100,7 @@ define(['moment', 'lodash'],
                 };
 
                 var deleteCompletion = function (dataSetIds) {
-                    if(dhisCompletionData && moduleDataBlock.dataValuesHaveBeenModifiedLocally) {
+                    if(dhisCompletionData && dataHasBeenModifiedLocally) {
                         return approvalService.markAsIncomplete(dataSetIds, [periodAndOrgUnit]);
                     } else {
                         return $q.when({});
@@ -128,13 +130,11 @@ define(['moment', 'lodash'],
                         return programEventRepository.upsert(updatedEvents);
                     };
 
-                    var eventsToUpload = _.filter(moduleDataBlock.events, { localStatus: 'READY_FOR_DHIS'});
-
                     return _.isEmpty(eventsToUpload) ? $q.when() : eventService.upsertEvents(eventsToUpload).then(_.partial(changeEventLocalStatus, eventsToUpload));
                 };
 
                 var uploadCompletionData = function (dataSetIds) {
-                    if(moduleDataBlock.approvedAtProjectLevel && (dataOnDhisNotPreviouslyCompleted || moduleDataBlock.dataValuesHaveBeenModifiedLocally)) {
+                    if(moduleDataBlock.approvedAtProjectLevel && (dataOnDhisNotPreviouslyCompleted || dataHasBeenModifiedLocally)) {
                         var completedBy = moduleDataBlock.approvedAtProjectLevelBy;
                         var completedOn = moduleDataBlock.approvedAtProjectLevelAt.toISOString();
 
@@ -144,7 +144,7 @@ define(['moment', 'lodash'],
                 };
 
                 var uploadApprovalData = function (dataSetIds) {
-                  if(moduleDataBlock.approvedAtCoordinationLevel && (dataOnDhisNotPreviouslyApproved || moduleDataBlock.dataValuesHaveBeenModifiedLocally || dataHasBeenCompletedLocallyButNotOnDhis)) {
+                  if(moduleDataBlock.approvedAtCoordinationLevel && (dataOnDhisNotPreviouslyApproved || dataHasBeenModifiedLocally || dataHasBeenCompletedLocallyButNotOnDhis)) {
                       var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId};
                       var approvedBy = moduleDataBlock.approvedAtCoordinationLevelBy;
                       var approvedOn = moduleDataBlock.approvedAtCoordinationLevelAt.toISOString();
