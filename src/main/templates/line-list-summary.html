@@ -39,45 +39,59 @@
                             <button class="viewRegistrationBookBtn btn btn-xs btn-default"ng-click="showRegistrationBook()">{{resourceBundle.viewRegistrationBook}}</button>
                         </span>
                     </accordion-heading>
-                    <div class="sub-nav clearfix">
-                        <ul class="list-inline">
-                            <li>
-                            <ul class="list-inline">
-                                <li><a href="#/line-list-summary/{{selectedModuleId}}/caseNumber" ng-class="{'active': (filterBy === 'caseNumber' || filterBy === 'dateRange')}">{{resourceBundle.findCases}}</a></li>
-                                <li>|</li>
-                                <li><a href="#/line-list-summary/{{selectedModuleId}}/incomplete" ng-class="{'active': (filterBy === 'incomplete')}">{{resourceBundle.incompleteCases}}</a></li>
-                                <li>|</li>
-                                <li><a href="#/line-list-summary/{{selectedModuleId}}/readyToSubmit" ng-class="{'active': (filterBy === 'readyToSubmit')}">{{resourceBundle.casesReadyToSubmit}}</a></li>
-                                <li>|</li>
-                                <li><a href="#/line-list-summary/{{selectedModuleId}}/eventSummary" ng-class="{'active': (filterBy === 'eventSummary')}">{{resourceBundle.caseSummary}}</a></li>
-                            </ul>
-                        </li>
-                        <li class="new-case-btn" ng-class="layoutDirection.direction == 'rtl' ? 'text-left' : 'text-right'">
-                           <a ng-href="#/line-list-data-entry/{{selectedModuleId}}/new?returnTo={{currentUrl}}" class="btn btn-primary">{{resourceBundle.newCaseBtnValue}}</a>
-                        </li>
-                        </ul>
+
+                    <div class="row line-list-menu">
+                        <div class="col-md-8" ng-class="layoutDirection.direction == 'rtl' ? 'pull-right' : 'pull-left'">
+                            <div class="btn-group">
+                                <a class="btn btn-default"
+                                   href="#/line-list-summary/{{selectedModuleId}}/caseNumber"
+                                   ng-class="{'active btn-primary': (filterBy === 'caseNumber' || filterBy === 'dateRange')}">
+                                    {{resourceBundle.findCases}}
+                                </a>
+                                <a class="btn btn-default"
+                                   href="#/line-list-summary/{{selectedModuleId}}/incomplete"
+                                   ng-class="{'active btn-primary': (filterBy === 'incomplete')}">
+                                    {{resourceBundle.incompleteCases}}
+                                </a>
+                                <a class="btn btn-default"
+                                   href="#/line-list-summary/{{selectedModuleId}}/readyToSubmit"
+                                   ng-class="{'active btn-primary': (filterBy === 'readyToSubmit')}">
+                                    {{resourceBundle.casesReadyToSubmit}}
+                                </a>
+                                <a class="btn btn-default"
+                                   href="#/line-list-summary/{{selectedModuleId}}/eventSummary"
+                                   ng-class="{'active btn-primary': (filterBy === 'eventSummary')}">
+                                    {{resourceBundle.caseSummary}}
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4" ng-class="layoutDirection.direction == 'rtl' ? 'pull-right' : 'pull-left'">
+                            <a class="btn btn-primary" ng-class="layoutDirection.direction != 'rtl' ? 'pull-right' : 'pull-left'"
+                               ng-href="#/line-list-data-entry/{{selectedModuleId}}/new?returnTo={{currentUrl}}">
+                                {{resourceBundle.newCaseBtnValue}}
+                            </a>
+                        </div>
                     </div>
                     <div>
                         <div class="row form-inline event-search-form" ng-if="filterBy === 'caseNumber' || filterBy === 'dateRange'">
-                            <div class="col-md-12">
-                                <form name="eventfilterForm" id="eventfilterForm">
+                            <div class="col-md-12 ">
+                                <form name="eventfilterForm" id="eventfilterForm" class="well">
+                                    <span>{{resourceBundle.findCaseBy}}</span>
                                     <span>
-                                {{resourceBundle.findCaseBy}}
-                            </span>
-                                    <span>
-                                    <select class="form-control" ng-model="filterBy">
-                                      <option value="caseNumber">{{resourceBundle.caseNumber}}</option>
-                                      <option value="dateRange">{{resourceBundle.dateRange}}</option>
-                                    </select>
-                            </span>
+                                        <select class="form-control" ng-model="filterBy">
+                                          <option value="caseNumber">{{resourceBundle.caseNumber}}</option>
+                                          <option value="dateRange">{{resourceBundle.dateRange}}</option>
+                                        </select>
+                                    </span>
                                     <span ng-if="filterBy === 'caseNumber'">
-                                <input type="text" class="form-control" ng-model="filterParams.caseNumber" />
-                                <input type="button" value="{{resourceBundle.search}}" class="btn btn-default" ng-click="filterByCaseNumber()"/>
-                            </span>
+                                        <input type="text" class="form-control" ng-model="filterParams.caseNumber" />
+                                        <input type="button" value="{{resourceBundle.search}}" class="btn btn-default" ng-click="filterByCaseNumber()"/>
+                                    </span>
                                     <span ng-if="filterBy === 'dateRange'">
-                                <input type="date" class="form-control" ng-model="filterParams.startDate" /> {{resourceBundle.toLabel}} <input type="date" class="form-control" ng-model="filterParams.endDate" />
-                                <input type="button" value="{{resourceBundle.search}}" class="btn btn-default" ng-click="filterByDateRange()" ng-disabled="filterBy === 'dateRange' && dateRangeError" />
-                            </span>
+                                        <input type="date" class="form-control" ng-model="filterParams.startDate" /> {{resourceBundle.toLabel}} <input type="date" class="form-control" ng-model="filterParams.endDate" />
+                                        <input type="button" value="{{resourceBundle.search}}" class="btn btn-default" ng-click="filterByDateRange()" ng-disabled="filterBy === 'dateRange' && dateRangeError" />
+                                    </span>
                                     <div class="errortxt" ng-if="filterBy === 'dateRange' && dateRangeError">{{resourceBundle.dateRangeError}}</div>
                                 </form>
                             </div>

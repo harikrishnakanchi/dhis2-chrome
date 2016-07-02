@@ -1079,6 +1079,17 @@ input[type="checkbox"].dashboard-form-checkbox {
             padding: 6px 12px;
         }
     }
+    .line-list-menu {
+        padding-bottom: 20px;
+        .btn-group {
+            > .btn:not(.active) {
+                background-color: #ebebeb;
+            }
+            > .btn:hover:not(.active) {
+                background-color: #dddddd;
+            }
+        }
+    }
 }
 
 ul.main-menu >li >a {
@@ -1126,11 +1137,54 @@ li.dropdown-submenu {
     }
 
     &.line-list{
-        .list-inline{
-            padding-right: 0;
-        }
         .new-case-btn {
             float: left;
+        }
+        .line-list-menu {
+            .btn-group {
+                > .btn {
+                    float: right;
+                }
+            }
+            .btn-group {
+                .btn + .btn,
+                .btn + .btn-group,
+                .btn-group + .btn,
+                .btn-group + .btn-group {
+                    margin-right: -1px;
+                    margin-left: 0;
+                }
+            }
+            .btn-group > .btn:first-child {
+                margin-right: 0;
+                &:not(:last-child):not(.dropdown-toggle) {
+                    border-top-right-radius: @border-radius-base;
+                    border-bottom-right-radius: @border-radius-base;
+                    .border-left-radius(0);
+                }
+            }
+            .btn-group > .btn:last-child:not(:first-child),
+            .btn-group > .dropdown-toggle:not(:first-child) {
+                border-top-left-radius: @border-radius-base;
+                border-bottom-left-radius: @border-radius-base;
+                .border-right-radius(0);
+            }
+            .btn-group > .btn-group:not(:first-child):not(:last-child) > .btn {
+                border-radius: 0;
+            }
+            .btn-group > .btn-group:first-child {
+                > .btn:last-child,
+                > .dropdown-toggle {
+                    border-top-right-radius: @border-radius-base;
+                    border-bottom-right-radius: @border-radius-base;
+                    .border-left-radius(0);
+                }
+            }
+            .btn-group > .btn-group:last-child > .btn:first-child {
+                border-top-left-radius: @border-radius-base;
+                border-bottom-left-radius: @border-radius-base;
+                .border-right-radius(0);
+            }
         }
     }
 
@@ -1201,6 +1255,7 @@ header .hamburger-menu {
     }
     .module-week-selector {
         margin: 0;
+        padding-top: 0;
     }
     .panel-group .dataset-acc-wrapper + .dataset-acc-wrapper {
         padding-top: 5px;
