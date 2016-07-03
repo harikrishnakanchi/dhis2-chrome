@@ -83,9 +83,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 };
 
                 scope.resourceBundle = {
-                    syncModuleDataBlockDesc: 'some description',
-                    uploadApprovalDataDesc: 'some description',
-                    uploadCompletionDataDesc: 'some description'
+                    syncModuleDataBlockDesc: 'some description'
                 };
 
                 fakeModal = {
@@ -254,11 +252,14 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
 
                 expect(approvalDataRepository.markAsComplete).toHaveBeenCalledWith(periodAndOrgUnit, storedBy);
 
-                expect(hustle.publish).toHaveBeenCalledWith({
-                    "data": [periodAndOrgUnit],
-                    "type": "uploadCompletionData",
+                expect(hustle.publishOnce).toHaveBeenCalledWith({
+                    "data": {
+                        period: '2014W14',
+                        moduleId: 'mod1'
+                    },
+                    "type": "syncModuleDataBlock",
                     "locale": "en",
-                    "desc": scope.resourceBundle.uploadCompletionDataDesc + selectedPeriod + ', ' + scope.selectedModule.name
+                    "desc": scope.resourceBundle.syncModuleDataBlockDesc + selectedPeriod + ', ' + scope.selectedModule.name
                 }, "dataValues");
             });
 
@@ -403,11 +404,14 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 scope.$apply();
 
                 expect(approvalDataRepository.markAsApproved).toHaveBeenCalledWith(periodAndOrgUnit, approvedBy);
-                expect(hustle.publish).toHaveBeenCalledWith({
-                    "data": [periodAndOrgUnit],
-                    "type": "uploadApprovalData",
+                expect(hustle.publishOnce).toHaveBeenCalledWith({
+                    "data": {
+                        moduleId: periodAndOrgUnit.orgUnit,
+                        period: periodAndOrgUnit.period
+                    },
+                    "type": "syncModuleDataBlock",
                     "locale": "en",
-                    "desc": scope.resourceBundle.uploadApprovalDataDesc + selectedPeriod + ', ' + scope.selectedModule.name
+                    "desc": scope.resourceBundle.syncModuleDataBlockDesc + selectedPeriod + ', ' + scope.selectedModule.name
                 }, "dataValues");
             });
 
