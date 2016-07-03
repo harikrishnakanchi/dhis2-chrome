@@ -29,9 +29,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
 
                 scope.resourceBundle = {
                     "dataApprovalConfirmationMessage": "Are you sure?",
-                    "syncModuleDataBlockDesc": "some description",
-                    "uploadApprovalDataDesc": 'some other description',
-                    "uploadCompletionDataDesc": 'yet another description'
+                    "syncModuleDataBlockDesc": "some description"
                 };
 
                 approvalDataRepository = new ApprovalDataRepository();
@@ -147,8 +145,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                         "period": "2014W02"
                     }], rootScope.currentUser.userCredentials.username);
 
-                    expect(hustle.publish.calls.count()).toEqual(1);
-                    expect(hustle.publishOnce.calls.count()).toEqual(2);
+                    expect(hustle.publishOnce.calls.count()).toEqual(3);
                     expect(hustle.publishOnce.calls.argsFor(0)[0]).toEqual({
                         "data": {
                             "moduleId": "mod2",
@@ -167,14 +164,14 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                         "locale": "en",
                         "desc": scope.resourceBundle.syncModuleDataBlockDesc + " 2014W02"
                     });
-                    expect(hustle.publish.calls.argsFor(0)[0]).toEqual({
-                        "data": [{
-                            "orgUnit": "mod4",
+                    expect(hustle.publishOnce.calls.argsFor(2)[0]).toEqual({
+                        "data": {
+                            "moduleId": "mod4",
                             "period": "2014W02"
-                        }],
-                        "type": "uploadCompletionData",
+                        },
+                        "type": "syncModuleDataBlock",
                         "locale": "en",
-                        "desc": scope.resourceBundle.uploadCompletionDataDesc + "2014W02"
+                        "desc": scope.resourceBundle.syncModuleDataBlockDesc + " 2014W02"
                     });
                 });
 
@@ -234,8 +231,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                         "period": "2014W02"
                     }], "dataentryuser");
 
-                    expect(hustle.publish.calls.count()).toEqual(1);
-                    expect(hustle.publishOnce.calls.count()).toEqual(2);
+                    expect(hustle.publishOnce.calls.count()).toEqual(3);
                     expect(hustle.publishOnce.calls.argsFor(0)[0]).toEqual({
                         "data": {
                             "moduleId": "mod2",
@@ -254,14 +250,14 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                         "locale": "en",
                         "desc": scope.resourceBundle.syncModuleDataBlockDesc + " 2014W02"
                     });
-                    expect(hustle.publish.calls.argsFor(0)[0]).toEqual({
-                        "data": [{
-                            "orgUnit": "mod4",
+                    expect(hustle.publishOnce.calls.argsFor(2)[0]).toEqual({
+                        "data": {
+                            "moduleId": "mod4",
                             "period": "2014W02"
-                        }],
-                        "type": "uploadApprovalData",
+                        },
+                        "type": "syncModuleDataBlock",
                         "locale": "en",
-                        "desc": scope.resourceBundle.uploadApprovalDataDesc + "2014W02"
+                        "desc": scope.resourceBundle.syncModuleDataBlockDesc + " 2014W02"
                     });
                 });
             });
