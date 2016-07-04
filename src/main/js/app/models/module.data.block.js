@@ -20,20 +20,19 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         this.approvedAtCoordinationLevelAt = this.approvedAtCoordinationLevel ? moment(approvalData.approvedOn) : null;
         this.approvedAtAnyLevel = this.approvedAtProjectLevel || this.approvedAtCoordinationLevel;
 
-        this.failedToSync = isFailedToSync(this.lineListService, aggregateDataValues, failedToSyncData);
+        this.failedToSync = isFailedToSync(this.lineListService, aggregateDataValues, failedToSyncData, this.approvedAtAnyLevel);
 
         this.awaitingActionAtDataEntryLevel = isWaitingForActionAtDataEntryLevel(this.submitted, this.approvedAtProjectLevel, this.approvedAtCoordinationLevel, this.failedToSync);
         this.awaitingActionAtProjectLevelApprover = isWaitingForActionAtProjectLevel(this.submitted, this.approvedAtProjectLevel, this.approvedAtCoordinationLevel, this.failedToSync);
         this.awaitingActionAtCoordinationLevelApprover = isWaitingForActionAtCoordinationLevel(this.submitted, this.approvedAtProjectLevel, this.approvedAtCoordinationLevel, this.failedToSync);
     };
 
-    var isFailedToSync = function(lineListService, aggregateDataValues, failedToSyncData) {
-
+    var isFailedToSync = function(lineListService, aggregateDataValues, failedToSyncData, approvedAtAnyLevel) {
         //This can be removed after v6.0 has been released
         var aggregateDataValuesFailedToSyncAsPerDeprecatedLocalStatus = !!aggregateDataValues && _.any(aggregateDataValues, { localStatus: 'FAILED_TO_SYNC' });
         var failedToSync = !_.isEmpty(failedToSyncData);
-
-        return !lineListService && (failedToSync || aggregateDataValuesFailedToSyncAsPerDeprecatedLocalStatus);
+        var lineListEventSubmissionFailure = lineListService && !approvedAtAnyLevel;
+        return !(lineListEventSubmissionFailure) && (failedToSync || aggregateDataValuesFailedToSyncAsPerDeprecatedLocalStatus);
     };
 
     var isWaitingForActionAtDataEntryLevel = function(submitted, approvedAtProject, approvedAtCoordination, failedToSync) {

@@ -487,6 +487,7 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                 expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(true);
                 expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
                 expect(moduleDataBlock.awaitingActionAtCoordinationLevelApprover).toEqual(false);
+                expect(moduleDataBlock.failedToSync).toEqual(true);
             });
 
             it('should be waiting at projectLevel if data has been submitted, approved at project level, but failed to sync', function() {
@@ -540,6 +541,27 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                     })];
                     moduleDataBlock = createModuleDataBlock();
 
+                    expect(moduleDataBlock.failedToSync).toEqual(false);
+                });
+            });
+
+            describe('Line list module', function () {
+               beforeEach(function () {
+                  isLineListService = true;
+               });
+
+                it('should be true if module is failedToSync while approving', function () {
+                    failedToSyncData = {"moduleId": "someModuleId", "period": "period"};
+                    approvalData = {
+                        isComplete: true,
+                    };
+                    moduleDataBlock = createModuleDataBlock();
+                    expect(moduleDataBlock.failedToSync).toEqual(true);
+                });
+
+                it('should be false if module is failedToSync while data submission', function () {
+                    failedToSyncData = {"moduleId": "someModuleId", "period": "period"};
+                    moduleDataBlock = createModuleDataBlock();
                     expect(moduleDataBlock.failedToSync).toEqual(false);
                 });
             });
