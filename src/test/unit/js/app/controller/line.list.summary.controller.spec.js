@@ -1,11 +1,11 @@
 define(["lineListSummaryController", "angularMocks", "utils", "timecop", "programRepository", "programEventRepository", "excludedDataElementsRepository",
-        "orgUnitRepository", "approvalDataRepository", "referralLocationsRepository", "translationsService"
+        "orgUnitRepository", "approvalDataRepository", "referralLocationsRepository", "dataSyncFailureRepository", "translationsService"
     ],
-    function(LineListSummaryController, mocks, utils, timecop, ProgramRepository, ProgramEventRepository, ExcludedDataElementsRepository, OrgUnitRepository, ApprovalDataRepository, ReferralLocationsRepository, TranslationsService) {
+    function(LineListSummaryController, mocks, utils, timecop, ProgramRepository, ProgramEventRepository, ExcludedDataElementsRepository, OrgUnitRepository, ApprovalDataRepository, ReferralLocationsRepository, DataSyncFailureRepository, TranslationsService) {
         describe("lineListSummaryController ", function() {
             var scope, q, hustle, timeout, fakeModal, anchorScroll, location, routeParams, window,
                 lineListSummaryController,
-                programRepository, programEventRepository, referralLocationsRepository, approvalDataRepository, excludedDataElementsRepository, orgUnitRepository, translationsService,
+                programRepository, programEventRepository, referralLocationsRepository, approvalDataRepository, excludedDataElementsRepository, orgUnitRepository, dataSyncFailureRepository, translationsService,
                 systemSettings, currentModule, originOrgUnits, program, project, mockEvent;
 
             beforeEach(module('hustle'));
@@ -152,6 +152,9 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                 spyOn(approvalDataRepository, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
                 spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, {}));
 
+                dataSyncFailureRepository = new DataSyncFailureRepository();
+                spyOn(dataSyncFailureRepository, 'delete').and.returnValue(utils.getPromise(q,{}));
+
                 translationsService = new TranslationsService();
                 spyOn(translationsService, "translate").and.callFake(function(object){
                     return object;
@@ -166,7 +169,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
             });
 
             var createLineListSummary = function () {
-                lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, excludedDataElementsRepository, orgUnitRepository, approvalDataRepository, referralLocationsRepository, translationsService);
+                lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, excludedDataElementsRepository, orgUnitRepository, approvalDataRepository, referralLocationsRepository, dataSyncFailureRepository, translationsService);
             };
 
             var createMockEvent = function (options) {
@@ -251,6 +254,8 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                     orgUnit: currentModule.id
                 }]);
 
+                expect(dataSyncFailureRepository.delete).toHaveBeenCalledWith(currentModule.id, mockEventA.period);
+                expect(dataSyncFailureRepository.delete).toHaveBeenCalledWith(currentModule.id, mockEventB.period);
                 expect(hustle.publishOnce).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEventA.period), 'dataValues');
                 expect(hustle.publishOnce).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEventB.period), 'dataValues');
                 expect(scope.resultMessageType).toEqual('success');
@@ -279,6 +284,8 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                     orgUnit: currentModule.id
                 }], 'dataentryuser');
 
+                expect(dataSyncFailureRepository.delete).toHaveBeenCalledWith(currentModule.id, mockEventA.period);
+                expect(dataSyncFailureRepository.delete).toHaveBeenCalledWith(currentModule.id, mockEventB.period);
                 expect(hustle.publishOnce).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEventA.period), 'dataValues');
                 expect(hustle.publishOnce).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEventB.period), 'dataValues');
                 expect(scope.resultMessageType).toEqual('success');
@@ -299,6 +306,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                 expect(fakeModal.open).toHaveBeenCalled();
                 expect(hustle.publishOnce).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEvent.period), 'dataValues');
 
+                expect(dataSyncFailureRepository.delete).toHaveBeenCalledWith(currentModule.id, mockEvent.period);
                 expect(programEventRepository.upsert).toHaveBeenCalledWith(mockEvent);
                 expect(mockEvent.localStatus).toEqual('DELETED');
                 expect(programEventRepository.getSubmitableEventsFor).toHaveBeenCalled();

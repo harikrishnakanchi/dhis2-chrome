@@ -1,6 +1,6 @@
 define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, properties, orgUnitMapper) {
     return function($scope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, programRepository, programEventRepository, excludedDataElementsRepository,
-        orgUnitRepository, approvalDataRepository, referralLocationsRepository, translationsService) {
+        orgUnitRepository, approvalDataRepository, referralLocationsRepository, dataSyncFailureRepository, translationsService) {
 
         $scope.filterParams = {};
         $scope.currentUrl = $location.path();
@@ -176,6 +176,12 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 return approvalDataRepository.clearApprovals(periodsAndOrgUnits);
             };
 
+            var clearFailedToSync = function () {
+              return _.each(submitablePeriods, function (period) {
+                  dataSyncFailureRepository.delete($scope.selectedModuleId, period);
+              });
+            };
+
             var publishToDhis = function() {
                 var publishPromises = _.map(submitablePeriods, publishMessageToSyncModuleDataBlock);
                 return $q.all(publishPromises);
@@ -188,6 +194,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
 
             programEventRepository.markEventsAsSubmitted(_.pluck(submitableEvents, 'event'))
                 .then(clearAnyExisingApprovals)
+                .then(clearFailedToSync)
                 .then(publishToDhis)
                 .then(updateView);
         };
@@ -199,6 +206,12 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
 
             var clearAnyExisingApprovals = function() {
                 return approvalDataRepository.clearApprovals(periodsAndOrgUnits);
+            };
+
+            var clearFailedToSync = function () {
+                return _.each(submittablePeriods, function (period) {
+                    dataSyncFailureRepository.delete($scope.selectedModuleId, period);
+                });
             };
 
             var markAsApproved = function() {
@@ -218,6 +231,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
 
             programEventRepository.markEventsAsSubmitted(_.pluck(submitableEvents, 'event'))
                 .then(clearAnyExisingApprovals)
+                .then(clearFailedToSync)
                 .then(markAsApproved)
                 .then(publishToDhis)
                 .then(updateView);
@@ -235,8 +249,13 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 };
                 event.localStatus = 'DELETED';
 
+                var clearFailedToSync = function () {
+                    return dataSyncFailureRepository.delete($scope.selectedModuleId, periodAndOrgUnit.period);
+                };
+
                 return programEventRepository.upsert(event)
                     .then(_.partial(approvalDataRepository.clearApprovals, periodAndOrgUnit))
+                    .then(clearFailedToSync)
                     .then(_.partial(publishMessageToSyncModuleDataBlock, event.period));
             };
 
