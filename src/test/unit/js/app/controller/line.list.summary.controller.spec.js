@@ -157,13 +157,17 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                     return object;
                 });
 
-                lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, excludedDataElementsRepository, orgUnitRepository, approvalDataRepository, referralLocationsRepository, translationsService);
+                createLineListSummary();
             }));
 
             afterEach(function() {
                 Timecop.returnToPresent();
                 Timecop.uninstall();
             });
+
+            var createLineListSummary = function () {
+                lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, excludedDataElementsRepository, orgUnitRepository, approvalDataRepository, referralLocationsRepository, translationsService);
+            };
 
             var createMockEvent = function (options) {
                 return _.merge({
@@ -232,7 +236,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                 programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [mockEventA, mockEventB]));
 
                 routeParams.filterBy = 'readyToSubmit';
-                lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, excludedDataElementsRepository, orgUnitRepository, approvalDataRepository, referralLocationsRepository, translationsService);
+                createLineListSummary();
                 scope.$apply();
 
                 scope.submit();
@@ -259,7 +263,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                 programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [mockEventA, mockEventB]));
 
                 routeParams.filterBy = 'readyToSubmit';
-                lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, excludedDataElementsRepository, orgUnitRepository, approvalDataRepository, referralLocationsRepository, translationsService);
+                createLineListSummary();
                 scope.$apply();
 
                 scope.submitAndApprove();
@@ -286,7 +290,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                 programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [mockEvent]));
 
                 routeParams.filterBy = 'readyToSubmit';
-                lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, excludedDataElementsRepository, orgUnitRepository, approvalDataRepository, referralLocationsRepository, translationsService);
+                createLineListSummary();
                 scope.$apply();
 
                 scope.deleteEvent(mockEvent);
@@ -306,7 +310,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                 programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [mockEvent]));
 
                 routeParams.filterBy = 'readyToSubmit';
-                lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, excludedDataElementsRepository, orgUnitRepository, approvalDataRepository, referralLocationsRepository, translationsService);
+                createLineListSummary();
                 scope.$apply();
 
                 scope.deleteEvent(mockEvent);
