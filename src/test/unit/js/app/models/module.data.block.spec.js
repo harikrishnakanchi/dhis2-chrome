@@ -149,13 +149,25 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                     expect(moduleDataBlock.submitted).toEqual(false);
                 });
 
-                it('should be false if there are events with a localStatus not equal to READY_FOR_DHIS', function () {
+                it('should be false if there are no events with a localStatus equal to READY_FOR_DHIS', function () {
                     lineListEvents = [{
                         someEventInfo: 'someEventDetails',
                         localStatus: 'SOME_OTHER_STATUS'
                     }];
                     moduleDataBlock = createModuleDataBlock();
                     expect(moduleDataBlock.submitted).toEqual(false);
+                });
+
+                it('should be true if there are any event with a local status READY_FOR_DHIS', function () {
+                    lineListEvents = [{
+                        someEventInfo: 'someEventDetails',
+                        localStatus: 'READY_FOR_DHIS'
+                    }, {
+                        someEventInfo: 'someEventDetails',
+                        localStatus: 'SOME_OTHER_STATUS'
+                    }];
+                    moduleDataBlock = createModuleDataBlock();
+                    expect(moduleDataBlock.submitted).toEqual(true);
                 });
             });
         });

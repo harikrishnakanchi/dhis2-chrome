@@ -72,7 +72,7 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
 
     var isSubmitted = function (dataValues, lineListEvents, lineListService) {
         if(lineListService) {
-            return !!(lineListEvents && lineListEvents.length > 0 && _.all(lineListEvents, eventIsSubmitted));
+            return !!(lineListEvents && lineListEvents.length > 0 && _.any(lineListEvents, eventIsSubmitted));
         } else {
             return !!(dataValues.length > 0 && !_.some(dataValues, { isDraft: true }));
         }
