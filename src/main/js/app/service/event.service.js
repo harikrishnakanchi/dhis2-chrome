@@ -1,8 +1,8 @@
-define(["dhisUrl", "moment", "lodash"], function(dhisUrl, moment, _) {
+define(['dhisUrl', 'properties', 'moment', 'lodash'], function(dhisUrl, properties, moment, _) {
     return function($http, $q) {
-        var MAX_NUMBER_OF_EVENTS = 10000,
-            EVENT_ID_PAGE_SIZE = 1000,
-            EVENT_DATA_PAGE_SIZE = 200,
+        var MAX_NUMBER_OF_EVENTS = properties.eventsSync.maximumNumberOfEventsToSync,
+            EVENT_ID_PAGE_SIZE = properties.eventsSync.pageSize.eventIds,
+            EVENT_DATA_PAGE_SIZE = properties.eventsSync.pageSize.eventData,
             DEFAULT_PAGE_REQUESTS_MAX_LIMIT = 99;
 
         var recursivelyDownloadPagedEvents = function(queryParams, maximumPageRequests, eventsResponses) {

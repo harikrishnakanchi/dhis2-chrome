@@ -50,6 +50,11 @@ define(['lodash', 'overrides'], function(_, overrides) {
             checkMsgcountDelayInMinutes: 1
         },
         eventsSync: {
+            maximumNumberOfEventsToSync: 10000,
+            pageSize: {
+                eventIds: 1000,
+                eventData: 200
+            },
             numberOfDaysToAllowResubmit: 3
         },
         logging: {

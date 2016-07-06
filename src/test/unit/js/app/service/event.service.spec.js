@@ -1,5 +1,5 @@
-define(["eventService", "angularMocks", "properties", "moment", "lodash"], function(EventService, mocks, properties, moment, _) {
-    describe("eventService", function() {
+define(['eventService', 'angularMocks', 'properties', 'moment', 'lodash'], function(EventService, mocks, properties, moment, _) {
+    describe('eventService', function() {
         var httpBackend, http, eventService;
 
         beforeEach(mocks.inject(function($injector, $q) {
@@ -33,7 +33,7 @@ define(["eventService", "angularMocks", "properties", "moment", "lodash"], funct
                     '&orgUnit=' + orgUnitId +
                     '&ouMode=DESCENDANTS' +
                     '&page=1' +
-                    '&pageSize=200' +
+                    '&pageSize=' + properties.eventsSync.pageSize.eventData +
                     '&startDate=' + expectedStartDate +
                     '&totalPages=true'
                 ).respond(200, {});
@@ -112,7 +112,7 @@ define(["eventService", "angularMocks", "properties", "moment", "lodash"], funct
                 eventService.getEvents(orgUnitId, periodRange);
                 httpBackend.flush();
 
-                expect(numberOfRequests).toEqual(50);
+                expect(numberOfRequests).toEqual(properties.eventsSync.maximumNumberOfEventsToSync / properties.eventsSync.pageSize.eventData);
             });
 
             it('should not make any further requests if events response is empty', function() {
@@ -143,7 +143,7 @@ define(["eventService", "angularMocks", "properties", "moment", "lodash"], funct
                     '&orgUnit=' + orgUnitId +
                     '&ouMode=DESCENDANTS' +
                     '&page=1' +
-                    '&pageSize=1000' +
+                    '&pageSize=' + properties.eventsSync.pageSize.eventIds +
                     '&startDate=' + expectedStartDate +
                     '&totalPages=true'
                 ).respond(200, {});
@@ -216,7 +216,7 @@ define(["eventService", "angularMocks", "properties", "moment", "lodash"], funct
                 eventService.getEventIds(orgUnitId, periodRange);
                 httpBackend.flush();
 
-                expect(numberOfRequests).toEqual(10);
+                expect(numberOfRequests).toEqual(properties.eventsSync.maximumNumberOfEventsToSync / properties.eventsSync.pageSize.eventIds);
             });
 
             it('should not make any further requests if events response is empty', function() {
