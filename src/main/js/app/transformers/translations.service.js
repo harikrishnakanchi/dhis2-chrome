@@ -60,7 +60,7 @@ define(['lodash'], function(_){
                         item.description = descriptionTranslation ? descriptionTranslation.value : item.description;
                     }
                     var shortNameTranslation = _.find(translationObject, {property: "shortName"});
-                    namesHash[item.id] = shortNameTranslation ? shortNameTranslation.value : item.name;
+                    item.name = shortNameTranslation ? shortNameTranslation.value : item.name;
                 });
             });
         };

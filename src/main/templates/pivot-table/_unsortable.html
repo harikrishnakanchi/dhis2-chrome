@@ -17,9 +17,9 @@
             <a id="elementId_{{$index}}"
                class="changeColor"
                description-popup
-               dp-title="{{getDataElementName(data.metaData.names[datum.dataElement])}}"
+               dp-title="{{getDataElementName(datum.dataElementName)}}"
                dp-desc="{{datum.dataElementDescription}}">
-                {{getDataElementName(data.metaData.names[datum.dataElement])}}
+                {{getDataElementName(datum.dataElementName)}}
             </a>
         </td>
         <td ng-repeat="item in maxColumnsHeader.headers" ng-show="periodBasedValues[item.period] !== undefined">

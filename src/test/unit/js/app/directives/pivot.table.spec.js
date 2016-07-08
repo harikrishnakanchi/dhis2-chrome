@@ -41,6 +41,15 @@ define(["pivotTableDirective", "angularMocks", "utils", "pivotTableController", 
                     "name": "Follow-up Consultations - Consultations - Out Patient Department - Pediatric"
                 }],
                 "rows": [{
+                    "dimension": "de",
+                    "items": [{
+                        "id": "a0e7d3973e3",
+                        "name": "New Consultations - Consultations - Out Patient Department - Pediatric"
+                    }, {
+                        "id": "a67aa742313",
+                        "name": "Follow-up Consultations - Consultations - Out Patient Department - Pediatric"
+                    }]
+                }, {
                     "dimension": "a1948a9c6f4",
                     "items": [{
                         "id": "ab3a614eed1",
@@ -54,15 +63,6 @@ define(["pivotTableDirective", "angularMocks", "utils", "pivotTableController", 
                     }, {
                         "id": "afca0bdf0f1",
                         "name": "<1 month"
-                    }]
-                }, {
-                    "dimension": "de",
-                    "items": [{
-                        "id": "a0e7d3973e3",
-                        "name": "New Consultations - Consultations - Out Patient Department - Pediatric"
-                    }, {
-                        "id": "a67aa742313",
-                        "name": "Follow-up Consultations - Consultations - Out Patient Department - Pediatric"
                     }]
                 }],
                 "filters": [{

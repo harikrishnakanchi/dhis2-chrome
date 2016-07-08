@@ -93,6 +93,11 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
                                 id: 'a0e7d3973e3',
                                 name: 'New Consultations - Consultations - Out Patient Department - Pediatric',
                                 description: 'random description'
+                            },
+                            {
+                                id: 'a67aa742313',
+                                name: 'Follow-up Consultations - Consultations - Out Patient Department - Pediatric',
+                                description: 'random description'
                             }
                         ]
                     }
@@ -266,7 +271,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
             }, {
                 dataElement: 'a67aa742313',
                 dataElementName: 'Follow-up Consultations - Consultations - Out Patient Department - Pediatric',
-                dataElementDescription: '',
+                dataElementDescription: 'random description',
                 dataElementIndex: 2,
                 sortKey_201507: 8205,
                 sortKey_201508: 0

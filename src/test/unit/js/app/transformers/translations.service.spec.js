@@ -343,7 +343,7 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                         rows: [{
                             items: [{
                                 id: 'id4',
-                                value: 'someName'
+                                name: 'someName'
                             }]
                         }]
                     },
@@ -367,7 +367,7 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                 scope.$apply();
 
                 var translatedReport = translationsService.translateReports([mockReport]);
-                expect(translatedReport[0].data.metaData.names).toEqual({id4: 'frenchReport'});
+                expect(translatedReport[0].definition.rows[0].items[0].name).toEqual('frenchReport');
             });
 
             it('should translate the description of the item if translation exists', function () {
