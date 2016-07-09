@@ -191,50 +191,55 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
         });
 
         describe('getUpdatedPivotTables', function () {
-            it('should download field app pivot tables modified since lastUpdated', function () {
-                var lastUpdatedTime = '2016-02-19T04:28:32.082Z';
+            var pivotTableIds;
 
-                reportService.getUpdatedPivotTables(lastUpdatedTime).then(function (pivotTablesFromService) {
-                    expect(pivotTablesFromService).toEqual([pivotTable1DetailsResponse, pivotTable2DetailsResponse]);
-                });
-
-                var updatedPivotTablesResponse = {
-                    'reportTables': [
-                        { 'id': 'pivotTable1' },
-                        { 'id': 'pivotTable2' }
+            beforeEach(function () {
+                pivotTableIds = {
+                    reportTables: [
+                        { id: 'pivotTable1' },
+                        { id: 'pivotTable2' }
                     ]
                 };
+            });
 
-                var pivotTable1DetailsResponse = {
-                    'id': 'pivotTable1',
-                    'more': 'details',
-                    'rows': [],
-                    'columns': [],
-                    'filters': []
-                };
+            it('downloads the id of each pivot table', function () {
+                var expectedQueryParams = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false';
+                httpBackend.expectGET(properties.dhis.url + '/api/reportTables.json?' + expectedQueryParams).respond(200, {});
 
-                var pivotTable2DetailsResponse = {
-                    'id': 'pivotTable2',
-                    'more': 'details',
-                    'rows': [],
-                    'columns': [],
-                    'filters': []
-                };
-
-                var expectedQueryParamsForUpdatedPivotTables = 'fields=id&filter=name:like:%5BFieldApp+-+&filter=lastUpdated:gte:' + lastUpdatedTime + '&paging=false';
-                httpBackend.expectGET(properties.dhis.url + '/api/reportTables.json?' + expectedQueryParamsForUpdatedPivotTables).respond(200, updatedPivotTablesResponse);
-
-                var expectedQueryParamsForPivotTableDetails = 'fields=id,name,sortOrder,categoryDimensions%5BdataElementCategory,categoryOptions%5B:identifiable%5D%5D,dataElements,indicators,dataDimensionItems,relativePeriods,columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name,description%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D';
-                httpBackend.expectGET(properties.dhis.url + '/api/reportTables/pivotTable1.json?' + expectedQueryParamsForPivotTableDetails).respond(200, pivotTable1DetailsResponse);
-                httpBackend.expectGET(properties.dhis.url + '/api/reportTables/pivotTable2.json?' + expectedQueryParamsForPivotTableDetails).respond(200, pivotTable2DetailsResponse);
+                reportService.getUpdatedPivotTables();
                 httpBackend.flush();
             });
 
-            it('should download all field app pivot tables if lastUpdated is not provided', function () {
-                reportService.getUpdatedPivotTables();
+            it('downloads the details of each pivot table', function () {
+                httpBackend.expectGET(/.*reportTables.json.*/).respond(200, pivotTableIds);
 
-                var expectedQueryParams = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false';
-                httpBackend.expectGET(properties.dhis.url + '/api/reportTables.json?' + expectedQueryParams).respond(200, {});
+                var expectedQueryParams = 'fields=id,name,sortOrder,categoryDimensions%5BdataElementCategory,categoryOptions%5B:identifiable%5D%5D,dataElements,indicators,dataDimensionItems,relativePeriods,columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name,description%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D';
+                httpBackend.expectGET(properties.dhis.url + '/api/reportTables/pivotTable1.json?' + expectedQueryParams).respond(200, {});
+                httpBackend.expectGET(properties.dhis.url + '/api/reportTables/pivotTable2.json?' + expectedQueryParams).respond(200, {});
+
+                reportService.getUpdatedPivotTables();
+                httpBackend.flush();
+            });
+
+            it('returns the details of each pivot table', function () {
+                var pivotTable1 = { id: 'table1' },
+                    pivotTable2 = { id: 'table2' };
+
+                httpBackend.expectGET(/.*reportTables.json.*/).respond(200, pivotTableIds);
+                httpBackend.expectGET(/.*pivotTable1.json.*/).respond(200, pivotTable1);
+                httpBackend.expectGET(/.*pivotTable2.json.*/).respond(200, pivotTable2);
+
+                reportService.getUpdatedPivotTables().then(function (response) {
+                    expect(response).toEqual([pivotTable1, pivotTable2]);
+                });
+
+                httpBackend.flush();
+            });
+
+            it('downloads the id of each pivot table modified since specified lastUpdated timestamp', function () {
+                reportService.getUpdatedPivotTables('someTimestamp');
+
+                httpBackend.expectGET(/.*filter=lastUpdated:gte:someTimestamp.*/).respond(200, {});
                 httpBackend.flush();
             });
         });
