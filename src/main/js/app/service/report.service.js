@@ -61,20 +61,26 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
         };
 
         var getResourceDetails = function(resourceUrl, requiredFields, resourceIds) {
-            var config = {
-                params: {
-                    fields: requiredFields
-                }
-            };
+            var downloadResource = function (id) {
+                var config = { params: { fields: requiredFields } };
 
-            var getIndividualResourceDetails = function(resourceId) {
-                return $http.get(resourceUrl + '/' + resourceId + '.json', config).then(function (response) {
+                return $http.get(resourceUrl + '/' + id + '.json', config).then(function (response) {
                     return response.data;
                 });
             };
 
-            var allPromises = _.map(resourceIds, getIndividualResourceDetails);
-            return $q.all(allPromises);
+            var recursivelyLoopThroughResourceIds = function (ids, resources) {
+                if(_.isEmpty(ids)) {
+                    return $q.when(resources);
+                }
+
+                return downloadResource(ids.shift()).then(function (resource) {
+                    resources.push(resource);
+                    return recursivelyLoopThroughResourceIds(ids, resources);
+                });
+            };
+
+            return recursivelyLoopThroughResourceIds(resourceIds, []);
         };
 
         this.getUpdatedCharts = function(lastUpdatedTime) {
