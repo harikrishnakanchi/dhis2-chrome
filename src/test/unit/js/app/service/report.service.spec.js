@@ -123,50 +123,55 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
         });
 
         describe('getUpdatedCharts', function () {
-            it('should download field app charts modified since lastUpdated', function () {
-                var lastUpdatedTime = '2016-02-19T04:28:32.082Z';
+            var chartIds;
 
-                reportService.getUpdatedCharts(lastUpdatedTime).then(function (chartsFromService) {
-                    expect(chartsFromService).toEqual([chart1DetailsResponse, chart2DetailsResponse]);
-                });
-
-                var updatedChartsResponse = {
-                    'charts': [
-                        { 'id': 'chart1' },
-                        { 'id': 'chart2' }
+            beforeEach(function () {
+                chartIds = {
+                    charts: [
+                        { id: 'chart1' },
+                        { id: 'chart2' }
                     ]
                 };
+            });
 
-                var chart1DetailsResponse = {
-                    'id': 'chart1',
-                    'more': 'details',
-                    'rows': [],
-                    'columns': [],
-                    'filters': []
-                };
+            it('downloads the id of each chart', function () {
+                var expectedQueryParams = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false';
+                httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedQueryParams).respond(200, {});
 
-                var chart2DetailsResponse = {
-                    'id': 'chart2',
-                    'more': 'details',
-                    'rows': [],
-                    'columns': [],
-                    'filters': []
-                };
-
-                var expectedQueryParamsForUpdatedCharts = 'fields=id&filter=name:like:%5BFieldApp+-+&filter=lastUpdated:gte:' + lastUpdatedTime + '&paging=false';
-                httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedQueryParamsForUpdatedCharts).respond(200, updatedChartsResponse);
-
-                var expectedQueryParamsForChartDetails = 'fields=id,name,title,relativePeriods,type,columns%5Bdimension,filter,items%5Bid,name,description%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D';
-                httpBackend.expectGET(properties.dhis.url + '/api/charts/chart1.json?' + expectedQueryParamsForChartDetails).respond(200, chart1DetailsResponse);
-                httpBackend.expectGET(properties.dhis.url + '/api/charts/chart2.json?' + expectedQueryParamsForChartDetails).respond(200, chart2DetailsResponse);
+                reportService.getUpdatedCharts();
                 httpBackend.flush();
             });
 
-            it('should download all field app charts if lastUpdated is not provided', function () {
-                reportService.getUpdatedCharts();
+            it('downloads the details of each chart', function () {
+                httpBackend.expectGET(/.*charts.json.*/).respond(200, chartIds);
 
-                var expectedQueryParams = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false';
-                httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedQueryParams).respond(200, {});
+                var expectedQueryParams = 'fields=id,name,title,relativePeriods,type,columns%5Bdimension,filter,items%5Bid,name,description%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D';
+                httpBackend.expectGET(properties.dhis.url + '/api/charts/chart1.json?' + expectedQueryParams).respond(200, {});
+                httpBackend.expectGET(properties.dhis.url + '/api/charts/chart2.json?' + expectedQueryParams).respond(200, {});
+
+                reportService.getUpdatedCharts();
+                httpBackend.flush();
+            });
+
+            it('returns the details of each chart', function () {
+                var chart1 = { id: 'chart1' },
+                    chart2 = { id: 'chart2' };
+
+                httpBackend.expectGET(/.*charts.json.*/).respond(200, chartIds);
+                httpBackend.expectGET(/.*chart1.json.*/).respond(200, chart1);
+                httpBackend.expectGET(/.*chart2.json.*/).respond(200, chart2);
+
+                reportService.getUpdatedCharts().then(function (response) {
+                    expect(response).toEqual([chart1, chart2]);
+                });
+
+                httpBackend.flush();
+            });
+
+            it('downloads the id of each chart modified since specific lastUpdated timestamp', function () {
+                reportService.getUpdatedCharts('someTimestamp');
+
+                httpBackend.expectGET(/.*filter=lastUpdated:gte:someTimestamp.*/).respond(200, {});
                 httpBackend.flush();
             });
         });
