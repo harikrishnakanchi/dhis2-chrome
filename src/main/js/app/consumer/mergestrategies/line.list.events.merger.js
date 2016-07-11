@@ -28,12 +28,17 @@ define(['moment', 'lodash'], function (moment, _) {
 
         var checkIfEventsHaveBeenModified = function (praxisEvents, eventsToUpsert) {
             var dataValuesAreEqual = function (dataValueA, dataValueB) {
-                return dataValueA.dataElement === dataValueB.dataElement && dataValueA.value === dataValueB.value;
+                return dataValueA.dataElement === dataValueB.dataElement && String(dataValueA.value) === String(dataValueB.value);
+            };
+
+            var emptyDataValue = function (dataValue) {
+                return _.isUndefined(dataValue.value);
             };
 
             var eventDataValuesAreEqual = function (eventA, eventB) {
-                var dataValuesA = eventA.dataValues || [],
-                    dataValuesB = eventB.dataValues || [];
+                var dataValuesA = _.reject(eventA.dataValues || [], emptyDataValue),
+                    dataValuesB = _.reject(eventB.dataValues || [], emptyDataValue);
+
                 return dataValuesA.length === dataValuesB.length && _.all(dataValuesA, function (dataValueA) {
                         return _.any(dataValuesB, function (dataValueB) {
                             return dataValuesAreEqual(dataValueA, dataValueB);

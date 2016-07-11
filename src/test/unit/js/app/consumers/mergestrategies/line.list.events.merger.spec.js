@@ -182,20 +182,45 @@ define(['lineListEventsMerger', 'angularMocks', 'moment'], function (LineListEve
         });
 
         describe('updated event on DHIS has same data values as existing event on Praxis', function () {
-            beforeEach(function () {
-                var dataValues = [createMockDataValue()];
-                updatedEventsFromDhis = [createMockEvent({ lastUpdated: someMomentInTime, dataValues: dataValues })];
-                eventIdsFromDhis = _.pluck(updatedEventsFromDhis, 'event');
-                praxisEvents = [createMockEvent({ lastUpdated: someOlderMomentInTime, dataValues: dataValues })];
+            var mockDataValue;
 
-                merger = createMerger();
+            beforeEach(function () {
+                mockDataValue = createMockDataValue({ value: '88888888' });
+                updatedEventsFromDhis = [createMockEvent({ lastUpdated: someMomentInTime, dataValues: [mockDataValue] })];
+                eventIdsFromDhis = _.pluck(updatedEventsFromDhis, 'event');
             });
 
             it('should return the updated DHIS event', function () {
+                praxisEvents = [createMockEvent({ lastUpdated: someOlderMomentInTime, dataValues: [mockDataValue] })];
+                merger = createMerger();
+
                 expect(merger.eventsToUpsert).toEqual(updatedEventsFromDhis);
             });
 
             it('should indicate that praxisAndDhisAreBothUpToDate', function () {
+                praxisEvents = [createMockEvent({ lastUpdated: someOlderMomentInTime, dataValues: [mockDataValue] })];
+                merger = createMerger();
+
+                expect(merger.praxisAndDhisAreBothUpToDate).toEqual(true);
+                expect(merger.dhisIsUpToDateAndPraxisIsOutOfDate).toEqual(false);
+                expect(merger.praxisAndDhisAreBothOutOfDate).toEqual(false);
+            });
+
+            it('should ignore empty data values', function () {
+                var emptyDataValue = _.omit(createMockDataValue({ dataElement: 'anotherDataElementId' }), 'value');
+                praxisEvents = [createMockEvent({ lastUpdated: someOlderMomentInTime, dataValues: [mockDataValue, emptyDataValue] })];
+                merger = createMerger();
+
+                expect(merger.praxisAndDhisAreBothUpToDate).toEqual(true);
+                expect(merger.dhisIsUpToDateAndPraxisIsOutOfDate).toEqual(false);
+                expect(merger.praxisAndDhisAreBothOutOfDate).toEqual(false);
+            });
+
+            it('should compare all data values as strings', function () {
+                var numericDataValue = createMockDataValue({ value: 88888888 });
+                praxisEvents = [createMockEvent({ lastUpdated: someOlderMomentInTime, dataValues: [numericDataValue] })];
+                merger = createMerger();
+
                 expect(merger.praxisAndDhisAreBothUpToDate).toEqual(true);
                 expect(merger.dhisIsUpToDateAndPraxisIsOutOfDate).toEqual(false);
                 expect(merger.praxisAndDhisAreBothOutOfDate).toEqual(false);
