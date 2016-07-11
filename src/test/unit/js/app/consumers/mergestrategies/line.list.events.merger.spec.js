@@ -26,6 +26,7 @@ define(['lineListEventsMerger', 'angularMocks', 'moment'], function (LineListEve
         describe('updated events exist on DHIS', function () {
             beforeEach(function () {
                 updatedEventsFromDhis = [createMockEvent({ lastUpdated: someMomentInTime })];
+                eventIdsFromDhis = _.pluck(updatedEventsFromDhis, 'event');
                 praxisEvents = [createMockEvent({ lastUpdated: someOlderMomentInTime })];
                 merger = createMerger();
             });
@@ -44,6 +45,7 @@ define(['lineListEventsMerger', 'angularMocks', 'moment'], function (LineListEve
         describe('event in Praxis has no timestamps', function () {
             beforeEach(function () {
                 updatedEventsFromDhis = [createMockEvent({ lastUpdated: someMomentInTime })];
+                eventIdsFromDhis = _.pluck(updatedEventsFromDhis, 'event');
                 praxisEvents = [createMockEvent({ lastUpdated: null })];
                 merger = createMerger();
             });
@@ -105,6 +107,7 @@ define(['lineListEventsMerger', 'angularMocks', 'moment'], function (LineListEve
             beforeEach(function () {
                 dhisEvent = createMockEvent({ event: 'eventA', lastUpdated: someMomentInTime });
                 updatedEventsFromDhis = [dhisEvent];
+                eventIdsFromDhis = _.pluck(updatedEventsFromDhis, 'event');
                 praxisEvents = [createMockEvent({ event: 'eventA', lastUpdated: someOlderMomentInTime, localStatus: 'DELETED' })];
                 merger = createMerger();
             });
@@ -124,6 +127,7 @@ define(['lineListEventsMerger', 'angularMocks', 'moment'], function (LineListEve
                 praxisEventB = createMockEvent({ event: 'eventIdB', clientLastUpdated: someMomentInTime, localStatus: 'READY_FOR_DHIS' });
 
                 updatedEventsFromDhis = [dhisEventA, dhisEventB];
+                eventIdsFromDhis = _.pluck(updatedEventsFromDhis, 'event');
                 praxisEvents = [praxisEventA, praxisEventB];
 
                 merger = createMerger();
@@ -145,7 +149,7 @@ define(['lineListEventsMerger', 'angularMocks', 'moment'], function (LineListEve
                 var mockEvent = createMockEvent({ lastUpdated: someMomentInTime });
                 praxisEvents = [mockEvent];
                 updatedEventsFromDhis = [mockEvent];
-                eventIdsFromDhis = [mockEvent.event];
+                eventIdsFromDhis = _.pluck(updatedEventsFromDhis, 'event');
                 merger = createMerger();
             });
 
