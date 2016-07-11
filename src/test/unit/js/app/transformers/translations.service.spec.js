@@ -74,6 +74,35 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
             });
         }));
 
+        it('should return translation value of property for specified object', function() {
+            var locale = 'fr';
+            var objectId = "id1";
+
+            translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
+            translationsService.setLocale(locale);
+
+            scope.$apply();
+
+            var actual = translationsService.getTranslationForProperty(objectId, 'name');
+
+            expect(actual).toEqual("frenchName");
+        });
+
+        it('should return default value if translation for specified property in specified object is not present', function() {
+            var locale = 'fr';
+            var objectId = "id1";
+            var defaultValue = "defaultValue";
+
+            translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
+            translationsService.setLocale(locale);
+
+            scope.$apply();
+
+            var actual = translationsService.getTranslationForProperty(objectId, 'formName', defaultValue);
+
+            expect(actual).toEqual(defaultValue);
+        });
+
         it('should translate name to french if locale is french', function () {
             var locale = 'fr';
             var obj = [{

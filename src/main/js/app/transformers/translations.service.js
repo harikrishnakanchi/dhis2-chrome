@@ -70,6 +70,10 @@ define(['lodash'], function(_){
             return translationObject && translationObject.value;
         };
 
+        this.getTranslationForProperty = function (objectId, property, defaultValue) {
+            return getTranslation(objectId, property) || defaultValue;
+        };
+
         this.translateCharts = function (chartData) {
             if(_locale == 'en') {
                 return chartData;
