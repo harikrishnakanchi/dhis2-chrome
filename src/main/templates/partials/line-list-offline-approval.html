@@ -171,7 +171,7 @@
                                                 <a class="description-popup-icon"
                                                    description-popup
                                                    dp-title="{{resourceBundle.proceduresPerformed}}"
-                                                   dp-desc="{{ getDescriptionsForProceduresPerformed() }}"
+                                                   dp-data = "proceduresPerformed"
                                                    >
                                                     <i class="fa fa-info-circle" tooltip-placement="top"></i>
                                                 </a>
@@ -247,7 +247,8 @@
                                                 <a class="description-popup-icon"
                                                    description-popup
                                                    dp-title="{{resourceBundle.proceduresPerformed}}"
-                                                   dp-desc="{{ getDescriptionsForProceduresPerformed() }}">
+                                                   dp-data = "proceduresPerformed"
+                                                >
                                                     <i class="fa fa-info-circle" tooltip-placement="top"></i>
                                                 </a>
                                                 <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
@@ -341,7 +342,8 @@
                                                 <a class="description-popup-icon"
                                                    description-popup
                                                    dp-title="{{resourceBundle.proceduresPerformed}}"
-                                                   dp-desc="{{ getDescriptionsForProceduresPerformed() }}">
+                                                   dp-data = "proceduresPerformed"
+                                                >
                                                     <i class="fa fa-info-circle" tooltip-placement="top"></i>
                                                 </a>
                                                 <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
