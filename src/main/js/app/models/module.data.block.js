@@ -28,11 +28,15 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
     };
 
     var isFailedToSync = function(lineListService, aggregateDataValues, failedToSyncData, approvedAtAnyLevel) {
-        //This can be removed after v6.0 has been released
-        var aggregateDataValuesFailedToSyncAsPerDeprecatedLocalStatus = !!aggregateDataValues && _.any(aggregateDataValues, { localStatus: 'FAILED_TO_SYNC' });
         var failedToSync = !_.isEmpty(failedToSyncData);
-        var lineListEventSubmissionFailure = lineListService && !approvedAtAnyLevel;
-        return !(lineListEventSubmissionFailure) && (failedToSync || aggregateDataValuesFailedToSyncAsPerDeprecatedLocalStatus);
+
+        if(lineListService) {
+            return failedToSync && approvedAtAnyLevel;
+        } else {
+            //This can be removed after v6.0 has been released
+            var aggregateDataValuesFailedToSyncAsPerDeprecatedLocalStatus = !!aggregateDataValues && _.any(aggregateDataValues, { localStatus: 'FAILED_TO_SYNC' });
+            return failedToSync || aggregateDataValuesFailedToSyncAsPerDeprecatedLocalStatus;
+        }
     };
 
     var isWaitingForActionAtDataEntryLevel = function(submitted, approvedAtProject, approvedAtCoordination, failedToSync) {
