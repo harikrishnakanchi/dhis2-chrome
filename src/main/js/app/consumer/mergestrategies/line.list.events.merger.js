@@ -1,20 +1,6 @@
 define(['moment', 'lodash'], function (moment, _) {
     return function () {
 
-        var dataValuesEquals = function (dataValueA, dataValueB) {
-            return dataValueA.dataElement === dataValueB.dataElement && dataValueA.value === dataValueB.value;
-        };
-
-        var eventDataValuesAreEqual = function (eventA, eventB) {
-            var dataValuesA = eventA.dataValues || [],
-                dataValuesB = eventB.dataValues || [];
-            return dataValuesA.length === dataValuesB.length && _.all(dataValuesA, function (dataValueA) {
-                return _.any(dataValuesB, function (dataValueB) {
-                    return dataValuesEquals(dataValueA, dataValueB);
-                });
-            });
-        };
-
         var getEventIdsToDelete = function(praxisEvents, eventIdsFromDhis) {
             var indexedDhisEventIds = _.indexBy(eventIdsFromDhis, function(eventId) { return eventId; }),
                 eventsToDelete = _.reject(praxisEvents, function(praxisEvent) {
@@ -24,9 +10,7 @@ define(['moment', 'lodash'], function (moment, _) {
         };
 
         var getEventsToUpsert = function (praxisEvents, updatedEventsFromDhis) {
-            var eventsHaveBeenModified = false;
-
-            var eventsToUpsert = _.transform(updatedEventsFromDhis, function (eventsToUpsert, dhisEvent) {
+           return _.transform(updatedEventsFromDhis, function (eventsToUpsert, dhisEvent) {
                 var matchingPraxisEvent = _.find(praxisEvents, { event: dhisEvent.event });
                 if(matchingPraxisEvent) {
                     var dhisEventLastUpdated = moment(dhisEvent.lastUpdated),
@@ -35,20 +19,34 @@ define(['moment', 'lodash'], function (moment, _) {
 
                     if(praxisEventHasNoTimestamps || dhisEventLastUpdated.isAfter(praxisEventLastUpdated)) {
                         eventsToUpsert.push(dhisEvent);
-                        if(!eventDataValuesAreEqual(dhisEvent, matchingPraxisEvent)) {
-                            eventsHaveBeenModified = true;
-                        }
                     }
                 } else {
                     eventsToUpsert.push(dhisEvent);
-                    eventsHaveBeenModified = true;
                 }
             }, []);
+        };
 
-            return {
-                events: eventsToUpsert,
-                haveBeenModified: eventsHaveBeenModified
+        var checkIfEventsHaveBeenModified = function (praxisEvents, eventsToUpsert) {
+            var dataValuesAreEqual = function (dataValueA, dataValueB) {
+                return dataValueA.dataElement === dataValueB.dataElement && dataValueA.value === dataValueB.value;
             };
+
+            var eventDataValuesAreEqual = function (eventA, eventB) {
+                var dataValuesA = eventA.dataValues || [],
+                    dataValuesB = eventB.dataValues || [];
+                return dataValuesA.length === dataValuesB.length && _.all(dataValuesA, function (dataValueA) {
+                        return _.any(dataValuesB, function (dataValueB) {
+                            return dataValuesAreEqual(dataValueA, dataValueB);
+                        });
+                    });
+            };
+
+            var isNewOrHasBeenModified = function (eventToUpsert) {
+                var matchingPraxisEvent = _.find(praxisEvents, { event: eventToUpsert.event});
+                return !matchingPraxisEvent || !eventDataValuesAreEqual(eventToUpsert, matchingPraxisEvent);
+            };
+
+            return _.any(eventsToUpsert, isNewOrHasBeenModified);
         };
 
         var getMergedEvents = function (praxisEvents, eventsToUpsert) {
@@ -66,14 +64,15 @@ define(['moment', 'lodash'], function (moment, _) {
             eventIdsFromDhis = eventIdsFromDhis || [];
 
             var eventsToUpsert = getEventsToUpsert(praxisEvents, updatedEventsFromDhis),
+                eventsHaveBeenModified = checkIfEventsHaveBeenModified(praxisEvents, eventsToUpsert),
                 eventIdsToDelete = getEventIdsToDelete(praxisEvents, eventIdsFromDhis),
-                mergedEvents = getMergedEvents(praxisEvents, eventsToUpsert.events);
+                mergedEvents = getMergedEvents(praxisEvents, eventsToUpsert);
 
-            var praxisEventsAreUpToDate = !eventsToUpsert.haveBeenModified && _.isEmpty(eventIdsToDelete);
+            var praxisEventsAreUpToDate = !eventsHaveBeenModified && _.isEmpty(eventIdsToDelete);
             var dhisEventsAreUpToDate = !_.any(mergedEvents, isModifiedOnPraxis);
 
             return {
-                eventsToUpsert: eventsToUpsert.events,
+                eventsToUpsert: eventsToUpsert,
                 eventIdsToDelete: eventIdsToDelete,
                 praxisAndDhisAreBothUpToDate: praxisEventsAreUpToDate && dhisEventsAreUpToDate,
                 dhisIsUpToDateAndPraxisIsOutOfDate: dhisEventsAreUpToDate && !praxisEventsAreUpToDate,
