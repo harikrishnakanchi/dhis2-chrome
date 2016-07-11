@@ -16,10 +16,27 @@ define(['lineListEventsMerger', 'angularMocks', 'moment'], function (LineListEve
             return lineListEventsMerger.create(praxisEvents, updatedEventsFromDhis, eventIdsFromDhis);
         };
 
+        var getUniqueMockValue = function () {
+            var mockValueCounter = 0;
+            return function () {
+                return 'mockValue' + (++mockValueCounter);
+            };
+        }();
+
         var createMockEvent = function (options) {
             return _.merge({
                 event: 'someEventId',
+                dataValues: [
+                    createMockDataValue({ value: getUniqueMockValue() })
+                ],
                 lastUpdated: '2015-12-14T12:00:00.888+0000'
+            }, options);
+        };
+
+        var createMockDataValue = function (options) {
+            return _.merge({
+                dataElement: 'someDataElementId',
+                value: 'someValue'
             }, options);
         };
 
@@ -155,6 +172,27 @@ define(['lineListEventsMerger', 'angularMocks', 'moment'], function (LineListEve
 
             it('should return an empty array', function () {
                 expect(merger.eventsToUpsert).toEqual([]);
+            });
+
+            it('should indicate that praxisAndDhisAreBothUpToDate', function () {
+                expect(merger.praxisAndDhisAreBothUpToDate).toEqual(true);
+                expect(merger.dhisIsUpToDateAndPraxisIsOutOfDate).toEqual(false);
+                expect(merger.praxisAndDhisAreBothOutOfDate).toEqual(false);
+            });
+        });
+
+        describe('updated event on DHIS has same data values as existing event on Praxis', function () {
+            beforeEach(function () {
+                var dataValues = [createMockDataValue()];
+                updatedEventsFromDhis = [createMockEvent({ lastUpdated: someMomentInTime, dataValues: dataValues })];
+                eventIdsFromDhis = _.pluck(updatedEventsFromDhis, 'event');
+                praxisEvents = [createMockEvent({ lastUpdated: someOlderMomentInTime, dataValues: dataValues })];
+
+                merger = createMerger();
+            });
+
+            it('should return the updated DHIS event', function () {
+                expect(merger.eventsToUpsert).toEqual(updatedEventsFromDhis);
             });
 
             it('should indicate that praxisAndDhisAreBothUpToDate', function () {
