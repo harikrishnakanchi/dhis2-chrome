@@ -132,8 +132,8 @@ define(["lodash", "moment"], function(_, moment) {
             var proceduresPerformed = _.uniq($scope.dataValues._procedures, 'formName');
             proceduresPerformed =  _.map(proceduresPerformed, function (procedurePerformed) {
                 return {
-                    "title" : procedurePerformed.formName,
-                    "description": procedurePerformed.description
+                    "title" : translationsService.getTranslationForProperty(procedurePerformed.dataElement, 'formName', procedurePerformed.formName),
+                    "description": translationsService.getTranslationForProperty(procedurePerformed.dataElement, 'description', procedurePerformed.description)
                 };
             });
             $scope.proceduresPerformed = _.groupBy(proceduresPerformed, 'description');

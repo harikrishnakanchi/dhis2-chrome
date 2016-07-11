@@ -172,6 +172,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 translationsService = new TranslationsService();
                 spyOn(translationsService, "translate").and.returnValue([program]);
                 spyOn(translationsService, "translateOptionSetMap").and.returnValue(optionSetMapping);
+                spyOn(translationsService, "getTranslationForProperty").and.returnValue("");
 
                 optionSetRepository = new OptionSetRepository();
                 spyOn(optionSetRepository, "getOptionSetMapping").and.returnValue(utils.getPromise(q, {
@@ -370,6 +371,28 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                     "origin2": [events[1]]
                 });
                 expect(scope.associatedDataSets).toEqual(associatedDataSets);
+            });
+
+            it("should translate procedure dataElements formName and description", function () {
+                var translatedValue = "translatedValue";
+                expect(scope.originOrgUnits).toEqual([origin2, origin1, origin4, origin3]);
+                expect(scope.program).toEqual(program);
+
+                translationsService.translate.and.returnValue(associatedDataSets);
+                translationsService.getTranslationForProperty.and.returnValue(translatedValue);
+                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService);
+
+                scope.$apply();
+
+                expect(scope.proceduresPerformed).toEqual({
+                    "translatedValue": [{
+                        "title": translatedValue,
+                        "description": translatedValue
+                    }, {
+                        "title": translatedValue,
+                        "description": translatedValue
+                    }]
+                });
             });
 
             it("should return set showFilters to false if there are no events", function() {
