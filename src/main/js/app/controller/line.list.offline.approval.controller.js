@@ -259,12 +259,10 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         var init = function() {
-            var submittedEvents = [];
             return $q.all([loadOriginsOrgUnits(), loadProgram(), getOptionSetMapping(), getReferralLocations()]).then(function() {
                 return programEventRepository.getEventsForPeriod($scope.associatedProgramId, _.pluck($scope.originOrgUnits, "id"), getPeriod()).then(function(events) {
-                    _.forEach(events, function(event) {
-                        if (event.localStatus === "READY_FOR_DHIS" || event.localStatus === undefined)
-                            submittedEvents.push(event);
+                    var submittedEvents = _.filter(events, function(event) {
+                        return event.localStatus === "READY_FOR_DHIS" || event.localStatus === undefined;
                     });
                     loadGroupedDataValues(submittedEvents);
                     setShowFilterFlag();
