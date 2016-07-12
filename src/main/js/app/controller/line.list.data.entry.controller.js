@@ -125,7 +125,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
         $scope.update = function() {
             var dataValuesAndEventDate = getDataValuesAndEventDate();
             $scope.event.orgUnit = $scope.patientOrigin.selected.id;
-            $scope.event.eventDate = dataValuesAndEventDate.eventDate;
+            $scope.event.eventDate = moment(dataValuesAndEventDate.eventDate).toISOString();
             $scope.event.localStatus = dataValuesAndEventDate.compulsoryFieldsPresent ? "UPDATED_DRAFT" : "UPDATED_INCOMPLETE_DRAFT";
             $scope.event.dataValues = dataValuesAndEventDate.dataValues;
 
@@ -152,7 +152,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 "program": $scope.program.id,
                 "programStage": $scope.program.programStages[0].id,
                 "orgUnit": $scope.patientOrigin.selected.id,
-                "eventDate": dataValuesAndEventDate.eventDate,
+                "eventDate": moment(dataValuesAndEventDate.eventDate).toISOString(),
                 "localStatus": dataValuesAndEventDate.compulsoryFieldsPresent ? "NEW_DRAFT" : "NEW_INCOMPLETE_DRAFT",
                 "dataValues": dataValuesAndEventDate.dataValues
             };
