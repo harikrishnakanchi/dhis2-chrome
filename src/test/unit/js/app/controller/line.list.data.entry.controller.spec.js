@@ -241,7 +241,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 expect(actualUpsertedEvent.program).toEqual("Prg1");
                 expect(actualUpsertedEvent.programStage).toEqual("PrgStage1");
                 expect(actualUpsertedEvent.orgUnit).toEqual(originOrgUnits[0].id);
-                expect(actualUpsertedEvent.eventDate).toEqual(moment('2015-02-03').toISOString());
+                expect(actualUpsertedEvent.eventDate).toEqual("2015-02-03");
                 expect(actualUpsertedEvent.localStatus).toEqual("NEW_DRAFT");
                 expect(actualUpsertedEvent.dataValues).toEqual([{
                     "dataElement": 'de1',
@@ -311,7 +311,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 var expectedEventPayload = {
                     'event': "event1",
                     'orgUnit': "o1",
-                    'eventDate': moment('2015-04-15').toISOString(),
+                    'eventDate': "2015-04-15",
                     'dataValues': [{
                         "dataElement": "de1",
                         "value": "2015-04-15"
@@ -354,7 +354,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 expect(actualUpsertedEvent.program).toEqual("Prg1");
                 expect(actualUpsertedEvent.programStage).toEqual("PrgStage1");
                 expect(actualUpsertedEvent.orgUnit).toEqual("o1");
-                expect(actualUpsertedEvent.eventDate).toEqual(moment('2015-02-03').toISOString());
+                expect(actualUpsertedEvent.eventDate).toEqual("2015-02-03");
                 expect(actualUpsertedEvent.localStatus).toEqual("NEW_INCOMPLETE_DRAFT");
                 expect(actualUpsertedEvent.dataValues).toEqual([{
                     "dataElement": 'de1',
