@@ -265,5 +265,18 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyPivotTableData:' + mockProjectId, currentTime.toISOString());
             });
 
+            it('should download project report for a project', function () {
+                var mockProjectReport = {
+                    projectReport: true
+                };
+
+                pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [mockProjectReport]));
+
+                downloadPivotTableDataConsumer.run();
+                scope.$apply();
+
+                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(mockProjectReport, mockProjectId);
+            });
+
         });
     });

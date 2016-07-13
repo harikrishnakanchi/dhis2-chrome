@@ -63,15 +63,14 @@ define(["lodash", "moment"], function(_, moment) {
                 };
 
                 var addProjectReportPivotTables = function(orgUnitsAndTables){
-                    _.forEach(pivotTables, function(pivotTable) {
-                        if(_.contains(pivotTable.name, "ProjectReport")) {
-                            orgUnitsAndTables.push({
-                                orgUnitId: projectId,
-                                pivotTable: pivotTable
-                            });
-                        }
-                    });
+                    var projectReportPivotTables = _.filter(pivotTables, { projectReport: true });
 
+                    _.forEach(projectReportPivotTables, function(pivotTable) {
+                        orgUnitsAndTables.push({
+                            orgUnitId: projectId,
+                            pivotTable: pivotTable
+                        });
+                    });
                     return $q.when(orgUnitsAndTables);
                 };
 
