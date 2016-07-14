@@ -1,4 +1,4 @@
-define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, properties, dateUtils) {
+define(["moment", "lodash", "properties", "dateUtils", "customAttributes"], function(moment, _, properties, dateUtils, CustomAttributes) {
     return function(db, $q) {
         this.upsert = function(events) {
 
@@ -247,17 +247,7 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
 
                     return $q.all(_.map(dataElementIds, function(dataElementId) {
                         return store.find(dataElementId).then(function(dataElement) {
-                            var attr = _.find(dataElement.attributeValues, {
-                                "attribute": {
-                                    "code": 'showInEventSummary'
-                                }
-                            });
-
-                            if ((!_.isEmpty(attr)) && attr.value === "true") {
-                                dataElement.showInEventSummary = true;
-                            } else {
-                                dataElement.showInEventSummary = false;
-                            }
+                            dataElement.showInEventSummary = CustomAttributes.getBooleanAttributeValue(dataElement.attributeValues, "showInEventSummary");
                             dataElement.dataElement = dataElement.id;
                             return _.omit(dataElement, ["id", "attributeValues"]);
                         });
