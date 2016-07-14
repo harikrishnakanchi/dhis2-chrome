@@ -1,4 +1,4 @@
-define(["lodash", "customAttributes"], function(_, CustomAttributes) {
+define(["lodash"], function(_) {
     return function(db, orgUnitRepository) {
         var get = function(username) {
             var store = db.objectStore('userPreferences');
