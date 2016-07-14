@@ -1,7 +1,7 @@
-define(["programEventRepository", "angularMocks", "utils", "moment", "properties", "timecop"], function(ProgramEventRepository, mocks, utils, moment, properties, timecop) {
+define(["programEventRepository", "angularMocks", "utils", "moment", "properties", "timecop", "dataElementRepository"], function(ProgramEventRepository, mocks, utils, moment, properties, timecop, DataElementRepository) {
     describe("programEventRepository", function() {
 
-        var scope, q, programEventRepository, mockDB;
+        var scope, q, programEventRepository, mockDB, dataElementRepository;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
@@ -85,8 +85,20 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             Timecop.install();
             Timecop.freeze(new Date("2015-11-26T09:47:07.840Z"));
 
-            programEventRepository = new ProgramEventRepository(mockDB.db, q);
+            dataElementRepository = new DataElementRepository(mockDB.db);
+            programEventRepository = new ProgramEventRepository(mockDB.db, q, dataElementRepository);
+            spyOn(dataElementRepository, 'get').and.callFake(function (dataElementId) {
+                if (dataElementId === "de1")
+                    return utils.getPromise(q, dataElements[0]);
+                if (dataElementId === "de2")
+                    return utils.getPromise(q, dataElements[1]);
+            });
+            spyOn(dataElementRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
         }));
+        
+        var initializeRepository = function () {
+            programEventRepository = new ProgramEventRepository(mockDB.db, q, dataElementRepository);
+        };
 
         afterEach(function() {
             Timecop.returnToPresent();
@@ -109,11 +121,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
                 "code": "code4"
             }];
 
-            mockStore.each.and.callFake(function(query) {
-                if (mockStore.storeName === "dataElements")
-                    return utils.getPromise(q, dataElementsData);
-                return utils.getPromise(q, undefined);
-            });
+            dataElementRepository.findAll.and.returnValue(utils.getPromise(q, dataElementsData));
 
             var event1ForP1 = {
                 "event": "ev1",
@@ -182,7 +190,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
 
             var expectedEventData = [expectedEvent1ForP1, expectedEvent2ForP1, expectedEvent3ForP2];
 
-            expect(mockStore.each.calls.argsFor(0)[0].inList).toEqual(["d1", "d2", "d3", "d4"]);
+            expect(dataElementRepository.findAll).toHaveBeenCalledWith(["d1", "d2", "d3", "d4"]);
             expect(mockStore.upsert).toHaveBeenCalledWith(expectedEventData);
             expect(returnValue).toEqual(expectedEventData);
         });
@@ -190,7 +198,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
         it("should delete events given ids", function() {
             mockDB = utils.getMockDB(q);
             mockStore = mockDB.objectStore;
-            programEventRepository = new ProgramEventRepository(mockDB.db, q);
+            initializeRepository();
 
             programEventRepository.delete(["eventId1", "eventId2"]);
             scope.$apply();
@@ -222,7 +230,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             }];
             mockStore.each.and.returnValue(utils.getPromise(q, events));
 
-            programEventRepository = new ProgramEventRepository(mockDB.db, q);
+            initializeRepository();
 
             programEventRepository.markEventsAsSubmitted(["event1", "event2"]);
             scope.$apply();
@@ -253,7 +261,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
         it("should return true if events are present for the given orgunitids", function() {
             mockDB = utils.getMockDB(q);
             mockStore = mockDB.objectStore;
-            programEventRepository = new ProgramEventRepository(mockDB.db, q);
+            initializeRepository();
 
             mockStore.exists.and.returnValue(utils.getPromise(q, true));
 
@@ -267,7 +275,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
         it("should return false if events are not present for the given orgunitids", function() {
             mockDB = utils.getMockDB(q);
             mockStore = mockDB.objectStore;
-            programEventRepository = new ProgramEventRepository(mockDB.db, q);
+            initializeRepository();
 
             mockStore.exists.and.returnValue(utils.getPromise(q, false));
 
@@ -306,7 +314,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
 
             mockStore.each.and.returnValue(utils.getPromise(q, events));
 
-            programEventRepository = new ProgramEventRepository(mockDB.db, q);
+            initializeRepository();
 
             var enrichedEvents;
             programEventRepository.getEventsForPeriod("p1", "mod1", "2014W1").then(function(data) {
@@ -382,7 +390,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
                 }
             });
 
-            programEventRepository = new ProgramEventRepository(mockDB.db, q);
+            initializeRepository();
 
             var actualData;
             programEventRepository.getEventsForPeriod("p1", ["ou1", "ou2"], "2014W1").then(function(data) {
@@ -435,7 +443,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
 
             mockStore.each.and.returnValue(utils.getPromise(q, events));
 
-            programEventRepository = new ProgramEventRepository(mockDB.db, q);
+            initializeRepository();
 
             var actualData;
             programEventRepository.getSubmitableEventsFor('p1', ['ou1']).then(function(data) {
@@ -460,7 +468,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             mockDB = utils.getMockDB(q, [], [], listOfEvents);
             mockStore = mockDB.objectStore;
 
-            programEventRepository = new ProgramEventRepository(mockDB.db, q);
+            initializeRepository();
 
             programEventRepository.getDraftEventsFor('prg1', ['ou1']);
 
@@ -483,7 +491,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             mockDB = utils.getMockDB(q, [], [], listOfEvents);
             mockStore = mockDB.objectStore;
 
-            programEventRepository = new ProgramEventRepository(mockDB.db, q);
+            initializeRepository();
 
             var actualEvents;
             programEventRepository.findEventById('prg1', 'e1');
@@ -499,7 +507,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             mockDB = utils.getMockDB(q, [], [], listOfEvents);
             mockStore = mockDB.objectStore;
 
-            programEventRepository = new ProgramEventRepository(mockDB.db, q);
+            initializeRepository();
 
             programEventRepository.getEventsForUpload(['e1']);
 

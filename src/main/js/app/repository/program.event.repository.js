@@ -1,14 +1,12 @@
 define(["moment", "lodash", "properties", "dateUtils", "customAttributes"], function(moment, _, properties, dateUtils, CustomAttributes) {
-    return function(db, $q) {
+    return function(db, $q, dataElementRepository) {
         this.upsert = function(events) {
 
             var extractEventCode = function(events) {
 
                 var getEventCodeDataElementIds = function() {
-                    var store = db.objectStore("dataElements");
                     var uniqueDataElementIds = _.uniq(_.flatten(_.pluck(_.flatten(_.pluck(events, 'dataValues')), 'dataElement')));
-                    var query = db.queryBuilder().$in(uniqueDataElementIds).compile();
-                    return store.each(query).then(function(dataElements) {
+                    return dataElementRepository.findAll(uniqueDataElementIds).then(function(dataElements) {
                         return _.pluck(_.filter(dataElements, function(dataElement) {
                             return _.endsWith(dataElement.code, '_code');
                         }), "id");
@@ -242,11 +240,10 @@ define(["moment", "lodash", "properties", "dateUtils", "customAttributes"], func
 
 
                 return getProgram().then(function(program) {
-                    var store = db.objectStore("dataElements");
                     var dataElementIds = getDataElementIds(program.programStages);
 
                     return $q.all(_.map(dataElementIds, function(dataElementId) {
-                        return store.find(dataElementId).then(function(dataElement) {
+                        return dataElementRepository.get(dataElementId).then(function(dataElement) {
                             dataElement.showInEventSummary = CustomAttributes.getBooleanAttributeValue(dataElement.attributeValues, "showInEventSummary");
                             dataElement.dataElement = dataElement.id;
                             return _.omit(dataElement, ["id", "attributeValues"]);
