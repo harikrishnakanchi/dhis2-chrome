@@ -3,17 +3,22 @@ define(['lodash'], function(_) {
         LINE_LIST_ATTRIBUTE_CODE: 'isLineListService'
     };
 
-    var parseAttribute = function(attributeValues, attributeCode) {
+    var getBooleanAttributeValue = function(attributeValues, attributeCode) {
+        return getAttributeValue(attributeValues, attributeCode) == "true";
+    };
+
+    var getAttributeValue = function(attributeValues, attributeCode) {
         var correspondingAttributeValue = _.find(attributeValues, {
             attribute: {
                 code: attributeCode
             }
         });
 
-        return !!(correspondingAttributeValue && correspondingAttributeValue.value == "true");
+        return correspondingAttributeValue && correspondingAttributeValue.value;
     };
 
     return _.merge(ATTRIBUTE_CODES, {
-        parseAttribute: parseAttribute
+        getBooleanAttributeValue: getBooleanAttributeValue,
+        getAttributeValue: getAttributeValue
     });
 });

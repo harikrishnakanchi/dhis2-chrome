@@ -3,7 +3,7 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         this.moduleId = orgUnit.id;
         this.period = period;
         this.moduleName = parseModuleName(orgUnit);
-        this.lineListService = CustomAttributes.parseAttribute(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
+        this.lineListService = CustomAttributes.getBooleanAttributeValue(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
         this.active = isActive(this.period, orgUnit.openingDate);
 
         this.dataValues = getAggregateDataValues(aggregateDataValues);

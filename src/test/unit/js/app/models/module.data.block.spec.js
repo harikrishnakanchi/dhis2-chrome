@@ -4,7 +4,7 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
 
         beforeEach(function() {
             isLineListService = false;
-            spyOn(CustomAttributes, 'parseAttribute').and.callFake(function() {
+            spyOn(CustomAttributes, 'getBooleanAttributeValue').and.callFake(function() {
                 return isLineListService;
             });
             orgUnit = {
@@ -73,11 +73,11 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                 orgUnit = {
                     attributeValues: 'someAttributeValue'
                 };
-                CustomAttributes.parseAttribute.and.returnValue('lineListServiceAttributeValue');
+                CustomAttributes.getBooleanAttributeValue.and.returnValue('lineListServiceAttributeValue');
 
                 moduleDataBlock = createModuleDataBlock();
 
-                expect(CustomAttributes.parseAttribute).toHaveBeenCalledWith(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
+                expect(CustomAttributes.getBooleanAttributeValue).toHaveBeenCalledWith(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
                 expect(moduleDataBlock.lineListService).toEqual('lineListServiceAttributeValue');
             });
         });

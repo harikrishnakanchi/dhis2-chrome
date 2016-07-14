@@ -49,7 +49,7 @@ define(["lodash", "customAttributes"], function(_, CustomAttributes) {
 
         var getCurrentUsersLineListOriginOrgUnitIds = function() {
             return getFilteredCurrentUsersOriginOrgUnitIds(function (module) {
-                return CustomAttributes.parseAttribute(module.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
+                return CustomAttributes.getBooleanAttributeValue(module.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
             });
         };
 
