@@ -246,6 +246,7 @@ define(["moment", "lodash", "properties", "dateUtils", "customAttributes"], func
                         return dataElementRepository.get(dataElementId).then(function(dataElement) {
                             dataElement.showInEventSummary = CustomAttributes.getBooleanAttributeValue(dataElement.attributeValues, "showInEventSummary");
                             dataElement.dataElement = dataElement.id;
+                            dataElement.offlineSummaryType = CustomAttributes.getAttributeValue(dataElement.attributeValues, "lineListOfflineSummaryCategory");
                             return _.omit(dataElement, ["id", "attributeValues"]);
                         });
                     }));

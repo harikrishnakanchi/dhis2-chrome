@@ -58,10 +58,21 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
                         "code": "showInEventSummary",
                     },
                     "value": "true"
+                }, {
+                    "attribute": {
+                        "code": "lineListOfflineSummaryCategory",
+                    },
+                    "value": "age"
                 }]
             }, {
                 'id': 'de2',
                 'shortName': 'PatientId',
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "lineListOfflineSummaryCategory",
+                    },
+                    "value": "code"
+                }]
             }, {
                 'id': 'de3',
                 'shortName': 'SomeNonProgramDataElement',
@@ -95,7 +106,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             });
             spyOn(dataElementRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
         }));
-        
+
         var initializeRepository = function () {
             programEventRepository = new ProgramEventRepository(mockDB.db, q, dataElementRepository);
         };
@@ -330,10 +341,12 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
                     'showInEventSummary': true,
                     'dataElement': 'de1',
                     'value': '20',
+                    'offlineSummaryType': "age"
                 }, {
                     'shortName': 'PatientId',
                     'showInEventSummary': false,
-                    'dataElement': 'de2'
+                    'dataElement': 'de2',
+                    'offlineSummaryType': 'code'
                 }]
             }, {
                 'event': 'event2',
@@ -341,11 +354,13 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
                 'dataValues': [{
                     'shortName': 'Age',
                     'showInEventSummary': true,
-                    'dataElement': 'de1'
+                    'dataElement': 'de1',
+                    'offlineSummaryType': "age"
                 }, {
                     'shortName': 'PatientId',
                     'showInEventSummary': false,
                     'dataElement': 'de2',
+                    'offlineSummaryType': 'code',
                     'value': 'ABC1',
                 }]
             }];
@@ -407,10 +422,12 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
                     'showInEventSummary': true,
                     'dataElement': 'de1',
                     'value': '20',
+                    'offlineSummaryType': 'age'
                 }, {
                     'shortName': 'PatientId',
                     'showInEventSummary': false,
-                    'dataElement': 'de2'
+                    'dataElement': 'de2',
+                    'offlineSummaryType': 'code'
                 }]
             }, {
                 'event': 'event2',
@@ -419,12 +436,14 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
                 'dataValues': [{
                     'shortName': 'Age',
                     'showInEventSummary': true,
-                    'dataElement': 'de1'
+                    'dataElement': 'de1',
+                    'offlineSummaryType': 'age'
                 }, {
                     'shortName': 'PatientId',
                     'showInEventSummary': false,
                     'dataElement': 'de2',
                     'value': 'ABC1',
+                    'offlineSummaryType': 'code'
                 }]
             }];
 

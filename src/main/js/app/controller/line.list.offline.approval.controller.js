@@ -117,8 +117,9 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         $scope.shouldShowInOfflineSummary = function(dataElementId, allDataElements) {
+
             allDataElements = _.filter(allDataElements, function(de) {
-                return _.endsWith(de.dataElement.code, "_showInOfflineSummary") && de.dataElement.optionSet;
+                return (_.endsWith(de.dataElement.code, "_showInOfflineSummary") || de.dataElement.offlineSummaryType == 'showInOfflineSummary') && de.dataElement.optionSet;
             });
             var dataElementIds = _.pluck(_.pluck(allDataElements, 'dataElement'), 'id');
             return _.contains(dataElementIds, dataElementId);
@@ -198,19 +199,19 @@ define(["lodash", "moment"], function(_, moment) {
             $scope.eventsMap = _.groupBy(allDataValues, "eventId");
 
             $scope.dataValues = _.groupBy(allDataValues, function(dv) {
-                if (_.endsWith(dv.code, "_showInOfflineSummary")) {
+                if (_.endsWith(dv.code, "_showInOfflineSummary") || dv.offlineSummaryType == "showInOfflineSummary") {
                     return "_showInOfflineSummary";
                 }
-                if (_.endsWith(dv.code, "_age")) {
+                if (_.endsWith(dv.code, "_age") || dv.offlineSummaryType == "age") {
                     return "_age";
                 }
-                if (_.endsWith(dv.code, "_sex")) {
+                if (_.endsWith(dv.code, "_sex") || dv.offlineSummaryType == "sex") {
                     return "_sex";
                 }
-                if (_.endsWith(dv.code, "_procedures")) {
+                if (_.endsWith(dv.code, "_procedures") || dv.offlineSummaryType == "procedures") {
                     return "_procedures";
                 }
-                if (_.endsWith(dv.code, "_referralLocations")) {
+                if (_.endsWith(dv.code, "_referralLocations") || dv.offlineSummaryType == "referralLocations") {
                     return "_referralLocations";
                 }
             });
