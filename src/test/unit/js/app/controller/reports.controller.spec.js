@@ -143,7 +143,8 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                 "isOriginDataset": false,
                 "isPopulationDataset": false,
                 "isReferralDataset": false,
-                "isChartsAvailable": false,
+                "isWeeklyChartsAvailable": false,
+                "isMonthlyChartsAvailable": false,
                 "isWeeklyPivotTablesAvailable": false,
                 "isMonthlyPivotTablesAvailable": false,
                 "isReportsAvailable": false
@@ -202,9 +203,19 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                 "title": "Title2",
                 "dataSetCode": "dataSetCode2",
                 "displayPosition": 2,
-                "type": "LINE"
+                "type": "LINE",
+                "weeklyChart": true,
+                "monthlyChart": true
             }, {
-                "name": "chart3 Notifications",
+                "name": "chart3",
+                "title": "Title3",
+                "dataSetCode": "dataSetCode3",
+                "displayPosition": 3,
+                "type": "STACKED_COLUMN",
+                "weeklyChart": true,
+                "monthlyChart": true
+            }, {
+                "name": "chart4 Notifications",
                 "title": "Title1",
                 "dataSetCode": "dataSetCode1",
                 "displayPosition": null,
@@ -341,6 +352,8 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                     return utils.getPromise(q, chartData1);
                 if (chartName === "chart2")
                     return utils.getPromise(q, chartData2);
+                if (chartName === 'chart3')
+                    return utils.getPromise(q);
             });
 
             translationsService.setLocale('en');
@@ -417,7 +430,9 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                     "title": "Title2",
                     "dataSetCode": "dataSetCode2",
                     "displayPosition": 2,
-                    "type": "LINE"
+                    "type": "LINE",
+                    "weeklyChart": true,
+                    "monthlyChart": true
                 },
                 "data": [{
                     "key": "Total Consultations 1-23 months Pediatric OPD",
@@ -474,16 +489,18 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                         "value": 0
                     }]
                 }]
-            }];
+            }, undefined];
 
-            expect(scope.chartData).toEqual(expectedChartData);
+            expect(scope.charts).toEqual(expectedChartData);
 
-            expect(scope.datasets[0].isChartsAvailable).toBeTruthy();
-            expect(scope.datasets[0].isPivotTablesAvailable).toBeFalsy();
-            expect(scope.datasets[0].isReportsAvailable).toBeTruthy();
+            expect(scope.datasets[0].isWeeklyChartsAvailable).toBeTruthy();
+            expect(scope.datasets[0].isMonthlyChartsAvailable).toBeTruthy();
 
-            expect(scope.datasets[2].isChartsAvailable).toBeFalsy();
-            expect(scope.datasets[2].isReportsAvailable).toBeFalsy();
+            expect(scope.datasets[1].isWeeklyChartsAvailable).toBeFalsy();
+            expect(scope.datasets[1].isMonthlyChartsAvailable).toBeFalsy();
+
+            expect(scope.datasets[2].isWeeklyChartsAvailable).toBeFalsy();
+            expect(scope.datasets[2].isMonthlyChartsAvailable).toBeFalsy();
         });
 
         it("should load pivot tables into the scope", function() {
@@ -498,14 +515,14 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
             var datasets = [{
                 "id": "ds1",
                 "code": "dataSetCode1",
-                "isOriginDataset": false,
+                "isOriginDataset": false
             }, {
                 "id": "ds2",
                 "code": "dataSetCode2",
                 "isOriginDataset": false
             }, {
                 "id": "ds3",
-                "code": "dataSetCode2",
+                "code": "dataSetCode3",
                 "isOriginDataset": false
             }];
 
@@ -514,11 +531,19 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                 "dataSetCode": "dataSetCode1"
             }, {
                 "name": "Table 2",
-                "dataSetCode": "dataSetCode2"
+                "dataSetCode": "dataSetCode2",
+                "monthlyReport": true,
+                "weeklyReport": true
+            }, {
+                "name": "Table 3",
+                "dataSetCode": "dataSetCode3",
+                "monthlyReport": true,
+                "weeklyReport": true
             }];
 
             var pivotTableData1 = "table 1 data";
             var pivotTableData2 = "table 2 data";
+            var pivotTableData3 = "table 3 data";
 
             orgUnitRepository.get.and.returnValue(utils.getPromise(q, mod1));
             orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [mod1]));
@@ -529,21 +554,38 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                     return utils.getPromise(q, pivotTableData1);
                 if (tableName === "Table 2")
                     return utils.getPromise(q, pivotTableData2);
+                if (tableName === "Table 3")
+                    return utils.getPromise(q, pivotTableData3);
             });
-            var translatedData = [
-                {"definition": {
-                    "name":"Table 1",
-                    "dataSetCode":"dataSetCode1"},
-                    "data":"table 1 data",
-                    "dataSetCode":"dataSetCode1",
-                    "isTableDataAvailable":false
-                },{"definition": {
-                    "name":"Table 2",
-                    "dataSetCode":"dataSetCode2"},
-                    "data":"table 2 data",
-                    "dataSetCode":"dataSetCode2",
-                    "isTableDataAvailable":false
-                }];
+            var translatedData = [{
+                "definition": {
+                    "name": "Table 1",
+                    "dataSetCode": "dataSetCode1"
+                },
+                "data": pivotTableData1,
+                "dataSetCode": "dataSetCode1",
+                "isTableDataAvailable": false
+            }, {
+                "definition": {
+                    "name": "Table 2",
+                    "dataSetCode": "dataSetCode2",
+                    "weeklyReport": true,
+                    "monthlyReport": true
+                },
+                "data": pivotTableData2,
+                "dataSetCode": "dataSetCode2",
+                "isTableDataAvailable": true
+            }, {
+                "definition": {
+                    "name": "Table 3",
+                    "dataSetCode": "dataSetCode3",
+                    "weeklyReport": true,
+                    "monthlyReport": true
+                },
+                "data": pivotTableData3,
+                "dataSetCode": "dataSetCode3",
+                "isTableDataAvailable": false
+            }];
 
             translationsService.translateReports.and.returnValue(utils.getPromise(q, translatedData));
             translationsService.setLocale('en');
@@ -557,6 +599,11 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                 "definition": pivotTables[1],
                 "dataSetCode": "dataSetCode2",
                 "data": pivotTableData2,
+                "isTableDataAvailable": true
+            }, {
+                "definition": pivotTables[2],
+                "dataSetCode": "dataSetCode3",
+                "data": pivotTableData3,
                 "isTableDataAvailable": false
             }];
             reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService);
@@ -565,6 +612,15 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
             expect(pivotTableRepository.getDataForPivotTable).toHaveBeenCalledWith(pivotTables[0].name, "mod1");
             expect(pivotTableRepository.getDataForPivotTable).toHaveBeenCalledWith(pivotTables[1].name, "mod1");
             expect(scope.pivotTables).toEqual(expectedPivotTableData);
+
+            expect(scope.datasets[0].isWeeklyPivotTablesAvailable).toBeTruthy();
+            expect(scope.datasets[0].isMonthlyPivotTablesAvailable).toBeTruthy();
+
+            expect(scope.datasets[1].isWeeklyPivotTablesAvailable).toBeFalsy();
+            expect(scope.datasets[1].isMonthlyPivotTablesAvailable).toBeFalsy();
+
+            expect(scope.datasets[2].isWeeklyPivotTablesAvailable).toBeFalsy();
+            expect(scope.datasets[2].isMonthlyPivotTablesAvailable).toBeFalsy();
         });
     });
 });

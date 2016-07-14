@@ -1,4 +1,8 @@
 <div class="dataentrypage parent-margin report-container">
+    <div class="loading" ng-show="loading">
+        <img src="img/ajax-loader.gif" class="spinner" />
+    </div>
+
     <section class="panel tab-panel">
         <div class="row">
             <div class="col-md-12">
@@ -13,11 +17,11 @@
         </div>
         <tabset>
             <tab heading="{{resourceBundle.weeklyReports}}" ng-click="resizeCharts()">
-                <div ng-hide="selectedDataset.isReportsAvailable">
-                    <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
-                </div>
-                <div ng-repeat="chart in chartData | filter: {definition: {dataSetCode: selectedDataset.code}} | orderBy: 'definition.displayPosition'" ng-if="chart.data.length > 0">
-                    <div>
+                <div id="weeklyCharts">
+                    <div ng-hide="selectedDataset.isWeeklyChartsAvailable">
+                        <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
+                    </div>
+                    <div ng-repeat="chart in charts | filter: {definition: {dataSetCode: selectedDataset.code}} | orderBy: 'definition.displayPosition'" ng-show="chart.definition.weeklyChart && chart.data && chart.data.length > 0">
                         <div class="row chart-title">
                             <h3 class="col-md-6 col-md-offset-3 text-center">{{chart.definition.title}}</h3>
                             <a class="col-md-1 col-md-offset-2" href="" title="{{ resourceBundle.downloadChart }}" ng-click="downloadChartAsPng($event)">
@@ -36,7 +40,8 @@
                         </p>
                     </div>
                 </div>
-                <div>
+
+                <div id="weeklyReports">
                     <accordion is-open="true" close-others="false">
                         <accordion-group is-open="isReportOpen">
                             <accordion-heading>
@@ -65,17 +70,42 @@
                     </accordion>
                 </div>
             </tab>
-            <tab heading="{{resourceBundle.monthlyReports}}">
-                <div ng-show="!selectedDataset.isMonthlyPivotTablesAvailable">
-                    <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
+
+            <tab heading="{{resourceBundle.monthlyReports}}" ng-click="resizeCharts()">
+                <div id="monthlyCharts">
+                    <div ng-hide="selectedDataset.isMonthlyChartsAvailable">
+                        <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
+                    </div>
+                    <div ng-repeat="chart in charts | filter: {definition: {dataSetCode: selectedDataset.code}} | orderBy: 'definition.displayPosition'" ng-show="chart.definition.monthlyChart && chart.data && chart.data.length > 0">
+                        <div class="row chart-title">
+                            <h3 class="col-md-6 col-md-offset-3 text-center">{{chart.definition.title}}</h3>
+                            <a class="col-md-1 col-md-offset-2" href="" title="{{ resourceBundle.downloadChart }}" ng-click="downloadChartAsPng($event)">
+                                <span class="glyphicon glyphicon-download-alt"></span>
+                            </a>
+                        </div>
+                        <!-- ToDo - Remove chart type non-capitalized after dhis 2.22 upgrade -->
+                        <p ng-if="chart.definition.type === 'LINE'" class="lineChart-container">
+                            <nvd3 options="lineChartOptions" data="chart.data"></nvd3>
+                        </p>
+                        <p ng-if="chart.definition.type === 'COLUMN'">
+                            <nvd3 options="barChartOptions" data="chart.data"></nvd3>
+                        </p>
+                        <p ng-if="chart.definition.type === 'STACKED_COLUMN'">
+                            <nvd3 options="stackedBarChartOptions" data="chart.data"></nvd3>
+                        </p>
+                    </div>
                 </div>
-                <div id="reports" class="margin-top" ng-if="selectedDataset.isMonthlyPivotTablesAvailable">
+
+                <div id="monthlyReports" class="margin-top">
                     <accordion close-others="false">
                         <accordion-group is-open="isReportOpen">
                             <accordion-heading>
                                 <span>{{resourceBundle.tabularReports}}</span>
                                 <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isReportOpen, 'glyphicon-chevron-right': !isReportOpen}"></i>
                             </accordion-heading>
+                            <div ng-show="!selectedDataset.isMonthlyPivotTablesAvailable">
+                                <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
+                            </div>
                             <div class="exp-coll-group">
                                 <div ng-if="table.definition.monthlyReport && table.isTableDataAvailable" ng-repeat="table in pivotTables | filter: {dataSetCode: selectedDataset.code} | orderBy: 'definition.displayPosition'" class="exportCSV-container">
                                     <accordion close-others="false">
@@ -96,8 +126,5 @@
                 </div>
             </tab>
         </tabset>
-        <div class="loading" ng-show="loading">
-            <img src="img/ajax-loader.gif" class="spinner" />
-        </div>
     </section>
 </div>

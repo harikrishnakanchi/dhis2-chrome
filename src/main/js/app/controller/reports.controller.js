@@ -78,9 +78,6 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
         $scope.stackedBarChartOptions = getChartOptions(stackedBarChartOptions);
         $scope.lineChartOptions = getChartOptions(lineChartOptions);
 
-        $scope.isMonthlyPivotTablesAvailable = false;
-        $scope.isWeeklyPivotTablesAvailable = false;
-
         $scope.resizeCharts = function() {
             window.dispatchEvent(new Event('resize'));
         };
@@ -200,7 +197,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             return chartRepository.getAll()
                 .then(getChartData)
                 .then(function(chartData) {
-                    $scope.chartData = chartData;
+                    $scope.charts = chartData;
                 });
         };
 
@@ -276,7 +273,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
         var prepareDataForView = function() {
             _.each($scope.datasets, function(eachDataSet) {
 
-                var filteredCharts = _.filter($scope.chartData, {
+                var filteredCharts = _.filter($scope.charts, {
                     definition: {
                         dataSetCode: eachDataSet.code
                     }
@@ -286,8 +283,12 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     dataSetCode: eachDataSet.code
                 });
 
-                eachDataSet.isChartsAvailable = _.any(filteredCharts, function(chart) {
-                    return chart.data && chart.data.length > 0;
+                eachDataSet.isWeeklyChartsAvailable = _.any(filteredCharts, function(chart) {
+                    return chart.definition.weeklyChart && chart.data && chart.data.length > 0;
+                });
+
+                eachDataSet.isMonthlyChartsAvailable = _.any(filteredCharts, function(chart) {
+                    return chart.definition.monthlyChart && chart.data && chart.data.length > 0;
                 });
 
                 eachDataSet.isWeeklyPivotTablesAvailable = _.any(filteredPivotTables, function(table) {
@@ -298,11 +299,10 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     return table.definition.monthlyReport && table.isTableDataAvailable;
                 });
 
-                eachDataSet.isReportsAvailable = eachDataSet.isChartsAvailable || eachDataSet.isMonthlyPivotTablesAvailable || eachDataSet.isWeeklyPivotTablesAvailable;
+                eachDataSet.isReportsAvailable = eachDataSet.isWeeklyChartsAvailable || eachDataSet.isMonthlyChartsAvailable || eachDataSet.isMonthlyPivotTablesAvailable || eachDataSet.isWeeklyPivotTablesAvailable;
             });
-
-            $scope.datasets = _.sortBy($scope.datasets, "name").reverse();
-            $scope.datasets = _.sortBy($scope.datasets, "isReportsAvailable").reverse();
+            
+            $scope.datasets = _.sortByOrder($scope.datasets, ['name', 'isReportsAvailable'], ['asc' ,'desc']);
 
             if (!_.isEmpty($scope.datasets))
                 $scope.selectedDataset = $scope.datasets[0];
