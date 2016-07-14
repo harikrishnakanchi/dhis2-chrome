@@ -34,7 +34,7 @@ define(["lodash", "moment"], function(_, moment) {
                 if ($scope.isCategoryPresent) {
                     _.each(getSortedCategories(), function(category) {
                         var value = {};
-                        value["Data Element"] = $scope.getDataElementName($scope.data.metaData.names[datum.dataElement]);
+                        value["Data Element"] = $scope.getDataElementName(datum.dataElementName);
                         value.Category = category.name;
                         _.each($scope.periods, function(period) {
                             value[$scope.data.metaData.names[period]] = $scope.getValue(category.id, datum.dataElement, period);
@@ -43,7 +43,7 @@ define(["lodash", "moment"], function(_, moment) {
                     });
                 } else {
                     var value = {};
-                    value["Data Element"] = $scope.getDataElementName($scope.data.metaData.names[datum.dataElement]);
+                    value["Data Element"] = $scope.getDataElementName(datum.dataElementName);
                     _.each($scope.periods, function(period) {
                         value[$scope.data.metaData.names[period]] = $scope.getValue(datum.category, datum.dataElement, period);
                     });
