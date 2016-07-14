@@ -43,41 +43,12 @@ define(["lodash", "customAttributes"], function(_, CustomAttributes) {
             });
         };
 
-        var getCurrentUsersOriginOrgUnitIds = function() {
-            return getFilteredCurrentUsersOriginOrgUnitIds();
-        };
-
-        var getCurrentUsersLineListOriginOrgUnitIds = function() {
-            return getFilteredCurrentUsersOriginOrgUnitIds(function (module) {
-                return CustomAttributes.getBooleanAttributeValue(module.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
-            });
-        };
-
-        var getFilteredCurrentUsersOriginOrgUnitIds = function(filterModules) {
-            var getFilteredModules = function (modules) {
-                if (filterModules) {
-                    return _.filter(modules, filterModules);
-                }
-                return modules;
-            };
-            return getCurrentUsersModules()
-                .then(getFilteredModules)
-                .then(function (modules) {
-                    var moduleIds = _.pluck(modules, "id");
-                    return orgUnitRepository.findAllByParent(moduleIds).then(function (originOrgUnits) {
-                        return _.pluck(originOrgUnits, "id");
-                    });
-                });
-        };
-
         return {
             'get': get,
             'save': save,
             'getCurrentUsersUsername': getCurrentUsersUsername,
             'getCurrentUsersProjectIds': getCurrentUsersProjectIds,
             'getCurrentUsersModules': getCurrentUsersModules,
-            'getCurrentUsersOriginOrgUnitIds': getCurrentUsersOriginOrgUnitIds,
-            'getCurrentUsersLineListOriginOrgUnitIds': getCurrentUsersLineListOriginOrgUnitIds,
             'getCurrentUsersPreferences': getCurrentUsersPreferences
         };
     };
