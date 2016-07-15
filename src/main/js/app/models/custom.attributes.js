@@ -1,6 +1,8 @@
 define(['lodash'], function(_) {
     var ATTRIBUTE_CODES = {
-        LINE_LIST_ATTRIBUTE_CODE: 'isLineListService'
+        LINE_LIST_ATTRIBUTE_CODE: 'isLineListService',
+        LINE_LIST_OFFLINE_SUMMARY_CODE: 'lineListOfflineSummaryCategory',
+        SHOW_IN_EVENT_SUMMARY_CODE: 'showInEventSummary'
     };
 
     var getBooleanAttributeValue = function(attributeValues, attributeCode) {
