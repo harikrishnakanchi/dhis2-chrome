@@ -199,21 +199,23 @@ define(["lodash", "moment"], function(_, moment) {
             $scope.eventsMap = _.groupBy(allDataValues, "eventId");
 
             $scope.dataValues = _.groupBy(allDataValues, function(dv) {
-                if (_.endsWith(dv.code, "_showInOfflineSummary") || dv.offlineSummaryType == "showInOfflineSummary") {
-                    return "_showInOfflineSummary";
-                }
-                if (_.endsWith(dv.code, "_age") || dv.offlineSummaryType == "age") {
-                    return "_age";
-                }
-                if (_.endsWith(dv.code, "_sex") || dv.offlineSummaryType == "sex") {
-                    return "_sex";
-                }
-                if (_.endsWith(dv.code, "_procedures") || dv.offlineSummaryType == "procedures") {
-                    return "_procedures";
-                }
-                if (_.endsWith(dv.code, "_referralLocations") || dv.offlineSummaryType == "referralLocations") {
-                    return "_referralLocations";
-                }
+                var lineListSummaryfilters = {
+                    'showInOfflineSummary': '_showInOfflineSummary',
+                    'age': '_age',
+                    'sex': '_sex',
+                    'procedures': '_procedures',
+                    'referralLocations': '_referralLocations'
+                };
+
+                // TODO: remove offlineSummaryCodeFromCodeAttribute once all fields are upto date with latest DHIS metadata
+                var getOfflineSummaryCode = function (dv) {
+                    var offlineSummaryCode = dv.offlineSummaryType;
+                    var offlineSummaryCodeFromCodeAttribute = _.contains(dv.code, '_') ? _.last(dv.code.split('_')) : undefined;
+                    return offlineSummaryCode || offlineSummaryCodeFromCodeAttribute;
+                };
+
+                var offlineSummaryCode = getOfflineSummaryCode(dv);
+                return lineListSummaryfilters[offlineSummaryCode];
             });
 
             $scope.originEvents = _.groupBy(events, "orgUnit");
