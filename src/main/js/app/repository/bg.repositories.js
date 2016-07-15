@@ -1,17 +1,18 @@
 define(["dataRepository", "datasetRepository", "userPreferenceRepository", "approvalDataRepository", "orgUnitRepository", "patientOriginRepository", "programEventRepository",
         "orgUnitGroupRepository", "changeLogRepository", "programRepository", "systemSettingRepository", "metadataRepository", "chartRepository",
-        "referralLocationsRepository", "pivotTableRepository", "excludedDataElementsRepository", "dataSyncFailureRepository"
+        "referralLocationsRepository", "pivotTableRepository", "excludedDataElementsRepository", "dataSyncFailureRepository", "dataElementRepository"
     ],
     function(dataRepository, datasetRepository, userPreferenceRepository, approvalDataRepository, orgUnitRepository, patientOriginRepository,
         programEventRepository, orgUnitGroupRepository, changeLogRepository, programRepository, systemSettingRepository, metadataRepository, chartRepository,
-        referralLocationsRepository, pivotTableRepository, excludedDataElementsRepository, dataSyncFailureRepository) {
+        referralLocationsRepository, pivotTableRepository, excludedDataElementsRepository, dataSyncFailureRepository, dataElementRepository) {
         var init = function(app) {
             app.service('dataRepository', ['$q', '$indexedDB', dataRepository]);
             app.service('datasetRepository', ['$indexedDB', '$q', datasetRepository]);
             app.service('orgUnitRepository', ['$indexedDB', '$q', orgUnitRepository]);
             app.service('userPreferenceRepository', ['$indexedDB', 'orgUnitRepository', userPreferenceRepository]);
             app.service('approvalDataRepository', ['$indexedDB', '$q', approvalDataRepository]);
-            app.service('programEventRepository', ['$indexedDB', '$q', programEventRepository]);
+            app.service('dataElementRepository', ['$indexedDB', dataElementRepository]);
+            app.service('programEventRepository', ['$indexedDB', '$q', 'dataElementRepository', programEventRepository]);
             app.service('orgUnitGroupRepository', ['$indexedDB', '$q', orgUnitGroupRepository]);
             app.service('changeLogRepository', ['$indexedDB', '$q', changeLogRepository]);
             app.service('programRepository', ['$indexedDB', "$q", programRepository]);

@@ -48,6 +48,7 @@ require.config({
         "referralLocationsRepository": "app/repository/referral.locations.repository",
         "pivotTableRepository": "app/repository/pivot.table.repository",
         "dataSyncFailureRepository": "app/repository/data.sync.failure.repository",
+        "dataElementRepository": "app/repository/data.element.repository",
 
         //Models
         "chart": "app/models/chart",
