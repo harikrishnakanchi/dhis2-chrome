@@ -197,22 +197,21 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                 "title": "Title1",
                 "dataSetCode": "dataSetCode1",
                 "displayPosition": 1,
-                "type": "STACKED_COLUMN"
+                "type": "STACKED_COLUMN",
+                "weeklyChart": true
             }, {
                 "name": "chart2",
                 "title": "Title2",
                 "dataSetCode": "dataSetCode2",
                 "displayPosition": 2,
                 "type": "LINE",
-                "weeklyChart": true,
-                "monthlyChart": true
+                "weeklyChart": true
             }, {
                 "name": "chart3",
                 "title": "Title3",
                 "dataSetCode": "dataSetCode3",
                 "displayPosition": 3,
                 "type": "STACKED_COLUMN",
-                "weeklyChart": true,
                 "monthlyChart": true
             }, {
                 "name": "chart4 Notifications",
@@ -373,7 +372,8 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                     "title": "Title1",
                     "dataSetCode": "dataSetCode1",
                     "displayPosition": 1,
-                    "type": "STACKED_COLUMN"
+                    "type": "STACKED_COLUMN",
+                    "weeklyChart": true
                 },
                 "data": [{
                     "key": "5-14 years",
@@ -431,8 +431,7 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                     "dataSetCode": "dataSetCode2",
                     "displayPosition": 2,
                     "type": "LINE",
-                    "weeklyChart": true,
-                    "monthlyChart": true
+                    "weeklyChart": true
                 },
                 "data": [{
                     "key": "Total Consultations 1-23 months Pediatric OPD",
@@ -494,9 +493,9 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
             expect(scope.charts).toEqual(expectedChartData);
 
             expect(scope.datasets[0].isWeeklyChartsAvailable).toBeTruthy();
-            expect(scope.datasets[0].isMonthlyChartsAvailable).toBeTruthy();
+            expect(scope.datasets[0].isMonthlyChartsAvailable).toBeFalsy();
 
-            expect(scope.datasets[1].isWeeklyChartsAvailable).toBeFalsy();
+            expect(scope.datasets[1].isWeeklyChartsAvailable).toBeTruthy();
             expect(scope.datasets[1].isMonthlyChartsAvailable).toBeFalsy();
 
             expect(scope.datasets[2].isWeeklyChartsAvailable).toBeFalsy();

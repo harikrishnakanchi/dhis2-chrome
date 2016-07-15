@@ -8,7 +8,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
 
         $scope.isReportOpen = false;
 
-        var getChartOptions = function (chartOptions) {
+        var getChartOptions = function (chartOptions, isWeeklyChart) {
             var defaultChartOptions = {
                 chart: {
                     height: 450,
@@ -22,10 +22,9 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     xAxis: {
                         axisLabel: $scope.resourceBundle.xAxisLabel,
                         tickFormat: function (d) {
-                            return moment.unix(d).format('GGGG[W]W');
+                            return isWeeklyChart ? moment.unix(d).format('GGGG[W]W') : moment.localeData($scope.locale).monthsShort(moment.unix(d)) + ' ' +moment.unix(d).format('YY');
                         }
                     },
-                    yAxis: {tickFormat: formatYAxisTicks},
                     legend: {maxKeyLength: 50}
                 }
             };
@@ -43,7 +42,8 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 controlLabels: {
                     grouped: $scope.resourceBundle.grouped,
                     stacked: $scope.resourceBundle.stacked
-                }
+                },
+                yAxis: {tickFormat: formatYAxisTicks}
             }
         };
 
@@ -58,7 +58,8 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 controlLabels: {
                     grouped: $scope.resourceBundle.grouped,
                     stacked: $scope.resourceBundle.stacked
-                }
+                },
+                yAxis: {tickFormat: formatYAxisTicks}
             }
         };
 
@@ -74,9 +75,13 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             }
         };
 
-        $scope.barChartOptions = getChartOptions(barChartOptions);
-        $scope.stackedBarChartOptions = getChartOptions(stackedBarChartOptions);
-        $scope.lineChartOptions = getChartOptions(lineChartOptions);
+        $scope.weeklyBarChartOptions = getChartOptions(barChartOptions, true);
+        $scope.weeklyStackedBarChartOptions = getChartOptions(stackedBarChartOptions, true);
+        $scope.weeklyLineChartOptions = getChartOptions(lineChartOptions, true);
+
+        $scope.monthlyBarChartOptions = getChartOptions(barChartOptions, false);
+        $scope.monthlyStackedBarChartOptions = getChartOptions(stackedBarChartOptions, false);
+        $scope.monthlyLineChartOptions = getChartOptions(lineChartOptions, false);
 
         $scope.resizeCharts = function() {
             window.dispatchEvent(new Event('resize'));
@@ -90,10 +95,9 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
 
             var insertMissingPeriods = function(chartData, periodsForXAxis) {
                 _.each(chartData, function(chartDataForKey) {
-                    var periodsWithData = _.reduce(chartDataForKey.values, function(result, data) {
-                        result.push(data.label);
-                        return result;
-                    }, []);
+                    var periodsWithData = _.map(chartDataForKey.values, function (data) {
+                        return data.label;
+                    });
 
                     var missingPeriods = _.difference(periodsForXAxis, periodsWithData);
                     _.each(missingPeriods, function(period) {
@@ -117,10 +121,10 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                         return chartData.metaData.names[id];
                     };
 
-                    var periodsForXAxis = _.reduce(chartData.metaData.pe, function(result, period) {
-                        result.push(parseInt(moment(period, 'GGGG[W]W').format('X')));
-                        return result;
-                    }, []);
+                    var parseFormat = chart.weeklyChart ? 'GGGG[W]W' : 'YYYYMM';
+                    var periodsForXAxis = _.map(chartData.metaData.pe, function (period) {
+                        return parseInt(moment(period, parseFormat).format('X'));
+                    });
 
                     var transformedChartData = _.transform(chartData.rows, function(result, row) {
 
@@ -142,12 +146,12 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                         var periodIndex = _.findIndex(chartData.headers, {
                             "name": "pe"
                         });
-                        var chartDataPeriod = parseInt(moment(row[periodIndex], 'GGGG[W]W').format('X'));
+                        var chartDataPeriod = parseInt(moment(row[periodIndex], parseFormat).format('X'));
 
                         var valueIndex = _.findIndex(chartData.headers, {
                             "name": "value"
                         });
-                        var chartDataValue = parseInt(row[valueIndex]);
+                        var chartDataValue = parseFloat(row[valueIndex]);
 
                         var existingItem = _.find(result, {
                             'key': chartDataKey

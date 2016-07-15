@@ -28,15 +28,14 @@
                                 <span class="glyphicon glyphicon-download-alt"></span>
                             </a>
                         </div>
-                        <!-- ToDo - Remove chart type non-capitalized after dhis 2.22 upgrade -->
                         <p ng-if="chart.definition.type === 'LINE'" class="lineChart-container">
-                            <nvd3 options="lineChartOptions" data="chart.data"></nvd3>
+                            <nvd3 options="weeklyLineChartOptions" data="chart.data"></nvd3>
                         </p>
                         <p ng-if="chart.definition.type === 'COLUMN'">
-                            <nvd3 options="barChartOptions" data="chart.data"></nvd3>
+                            <nvd3 options="weeklyBarChartOptions" data="chart.data"></nvd3>
                         </p>
                         <p ng-if="chart.definition.type === 'STACKED_COLUMN'">
-                            <nvd3 options="stackedBarChartOptions" data="chart.data"></nvd3>
+                            <nvd3 options="weeklyStackedBarChartOptions" data="chart.data"></nvd3>
                         </p>
                     </div>
                 </div>
@@ -83,15 +82,14 @@
                                 <span class="glyphicon glyphicon-download-alt"></span>
                             </a>
                         </div>
-                        <!-- ToDo - Remove chart type non-capitalized after dhis 2.22 upgrade -->
                         <p ng-if="chart.definition.type === 'LINE'" class="lineChart-container">
-                            <nvd3 options="lineChartOptions" data="chart.data"></nvd3>
+                            <nvd3 options="monthlyLineChartOptions" data="chart.data"></nvd3>
                         </p>
                         <p ng-if="chart.definition.type === 'COLUMN'">
-                            <nvd3 options="barChartOptions" data="chart.data"></nvd3>
+                            <nvd3 options="monthlyBarChartOptions" data="chart.data"></nvd3>
                         </p>
                         <p ng-if="chart.definition.type === 'STACKED_COLUMN'">
-                            <nvd3 options="stackedBarChartOptions" data="chart.data"></nvd3>
+                            <nvd3 options="monthlyStackedBarChartOptions" data="chart.data"></nvd3>
                         </p>
                     </div>
                 </div>
