@@ -1,18 +1,22 @@
-define(["lodash"], function (_) {
+define(["lodash", "customAttributes"], function (_, CustomAttributes) {
     return function (db) {
         var store = db.objectStore("dataElements");
 
-        this.getAll = function () {
-            return store.getAll();
+        var transformDataElement = function (dataElement) {
+            dataElement.offlineSummaryType = CustomAttributes.getAttributeValue(dataElement.attributeValues, CustomAttributes.LINE_LIST_OFFLINE_SUMMARY_CODE);
+            return dataElement;
         };
 
         this.get = function (dataElementId) {
-            return store.find(dataElementId);
+            return store.find(dataElementId)
+                .then(transformDataElement);
         };
 
         this.findAll = function (dataElementIds) {
             var query = db.queryBuilder().$in(dataElementIds).compile();
-            return store.each(query);
+            return store.each(query).then(function (dataElements) {
+                return _.map(dataElements, transformDataElement);
+            });
         };
     };
 });
