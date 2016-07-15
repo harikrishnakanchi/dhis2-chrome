@@ -8,7 +8,7 @@ define(["moment", "lodash", "properties", "dateUtils", "customAttributes"], func
                     var uniqueDataElementIds = _.uniq(_.flatten(_.pluck(_.flatten(_.pluck(events, 'dataValues')), 'dataElement')));
                     return dataElementRepository.findAll(uniqueDataElementIds).then(function(dataElements) {
                         return _.pluck(_.filter(dataElements, function(dataElement) {
-                            return _.endsWith(dataElement.code, '_code');
+                            return dataElement.offlineSummaryType === 'code';
                         }), "id");
                     });
                 };
@@ -246,7 +246,6 @@ define(["moment", "lodash", "properties", "dateUtils", "customAttributes"], func
                         return dataElementRepository.get(dataElementId).then(function(dataElement) {
                             dataElement.showInEventSummary = CustomAttributes.getBooleanAttributeValue(dataElement.attributeValues, CustomAttributes.SHOW_IN_EVENT_SUMMARY_CODE);
                             dataElement.dataElement = dataElement.id;
-                            dataElement.offlineSummaryType = CustomAttributes.getAttributeValue(dataElement.attributeValues, CustomAttributes.LINE_LIST_OFFLINE_SUMMARY_CODE);
                             return _.omit(dataElement, ["id", "attributeValues"]);
                         });
                     }));

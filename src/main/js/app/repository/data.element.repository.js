@@ -3,7 +3,15 @@ define(["lodash", "customAttributes"], function (_, CustomAttributes) {
         var store = db.objectStore("dataElements");
 
         var transformDataElement = function (dataElement) {
-            dataElement.offlineSummaryType = CustomAttributes.getAttributeValue(dataElement.attributeValues, CustomAttributes.LINE_LIST_OFFLINE_SUMMARY_CODE);
+
+            // TODO: remove offlineSummaryCodeFromCodeAttribute once all fields are upto date with latest DHIS metadata
+            var getOfflineSummaryCode = function (de) {
+                var offlineSummaryCode = CustomAttributes.getAttributeValue(de.attributeValues, CustomAttributes.LINE_LIST_OFFLINE_SUMMARY_CODE);
+                var offlineSummaryCodeFromCodeAttribute = _.contains(de.code, '_') && _.last(de.code.split('_'));
+                return offlineSummaryCode || offlineSummaryCodeFromCodeAttribute;
+            };
+
+            dataElement.offlineSummaryType = getOfflineSummaryCode(dataElement);
             return dataElement;
         };
 

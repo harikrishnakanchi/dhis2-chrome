@@ -207,15 +207,7 @@ define(["lodash", "moment"], function(_, moment) {
                     'referralLocations': '_referralLocations'
                 };
 
-                // TODO: remove offlineSummaryCodeFromCodeAttribute once all fields are upto date with latest DHIS metadata
-                var getOfflineSummaryCode = function (dv) {
-                    var offlineSummaryCode = dv.offlineSummaryType;
-                    var offlineSummaryCodeFromCodeAttribute = _.contains(dv.code, '_') ? _.last(dv.code.split('_')) : undefined;
-                    return offlineSummaryCode || offlineSummaryCodeFromCodeAttribute;
-                };
-
-                var offlineSummaryCode = getOfflineSummaryCode(dv);
-                return lineListSummaryfilters[offlineSummaryCode];
+                return lineListSummaryfilters[dv.offlineSummaryType];
             });
 
             $scope.originEvents = _.groupBy(events, "orgUnit");

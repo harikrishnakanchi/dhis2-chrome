@@ -1,5 +1,5 @@
 define(["lodash", "moment", "customAttributes"], function(_, moment, CustomAttributes) {
-    return function(db, $q) {
+    return function(db, $q, dataElementRepository) {
         var getBooleanAttributeValue = function(attributeValues, attributeCode) {
             var attr = _.find(attributeValues, {
                 "attribute": {
@@ -78,15 +78,12 @@ define(["lodash", "moment", "customAttributes"], function(_, moment, CustomAttri
 
             var enrichDataElements = function(program) {
                 if (!program) return undefined;
-
-                var dataElementsStore = db.objectStore("dataElements");
                 var promises = [];
                 _.each(program.programStages, function(stage) {
                     _.each(stage.programStageSections, function(section) {
                         _.each(section.programStageDataElements, function(sde) {
-                            promises.push(dataElementsStore.find(sde.dataElement.id).then(function(de) {
+                            promises.push(dataElementRepository.get(sde.dataElement.id).then(function(de) {
                                 de.isIncluded = _.isEmpty(excludedDataElements) || !_.contains(excludedDataElements, de.id);
-                                de.offlineSummaryType = CustomAttributes.getAttributeValue(de.attributeValues, "lineListOfflineSummaryCategory");
                                 sde.dataElement = de;
                             }));
                         });

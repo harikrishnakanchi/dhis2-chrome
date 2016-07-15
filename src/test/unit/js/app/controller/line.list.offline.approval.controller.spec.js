@@ -64,16 +64,16 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                     'orgUnitName': 'Origin 1',
                     'localStatus': 'READY_FOR_DHIS',
                     "dataValues": [{
-                        "code": "_showInOfflineSummary",
                         "value": "Green",
                         "dataElement": "Triage Status",
+                        "offlineSummaryType": "showInOfflineSummary"
 
                     }, {
-                        "code": "_showInOfflineSummary",
+                        "offlineSummaryType": "showInOfflineSummary",
                         "value": "4 months",
                         "dataElement": "Time between admission and discharge",
                     }, {
-                        "code": "_procedures",
+                        "offlineSummaryType": "procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
                         "formName": "Procedure performed 1",
@@ -82,7 +82,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                             "id": "proc_id"
                         }
                     }, {
-                        "code": "_procedures",
+                        "offlineSummaryType": "procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 2",
                         "formName": "Procedure performed 2",
@@ -91,18 +91,18 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                             "id": "proc_id"
                         }
                     }, {
-                        "code": "_sex",
+                        "offlineSummaryType": "sex",
                         "value": "Male_er",
                         "dataElement": "gender",
                         "optionSet": {
                             "id": "gender_id"
                         }
                     }, {
-                        "code": "_age",
+                        "offlineSummaryType": "age",
                         "value": 6,
                         "dataElement": "age",
                     }, {
-                        "code": "_referralLocations",
+                        "offlineSummaryType": "referralLocations",
                         "value": "ref_id",
                         "dataElement": "ref",
                         "optionSet": {
@@ -115,11 +115,11 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                     'orgUnitName': 'Origin 2',
                     'localStatus': 'READY_FOR_DHIS',
                     "dataValues": [{
-                        "code": "_showInOfflineSummary",
+                        "offlineSummaryType": "showInOfflineSummary",
                         "value": "Green",
                         "dataElement": "Triage Status",
                     }, {
-                        "code": "_procedures",
+                        "offlineSummaryType": "procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
                         "formName": "Procedure performed 1",
@@ -128,7 +128,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                             "id": "proc_id"
                         }
                     }, {
-                        "code": "_procedures",
+                        "offlineSummaryType": "procedures",
                         "value": "procedure 2",
                         "dataElement": "Procedure performed 2",
                         "formName": "Procedure performed 2",
@@ -137,15 +137,15 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                             "id": "proc_id"
                         }
                     }, {
-                        "code": "_sex",
+                        "offlineSummaryType": "sex",
                         "value": "Female_er",
                         "dataElement": "gender",
                     }, {
-                        "code": "_age",
+                        "offlineSummaryType": "age",
                         "value": 4,
                         "dataElement": "age",
                     }, {
-                        "code": "_referralLocations",
+                        "offlineSummaryType": "referralLocations",
                         "value": "ref_id",
                         "dataElement": "ref",
                         "optionSet": {
@@ -214,34 +214,34 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 expect(scope.optionSetMapping).toEqual(optionSetMapping);
                 expect(scope.dataValues).toEqual({
                     "_showInOfflineSummary": [{
-                        "code": "_showInOfflineSummary",
+                        "offlineSummaryType": "showInOfflineSummary",
                         "value": "Green",
                         "dataElement": "Triage Status",
                         "eventId": "event1"
                     }, {
-                        "code": "_showInOfflineSummary",
+                        "offlineSummaryType": "showInOfflineSummary",
                         "value": "4 months",
                         "dataElement": "Time between admission and discharge",
                         "eventId": "event1"
                     }, {
-                        "code": "_showInOfflineSummary",
+                        "offlineSummaryType": "showInOfflineSummary",
                         "value": "Green",
                         "dataElement": "Triage Status",
                         "eventId": "event2"
                     }],
                     "_age": [{
-                        "code": "_age",
+                        "offlineSummaryType": "age",
                         "value": 6,
                         "dataElement": "age",
                         "eventId": "event1"
                     }, {
-                        "code": "_age",
+                        "offlineSummaryType": "age",
                         "value": 4,
                         "dataElement": "age",
                         "eventId": "event2"
                     }],
                     "_sex": [{
-                        "code": "_sex",
+                        "offlineSummaryType": "sex",
                         "value": "Male_er",
                         "dataElement": "gender",
                         "optionSet": {
@@ -249,13 +249,13 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         },
                         "eventId": "event1"
                     }, {
-                        "code": "_sex",
+                        "offlineSummaryType": "sex",
                         "value": "Female_er",
                         "dataElement": "gender",
                         "eventId": "event2"
                     }],
                     "_procedures": [{
-                        "code": "_procedures",
+                        "offlineSummaryType": "procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
                         "formName": "Procedure performed 1",
@@ -265,7 +265,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         },
                         "eventId": "event1"
                     }, {
-                        "code": "_procedures",
+                        "offlineSummaryType": "procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 2",
                         "formName": "Procedure performed 2",
@@ -275,7 +275,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         },
                         "eventId": "event1"
                     }, {
-                        "code": "_procedures",
+                        "offlineSummaryType": "procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
                         "formName": "Procedure performed 1",
@@ -285,7 +285,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         },
                         "eventId": "event2"
                     }, {
-                        "code": "_procedures",
+                        "offlineSummaryType": "procedures",
                         "value": "procedure 2",
                         "dataElement": "Procedure performed 2",
                         "formName": "Procedure performed 2",
@@ -296,7 +296,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "eventId": "event2"
                     }],
                     "_referralLocations": [{
-                        "code": '_referralLocations',
+                        "offlineSummaryType": 'referralLocations',
                         "value": 'ref_id',
                         "dataElement": 'ref',
                         "eventId": 'event1',
@@ -305,7 +305,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         }
 
                     }, {
-                        "code": '_referralLocations',
+                        "offlineSummaryType": 'referralLocations',
                         "value": 'ref_id',
                         "dataElement": 'ref',
                         "eventId": 'event2',
@@ -317,7 +317,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 expect(scope.procedureDataValueIds).toEqual(['procedure 1', 'procedure 2']);
                 expect(scope.procedureDataValues).toEqual({
                     "procedure 1": [{
-                        "code": "_procedures",
+                        "offlineSummaryType": "procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
                         "formName": "Procedure performed 1",
@@ -327,7 +327,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         },
                         "eventId": "event1"
                     }, {
-                        "code": "_procedures",
+                        "offlineSummaryType": "procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 2",
                         "formName": "Procedure performed 2",
@@ -337,7 +337,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         },
                         "eventId": "event1"
                     }, {
-                        "code": "_procedures",
+                        "offlineSummaryType": "procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
                         "formName": "Procedure performed 1",
@@ -348,7 +348,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "eventId": "event2"
                     }],
                     "procedure 2": [{
-                        "code": "_procedures",
+                        "offlineSummaryType": "procedures",
                         "value": "procedure 2",
                         "dataElement": "Procedure performed 2",
                         "formName": "Procedure performed 2",

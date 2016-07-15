@@ -1,6 +1,6 @@
-define(["programRepository", "angularMocks", "utils", "timecop"], function(ProgramRepository, mocks, utils, timecop) {
+define(["programRepository", "dataElementRepository", "angularMocks", "utils", "timecop"], function(ProgramRepository, DataElementRepository, mocks, utils, timecop) {
     describe("programRepository", function() {
-        var scope, q, programRepository, programData, attributeValues;
+        var scope, q, programRepository, programData, attributeValues, dataElementRepository;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
@@ -8,14 +8,9 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
 
             var mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
-            programRepository = new ProgramRepository(mockDB.db, q);
-
-            attributeValues =  [{
-                    "attribute": {
-                        "code": "lineListOfflineSummaryCategory"
-                    },
-                    "value": "showInOfflineSummary"
-                }];
+            dataElementRepository = new DataElementRepository(mockDB.db);
+            spyOn(dataElementRepository, "get");
+            programRepository = new ProgramRepository(mockDB.db, q, dataElementRepository);
 
             programData = {
                 'id': 'p1',
@@ -62,19 +57,21 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
                 'id': 'd1',
                 'name': 'Date',
                 'type': 'date',
-                "attributeValues": attributeValues
+                'offlineSummaryType': 'showInOfflineSummary'
             };
 
             var dataElement2Data = {
                 'id': 'd2',
                 'name': 'Mode of Arrival',
-                'type': 'string'
+                'type': 'string',
+                'offlineSummaryType': undefined
             };
 
             var dataElement3Data = {
                 'id': 'd3',
                 'name': 'Mode of Discharge',
-                'type': 'string'
+                'type': 'string',
+                'offlineSummaryType': undefined
             };
 
             mockStore.getAll.and.returnValue(utils.getPromise(q, []));
@@ -82,6 +79,10 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
             mockStore.find.and.callFake(function(id) {
                 if (id === "p1")
                     return utils.getPromise(q, programData);
+                return utils.getPromise(q, undefined);
+            });
+
+            dataElementRepository.get.and.callFake(function(id) {
                 if (id === "d1")
                     return utils.getPromise(q, dataElement1Data);
                 if (id === "d2")
@@ -182,8 +183,7 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
                                 'name': 'Date',
                                 'type': 'date',
                                 'isIncluded': true,
-                                'offlineSummaryType': "showInOfflineSummary",
-                                'attributeValues': attributeValues
+                                'offlineSummaryType': "showInOfflineSummary"
                             }
                         }, {
                             'dataElement': {
@@ -203,9 +203,7 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
                                 'name': 'Date',
                                 'type': 'date',
                                 'isIncluded': true,
-                                'offlineSummaryType': "showInOfflineSummary",
-                                'attributeValues': attributeValues
-
+                                'offlineSummaryType': "showInOfflineSummary"
                             }
                         }, {
                             'dataElement': {
@@ -252,7 +250,6 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
                                 'type': 'date',
                                 'isIncluded': true,
                                 'offlineSummaryType': "showInOfflineSummary",
-                                'attributeValues': attributeValues
                             }
                         }, {
                             'dataElement': {
@@ -273,7 +270,6 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
                                 'type': 'date',
                                 'isIncluded': true,
                                 'offlineSummaryType': "showInOfflineSummary",
-                                'attributeValues': attributeValues
                             }
                         }, {
                             'dataElement': {

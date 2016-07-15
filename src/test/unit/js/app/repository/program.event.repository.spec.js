@@ -53,6 +53,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             var dataElements = [{
                 'id': 'de1',
                 'shortName': 'Age',
+                'offlineSummaryType': 'age',
                 "attributeValues": [{
                     "attribute": {
                         "code": "showInEventSummary",
@@ -67,6 +68,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             }, {
                 'id': 'de2',
                 'shortName': 'PatientId',
+                'offlineSummaryType': 'code',
                 "attributeValues": [{
                     "attribute": {
                         "code": "lineListOfflineSummaryCategory",
@@ -120,13 +122,13 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
 
             var dataElementsData = [{
                 "id": "d1",
-                "code": "code1_event_code"
+                'offlineSummaryType': 'code'
             }, {
                 "id": "d2",
                 "code": "code2"
             }, {
                 "id": "d3",
-                "code": "code3_event_code"
+                'offlineSummaryType': 'code'
             }, {
                 "id": "d4",
                 "code": "code4"
