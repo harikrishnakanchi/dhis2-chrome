@@ -42,6 +42,7 @@
                 "bower_components/angular/angular.js",
                 "bower_components/angular/angular-csp.css"
             ],
+            "angular-filter": "bower_components/angular-filter/dist/angular-filter.min.js",
             "hustle": "bower_components/hustle/hustle.js",
             "ng-i18n": "bower_components/ng-i18n/src/js/ng-i18n.js",
             "angularjs-directives": "bower_components/angularjs-directives/**",
