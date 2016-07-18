@@ -89,7 +89,14 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             saveSvgAsPng(event.currentTarget.parentElement.parentElement.getElementsByTagName("svg")[0], "chart.png");
         };
 
-        var loadChartData = function() {
+        var filterReportsForCurrentModule = function (allReports) {
+            var allDatsasetCodes = _.map($scope.datasets, 'code');
+            return _.filter(allReports, function(report) {
+                return _.contains(allDatsasetCodes, report.dataSetCode);
+            });
+        };
+
+        var loadChartsWithData = function() {
 
             var insertMissingPeriods = function(chartData, periodsForXAxis) {
                 _.each(chartData, function(chartDataForKey) {
@@ -193,6 +200,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             };
 
             return chartRepository.getAll()
+                .then(filterReportsForCurrentModule)
                 .then(getChartData)
                 .then(function(chartData) {
                     $scope.charts = chartData;
@@ -259,8 +267,9 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             return translationsService.translateReports(pivotTables);
         };
 
-        var loadPivotTables = function() {
+        var loadPivotTablesWithData = function() {
             return pivotTableRepository.getAll()
+                .then(filterReportsForCurrentModule)
                 .then(transformTables)
                 .then(translatePivotTables)
                 .then(function(pivotTables) {
@@ -312,8 +321,8 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             $scope.selectedDataset = null;
             loadOrgUnit()
                 .then(loadRelevantDatasets)
-                .then(loadChartData)
-                .then(loadPivotTables)
+                .then(loadChartsWithData)
+                .then(loadPivotTablesWithData)
                 .then(prepareDataForView)
                 .finally(function() {
                     $scope.loading = false;
