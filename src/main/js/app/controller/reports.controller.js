@@ -93,9 +93,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
 
             var insertMissingPeriods = function(chartData, periodsForXAxis) {
                 _.each(chartData, function(chartDataForKey) {
-                    var periodsWithData = _.map(chartDataForKey.values, function (data) {
-                        return data.label;
-                    });
+                    var periodsWithData = _.map(chartDataForKey.values, 'label');
 
                     var missingPeriods = _.difference(periodsForXAxis, periodsWithData);
                     _.each(missingPeriods, function(period) {
@@ -104,9 +102,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                             "value": 0
                         });
                     });
-                    chartDataForKey.values = _.sortBy(chartDataForKey.values, function(value) {
-                        return value.label;
-                    });
+                    chartDataForKey.values = _.sortBy(chartDataForKey.values, 'label');
                 });
 
                 return chartData;
@@ -306,8 +302,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             
             $scope.datasets = _.sortByOrder($scope.datasets, ['name', 'isReportsAvailable'], ['asc' ,'desc']);
 
-            if (!_.isEmpty($scope.datasets))
-                $scope.selectedDataset = $scope.datasets[0];
+            $scope.selectedDataset = _.first($scope.datasets);
 
             return $q.when();
         };
