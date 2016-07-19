@@ -122,36 +122,34 @@ define(["indexeddbUtils", "angularMocks", "utils", "lodash"], function(Indexeddb
             var hustleStore1 = db.objectStore("hustleStore1");
 
             var backupData = {
-                "store1": encodeBase64([{
+                "msf__store1__0": encodeBase64([{
                     "id": "identity"
                 }]),
-                "store2": encodeBase64([{
-                    "id": "identity"
+                "msf__store2__0": encodeBase64([{
+                    "id": "identity2"
                 }]),
                 "hustle": encodeBase64({
                     "hustleStore1": [{
-                        "id": "identity"
+                        "id": "identity3"
                     }]
                 })
             };
 
-            indexeddbUtils.restore(backupData).then(function() {
-                expect(objectStore1.upsert).toHaveBeenCalledWith([{
-                    "id": "identity"
-                }]);
-                expect(objectStore2.upsert).toHaveBeenCalledWith([{
-                    "id": "identity"
-                }]);
-                expect(hustleStore1.upsert).toHaveBeenCalledWith([{
-                    "id": "identity"
-                }]);
-            });
+            indexeddbUtils.restore(backupData);
 
+            scope.$digest();
+            expect(objectStore1.upsert).toHaveBeenCalledWith([{
+                "id": "identity"
+            }]);
+            expect(objectStore2.upsert).toHaveBeenCalledWith([{
+                "id": "identity2"
+            }]);
+            expect(hustleStore1.upsert).toHaveBeenCalledWith([{
+                "id": "identity3"
+            }]);
             expect(objectStore1.clear).toHaveBeenCalled();
             expect(objectStore2.clear).toHaveBeenCalled();
             expect(hustleStore1.clear).toHaveBeenCalled();
-
-            scope.$digest();
         });
 
         it("should create a backup of logs database", function() {
