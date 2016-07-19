@@ -152,6 +152,38 @@ define(["indexeddbUtils", "angularMocks", "utils", "lodash"], function(Indexeddb
             expect(hustleStore1.clear).toHaveBeenCalled();
         });
 
+        it("should not copy data for deleted objectstore from backup", function() {
+            var store1 = storeNames[0];
+            var store2 = storeNames[1];
+
+            var objectStore3 = db.objectStore("store3");
+            var hustleStore1 = db.objectStore("hustleStore1");
+
+            var backupData = {
+                "msf__store1__0": encodeBase64([{
+                    "id": "identity"
+                }]),
+                "msf__store2__0": encodeBase64([{
+                    "id": "identity2"
+                }]),
+                "msf__store3__0": encodeBase64([{
+                    "id": "identity3"
+                }]),
+                "hustle": encodeBase64({
+                    "hustleStore1": [{
+                        "id": "identity4"
+                    }]
+                })
+            };
+
+            indexeddbUtils.restore(backupData);
+
+            scope.$digest();
+            expect(objectStore3.upsert).not.toHaveBeenCalledWith([{
+                "id": "identity3"
+            }]);
+        });
+
         it("should create a backup of logs database", function() {
             var dbInfo = {
                 "objectStores": [{
