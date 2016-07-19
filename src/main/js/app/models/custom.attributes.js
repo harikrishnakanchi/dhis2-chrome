@@ -1,7 +1,7 @@
 define(['lodash'], function(_) {
     var ATTRIBUTE_CODES = {
         LINE_LIST_ATTRIBUTE_CODE: 'isLineListService',
-        LINE_LIST_OFFLINE_SUMMARY_CODE: 'lineListOfflineSummaryCategory',
+        LINE_LIST_OFFLINE_SUMMARY_CODE: 'praxisLineListSummaryType',
         SHOW_IN_EVENT_SUMMARY_CODE: 'showInEventSummary'
     };
 
