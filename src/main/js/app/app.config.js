@@ -78,6 +78,7 @@ require.config({
         "projectReportController": "app/controller/project.report.controller",
         "headerController": "app/controller/header.controller",
         "footerController": "app/controller/footer.controller",
+        "exportReportDataController": "app/controller/export.report.data.controller",
 
         //Services
         "services": "app/service/services",

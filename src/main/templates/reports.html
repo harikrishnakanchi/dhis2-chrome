@@ -123,6 +123,27 @@
                     </accordion>
                 </div>
             </tab>
+
+            <tab heading="{{ resourceBundle.exportReportData }}">
+                <div ng-controller="exportReportDataController">
+                    <br>
+                    <div class="row form-inline">
+                        <div class="col-md-12 ">
+                            <form class="well well-sm">
+                                <span>{{ resourceBundle.weeksToExport }}</span>
+                                <span>
+                                    <select class="form-control" ng-model="weekRange" ng-options="weekRange.value as weekRange.label for weekRange in weekRanges">
+                                        <option value="">-</option>
+                                    </select>
+                                </span>
+                                <span>
+                                    <input type="button" value="{{ resourceBundle.exportReportToCSV }}" class="btn btn-primary btn-sm" />
+                                </span>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </tab>
         </tabset>
     </section>
 </div>

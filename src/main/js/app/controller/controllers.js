@@ -2,13 +2,13 @@ define(['reportsController', 'moduleWeekSelectorController', 'headerController',
         'lineListModuleController', 'projectController', 'countryController', 'confirmDialogController', 'projectUserController',
         'aggregateDataEntryController', 'lineListDataEntryController', 'patientOriginController', 'productKeyController',
         'lineListSummaryController', 'dataApprovalController', 'dashboardController', 'lineListOfflineApprovalController', 'appCloneController', 'downloadDataController', 'notificationDialogController', 'selectLanguageController',
-        'referralLocationsController', 'notificationsController', 'selectProjectPreferenceController', 'projectReportController', 'footerController'
+        'referralLocationsController', 'notificationsController', 'selectProjectPreferenceController', 'projectReportController', 'footerController', 'exportReportDataController'
     ],
     function(reportsController, moduleWeekSelectorController, headerController, orgUnitContoller, loginController, opUnitController, aggregateModuleController,
         lineListModuleController, projectController, countryController, confirmDialogController, projectUserController,
         aggregateDataEntryController, lineListDataEntryController, patientOriginController, productKeyController,
         lineListSummaryController, dataApprovalController, dashboardController, lineListOfflineApprovalController, appCloneController, downloadDataController, notificationDialogController, selectLanguageController,
-        referralLocationsController, notificationsController, selectProjectPreferenceController, projectReportController, footerController) {
+        referralLocationsController, notificationsController, selectProjectPreferenceController, projectReportController, footerController, exportReportDataController) {
 
         var init = function(app) {
             app.controller('reportsController', ['$scope', '$q', '$routeParams', 'datasetRepository', 'orgUnitRepository', 'chartRepository', 'pivotTableRepository', 'translationsService', reportsController]);
@@ -40,6 +40,7 @@ define(['reportsController', 'moduleWeekSelectorController', 'headerController',
             app.controller('projectReportController', ['$rootScope', '$q', '$scope', 'orgUnitRepository','pivotTableRepository', 'translationsService', 'orgUnitGroupSetRepository', projectReportController]);
             app.controller('headerController', ['$q', '$scope', '$location', '$rootScope', '$hustle', '$timeout', '$indexedDB', 'sessionHelper', 'orgUnitRepository', 'systemSettingRepository', 'dhisMonitor', headerController]);
             app.controller('footerController', ['$rootScope', '$scope', '$interpolate','systemSettingRepository', footerController]);
+            app.controller('exportReportDataController', ['$scope', exportReportDataController]);
         };
         return {
             init: init
