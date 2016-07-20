@@ -2,7 +2,7 @@ define(['properties', 'dateUtils'], function (properties, dateUtils) {
     return function (moduleDataBlockFactory, dataService, eventService, datasetRepository, approvalService, orgUnitRepository, changeLogRepository, moduleDataBlockMerger, $q) {
         var getModuleDataBlock = function(data) {
             return moduleDataBlockFactory.create(data.moduleId, data.period).then(function (moduleDataBlock) {
-                return _.merge({ moduleDataBlock: moduleDataBlock }, data);
+                return _.assign({}, data, { moduleDataBlock: moduleDataBlock });
             });
         };
 

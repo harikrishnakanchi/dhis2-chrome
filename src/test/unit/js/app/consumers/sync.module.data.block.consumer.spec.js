@@ -200,16 +200,17 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
 
             it('should upload module data block to DHIS', function() {
                 var period = '2016W20',
-                    mockModuleDataBlockBeforeDownstreamSync = { moduleId: mockModule.id, period: period, moduleName: 'beforeDownstreamSync' },
+                    mockModuleDataBlockBeforeDownstreamSync = { moduleId: mockModule.id, period: period, moduleName: 'beforeDownstreamSync', someCollection: ['someItem'] },
                     mockModuleDataBlockAfterDownstreamSync = { moduleId: mockModule.id, period: period, moduleName: 'afterDownstreamSync' },
                     mockDhisCompletion  = { orgUnit: mockModule.id, period: period, isComplete: true },
                     mockDhisApproval    = { orgUnit: mockModule.id, period: period, isApproved: true},
                     moduleDataBlockFactoryHasBeenCalledBefore = false;
 
                 moduleDataBlockFactory.create.and.callFake(function() {
-                    var moduleDataBlock = moduleDataBlockFactoryHasBeenCalledBefore ? mockModuleDataBlockAfterDownstreamSync : mockModuleDataBlockBeforeDownstreamSync;
+                    var moduleDataBlock = moduleDataBlockFactoryHasBeenCalledBefore ? mockModuleDataBlockAfterDownstreamSync : mockModuleDataBlockBeforeDownstreamSync,
+                        cloneOfModuleDataBlock = _.merge({}, moduleDataBlock);
                     moduleDataBlockFactoryHasBeenCalledBefore = true;
-                    return utils.getPromise(q, moduleDataBlock);
+                    return utils.getPromise(q, cloneOfModuleDataBlock);
                 });
                 approvalService.getCompletionData.and.returnValue(utils.getPromise(q, [mockDhisCompletion]));
                 approvalService.getApprovalData.and.returnValue(utils.getPromise(q, [mockDhisApproval]));
