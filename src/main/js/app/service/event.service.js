@@ -61,12 +61,22 @@ define(['dhisUrl', 'properties', 'moment', 'lodash'], function(dhisUrl, properti
             });
         };
 
-        this.upsertEvents = function(events) {
+        this.createEvents = function(events) {
             var eventsToUpload = _.map(events, function(event) {
                 return _.omit(event, ['period', 'localStatus', 'eventCode', 'clientLastUpdated']);
             });
 
             return $http.post(dhisUrl.events, { events: eventsToUpload });
+        };
+
+        this.updateEvents = function(events) {
+            var updateEvent = function(event) {
+                return $http.put(dhisUrl.events + '/' + event.event, event);
+            };
+
+            return _.reduce(events, function(previousPromises, event) {
+                return previousPromises.then(_.partial(updateEvent, event));
+            }, $q.when());
         };
 
         this.deleteEvent = function(eventId) {

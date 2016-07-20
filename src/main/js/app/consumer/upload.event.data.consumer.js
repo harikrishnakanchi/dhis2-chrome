@@ -10,7 +10,7 @@ define(["lodash"], function(_) {
         };
 
         var uploadEventData = function(events) {
-            return eventService.upsertEvents(events).then(function() {
+            return eventService.createEvents(events).then(function() {
                 return events;
             });
         };

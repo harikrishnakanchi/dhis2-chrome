@@ -199,11 +199,11 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
             });
 
             it('should upload module data block to DHIS', function() {
-                var period = '2016W20',
-                    mockModuleDataBlockBeforeDownstreamSync = { moduleId: mockModule.id, period: period, moduleName: 'beforeDownstreamSync', someCollection: ['someItem'] },
-                    mockModuleDataBlockAfterDownstreamSync = { moduleId: mockModule.id, period: period, moduleName: 'afterDownstreamSync' },
-                    mockDhisCompletion  = { orgUnit: mockModule.id, period: period, isComplete: true },
-                    mockDhisApproval    = { orgUnit: mockModule.id, period: period, isApproved: true},
+                var mockModuleDataBlockBeforeDownstreamSync = { lineListService: true, moduleName: 'beforeDownstreamSync', someCollection: ['someItem'] },
+                    mockModuleDataBlockAfterDownstreamSync = { lineListService: true, moduleName: 'afterDownstreamSync' },
+                    mockDhisCompletion  = { orgUnit: mockModule.id, period: mockPeriod, isComplete: true },
+                    mockDhisApproval    = { orgUnit: mockModule.id, period: mockPeriod, isApproved: true },
+                    mockEventIds = ['someEventId'],
                     moduleDataBlockFactoryHasBeenCalledBefore = false;
 
                 moduleDataBlockFactory.create.and.callFake(function() {
@@ -212,11 +212,12 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
                     moduleDataBlockFactoryHasBeenCalledBefore = true;
                     return utils.getPromise(q, cloneOfModuleDataBlock);
                 });
+                eventService.getEventIds.and.returnValue(utils.getPromise(q, mockEventIds));
                 approvalService.getCompletionData.and.returnValue(utils.getPromise(q, [mockDhisCompletion]));
                 approvalService.getApprovalData.and.returnValue(utils.getPromise(q, [mockDhisApproval]));
 
                 runConsumer();
-                expect(moduleDataBlockMerger.uploadToDHIS).toHaveBeenCalledWith(mockModuleDataBlockAfterDownstreamSync, mockDhisCompletion, mockDhisApproval);
+                expect(moduleDataBlockMerger.uploadToDHIS).toHaveBeenCalledWith(mockModuleDataBlockAfterDownstreamSync, mockDhisCompletion, mockDhisApproval, mockEventIds);
             });
         });
     });

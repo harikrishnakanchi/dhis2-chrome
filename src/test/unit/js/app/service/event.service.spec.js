@@ -229,14 +229,14 @@ define(['eventService', 'angularMocks', 'properties', 'moment', 'lodash'], funct
             });
         });
 
-        describe('upsertEvents', function () {
-            it("should upload the events to DHIS", function() {
+        describe('createEvents', function () {
+            it("should create the events to DHIS", function() {
                 var events = [{
                     event: 'someEventId'
                 }];
                 httpBackend.expectPOST(properties.dhis.url + '/api/events', { events: events }).respond(200, {});
 
-                eventService.upsertEvents(events);
+                eventService.createEvents(events);
                 httpBackend.flush();
             });
 
@@ -255,10 +255,22 @@ define(['eventService', 'angularMocks', 'properties', 'moment', 'lodash'], funct
 
                 httpBackend.expectPOST(properties.dhis.url + '/api/events', expectedPayLoad).respond(200, {});
 
-                eventService.upsertEvents([event]);
+                eventService.createEvents([event]);
                 httpBackend.flush();
             });
+        });
 
+        describe('updateEvents', function() {
+            it('should update the events on DHIS', function() {
+                var eventA = { event: 'eventAId' },
+                    eventB = { event: 'eventBId' };
+
+                httpBackend.expectPUT(properties.dhis.url + '/api/events/' + eventA.event, eventA).respond(200, {});
+                httpBackend.expectPUT(properties.dhis.url + '/api/events/' + eventB.event, eventB).respond(200, {});
+
+                eventService.updateEvents([eventA, eventB]);
+                httpBackend.flush();
+            });
         });
 
         it("should delete event", function() {

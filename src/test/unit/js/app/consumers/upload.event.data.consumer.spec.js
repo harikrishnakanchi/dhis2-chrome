@@ -25,7 +25,7 @@ define(["uploadEventDataConsumer", "angularMocks", "properties", "utils", "event
                 }];
 
                 spyOn(programEventRepository, 'getEventsForUpload').and.returnValue(utils.getPromise(q, events));
-                spyOn(eventService, 'upsertEvents').and.returnValue(utils.getPromise(q, {}));
+                spyOn(eventService, 'createEvents').and.returnValue(utils.getPromise(q, {}));
                 spyOn(programEventRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
 
                 var message = {
@@ -42,7 +42,7 @@ define(["uploadEventDataConsumer", "angularMocks", "properties", "utils", "event
                 });
 
                 expect(programEventRepository.getEventsForUpload).toHaveBeenCalledWith(message.data.data);
-                expect(eventService.upsertEvents).toHaveBeenCalledWith(events);
+                expect(eventService.createEvents).toHaveBeenCalledWith(events);
                 expect(programEventRepository.upsert).toHaveBeenCalledWith(expectedEventUpserts);
             });
         });

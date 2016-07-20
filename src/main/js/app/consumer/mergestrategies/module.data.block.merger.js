@@ -82,7 +82,7 @@ define(['moment', 'lodash'],
                     .then(resetDataSyncFailure);
             };
 
-            var uploadToDHIS = function (moduleDataBlock, dhisCompletionData, dhisApprovalData) {
+            var uploadToDHIS = function (moduleDataBlock, dhisCompletionData, dhisApprovalData, dhisEventIds) {
                 var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId},
                     eventsToUpload = _.filter(moduleDataBlock.events, { localStatus: 'READY_FOR_DHIS' }),
                     eventIdsToDelete = _.pluck(_.filter(moduleDataBlock.events, { localStatus: 'DELETED' }), 'event'),
@@ -124,14 +124,28 @@ define(['moment', 'lodash'],
                 };
 
                 var uploadEventData = function () {
-                    var changeEventLocalStatus = function(events) {
-                        var updatedEvents = _.map(events, function(ev) {
+                    var eventExistsOnDhis = function(event) {
+                        return _.contains(dhisEventIds, event.event);
+                    };
+
+                    var createNewEvents = function() {
+                        var newEvents = _.reject(eventsToUpload, eventExistsOnDhis);
+                        return _.isEmpty(newEvents) ? $q.when() : eventService.createEvents(newEvents);
+                    };
+
+                    var updateExistingEvents = function() {
+                        var existingEvents = _.filter(eventsToUpload, eventExistsOnDhis);
+                        return _.isEmpty(existingEvents) ? $q.when() : eventService.updateEvents(existingEvents);
+                    };
+
+                    var changeEventLocalStatus = function() {
+                        var updatedEvents = _.map(eventsToUpload, function(ev) {
                             return _.omit(ev, ["localStatus", "clientLastUpdated"]);
                         });
                         return programEventRepository.upsert(updatedEvents);
                     };
 
-                    return _.isEmpty(eventsToUpload) ? $q.when() : eventService.upsertEvents(eventsToUpload).then(_.partial(changeEventLocalStatus, eventsToUpload));
+                    return _.isEmpty(eventsToUpload) ? $q.when() : createNewEvents().then(updateExistingEvents).then(changeEventLocalStatus);
                 };
 
                 var deleteEvents = function () {

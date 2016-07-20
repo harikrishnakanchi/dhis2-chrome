@@ -81,7 +81,7 @@ define(['properties', 'dateUtils'], function (properties, dateUtils) {
         };
 
         var uploadModuleDataBlockToDhis = function (data) {
-            return moduleDataBlockMerger.uploadToDHIS(data.moduleDataBlock, data.dhisCompletion, data.dhisApproval);
+            return moduleDataBlockMerger.uploadToDHIS(data.moduleDataBlock, data.dhisCompletion, data.dhisApproval, data.eventIds);
         };
 
         this.run = function(message) {

@@ -45,7 +45,8 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                 spyOn(programEventRepository, 'delete').and.returnValue(utils.getPromise(q, {}));
 
                 eventService = new EventService();
-                spyOn(eventService, 'upsertEvents').and.returnValue(utils.getPromise(q, {}));
+                spyOn(eventService, 'createEvents').and.returnValue(utils.getPromise(q, {}));
+                spyOn(eventService, 'updateEvents').and.returnValue(utils.getPromise(q, {}));
                 spyOn(eventService, 'deleteEvent').and.returnValue(utils.getPromise(q, {}));
 
                 aggregateDataValuesMerger = new AggregateDataValuesMerger();
@@ -55,8 +56,8 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                 spyOn(lineListEventsMerger, 'create').and.returnValue({});
 
                 moduleDataBlockMerger = new ModuleDataBlockMerger(dataRepository, approvalRepository, dataService, q, datasetRepository, approvalService,
-                                                                  dataSyncFailureRepository, programEventRepository, eventService, aggregateDataValuesMerger,
-                                                                  lineListEventsMerger);
+                    dataSyncFailureRepository, programEventRepository, eventService, aggregateDataValuesMerger,
+                    lineListEventsMerger);
 
                 moduleDataBlock = createMockModuleDataBlock();
                 periodAndOrgUnit = {
@@ -479,7 +480,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
             describe('uploadToDHIS', function() {
                 var performUpload = function () {
-                    moduleDataBlockMerger.uploadToDHIS(moduleDataBlock, dhisCompletion, dhisApproval);
+                    moduleDataBlockMerger.uploadToDHIS(moduleDataBlock, dhisCompletion, dhisApproval, dhisEventIds);
                     scope.$apply();
                 };
 
@@ -520,7 +521,8 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
 
                     it('should not upload events to DHIS', function () {
                         performUpload();
-                        expect(eventService.upsertEvents).not.toHaveBeenCalled();
+                        expect(eventService.createEvents).not.toHaveBeenCalled();
+                        expect(eventService.updateEvents).not.toHaveBeenCalled();
                     });
                 });
 
@@ -543,9 +545,18 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         });
                     });
 
-                    it('should upload submitted events to DHIS', function(){
+                    it('should create submitted events on DHIS if they do not already exist', function(){
+                        dhisEventIds = [];
                         performUpload();
-                        expect(eventService.upsertEvents).toHaveBeenCalledWith([submittedEvent]);
+                        expect(eventService.createEvents).toHaveBeenCalledWith([submittedEvent]);
+                        expect(eventService.updateEvents).not.toHaveBeenCalled();
+                    });
+
+                    it('should update submitted events on DHIS if they already exist', function(){
+                        dhisEventIds = [submittedEvent.event];
+                        performUpload();
+                        expect(eventService.createEvents).not.toHaveBeenCalled();
+                        expect(eventService.updateEvents).toHaveBeenCalledWith([submittedEvent]);
                     });
 
                     it('should remove local timestamp and status from submitted events', function(){
@@ -582,7 +593,8 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                         moduleDataBlockMerger.uploadToDHIS(moduleDataBlock, dhisCompletion, dhisApproval);
                         scope.$apply();
 
-                        expect(eventService.upsertEvents).not.toHaveBeenCalled();
+                        expect(eventService.createEvents).not.toHaveBeenCalled();
+                        expect(eventService.updateEvents).not.toHaveBeenCalled();
                     });
                 });
 
