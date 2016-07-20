@@ -40,7 +40,7 @@ define(['reportsController', 'moduleWeekSelectorController', 'headerController',
             app.controller('projectReportController', ['$rootScope', '$q', '$scope', 'orgUnitRepository','pivotTableRepository', 'translationsService', 'orgUnitGroupSetRepository', projectReportController]);
             app.controller('headerController', ['$q', '$scope', '$location', '$rootScope', '$hustle', '$timeout', '$indexedDB', 'sessionHelper', 'orgUnitRepository', 'systemSettingRepository', 'dhisMonitor', headerController]);
             app.controller('footerController', ['$rootScope', '$scope', '$interpolate','systemSettingRepository', footerController]);
-            app.controller('exportReportDataController', ['$scope', exportReportDataController]);
+            app.controller('exportReportDataController', ['$scope', '$q', 'datasetRepository', 'excludedDataElementsRepository', 'moduleDataBlockFactory', exportReportDataController]);
         };
         return {
             init: init
