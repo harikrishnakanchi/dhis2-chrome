@@ -124,8 +124,10 @@ define(['moment', 'lodash'],
                 };
 
                 var uploadEventData = function () {
+                    var mapOfDhisEventIds = _.indexBy(dhisEventIds);
+
                     var eventExistsOnDhis = function(event) {
-                        return _.contains(dhisEventIds, event.event);
+                        return !!mapOfDhisEventIds[event.event];
                     };
 
                     var createNewEvents = function() {
