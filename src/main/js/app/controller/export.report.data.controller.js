@@ -46,6 +46,9 @@ define(['lodash', 'dateUtils'], function (_, dateUtils) {
         };
 
         var reloadView = function () {
+            $scope.sections = null;
+            $scope.dataValuesMap = null;
+
             if(!($scope.orgUnit && $scope.selectedDataset && $scope.selectedWeeksToExport)) return;
 
             $scope.weeks = dateUtils.getPeriodRange($scope.selectedWeeksToExport, { excludeCurrentWeek: true });

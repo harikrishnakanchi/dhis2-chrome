@@ -133,7 +133,7 @@
                 <br>
                 <div class="row form-inline">
                     <div class="col-md-12 ">
-                        <form class="well well-sm">
+                        <form class="well">
                             <span>{{ resourceBundle.weeksToExport }}</span>
                             <span>
                                 <select class="form-control" ng-model="selectedWeeksToExport" ng-options="weeksToExport.value as weeksToExport.label for weeksToExport in weeksToExportOptions">
@@ -141,9 +141,33 @@
                                 </select>
                             </span>
                             <span>
-                                <input type="button" value="{{ resourceBundle.exportReportToCSV }}" class="btn btn-primary btn-sm" />
+                                <input type="button" value="{{ resourceBundle.exportReportToCSV }}" class="btn btn-primary" />
                             </span>
                         </form>
+
+                        <div class="table-responsive" ng-if="sections && dataValuesMap">
+                            <table class="table table-striped table-bordered" locked-table-header>
+                                <thead>
+                                <tr>
+                                    <th>{{ resourceBundle.dataElement }}</th>
+                                    <th ng-repeat="week in weeks">{{ week }}</th>
+                                </tr>
+                                </thead>
+                                <tbody ng-repeat="section in sections">
+                                <tr>
+                                    <td class="active text-center" colspan="{{ weeks.length + 1 }}">
+                                        <strong>{{ section.name }}</strong>
+                                    </td>
+                                </tr>
+                                <tr ng-repeat="dataElement in section.dataElements">
+                                    <td>{{ dataElement.formName }}</td>
+                                    <td ng-repeat="week in weeks">
+                                        {{ dataValuesMap[week][dataElement.id] }}
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
