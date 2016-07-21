@@ -53,8 +53,13 @@ define(['lodash', 'dateUtils'], function (_, dateUtils) {
 
             $scope.weeks = dateUtils.getPeriodRange($scope.selectedWeeksToExport, { excludeCurrentWeek: true });
 
-            moduleDataBlockFactory.createForModule($scope.orgUnit.id, $scope.weeks).then(createDataValuesMap);
-            loadExcludedDataElements($scope.orgUnit).then(createSections);
+            $scope.loading = true;
+            $q.all([
+                moduleDataBlockFactory.createForModule($scope.orgUnit.id, $scope.weeks).then(createDataValuesMap),
+                loadExcludedDataElements($scope.orgUnit).then(createSections)
+            ]).finally(function() {
+                $scope.loading = false;
+            });
         };
 
         $scope.$watchGroup(['orgUnit', 'selectedDataset', 'selectedWeeksToExport'], reloadView);
