@@ -191,14 +191,14 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('weeklyChartData:' + mockProjectId, currentTime.toISOString());
             });
 
-            it('should not download monthly chart data if it has already been downloaded in the same week', function() {
+            it('should not download monthly chart data if it has already been downloaded that same day', function() {
                 var mockMonthlyChart = {
                     id: 'someChartId',
                     monthlyChart: true
                 };
 
                 var lastDownloadedTime = moment('2014-10-01T12:00:00.000Z').toISOString();
-                currentTime = moment('2014-10-03T12:00:00.000Z');
+                currentTime = moment('2014-10-01T12:00:00.000Z');
                 Timecop.freeze(currentTime);
 
                 chartRepository.getAll.and.returnValue(utils.getPromise(q, [mockMonthlyChart]));
@@ -211,7 +211,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('monthlyChartData:' + mockProjectId, currentTime.toISOString());
             });
 
-            it('should download monthly chart data if it has not been downloaded in the same week', function() {
+            it('should download monthly chart data if it has not been downloaded in the same day', function() {
                 var mockMonthlyChart = {
                     id: 'someChartId',
                     monthlyChart: true,
@@ -219,27 +219,8 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 };
 
                 var lastDownloadedTime = moment('2014-10-01T12:00:00.000Z').toISOString();
-                currentTime = moment('2014-10-06T12:00:00.000Z');
+                currentTime = moment('2014-10-02T12:00:00.000Z');
                 Timecop.freeze(currentTime);
-
-                chartRepository.getAll.and.returnValue(utils.getPromise(q, [mockMonthlyChart]));
-                changeLogRepository.get.and.returnValue(utils.getPromise(q, lastDownloadedTime));
-
-                downloadChartDataConsumer.run();
-                scope.$apply();
-
-                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalled();
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyChartData:' + mockProjectId, currentTime.toISOString());
-            });
-
-            it('should download monthly chart data if it has not been downloaded in the same month', function() {
-                var mockMonthlyChart = {
-                    id: 'someChartId',
-                    monthlyChart: true,
-                    dataSetCode: 'someDataSetCode'
-                };
-
-                var lastDownloadedTime = moment('2014-09-30T12:00:00.000Z').toISOString();
 
                 chartRepository.getAll.and.returnValue(utils.getPromise(q, [mockMonthlyChart]));
                 changeLogRepository.get.and.returnValue(utils.getPromise(q, lastDownloadedTime));

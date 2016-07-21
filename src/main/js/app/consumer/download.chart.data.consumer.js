@@ -84,13 +84,13 @@ define(["lodash", "moment"], function(_, moment) {
                     weeklyChartsLastDownloaded: changeLogRepository.get(weeklyChangeLogKey),
                     monthlyChartsLastDownloaded: changeLogRepository.get(monthlyChangeLogKey)
                 }).then(function(data) {
-                    var isDownloadedInSameDay =  moment().isSame(data.weeklyChartsLastDownloaded, 'day');
-                    var isDownloadedInSameWeekAndMonth = moment().isSame(data.monthlyChartsLastDownloaded, 'isoWeek') && moment().isSame(data.monthlyChartsLastDownloaded, 'month');
-                    if (data.weeklyChartsLastDownloaded && isDownloadedInSameDay) {
+                    var isWeeklyChartDownloadedInSameDay = moment().isSame(data.weeklyChartsLastDownloaded, 'day');
+                    var isMonthlyChartDownloadedInSameDay = moment().isSame(data.monthlyChartsLastDownloaded, 'day');
+                    if (data.weeklyChartsLastDownloaded && isWeeklyChartDownloadedInSameDay) {
                         _.remove(charts, { weeklyChart: true });
                         _.pull(changeLogKeys, weeklyChangeLogKey);
                     }
-                    if(data.monthlyChartsLastDownloaded && isDownloadedInSameWeekAndMonth) {
+                    if(data.monthlyChartsLastDownloaded && isMonthlyChartDownloadedInSameDay) {
                         _.remove(charts, { monthlyChart: true});
                         _.pull(changeLogKeys, monthlyChangeLogKey);
                     }
