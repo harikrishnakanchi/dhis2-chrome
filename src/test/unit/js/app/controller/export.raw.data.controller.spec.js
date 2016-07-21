@@ -42,24 +42,30 @@ define(['exportRawDataController', 'angularMocks', 'utils', 'lodash', 'timecop',
                 mockDataBlocks = [{
                     period: '2016W01',
                     dataValues: [{
+                        period: '2016W01',
                         dataElement: 'deId1',
                         value: '3'
                     }, {
+                        period: '2016W01',
                         dataElement: 'deId1',
                         value: '2'
                     }, {
+                        period: '2016W01',
                         dataElement: 'deId2',
                         value: '6'
                     }]
                 }, {
                     period: '2016W25',
                     dataValues: [{
+                        period: '2016W25',
                         dataElement: 'deId3',
                         value: '5'
                     }, {
+                        period: '2016W25',
                         dataElement: 'deId4',
                         value: '16'
                     }, {
+                        period: '2016W25',
                         dataElement: 'deId3',
                         value: '7'
                     }]

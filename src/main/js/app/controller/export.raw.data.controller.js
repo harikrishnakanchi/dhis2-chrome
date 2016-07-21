@@ -16,25 +16,18 @@ define(['lodash', 'dateUtils'], function (_, dateUtils) {
         }];
 
         var createDataValuesMap = function (moduleDataBlocks) {
-            var map = {};
+            var allDataValues = _.flatten(_.map(moduleDataBlocks, 'dataValues'));
 
-            _.each(moduleDataBlocks, function (moduleDataBlock) {
-                map[moduleDataBlock.period] = {};
-                var dataValueMapByDataElementId = _.groupBy(moduleDataBlock.dataValues, 'dataElement');
-
-                _.each(dataValueMapByDataElementId, function (dataValues, dataElementId) {
-                    map[moduleDataBlock.period][dataElementId] = _.reduce(dataValues, function (acc, dataValue) {
-                        return acc + parseInt(dataValue.value);
-                    }, 0);
-                });
-            });
-
-            $scope.dataValuesMap = map;
+            $scope.dataValuesMap = _.transform(allDataValues, function (map, dataValue) {
+                map[dataValue.period] = map[dataValue.period] || {};
+                map[dataValue.period][dataValue.dataElement] = map[dataValue.period][dataValue.dataElement] || 0;
+                map[dataValue.period][dataValue.dataElement] += parseInt(dataValue.value);
+            }, {});
         };
 
-        var loadExcludedDataElements = function(module) {
+        var loadExcludedDataElementIds = function(module) {
             return excludedDataElementsRepository.get(module.id).then(function(excludedDataElements) {
-                return excludedDataElements ? _.pluck(excludedDataElements.dataElements, 'id') : [];
+                return _.pluck(excludedDataElements && excludedDataElements.dataElements, 'id');
             });
         };
 
@@ -56,7 +49,7 @@ define(['lodash', 'dateUtils'], function (_, dateUtils) {
             $scope.loading = true;
             $q.all([
                 moduleDataBlockFactory.createForModule($scope.orgUnit.id, $scope.weeks).then(createDataValuesMap),
-                loadExcludedDataElements($scope.orgUnit).then(createSections)
+                loadExcludedDataElementIds($scope.orgUnit).then(createSections)
             ]).finally(function() {
                 $scope.loading = false;
             });
