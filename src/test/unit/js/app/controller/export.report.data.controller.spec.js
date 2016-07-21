@@ -74,7 +74,6 @@ define(['exportReportDataController', 'angularMocks', 'utils', 'lodash', 'timeco
                 spyOn(dateUtils, 'getPeriodRange').and.returnValue(['2016W20']);
 
                 datasetRepository = new DatasetRepository();
-                spyOn(datasetRepository, 'get').and.returnValue(utils.getPromise(q, mockDataset));
                 spyOn(datasetRepository, 'includeDataElements').and.returnValue(utils.getPromise(q, [mockEnrichedDataset]));
 
                 moduleDataBlockFactory = ModuleDataBlockFactory();

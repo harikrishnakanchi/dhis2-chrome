@@ -313,13 +313,5 @@ define(["datasetRepository", "datasetTransformer", "testData", "angularMocks", "
 
             expect(mockStore.upsert).toHaveBeenCalledWith(expectedDatasetUpsert);
         });
-
-        it('should fetch the dataSet for the given dataSet id', function () {
-            var dataSetId = "someDataSetId";
-            datasetRepository.get(dataSetId);
-
-            scope.$apply();
-            expect(mockStore.find).toHaveBeenCalledWith(dataSetId);
-        });
     });
 });

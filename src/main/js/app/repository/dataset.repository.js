@@ -10,11 +10,6 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
                 return datasets;
             });
         };
-
-        this.get = function (dataSetId) {
-            var store = db.objectStore("dataSets");
-            return store.find(dataSetId);
-        };
         
         this.findAllForOrgUnits = function(orgUnitIds) {
             var store = db.objectStore("dataSets");
