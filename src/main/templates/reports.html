@@ -19,7 +19,7 @@
         <ul class="nav nav-tabs">
             <li ng-class="{ 'active': currentTab == 'weeklyReport'}"><a ng-click="currentTab = 'weeklyReport'">{{resourceBundle.weeklyReports}}</a></li>
             <li ng-class="{ 'active': currentTab == 'monthlyReport'}"><a ng-click="currentTab = 'monthlyReport'">{{resourceBundle.monthlyReports}}</a></li>
-            <li ng-class="{ 'active': currentTab == 'exportRawData'}"><a ng-click="currentTab = 'exportRawData'">{{ resourceBundle.exportReportData }}</a></li>
+            <li ng-class="{ 'active': currentTab == 'exportRawData'}"><a ng-click="currentTab = 'exportRawData'">{{ resourceBundle.exportRawData }}</a></li>
         </ul>
 
         <div ng-if="currentTab == 'weeklyReport'" ng-include="'templates/reports/weekly.report.html'"></div>

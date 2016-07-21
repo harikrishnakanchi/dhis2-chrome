@@ -1,6 +1,6 @@
-define(['exportReportDataController', 'angularMocks', 'utils', 'lodash', 'timecop', 'datasetRepository', 'excludedDataElementsRepository', 'moduleDataBlockFactory', 'dateUtils'],
-    function (ExportReportDataController, mocks, utils, _, timecop, DatasetRepository, ExcludedDataElementsRepository, ModuleDataBlockFactory, dateUtils) {
-        describe('ExportReportDataController', function () {
+define(['exportRawDataController', 'angularMocks', 'utils', 'lodash', 'timecop', 'datasetRepository', 'excludedDataElementsRepository', 'moduleDataBlockFactory', 'dateUtils'],
+    function (ExportRawDataController, mocks, utils, _, timecop, DatasetRepository, ExcludedDataElementsRepository, ModuleDataBlockFactory, dateUtils) {
+        describe('ExportRawDataController', function () {
             var controller, rootScope, scope, q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory,
                 mockOrgUnit, mockDataset, mockEnrichedDataset, mockExcludedDataElements, mockDataBlocks;
 
@@ -82,7 +82,7 @@ define(['exportReportDataController', 'angularMocks', 'utils', 'lodash', 'timeco
                 excludedDataElementsRepository = new ExcludedDataElementsRepository();
                 spyOn(excludedDataElementsRepository, 'get').and.returnValue(utils.getPromise(q, mockExcludedDataElements));
 
-                controller = new ExportReportDataController(scope, q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory);
+                controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory);
             }));
 
             it('should fetch sections along with dataelements', function () {
