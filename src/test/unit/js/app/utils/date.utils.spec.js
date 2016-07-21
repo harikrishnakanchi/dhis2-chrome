@@ -54,6 +54,11 @@ define(['dateUtils', 'moment', 'timecop'], function(dateUtils, moment, timecop) 
                 var actualResult = dateUtils.getPeriodRange(3);
                 expect(actualResult).toEqual(['2015W53', '2016W01', '2016W02']);
             });
+
+            it('should return period range for the last X weeks excluding the current week', function() {
+                var actualResult = dateUtils.getPeriodRange(3, { excludeCurrentWeek: true });
+                expect(actualResult).toEqual(['2015W52', '2015W53', '2016W01']);
+            });
         });
     });
 });
