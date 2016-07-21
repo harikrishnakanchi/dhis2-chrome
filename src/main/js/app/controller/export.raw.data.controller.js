@@ -35,6 +35,9 @@ define(['lodash', 'dateUtils'], function (_, dateUtils) {
             return datasetRepository.includeDataElements([$scope.selectedDataset], excludedDataElements).then(function (enrichedDatasets) {
                 var currentDataset = _.first(enrichedDatasets);
                 $scope.sections = _.filter(currentDataset.sections, 'isIncluded');
+                _.each($scope.sections, function(section) {
+                    section.dataElements = _.filter(section.dataElements, 'isIncluded');
+                });
             });
         };
 

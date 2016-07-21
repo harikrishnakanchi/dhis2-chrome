@@ -27,14 +27,13 @@ define(['exportRawDataController', 'angularMocks', 'utils', 'lodash', 'timecop',
                     name: 'data set name',
                     sections: [{
                         id: 'section 1 id',
+                        isIncluded: true,
                         dataElements: [{
                             id: 'dataElementId'
                         }]
                     }, {
                         id: 'section 2 id',
-                        dataElements: []
-                    }, {
-                        id: 'section 3 id',
+                        isIncluded: true,
                         dataElements: []
                     }]
                 };
@@ -94,6 +93,51 @@ define(['exportRawDataController', 'angularMocks', 'utils', 'lodash', 'timecop',
             it('should fetch sections along with dataelements', function () {
                 scope.$apply();
                 expect(datasetRepository.includeDataElements).toHaveBeenCalledWith([mockDataset], _.map(mockExcludedDataElements.dataElements, 'id'));
+            });
+
+            it('should filter out excluded dataSetSections', function () {
+                mockEnrichedDataset = {
+                    name: 'data set name',
+                    sections: [{
+                        id: 'section 1 id',
+                        isIncluded: true,
+                        dataElements: [{
+                            id: 'dataElementId'
+                        }]
+                    }, {
+                        id: 'section 2 id',
+                        isIncluded: false,
+                        dataElements: []
+                    }]
+                };
+
+                datasetRepository.includeDataElements.and.returnValue(utils.getPromise(q, [mockEnrichedDataset]));
+                scope.$apply();
+                expect(scope.sections).toEqual(_.filter(mockEnrichedDataset.sections, 'isIncluded'));
+            });
+
+            it('should filter out excluded DataElements', function () {
+                var dataElements = [{
+                    id: 'dataElementId 1',
+                    isIncluded: true
+                }, {
+                    id: 'dataElementId 2',
+                    isIncluded: false
+                }];
+                var dataSetSection = {
+                    id: 'section 1 id',
+                    isIncluded: true,
+                    dataElements: dataElements
+                };
+
+                mockEnrichedDataset = {
+                    name: 'data set name',
+                    sections: [dataSetSection]
+                };
+
+                datasetRepository.includeDataElements.and.returnValue(utils.getPromise(q, [mockEnrichedDataset]));
+                scope.$apply();
+                expect(dataSetSection.dataElements).toEqual(_.filter(dataElements, 'isIncluded'));
             });
 
             it('should populate the specified week range', function () {
