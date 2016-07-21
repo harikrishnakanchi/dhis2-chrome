@@ -318,7 +318,10 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
 
         var init = function() {
             $scope.loading = true;
+
+            $scope.currentTab = 'weeklyReport';
             $scope.selectedDataset = null;
+
             loadOrgUnit()
                 .then(loadRelevantDatasets)
                 .then(loadChartsWithData)

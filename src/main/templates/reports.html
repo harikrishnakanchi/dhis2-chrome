@@ -15,122 +15,126 @@
                 <select id="selectDataset" class="form-control" ng-model="selectedDataset" ng-options="dataset as dataset.name for dataset in datasets"></select>
             </div>
         </div>
-        <tabset>
-            <tab heading="{{resourceBundle.weeklyReports}}" ng-click="resizeCharts()">
-                <div id="weeklyCharts">
-                    <div ng-hide="selectedDataset.isWeeklyChartsAvailable">
-                        <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
+
+        <ul class="nav nav-tabs">
+            <li ng-class="{ 'active': currentTab == 'weeklyReport'}"><a ng-click="currentTab = 'weeklyReport'">{{resourceBundle.weeklyReports}}</a></li>
+            <li ng-class="{ 'active': currentTab == 'monthlyReport'}"><a ng-click="currentTab = 'monthlyReport'">{{resourceBundle.monthlyReports}}</a></li>
+            <li ng-class="{ 'active': currentTab == 'exportRawData'}"><a ng-click="currentTab = 'exportRawData'">{{ resourceBundle.exportReportData }}</a></li>
+        </ul>
+
+        <div ng-if="currentTab == 'weeklyReport'">
+            <div id="weeklyCharts">
+                <div ng-hide="selectedDataset.isWeeklyChartsAvailable">
+                    <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
+                </div>
+                <div ng-repeat="chart in charts | filter: {definition: {dataSetCode: selectedDataset.code}} | orderBy: 'definition.displayPosition'" ng-show="chart.definition.weeklyChart && chart.data && chart.data.length > 0">
+                    <div class="row chart-title">
+                        <h3 class="col-md-6 col-md-offset-3 text-center">{{chart.definition.title}}</h3>
+                        <a class="col-md-1 col-md-offset-2" href="" title="{{ resourceBundle.downloadChart }}" ng-click="downloadChartAsPng($event)">
+                            <span class="glyphicon glyphicon-download-alt"></span>
+                        </a>
                     </div>
-                    <div ng-repeat="chart in charts | filter: {definition: {dataSetCode: selectedDataset.code}} | orderBy: 'definition.displayPosition'" ng-show="chart.definition.weeklyChart && chart.data && chart.data.length > 0">
-                        <div class="row chart-title">
-                            <h3 class="col-md-6 col-md-offset-3 text-center">{{chart.definition.title}}</h3>
-                            <a class="col-md-1 col-md-offset-2" href="" title="{{ resourceBundle.downloadChart }}" ng-click="downloadChartAsPng($event)">
-                                <span class="glyphicon glyphicon-download-alt"></span>
-                            </a>
+                    <p ng-if="chart.definition.type === 'LINE'" class="lineChart-container">
+                        <nvd3 options="weeklyLineChartOptions" data="chart.data"></nvd3>
+                    </p>
+                    <p ng-if="chart.definition.type === 'COLUMN'">
+                        <nvd3 options="weeklyBarChartOptions" data="chart.data"></nvd3>
+                    </p>
+                    <p ng-if="chart.definition.type === 'STACKED_COLUMN'">
+                        <nvd3 options="weeklyStackedBarChartOptions" data="chart.data"></nvd3>
+                    </p>
+                </div>
+            </div>
+
+            <div id="weeklyReports">
+                <accordion close-others="false">
+                    <accordion-group is-open="true">
+                        <accordion-heading>
+                            <span>{{resourceBundle.tabularReports}}</span>
+                            <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isReportOpen, 'glyphicon-chevron-right': !isReportOpen}"></i>
+                        </accordion-heading>
+                        <div ng-show="!selectedDataset.isWeeklyPivotTablesAvailable">
+                            <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
                         </div>
-                        <p ng-if="chart.definition.type === 'LINE'" class="lineChart-container">
-                            <nvd3 options="weeklyLineChartOptions" data="chart.data"></nvd3>
-                        </p>
-                        <p ng-if="chart.definition.type === 'COLUMN'">
-                            <nvd3 options="weeklyBarChartOptions" data="chart.data"></nvd3>
-                        </p>
-                        <p ng-if="chart.definition.type === 'STACKED_COLUMN'">
-                            <nvd3 options="weeklyStackedBarChartOptions" data="chart.data"></nvd3>
-                        </p>
-                    </div>
-                </div>
-
-                <div id="weeklyReports">
-                    <accordion close-others="false">
-                        <accordion-group is-open="true">
-                            <accordion-heading>
-                                <span>{{resourceBundle.tabularReports}}</span>
-                                <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isReportOpen, 'glyphicon-chevron-right': !isReportOpen}"></i>
-                            </accordion-heading>
-                            <div ng-show="!selectedDataset.isWeeklyPivotTablesAvailable">
-                                <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
+                        <div class="exp-coll-group" ng-if="selectedDataset.isWeeklyPivotTablesAvailable">
+                            <div ng-if="table.definition.weeklyReport && table.isTableDataAvailable" ng-repeat="table in pivotTables | filter: {dataSetCode: selectedDataset.code} | orderBy: 'definition.displayPosition'" class="exportCSV-container">
+                                <accordion close-others="false">
+                                    <accordion-group is-open="status.open">
+                                        <accordion-heading>
+                                            <span>{{ table.definition.title }}</span>
+                                            <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                        </accordion-heading>
+                                        <div>
+                                            <pivot-table definition="table.definition" data="table.data" resource-bundle="resourceBundle"></pivot-table>
+                                        </div>
+                                    </accordion-group>
+                                </accordion>
                             </div>
-                            <div class="exp-coll-group" ng-if="selectedDataset.isWeeklyPivotTablesAvailable">
-                                <div ng-if="table.definition.weeklyReport && table.isTableDataAvailable" ng-repeat="table in pivotTables | filter: {dataSetCode: selectedDataset.code} | orderBy: 'definition.displayPosition'" class="exportCSV-container">
-                                    <accordion close-others="false">
-                                        <accordion-group is-open="status.open">
-                                            <accordion-heading>
-                                                <span>{{ table.definition.title }}</span>
-                                                <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-                                            </accordion-heading>
-                                            <div>
-                                                <pivot-table definition="table.definition" data="table.data" resource-bundle="resourceBundle"></pivot-table>
-                                            </div>
-                                        </accordion-group>
-                                    </accordion>
-                                </div>
-                            </div>
-                        </accordion-group>
-                    </accordion>
-                </div>
-            </tab>
-
-            <tab heading="{{resourceBundle.monthlyReports}}" ng-click="resizeCharts()">
-                <div id="monthlyCharts">
-                    <div ng-hide="selectedDataset.isMonthlyChartsAvailable">
-                        <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
-                    </div>
-                    <div ng-repeat="chart in charts | filter: {definition: {dataSetCode: selectedDataset.code}} | orderBy: 'definition.displayPosition'" ng-show="chart.definition.monthlyChart && chart.data && chart.data.length > 0">
-                        <div class="row chart-title">
-                            <h3 class="col-md-6 col-md-offset-3 text-center">{{chart.definition.title}}</h3>
-                            <a class="col-md-1 col-md-offset-2" href="" title="{{ resourceBundle.downloadChart }}" ng-click="downloadChartAsPng($event)">
-                                <span class="glyphicon glyphicon-download-alt"></span>
-                            </a>
                         </div>
-                        <p ng-if="chart.definition.type === 'LINE'" class="lineChart-container">
-                            <nvd3 options="monthlyLineChartOptions" data="chart.data"></nvd3>
-                        </p>
-                        <p ng-if="chart.definition.type === 'COLUMN'">
-                            <nvd3 options="monthlyBarChartOptions" data="chart.data"></nvd3>
-                        </p>
-                        <p ng-if="chart.definition.type === 'STACKED_COLUMN'">
-                            <nvd3 options="monthlyStackedBarChartOptions" data="chart.data"></nvd3>
-                        </p>
+                    </accordion-group>
+                </accordion>
+            </div>
+        </div>
+        <div ng-if="currentTab == 'monthlyReport'">
+            <div id="monthlyCharts">
+                <div ng-hide="selectedDataset.isMonthlyChartsAvailable">
+                    <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
+                </div>
+                <div ng-repeat="chart in charts | filter: {definition: {dataSetCode: selectedDataset.code}} | orderBy: 'definition.displayPosition'" ng-show="chart.definition.monthlyChart && chart.data && chart.data.length > 0">
+                    <div class="row chart-title">
+                        <h3 class="col-md-6 col-md-offset-3 text-center">{{chart.definition.title}}</h3>
+                        <a class="col-md-1 col-md-offset-2" href="" title="{{ resourceBundle.downloadChart }}" ng-click="downloadChartAsPng($event)">
+                            <span class="glyphicon glyphicon-download-alt"></span>
+                        </a>
                     </div>
+                    <p ng-if="chart.definition.type === 'LINE'" class="lineChart-container">
+                        <nvd3 options="monthlyLineChartOptions" data="chart.data"></nvd3>
+                    </p>
+                    <p ng-if="chart.definition.type === 'COLUMN'">
+                        <nvd3 options="monthlyBarChartOptions" data="chart.data"></nvd3>
+                    </p>
+                    <p ng-if="chart.definition.type === 'STACKED_COLUMN'">
+                        <nvd3 options="monthlyStackedBarChartOptions" data="chart.data"></nvd3>
+                    </p>
                 </div>
+            </div>
 
-                <div id="monthlyReports" class="margin-top">
-                    <accordion close-others="false">
-                        <accordion-group is-open="true">
-                            <accordion-heading>
-                                <span>{{resourceBundle.tabularReports}}</span>
-                                <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isReportOpen, 'glyphicon-chevron-right': !isReportOpen}"></i>
-                            </accordion-heading>
-                            <div ng-show="!selectedDataset.isMonthlyPivotTablesAvailable">
-                                <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
+            <div id="monthlyReports" class="margin-top">
+                <accordion close-others="false">
+                    <accordion-group is-open="true">
+                        <accordion-heading>
+                            <span>{{resourceBundle.tabularReports}}</span>
+                            <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isReportOpen, 'glyphicon-chevron-right': !isReportOpen}"></i>
+                        </accordion-heading>
+                        <div ng-show="!selectedDataset.isMonthlyPivotTablesAvailable">
+                            <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
+                        </div>
+                        <div class="exp-coll-group">
+                            <div ng-if="table.definition.monthlyReport && table.isTableDataAvailable" ng-repeat="table in pivotTables | filter: {dataSetCode: selectedDataset.code} | orderBy: 'definition.displayPosition'" class="exportCSV-container">
+                                <accordion close-others="false">
+                                    <accordion-group is-open="status.open">
+                                        <accordion-heading>
+                                            <span>{{ table.definition.title }}</span>
+                                            <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                        </accordion-heading>
+                                        <div>
+                                            <pivot-table definition="table.definition" data="table.data" resource-bundle="resourceBundle"></pivot-table>
+                                        </div>
+                                    </accordion-group>
+                                </accordion>
                             </div>
-                            <div class="exp-coll-group">
-                                <div ng-if="table.definition.monthlyReport && table.isTableDataAvailable" ng-repeat="table in pivotTables | filter: {dataSetCode: selectedDataset.code} | orderBy: 'definition.displayPosition'" class="exportCSV-container">
-                                    <accordion close-others="false">
-                                        <accordion-group is-open="status.open">
-                                            <accordion-heading>
-                                                <span>{{ table.definition.title }}</span>
-                                                <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-                                            </accordion-heading>
-                                            <div>
-                                                <pivot-table definition="table.definition" data="table.data" resource-bundle="resourceBundle"></pivot-table>
-                                            </div>
-                                        </accordion-group>
-                                    </accordion>
-                                </div>
-                            </div>
-                        </accordion-group>
-                    </accordion>
-                </div>
-            </tab>
-
-            <tab heading="{{ resourceBundle.exportReportData }}">
-                <div ng-controller="exportReportDataController">
-                    <br>
-                    <div class="row form-inline">
-                        <div class="col-md-12 ">
-                            <form class="well well-sm">
-                                <span>{{ resourceBundle.weeksToExport }}</span>
+                        </div>
+                    </accordion-group>
+                </accordion>
+            </div>
+        </div>
+        <div ng-if="currentTab == 'exportRawData'">
+            <div ng-controller="exportReportDataController">
+                <br>
+                <div class="row form-inline">
+                    <div class="col-md-12 ">
+                        <form class="well well-sm">
+                            <span>{{ resourceBundle.weeksToExport }}</span>
                                 <span>
                                     <select class="form-control" ng-model="weekRange" ng-options="weekRange.value as weekRange.label for weekRange in weekRanges">
                                         <option value="">-</option>
@@ -143,7 +147,8 @@
                         </div>
                     </div>
                 </div>
-            </tab>
-        </tabset>
+            </div>
+        </div>
+
     </section>
 </div>
