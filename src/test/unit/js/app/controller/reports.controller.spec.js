@@ -1,4 +1,4 @@
-define(["angularMocks", "utils", "moment", "reportsController", "datasetRepository", "orgUnitRepository", "chartRepository", "pivotTableRepository", "translationsService", "systemSettingRepository"], function(mocks, utils, moment, ReportsController, DatasetRepository, OrgUnitRepository, ChartRepository, PivotTableRepository, TranslationsService, SystemSettingRepository) {
+define(["angularMocks", "utils", "moment", "reportsController", "datasetRepository", "orgUnitRepository", "chartRepository", "pivotTableRepository", "translationsService", "systemSettingRepository", "customAttributes"], function(mocks, utils, moment, ReportsController, DatasetRepository, OrgUnitRepository, ChartRepository, PivotTableRepository, TranslationsService, SystemSettingRepository, CustomAttributes) {
     describe("reportsControllerspec", function() {
 
         var scope, rootScope, reportsController, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, systemSettingRepository;
@@ -24,6 +24,8 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
             spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
             spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, []));
+
+            spyOn(CustomAttributes, 'getBooleanAttributeValue').and.returnValue(false);
 
             var mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
@@ -72,6 +74,27 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
             scope.$apply();
 
             expect(scope.orgUnit.displayName).toEqual("op unit - module 1");
+        });
+
+        it("should set the flag whether current orgUnit is a linelist module", function() {
+            var mockModule = {
+                id: 'mod1',
+                name: 'module 1',
+                attributeValues: ['someAttributeValue']
+            };
+
+            routeParams = {
+                orgUnit: mockModule.id
+            };
+
+            orgUnitRepository.get.and.returnValue(utils.getPromise(q, mockModule));
+            CustomAttributes.getBooleanAttributeValue.and.returnValue('someBooleanValue');
+
+            reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService);
+            scope.$apply();
+
+            expect(CustomAttributes.getBooleanAttributeValue).toHaveBeenCalledWith(mockModule.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
+            expect(scope.orgUnit.lineListService).toEqual('someBooleanValue');
         });
 
         it("should set the orgunit display name for project", function() {

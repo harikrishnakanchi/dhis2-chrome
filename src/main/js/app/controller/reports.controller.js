@@ -1,4 +1,4 @@
-define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
+define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng"], function(d3, _, moment, CustomAttributes) {
     return function($scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService) {
 
         var formatYAxisTicks = function(datum) {
@@ -246,6 +246,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             return orgUnitRepository.get(orgUnitId).then(function(ou) {
                 if (isOfType(ou, 'Module'))
                     ou.displayName = ou.parent.name + ' - ' + ou.name;
+                ou.lineListService = CustomAttributes.getBooleanAttributeValue(ou.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
                 $scope.orgUnit = ou;
             });
         };
