@@ -1,5 +1,5 @@
-define(['exportReportDataController', 'angularMocks', 'utils', 'lodash', 'timecop', 'datasetRepository', 'excludedDataElementsRepository', 'moduleDataBlockFactory'],
-    function (ExportReportDataController, mocks, utils, _, timecop, DatasetRepository, ExcludedDataElementsRepository, ModuleDataBlockFactory) {
+define(['exportReportDataController', 'angularMocks', 'utils', 'lodash', 'timecop', 'datasetRepository', 'excludedDataElementsRepository', 'moduleDataBlockFactory', 'dateUtils'],
+    function (ExportReportDataController, mocks, utils, _, timecop, DatasetRepository, ExcludedDataElementsRepository, ModuleDataBlockFactory, dateUtils) {
         describe('ExportReportDataController', function () {
             var controller, rootScope, scope, q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory,
                 mockOrgUnit, mockDataset, mockEnrichedDataset, mockExcludedDataElements, mockDataBlocks;
@@ -71,6 +71,8 @@ define(['exportReportDataController', 'angularMocks', 'utils', 'lodash', 'timeco
                 scope.orgUnit = mockOrgUnit;
                 scope.selectedDataset = mockDataset;
 
+                spyOn(dateUtils, 'getPeriodRange').and.returnValue(['2016W20']);
+
                 datasetRepository = new DatasetRepository();
                 spyOn(datasetRepository, 'get').and.returnValue(utils.getPromise(q, mockDataset));
                 spyOn(datasetRepository, 'includeDataElements').and.returnValue(utils.getPromise(q, [mockEnrichedDataset]));
@@ -94,6 +96,15 @@ define(['exportReportDataController', 'angularMocks', 'utils', 'lodash', 'timeco
                 expect(datasetRepository.includeDataElements).toHaveBeenCalledWith([mockDataset], _.map(mockExcludedDataElements.dataElements, 'id'));
             });
 
+            it('should populate the specified week range', function () {
+                var periodRange = ['2016W20', '2016W21'];
+                dateUtils.getPeriodRange.and.returnValue(periodRange);
+                scope.$apply();
+
+                expect(dateUtils.getPeriodRange).toHaveBeenCalledWith(scope.weekRange, { excludeCurrentWeek: true });
+                expect(scope.weeks).toEqual(periodRange);
+            });
+
             it('should create module data block for the given module and period range', function () {
                 scope.$apply();
                 expect(moduleDataBlockFactory.createForModule).toHaveBeenCalledWith(mockOrgUnit.id, scope.weeks);
@@ -114,32 +125,6 @@ define(['exportReportDataController', 'angularMocks', 'utils', 'lodash', 'timeco
                 };
 
                 expect(scope.dataValuesMap).toEqual(expectedDataValues);
-            });
-
-            describe('weekRange', function () {
-                beforeEach(function () {
-                    Timecop.install();
-                });
-
-                afterEach(function () {
-                    Timecop.returnToPresent();
-                    Timecop.uninstall();
-                });
-
-                it('should set the weeks on the scope for last week', function () {
-                    Timecop.freeze(new Date("2016-07-20T06:50:53.786Z"));
-
-                    scope.$apply();
-                    expect(scope.weeks).toEqual(['2016W28']);
-                });
-
-                it('should set the weeks from previous year if the current week is the first week of the year', function () {
-                    Timecop.freeze(new Date("2016-01-20T06:50:53.786Z"));
-
-                    scope.weekRange = 4;
-                    scope.$apply();
-                    expect(scope.weeks).toEqual(['2015W52', '2015W53', '2016W01', '2016W02']);
-                });
             });
         });
     });

@@ -1,4 +1,4 @@
-define(['lodash', 'moment'], function (_, moment) {
+define(['lodash', 'dateUtils'], function (_, dateUtils) {
     return function($scope, $q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory) {
 
         $scope.weekRanges = [{
@@ -14,14 +14,6 @@ define(['lodash', 'moment'], function (_, moment) {
             label: $scope.resourceBundle.lastTwelveWeeks,
             value: 12
         }];
-
-        var generateWeeksToDisplay = function (noOfWeeksToDisplay) {
-            var weeksToDisplay = [];
-            for(var i = noOfWeeksToDisplay; i > 0; i--) {
-                weeksToDisplay.push(moment().subtract(i, 'weeks').format('GGGG[W]WW'));
-            }
-            return weeksToDisplay;
-        };
 
         var createDataValuesMap = function (moduleDataBlocks) {
             var map = {};
@@ -67,7 +59,7 @@ define(['lodash', 'moment'], function (_, moment) {
             var selectedDataset = data[1];
             var selectedWeekRange = data[2];
 
-            $scope.weeks = generateWeeksToDisplay(selectedWeekRange);
+            $scope.weeks = dateUtils.getPeriodRange(selectedWeekRange, { excludeCurrentWeek: true });
 
             moduleDataBlockFactory.createForModule(module.id, $scope.weeks).then(createDataValuesMap);
 
