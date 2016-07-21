@@ -3,7 +3,10 @@
         <img src="img/ajax-loader.gif" class="spinner" />
     </div>
     <br>
-    <div class="row form-inline">
+    <div class="alert alert-danger" ng-show="orgUnit.lineListService">
+        {{ resourceBundle.noExportRawDataForLineLists }}
+    </div>
+    <div class="row form-inline" ng-hide="orgUnit.lineListService">
         <div class="col-md-12 ">
             <form class="well">
                 <span>{{ resourceBundle.weeksToExport }}</span>

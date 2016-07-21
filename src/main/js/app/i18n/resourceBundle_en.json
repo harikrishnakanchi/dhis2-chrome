@@ -271,6 +271,7 @@
     "exportRawData": "Export Data",
     "weeksToExport": "Number of weeks to export:",
     "exportRawDataToCSV": "Export report as CSV",
+    "noExportRawDataForLineLists": "Raw data for linelist modules can be accessed from the event summary page.",
     "lastOneWeek": "Last week",
     "lastFourWeeks": "Last 4 weeks",
     "lastEightWeeks": "Last 8 weeks",
