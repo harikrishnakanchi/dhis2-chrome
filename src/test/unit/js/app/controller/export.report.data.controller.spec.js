@@ -67,7 +67,7 @@ define(['exportReportDataController', 'angularMocks', 'utils', 'lodash', 'timeco
 
                 mockExcludedDataElements = {dataElements: [{id: 'deId1'}, {id: 'deId2'}]};
 
-                scope.weekRange = 1;
+                scope.selectedWeeksToExport = 1;
                 scope.orgUnit = mockOrgUnit;
                 scope.selectedDataset = mockDataset;
 
@@ -101,7 +101,7 @@ define(['exportReportDataController', 'angularMocks', 'utils', 'lodash', 'timeco
                 dateUtils.getPeriodRange.and.returnValue(periodRange);
                 scope.$apply();
 
-                expect(dateUtils.getPeriodRange).toHaveBeenCalledWith(scope.weekRange, { excludeCurrentWeek: true });
+                expect(dateUtils.getPeriodRange).toHaveBeenCalledWith(scope.selectedWeeksToExport, { excludeCurrentWeek: true });
                 expect(scope.weeks).toEqual(periodRange);
             });
 

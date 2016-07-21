@@ -1,7 +1,7 @@
 define(['lodash', 'dateUtils'], function (_, dateUtils) {
     return function($scope, $q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory) {
 
-        $scope.weekRanges = [{
+        $scope.weeksToExportOptions = [{
             label: $scope.resourceBundle.lastOneWeek,
             value: 1
         }, {
@@ -52,23 +52,19 @@ define(['lodash', 'dateUtils'], function (_, dateUtils) {
             });
         };
 
-        var reloadView = function (data) {
-            if(!(data[0] && data[1] && data[2])) return;
+        var reloadView = function () {
+            if(!($scope.orgUnit && $scope.selectedDataset && $scope.selectedWeeksToExport)) return;
 
-            var module = data[0];
-            var selectedDataset = data[1];
-            var selectedWeekRange = data[2];
+            $scope.weeks = dateUtils.getPeriodRange($scope.selectedWeeksToExport, { excludeCurrentWeek: true });
 
-            $scope.weeks = dateUtils.getPeriodRange(selectedWeekRange, { excludeCurrentWeek: true });
-
-            moduleDataBlockFactory.createForModule(module.id, $scope.weeks).then(createDataValuesMap);
+            moduleDataBlockFactory.createForModule($scope.orgUnit.id, $scope.weeks).then(createDataValuesMap);
 
             $q.all({
-                dataset: fetchCurrentDataset(selectedDataset.id),
-                excludedDataElements: loadExcludedDataElements(module)
+                dataset: fetchCurrentDataset($scope.selectedDataset.id),
+                excludedDataElements: loadExcludedDataElements($scope.orgUnit)
             }).then(createSections);
         };
 
-        $scope.$watchGroup(['orgUnit', 'selectedDataset', 'weekRange'], reloadView);
+        $scope.$watchGroup(['orgUnit', 'selectedDataset', 'selectedWeeksToExport'], reloadView);
     };
 });
