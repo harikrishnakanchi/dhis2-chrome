@@ -32,21 +32,14 @@ define(['lodash', 'dateUtils'], function (_, dateUtils) {
             $scope.dataValuesMap = map;
         };
 
-        var fetchCurrentDataset = function (datasetId) {
-            return datasetRepository.get(datasetId);
-        };
-
         var loadExcludedDataElements = function(module) {
             return excludedDataElementsRepository.get(module.id).then(function(excludedDataElements) {
                 return excludedDataElements ? _.pluck(excludedDataElements.dataElements, 'id') : [];
             });
         };
 
-        var createSections = function (data) {
-            var dataset = data.dataset,
-                excludedDataElements = data.excludedDataElements;
-
-            return datasetRepository.includeDataElements([dataset], excludedDataElements).then(function (enrichedDatasets) {
+        var createSections = function (excludedDataElements) {
+            return datasetRepository.includeDataElements([$scope.selectedDataset], excludedDataElements).then(function (enrichedDatasets) {
                 var currentDataset = _.first(enrichedDatasets);
                 $scope.sections = _.filter(currentDataset.sections, 'isIncluded');
             });
@@ -58,11 +51,7 @@ define(['lodash', 'dateUtils'], function (_, dateUtils) {
             $scope.weeks = dateUtils.getPeriodRange($scope.selectedWeeksToExport, { excludeCurrentWeek: true });
 
             moduleDataBlockFactory.createForModule($scope.orgUnit.id, $scope.weeks).then(createDataValuesMap);
-
-            $q.all({
-                dataset: fetchCurrentDataset($scope.selectedDataset.id),
-                excludedDataElements: loadExcludedDataElements($scope.orgUnit)
-            }).then(createSections);
+            loadExcludedDataElements($scope.orgUnit).then(createSections);
         };
 
         $scope.$watchGroup(['orgUnit', 'selectedDataset', 'selectedWeeksToExport'], reloadView);

@@ -86,11 +86,6 @@ define(['exportReportDataController', 'angularMocks', 'utils', 'lodash', 'timeco
                 controller = new ExportReportDataController(scope, q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory);
             }));
 
-            it('should fetch dataset object for the given dataset id', function () {
-                scope.$apply();
-                expect(datasetRepository.get).toHaveBeenCalledWith(mockDataset.id);
-            });
-
             it('should fetch sections along with dataelements', function () {
                 scope.$apply();
                 expect(datasetRepository.includeDataElements).toHaveBeenCalledWith([mockDataset], _.map(mockExcludedDataElements.dataElements, 'id'));
