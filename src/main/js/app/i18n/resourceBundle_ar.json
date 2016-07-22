@@ -270,7 +270,7 @@
     "monthlyReports": "تقارير شهرية",
     "exportRawData": "تصدير البيانات",
     "weeksToExport": "Number of weeks to export: [ARABIC]",
-    "exportRawDataToCSV": "Export report as CSV [ARABIC]",
+    "exportRawDataToCSV": "Export data as CSV [ARABIC]",
     "noExportRawDataForLineLists": "Raw data for linelist modules can be accessed from the event summary page. [ARABIC]",
     "lastOneWeek": "Last week [ARABIC]",
     "lastFourWeeks": "Last 4 weeks [ARABIC]",

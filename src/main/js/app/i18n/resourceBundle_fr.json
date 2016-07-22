@@ -270,7 +270,7 @@
     "monthlyReports": "Rapports Mensuels",
     "exportRawData": "Exporter des données",
     "weeksToExport": "Number of weeks to export: [FRENCH]",
-    "exportRawDataToCSV": "Export report as CSV [FRENCH]",
+    "exportRawDataToCSV": "Export data as CSV [FRENCH]",
     "noExportRawDataForLineLists": "Raw data for linelist modules can be accessed from the event summary page. [FRENCH]",
     "lastOneWeek": "Last week [FRENCH]",
     "lastFourWeeks": "Last 4 weeks [FRENCH]",
