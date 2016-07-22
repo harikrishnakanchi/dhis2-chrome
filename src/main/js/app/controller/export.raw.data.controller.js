@@ -1,5 +1,5 @@
-define(['lodash', 'dateUtils'], function (_, dateUtils) {
-    return function($scope, $q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory) {
+define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
+    return function($scope, $q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory, filesystemService) {
 
         $scope.weeksToExportOptions = [{
             label: $scope.resourceBundle.lastOneWeek,
@@ -56,6 +56,44 @@ define(['lodash', 'dateUtils'], function (_, dateUtils) {
             ]).finally(function() {
                 $scope.loading = false;
             });
+        };
+
+        var buildCsvContent = function() {
+            var DELIMITER = ',',
+                NEW_LINE = '\n',
+                EMPTY_LINE = '';
+
+            var escapeString = function (string) {
+                return '"' + string + '"';
+            };
+
+            var buildHeader = function () {
+                return [$scope.resourceBundle.dataElement].concat($scope.weeks).join(DELIMITER);
+            };
+
+            var buildDataElement = function (dataElement) {
+                return [
+                    escapeString(dataElement.formName),
+                    _.map($scope.weeks, function(week) { return $scope.dataValuesMap[week] && $scope.dataValuesMap[week][dataElement.id]; })
+                ].join(DELIMITER);
+            };
+
+            var buildSection = function (section) {
+                return [
+                    EMPTY_LINE,
+                    escapeString(section.name),
+                    _.map(section.dataElements, buildDataElement)
+                ];
+            };
+
+            return _.flattenDeep([buildHeader(), _.map($scope.sections, buildSection)]).join(NEW_LINE);
+        };
+
+        $scope.exportToCSV = function () {
+            var fileName = [$scope.orgUnit.name, $scope.selectedDataset.name, 'export', moment().format('YYYYMMDD'), 'csv'].join('.'),
+                csvContent = buildCsvContent();
+
+            return filesystemService.promptAndWriteFile(fileName, new Blob([csvContent], { type: 'text/csv' }), filesystemService.FILE_TYPE_OPTIONS.CSV);
         };
 
         $scope.$watchGroup(['orgUnit', 'selectedDataset', 'selectedWeeksToExport'], reloadView);

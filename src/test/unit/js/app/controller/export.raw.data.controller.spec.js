@@ -1,7 +1,7 @@
-define(['exportRawDataController', 'angularMocks', 'utils', 'lodash', 'timecop', 'datasetRepository', 'excludedDataElementsRepository', 'moduleDataBlockFactory', 'dateUtils'],
-    function (ExportRawDataController, mocks, utils, _, timecop, DatasetRepository, ExcludedDataElementsRepository, ModuleDataBlockFactory, dateUtils) {
+define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'excludedDataElementsRepository', 'moduleDataBlockFactory', 'filesystemService', 'utils', 'dateUtils', 'timecop', 'moment', 'lodash'],
+    function (ExportRawDataController, mocks, DatasetRepository, ExcludedDataElementsRepository, ModuleDataBlockFactory, FilesystemService, utils, dateUtils, timecop, moment, _) {
         describe('ExportRawDataController', function () {
-            var controller, rootScope, scope, q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory,
+            var controller, rootScope, scope, q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory, filesystemService,
                 mockOrgUnit, mockDataset, mockEnrichedDataset, mockExcludedDataElements, mockDataBlocks;
 
             beforeEach(mocks.inject(function ($rootScope, $q) {
@@ -10,6 +10,7 @@ define(['exportRawDataController', 'angularMocks', 'utils', 'lodash', 'timecop',
                 q = $q;
 
                 scope.resourceBundle = {
+                    dataElement: 'Data Element',
                     lastOneWeek: 'Last week',
                     lastFourWeeks: 'Last 4 weeks',
                     lastEightWeeks: 'Last 8 weeks',
@@ -17,10 +18,12 @@ define(['exportRawDataController', 'angularMocks', 'utils', 'lodash', 'timecop',
                 };
 
                 mockOrgUnit = {
-                    id: 'orgUnitId'
+                    id: 'orgUnitId',
+                    name: 'someModuleName'
                 };
                 mockDataset = {
-                    id: 'selected dataset id'
+                    id: 'selected dataset id',
+                    name: 'someDataSetName'
                 };
 
                 mockEnrichedDataset = {
@@ -87,7 +90,10 @@ define(['exportRawDataController', 'angularMocks', 'utils', 'lodash', 'timecop',
                 excludedDataElementsRepository = new ExcludedDataElementsRepository();
                 spyOn(excludedDataElementsRepository, 'get').and.returnValue(utils.getPromise(q, mockExcludedDataElements));
 
-                controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory);
+                filesystemService = new FilesystemService();
+                spyOn(filesystemService, 'promptAndWriteFile').and.returnValue(utils.getPromise(q, {}));
+
+                controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory, filesystemService);
             }));
 
             it('should fetch sections along with dataelements', function () {
@@ -169,6 +175,86 @@ define(['exportRawDataController', 'angularMocks', 'utils', 'lodash', 'timecop',
                 };
 
                 expect(scope.dataValuesMap).toEqual(expectedDataValues);
+            });
+
+            describe('exportToCSV', function () {
+                beforeEach(function () {
+                    Timecop.install();
+                });
+
+                afterEach(function() {
+                    Timecop.returnToPresent();
+                    Timecop.uninstall();
+                });
+
+                it('should prompt the user to save CSV file with suggested name', function () {
+                    var currentTime = moment('2016-07-21T00:00:00.888Z');
+                    Timecop.freeze(currentTime);
+
+                    scope.exportToCSV();
+
+                    var expectedFilename = [mockOrgUnit.name, mockDataset.name, 'export', currentTime.format('YYYYMMDD'), 'csv'].join('.');
+                    expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
+                });
+
+                describe('contents of csv', function () {
+                    var csvContent, sectionA, sectionB;
+
+                    beforeEach(function () {
+                        csvContent = null;
+                        scope.weeks = ['2016W01', '2016W02'];
+                        scope.dataValuesMap = {
+                            '2016W01': {
+                                dataElementIdA: 5,
+                                dataElementIdB: 6
+                            },
+                            '2016W02': {
+                                dataElementIdA: 12,
+                                dataElementIdB: 16
+                            }
+                        };
+                        sectionA = {
+                            name: 'sectionNameA',
+                            dataElements: [{
+                                id: 'dataElementIdA',
+                                formName: 'dataElementNameA'
+                            }]
+                        };
+                        sectionB = {
+                            name: 'sectionNameB',
+                            dataElements: [{
+                                id: 'dataElementIdB',
+                                formName: 'dataElementNameB'
+                            }]
+                        };
+                        scope.sections = [sectionA, sectionB];
+
+                        spyOn(window, 'Blob').and.callFake(function (contentArray) {
+                            this.value = contentArray.join();
+                        });
+
+                        filesystemService.promptAndWriteFile.and.callFake(function (fileName, blob) {
+                            csvContent = blob.value;
+                        });
+
+                        scope.exportToCSV();
+                    });
+
+                    it('should contain the row headers', function () {
+                        var expectedHeader = [scope.resourceBundle.dataElement].concat(scope.weeks).join(',');
+                        expect(csvContent).toContain(expectedHeader);
+                    });
+
+                    it('should contain the section names', function () {
+                        expect(csvContent).toContain(sectionA.name);
+                        expect(csvContent).toContain(sectionB.name);
+                    });
+
+                    it('should contain the data element data', function () {
+                        expect(csvContent).toContain('"dataElementNameA",5,12');
+                        expect(csvContent).toContain('"dataElementNameB",6,16');
+                    });
+                });
             });
         });
     });
