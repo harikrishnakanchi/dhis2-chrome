@@ -13,11 +13,14 @@
                     <select class="form-control" ng-model="selectedWeeksToExport" ng-options="weeksToExport.value as weeksToExport.label for weeksToExport in weeksToExportOptions"></select>
                 </span>
                 <span>
-                    <input type="button" value="{{ resourceBundle.exportRawDataToCSV }}" class="btn btn-primary" ng-click="exportToCSV()"/>
+                    <input type="button" value="{{ resourceBundle.exportRawDataToCSV }}" class="btn btn-primary" ng-click="exportToCSV()" ng-disabled="dataValuesMap | isEmpty"/>
                 </span>
             </form>
 
-            <div class="table-responsive" ng-if="sections && dataValuesMap">
+            <div class="alert alert-danger" ng-if="dataValuesMap | isEmpty">
+                {{ resourceBundle.noRawDataAvailable }}
+            </div>
+            <div class="table-responsive" ng-if="sections && !(dataValuesMap | isEmpty)">
                 <table class="table table-striped table-bordered" locked-table-header>
                     <thead>
                     <tr>

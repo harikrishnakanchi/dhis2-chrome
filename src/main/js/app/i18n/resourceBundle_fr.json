@@ -271,6 +271,7 @@
     "exportRawData": "Exporter des données",
     "weeksToExport": "Number of weeks to export: [FRENCH]",
     "exportRawDataToCSV": "Export data as CSV [FRENCH]",
+    "noRawDataAvailable": "No data available for selected weeks [FRENCH]",
     "noExportRawDataForLineLists": "Raw data for linelist modules can be accessed from the event summary page. [FRENCH]",
     "lastOneWeek": "Last week [FRENCH]",
     "lastFourWeeks": "Last 4 weeks [FRENCH]",
