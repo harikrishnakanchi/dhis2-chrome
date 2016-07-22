@@ -205,7 +205,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('weeklyPivotTableData:' + mockProjectId, currentTime.toISOString());
             });
 
-            it('should not download monthly pivot table data if it has already been downloaded in the same week', function () {
+            it('should not download monthly pivot table data if it has already been downloaded in the same day', function () {
                 var mockMonthlyPivotTable = {
                     id: 'someId',
                     monthlyReport: true,
@@ -213,7 +213,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 };
 
                 var lastDownlaodedTime =  moment('2016-02-27T02:03:00.000Z').toISOString();
-                currentTime = moment('2016-02-25T02:03:00.000Z');
+                currentTime = moment('2016-02-27T02:03:00.000Z');
                 Timecop.freeze(currentTime.toISOString());
 
                 pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [mockMonthlyPivotTable]));
@@ -226,14 +226,17 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('monthlyPivotTableData:' + mockProjectId, currentTime.toISOString());
             });
 
-            it('should download monthly pivot table if it has not been downloaded in the current week', function() {
+            it('should download monthly pivot table if it has not been downloaded on wednesday', function() {
                 var mockMonthlyPivotTable = {
                     id: 'someId',
                     monthlyReport: true,
                     dataSetCode: mockDataSet.code
                 };
 
-                var lastDownloadedTime = moment('2016-02-27T02:03:00.000Z').toISOString();
+                var lastDownloadedTime = moment('2016-07-06T02:03:00.000Z').toISOString();
+                currentTime = moment('2016-07-13T13:00:00.000Z');
+                Timecop.freeze(currentTime);
+
                 pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [mockMonthlyPivotTable]));
                 changeLogRepository.get.and.returnValue(utils.getPromise(q, lastDownloadedTime));
 
@@ -244,15 +247,57 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyPivotTableData:' + mockProjectId, currentTime.toISOString());
             });
 
-            it('should download monthly pivot table if it has not been downloaded in the current month', function() {
+            it('should not download monthly pivot table if it has already been downloaded on that week\'s wednesday', function() {
                 var mockMonthlyPivotTable = {
                     id: 'someId',
                     monthlyReport: true,
                     dataSetCode: mockDataSet.code
                 };
 
-                var lastDownloadedTime = moment('2016-02-29T02:03:00.000Z').toISOString();
-                currentTime = moment('2016-03-01T02:03:00.000Z');
+                var lastDownloadedTime = moment('2016-07-13T02:03:00.000Z').toISOString();
+                currentTime = moment('2016-07-15T02:03:00.000Z');
+                Timecop.freeze(currentTime.toISOString());
+
+                pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [mockMonthlyPivotTable]));
+                changeLogRepository.get.and.returnValue(utils.getPromise(q, lastDownloadedTime));
+
+                downloadPivotTableDataConsumer.run();
+                scope.$apply();
+
+                expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
+                expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('monthlyPivotTableData:' + mockProjectId, currentTime.toISOString());
+            });
+
+            it('should not download monthly pivot table if it has already been downloaded in previous week\'s wednesday and current day is before wednesday', function() {
+                var mockMonthlyPivotTable = {
+                    id: 'someId',
+                    monthlyReport: true,
+                    dataSetCode: mockDataSet.code
+                };
+
+                var lastDownloadedTime = moment('2016-07-13T02:03:00.000Z').toISOString();
+                currentTime = moment('2016-07-19T02:03:00.000Z');
+                Timecop.freeze(currentTime.toISOString());
+
+                pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [mockMonthlyPivotTable]));
+                changeLogRepository.get.and.returnValue(utils.getPromise(q, lastDownloadedTime));
+
+                downloadPivotTableDataConsumer.run();
+                scope.$apply();
+
+                expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
+                expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('monthlyPivotTableData:' + mockProjectId, currentTime.toISOString());
+            });
+
+            it('should download monthly pivot table if the current date is in first 10 days of the current month', function() {
+                var mockMonthlyPivotTable = {
+                    id: 'someId',
+                    monthlyReport: true,
+                    dataSetCode: mockDataSet.code
+                };
+
+                var lastDownloadedTime = moment('2016-07-09T02:03:00.000Z').toISOString();
+                currentTime = moment('2016-07-10T02:03:00.000Z');
                 Timecop.freeze(currentTime.toISOString());
 
                 pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [mockMonthlyPivotTable]));

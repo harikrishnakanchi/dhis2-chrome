@@ -99,13 +99,29 @@ define(["lodash", "moment"], function(_, moment) {
                     weeklyReportsLastUpdated: changeLogRepository.get(weeklyChangeLogKey),
                     monthlyReportsLastUpdated: changeLogRepository.get(monthlyChangeLogKey)
                 }).then(function(data) {
-                    var isDownloadedInSameWeekAndMonth = moment().isSame(data.monthlyReportsLastUpdated, 'isoWeek') && moment().isSame(data.monthlyReportsLastUpdated, 'month');
+                    var isMonthlyReportDownloaded = function () {
+                        var getCurrentWednesday = function () {
+                            var WEDNESDAY = 3;
+                            if (moment().day() < WEDNESDAY) {
+                                return moment().subtract(1, 'week').startOf('week').add(3, 'days');
+                            } else {
+                                return moment().startOf('week').add(3, 'days');
+                            }
+                        };
+                        var lastDownloadedWednesday = moment(data.monthlyReportsLastUpdated).startOf('week').add(3, 'days');
+                        var currentWednesday = getCurrentWednesday();
+                        var isMonthlyReportsDownloadedToday = moment().isSame(data.monthlyReportsLastUpdated, 'day');
+                        var isCurrentDateInFirstTenDaysOfMonth = moment().date() <= 10;
+                        return isCurrentDateInFirstTenDaysOfMonth ? isMonthlyReportsDownloadedToday :
+                        isMonthlyReportsDownloadedToday || lastDownloadedWednesday.isSame(currentWednesday, 'day');
+                    };
+
                     var isDownloadedSameDay = moment().isSame(data.weeklyReportsLastUpdated, 'day');
                     if(data.weeklyReportsLastUpdated && isDownloadedSameDay) {
                         _.remove(pivotTables, { weeklyReport: true });
                         _.pull(changeLogKeys, weeklyChangeLogKey);
                     }
-                    if(data.monthlyReportsLastUpdated && isDownloadedInSameWeekAndMonth) {
+                    if(data.monthlyReportsLastUpdated && isMonthlyReportDownloaded()) {
                         _.remove(pivotTables, { monthlyReport: true });
                         _.pull(changeLogKeys, monthlyChangeLogKey);
                     }
