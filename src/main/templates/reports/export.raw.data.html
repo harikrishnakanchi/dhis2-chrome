@@ -10,9 +10,7 @@
             <form class="well">
                 <span>{{ resourceBundle.weeksToExport }}</span>
                 <span>
-                    <select class="form-control" ng-model="selectedWeeksToExport" ng-options="weeksToExport.value as weeksToExport.label for weeksToExport in weeksToExportOptions">
-                        <option value="">-</option>
-                    </select>
+                    <select class="form-control" ng-model="selectedWeeksToExport" ng-options="weeksToExport.value as weeksToExport.label for weeksToExport in weeksToExportOptions"></select>
                 </span>
                 <span>
                     <input type="button" value="{{ resourceBundle.exportRawDataToCSV }}" class="btn btn-primary" ng-click="exportToCSV()"/>

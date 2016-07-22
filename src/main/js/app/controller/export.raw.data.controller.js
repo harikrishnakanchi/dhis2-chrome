@@ -97,5 +97,6 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
         };
 
         $scope.$watchGroup(['orgUnit', 'selectedDataset', 'selectedWeeksToExport'], reloadView);
+        $scope.selectedWeeksToExport = _.first($scope.weeksToExportOptions).value;
     };
 });
