@@ -84,13 +84,29 @@ define(["lodash", "moment"], function(_, moment) {
                     weeklyChartsLastDownloaded: changeLogRepository.get(weeklyChangeLogKey),
                     monthlyChartsLastDownloaded: changeLogRepository.get(monthlyChangeLogKey)
                 }).then(function(data) {
+                    var isMonthlyReportDownloaded = function () {
+                        var getCurrentWednesdayAsWeekStartsFromWednesday = function () {
+                            var currentDay = moment().day();
+                            var WEDNESDAY = 3;
+                            if (currentDay < WEDNESDAY) {
+                                return moment().subtract(1, 'week').startOf('week').add(3, 'days');
+                            } else {
+                                return moment().startOf('week').add(3, 'days');
+                            }
+                        };
+                        var currentWednesday = getCurrentWednesdayAsWeekStartsFromWednesday();
+                        var lastDownloadedWednesday = moment(data.monthlyChartsLastDownloaded).startOf('week').add(3, 'days');
+                        var currentDateInFirstTenDaysOfMonth = moment().date() <= 10;
+                        var isMonthlyChartsDownloadedToday = moment().isSame(data.monthlyChartsLastDownloaded, 'day');
+                        return currentDateInFirstTenDaysOfMonth ? isMonthlyChartsDownloadedToday :
+                        isMonthlyChartsDownloadedToday || lastDownloadedWednesday.isSame(currentWednesday, 'day');
+                    };
                     var isDownloadedInSameDay =  moment().isSame(data.weeklyChartsLastDownloaded, 'day');
-                    var isDownloadedInSameWeekAndMonth = moment().isSame(data.monthlyChartsLastDownloaded, 'isoWeek') && moment().isSame(data.monthlyChartsLastDownloaded, 'month');
                     if (data.weeklyChartsLastDownloaded && isDownloadedInSameDay) {
                         _.remove(charts, { weeklyChart: true });
                         _.pull(changeLogKeys, weeklyChangeLogKey);
                     }
-                    if(data.monthlyChartsLastDownloaded && isDownloadedInSameWeekAndMonth) {
+                    if(data.monthlyChartsLastDownloaded && isMonthlyReportDownloaded()) {
                         _.remove(charts, { monthlyChart: true});
                         _.pull(changeLogKeys, monthlyChangeLogKey);
                     }
