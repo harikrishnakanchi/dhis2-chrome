@@ -1,5 +1,46 @@
-define([], function() {
+define(['lodash'], function(_) {
     return function($q) {
+        var FILE_TYPE_OPTIONS = {
+            CSV: {
+                accepts: [{
+                    description: 'Text CSV (.csv)',
+                    mimeTypes: ['text/csv'],
+                    extensions: ['csv']
+                }],
+                acceptsAllTypes: false
+            }
+        };
+
+        var promptAndWriteFile = function(fileName, contents, options) {
+            var deferred = $q.defer(),
+                defaultOptions = {
+                    type: 'saveFile',
+                    suggestedName: fileName
+                };
+
+            var errorHandler = function(err) {
+                deferred.reject(err);
+            };
+
+            chrome.fileSystem.chooseEntry(_.merge(defaultOptions, options), function(fileEntry) {
+                if (chrome.runtime.lastError || fileEntry === undefined) {
+                    // Evaluate chrome.runtime.lastError in case user clicked cancel
+                    errorHandler('No download path was selected');
+                } else {
+                    fileEntry.createWriter(function(writer) {
+                        writer.onerror = errorHandler;
+                        writer.truncate(0);
+                        writer.onwriteend = function() {
+                            writer.onwriteend = _.partial(deferred.resolve, fileEntry);
+                            writer.write(contents);
+                        };
+                    }, errorHandler);
+                }
+            });
+
+            return deferred.promise;
+        };
+
         var writeFile = function(fileName, contents) {
             var deferred = $q.defer();
             var errorHandler = function(err) {
@@ -65,6 +106,8 @@ define([], function() {
         };
 
         return {
+            "FILE_TYPE_OPTIONS": FILE_TYPE_OPTIONS,
+            "promptAndWriteFile": promptAndWriteFile,
             "writeFile": writeFile,
             "readFile": readFile
         };
