@@ -219,7 +219,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 scope.dataValues = {
                     'de1': "2015-02-03",
                     'de2': "someValue",
-                    'de3': moment('2015-02-04').toDate(),
+                    'de3': moment.utc('2015-02-04').toDate(),
                     'de4': {
                         'id': 'os1o1',
                         'code': 'os1o1',
@@ -300,7 +300,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 scope.dataValues = {
                     'de1': "2015-04-15",
                     'de2': "someValue",
-                    'de3': moment('2015-04-16').toDate(),
+                    'de3': moment.utc('2015-04-16').toDate(),
                     'de4': "blah-again"
                 };
 
@@ -340,7 +340,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 scope.dataValues = {
                     'de1': "2015-02-03",
                     'de2': undefined,
-                    'de3': moment('2015-04-16').toDate(),
+                    'de3': moment.utc('2015-04-16').toDate(),
                     'de4': undefined
                 };
                 scope.patientOrigin = {
