@@ -1,5 +1,5 @@
 define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
-    return function($scope, $q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory, filesystemService) {
+    return function($scope, $q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory, filesystemService, translationsService) {
 
         $scope.weeksToExportOptions = [{
             label: $scope.resourceBundle.lastOneWeek,
@@ -33,8 +33,10 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
 
         var createSections = function (excludedDataElements) {
             return datasetRepository.includeDataElements([$scope.selectedDataset], excludedDataElements).then(function (enrichedDatasets) {
-                var currentDataset = _.first(enrichedDatasets);
-                $scope.sections = _.filter(currentDataset.sections, 'isIncluded');
+                var currentDataset = _.first(enrichedDatasets),
+                    translatedDataSet = _.first(translationsService.translate([currentDataset]));
+
+                $scope.sections = _.filter(translatedDataSet.sections, 'isIncluded');
                 _.each($scope.sections, function(section) {
                     section.dataElements = _.filter(section.dataElements, 'isIncluded');
                 });

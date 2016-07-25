@@ -1,7 +1,7 @@
-define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'excludedDataElementsRepository', 'moduleDataBlockFactory', 'filesystemService', 'utils', 'dateUtils', 'timecop', 'moment', 'lodash'],
-    function (ExportRawDataController, mocks, DatasetRepository, ExcludedDataElementsRepository, ModuleDataBlockFactory, FilesystemService, utils, dateUtils, timecop, moment, _) {
+define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'excludedDataElementsRepository', 'moduleDataBlockFactory', 'filesystemService', 'translationsService', 'utils', 'dateUtils', 'timecop', 'moment', 'lodash'],
+    function (ExportRawDataController, mocks, DatasetRepository, ExcludedDataElementsRepository, ModuleDataBlockFactory, FilesystemService, TranslationsService, utils, dateUtils, timecop, moment, _) {
         describe('ExportRawDataController', function () {
-            var controller, rootScope, scope, q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory, filesystemService,
+            var controller, rootScope, scope, q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory, filesystemService, translationsService,
                 mockOrgUnit, mockDataset, mockEnrichedDataset, mockExcludedDataElements, mockDataBlocks;
 
             beforeEach(mocks.inject(function ($rootScope, $q) {
@@ -93,7 +93,10 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                 filesystemService = new FilesystemService();
                 spyOn(filesystemService, 'promptAndWriteFile').and.returnValue(utils.getPromise(q, {}));
 
-                controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory, filesystemService);
+                translationsService = new TranslationsService();
+                spyOn(translationsService, 'translate').and.callFake(function(objectToTranslate) { return objectToTranslate; });
+
+                controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory, filesystemService, translationsService);
             }));
 
             it('should fetch sections along with dataelements', function () {
@@ -144,6 +147,20 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                 datasetRepository.includeDataElements.and.returnValue(utils.getPromise(q, [mockEnrichedDataset]));
                 scope.$apply();
                 expect(dataSetSection.dataElements).toEqual(_.filter(dataElements, 'isIncluded'));
+            });
+
+            it('should translate the filtered DataSetSections', function () {
+                mockEnrichedDataset = {
+                    name: 'someDataSetName',
+                    sections: [{
+                        id: 'someDataSetSection',
+                        isIncluded: true
+                    }]
+                };
+                datasetRepository.includeDataElements.and.returnValue(utils.getPromise(q, [mockEnrichedDataset]));
+                scope.$apply();
+
+                expect(translationsService.translate).toHaveBeenCalledWith([mockEnrichedDataset]);
             });
 
             it('should populate the specified week range', function () {
