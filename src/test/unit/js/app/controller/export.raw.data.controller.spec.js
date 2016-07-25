@@ -2,7 +2,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
     function (ExportRawDataController, mocks, DatasetRepository, ExcludedDataElementsRepository, ModuleDataBlockFactory, FilesystemService, TranslationsService, utils, dateUtils, timecop, moment, _) {
         describe('ExportRawDataController', function () {
             var controller, rootScope, scope, q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory, filesystemService, translationsService,
-                mockOrgUnit, mockDataset, mockEnrichedDataset, mockExcludedDataElements, mockDataBlocks;
+                selectedOrgUnit, selectedDataSet, mockEnrichedDataSet, mockExcludedDataElements, mockDataBlocks;
 
             beforeEach(mocks.inject(function ($rootScope, $q) {
                 rootScope = $rootScope;
@@ -17,35 +17,35 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     lastTwelveWeeks: 'Last 12 weeks'
                 };
 
-                mockOrgUnit = {
+                selectedOrgUnit = {
                     id: 'orgUnitId',
                     name: 'someModuleName'
                 };
-                mockDataset = {
-                    id: 'selected dataset id',
+                selectedDataSet = {
+                    id: 'dataSetId',
                     name: 'someDataSetName'
                 };
 
-                mockEnrichedDataset = {
-                    name: 'data set name',
+                mockEnrichedDataSet = {
+                    name: 'someDataSetName',
                     sections: [{
-                        id: 'section 1 id',
+                        id: 'sectionIdA',
                         isIncluded: true,
                         dataElements: [{
-                            id: 'deId1',
+                            id: 'dataElementId1',
                             isIncluded: true
                         }, {
-                            id: 'deId2',
+                            id: 'dataElementId2',
                             isIncluded: true
                         }, {
-                            id: 'deId3',
+                            id: 'dataElementId3',
                             isIncluded: true
                         }, {
-                            id: 'deId4',
+                            id: 'dataElementId4',
                             isIncluded: true
                         }]
                     }, {
-                        id: 'section 2 id',
+                        id: 'sectionIdB',
                         isIncluded: true,
                         dataElements: []
                     }]
@@ -55,44 +55,49 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     period: '2016W01',
                     dataValues: [{
                         period: '2016W01',
-                        dataElement: 'deId1',
+                        dataElement: 'dataElementId1',
                         value: '3'
                     }, {
                         period: '2016W01',
-                        dataElement: 'deId1',
+                        dataElement: 'dataElementId1',
                         value: '2'
                     }, {
                         period: '2016W01',
-                        dataElement: 'deId2',
+                        dataElement: 'dataElementId2',
                         value: '6'
                     }]
                 }, {
-                    period: '2016W25',
+                    period: '2016W02',
                     dataValues: [{
-                        period: '2016W25',
-                        dataElement: 'deId3',
+                        period: '2016W02',
+                        dataElement: 'dataElementId3',
                         value: '5'
                     }, {
-                        period: '2016W25',
-                        dataElement: 'deId4',
+                        period: '2016W02',
+                        dataElement: 'dataElementId4',
                         value: '16'
                     }, {
-                        period: '2016W25',
-                        dataElement: 'deId3',
+                        period: '2016W02',
+                        dataElement: 'dataElementId3',
                         value: '7'
                     }]
                 }];
 
-                mockExcludedDataElements = {dataElements: [{id: 'deId1'}, {id: 'deId2'}]};
+                mockExcludedDataElements = {
+                    dataElements: [
+                        { id: 'dataElementId1' },
+                        { id: 'dataElementId2' }
+                    ]
+                };
 
                 scope.selectedWeeksToExport = 1;
-                scope.orgUnit = mockOrgUnit;
-                scope.selectedDataset = mockDataset;
+                scope.orgUnit = selectedOrgUnit;
+                scope.selectedDataset = selectedDataSet;
 
                 spyOn(dateUtils, 'getPeriodRange').and.returnValue(['2016W20']);
 
                 datasetRepository = new DatasetRepository();
-                spyOn(datasetRepository, 'includeDataElements').and.returnValue(utils.getPromise(q, [mockEnrichedDataset]));
+                spyOn(datasetRepository, 'includeDataElements').and.returnValue(utils.getPromise(q, [mockEnrichedDataSet]));
 
                 moduleDataBlockFactory = ModuleDataBlockFactory();
                 spyOn(moduleDataBlockFactory, 'createForModule').and.returnValue(utils.getPromise(q, mockDataBlocks));
@@ -109,68 +114,57 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                 controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory, filesystemService, translationsService);
             }));
 
-            it('should fetch sections along with dataelements', function () {
+            it('should fetch sections along with data elements', function () {
                 scope.$apply();
-                expect(datasetRepository.includeDataElements).toHaveBeenCalledWith([mockDataset], _.map(mockExcludedDataElements.dataElements, 'id'));
+                expect(datasetRepository.includeDataElements).toHaveBeenCalledWith([selectedDataSet], _.map(mockExcludedDataElements.dataElements, 'id'));
             });
 
             it('should filter out excluded dataSetSections', function () {
-                mockEnrichedDataset = {
-                    name: 'data set name',
+                mockEnrichedDataSet = {
                     sections: [{
-                        id: 'section 1 id',
+                        id: 'sectionIdA',
                         isIncluded: true,
-                        dataElements: [{
-                            id: 'dataElementId'
-                        }]
+                        dataElements: []
                     }, {
-                        id: 'section 2 id',
+                        id: 'sectionIdB',
                         isIncluded: false,
                         dataElements: []
                     }]
                 };
 
-                datasetRepository.includeDataElements.and.returnValue(utils.getPromise(q, [mockEnrichedDataset]));
+                datasetRepository.includeDataElements.and.returnValue(utils.getPromise(q, [mockEnrichedDataSet]));
                 scope.$apply();
-                expect(scope.sections).toEqual(_.filter(mockEnrichedDataset.sections, 'isIncluded'));
+                expect(scope.sections).toEqual(_.filter(mockEnrichedDataSet.sections, 'isIncluded'));
             });
 
             it('should filter out excluded DataElements', function () {
                 var dataElements = [{
-                    id: 'dataElementId 1',
+                    id: 'dataElementIdA',
                     isIncluded: true
                 }, {
-                    id: 'dataElementId 2',
+                    id: 'dataElementIdB',
                     isIncluded: false
                 }];
                 var dataSetSection = {
-                    id: 'section 1 id',
+                    id: 'sectionIdA',
                     isIncluded: true,
                     dataElements: dataElements
                 };
 
-                mockEnrichedDataset = {
-                    name: 'data set name',
+                mockEnrichedDataSet = {
+                    name: 'someDataSetName',
                     sections: [dataSetSection]
                 };
 
-                datasetRepository.includeDataElements.and.returnValue(utils.getPromise(q, [mockEnrichedDataset]));
+                datasetRepository.includeDataElements.and.returnValue(utils.getPromise(q, [mockEnrichedDataSet]));
                 scope.$apply();
                 expect(dataSetSection.dataElements).toEqual(_.filter(dataElements, 'isIncluded'));
             });
 
             it('should translate the filtered DataSetSections', function () {
-                mockEnrichedDataset = {
-                    name: 'someDataSetName',
-                    sections: [{
-                        id: 'someDataSetSection',
-                        isIncluded: true
-                    }]
-                };
-                datasetRepository.includeDataElements.and.returnValue(utils.getPromise(q, [mockEnrichedDataset]));
                 scope.$apply();
 
-                expect(translationsService.translate).toHaveBeenCalledWith(mockEnrichedDataset);
+                expect(translationsService.translate).toHaveBeenCalledWith(mockEnrichedDataSet);
             });
 
             it('should populate the specified week range', function () {
@@ -184,7 +178,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
 
             it('should create module data block for the given module and period range', function () {
                 scope.$apply();
-                expect(moduleDataBlockFactory.createForModule).toHaveBeenCalledWith(mockOrgUnit.id, scope.weeks);
+                expect(moduleDataBlockFactory.createForModule).toHaveBeenCalledWith(selectedOrgUnit.id, scope.weeks);
             });
 
             it('should create two-dimensional map of data values by week by data element', function () {
@@ -192,12 +186,12 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
 
                 var expectedDataValues = {
                     '2016W01': {
-                        deId1: 5,
-                        deId2: 6
+                        dataElementId1: 5,
+                        dataElementId2: 6
                     },
-                    '2016W25': {
-                        deId3: 12,
-                        deId4: 16
+                    '2016W02': {
+                        dataElementId3: 12,
+                        dataElementId4: 16
                     }
                 };
 
@@ -217,7 +211,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                         value: '2'
                     }]
                 }];
-                mockEnrichedDataset = {
+                mockEnrichedDataSet = {
                     name: 'dataSetNameA',
                     sections: [{
                         id: 'sectionId',
@@ -229,7 +223,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     }]
                 };
 
-                datasetRepository.includeDataElements.and.returnValue(utils.getPromise(q, [mockEnrichedDataset]));
+                datasetRepository.includeDataElements.and.returnValue(utils.getPromise(q, [mockEnrichedDataSet]));
                 moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, mockDataBlocks));
 
                 scope.$apply();
@@ -252,7 +246,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
 
                     scope.exportToCSV();
 
-                    var expectedFilename = [mockOrgUnit.name, mockDataset.name, 'export', currentTime.format('YYYYMMDD'), 'csv'].join('.');
+                    var expectedFilename = [selectedOrgUnit.name, selectedDataSet.name, 'export', currentTime.format('YYYYMMDD'), 'csv'].join('.');
                     expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
                 });
 
