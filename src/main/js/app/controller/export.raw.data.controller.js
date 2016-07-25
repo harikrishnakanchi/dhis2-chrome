@@ -50,7 +50,7 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
 
         var reloadView = function () {
             $scope.sections = null;
-            $scope.dataValuesMap = null;
+            $scope.dataValuesMap = {};
 
             if(!($scope.orgUnit && $scope.selectedDataset && $scope.selectedWeeksToExport)) return;
 
@@ -105,5 +105,6 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
 
         $scope.$watchGroup(['orgUnit', 'selectedDataset', 'selectedWeeksToExport'], reloadView);
         $scope.selectedWeeksToExport = _.first($scope.weeksToExportOptions).value;
+        $scope.dataValuesMap = {};
     };
 });
