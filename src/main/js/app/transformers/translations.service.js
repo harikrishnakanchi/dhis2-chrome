@@ -1,7 +1,7 @@
 define(['lodash'], function(_){
     return function($q, db, $rootScope, ngI18nResourceBundle, systemSettingRepository) {
-        var translatableTypes = ["sections", "dataElements", "headers", "programStages", "programStageSections", "programStageDataElements", "dataElement", "optionSet", "options", "dataValues", "attribute"],
-            translatableProperties = ["name", "description", "formName", "shortName", "displayName"],
+        var TRANSLATABLE_ENTITIES = ["sections", "dataElements", "headers", "programStages", "programStageSections", "programStageDataElements", "dataElement", "optionSet", "options", "dataValues", "attribute"],
+            TRANSLATABLE_PROPERTIES = ["name", "description", "formName", "shortName", "displayName"],
             translations, categoryOptionCombosAndOptions, _locale, self = this;
 
         var refreshResourceBundle = function () {
@@ -103,7 +103,7 @@ define(['lodash'], function(_){
             return _.map(arrayOfObjectsToBeTranslated, function (objectToBeTranslated) {
                 var translationObject = translations[objectToBeTranslated.id];
 
-                _.each(translatableProperties, function (property) {
+                _.each(TRANSLATABLE_PROPERTIES, function (property) {
                     if(objectToBeTranslated[property]) {
                         var translationsByProperty = _.filter(translationObject, {property: property});
                         objectToBeTranslated[property] = translationsByProperty[0] ? translationsByProperty[0].value : objectToBeTranslated[property];
@@ -152,7 +152,7 @@ define(['lodash'], function(_){
             _.each(objectsToBeTranslated, function (objectToBeTranslated) {
                 var translationObject = translations[objectToBeTranslated.id] || [];
 
-                _.each(translatableProperties, function (property) {
+                _.each(TRANSLATABLE_PROPERTIES, function (property) {
                     if(objectToBeTranslated[property]) {
                         var translationsByProperty = _.filter(translationObject, {property: property});
                         objectToBeTranslated[property] = translationsByProperty[0] ? translationsByProperty[0].value : objectToBeTranslated[property];
@@ -160,12 +160,14 @@ define(['lodash'], function(_){
                 });
 
                 _.each(objectToBeTranslated, function (value, key) {
-                    if(_.isArray(value) && _.contains(translatableTypes, key)){
-                        _.each(value,function(object){
-                            self.translate(_.flatten([object]));
-                        });
-                    } else if(_.isObject(value) && _.contains(translatableTypes, key)){
-                        self.translate([value]);
+                    if(_.contains(TRANSLATABLE_ENTITIES, key)) {
+                        if(_.isArray(value)) {
+                            _.each(value, function(object){
+                                self.translate(_.flatten([object]));
+                            });
+                        } else if(_.isObject(value)){
+                            self.translate([value]);
+                        }
                     }
                 });
             });
