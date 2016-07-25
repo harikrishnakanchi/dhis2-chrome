@@ -17,7 +17,7 @@
                 </span>
             </form>
 
-            <div class="alert alert-danger" ng-if="dataValuesMap | isEmpty">
+            <div class="alert alert-danger" ng-if="!loading && (dataValuesMap | isEmpty)">
                 {{ resourceBundle.noRawDataAvailable }}
             </div>
             <div class="table-responsive" ng-if="sections && !(dataValuesMap | isEmpty)">
