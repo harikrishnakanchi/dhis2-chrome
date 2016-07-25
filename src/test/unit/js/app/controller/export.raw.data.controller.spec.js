@@ -1,7 +1,7 @@
-define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'excludedDataElementsRepository', 'moduleDataBlockFactory', 'filesystemService', 'translationsService', 'utils', 'dateUtils', 'timecop', 'moment', 'lodash'],
-    function (ExportRawDataController, mocks, DatasetRepository, ExcludedDataElementsRepository, ModuleDataBlockFactory, FilesystemService, TranslationsService, utils, dateUtils, timecop, moment, _) {
+define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'excludedDataElementsRepository', 'orgUnitRepository', 'moduleDataBlockFactory', 'filesystemService', 'translationsService', 'utils', 'dateUtils', 'timecop', 'moment', 'lodash'],
+    function (ExportRawDataController, mocks, DatasetRepository, ExcludedDataElementsRepository, OrgUnitRepository, ModuleDataBlockFactory, FilesystemService, TranslationsService, utils, dateUtils, timecop, moment, _) {
         describe('ExportRawDataController', function () {
-            var controller, rootScope, scope, q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory, filesystemService, translationsService,
+            var controller, rootScope, scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, moduleDataBlockFactory, filesystemService, translationsService,
                 selectedOrgUnit, selectedDataSet, mockEnrichedDataSet, mockExcludedDataElements, mockDataBlocks;
 
             beforeEach(mocks.inject(function ($rootScope, $q) {
@@ -105,13 +105,16 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                 excludedDataElementsRepository = new ExcludedDataElementsRepository();
                 spyOn(excludedDataElementsRepository, 'get').and.returnValue(utils.getPromise(q, mockExcludedDataElements));
 
+                orgUnitRepository = new OrgUnitRepository();
+                spyOn(orgUnitRepository, 'findAllByParent').and.returnValue(utils.getPromise(q, {}));
+
                 filesystemService = new FilesystemService();
                 spyOn(filesystemService, 'promptAndWriteFile').and.returnValue(utils.getPromise(q, {}));
 
                 translationsService = new TranslationsService();
                 spyOn(translationsService, 'translate').and.callFake(function(objectToTranslate) { return objectToTranslate; });
 
-                controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory, filesystemService, translationsService);
+                controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, moduleDataBlockFactory, filesystemService, translationsService);
             }));
 
             it('should fetch sections along with data elements', function () {
@@ -228,6 +231,83 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
 
                 scope.$apply();
                 expect(scope.dataValuesMap['2016W01']).toEqual({ dataElementIdForDataSetA: 1 });
+            });
+
+            describe('selected dataSet is an origin dataSet', function () {
+                var mockDataSet, dataSetSection, dataElements;
+
+                beforeEach(function () {
+                    dataElements = [{
+                        id: 'dataElementId1',
+                        isIncluded: true,
+                        associatedProgramId: 'someProgramId'
+                    }, {
+                        id: 'dataElementId2',
+                        isIncluded: true
+                    }];
+
+                    dataSetSection = {
+                        id: 'sectionIdA',
+                        isIncluded: true,
+                        dataElements: dataElements
+                    };
+
+                    mockDataSet = {
+                        name: 'someDataSetName',
+                        isOriginDataset: true,
+                        sections: [dataSetSection],
+                    };
+
+                    mockDataBlocks = [{
+                        period: '2016W01',
+                        dataValues: [{
+                            orgUnit: 'orgUnitA',
+                            period: '2016W01',
+                            dataElement: 'dataElementId2',
+                            value: '1'
+                        }, {
+                            orgUnit: 'orgUnitB',
+                            period: '2016W01',
+                            dataElement: 'dataElementId2',
+                            value: '2'
+                        }]
+                    }, {
+                        period: '2016W02',
+                        dataValues: [{
+                            orgUnit: 'orgUnitA',
+                            period: '2016W02',
+                            dataElement: 'dataElementId2',
+                            value: '3'
+                        }]
+                    }];
+
+                    scope.selectedDataset = mockDataSet;
+                    datasetRepository.includeDataElements.and.returnValue(utils.getPromise(q, [mockDataSet]));
+                    moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, mockDataBlocks));
+                    scope.$apply();
+                });
+
+                it('should fetch origins of selected orgUnit', function () {
+                    expect(orgUnitRepository.findAllByParent).toHaveBeenCalledWith(selectedOrgUnit.id);
+                });
+
+                it('should filter out data elements with an associatedProgramId', function () {
+                    expect(dataSetSection.dataElements).toEqual(_.reject(dataElements, 'associatedProgramId'));
+                });
+
+                it('should create two-dimension map of data values by week by orgUnit', function () {
+                    var expectedDataValues = {
+                        '2016W01': {
+                            orgUnitA: 1,
+                            orgUnitB: 2
+                        },
+                        '2016W02': {
+                            orgUnitA: 3
+                        }
+                    };
+
+                    expect(scope.dataValuesMap).toEqual(expectedDataValues);
+                });
             });
 
             describe('exportToCSV', function () {

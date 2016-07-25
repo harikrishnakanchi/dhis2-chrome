@@ -28,7 +28,7 @@
                         <th ng-repeat="week in weeks">{{ week }}</th>
                     </tr>
                     </thead>
-                    <tbody ng-repeat="section in sections">
+                    <tbody ng-repeat="section in sections" ng-if="!selectedDataset.isOriginDataset">
                     <tr>
                         <td class="active text-center" colspan="{{ weeks.length + 1 }}">
                             <strong>{{ section.name }}</strong>
@@ -41,6 +41,15 @@
                         </td>
                     </tr>
                     </tbody>
+                    <tbody ng-repeat="section in sections" ng-if="selectedDataset.isOriginDataset">
+                    <tr ng-repeat="originOrgUnit in originOrgUnits | orderBy: 'name'">
+                        <td>{{ originOrgUnit.name }}</td>
+                        <td ng-repeat="week in weeks">
+                            {{ dataValuesMap[week][originOrgUnit.id] }}
+                        </td>
+                    </tr>
+                    </tbody>
+
                 </table>
             </div>
         </div>

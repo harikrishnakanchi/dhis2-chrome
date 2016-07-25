@@ -141,12 +141,6 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                 "isPopulationDataset": false,
                 "isReferralDataset": false
             }, {
-                "id": "ds2",
-                "name": "ds2",
-                "isOriginDataset": true,
-                "isPopulationDataset": false,
-                "isReferralDataset": false
-            }, {
                 "id": "ds3",
                 "name": "ds3",
                 "isOriginDataset": false,

@@ -1,5 +1,5 @@
 define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
-    return function($scope, $q, datasetRepository, excludedDataElementsRepository, moduleDataBlockFactory, filesystemService, translationsService) {
+    return function($scope, $q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, moduleDataBlockFactory, filesystemService, translationsService) {
 
         $scope.weeksToExportOptions = [{
             label: $scope.resourceBundle.lastOneWeek,
@@ -22,9 +22,10 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
 
                 $scope.dataValuesMap = _.transform(allDataValues, function (map, dataValue) {
                     if(_.contains(selectedDataSetDataElementIds, dataValue.dataElement)) {
+                        var dataDimension = $scope.selectedDataset.isOriginDataset ? dataValue.orgUnit : dataValue.dataElement;
                         map[dataValue.period] = map[dataValue.period] || {};
-                        map[dataValue.period][dataValue.dataElement] = map[dataValue.period][dataValue.dataElement] || 0;
-                        map[dataValue.period][dataValue.dataElement] += parseInt(dataValue.value);
+                        map[dataValue.period][dataDimension] = map[dataValue.period][dataDimension] || 0;
+                        map[dataValue.period][dataDimension] += parseInt(dataValue.value);
                     }
                 }, {});
             });
@@ -48,6 +49,18 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
             });
         };
 
+        var filterDataElementsAndRetrieveOriginsForOriginDataSet = function () {
+            if(!$scope.selectedDataset.isOriginDataset) return $q.when();
+
+            _.each($scope.sections, function(section) {
+                section.dataElements = _.reject(section.dataElements, 'associatedProgramId');
+            });
+
+            return orgUnitRepository.findAllByParent($scope.orgUnit.id).then(function (originOrgUnits) {
+                $scope.originOrgUnits = originOrgUnits;
+            });
+        };
+
         var reloadView = function () {
             $scope.sections = null;
             $scope.dataValuesMap = {};
@@ -59,6 +72,7 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
             $scope.loading = true;
             loadExcludedDataElementIds($scope.orgUnit)
                 .then(createSections)
+                .then(filterDataElementsAndRetrieveOriginsForOriginDataSet)
                 .then(createDataValuesMap)
                 .finally(function() {
                     $scope.loading = false;
