@@ -1,6 +1,8 @@
 define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository'], function (TranslationsService, mocks, utils, SystemSettingRepository) {
     describe('Translation Service', function () {
-        var q, rootScope, translationsService, mockDB, scope, mockStore, i18nResourceBundle, systemSettingRepository, getResourceBundleSpy, mockedTranslations;
+        var q, rootScope, translationsService, mockDB, scope, mockStore, i18nResourceBundle, systemSettingRepository, getResourceBundleSpy, mockTranslations;
+        var ENGLISH = 'en', FRENCH = FRENCH;
+
         beforeEach(mocks.inject(function ($q, $rootScope) {
             q = $q;
             scope = $rootScope.$new();
@@ -11,140 +13,100 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
             i18nResourceBundle = {
                 get: function() {}
             };
-
-            getResourceBundleSpy = spyOn(i18nResourceBundle, "get");
-
-            var frenchResourceBundle = {
-                "data": {
-                    "login": "french"
-                }
-            };
-            getResourceBundleSpy.and.returnValue(utils.getPromise(q, frenchResourceBundle));
-
-            rootScope.locale = 'fr';
-            rootScope.$digest();
+            spyOn(i18nResourceBundle, 'get').and.returnValue(utils.getPromise(q, {}));
 
             systemSettingRepository = new SystemSettingRepository();
             spyOn(systemSettingRepository, 'upsertLocale').and.returnValue(utils.getPromise(q, {}));
 
-            mockedTranslations = [{
+            mockTranslations = [{
                 objectId: 'id1',
                 value: 'frenchName',
-                locale: 'fr',
+                locale: FRENCH,
                 property: 'name'
             }, {
                 objectId: 'id2',
                 value: 'frenchSection',
-                locale: 'fr',
+                locale: FRENCH,
                 property: 'name'
             }, {
                 objectId: 'id3',
                 value: 'frenchDataElement',
-                locale: 'fr',
+                locale: FRENCH,
                 property: 'name'
             },{
                 objectId: 'id4',
                 value: 'french description',
-                locale: 'fr',
+                locale: FRENCH,
                 property: 'description'
             },{
                 objectId: 'id4',
                 value: 'frenchReport',
-                locale: 'fr',
+                locale: FRENCH,
                 property: 'shortName'
             }, {
                 objectId: 'id4',
                 value: 'french name',
-                locale: 'fr',
+                locale: FRENCH,
                 property: 'name'
             }, {
                 objectId: 'id5',
                 value: 'frenchDataElementDescription',
-                locale: 'fr',
+                locale: FRENCH,
                 property: 'description'
             }, {
                 objectId: 'id6',
                 value: 'frenchHeader',
-                locale: 'fr',
+                locale: FRENCH,
                 property: 'name'
             }];
-
-            mockStore.each.and.callFake(function (query) {
-                return utils.getPromise(q, mockedTranslations);
-            });
-        }));
-
-        it('should return translation value of property for specified object', function() {
-            var locale = 'fr';
-            var objectId = "id1";
+            mockStore.each.and.returnValue(utils.getPromise(q, mockTranslations));
 
             translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
+        }));
+
+        var initialiseTranslationsServiceForLocale = function (locale) {
             translationsService.setLocale(locale);
-
             scope.$apply();
+        };
 
-            var actual = translationsService.getTranslationForProperty(objectId, 'name');
-
-            expect(actual).toEqual("frenchName");
+        it('should return translation value of property for specified object', function() {
+            initialiseTranslationsServiceForLocale(FRENCH);
+            expect(translationsService.getTranslationForProperty('id1', 'name')).toEqual('frenchName');
         });
 
         it('should return default value if translation for specified property in specified object is not present', function() {
-            var locale = 'fr';
-            var objectId = "id1";
             var defaultValue = "defaultValue";
 
-            translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
-            translationsService.setLocale(locale);
-
-            scope.$apply();
-
-            var actual = translationsService.getTranslationForProperty(objectId, 'formName', defaultValue);
-
-            expect(actual).toEqual(defaultValue);
+            initialiseTranslationsServiceForLocale(FRENCH);
+            expect(translationsService.getTranslationForProperty('id1', 'formName', defaultValue)).toEqual(defaultValue);
         });
 
         it('should translate name to french if locale is french', function () {
-            var locale = 'fr';
             var obj = [{
                 id: 'id1',
                 name: 'testName'
             }];
-
-            translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
-            translationsService.setLocale(locale);
-
-            scope.$apply();
-
-            var actual = translationsService.translate(obj);
-
-            expect(actual).toEqual([{
+            initialiseTranslationsServiceForLocale(FRENCH);
+            expect(translationsService.translate(obj)).toEqual([{
                 id: 'id1',
                 name: 'frenchName'
             }]);
         });
 
         it('should not translate if locale is english', function () {
-            var locale = 'en';
             var obj = [{
                 id: 'id1',
                 name: 'testName'
             }];
+            initialiseTranslationsServiceForLocale(ENGLISH);
 
-            translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
-            translationsService.setLocale(locale);
-
-            scope.$apply();
-
-            var actual = translationsService.translate(obj);
-
-            expect(actual).toEqual([{
+            expect(translationsService.translate(obj)).toEqual([{
                 id: 'id1',
                 name: 'testName'
             }]);
         });
 
         it('should translate the name in the nested object structure if locale is anything other than english', function () {
-            var locale = 'fr';
             var obj = [{
                 id: 'id1',
                 name: 'testName',
@@ -165,14 +127,9 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                 }]
             }];
 
-            translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
-            translationsService.setLocale(locale);
+            initialiseTranslationsServiceForLocale(FRENCH);
 
-            scope.$apply();
-
-            var actual = translationsService.translate(obj);
-
-            expect(actual).toEqual([{
+            expect(translationsService.translate(obj)).toEqual([{
                 id: 'id1',
                 name: 'frenchName',
                 sections: [{
@@ -194,61 +151,41 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
         });
 
         it('should set the default english name if there was no translation with the selected locale', function () {
-            var locale = 'fr';
             var obj = [{
                 id: 'dhi',
                 name: 'testName'
             }];
+            initialiseTranslationsServiceForLocale(FRENCH);
 
-            translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
-            translationsService.setLocale(locale);
-
-            scope.$apply();
-
-            var actual = translationsService.translate(obj);
-
-            expect(actual).toEqual([{
+            expect(translationsService.translate(obj)).toEqual([{
                 id: 'dhi',
                 name: 'testName'
             }]);
         });
 
         it('should translate description property in the object with the selected locale', function () {
-            var locale = 'fr';
             var obj = [{
                 id: 'id4',
                 description: 'english description'
             }];
+            initialiseTranslationsServiceForLocale(FRENCH);
 
-            translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
-            translationsService.setLocale(locale);
-
-            scope.$apply();
-
-            var actual = translationsService.translate(obj);
-
-            expect(actual).toEqual([{
+            expect(translationsService.translate(obj)).toEqual([{
                 id: 'id4',
                 description: 'french description'
             }]);
         });
 
         it('should translate name and description properties in the object with the selected locale', function () {
-            var locale = 'fr';
             var obj = [{
                 id: 'id4',
                 name: 'english name',
                 description: 'english description'
             }];
 
-            translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
-            translationsService.setLocale(locale);
+            initialiseTranslationsServiceForLocale(FRENCH);
 
-            scope.$apply();
-
-            var actual = translationsService.translate(obj);
-
-            expect(actual).toEqual([{
+            expect(translationsService.translate(obj)).toEqual([{
                 id: 'id4',
                 name: 'french name',
                 description: 'french description'
@@ -256,7 +193,6 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
         });
 
         it('should translate the description in the nested object structure if locale is anything other than english', function () {
-            var locale = 'fr';
             var obj = [{
                 id: 'id1',
                 name: 'testName',
@@ -282,14 +218,9 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                 }]
             }];
 
-            translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
-            translationsService.setLocale(locale);
+            initialiseTranslationsServiceForLocale(FRENCH);
 
-            scope.$apply();
-
-            var actual = translationsService.translate(obj);
-
-            expect(actual).toEqual([{
+            expect(translationsService.translate(obj)).toEqual([{
                 id: 'id1',
                 name: 'frenchName',
                 sections: [{
@@ -316,7 +247,6 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
         });
 
         it('should not translate dataElements for referral datasets if locale is anything other than english', function () {
-            var locale = 'fr';
             var obj = [{
                 id: 'id1',
                 name: 'testName',
@@ -336,15 +266,9 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                     }
                 }]
             }];
+            initialiseTranslationsServiceForLocale(FRENCH);
 
-            translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
-            translationsService.setLocale(locale);
-
-            scope.$apply();
-
-            var actual = translationsService.translateReferralLocations(obj);
-
-            expect(actual).toEqual([{
+            expect(translationsService.translateReferralLocations(obj)).toEqual([{
                 id: 'id1',
                 name: 'frenchName',
                 sections: [{
@@ -366,8 +290,10 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
         });
 
         describe('translate reports', function () {
-            var createMockReport = function () {
-                return {
+            var mockReport, translatedReport;
+
+            beforeEach(function () {
+                mockReport = {
                     definition: {
                         rows: [{
                             items: [{
@@ -382,36 +308,25 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                         }
                     }
                 };
-            };
 
-            beforeEach(function () {
-                var locale = 'fr';
-                translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
-                translationsService.setLocale(locale);
+                initialiseTranslationsServiceForLocale(FRENCH);
             });
 
             it('should translate the names for the rows in the reports', function () {
-                var mockReport = createMockReport();
-
-                scope.$apply();
-
-                var translatedReport = translationsService.translateReports([mockReport]);
+                translatedReport = translationsService.translateReports([mockReport]);
                 expect(translatedReport[0].definition.rows[0].items[0].name).toEqual('frenchReport');
             });
 
             it('should translate the description of the item if translation exists', function () {
-                var mockReport = createMockReport();
                 mockReport.definition.rows[0].items[0].description = 'someDescription';
 
-                scope.$apply();
-
-                var translatedReport = translationsService.translateReports([mockReport]);
+                translatedReport = translationsService.translateReports([mockReport]);
                 expect(translatedReport[0].definition.rows[0].items[0].description).toEqual('french description');
             });
         });
 
         describe('translateCharts', function () {
-            var locale, chartData;
+            var chartData;
 
             beforeEach(function () {
                 var categoryOptionCombos = [{
@@ -439,42 +354,39 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                 var translations = [{
                     objectId: 'dataElementId',
                     value: 'french data element name',
-                    locale: 'fr',
+                    locale: FRENCH,
                     property: 'shortName'
                 }, {
                     objectId: 'indicatorId',
                     value: 'french indicator name',
-                    locale: 'fr',
+                    locale: FRENCH,
                     property: 'shortName'
                 }, {
                     objectId: 'categoryOptionId1',
                     value: 'Female fr',
-                    locale: 'fr',
+                    locale: FRENCH,
                     property: 'shortName'
                 }, {
                     objectId: 'categoryOptionId2',
                     value: '<23 months fr',
-                    locale: 'fr',
+                    locale: FRENCH,
                     property: 'shortName'
                 }, {
                     objectId: 'categoryOptionId3',
                     value: '5-14 years fr',
-                    locale: 'fr',
+                    locale: FRENCH,
                     property: 'shortName'
                 }, {
                     objectId: 'categoryOptionId4',
                     value: 'Male fr',
-                    locale: 'fr',
+                    locale: FRENCH,
                     property: 'shortName'
                 }];
 
                 mockStore.getAll.and.returnValue(utils.getPromise(q, categoryOptionCombos));
                 mockStore.each.and.returnValue(utils.getPromise(q, translations));
 
-                locale = 'fr';
-
-                translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
-                translationsService.setLocale(locale);
+                initialiseTranslationsServiceForLocale(FRENCH);
 
                 chartData = {
                     metaData: {
@@ -489,31 +401,20 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                         co: ["categoryOptionComboId1", "categoryOptionComboId2", "categoryOptionComboId3"]
                     }
                 };
+                translationsService.translateCharts(chartData);
             });
 
             it('should translate dataelement, indicator and category option combo names in chart data', function () {
-                scope.$apply();
-
-                translationsService.translateCharts(chartData);
-
                 expect(chartData.metaData.names.dataElementId).toEqual('french data element name');
                 expect(chartData.metaData.names.indicatorId).toEqual('french indicator name');
             });
 
             it('should translate category option combo names in chart data', function () {
-                scope.$apply();
-
-                translationsService.translateCharts(chartData);
-
                 expect(chartData.metaData.names.categoryOptionComboId1).toEqual('<23 months fr, Female fr');
                 expect(chartData.metaData.names.categoryOptionComboId2).toEqual('5-14 years fr');
             });
 
             it('should translate return english category option combo name in chart data if one of the option is missing translation', function () {
-                scope.$apply();
-
-                translationsService.translateCharts(chartData);
-
                 expect(chartData.metaData.names.categoryOptionComboId3).toEqual('some category option data 3');
             });
         });
