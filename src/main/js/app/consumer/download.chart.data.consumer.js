@@ -85,17 +85,18 @@ define(["lodash", "moment"], function(_, moment) {
                     monthlyChartsLastDownloaded: changeLogRepository.get(monthlyChangeLogKey)
                 }).then(function(data) {
                     var isMonthlyReportDownloaded = function () {
-                        var getCurrentWednesdayAsWeekStartsFromWednesday = function () {
-                            var currentDay = moment().day();
+
+                        var getWednesdayAsWeekStartsFromWednesday = function (date) {
+                            var currentDay = date.day();
                             var WEDNESDAY = 3;
                             if (currentDay < WEDNESDAY) {
-                                return moment().subtract(1, 'week').startOf('week').add(3, 'days');
+                                return date.subtract(1, 'week').startOf('week').add(3, 'days');
                             } else {
-                                return moment().startOf('week').add(3, 'days');
+                                return date.startOf('week').add(3, 'days');
                             }
                         };
-                        var currentWednesday = getCurrentWednesdayAsWeekStartsFromWednesday();
-                        var lastDownloadedWednesday = moment(data.monthlyChartsLastDownloaded).startOf('week').add(3, 'days');
+                        var currentWednesday = getWednesdayAsWeekStartsFromWednesday(moment());
+                        var lastDownloadedWednesday = getWednesdayAsWeekStartsFromWednesday(moment(data.monthlyChartsLastDownloaded));
                         var currentDateInFirstTenDaysOfMonth = moment().date() <= 10;
                         var isMonthlyChartsDownloadedToday = moment().isSame(data.monthlyChartsLastDownloaded, 'day');
                         return currentDateInFirstTenDaysOfMonth ? isMonthlyChartsDownloadedToday :

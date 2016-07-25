@@ -232,6 +232,27 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyChartData:' + mockProjectId, currentTime.toISOString());
             });
 
+            it('should download monthly chart data if it has been last downloaded on tuesday', function() {
+                var mockMonthlyChart = {
+                    id: 'someChartId',
+                    monthlyChart: true,
+                    dataSetCode: 'someDataSetCode'
+                };
+
+                var lastDownloadedTime = moment('2016-07-11T12:00:00.000Z').toISOString();
+                currentTime = moment('2016-07-13T13:00:00.000Z');
+                Timecop.freeze(currentTime);
+
+                chartRepository.getAll.and.returnValue(utils.getPromise(q, [mockMonthlyChart]));
+                changeLogRepository.get.and.returnValue(utils.getPromise(q, lastDownloadedTime));
+
+                downloadChartDataConsumer.run();
+                scope.$apply();
+
+                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalled();
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyChartData:' + mockProjectId, currentTime.toISOString());
+            });
+
             it('should not download monthly chart data if it has already been downloaded on that week\'s wednesday', function() {
                 var mockMonthlyChart = {
                     id: 'someChartId',
@@ -294,5 +315,6 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalled();
                 expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyChartData:' + mockProjectId, currentTime.toISOString());
             });
+
         });
     });

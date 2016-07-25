@@ -247,6 +247,27 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyPivotTableData:' + mockProjectId, currentTime.toISOString());
             });
 
+            it('should download monthly pivot table if it has been downloaded on tuesday', function() {
+                var mockMonthlyPivotTable = {
+                    id: 'someId',
+                    monthlyReport: true,
+                    dataSetCode: mockDataSet.code
+                };
+
+                var lastDownloadedTime = moment('2016-07-11T02:03:00.000Z').toISOString();
+                currentTime = moment('2016-07-15T13:00:00.000Z');
+                Timecop.freeze(currentTime);
+
+                pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [mockMonthlyPivotTable]));
+                changeLogRepository.get.and.returnValue(utils.getPromise(q, lastDownloadedTime));
+
+                downloadPivotTableDataConsumer.run();
+                scope.$apply();
+
+                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalled();
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyPivotTableData:' + mockProjectId, currentTime.toISOString());
+            });
+
             it('should not download monthly pivot table if it has already been downloaded on that week\'s wednesday', function() {
                 var mockMonthlyPivotTable = {
                     id: 'someId',
