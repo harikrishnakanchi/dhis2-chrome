@@ -168,8 +168,7 @@ define(["lodash", "moment"], function(_, moment) {
 
             var getProgram = function(excludedDataElements) {
                 return programRepository.get($scope.associatedProgramId, excludedDataElements).then(function(program) {
-                    var translatedProgram = translationsService.translate([program]);
-                    $scope.program = translatedProgram[0];
+                    $scope.program = translationsService.translate(program);
                 });
             };
 
@@ -235,8 +234,7 @@ define(["lodash", "moment"], function(_, moment) {
 
         var getAssociatedDataSets = function() {
             return datasetRepository.findAllForOrgUnits([$scope.originOrgUnits[0].id]).then(function(data) {
-                var translatedDataset = translationsService.translate(data);
-                $scope.associatedDataSets = translatedDataset;
+                $scope.associatedDataSets = translationsService.translate(data);
             });
         };
 

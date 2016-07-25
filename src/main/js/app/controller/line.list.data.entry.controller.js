@@ -218,8 +218,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                                     });
                                 });
                             });
-                            var translatedProgram = translationsService.translate([program]);
-                            $scope.program = translatedProgram[0];
+                            $scope.program = translationsService.translate(program);
                         });
                     });
                 };

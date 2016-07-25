@@ -102,11 +102,10 @@ define(["moment"], function(moment) {
 
         var enrichAndTranslate = function(referralDataset) {
             return datasetRepository.includeDataElements([referralDataset], []).then(function (enrichedDatasets) {
-                var referralSection = enrichedDatasets[0].sections[0];
-                var genericNames = _.pluck(referralSection.dataElements, 'formName');
-
-                referralSection = translationsService.translate([referralSection])[0];
-                var translatedNames = _.pluck(referralSection.dataElements, 'formName');
+                var referralSection = enrichedDatasets[0].sections[0],
+                    referralDataElements = referralSection.dataElements,
+                    genericNames = _.pluck(referralDataElements, 'formName'),
+                    translatedNames = _.pluck(translationsService.translate(referralDataElements), 'formName');
 
                 return [genericNames, translatedNames];
             });

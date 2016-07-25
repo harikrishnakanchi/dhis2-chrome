@@ -125,7 +125,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, program));
 
                 translationsService = new TranslationsService();
-                spyOn(translationsService, "translate").and.returnValue([program]);
+                spyOn(translationsService, "translate").and.returnValue(program);
                 spyOn(translationsService, "translateOptionSetMap").and.returnValue(optionSetMapping.optionSetMap);
 
                 Timecop.install();

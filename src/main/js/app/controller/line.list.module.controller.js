@@ -77,8 +77,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
                 var getEnrichedProgram = function(progId) {
                     return programRepository.get(progId, $scope.excludedDataElements).then(function(data) {
-                        var translatedEnrichedProgram = translationsService.translate([data]);
-                        $scope.enrichedProgram = translatedEnrichedProgram[0];
+                        $scope.enrichedProgram = translationsService.translate(data);
                         resetCollapse();
                     });
                 };

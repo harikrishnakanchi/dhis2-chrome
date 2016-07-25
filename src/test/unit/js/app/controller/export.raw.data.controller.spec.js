@@ -160,7 +160,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                 datasetRepository.includeDataElements.and.returnValue(utils.getPromise(q, [mockEnrichedDataset]));
                 scope.$apply();
 
-                expect(translationsService.translate).toHaveBeenCalledWith([mockEnrichedDataset]);
+                expect(translationsService.translate).toHaveBeenCalledWith(mockEnrichedDataset);
             });
 
             it('should populate the specified week range', function () {

@@ -346,7 +346,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 scope.isNewMode = false;
                 programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, program));
                 programRepository.get.and.returnValue(utils.getPromise(q, program));
-                translationsService.translate.and.returnValue([program]);
+                translationsService.translate.and.returnValue(program);
 
                 lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService);
 
@@ -584,7 +584,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
                 programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, program));
                 programRepository.get.and.returnValue(utils.getPromise(q, program));
-                translationsService.translate.and.returnValue([program]);
+                translationsService.translate.and.returnValue(program);
 
                 scope.onProgramSelect(selectedObject).then(function(data) {
                     expect(scope.enrichedProgram).toEqual(program);

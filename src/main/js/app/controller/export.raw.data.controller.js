@@ -34,7 +34,7 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
         var createSections = function (excludedDataElements) {
             return datasetRepository.includeDataElements([$scope.selectedDataset], excludedDataElements).then(function (enrichedDatasets) {
                 var currentDataset = _.first(enrichedDatasets),
-                    translatedDataSet = _.first(translationsService.translate([currentDataset]));
+                    translatedDataSet = translationsService.translate(currentDataset);
 
                 $scope.sections = _.filter(translatedDataSet.sections, 'isIncluded');
                 _.each($scope.sections, function(section) {

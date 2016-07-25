@@ -333,9 +333,8 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 var getProgram = function(excludedDataElements) {
                     return programRepository.getProgramForOrgUnit($scope.originOrgUnits[0].id).then(function(program) {
                         return programRepository.get(program.id, excludedDataElements).then(function(program) {
-                            var translatedProgram = translationsService.translate([program]);
-                            $scope.program = translatedProgram[0];
-                            $scope.associatedProgramId = translatedProgram[0].id;
+                            $scope.program = translationsService.translate(program);
+                            $scope.associatedProgramId = $scope.program.id;
                         });
                     });
                 };
