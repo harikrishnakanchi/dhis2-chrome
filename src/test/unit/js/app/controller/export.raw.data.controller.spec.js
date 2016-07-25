@@ -32,7 +32,17 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                         id: 'section 1 id',
                         isIncluded: true,
                         dataElements: [{
-                            id: 'dataElementId'
+                            id: 'deId1',
+                            isIncluded: true
+                        }, {
+                            id: 'deId2',
+                            isIncluded: true
+                        }, {
+                            id: 'deId3',
+                            isIncluded: true
+                        }, {
+                            id: 'deId4',
+                            isIncluded: true
                         }]
                     }, {
                         id: 'section 2 id',
@@ -192,6 +202,38 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                 };
 
                 expect(scope.dataValuesMap).toEqual(expectedDataValues);
+            });
+
+            it('should create map of data values only for data elements in selected dataSet', function () {
+                mockDataBlocks = [{
+                    period: '2016W01',
+                    dataValues: [{
+                        period: '2016W01',
+                        dataElement: 'dataElementIdForDataSetA',
+                        value: '1'
+                    }, {
+                        period: '2016W01',
+                        dataElement: 'dataElementIdForDataSetB',
+                        value: '2'
+                    }]
+                }];
+                mockEnrichedDataset = {
+                    name: 'dataSetNameA',
+                    sections: [{
+                        id: 'sectionId',
+                        isIncluded: true,
+                        dataElements: [{
+                            id: 'dataElementIdForDataSetA',
+                            isIncluded: true
+                        }]
+                    }]
+                };
+
+                datasetRepository.includeDataElements.and.returnValue(utils.getPromise(q, [mockEnrichedDataset]));
+                moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, mockDataBlocks));
+
+                scope.$apply();
+                expect(scope.dataValuesMap['2016W01']).toEqual({ dataElementIdForDataSetA: 1 });
             });
 
             describe('exportToCSV', function () {

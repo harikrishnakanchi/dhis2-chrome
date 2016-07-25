@@ -15,14 +15,19 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
             value: 12
         }];
 
-        var createDataValuesMap = function (moduleDataBlocks) {
-            var allDataValues = _.flatten(_.map(moduleDataBlocks, 'dataValues'));
+        var createDataValuesMap = function () {
+            return moduleDataBlockFactory.createForModule($scope.orgUnit.id, $scope.weeks).then(function(moduleDataBlocks) {
+                var allDataValues = _.flatten(_.map(moduleDataBlocks, 'dataValues')),
+                    selectedDataSetDataElementIds = _.map(_.flatten(_.map($scope.sections, 'dataElements')), 'id');
 
-            $scope.dataValuesMap = _.transform(allDataValues, function (map, dataValue) {
-                map[dataValue.period] = map[dataValue.period] || {};
-                map[dataValue.period][dataValue.dataElement] = map[dataValue.period][dataValue.dataElement] || 0;
-                map[dataValue.period][dataValue.dataElement] += parseInt(dataValue.value);
-            }, {});
+                $scope.dataValuesMap = _.transform(allDataValues, function (map, dataValue) {
+                    if(_.contains(selectedDataSetDataElementIds, dataValue.dataElement)) {
+                        map[dataValue.period] = map[dataValue.period] || {};
+                        map[dataValue.period][dataValue.dataElement] = map[dataValue.period][dataValue.dataElement] || 0;
+                        map[dataValue.period][dataValue.dataElement] += parseInt(dataValue.value);
+                    }
+                }, {});
+            });
         };
 
         var loadExcludedDataElementIds = function(module) {
@@ -52,12 +57,12 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
             $scope.weeks = dateUtils.getPeriodRange($scope.selectedWeeksToExport, { excludeCurrentWeek: true });
 
             $scope.loading = true;
-            $q.all([
-                moduleDataBlockFactory.createForModule($scope.orgUnit.id, $scope.weeks).then(createDataValuesMap),
-                loadExcludedDataElementIds($scope.orgUnit).then(createSections)
-            ]).finally(function() {
-                $scope.loading = false;
-            });
+            loadExcludedDataElementIds($scope.orgUnit)
+                .then(createSections)
+                .then(createDataValuesMap)
+                .finally(function() {
+                    $scope.loading = false;
+                });
         };
 
         var buildCsvContent = function() {
