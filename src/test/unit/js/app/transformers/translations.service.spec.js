@@ -82,32 +82,54 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
         });
 
         it('should translate name to french if locale is french', function () {
-            var obj = [{
+            var obj = {
                 id: 'id1',
+                name: 'testName'
+            };
+            initialiseTranslationsServiceForLocale(FRENCH);
+            expect(translationsService.translate(obj)).toEqual({
+                id: 'id1',
+                name: 'frenchName'
+            });
+        });
+
+        it('should translate each element if object is an array', function () {
+            var array = [{
+                id: 'id1',
+                name: 'testName'
+            }, {
+                id: 'id2',
                 name: 'testName'
             }];
             initialiseTranslationsServiceForLocale(FRENCH);
-            expect(translationsService.translate(obj)).toEqual([{
+            expect(translationsService.translate(array)).toEqual([{
                 id: 'id1',
                 name: 'frenchName'
+            }, {
+                id: 'id2',
+                name: 'frenchSection'
             }]);
+        });
+
+        it('should return undefined if object to be translated is undefined', function() {
+            expect(translationsService.translate(undefined)).toBeUndefined();
         });
 
         it('should not translate if locale is english', function () {
-            var obj = [{
+            var obj = {
                 id: 'id1',
                 name: 'testName'
-            }];
+            };
             initialiseTranslationsServiceForLocale(ENGLISH);
 
-            expect(translationsService.translate(obj)).toEqual([{
+            expect(translationsService.translate(obj)).toEqual({
                 id: 'id1',
                 name: 'testName'
-            }]);
+            });
         });
 
         it('should translate the name in the nested object structure if locale is anything other than english', function () {
-            var obj = [{
+            var obj = {
                 id: 'id1',
                 name: 'testName',
                 sections: [{
@@ -125,11 +147,11 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                         name: 'testDataElement'
                     }
                 }]
-            }];
+            };
 
             initialiseTranslationsServiceForLocale(FRENCH);
 
-            expect(translationsService.translate(obj)).toEqual([{
+            expect(translationsService.translate(obj)).toEqual({
                 id: 'id1',
                 name: 'frenchName',
                 sections: [{
@@ -147,7 +169,7 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                         name: 'frenchDataElement'
                     }
                 }]
-            }]);
+            });
         });
 
         it('should set the default english name if there was no translation with the selected locale', function () {
@@ -164,36 +186,36 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
         });
 
         it('should translate description property in the object with the selected locale', function () {
-            var obj = [{
+            var obj = {
                 id: 'id4',
                 description: 'english description'
-            }];
+            };
             initialiseTranslationsServiceForLocale(FRENCH);
 
-            expect(translationsService.translate(obj)).toEqual([{
+            expect(translationsService.translate(obj)).toEqual({
                 id: 'id4',
                 description: 'french description'
-            }]);
+            });
         });
 
         it('should translate name and description properties in the object with the selected locale', function () {
-            var obj = [{
+            var obj = {
                 id: 'id4',
                 name: 'english name',
                 description: 'english description'
-            }];
+            };
 
             initialiseTranslationsServiceForLocale(FRENCH);
 
-            expect(translationsService.translate(obj)).toEqual([{
+            expect(translationsService.translate(obj)).toEqual({
                 id: 'id4',
                 name: 'french name',
                 description: 'french description'
-            }]);
+            });
         });
 
         it('should translate the description in the nested object structure if locale is anything other than english', function () {
-            var obj = [{
+            var obj = {
                 id: 'id1',
                 name: 'testName',
                 sections: [{
@@ -216,11 +238,11 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                         description: 'testDataElementDescription'
                     }
                 }]
-            }];
+            };
 
             initialiseTranslationsServiceForLocale(FRENCH);
 
-            expect(translationsService.translate(obj)).toEqual([{
+            expect(translationsService.translate(obj)).toEqual({
                 id: 'id1',
                 name: 'frenchName',
                 sections: [{
@@ -243,7 +265,7 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                         description: 'frenchDataElementDescription'
                     }
                 }]
-            }]);
+            });
         });
 
         it('should not translate dataElements for referral datasets if locale is anything other than english', function () {

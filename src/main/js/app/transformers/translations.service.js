@@ -144,35 +144,32 @@ define(['lodash'], function(_){
             return optionMap;
         };
 
-        this.translate = function(objectsToBeTranslated) {
-            if(_locale == 'en') {
-                return objectsToBeTranslated;
-            }
+        var translateObject = function (objectToBeTranslated) {
+            var translationsForObject = translations[objectToBeTranslated.id] || [];
 
-            _.each(objectsToBeTranslated, function (objectToBeTranslated) {
-                var translationObject = translations[objectToBeTranslated.id] || [];
-
-                _.each(TRANSLATABLE_PROPERTIES, function (property) {
-                    if(objectToBeTranslated[property]) {
-                        var translationsByProperty = _.filter(translationObject, {property: property});
-                        objectToBeTranslated[property] = translationsByProperty[0] ? translationsByProperty[0].value : objectToBeTranslated[property];
-                    }
-                });
-
-                _.each(objectToBeTranslated, function (value, key) {
-                    if(_.contains(TRANSLATABLE_ENTITIES, key)) {
-                        if(_.isArray(value)) {
-                            _.each(value, function(object){
-                                self.translate(_.flatten([object]));
-                            });
-                        } else if(_.isObject(value)){
-                            self.translate([value]);
-                        }
-                    }
-                });
+            _.each(TRANSLATABLE_PROPERTIES, function (property) {
+                if(objectToBeTranslated[property]) {
+                    var translationForProperty = _.find(translationsForObject, { property: property });
+                    objectToBeTranslated[property] = translationForProperty && translationForProperty.value || objectToBeTranslated[property];
+                }
             });
 
-            return objectsToBeTranslated;
+            _.each(TRANSLATABLE_ENTITIES, function (entity) {
+                var nestedEntity = objectToBeTranslated[entity];
+                if(nestedEntity) {
+                    self.translate(nestedEntity);
+                }
+            });
+
+            return objectToBeTranslated;
+        };
+
+        this.translate = function (objectToBeTranslated) {
+            if(_locale == 'en' || _.isUndefined(objectToBeTranslated)) {
+                return objectToBeTranslated;
+            }
+
+            return _.isArray(objectToBeTranslated) ? _.map(objectToBeTranslated, self.translate) : translateObject(objectToBeTranslated);
         };
     };
 });
