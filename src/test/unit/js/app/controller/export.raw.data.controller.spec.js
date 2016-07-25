@@ -11,6 +11,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
 
                 scope.resourceBundle = {
                     dataElement: 'Data Element',
+                    originLabel: 'Origin',
                     lastOneWeek: 'Last week',
                     lastFourWeeks: 'Last 4 weeks',
                     lastEightWeeks: 'Last 8 weeks',
@@ -234,7 +235,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
             });
 
             describe('selected dataSet is an origin dataSet', function () {
-                var mockDataSet, dataSetSection, dataElements;
+                var mockDataSet, dataSetSection, dataElements, mockOriginOrgUnits;
 
                 beforeEach(function () {
                     dataElements = [{
@@ -281,9 +282,18 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                         }]
                     }];
 
+                    mockOriginOrgUnits = [{
+                        id: 'orgUnitA',
+                        name: 'originNameA'
+                    }, {
+                        id: 'orgUnitB',
+                        name: 'originNameB'
+                    }];
+
                     scope.selectedDataset = mockDataSet;
                     datasetRepository.includeDataElements.and.returnValue(utils.getPromise(q, [mockDataSet]));
                     moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, mockDataBlocks));
+                    orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, mockOriginOrgUnits));
                     scope.$apply();
                 });
 
@@ -307,6 +317,34 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     };
 
                     expect(scope.dataValuesMap).toEqual(expectedDataValues);
+                });
+
+                describe('exportToCSV', function () {
+                    var csvContent;
+
+                    beforeEach(function () {
+                        scope.weeks = ['2016W01', '2016W02'];
+
+                        spyOn(window, 'Blob').and.callFake(function (contentArray) {
+                            this.value = contentArray.join();
+                        });
+
+                        filesystemService.promptAndWriteFile.and.callFake(function (fileName, blob) {
+                            csvContent = blob.value;
+                        });
+
+                        scope.exportToCSV();
+                    });
+
+                    it('should contain the row headers', function () {
+                        var expectedHeader = [scope.resourceBundle.originLabel].concat(scope.weeks).join(',');
+                        expect(csvContent).toContain(expectedHeader);
+                    });
+
+                    it('should contain the origin data', function () {
+                        expect(csvContent).toContain('"originNameA",1,3');
+                        expect(csvContent).toContain('"originNameB",2,');
+                    });
                 });
             });
 

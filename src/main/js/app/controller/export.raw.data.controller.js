@@ -57,7 +57,7 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
             });
 
             return orgUnitRepository.findAllByParent($scope.orgUnit.id).then(function (originOrgUnits) {
-                $scope.originOrgUnits = originOrgUnits;
+                $scope.originOrgUnits = _.sortBy(originOrgUnits, 'name');
             });
         };
 
@@ -89,7 +89,8 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
             };
 
             var buildHeader = function () {
-                return [$scope.resourceBundle.dataElement].concat($scope.weeks).join(DELIMITER);
+                var columnHeader = $scope.selectedDataset.isOriginDataset ? $scope.resourceBundle.originLabel : $scope.resourceBundle.dataElement;
+                return [columnHeader].concat($scope.weeks).join(DELIMITER);
             };
 
             var buildDataElement = function (dataElement) {
@@ -99,12 +100,23 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
                 ].join(DELIMITER);
             };
 
-            var buildSection = function (section) {
+            var buildOriginData = function (originOrgUnit) {
                 return [
-                    EMPTY_LINE,
-                    escapeString(section.name),
-                    _.map(section.dataElements, buildDataElement)
-                ];
+                    escapeString(originOrgUnit.name),
+                    _.map($scope.weeks, function(week) { return $scope.dataValuesMap[week] && $scope.dataValuesMap[week][originOrgUnit.id]; })
+                ].join(DELIMITER);
+            };
+
+            var buildSection = function (section) {
+                if($scope.selectedDataset.isOriginDataset) {
+                    return _.map($scope.originOrgUnits, buildOriginData);
+                } else {
+                    return [
+                        EMPTY_LINE,
+                        escapeString(section.name),
+                        _.map(section.dataElements, buildDataElement)
+                    ];
+                }
             };
 
             return _.flattenDeep([buildHeader(), _.map($scope.sections, buildSection)]).join(NEW_LINE);
