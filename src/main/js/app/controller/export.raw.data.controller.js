@@ -1,5 +1,5 @@
 define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
-    return function($scope, $q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, moduleDataBlockFactory, filesystemService, translationsService) {
+    return function($scope, $q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService) {
 
         $scope.weeksToExportOptions = [{
             label: $scope.resourceBundle.lastOneWeek,
@@ -62,6 +62,23 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
             });
         };
 
+        var filterDataElementsAndRetrieveAliasesForReferralDataSet = function () {
+            if(!$scope.selectedDataset.isReferralDataset) return $q.when();
+
+            return referralLocationsRepository.get($scope.orgUnit.parent.id).then(function (referralLocations) {
+                _.each($scope.sections, function (section) {
+                    section.dataElements = _.transform(section.dataElements, function (dataElements, dataElement) {
+                        var referralLocation = referralLocations[dataElement.original_formName] || referralLocations[dataElement.formName];
+
+                        if(referralLocation && !referralLocation.isDisabled) {
+                            dataElement.formName = referralLocation.name;
+                            dataElements.push(dataElement);
+                        }
+                    }, []);
+                });
+            });
+        };
+
         var reloadView = function () {
             $scope.sections = null;
             $scope.dataValuesMap = {};
@@ -74,6 +91,7 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
             loadExcludedDataElementIds($scope.orgUnit)
                 .then(createSections)
                 .then(filterDataElementsAndRetrieveOriginsForOriginDataSet)
+                .then(filterDataElementsAndRetrieveAliasesForReferralDataSet)
                 .then(createDataValuesMap)
                 .finally(function() {
                     $scope.loading = false;

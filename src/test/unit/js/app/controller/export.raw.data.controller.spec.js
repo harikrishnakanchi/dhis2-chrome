@@ -1,7 +1,7 @@
-define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'excludedDataElementsRepository', 'orgUnitRepository', 'moduleDataBlockFactory', 'filesystemService', 'translationsService', 'utils', 'dateUtils', 'timecop', 'moment', 'lodash'],
-    function (ExportRawDataController, mocks, DatasetRepository, ExcludedDataElementsRepository, OrgUnitRepository, ModuleDataBlockFactory, FilesystemService, TranslationsService, utils, dateUtils, timecop, moment, _) {
+define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'excludedDataElementsRepository', 'orgUnitRepository', 'referralLocationsRepository', 'moduleDataBlockFactory', 'filesystemService', 'translationsService', 'utils', 'dateUtils', 'timecop', 'moment', 'lodash'],
+    function (ExportRawDataController, mocks, DatasetRepository, ExcludedDataElementsRepository, OrgUnitRepository, ReferralLocationsRepository, ModuleDataBlockFactory, FilesystemService, TranslationsService, utils, dateUtils, timecop, moment, _) {
         describe('ExportRawDataController', function () {
-            var controller, rootScope, scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, moduleDataBlockFactory, filesystemService, translationsService,
+            var controller, rootScope, scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService,
                 selectedOrgUnit, selectedDataSet, mockEnrichedDataSet, mockExcludedDataElements, mockDataBlocks;
 
             beforeEach(mocks.inject(function ($rootScope, $q) {
@@ -20,7 +20,10 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
 
                 selectedOrgUnit = {
                     id: 'orgUnitId',
-                    name: 'someModuleName'
+                    name: 'someModuleName',
+                    parent: {
+                        id: 'parentOrgUnitId'
+                    }
                 };
                 selectedDataSet = {
                     id: 'dataSetId',
@@ -115,7 +118,10 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                 translationsService = new TranslationsService();
                 spyOn(translationsService, 'translate').and.callFake(function(objectToTranslate) { return objectToTranslate; });
 
-                controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, moduleDataBlockFactory, filesystemService, translationsService);
+                referralLocationsRepository = new ReferralLocationsRepository();
+                spyOn(referralLocationsRepository, 'get').and.returnValue(utils.getPromise(q, {}));
+
+                controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService);
             }));
 
             it('should fetch sections along with data elements', function () {
@@ -364,6 +370,78 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                 });
             });
 
+            describe('selected dataset is a referral location', function () {
+                var mockReferralLocations, mockDataSet, dataElements, dataSetSection;
+
+                beforeEach(function () {
+                    dataElements = [{
+                        id: 'dataElementId1',
+                        formName: 'referralLocation1',
+                        isIncluded: true
+                    }, {
+                        id: 'dataElementId2',
+                        formName: 'referralLocation2',
+                        isIncluded: true
+                    }];
+
+                    dataSetSection = {
+                        id: 'sectionIdA',
+                        isIncluded: true,
+                        dataElements: dataElements
+                    };
+
+                    mockDataSet = {
+                        name: 'someDataSetName',
+                        isReferralDataset: true,
+                        sections: [dataSetSection]
+                    };
+                    mockReferralLocations = {
+                        orgUnit: 'someOpUnitId',
+                        referralLocation1: {
+                            name: 'some referral location',
+                            isDisabled: false
+                        },
+                        referralLocation2: {
+                            name: 'some referral location 2',
+                            isDisabled: true
+                        }
+                    };
+
+                    scope.selectedDataset = mockDataSet;
+                    datasetRepository.includeDataElements.and.returnValue(utils.getPromise(q, [mockDataSet]));
+                    referralLocationsRepository.get.and.returnValue(utils.getPromise(q, mockReferralLocations));
+                });
+
+                it('should fetch referral locations of the selected orgUnit', function () {
+                    scope.$apply();
+                    expect(referralLocationsRepository.get).toHaveBeenCalledWith(selectedOrgUnit.parent.id);
+                });
+
+                it('should filter out data elements without an enabled alias', function () {
+                    scope.$apply();
+
+                    var dataElementIds = _.map(_.first(scope.sections).dataElements, 'id');
+                    expect(dataElementIds).toEqual(['dataElementId1']);
+                });
+
+                it('should replace the formName with the configured referral location name', function () {
+                    scope.$apply();
+
+                    var dataElementFormNames = _.map(_.first(scope.sections).dataElements, 'formName');
+                    expect(dataElementFormNames).toEqual([mockReferralLocations.referralLocation1.name]);
+                });
+
+                it('should replace the formName even if data elements have been translated', function () {
+                    _.each(dataElements, function (dataElement) {
+                        dataElement.original_formName = dataElement.formName;
+                        dataElement.formName = 'someTranslatedFormName';
+                    });
+                    scope.$apply();
+
+                    var dataElementFormNames = _.map(_.first(scope.sections).dataElements, 'formName');
+                    expect(dataElementFormNames).toEqual([mockReferralLocations.referralLocation1.name]);
+                });
+            });
             describe('exportToCSV', function () {
                 beforeEach(function () {
                     Timecop.install();
