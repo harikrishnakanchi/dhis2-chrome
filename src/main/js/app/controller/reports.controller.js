@@ -312,8 +312,6 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng"], function(
             
             $scope.datasets = _.sortByOrder($scope.datasets, ['name', 'isReportsAvailable'], ['asc' ,'desc']);
 
-            $scope.selectedDataset = _.first($scope.datasets);
-
             return $q.when();
         };
 
