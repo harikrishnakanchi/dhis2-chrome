@@ -165,6 +165,22 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                 expect(dataSetSection.dataElements).toEqual(_.filter(dataElements, 'isIncluded'));
             });
 
+            it('should filter out all the draft dataValues', function () {
+                mockDataBlocks = [{
+                    period: '2016W01',
+                    dataValues: [{
+                        period: '2016W01',
+                        dataElement: 'dataElementId1',
+                        value: '3',
+                        isDraft: true
+                    }]
+                }];
+                moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, mockDataBlocks));
+                scope.$apply();
+
+                expect(scope.dataValuesMap).toEqual({});
+            });
+
             it('should translate the filtered DataSetSections', function () {
                 scope.$apply();
 

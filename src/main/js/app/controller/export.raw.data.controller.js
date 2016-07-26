@@ -18,9 +18,10 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
         var createDataValuesMap = function () {
             return moduleDataBlockFactory.createForModule($scope.orgUnit.id, $scope.weeks).then(function(moduleDataBlocks) {
                 var allDataValues = _.flatten(_.map(moduleDataBlocks, 'dataValues')),
+                    submittedDataValues = _.reject(allDataValues, 'isDraft'),
                     selectedDataSetDataElementIds = _.map(_.flatten(_.map($scope.sections, 'dataElements')), 'id');
 
-                $scope.dataValuesMap = _.transform(allDataValues, function (map, dataValue) {
+                $scope.dataValuesMap = _.transform(submittedDataValues, function (map, dataValue) {
                     if(_.contains(selectedDataSetDataElementIds, dataValue.dataElement)) {
                         var dataDimension = $scope.selectedDataset.isOriginDataset ? dataValue.orgUnit : dataValue.dataElement;
                         map[dataValue.period] = map[dataValue.period] || {};
