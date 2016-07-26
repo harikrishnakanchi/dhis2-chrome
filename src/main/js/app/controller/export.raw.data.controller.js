@@ -6,7 +6,8 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
             value: 1
         }, {
             label: $scope.resourceBundle.lastFourWeeks,
-            value: 4
+            value: 4,
+            default: true
         }, {
             label: $scope.resourceBundle.lastEightWeeks,
             value: 8
@@ -149,7 +150,7 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
         };
 
         $scope.$watchGroup(['orgUnit', 'selectedDataset', 'selectedWeeksToExport'], reloadView);
-        $scope.selectedWeeksToExport = _.first($scope.weeksToExportOptions).value;
+        $scope.selectedWeeksToExport = _.find($scope.weeksToExportOptions, 'default').value;
         $scope.dataValuesMap = {};
     };
 });
