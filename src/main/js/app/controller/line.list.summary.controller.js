@@ -123,7 +123,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
         };
 
         $scope.showPatientOriginInSummaryTable = function() {
-            return $scope.program.name === "Burn Unit" || $scope.program.name === "Cholera Treatment Centre";
+            return $scope.program.name === "Cholera Treatment Centre";
         };
 
         $scope.getDisplayValue = function(dataValue) {
