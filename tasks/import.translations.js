@@ -24,14 +24,35 @@ module.exports = function () {
             locales = lines[1].split('\t').slice(1),
             newTranslations = lines.slice(2);
 
+        var keyPathExists = function (object, keyPath) {
+            var key = keyPath.shift();
+
+            if(key in object) {
+                return keyPath.length == 0 ? true : keyPathExists(object[key], keyPath);
+            } else {
+                return false
+            }
+        };
+
+        var setTranslation = function (object, keyPath, translation) {
+            var key = keyPath.shift();
+
+            if(keyPath.length == 0) {
+                object[key] = translation;
+            } else {
+                object[key] = object[key] || {};
+                setTranslation(object[key], keyPath, translation);
+            }
+        };
+
         newTranslations.forEach(function(newTranslation) {
             var values = newTranslation.split('\t'),
                 translationKey = values[0],
                 translationValues = values.slice(1);
 
-            if(translationKey in translations.en) {
+            if(keyPathExists(translations.en, translationKey.split('.'))) {
                 locales.forEach(function (locale, index) {
-                    translations[locale][translationKey] = translationValues[index];
+                    setTranslation(translations[locale], translationKey.split('.'), translationValues[index]);
                 });
             } else if(translationKey) {
                 console.log('Translation key does not exist: ' + translationKey);
