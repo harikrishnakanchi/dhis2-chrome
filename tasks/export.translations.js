@@ -5,15 +5,26 @@ module.exports = function () {
     var en = require(path + '_en.json'),
         fr = require(path + '_fr.json'),
         ar = require(path + '_ar.json');
-    var keys = Object.keys(en);
     var content = 'Key\tEnglish\tFrench\tArabic\r\nlocale\ten\tfr\tar';
-    keys.forEach(function(key) {
-        content += '\r\n';
-        content += key + '\t';
-        content += (en[key] || '') + '\t';
-        content += (fr[key] || '') + '\t';
-        content += (ar[key] || '');
-    });
+
+    var printTranslations = function(en, fr, ar, parentKeys) {
+        var keys = Object.keys(en);
+
+        keys.forEach(function (key) {
+            if(typeof en[key] == 'object') {
+                printTranslations(en[key], fr[key] || {}, ar[key] || {}, parentKeys.concat(key));
+            } else {
+                content += '\r\n';
+                content += parentKeys.concat(key).join('.') + '\t';
+                content += (en[key] || '') + '\t';
+                content += (fr[key] || '') + '\t';
+                content += (ar[key] || '');
+            }
+        });
+    };
+
+    printTranslations(en, fr, ar, []);
+
     fs.writeFile('translations.tsv', content, function () {
         console.log('Generated translations.tsv');
     });
