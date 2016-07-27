@@ -21,7 +21,6 @@ require.config({
         "JSZip": "lib/jszip/jszip",
         "sjcl": "lib/sjcl/sjcl",
         "saveSvgAsPng": "lib/save-svg-as-png/saveSvgAsPng",
-        "ng-csv": "lib/ng-csv/ng-csv.min",
         "angular-sanitize": "lib/angular-sanitize/angular-sanitize",
 
         //3rd party angular modules
@@ -253,9 +252,6 @@ require.config({
         },
         'angular-sanitize': {
             deps: ["angular"]
-        },
-        'ng-csv': {
-            deps: ["angular", "angular-sanitize"]
         }
     }
 });

@@ -1,7 +1,7 @@
 define(["angular", "Q", "services", "directives", "dbutils", "controllers", "repositories", "factories", "migrator", "migrations", "properties", "queuePostProcessInterceptor", "monitors", "helpers", "indexedDBLogger", "authenticationUtils", "transformers",
         "angular-route", "ng-i18n", "angular-indexedDB", "hustleModule", "angular-ui-tabs", "angular-ui-accordion", "angular-ui-collapse", "angular-ui-transition", "angular-ui-weekselector",
         "angular-treeview", "angular-ui-modal", "angular-multiselect", "angular-ui-notin", "angular-ui-equals", "angular-ui-dropdown", "angular-filter", "angucomplete-alt", "angular-nvd3", "angular-ui-tooltip",
-        "angular-ui-bindHtml", "angular-ui-position", "angular-sanitize", "ng-csv"
+        "angular-ui-bindHtml", "angular-ui-position", "angular-sanitize"
 
     ],
     function(angular, Q, services, directives, dbutils, controllers, repositories, factories, migrator, migrations, properties, queuePostProcessInterceptor, monitors, helpers, indexedDBLogger, authenticationUtils, transformers) {
@@ -9,7 +9,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
             var app = angular.module('PRAXIS', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs", "ui.bootstrap.transition", "ui.bootstrap.collapse",
                 "ui.bootstrap.accordion", "ui.weekselector", "angularTreeview", "ui.bootstrap.modal", "ui.bootstrap.dropdown",
                 "ui.multiselect", "ui.notIn", "ui.equals", "hustle", "angular.filter", "angucomplete-alt", "nvd3", "ui.bootstrap.tooltip", "ui.bootstrap.position", "ui.bootstrap.bindHtml",
-                "ngSanitize", "ngCsv"
+                "ngSanitize"
             ]);
 
             services.init(app);
