@@ -72,8 +72,8 @@
                                 {{resourceBundle.newCaseBtnValue}}
                             </a>
                             <button class="btn btn-primary" ng-class="layoutDirection.direction != 'rtl' ? 'pull-right' : 'pull-left'"
-                                    ng-if="filterBy === 'caseNumber' || filterBy === 'dateRange'"
-                                    type="button" ng-click="exportToCSV()"> {{ resourceBundle.exportRawData }}</button>
+                                    ng-if="filterBy === 'caseNumber' || filterBy === 'dateRange'    "
+                                    type="button" ng-click="exportToCSV()" ng-disabled="!events.length"> {{ resourceBundle.exportRawData }}</button>
                         </div>
                     </div>
                     <div>
