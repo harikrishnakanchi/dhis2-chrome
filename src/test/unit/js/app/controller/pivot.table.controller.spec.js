@@ -160,7 +160,7 @@ define(["angularMocks", "utils", "lodash", "moment", "pivotTableController", "ti
                 });
 
                 it("should get headers if category is present", function () {
-                    var expected = 'Data Element,Category,July 2015 (4 weeks),August 2015 (5 weeks)';
+                    var expected = '"Data Element","Category","July 2015 (4 weeks)","August 2015 (5 weeks)"';
                     expect(csvContent).toContain(expected);
                 });
 
@@ -168,17 +168,17 @@ define(["angularMocks", "utils", "lodash", "moment", "pivotTableController", "ti
                     scope.isCategoryPresent = false;
                     scope.exportToCSV();
                     scope.$apply();
-                    var expected = 'Data Element,July 2015 (4 weeks),August 2015 (5 weeks)';
+                    var expected = '"Data Element","July 2015 (4 weeks)","August 2015 (5 weeks)"';
 
                     expect(csvContent).toContain(expected);
                 });
 
                 it("should get data for csv file when categories are present", function () {
                     var expectedDataValues =
-                        'New Consultations,1-23 months,1387,215\n' +
-                        'New Consultations,24-59 months,264,201\n' +
-                        'Follow-up Consultations,1-23 months,1772,\n' +
-                        'Follow-up Consultations,24-59 months,6433,';
+                        '"New Consultations","1-23 months",1387,215\n' +
+                        '"New Consultations","24-59 months",264,201\n' +
+                        '"Follow-up Consultations","1-23 months",1772,\n' +
+                        '"Follow-up Consultations","24-59 months",6433,';
 
                     expect(csvContent).toContain(expectedDataValues);
                 });
@@ -228,7 +228,7 @@ define(["angularMocks", "utils", "lodash", "moment", "pivotTableController", "ti
                     pivotTableController = new PivotTableController(scope, rootScope, translationsService, filesystemService);
                     scope.exportToCSV();
                     scope.$apply();
-                    var expectedDataValues = 'New Consultations,215,45';
+                    var expectedDataValues = '"New Consultations",215,45';
 
                     expect(csvContent).toContain(expectedDataValues);
                 });

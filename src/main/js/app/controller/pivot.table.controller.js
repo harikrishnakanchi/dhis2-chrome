@@ -21,10 +21,14 @@ define(["lodash", "moment"], function(_, moment) {
             var DELIMITER = ',',
                 NEW_LINE = '\n';
 
+            var escapeString = function (string) {
+                return '"' + string + '"';
+            };
+
             var getCSVHeaders = function() {
-                var headers = [$scope.resourceBundle.dataElement];
+                var headers = [escapeString($scope.resourceBundle.dataElement)];
                 if ($scope.isCategoryPresent)
-                    headers.push($scope.resourceBundle.category);
+                    headers.push(escapeString($scope.resourceBundle.category));
                 _.each($scope.periods, function (period) {
                     var month = $scope.resourceBundle[$scope.data.metaData.names[period].split(' ')[0]];
                     var year = $scope.data.metaData.names[period].split(' ')[1];
@@ -32,9 +36,9 @@ define(["lodash", "moment"], function(_, moment) {
 
                     if ($scope.showWeeks) {
                         var numberofWeeks = getNumberOfISOWeeksInMonth(period);
-                        headers.push(name + " (" + numberofWeeks + " " + $scope.resourceBundle.weeksLabel + ")");
+                        headers.push(escapeString(name + " (" + numberofWeeks + " " + $scope.resourceBundle.weeksLabel + ")"));
                     } else {
-                        headers.push(name);
+                        headers.push(escapeString(name));
                     }
                 });
                 return headers.join(DELIMITER);
@@ -52,8 +56,8 @@ define(["lodash", "moment"], function(_, moment) {
                     if ($scope.isCategoryPresent) {
                         _.each(getSortedCategories(), function(category) {
                             var value = [];
-                            value.push($scope.getDataElementName(datum.dataElementName));
-                            value.push(category.name);
+                            value.push(escapeString($scope.getDataElementName(datum.dataElementName)));
+                            value.push(escapeString(category.name));
                             _.each($scope.periods, function(period) {
                                 value.push($scope.getValue(category.id, datum.dataElement, period));
                             });
@@ -61,7 +65,7 @@ define(["lodash", "moment"], function(_, moment) {
                         });
                     } else {
                         var value = [];
-                        value.push($scope.getDataElementName(datum.dataElementName));
+                        value.push(escapeString($scope.getDataElementName(datum.dataElementName)));
                         _.each($scope.periods, function(period) {
                             value.push($scope.getValue(datum.category, datum.dataElement, period));
                         });
