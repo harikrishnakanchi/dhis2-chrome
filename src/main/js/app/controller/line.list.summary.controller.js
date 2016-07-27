@@ -124,6 +124,8 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
         };
 
         $scope.getDisplayValue = function(dataValue) {
+            var dataValueType = dataValue && dataValue.valueType;
+
             if (!dataValue.value) return "";
 
             if (_.endsWith(dataValue.code, "_referralLocations"))
@@ -134,7 +136,15 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     return o.code === dataValue.value;
                 });
                 return option ? option.name : "";
-            } else {
+            }
+            if (dataValueType === 'DATE') {
+                return $scope.getFormattedDate(dataValue.value);
+            }
+
+            if (dataValueType === 'BOOLEAN') {
+                return dataValue.value === 'true' ? $scope.resourceBundle.yesLabel : $scope.resourceBundle.noLabel;
+            }
+            else {
                 return dataValue.value;
             }
         };

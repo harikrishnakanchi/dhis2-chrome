@@ -52,7 +52,8 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                     deleteApprovalsDesc: 'restart approval process for ',
                     eventSubmitAndApproveSuccess: 'some success message',
                     eventSubmitSuccess: 'some other success message',
-                    eventDateLabel: 'Event Date'
+                    eventDateLabel: 'Event Date',
+                    yesLabel: 'YES'
                 };
 
                 scope.locale = "en";
@@ -343,31 +344,47 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                 expect(programEventRepository.getSubmitableEventsFor).toHaveBeenCalled();
             });
 
-            it("should get data value", function() {
-                var actualValue = scope.getDisplayValue({
-                    "value": "Case123"
+            describe('getDisplayValue', function() {
+                it("should get data value", function() {
+                    var actualValue = scope.getDisplayValue({
+                        "value": "Case123"
+                    });
+                    expect(actualValue).toEqual("Case123");
                 });
-                expect(actualValue).toEqual("Case123");
-            });
 
-            it("should get option names as data value if options are present", function() {
-                var dataValue = {
-                    "id": "dv1",
-                    "optionSet": {
-                        "options": [{
-                            "id": "Code1",
-                            "code": "Code1",
-                            "name": "Male"
-                        }, {
-                            "id": "Code2",
-                            "code": "Code2",
-                            "name": "Female"
-                        }]
-                    },
-                    "value": "Code1"
-                };
-                var actualValue = scope.getDisplayValue(dataValue);
-                expect(actualValue).toEqual("Male");
+                it('should format value if it is a date type', function() {
+                    var mockDataValue = { value : "2016-07-07T00:00:00.000+0000", valueType: 'DATE'};
+                    var actualValue = scope.getDisplayValue(mockDataValue);
+
+                    expect(actualValue).toEqual("7/7/2016");
+                });
+
+                it('should format value if it is a boolean type', function() {
+                    var mockDataValue = { value : "true", valueType: 'BOOLEAN'};
+                    var actualValue = scope.getDisplayValue(mockDataValue);
+
+                    expect(actualValue).toEqual(scope.resourceBundle.yesLabel);
+                });
+
+                it("should get option names as data value if options are present", function() {
+                    var dataValue = {
+                        "id": "dv1",
+                        "optionSet": {
+                            "options": [{
+                                "id": "Code1",
+                                "code": "Code1",
+                                "name": "Male"
+                            }, {
+                                "id": "Code2",
+                                "code": "Code2",
+                                "name": "Female"
+                            }]
+                        },
+                        "value": "Code1"
+                    };
+                    var actualValue = scope.getDisplayValue(dataValue);
+                    expect(actualValue).toEqual("Male");
+                });
             });
 
             it("should filter events by case number", function() {

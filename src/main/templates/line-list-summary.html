@@ -125,10 +125,7 @@
                                             <td>{{ getFormattedDate(event.eventDate) }}</td>
                                             <td ng-if="showPatientOriginInSummaryTable()">{{ getOriginName(event.orgUnit)}}</td>
                                             <td ng-repeat="dataValue in event.dataValues">
-                                                <span ng-if="dataValue.type==='date'">{{ getFormattedDate(dataValue.value) }}</span>
-                                                <span ng-if="dataValue.type==='bool' &amp;&amp; dataValue.value==='true'">{{ resourceBundle.yesLabel }}</span>
-                                                <span ng-if="dataValue.type==='bool' &amp;&amp; dataValue.value==='false'">{{ resourceBundle.noLabel }}</span>
-                                                <span ng-if="dataValue.type !=='date' &amp;&amp; dataValue.type !=='bool'">{{ getDisplayValue(dataValue) }}</span>
+                                                <span>{{ getDisplayValue(dataValue) }}</span>
                                             </td>
                                             <td>
                                                 <a href title="Submitted" ng-if="!event.localStatus || event.localStatus==='READY_FOR_DHIS'" class="submitted disabled-link"><span class="glyphicon glyphicon-ok glyphicon-green"></span></a>
