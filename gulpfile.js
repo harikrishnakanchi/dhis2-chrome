@@ -14,7 +14,8 @@ var rename = require('gulp-rename');
 var path = require('path');
 var preprocess = require("gulp-preprocess");
 var zip = require('gulp-zip');
-var fs = require('fs');
+var exportTranslations = require('./tasks/export.translations');
+var importTranslations = require('./tasks/import.translations');
 
 var baseUrl = argv.url || "http://localhost:8080";
 var baseIntUrl = argv.int_url || baseUrl;
@@ -144,65 +145,5 @@ gulp.task('zip', ['less', 'config', 'download-metadata'], function() {
         .pipe(gulp.dest(''));
 });
 
-gulp.task('export-translations', function () {
-    var path = './src/main/js/app/i18n/resourceBundle';
-    var en = require(path + '_en.json'),
-        fr = require(path + '_fr.json'),
-        ar = require(path + '_ar.json');
-    var keys = Object.keys(en);
-    var content = 'Key\tEnglish\tFrench\tArabic\r\nlocale\ten\tfr\tar';
-    keys.forEach(function(key) {
-        content += '\r\n';
-        content += key + '\t';
-        content += (en[key] || '') + '\t';
-        content += (fr[key] || '') + '\t';
-        content += (ar[key] || '');
-    });
-    fs.writeFile('translations.tsv', content, function () {
-        console.log('Generated translations.tsv');
-    });
-});
-
-gulp.task('import-translations', function () {
-    if(!argv.tsvFilePath) {
-        console.log('Please specify TSV file path.\nUsage: gulp import-translations --tsvFilePath fileName.tsv');
-        return;
-    }
-
-    var newTranslationsFilepath = argv.tsvFilePath,
-        resourceBundlePath = './src/main/js/app/i18n/resourceBundle_',
-        translations = {
-            en: require(resourceBundlePath + 'en.json'),
-            fr: require(resourceBundlePath + 'fr.json'),
-            ar: require(resourceBundlePath + 'ar.json')
-        };
-
-    fs.readFile(newTranslationsFilepath, function (err, fileContents) {
-        if(err) throw new Error(err);
-
-        var contents = fileContents.toString('utf8'),
-            lines = contents.split('\r\n'),
-            locales = lines[1].split('\t').slice(1),
-            newTranslations = lines.slice(2);
-
-        newTranslations.forEach(function(newTranslation) {
-            var values = newTranslation.split('\t'),
-                translationKey = values[0],
-                translationValues = values.slice(1);
-
-            if(translationKey in translations.en) {
-                locales.forEach(function (locale, index) {
-                    translations[locale][translationKey] = translationValues[index];
-                });
-            } else if(translationKey) {
-                console.log('Translation key does not exist: ' + translationKey);
-            }
-        });
-
-        locales.forEach(function (locale) {
-            fs.writeFile(resourceBundlePath + locale + '.json', JSON.stringify(translations[locale], undefined, 4), function () {
-                console.log('Updated translations for locale: ' + locale);
-            });
-        });
-    });
-});
+gulp.task('export-translations', exportTranslations);
+gulp.task('import-translations', importTranslations);
