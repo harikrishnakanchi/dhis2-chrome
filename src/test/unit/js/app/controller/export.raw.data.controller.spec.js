@@ -458,7 +458,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
 
                     scope.exportToCSV();
 
-                    var expectedFilename = [selectedOrgUnit.name, selectedDataSet.name, 'export', currentTime.format('YYYYMMDD'), 'csv'].join('.');
+                    var expectedFilename = [selectedOrgUnit.name, selectedDataSet.name, 'export', currentTime.format('YYYYMMDD')].join('_');
                     expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
                 });
 
