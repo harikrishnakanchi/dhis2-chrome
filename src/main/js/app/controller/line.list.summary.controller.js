@@ -44,6 +44,14 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             scrollToTop();
         };
 
+        var translateAndFilterEventData = function (events) {
+            var translatedEvents = translationsService.translate(events);
+            $scope.events = _.map(translatedEvents, function (event) {
+                event.dataValues = _.filter(event.dataValues, 'showInEventSummary');
+                return event;
+            });
+        };
+
         var loadEventsView = function() {
             $scope.eventForm = {
                 allEvents: []
@@ -53,10 +61,8 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 $scope.eventListTitle = $scope.resourceBundle.incompleteEventsTitle;
                 $scope.noCasesMsg = $scope.resourceBundle.noIncompleteEventsFound;
 
-                return programEventRepository.getDraftEventsFor($scope.program.id, _.pluck($scope.originOrgUnits, "id")).then(function(events) {
-                    var translatedEvents = translationsService.translate(events);
-                    $scope.events = translatedEvents;
-                });
+                return programEventRepository.getDraftEventsFor($scope.program.id, _.pluck($scope.originOrgUnits, "id"))
+                    .then(translateAndFilterEventData);
             }
             if ($scope.filterBy === "readyToSubmit") {
                 var acc = [];
@@ -73,9 +79,8 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                                 acc.push(event);
                         }
                     });
-                    var translatedEvents = translationsService.translate(acc);
-                    $scope.events = translatedEvents;
-                });
+                    return acc;
+                }).then(translateAndFilterEventData);
             }
             if ($scope.filterBy === "dateRange") {
                 var startDate = $location.search().startDate;
@@ -271,11 +276,11 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
 
         $scope.filterByCaseNumber = function() {
             $scope.loadingResults = true;
-            programEventRepository.findEventsByCode($scope.program.id, _.pluck($scope.originOrgUnits, "id"), $scope.filterParams.caseNumber).then(function(events) {
-                var translatedEvents = translationsService.translate(events);
-                $scope.events = translatedEvents;
-                $scope.loadingResults = false;
-            });
+            programEventRepository.findEventsByCode($scope.program.id, _.pluck($scope.originOrgUnits, "id"), $scope.filterParams.caseNumber)
+                .then(translateAndFilterEventData)
+                .then(function() {
+                    $scope.loadingResults = false;
+                });
         };
 
         $scope.filterByDateRange = function() {
@@ -283,11 +288,11 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             var startDate = moment($scope.filterParams.startDate).format("YYYY-MM-DD");
             var endDate = moment($scope.filterParams.endDate).format("YYYY-MM-DD");
 
-            programEventRepository.findEventsByDateRange($scope.program.id, _.pluck($scope.originOrgUnits, "id"), startDate, endDate).then(function(events) {
-                var translatedEvents = translationsService.translate(events);
-                $scope.events = translatedEvents;
-                $scope.loadingResults = false;
-            });
+            programEventRepository.findEventsByDateRange($scope.program.id, _.pluck($scope.originOrgUnits, "id"), startDate, endDate)
+                .then(translateAndFilterEventData)
+                .then(function() {
+                    $scope.loadingResults = false;
+                });
 
         };
 
