@@ -316,7 +316,8 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             };
 
             var csvContent = _.flatten([buildHeaders(), _.map($scope.events, buildData)]).join(NEW_LINE);
-            return filesystemService.promptAndWriteFile("file.csv", new Blob([csvContent], { type: 'text/csv' }), filesystemService.FILE_TYPE_OPTIONS.CSV);
+            var fileName = [$scope.selectedModuleName, '_summary_', moment().format('YYYYMMDD'), '.csv'].join('');
+            return filesystemService.promptAndWriteFile(fileName, new Blob([csvContent], { type: 'text/csv' }), filesystemService.FILE_TYPE_OPTIONS.CSV);
         };
 
         $scope.getOriginName = function(orgUnitId) {

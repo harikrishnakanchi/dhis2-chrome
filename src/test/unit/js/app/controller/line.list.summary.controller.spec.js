@@ -1,9 +1,9 @@
-define(["lineListSummaryController", "angularMocks", "utils", "timecop", "programRepository", "programEventRepository", "excludedDataElementsRepository",
+define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment", "programRepository", "programEventRepository", "excludedDataElementsRepository",
         "orgUnitRepository", "approvalDataRepository", "referralLocationsRepository", "dataSyncFailureRepository", "translationsService", "filesystemService"
     ],
-    function(LineListSummaryController, mocks, utils, timecop, ProgramRepository, ProgramEventRepository, ExcludedDataElementsRepository, OrgUnitRepository, ApprovalDataRepository, ReferralLocationsRepository, DataSyncFailureRepository, TranslationsService, FilesystemService) {
+    function(LineListSummaryController, mocks, utils, timecop, moment, ProgramRepository, ProgramEventRepository, ExcludedDataElementsRepository, OrgUnitRepository, ApprovalDataRepository, ReferralLocationsRepository, DataSyncFailureRepository, TranslationsService, FilesystemService) {
         describe("lineListSummaryController ", function() {
-            var scope, q, hustle, timeout, fakeModal, anchorScroll, location, routeParams, window,
+            var scope, q, hustle, timeout, fakeModal, anchorScroll, location, routeParams, window, currentTime,
                 lineListSummaryController,
                 programRepository, programEventRepository, referralLocationsRepository, approvalDataRepository, excludedDataElementsRepository, orgUnitRepository, dataSyncFailureRepository, translationsService,
                 systemSettings, currentModule, originOrgUnits, program, project, mockEvent, filesystemService;
@@ -39,8 +39,9 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                     result: utils.getPromise(q, {})
                 });
 
+                currentTime = moment('2014-10-29T12:43:54.972Z');
                 Timecop.install();
-                Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
+                Timecop.freeze(currentTime);
 
                 scope.resourceBundle = {
                     syncModuleDataBlockDesc: 'some description',
@@ -417,6 +418,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                         dataValues: [mockDataValue]
                     });
                     scope.events = [mockEvent];
+                    scope.selectedModuleName = 'someModuleName';
                     scope.exportToCSV();
                 });
 
@@ -435,7 +437,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                 });
 
                 it('should prompt user to export data values into CSV', function () {
-                    var expectedFilename = "file.csv";
+                    var expectedFilename = scope.selectedModuleName + '_summary_' + currentTime.format('YYYYMMDD') + '.csv';
                     expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
                 });
 
