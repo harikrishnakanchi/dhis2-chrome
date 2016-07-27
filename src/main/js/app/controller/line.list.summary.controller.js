@@ -83,10 +83,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 $scope.filterParams.startDate = moment(startDate).startOf('day').toDate();
                 $scope.filterParams.endDate = moment(endDate).endOf('day').toDate();
 
-                return programEventRepository.findEventsByDateRange($scope.program.id, _.pluck($scope.originOrgUnits, "id"), startDate, endDate).then(function(events) {
-                    var translatedEvents = translationsService.translate(events);
-                    $scope.events = translatedEvents;
-                });
+                $scope.filterByDateRange();
             }
 
             if ($scope.filterBy === "caseNumber") {
