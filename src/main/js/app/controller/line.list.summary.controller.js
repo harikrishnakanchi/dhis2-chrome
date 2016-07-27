@@ -1,6 +1,6 @@
 define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, properties, orgUnitMapper) {
     return function($scope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, programRepository, programEventRepository, excludedDataElementsRepository,
-        orgUnitRepository, approvalDataRepository, referralLocationsRepository, dataSyncFailureRepository, translationsService) {
+        orgUnitRepository, approvalDataRepository, referralLocationsRepository, dataSyncFailureRepository, translationsService, filesystemService) {
 
         $scope.filterParams = {};
         $scope.currentUrl = $location.path();
@@ -279,7 +279,6 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 $scope.events = translatedEvents;
                 $scope.loadingResults = false;
             });
-
         };
 
         $scope.filterByDateRange = function() {
@@ -293,6 +292,31 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 $scope.loadingResults = false;
             });
 
+        };
+
+        $scope.exportToCSV = function () {
+            var NEW_LINE = '\n',
+                DELIMITER = ',';
+
+            var buildCSVRow = function (initialValue, values) {
+                return [initialValue].concat(values).join(DELIMITER);
+            };
+
+            var buildHeaders = function () {
+                var event = _.first($scope.events);
+                var eventDateLabel = $scope.resourceBundle.eventDateLabel;
+                var formNames = _.map(event.dataValues, 'formName');
+                return buildCSVRow(eventDateLabel, formNames);
+            };
+
+            var buildData = function (event) {
+                var values = _.map(event.dataValues, $scope.getDisplayValue);
+                var eventDate = event.eventDate;
+                return buildCSVRow(eventDate, values);
+            };
+
+            var csvContent = _.flatten([buildHeaders(), _.map($scope.events, buildData)]).join(NEW_LINE);
+            return filesystemService.promptAndWriteFile("file.csv", new Blob([csvContent], { type: 'text/csv' }), filesystemService.FILE_TYPE_OPTIONS.CSV);
         };
 
         $scope.getOriginName = function(orgUnitId) {

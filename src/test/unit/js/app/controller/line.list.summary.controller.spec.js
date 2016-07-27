@@ -1,12 +1,12 @@
 define(["lineListSummaryController", "angularMocks", "utils", "timecop", "programRepository", "programEventRepository", "excludedDataElementsRepository",
-        "orgUnitRepository", "approvalDataRepository", "referralLocationsRepository", "dataSyncFailureRepository", "translationsService"
+        "orgUnitRepository", "approvalDataRepository", "referralLocationsRepository", "dataSyncFailureRepository", "translationsService", "filesystemService"
     ],
-    function(LineListSummaryController, mocks, utils, timecop, ProgramRepository, ProgramEventRepository, ExcludedDataElementsRepository, OrgUnitRepository, ApprovalDataRepository, ReferralLocationsRepository, DataSyncFailureRepository, TranslationsService) {
+    function(LineListSummaryController, mocks, utils, timecop, ProgramRepository, ProgramEventRepository, ExcludedDataElementsRepository, OrgUnitRepository, ApprovalDataRepository, ReferralLocationsRepository, DataSyncFailureRepository, TranslationsService, FilesystemService) {
         describe("lineListSummaryController ", function() {
             var scope, q, hustle, timeout, fakeModal, anchorScroll, location, routeParams, window,
                 lineListSummaryController,
                 programRepository, programEventRepository, referralLocationsRepository, approvalDataRepository, excludedDataElementsRepository, orgUnitRepository, dataSyncFailureRepository, translationsService,
-                systemSettings, currentModule, originOrgUnits, program, project, mockEvent;
+                systemSettings, currentModule, originOrgUnits, program, project, mockEvent, filesystemService;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout, $location, $window) {
@@ -50,7 +50,8 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                     uploadCompletionDataDesc: 'approve data at project level for ',
                     deleteApprovalsDesc: 'restart approval process for ',
                     eventSubmitAndApproveSuccess: 'some success message',
-                    eventSubmitSuccess: 'some other success message'
+                    eventSubmitSuccess: 'some other success message',
+                    eventDateLabel: 'Event Date'
                 };
 
                 scope.locale = "en";
@@ -91,6 +92,9 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                 spyOn(programEventRepository, 'markEventsAsSubmitted').and.callFake(function(data) {
                     return utils.getPromise(q, data);
                 });
+
+                filesystemService = new FilesystemService();
+                spyOn(filesystemService, 'promptAndWriteFile').and.returnValue(utils.getPromise(q, {}));
 
                 systemSettings = {
                     "orgUnit": "ou1",
@@ -169,12 +173,13 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
             });
 
             var createLineListSummary = function () {
-                lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, excludedDataElementsRepository, orgUnitRepository, approvalDataRepository, referralLocationsRepository, dataSyncFailureRepository, translationsService);
+                lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, excludedDataElementsRepository, orgUnitRepository, approvalDataRepository, referralLocationsRepository, dataSyncFailureRepository, translationsService, filesystemService);
             };
 
             var createMockEvent = function (options) {
                 return _.merge({
                     event: 'someEventId',
+                    eventDate: 'someEventDate',
                     orgUnit: 'someOrgUnitId',
                     period: '2016W26'
                 }, options);
@@ -190,6 +195,13 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                     locale: 'en',
                     desc: scope.resourceBundle.syncModuleDataBlockDesc + period + ', ' + module.name
                 };
+            };
+
+            var mockEventDataValue = function (options) {
+                return _.merge({
+                    formName: 'age',
+                    value: 'someValue'
+                }, options);
             };
 
             it("should set projectIsAutoApproved on scope on init", function() {
@@ -384,5 +396,49 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "progra
                 expect(scope.events).toEqual([mockEvent]);
             });
 
+            describe('exportToCSV', function() {
+                var csvContent, mockDataValue, mockEvent;
+
+                beforeEach(function () {
+                    spyOn(scope, "getDisplayValue").and.callFake(function (data) {
+                        return data.value;
+                    });
+
+                    spyOn(window, 'Blob').and.callFake(function (contentArray) {
+                        this.value = contentArray.join();
+                    });
+
+                    filesystemService.promptAndWriteFile.and.callFake(function (fileName, blob) {
+                        csvContent = blob.value;
+                    });
+
+                    mockDataValue = mockEventDataValue();
+                    mockEvent = createMockEvent({
+                        dataValues: [mockDataValue]
+                    });
+                    scope.events = [mockEvent];
+                    scope.exportToCSV();
+                });
+
+                it('should build headers for listed events while exporting to CSV', function () {
+                    var expectedCsvContent = [scope.resourceBundle.eventDateLabel, mockDataValue.formName].join(',');
+                    expect(csvContent).toContain(expectedCsvContent);
+                });
+
+                it('should contain data for listed events while exporting data', function () {
+                    var expectedCsvContent = [mockEvent.eventDate, mockDataValue.value].join(',');
+                    expect(csvContent).toContain(expectedCsvContent);
+                });
+
+                it('should format data values in CSV', function () {
+                    expect(scope.getDisplayValue.calls.argsFor(0)).toContain(mockDataValue);
+                });
+
+                it('should prompt user to export data values into CSV', function () {
+                    var expectedFilename = "file.csv";
+                    expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
+                });
+
+            });
         });
     });
