@@ -19,6 +19,7 @@
         "moment": "2.9.0",
         "js-md5": "1.1.0",
         "angularjs-hustle": "https://github.com/DWB-eHealth/angularjs-hustle.git#v0.3.0",
+        "angular-sanitize": "~1",
         "jszip": "2.5.0",
         "sjcl": "1.0.2",
         "angular-nvd3": "~1.0.0",
