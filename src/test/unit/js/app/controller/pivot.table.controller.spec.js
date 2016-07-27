@@ -1,11 +1,12 @@
-define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "translationsService"], function(mocks, lodash, moment, PivotTableController, timecop, TranslationsService) {
-    describe("pivotTableControllerSpec", function() {
+define(["angularMocks", "utils", "lodash", "moment", "pivotTableController", "timecop", "translationsService", "filesystemService"], function (mocks, utils, lodash, moment, PivotTableController, timecop, TranslationsService, FilesystemService) {
+    describe("pivotTableControllerSpec", function () {
 
-        var scope, rootScope, pivotTableController, translationsService;
+        var scope, rootScope, q, pivotTableController, translationsService, filesystemService;
 
-        beforeEach(mocks.inject(function($rootScope) {
+        beforeEach(mocks.inject(function ($rootScope, $q) {
             rootScope = $rootScope;
             scope = $rootScope.$new();
+            q = $q;
 
             Timecop.install();
             Timecop.freeze(new Date("2015-10-29T12:43:54.972Z"));
@@ -116,7 +117,10 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
             translationsService = new TranslationsService();
             spyOn(translationsService, "translate").and.returnValue(scope.definition.categoryDimensions[0].categoryOptions);
 
-            pivotTableController = new PivotTableController(scope, rootScope, translationsService);
+            filesystemService = new FilesystemService();
+            spyOn(filesystemService, 'promptAndWriteFile').and.returnValue(utils.getPromise(q, {}));
+
+            pivotTableController = new PivotTableController(scope, rootScope, translationsService, filesystemService);
             scope.$apply();
         }));
 
@@ -125,138 +129,109 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
             Timecop.uninstall();
         });
 
-        describe("Export as csv", function() {
-            it("should get csv file name in expected format", function() {
-                expect(scope.getCsvFileName()).toEqual("NewConsultations_Consultations_29-Oct-2015.csv");
+        describe("Export as csv", function () {
+            it('should prompt the user to download tabular data to CSV with suggested filename', function () {
+                scope.exportToCSV();
+                expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith('NewConsultations.Consultations.29-Oct-2015.csv', jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
             });
 
-            it("should get headers if category is present", function() {
-                scope.resourceBundle = {
-                    weeksLabel: "weeks",
-                    July: "July",
-                    August: "August",
-                    October: "October",
-                    September: "September",
-                    dataElement: "Data Element",
-                    category: "Category"
-                };
-                var expected = ['Data Element', 'Category', 'July 2015 (4 weeks)', 'August 2015 (5 weeks)'];
-                expect(scope.getHeaders()).toEqual(expected);
-            });
+            describe('CSV Contents', function () {
+                var csvContent;
+                beforeEach(function () {
+                    spyOn(window, 'Blob').and.callFake(function (contentArray) {
+                        this.value = contentArray.join();
+                    });
 
-            it("should get headers if category not present", function() {
-                scope.resourceBundle = {
-                    weeksLabel: "weeks",
-                    July: "July",
-                    August: "August",
-                    October: "October",
-                    September: "September",
-                    dataElement: "Data Element",
-                    category: "Category"
-                };
-                scope.isCategoryPresent = false;
-                scope.$apply();
-                var expected = ['Data Element', 'July 2015 (4 weeks)', 'August 2015 (5 weeks)'];
+                    filesystemService.promptAndWriteFile.and.callFake(function (fileName, blob) {
+                        csvContent = blob.value;
+                    });
 
-                expect(scope.getHeaders()).toEqual(expected);
-            });
+                    scope.resourceBundle = {
+                        weeksLabel: "weeks",
+                        July: "July",
+                        August: "August",
+                        October: "October",
+                        September: "September",
+                        dataElement: "Data Element",
+                        category: "Category"
+                    };
 
-            it("should get data for csv file when categories are present", function() {
-                var expectedDataValues = [{
-                    "Data Element": 'New Consultations',
-                    "Category": '1-23 months',
-                    "July 2015": 1387,
-                    "August 2015": 215
-                }, {
-                    "Data Element": 'New Consultations',
-                    "Category": '24-59 months',
-                    "July 2015": 264,
-                    "August 2015": 201
-                }, {
-                    "Data Element": 'Follow-up Consultations',
-                    "Category": '1-23 months',
-                    "July 2015": 1772,
-                    "August 2015": undefined
-                }, {
-                    "Data Element": 'Follow-up Consultations',
-                    "Category": '24-59 months',
-                    "July 2015": 6433,
-                    "August 2015": undefined
-                }];
+                    scope.exportToCSV();
+                });
 
-                expect(scope.getData()).toEqual(expectedDataValues);
-            });
+                it("should get headers if category is present", function () {
+                    var expected = 'Data Element,Category,July 2015 (4 weeks),August 2015 (5 weeks)';
+                    expect(csvContent).toContain(expected);
+                });
 
-            it("should get data for csv file when categories are not present", function() {
-                scope.resourceBundle = {
-                    weeksLabel: "weeks",
-                    July: "July",
-                    August: "August",
-                    October: "October",
-                    September: "September"
-                };
-                scope.data = {
-                    "headers": [{
-                        "name": "dx",
-                        "column": "Data",
-                        "type": "java.lang.String",
-                        "hidden": false,
-                        "meta": true
-                    }, {
-                        "name": "pe",
-                        "column": "Period",
-                        "type": "java.lang.String",
-                        "hidden": false,
-                        "meta": true
-                    }, {
-                        "name": "value",
-                        "column": "Value",
-                        "type": "java.lang.Double",
-                        "hidden": false,
-                        "meta": false
-                    }],
-                    "metaData": {
-                        "pe": ["201508", "201509"],
-                        "names": {
-                            "dx": "Data",
-                            "a2cf79e8f13": "MSF",
-                            "201508": "August 2015",
-                            "201509": "September 2015",
-                            "a0e7d3973e3": "New Consultations - Consultations - Out Patient Department - Pediatric",
-                            "pe": "Period"
-                        }
-                    },
-                    "rows": [
-                        ["a0e7d3973e3", "201508", "215.0"],
-                        ["a0e7d3973e3", "201509", "45.0"]
-                    ],
-                    "width": 3
-                };
+                it("should get headers if category not present", function () {
+                    scope.isCategoryPresent = false;
+                    scope.exportToCSV();
+                    scope.$apply();
+                    var expected = 'Data Element,July 2015 (4 weeks),August 2015 (5 weeks)';
 
-                scope.definition = {
-                    "name": "[FieldApp - NewConsultations] Consultations",
-                    "dataElements": [{
-                        "id": "a0e7d3973e3",
-                        "name": "New Consultations - Consultations - Out Patient Department - Pediatric"
-                    }],
-                    rows: [{
-                        items: [
-                            {
-                                id: 'a0e7d3973e3',
-                                name: 'New Consultations - Consultations - Out Patient Department - Pediatric'
+                    expect(csvContent).toContain(expected);
+                });
+
+                it("should get data for csv file when categories are present", function () {
+                    var expectedDataValues =
+                        'New Consultations,1-23 months,1387,215\n' +
+                        'New Consultations,24-59 months,264,201\n' +
+                        'Follow-up Consultations,1-23 months,1772,\n' +
+                        'Follow-up Consultations,24-59 months,6433,';
+
+                    expect(csvContent).toContain(expectedDataValues);
+                });
+
+                it("should get data for csv file when categories are not present", function () {
+                    scope.data = {
+                        "headers": [{
+                            "name": "dx"
+                        }, {
+                            "name": "pe"
+                        }, {
+                            "name": "value"
+                        }],
+                        "metaData": {
+                            "pe": ["201508", "201509"],
+                            "names": {
+                                "dx": "Data",
+                                "a2cf79e8f13": "MSF",
+                                "201508": "August 2015",
+                                "201509": "September 2015",
+                                "a0e7d3973e3": "New Consultations - Consultations - Out Patient Department - Pediatric",
+                                "pe": "Period"
                             }
-                        ]
-                    }]
-                };
-                pivotTableController = new PivotTableController(scope, rootScope);
-                scope.$apply();
-                var expectedDataValues = [{
-                    "Data Element": 'New Consultations',
-                    "August 2015": 215,
-                    "September 2015": 45
-                }];
+                        },
+                        "rows": [
+                            ["a0e7d3973e3", "201508", "215.0"],
+                            ["a0e7d3973e3", "201509", "45.0"]
+                        ],
+                        "width": 3
+                    };
 
-                expect(scope.getData()).toEqual(expectedDataValues);
+                    scope.definition = {
+                        "name": "[FieldApp - NewConsultations] Consultations",
+                        "dataElements": [{
+                            "id": "a0e7d3973e3",
+                            "name": "New Consultations - Consultations - Out Patient Department - Pediatric"
+                        }],
+                        rows: [{
+                            items: [
+                                {
+                                    id: 'a0e7d3973e3',
+                                    name: 'New Consultations - Consultations - Out Patient Department - Pediatric'
+                                }
+                            ]
+                        }]
+                    };
+                    pivotTableController = new PivotTableController(scope, rootScope, translationsService, filesystemService);
+                    scope.exportToCSV();
+                    scope.$apply();
+                    var expectedDataValues = 'New Consultations,215,45';
+
+                    expect(csvContent).toContain(expectedDataValues);
+                });
             });
         });
 

@@ -1,5 +1,5 @@
 <div>
-    <button ng-if="showDownloadButton" class="col-md-2 exportCSV-btn btn btn-xs btn-primary" ng-csv="getData()" csv-header="getHeaders()" filename="{{getCsvFileName()}}">
+    <button ng-if="showDownloadButton" class="col-md-2 exportCSV-btn btn btn-xs btn-primary" ng-click="exportToCSV()">
         {{resourceBundle.exportAsCsv}}
     </button>
     <div ng-class="{ 'm-top-30' : showDownloadButton }">
