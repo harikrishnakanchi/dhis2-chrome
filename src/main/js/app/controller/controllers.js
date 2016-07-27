@@ -37,7 +37,7 @@ define(['reportsController', 'moduleWeekSelectorController', 'headerController',
             app.controller('referralLocationsController', ['$scope', '$hustle', '$modal', 'referralLocationsRepository', 'datasetRepository', 'translationsService', referralLocationsController]);
             app.controller('notificationsController', ['$scope', '$q', '$rootScope', 'userPreferenceRepository', 'chartRepository', 'orgUnitRepository', notificationsController]);
             app.controller('selectProjectPreferenceController', ['$rootScope', '$scope', '$hustle', '$location', 'orgUnitRepository', 'userPreferenceRepository', 'systemSettingRepository', selectProjectPreferenceController]);
-            app.controller('projectReportController', ['$rootScope', '$q', '$scope', 'orgUnitRepository','pivotTableRepository', 'translationsService', 'orgUnitGroupSetRepository', projectReportController]);
+            app.controller('projectReportController', ['$rootScope', '$q', '$scope', 'orgUnitRepository','pivotTableRepository', 'translationsService', 'orgUnitGroupSetRepository', 'filesystemService', projectReportController]);
             app.controller('headerController', ['$q', '$scope', '$location', '$rootScope', '$hustle', '$timeout', '$indexedDB', 'sessionHelper', 'orgUnitRepository', 'systemSettingRepository', 'dhisMonitor', headerController]);
             app.controller('footerController', ['$rootScope', '$scope', '$interpolate','systemSettingRepository', footerController]);
             app.controller('exportRawDataController', ['$scope', '$q', 'datasetRepository', 'excludedDataElementsRepository', 'orgUnitRepository', 'referralLocationsRepository', 'moduleDataBlockFactory', 'filesystemService', 'translationsService', exportRawDataController]);

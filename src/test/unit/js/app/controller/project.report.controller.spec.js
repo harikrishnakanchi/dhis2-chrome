@@ -1,6 +1,6 @@
-define(["orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "translationsService", "timecop", "orgUnitGroupSetRepository", "systemSettingRepository"], function(OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, TranslationsService, timecop, OrgUnitGroupSetRepository, SystemSettingRepository) {
+define(["moment", "orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "translationsService", "timecop", "orgUnitGroupSetRepository", "systemSettingRepository", "filesystemService"], function(moment, OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, TranslationsService, timecop, OrgUnitGroupSetRepository, SystemSettingRepository, FilesystemService) {
     describe("projectReportController", function() {
-        var scope, rootScope, projectReportController, orgUnitRepository, pivotTableRepository, translationsService, pivotTables, data, q, orgUnitGroupSetRepository, systemSettingRepository;
+        var scope, rootScope, projectReportController, orgUnitRepository, pivotTableRepository, translationsService, pivotTables, data, q, orgUnitGroupSetRepository, systemSettingRepository, filesystemService;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             rootScope = $rootScope;
@@ -303,40 +303,61 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
             orgUnitGroupSetRepository = new OrgUnitGroupSetRepository();
             spyOn(orgUnitGroupSetRepository, 'getAll').and.returnValue(utils.getPromise(q, orgUnitGroupSets));
 
-            projectReportController = new ProjectReportController(rootScope, $q, scope, orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository);
+            filesystemService = new FilesystemService();
+            spyOn(filesystemService, 'promptAndWriteFile').and.returnValue(utils.getPromise(q, {}));
+
+            projectReportController = new ProjectReportController(rootScope, q, scope, orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository, filesystemService);
         }));
 
-        it("should get csv file name in expected format", function() {
-            expect(scope.getCsvFileName()).toEqual("Aweil - SS153_ProjectReport_29-Oct-2015.csv");
-        });
+        describe('CSV Export', function () {
+            beforeEach(function () {
+                translationsService.setLocale('fr');
+                scope.$apply();
+                scope.pivotTables[0].currentOrderOfItems = ["adf6cf9405c", "ae70aadc5cf"];
+                
+                Timecop.install();
+                Timecop.freeze('2016-07-21T00:00:00.888Z');
+            });
+            
+            afterEach(function () {
+                Timecop.returnToPresent();
+                Timecop.uninstall();
+            });
 
-        it('should get data for csv file', function() {
-            var expectedData = [
-                ['Project Information'],
-                ['Country', 'SOUDAN Sud'],
-                ['Name', 'Aweil - SS153'],
-                ['Project Code', 'SS153'],
-                ['Project Type', 'Regular Project'],
-                ['Context', 'Cross-border instability'],
-                ['Type of population', 'General Population'],
-                ['Reason For Intervention', 'Access to health care'],
-                ['Mode Of Operation', 'Direct operation'],
-                ['Model Of Management', 'Collaboration'],
-                ['Opening Date', new Date("12/31/2007").toLocaleDateString()],
-                ['End Date', ''],
-                [],
-                ['Hospitalization', ['November 2015'],
-                    ['December 2015']
-                ],
-                ['Average bed occupation rate (%) - Adult IPD Ward', '1.1', '1.2'],
-                ['Average length of bed use (days) - Adult IPD Ward', '2.1', '2.2'],
-                []
-            ];
+            it('should prompt the user to save the CSV file with suggested filename', function () {
+                scope.exportToCSV();
 
-            translationsService.setLocale('fr');
-            scope.$apply();
-            scope.pivotTables[0].currentOrderOfItems = ["adf6cf9405c", "ae70aadc5cf"];
-            expect(scope.getCsvFileData()).toEqual(expectedData);
+                var expectedFilename = 'Aweil - SS153.ProjectReport.21-Jul-2016.csv';
+                expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
+            });
+
+            describe('CSV contents', function () {
+                var csvContent;
+
+                beforeEach(function () {
+                    spyOn(window, 'Blob').and.callFake(function (contentArray) {
+                        this.value = contentArray.join();
+                    });
+
+                    filesystemService.promptAndWriteFile.and.callFake(function (fileName, blob) {
+                        csvContent = blob.value;
+                    });
+
+                    scope.exportToCSV();
+                });
+
+                it('should contain project basic information', function () {
+                    expect(csvContent).toContain('"Project Information"\n"Country","SOUDAN Sud"');
+                });
+
+                it('should contain pivot table headers', function () {
+                    expect(csvContent).toContain('"Hospitalization","November 2015","December 2015"');
+                });
+
+                it('should contain pivot table data', function () {
+                    expect(csvContent).toContain('"Average bed occupation rate (%) - Adult IPD Ward",1.1,1.2\n"Average length of bed use (days) - Adult IPD Ward",2.1,2.2');
+                });
+            });
         });
 
         it('should filter out project report tables from pivot tables', function() {
