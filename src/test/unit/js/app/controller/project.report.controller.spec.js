@@ -115,7 +115,16 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             mockPivotTables = [{
                 id: 'pivotTable1',
                 projectReport: true,
-                title: 'Hospitalization'
+                title: 'Hospitalization',
+                rows: [{
+                    items: [{
+                        id: 'adf6cf9405c',
+                        name: 'Average bed occupation rate (%) - Adult IPD Ward'
+                    }, {
+                        id: 'ae70aadc5cf',
+                        name: 'Average length of bed use (days) - Adult IPD Ward'
+                    }]
+                }]
             }, {
                 id: 'pivotTable2',
                 projectReport: false

@@ -67,7 +67,8 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
 
                     var dataDimensionIndex = _.findIndex(pivotTable.data.headers, { name: 'dx' }),
                         periodIndex = _.findIndex(pivotTable.data.headers, { name: 'pe' }),
-                        valueIndex = _.findIndex(pivotTable.data.headers, { name: 'value' });
+                        valueIndex = _.findIndex(pivotTable.data.headers, { name: 'value' }),
+                        rowItems = _.flatten(_.map(pivotTable.definition.rows, 'items'));
 
                     _.forEach(pivotTable.currentOrderOfItems, function (itemId) {
                         var values = _.map(pivotTable.data.metaData.pe, function (period) {
@@ -76,7 +77,7 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
                             });
                             return row && row[valueIndex];
                         });
-                        csvData.push([escapeString(pivotTable.data.metaData.names[itemId])].concat(values).join(DELIMITER));
+                        csvData.push([escapeString(_.find(rowItems, { id: itemId }).name)].concat(values).join(DELIMITER));
                     });
                     csvData.push([]);
                 });
