@@ -165,6 +165,7 @@ require.config({
         "cipherUtils": "app/utils/cipher.utils",
         "appSettingsUtils": "app/utils/app.settings.utils",
         "authenticationUtils": "app/utils/authentication.utils",
+        "dataURItoBlob": "app/utils/data.uri.to.blob",
 
         //Helpers
         "helpers": "app/helpers/helpers",
