@@ -8,48 +8,6 @@ define(["lodash"], function(_) {
         };
 
         var enrichReferralLocations =  function (referralLocations) {
-            var getReferralLocationDataSet = function () {
-                var filterReferralLocationDataSets = function(dataSets) {
-                    return _.filter(dataSets, {isReferralDataset: true});
-                };
-                return datasetRepository.getAll().then(filterReferralLocationDataSets);
-            };
-
-            var getReferralLocationDataELements = function (referralLocationDataSets) {
-                 return datasetRepository.includeDataElements(referralLocationDataSets, []).then(function (dataSetIncludedWithDataElements) {
-                     var dataSetIncludedWithDataElement = _.first(dataSetIncludedWithDataElements),
-                     sections = dataSetIncludedWithDataElement.sections;
-                     return _.reduce(sections, function (referralLocationDataElements, section) {
-                         return referralLocationDataElements.concat(section.dataElements);
-                     }, []);
-                 });
-            };
-
-            var mapReferralLocationsWithDataElementIds = function (referralLocationDataElements) {
-                var referralLocationObjects = _.omit(referralLocations, 'orgUnit', 'clientLastUpdated', 'referralLocations');
-                return _.map(referralLocationObjects, function (referralLocationObject, referralLocationDataElementName) {
-                    var referralLocationDataElement = _.find(referralLocationDataElements, {formName: referralLocationDataElementName});
-                    if (referralLocationDataElement) {
-                        return {
-                            id: referralLocationDataElement.id,
-                            name: referralLocationObject.name,
-                            isDisabled: referralLocationObject.isDisabled
-                        };
-                    }
-                    return;
-                });
-            };
-
-            var addMappedReferralLocationObjectsToOriginal = function (referralLocationObjects) {
-                referralLocations = _.pick(referralLocations, 'orgUnit', 'clientLastUpdated');
-                referralLocations.referralLocations = referralLocationObjects;
-                return referralLocations;
-            };
-
-            return getReferralLocationDataSet()
-                .then(getReferralLocationDataELements)
-                .then(mapReferralLocationsWithDataElementIds)
-                .then(addMappedReferralLocationObjectsToOriginal);
         };
 
         var get = function(opUnitId) {
@@ -66,9 +24,47 @@ define(["lodash"], function(_) {
 
         var getWithId = function (opUnitId) {
             return get(opUnitId).then(function (referralLocations) {
-                if (referralLocations) {
-                    return enrichReferralLocations(referralLocations);
+                if (!referralLocations) {
+                    return $q.when([]);
                 }
+                var getReferralLocationDataSet = function () {
+                    var filterReferralLocationDataSets = function (dataSets) {
+                        return _.filter(dataSets, {isReferralDataset: true});
+                    };
+                    return datasetRepository.getAll().then(filterReferralLocationDataSets);
+                };
+
+                var getReferralLocationDataELements = function (referralLocationDataSets) {
+                    return datasetRepository.includeDataElements(referralLocationDataSets, []).then(function (dataSetIncludedWithDataElements) {
+                        return _.flatten(_.map(_.flatten(_.map(dataSetIncludedWithDataElements, 'sections')), 'dataElements'));
+                    });
+                };
+
+                var mapReferralLocationsWithDataElementIds = function (referralLocationDataElements) {
+                    return _.transform(referralLocationDataElements, function (referralLocationsWithIds, referralLocationDataElement) {
+                        var referralLocationObject = referralLocations[referralLocationDataElement.formName];
+                        if (referralLocationObject) {
+                            referralLocationsWithIds.push({
+                                id: referralLocationDataElement.id,
+                                name: referralLocationObject.name,
+                                isDisabled: referralLocationObject.isDisabled
+                            });
+                        }
+                    }, []);
+                };
+
+                var getEnrichedReferralLocations = function (referralLocationsWithIds) {
+                    return {
+                        orgUnit: referralLocations.orgUnit,
+                        clientLastUpdated: referralLocations.clientLastUpdated,
+                        referralLocations: referralLocationsWithIds
+                    };
+                };
+
+                return getReferralLocationDataSet()
+                    .then(getReferralLocationDataELements)
+                    .then(mapReferralLocationsWithDataElementIds)
+                    .then(getEnrichedReferralLocations);
             });
 
         };
