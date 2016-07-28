@@ -81,10 +81,6 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng"], function(
         $scope.monthlyStackedBarChartOptions = getChartOptions(stackedBarChartOptions, false);
         $scope.monthlyLineChartOptions = getChartOptions(lineChartOptions, false);
 
-        $scope.resizeCharts = function() {
-            window.dispatchEvent(new Event('resize'));
-        };
-
         $scope.downloadChartAsPng = function(event) {
             saveSvgAsPng(event.currentTarget.parentElement.parentElement.getElementsByTagName("svg")[0], "chart.png");
         };
