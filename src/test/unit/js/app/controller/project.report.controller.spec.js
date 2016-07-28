@@ -4,7 +4,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
         var scope, rootScope, q,
             projectReportController,
             orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository, filesystemService,
-            pivotTables, data;
+            mockPivotTables, pivotTableData, mockProjectOrgUnit, orgUnitGroupSets;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             rootScope = $rootScope;
@@ -15,9 +15,6 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             Timecop.freeze(new Date("2015-10-29T12:43:54.972Z"));
 
             rootScope.currentUser = {
-                userCredentials: {
-                    username: "test_user"
-                },
                 selectedProject: {
                     id: "xyz",
                     name: "Aweil - SS153"
@@ -39,7 +36,14 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
                 endDateLabel: 'End Date'
             };
 
-            var projectBasicInfo = {
+            mockProjectOrgUnit = {
+                "id": "xyz",
+                "name": "Aweil - SS153",
+                "openingDate": "2007-12-31",
+                "parent": {
+                    "id": "a18da381f7d",
+                    "name": "SOUDAN Sud"
+                },
                 "attributeValues": [
                     {
                         "attribute": {
@@ -104,16 +108,10 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
                         },
                         "value": "Northern Bar El Ghazal"
                     }
-                ],
-                "id": "xyz",
-                "name": "Aweil - SS153",
-                "openingDate": "2007-12-31",
-                "parent": {
-                    "id": "a18da381f7d",
-                    "name": "SOUDAN Sud"
-                }
+                ]
             };
-            pivotTables = [{
+
+            mockPivotTables = [{
                 id: 'pivotTable1',
                 projectReport: true,
                 title: 'Hospitalization'
@@ -121,7 +119,8 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
                 id: 'pivotTable2',
                 projectReport: false
             }];
-            data = {
+
+            pivotTableData = {
                 "headers": [{
                     "name": "dx",
                     "column": "Data"
@@ -160,33 +159,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
                 "width": 3
             };
 
-            var translatedReport = [
-                {"definition": {
-                    "id":"pivotTable1",
-                    "projectReport":true,
-                    "title":"Hospitalization"},
-                    "data":{
-                        "headers":[{"name":"dx","column":"Data"},{"name":"pe","column":"Period"},{"name":"value","column":"Value"}],
-                        "metaData":{
-                            "names":{"201511":"November 2015",
-                                "201512":"December 2015",
-                                "adf6cf9405c":"Average bed occupation rate (%) - Adult IPD Ward",
-                                "ae70aadc5cf":"Average length of bed use (days) - Adult IPD Ward",
-                                "dx":"Data","pe":"Period"},
-                            "dx":["adf6cf9405c","ae70aadc5cf"],
-                            "pe":["201511","201512"]},
-                        "rows":[
-                            ["adf6cf9405c","201511","1.1"],
-                            ["adf6cf9405c","201512","1.2"],
-                            ["ae70aadc5cf","201511","2.1"],
-                            ["ae70aadc5cf","201512","2.2"]],
-                        "height":132,
-                        "width":3},
-                    "isTableDataAvailable":true
-                }];
-
-
-            var orgUnitGroupSets = [{
+            orgUnitGroupSets = [{
                 "code": "project_type",
                 "id": "D6yNgLkqIKR",
                 "name": "Project Type",
@@ -276,14 +249,14 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             }];
 
             orgUnitRepository = new OrgUnitRepository();
-            spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise($q, projectBasicInfo));
+            spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise($q, mockProjectOrgUnit));
 
             pivotTableRepository = new PivotTableRepository();
-            spyOn(pivotTableRepository, "getAll").and.returnValue(utils.getPromise($q, pivotTables));
-            spyOn(pivotTableRepository, "getDataForPivotTable").and.returnValue(utils.getPromise($q, data));
+            spyOn(pivotTableRepository, "getAll").and.returnValue(utils.getPromise($q, mockPivotTables));
+            spyOn(pivotTableRepository, "getDataForPivotTable").and.returnValue(utils.getPromise($q, pivotTableData));
 
             translationsService = new TranslationsService();
-            spyOn(translationsService, "translateReports").and.returnValue(utils.getPromise(q, translatedReport));
+            spyOn(translationsService, "translateReports").and.callFake(function(object) { return object; });
             spyOn(translationsService, 'translate').and.callFake(function(object) { return object; });
 
             orgUnitGroupSetRepository = new OrgUnitGroupSetRepository();
@@ -295,6 +268,11 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             projectReportController = new ProjectReportController(rootScope, q, scope, orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository, filesystemService);
         }));
 
+        afterEach(function () {
+            Timecop.returnToPresent();
+            Timecop.uninstall();
+        });
+
         describe('CSV Export', function () {
             beforeEach(function () {
                 scope.$apply();
@@ -304,11 +282,6 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
                 Timecop.freeze('2016-07-21T00:00:00.888Z');
             });
             
-            afterEach(function () {
-                Timecop.returnToPresent();
-                Timecop.uninstall();
-            });
-
             it('should prompt the user to save the CSV file with suggested filename', function () {
                 scope.exportToCSV();
 
@@ -347,8 +320,8 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
 
         it('should filter out project report tables from pivot tables', function() {
             scope.$apply();
-            expect(scope.pivotTables[0].definition).toEqual(pivotTables[0]);
-            expect(scope.pivotTables[0].data).toEqual(data);
+            expect(scope.pivotTables[0].definition).toEqual(mockPivotTables[0]);
+            expect(scope.pivotTables[0].data).toEqual(pivotTableData);
         });
 
         it("should add the projectAttributes which lists all the project basic info into the scope", function() {
