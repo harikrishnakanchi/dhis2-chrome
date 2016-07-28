@@ -8,6 +8,14 @@ define(['lodash'], function(_) {
                     extensions: ['csv']
                 }],
                 acceptsAllTypes: false
+            },
+            PNG: {
+                accepts: [{
+                    description: 'PNG File (.png)',
+                    mimeTypes: ['image/png'],
+                    extensions: ['png']
+                }],
+                acceptsAllTypes: false
             }
         };
 
