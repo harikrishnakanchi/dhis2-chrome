@@ -71,10 +71,12 @@ define(["referralLocationsRepository", "datasetRepository", "angularMocks", "uti
                     orgUnit: opUnitId,
                     clientLastUpdated: 'someTime',
                     'SomeReferralLocation': {
-                        name: "SomeName"
+                        name: "SomeName",
+                        isDisabled: false
                     },
                     'SomeOtherReferralLocation': {
-                        name: "SomeOtherName"
+                        name: "SomeOtherName",
+                        isDisabled: true
                     }
                 };
                 mockStore.find.and.returnValue(utils.getPromise(q, mockReferralLocations));
@@ -92,10 +94,12 @@ define(["referralLocationsRepository", "datasetRepository", "angularMocks", "uti
                     clientLastUpdated: 'someTime',
                     referralLocations: [{
                         id: 'someId',
-                        name: 'SomeName'
+                        name: 'SomeName',
+                        isDisabled: false
                     }, {
                         id: 'someOtherId',
-                        name: 'SomeOtherName'
+                        name: 'SomeOtherName',
+                        isDisabled: true
                     }]
                 };
                 expect(referralLocations).toEqual(expectedReferralLocations);

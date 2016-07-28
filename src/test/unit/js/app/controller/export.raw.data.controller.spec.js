@@ -119,7 +119,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                 spyOn(translationsService, 'translate').and.callFake(function(objectToTranslate) { return objectToTranslate; });
 
                 referralLocationsRepository = new ReferralLocationsRepository();
-                spyOn(referralLocationsRepository, 'get').and.returnValue(utils.getPromise(q, {}));
+                spyOn(referralLocationsRepository, 'getWithId').and.returnValue(utils.getPromise(q, {}));
 
                 controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService);
             }));
@@ -397,24 +397,25 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     };
                     mockReferralLocations = {
                         orgUnit: 'someOpUnitId',
-                        referralLocation1: {
+                        referralLocations: [{
+                            id: 'dataElementId1',
                             name: 'some referral location',
                             isDisabled: false
-                        },
-                        referralLocation2: {
+                        }, {
+                            id: 'dataElementId2',
                             name: 'some referral location 2',
                             isDisabled: true
-                        }
+                        }]
                     };
 
                     scope.selectedDataset = mockDataSet;
                     datasetRepository.includeDataElements.and.returnValue(utils.getPromise(q, [mockDataSet]));
-                    referralLocationsRepository.get.and.returnValue(utils.getPromise(q, mockReferralLocations));
+                    referralLocationsRepository.getWithId.and.returnValue(utils.getPromise(q, mockReferralLocations));
                 });
 
                 it('should fetch referral locations of the selected orgUnit', function () {
                     scope.$apply();
-                    expect(referralLocationsRepository.get).toHaveBeenCalledWith(selectedOrgUnit.parent.id);
+                    expect(referralLocationsRepository.getWithId).toHaveBeenCalledWith(selectedOrgUnit.parent.id);
                 });
 
                 it('should filter out data elements without an enabled alias', function () {
@@ -428,19 +429,9 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     scope.$apply();
 
                     var dataElementFormNames = _.map(_.first(scope.sections).dataElements, 'formName');
-                    expect(dataElementFormNames).toEqual([mockReferralLocations.referralLocation1.name]);
+                    expect(dataElementFormNames).toEqual([mockReferralLocations.referralLocations[0].name]);
                 });
 
-                it('should replace the formName even if data elements have been translated', function () {
-                    _.each(dataElements, function (dataElement) {
-                        dataElement.original_formName = dataElement.formName;
-                        dataElement.formName = 'someTranslatedFormName';
-                    });
-                    scope.$apply();
-
-                    var dataElementFormNames = _.map(_.first(scope.sections).dataElements, 'formName');
-                    expect(dataElementFormNames).toEqual([mockReferralLocations.referralLocation1.name]);
-                });
             });
             describe('exportToCSV', function () {
                 beforeEach(function () {

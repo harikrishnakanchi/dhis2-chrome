@@ -32,7 +32,8 @@ define(["lodash"], function(_) {
                     if (referralLocationDataElement) {
                         return {
                             id: referralLocationDataElement.id,
-                            name: referralLocationObject.name
+                            name: referralLocationObject.name,
+                            isDisabled: referralLocationObject.isDisabled
                         };
                     }
                     return;

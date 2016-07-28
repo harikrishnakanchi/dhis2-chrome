@@ -66,11 +66,10 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
         var filterDataElementsAndRetrieveAliasesForReferralDataSet = function () {
             if(!$scope.selectedDataset.isReferralDataset) return $q.when();
 
-            return referralLocationsRepository.get($scope.orgUnit.parent.id).then(function (referralLocations) {
+            return referralLocationsRepository.getWithId($scope.orgUnit.parent.id).then(function (referralLocations) {
                 _.each($scope.sections, function (section) {
                     section.dataElements = _.transform(section.dataElements, function (dataElements, dataElement) {
-                        var referralLocation = referralLocations[dataElement.original_formName] || referralLocations[dataElement.formName];
-
+                        var referralLocation = _.find(referralLocations.referralLocations, {id: dataElement.id});
                         if(referralLocation && !referralLocation.isDisabled) {
                             dataElement.formName = referralLocation.name;
                             dataElements.push(dataElement);
