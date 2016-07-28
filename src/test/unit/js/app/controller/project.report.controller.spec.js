@@ -4,15 +4,16 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
         var scope, rootScope, q,
             projectReportController,
             orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository, filesystemService,
-            mockPivotTables, pivotTableData, mockProjectOrgUnit, orgUnitGroupSets;
+            mockPivotTables, pivotTableData, mockProjectOrgUnit, orgUnitGroupSets, currentTime;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             rootScope = $rootScope;
             scope = rootScope.$new();
             q = $q;
 
+            currentTime = moment('2015-10-29T12:43:54.972Z');
             Timecop.install();
-            Timecop.freeze(new Date("2015-10-29T12:43:54.972Z"));
+            Timecop.freeze(currentTime);
 
             rootScope.currentUser = {
                 selectedProject: {
@@ -274,36 +275,29 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
         });
 
         describe('CSV Export', function () {
+            var csvContent;
+
             beforeEach(function () {
                 scope.$apply();
                 scope.pivotTables[0].currentOrderOfItems = ["adf6cf9405c", "ae70aadc5cf"];
                 
-                Timecop.install();
-                Timecop.freeze('2016-07-21T00:00:00.888Z');
+                spyOn(window, 'Blob').and.callFake(function (contentArray) {
+                    this.value = contentArray.join();
+                });
+
+                filesystemService.promptAndWriteFile.and.callFake(function (fileName, blob) {
+                    csvContent = blob.value;
+                });
+
+                scope.exportToCSV();
             });
             
             it('should prompt the user to save the CSV file with suggested filename', function () {
-                scope.exportToCSV();
-
-                var expectedFilename = 'Aweil - SS153.ProjectReport.21-Jul-2016.csv';
+                var expectedFilename = 'Aweil - SS153.ProjectReport.' + currentTime.format('DD-MMM-YYYY') + '.csv';
                 expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
             });
 
             describe('CSV contents', function () {
-                var csvContent;
-
-                beforeEach(function () {
-                    spyOn(window, 'Blob').and.callFake(function (contentArray) {
-                        this.value = contentArray.join();
-                    });
-
-                    filesystemService.promptAndWriteFile.and.callFake(function (fileName, blob) {
-                        csvContent = blob.value;
-                    });
-
-                    scope.exportToCSV();
-                });
-
                 it('should contain project basic information', function () {
                     expect(csvContent).toContain('"Project Information"\n"Country","SOUDAN Sud"');
                 });
