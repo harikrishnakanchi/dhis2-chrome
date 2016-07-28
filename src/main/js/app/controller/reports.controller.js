@@ -1,5 +1,5 @@
-define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng"], function(d3, _, moment, CustomAttributes) {
-    return function($scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService) {
+define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURItoBlob"], function(d3, _, moment, CustomAttributes, SVGUtils, dataURItoBlob) {
+    return function($scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService) {
 
         var formatYAxisTicks = function(datum) {
             var isFraction = function(x) { return x % 1 !== 0; };
@@ -81,8 +81,25 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng"], function(
         $scope.monthlyStackedBarChartOptions = getChartOptions(stackedBarChartOptions, false);
         $scope.monthlyLineChartOptions = getChartOptions(lineChartOptions, false);
 
-        $scope.downloadChartAsPng = function(event) {
-            saveSvgAsPng(event.currentTarget.parentElement.parentElement.getElementsByTagName("svg")[0], "chart.png");
+        $scope.downloadChartAsPng = function(chartDefinition) {
+            var svgElement = document.getElementById(chartDefinition.id).firstElementChild;
+
+            var getPNGFileName = function() {
+                var regex = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]\s([a-zA-Z0-9\s]+)/;
+                var match = regex.exec(chartDefinition.name);
+                if (match) {
+                    var serviceName = match[1];
+                    var chartName = match[2];
+                    return [serviceName, chartName, moment().format("DD-MMM-YYYY"), 'png'].join('.');
+                } else {
+                    return "";
+                }
+            };
+
+            SVGUtils.svgAsPngUri(svgElement, {}, function(uri) {
+                var blob = dataURItoBlob(uri);
+                filesystemService.promptAndWriteFile(getPNGFileName(), blob, filesystemService.FILE_TYPE_OPTIONS.PNG);
+            });
         };
 
         var filterReportsForCurrentModule = function (allReports) {

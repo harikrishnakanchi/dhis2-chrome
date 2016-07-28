@@ -1,7 +1,7 @@
-define(["angularMocks", "utils", "moment", "reportsController", "datasetRepository", "orgUnitRepository", "chartRepository", "pivotTableRepository", "translationsService", "systemSettingRepository", "customAttributes"], function(mocks, utils, moment, ReportsController, DatasetRepository, OrgUnitRepository, ChartRepository, PivotTableRepository, TranslationsService, SystemSettingRepository, CustomAttributes) {
+define(["angularMocks", "utils", "moment", "timecop", "reportsController", "datasetRepository", "orgUnitRepository", "chartRepository", "pivotTableRepository", "translationsService", "systemSettingRepository", "customAttributes", "filesystemService", "saveSvgAsPng", "dataURItoBlob"], function(mocks, utils, moment, timecop, ReportsController, DatasetRepository, OrgUnitRepository, ChartRepository, PivotTableRepository, TranslationsService, SystemSettingRepository, CustomAttributes, FilesystemService, SVGUtils, dataURItoBlob) {
     describe("reportsControllerspec", function() {
 
-        var scope, rootScope, reportsController, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, systemSettingRepository;
+        var scope, q, rootScope, routeParams, reportsController, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, systemSettingRepository, filesystemService;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             rootScope = $rootScope;
@@ -625,6 +625,51 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
 
             expect(scope.datasets[2].isWeeklyPivotTablesAvailable).toBeFalsy();
             expect(scope.datasets[2].isMonthlyPivotTablesAvailable).toBeFalsy();
+        });
+
+        describe('download chart', function () {
+            var svgElement, blobObject;
+
+            beforeEach(function () {
+                routeParams = {orgUnit: 'mod1'};
+
+                Timecop.install();
+                Timecop.freeze(new Date("2016-07-21T12:43:54.972Z"));
+
+                var mockdataURI = 'data:text/plain;charset=utf-8;base64,aGVsbG8gd29ybGQ=';
+                spyOn(SVGUtils, 'svgAsPngUri').and.callFake(function(svgEl, options, callback) {
+                    callback(mockdataURI);
+                });
+
+                var mockElement = document.createElement('div');
+                svgElement = document.createElement('svg');
+
+                mockElement.appendChild(svgElement);
+                spyOn(document, 'getElementById').and.returnValue(mockElement);
+
+                blobObject = dataURItoBlob(mockdataURI);
+
+                filesystemService = new FilesystemService();
+                spyOn(filesystemService, 'promptAndWriteFile').and.returnValue(utils.getPromise(q, {}));
+
+                reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService);
+
+                var mockChartDefinition = {id: 'chartId', name: '[FieldApp - ServiceName] ChartName'};
+                scope.downloadChartAsPng(mockChartDefinition);
+            });
+
+            afterEach(function() {
+                Timecop.returnToPresent();
+                Timecop.uninstall();
+            });
+
+            it('should convert SVG to PNG DataURI', function () {
+                expect(SVGUtils.svgAsPngUri).toHaveBeenCalledWith(svgElement, {}, jasmine.any(Function));
+            });
+
+            it('should prompt user to save chart as PNG with suggested name', function () {
+                expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith('ServiceName.ChartName.21-Jul-2016.png', blobObject, filesystemService.FILE_TYPE_OPTIONS.PNG);
+            });
         });
     });
 });
