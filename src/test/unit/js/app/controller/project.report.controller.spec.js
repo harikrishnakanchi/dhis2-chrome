@@ -1,9 +1,14 @@
-define(["moment", "orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "translationsService", "timecop", "orgUnitGroupSetRepository", "filesystemService"], function(moment, OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, TranslationsService, timecop, OrgUnitGroupSetRepository, FilesystemService) {
+define(["moment", "orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "translationsService", "timecop", "orgUnitGroupSetRepository", "filesystemService"],
+    function(moment, OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, TranslationsService, timecop, OrgUnitGroupSetRepository, FilesystemService) {
     describe("projectReportController", function() {
-        var scope, rootScope, projectReportController, orgUnitRepository, pivotTableRepository, translationsService, pivotTables, data, q, orgUnitGroupSetRepository, filesystemService;
+        var scope, rootScope, q,
+            projectReportController,
+            orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository, filesystemService,
+            pivotTables, data;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             rootScope = $rootScope;
+            scope = rootScope.$new();
             q = $q;
 
             Timecop.install();
@@ -19,7 +24,20 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
                 }
             };
 
-            scope = rootScope.$new();
+            scope.resourceBundle = {
+                country: 'Country',
+                nameLabel: 'Name',
+                projectInformationLabel: 'Project Information',
+                projectCodeLabel: 'Project Code',
+                projectTypeLabel: 'Project Type',
+                contextLabel: 'Context',
+                typeOfPopulationLabel: 'Type of population',
+                reasonForInterventionLabel: 'Reason For Intervention',
+                modeOfOperationLabel: 'Mode Of Operation',
+                modelOfManagementLabel: 'Model Of Management',
+                openingDateLabel: 'Opening Date',
+                endDateLabel: 'End Date'
+            };
 
             var projectBasicInfo = {
                 "attributeValues": [
@@ -142,28 +160,6 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
                 "width": 3
             };
 
-            scope.resourceBundle = {
-                country: 'Country',
-                nameLabel: 'Name',
-                projectInformationLabel: 'Project Information',
-                projectCodeLabel: 'Project Code',
-                projectTypeLabel: 'Project Type',
-                contextLabel: 'Context',
-                typeOfPopulationLabel: 'Type of population',
-                reasonForInterventionLabel: 'Reason For Intervention',
-                modeOfOperationLabel: 'Mode Of Operation',
-                modelOfManagementLabel: 'Model Of Management',
-                openingDateLabel: 'Opening Date',
-                endDateLabel: 'End Date'
-            };
-
-            orgUnitRepository = new OrgUnitRepository();
-            spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise($q, projectBasicInfo));
-
-            pivotTableRepository = new PivotTableRepository();
-            spyOn(pivotTableRepository, "getAll").and.returnValue(utils.getPromise($q, pivotTables));
-            spyOn(pivotTableRepository, "getDataForPivotTable").and.returnValue(utils.getPromise($q, data));
-
             var translatedReport = [
                 {"definition": {
                     "id":"pivotTable1",
@@ -189,9 +185,6 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
                     "isTableDataAvailable":true
                 }];
 
-            translationsService = new TranslationsService();
-            spyOn(translationsService, "translateReports").and.returnValue(utils.getPromise(q, translatedReport));
-            spyOn(translationsService, 'translate').and.callFake(function(object) { return object; });
 
             var orgUnitGroupSets = [{
                 "code": "project_type",
@@ -281,6 +274,17 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
                     "name": "Direct operation"
                 }]
             }];
+
+            orgUnitRepository = new OrgUnitRepository();
+            spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise($q, projectBasicInfo));
+
+            pivotTableRepository = new PivotTableRepository();
+            spyOn(pivotTableRepository, "getAll").and.returnValue(utils.getPromise($q, pivotTables));
+            spyOn(pivotTableRepository, "getDataForPivotTable").and.returnValue(utils.getPromise($q, data));
+
+            translationsService = new TranslationsService();
+            spyOn(translationsService, "translateReports").and.returnValue(utils.getPromise(q, translatedReport));
+            spyOn(translationsService, 'translate').and.callFake(function(object) { return object; });
 
             orgUnitGroupSetRepository = new OrgUnitGroupSetRepository();
             spyOn(orgUnitGroupSetRepository, 'getAll').and.returnValue(utils.getPromise(q, orgUnitGroupSets));
