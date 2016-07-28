@@ -70,13 +70,11 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
                         valueIndex = _.findIndex(pivotTable.data.headers, { name: 'value' });
 
                     _.forEach(pivotTable.currentOrderOfItems, function (itemId) {
-                        var values = [];
-                        _.forEach(pivotTable.data.metaData.pe, function (period) {
-                            var value = _.find(pivotTable.data.rows, function (row) {
+                        var values = _.map(pivotTable.data.metaData.pe, function (period) {
+                            var row = _.find(pivotTable.data.rows, function (row) {
                                 return itemId == row[dataDimensionIndex] && period == row[periodIndex];
                             });
-                            
-                            values.push(value && value[valueIndex]);
+                            return row && row[valueIndex];
                         });
                         csvData.push([escapeString(pivotTable.data.metaData.names[itemId])].concat(values).join(DELIMITER));
                     });
