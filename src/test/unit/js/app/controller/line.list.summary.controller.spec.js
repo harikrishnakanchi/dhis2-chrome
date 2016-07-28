@@ -356,7 +356,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                     var mockDataValue = { value : "2016-07-07T00:00:00.000+0000", valueType: 'DATE'};
                     var actualValue = scope.getDisplayValue(mockDataValue);
 
-                    expect(actualValue).toEqual("7/7/2016");
+                    expect(actualValue).toEqual(moment(mockDataValue.value).toDate().toLocaleDateString());
                 });
 
                 it('should format value if it is a boolean type', function() {
