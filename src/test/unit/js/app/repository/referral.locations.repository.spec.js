@@ -1,6 +1,6 @@
 define(["referralLocationsRepository", "datasetRepository", "angularMocks", "utils"], function(ReferralLocationsRepository, DatasetRepository, mocks, utils) {
     describe("referralLocationsRepository", function() {
-        var datasetRepository, repo, mockStore, q, scope;
+        var datasetRepository, referralLocationRepository, mockStore, q, scope;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
@@ -9,12 +9,12 @@ define(["referralLocationsRepository", "datasetRepository", "angularMocks", "uti
             mockStore = mockDB.objectStore;
 
             datasetRepository = new DatasetRepository();
-            repo = new ReferralLocationsRepository(mockDB.db, $q, datasetRepository);
+            referralLocationRepository = new ReferralLocationsRepository(mockDB.db, $q, datasetRepository);
         }));
 
         describe("get", function() {
             it("should return empty array when opUnitId is not given", function() {
-                repo.get("").then(function(data) {
+                referralLocationRepository.get("").then(function(data) {
                     expect(data).toEqual([]);
                 });
                 scope.$apply();
@@ -23,7 +23,7 @@ define(["referralLocationsRepository", "datasetRepository", "angularMocks", "uti
 
             it('should return referral locations when opUnitId is given', function () {
                 mockStore.find.and.returnValue(utils.getPromise(q, {}));
-                repo.get('someOpUnitId');
+                referralLocationRepository.get('someOpUnitId');
 
                 var expectedReferralLocations = {};
                 expect(mockStore.find).toHaveBeenCalled();
@@ -34,7 +34,7 @@ define(["referralLocationsRepository", "datasetRepository", "angularMocks", "uti
         describe('findAll', function () {
            it('should return all referral locations', function () {
                mockStore.each.and.returnValue(utils.getPromise(q, []));
-               repo.findAll();
+               referralLocationRepository.findAll();
                expect(mockStore.each).toHaveBeenCalled();
            });
         });
@@ -85,7 +85,7 @@ define(["referralLocationsRepository", "datasetRepository", "angularMocks", "uti
 
             it('should return referral locations with id for the given opUnitId', function () {
                 var referralLocations;
-                repo.getWithId(opUnitId).then(function (data) {
+                referralLocationRepository.getWithId(opUnitId).then(function (data) {
                     referralLocations = data;
                 });
                 scope.$apply();
@@ -107,7 +107,7 @@ define(["referralLocationsRepository", "datasetRepository", "angularMocks", "uti
 
             it('should not enrich the referral locations if there is no referral location for the op unit', function () {
                 mockStore.find.and.returnValue(utils.getPromise(q, undefined));
-                repo.get('someOpUnitId');
+                referralLocationRepository.get('someOpUnitId');
                 scope.$apply();
 
                 expect(datasetRepository.getAll).not.toHaveBeenCalled();
