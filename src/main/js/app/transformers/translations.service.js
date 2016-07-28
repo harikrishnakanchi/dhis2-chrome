@@ -150,7 +150,6 @@ define(['lodash'], function(_){
             _.each(TRANSLATABLE_PROPERTIES, function (property) {
                 if(objectToBeTranslated[property]) {
                     var translationForProperty = _.find(translationsForObject, { property: property });
-                    objectToBeTranslated['original_' + property] = objectToBeTranslated[property];
                     objectToBeTranslated[property] = translationForProperty && translationForProperty.value || objectToBeTranslated[property];
                 }
             });
