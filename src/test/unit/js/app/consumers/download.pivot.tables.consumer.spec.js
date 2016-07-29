@@ -68,7 +68,7 @@ define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'repo
                 downloadPivotTablesConsumer.run();
                 scope.$apply();
 
-                expect(pivotTableRepository.deleteByIds).toHaveBeenCalledWith(['pivotTable1'], localDbPivotTables);
+                expect(pivotTableRepository.deleteByIds).toHaveBeenCalledWith(['pivotTable1']);
             });
        });
     });
