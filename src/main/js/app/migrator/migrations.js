@@ -325,6 +325,14 @@ define([], function() {
         migrate_data_between_stores(tx, 'pivotTables', 'pivotTableDefinitions');
     };
 
+    var delete_charts_store = function (db) {
+        db.deleteObjectStore('charts');
+    };
+
+    var delete_pivot_tables_store = function (db) {
+        db.deleteObjectStore('pivotTables');
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -367,6 +375,8 @@ define([], function() {
         create_chart_definitions_store,
         create_pivot_table_definitions_store,
         migrate_chart_definitions,
-        migrate_pivot_table_definitions
+        migrate_pivot_table_definitions,
+        delete_charts_store,
+        delete_pivot_tables_store
     ];
 });
