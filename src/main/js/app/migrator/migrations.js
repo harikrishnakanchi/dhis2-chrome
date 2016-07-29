@@ -302,7 +302,7 @@ define([], function() {
         create_store_with_key('pivotTableDefinitions', 'id', db);
     };
 
-    var migrate_data_between_stores = function (tx, oldStoreName, newStoreName) {
+    var migrate_data_between_stores = function (tx, oldStoreName, newStoreName, callback) {
         var oldStore = tx.objectStore(oldStoreName),
             newStore = tx.objectStore(newStoreName);
 
@@ -313,24 +313,22 @@ define([], function() {
                 newStore.put(record).onsuccess = function() {
                     cursor.continue();
                 };
+            } else {
+                callback();
             }
         };
     };
 
-    var migrate_chart_definitions = function (db, tx) {
-        migrate_data_between_stores(tx, 'charts', 'chartDefinitions');
+    var migrate_and_delete_charts_store = function (db, tx) {
+        migrate_data_between_stores(tx, 'charts', 'chartDefinitions', function() {
+            db.deleteObjectStore('charts');
+        });
     };
 
-    var migrate_pivot_table_definitions = function (db, tx) {
-        migrate_data_between_stores(tx, 'pivotTables', 'pivotTableDefinitions');
-    };
-
-    var delete_charts_store = function (db) {
-        db.deleteObjectStore('charts');
-    };
-
-    var delete_pivot_tables_store = function (db) {
-        db.deleteObjectStore('pivotTables');
+    var migrate_and_delete_pivot_table_store = function (db, tx) {
+        migrate_data_between_stores(tx, 'pivotTables', 'pivotTableDefinitions', function() {
+            db.deleteObjectStore('pivotTables');
+        });
     };
 
     return [add_object_stores,
@@ -374,10 +372,8 @@ define([], function() {
         delete_pivot_table_data_and_chart_data_changelog,
         create_chart_definitions_store,
         create_pivot_table_definitions_store,
-        migrate_chart_definitions,
-        migrate_pivot_table_definitions,
-        delete_charts_store,
-        delete_pivot_tables_store,
+        migrate_and_delete_charts_store,
+        migrate_and_delete_pivot_table_store,
         delete_keys_chart_and_reports_from_changelog
     ];
 });
