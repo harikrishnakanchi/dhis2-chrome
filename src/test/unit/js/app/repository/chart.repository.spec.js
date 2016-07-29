@@ -115,20 +115,12 @@ define(["chartRepository", "chart", "angularMocks", "utils", "lodash"], function
         });
 
         it('should remove all charts by id', function() {
-            var chartIds = ['1', '2'];
-            var dbCharts = [{
-                "name": "chart 1",
-                "id": "1"
-            }, {
-                "name": "chart 2",
-                "id": "2"
-            }, {
-                "name": "chart 3",
-                "id": "3"
-            }];
-            chartRepository.deleteMultipleChartsById(chartIds, dbCharts);
-            expect(mockStore.delete).toHaveBeenCalledWith('chart 1');
-            expect(mockStore.delete).toHaveBeenCalledWith('chart 2');
+            var chartIdA = 'chartIdA',
+                chartIdB = 'chartIdB';
+
+            chartRepository.deleteMultipleChartsById([chartIdA, chartIdB]);
+            expect(mockStore.delete).toHaveBeenCalledWith(chartIdA);
+            expect(mockStore.delete).toHaveBeenCalledWith(chartIdB);
         });
     });
 });

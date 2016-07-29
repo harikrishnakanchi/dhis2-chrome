@@ -1,6 +1,6 @@
 define(['chart', 'lodash'], function(Chart, _) {
     return function(db, $q) {
-        var CHART_STORE_NAME = 'charts';
+        var CHART_STORE_NAME = 'chartDefinitions';
         var CHART_DATA_STORE_NAME = 'chartData';
 
         this.upsert = function(charts) {
@@ -27,13 +27,10 @@ define(['chart', 'lodash'], function(Chart, _) {
             });
         };
 
-        this.deleteMultipleChartsById = function(idsToDelete, charts) {
+        this.deleteMultipleChartsById = function(idsToDelete) {
             var store = db.objectStore(CHART_STORE_NAME);
-            return $q.all(_.map(idsToDelete, function(id) {
-                chartToDelete = _.find(charts, {
-                    "id": id
-                });
-                return store.delete(chartToDelete.name);
+            return $q.all(_.map(idsToDelete, function(chartId) {
+                return store.delete(chartId);
             }));
         };
 

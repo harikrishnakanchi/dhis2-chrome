@@ -9,7 +9,7 @@ define(['moment'], function (moment) {
                 return chartRepository.getAll().then(function(localDbCharts) {
                     var localDbChartIds = _.pluck(localDbCharts, 'id');
                     var chartIdsToRemove = _.difference(localDbChartIds, remoteChartIds);
-                    return chartRepository.deleteMultipleChartsById(chartIdsToRemove, localDbCharts);
+                    return chartRepository.deleteMultipleChartsById(chartIdsToRemove);
                 });
             });
         };
