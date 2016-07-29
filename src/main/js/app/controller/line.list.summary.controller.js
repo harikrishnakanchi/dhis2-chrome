@@ -317,7 +317,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
 
             var buildData = function (event) {
                 var values = _.map(event.dataValues, $scope.getDisplayValue);
-                var eventDate = event.eventDate;
+                var eventDate = $scope.getFormattedDate(event.eventDate);
                 return buildCSVRow(eventDate, values);
             };
 

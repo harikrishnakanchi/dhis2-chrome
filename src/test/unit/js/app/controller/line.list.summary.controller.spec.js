@@ -432,6 +432,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
 
                     mockDataValue = mockEventDataValue();
                     mockEvent = createMockEvent({
+                        eventDate: moment('2016-07-31T12:00:00Z').toISOString(),
                         dataValues: [mockDataValue]
                     });
                     scope.events = [mockEvent];
@@ -445,7 +446,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                 });
 
                 it('should contain data for listed events while exporting data', function () {
-                    var expectedCsvContent = [mockEvent.eventDate, mockDataValue.value].join(',');
+                    var expectedCsvContent = [moment(mockEvent.eventDate).toDate().toLocaleDateString(), mockDataValue.value].join(',');
                     expect(csvContent).toContain(expectedCsvContent);
                 });
 
