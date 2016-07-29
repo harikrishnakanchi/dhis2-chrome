@@ -377,6 +377,7 @@ define([], function() {
         migrate_chart_definitions,
         migrate_pivot_table_definitions,
         delete_charts_store,
-        delete_pivot_tables_store
+        delete_pivot_tables_store,
+        delete_keys_chart_and_reports_from_changelog
     ];
 });
