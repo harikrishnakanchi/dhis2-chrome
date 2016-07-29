@@ -29,40 +29,19 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 return '^[1-9][0-9]?$';
         };
 
-        //TODO remove this when all clients have moved to 2.21
-        var getType = function(obj) {
-            var type = obj.type || obj.valueType;
-            switch (type) {
-                case "int":
-                    return "NUMBER";
-                case "date":
-                    return "DATE";
-                case "bool":
-                    return "BOOLEAN";
-                case "datetime":
-                    return "DATETIME";
-                case "string":
-                    return "TEXT";
-                case "INTEGER_ZERO_OR_POSITIVE":
-                    return "NUMBER";
-                default:
-                    return type;
-            }
-        };
-
         var getDataValuesAndEventDate = function() {
             var programStage = $scope.program.programStages[0];
             var eventDate = null;
             var compulsoryFieldsPresent = true;
 
-            var formatValue = function(value, type) {
+            var formatValue = function(value, valueType) {
                 if (_.isObject(value) && value.originalObject)
                     return value.originalObject.code;
                 if (_.isObject(value) && value.code)
                     return value.code;
-                if (value && type === "DATE")
+                if (value && valueType === "DATE")
                     return moment.utc(new Date(value)).format("YYYY-MM-DD");
-                if (value && type === "DATETIME")
+                if (value && valueType === "DATETIME")
                     return moment.utc(new Date(value)).toISOString();
                 return value;
             };
@@ -70,14 +49,14 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             var dataValuesList = _.flatten(_.map(programStage.programStageSections, function(sections) {
 
                 return _.map(sections.programStageDataElements, function(psde) {
-                    var type = getType(psde.dataElement);
-                    var value = formatValue($scope.dataValues[psde.dataElement.id], type);
+                    var dataElementValueType = psde.dataElement.valueType;
+                    var value = formatValue($scope.dataValues[psde.dataElement.id], dataElementValueType);
 
                     if ($scope.isEventDateSubstitute(psde.dataElement)) {
                         eventDate = value;
                     }
                     if (psde.compulsory) {
-                        if (type === "NUMBER") {
+                        if (dataElementValueType == "NUMBER" || dataElementValueType == "INTEGER_ZERO_OR_POSITIVE") {
                             compulsoryFieldsPresent = isNaN(value) || value === null ? false : compulsoryFieldsPresent;
                         } else if (_.isEmpty(value))
                             compulsoryFieldsPresent = false;
@@ -209,13 +188,6 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 var getProgram = function(excludedDataElements) {
                     return programRepository.getProgramForOrgUnit($scope.originOrgUnits[0].id).then(function(program) {
                         return programRepository.get(program.id, excludedDataElements).then(function(program) {
-                            _.each(program.programStages, function(stage) {
-                                _.each(stage.programStageSections, function(section) {
-                                    _.each(section.programStageDataElements, function(sde) {
-                                        sde.dataElement.type = getType(sde.dataElement);
-                                    });
-                                });
-                            });
                             $scope.program = translationsService.translate(program);
                         });
                     });
@@ -265,11 +237,11 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                             return value;
                         }
                     }
-                    //TODO remove date, datetime and int checks after DHIS 2.21
-                    if (dv.type === "date" || dv.valueType === "DATE" || dv.type === "datetime" || dv.valueType === "DATETIME")
+
+                    if (dv.valueType === "DATE" || dv.valueType === "DATETIME")
                         return new Date(dv.value);
 
-                    if (dv.type === "int" || dv.valueType === 'NUMBER')
+                    if (dv.valueType === 'NUMBER')
                         return parseFloat(dv.value);
 
                     return dv.value;

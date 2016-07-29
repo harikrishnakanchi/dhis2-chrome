@@ -55,13 +55,13 @@
                                                class="form-control"
                                                name="{{psdeFormName}}"
                                                type="text"
-                                               ng-if="programStageDE.dataElement.type === 'TEXT' && !programStageDE.dataElement.optionSet" />
+                                               ng-if="programStageDE.dataElement.valueType === 'TEXT' && !programStageDE.dataElement.optionSet" />
 
                                         <input ng-model="dataValues[programStageDE.dataElement.id]"
                                                class="form-control"
                                                name="{{psdeFormName}}"
                                                type="number"
-                                               ng-if="programStageDE.dataElement.type === 'NUMBER' && !programStageDE.dataElement.optionSet"
+                                               ng-if="(programStageDE.dataElement.valueType === 'NUMBER' || programStageDE.dataElement.valueType === 'INTEGER_ZERO_OR_POSITIVE') && !programStageDE.dataElement.optionSet"
                                                ng-pattern="getNumberPattern(programStageDE.dataElement)" />
 
                                         <input ng-model="dataValues[programStageDE.dataElement.id]"
@@ -69,19 +69,19 @@
                                                class="form-control"
                                                name="{{psdeFormName}}"
                                                type="date"
-                                               ng-if="programStageDE.dataElement.type === 'DATE' && !programStageDE.dataElement.optionSet && !isEventDateSubstitute(programStageDE.dataElement)" />
+                                               ng-if="programStageDE.dataElement.valueType === 'DATE' && !programStageDE.dataElement.optionSet && !isEventDateSubstitute(programStageDE.dataElement)" />
 
                                         <input ng-model="dataValues[programStageDE.dataElement.id]"
                                                ng-model-options="{timezone: 'UTC'}"
                                                class="form-control"
                                                name="{{psdeFormName}}"
                                                type="date"
-                                               ng-if="programStageDE.dataElement.type === 'DATE' && !programStageDE.dataElement.optionSet && isEventDateSubstitute(programStageDE.dataElement)"
+                                               ng-if="programStageDE.dataElement.valueType === 'DATE' && !programStageDE.dataElement.optionSet && isEventDateSubstitute(programStageDE.dataElement)"
                                                max="{{maxEventDate}}"
                                                min="{{minEventDate}}"
                                                required />
 
-                                        <div ng-if="programStageDE.dataElement.type === 'DATETIME'" class="date-time-form-control">
+                                        <div ng-if="programStageDE.dataElement.valueType === 'DATETIME'" class="date-time-form-control">
                                             <input type="datetime-local" class="form-control" ng-model="dataValues[programStageDE.dataElement.id]" name="{{psdeFormName}}" ng-if="!isEventDateSubstitute(programStageDE.dataElement)" />
                                             <input type="datetime-local" class="form-control" ng-model="dataValues[programStageDE.dataElement.id]" name="{{psdeFormName}}" ng-if="isEventDateSubstitute(programStageDE.dataElement)"
                                                    max="{{maxEventDate}}" min="{{minEventDate}}" required />
@@ -92,7 +92,7 @@
                                             </div>
                                         </div>
 
-                                        <div ng-if="programStageDE.dataElement.type === 'BOOLEAN' && !programStageDE.dataElement.optionSet" class="col-sm-8 col-md-8 form-inline">
+                                        <div ng-if="programStageDE.dataElement.valueType === 'BOOLEAN' && !programStageDE.dataElement.optionSet" class="col-sm-8 col-md-8 form-inline">
                                             <div class="radio-inline">
                                                 <label>
                                                     <input type="radio" ng-model="dataValues[programStageDE.dataElement.id]" value="true" /> {{resourceBundle.yesLabel}}
