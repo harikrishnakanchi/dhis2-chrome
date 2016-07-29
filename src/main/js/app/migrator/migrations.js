@@ -294,6 +294,37 @@ define([], function() {
         };
     };
 
+    var create_chart_definitions_store = function (db) {
+        create_store_with_key('chartDefinitions', 'id', db);
+    };
+
+    var create_pivot_table_definitions_store = function (db) {
+        create_store_with_key('pivotTableDefinitions', 'id', db);
+    };
+
+    var migrate_data_between_stores = function (tx, oldStoreName, newStoreName) {
+        var oldStore = tx.objectStore(oldStoreName),
+            newStore = tx.objectStore(newStoreName);
+
+        oldStore.openCursor().onsuccess = function (e) {
+            var cursor = e.target.result;
+            if (cursor) {
+                var record = cursor.value;
+                newStore.put(record).onsuccess = function() {
+                    cursor.continue();
+                };
+            }
+        };
+    };
+
+    var migrate_chart_definitions = function (db, tx) {
+        migrate_data_between_stores(tx, 'charts', 'chartDefinitions');
+    };
+
+    var migrate_pivot_table_definitions = function (db, tx) {
+        migrate_data_between_stores(tx, 'pivotTables', 'pivotTableDefinitions');
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -332,6 +363,10 @@ define([], function() {
         delete_keys_chart_and_reports_from_changelog,
         create_data_sync_failure,
         delete_org_unit_level_data_store,
-        delete_pivot_table_data_and_chart_data_changelog
+        delete_pivot_table_data_and_chart_data_changelog,
+        create_chart_definitions_store,
+        create_pivot_table_definitions_store,
+        migrate_chart_definitions,
+        migrate_pivot_table_definitions
     ];
 });
