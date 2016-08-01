@@ -12,6 +12,7 @@ define(["lodash", "customAttributes"], function (_, CustomAttributes) {
             };
 
             dataElement.offlineSummaryType = getOfflineSummaryCode(dataElement);
+            dataElement.showInEventSummary = CustomAttributes.getBooleanAttributeValue(dataElement.attributeValues, CustomAttributes.SHOW_IN_EVENT_SUMMARY_CODE);
             return dataElement;
         };
 

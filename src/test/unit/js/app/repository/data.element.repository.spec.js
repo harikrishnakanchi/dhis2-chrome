@@ -1,71 +1,65 @@
 define(["dataElementRepository", "angularMocks", "utils", "customAttributes"], function(DataElementRepository, mocks, utils, CustomAttributes) {
     describe("data element repository", function() {
-        var db, mockStore, dataElementRepository, scope, q, mockAttributeValue;
+        var mockDb, mockStore, dataElementRepository, scope, q, mockAttributeValue;
+
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
-            var mockDB = utils.getMockDB($q);
             scope = $rootScope.$new();
-            mockStore = mockDB.objectStore;
-            mockAttributeValue = "age"+ _.random(1,100);
+
+            mockDb = utils.getMockDB($q);
+            mockStore = mockDb.objectStore;
+
+            mockAttributeValue = 'mockAttributeValue';
             spyOn(CustomAttributes, 'getAttributeValue').and.returnValue(mockAttributeValue);
-            dataElementRepository = new DataElementRepository(mockDB.db);
+            spyOn(CustomAttributes, 'getBooleanAttributeValue').and.returnValue(mockAttributeValue);
+
+            dataElementRepository = new DataElementRepository(mockDb.db);
         }));
 
         describe('get', function() {
+            var dataElementId, mockDataElement;
+
+            beforeEach(function () {
+                dataElementId = "someDataElementId";
+                mockDataElement = {
+                    attributeValues: 'someAttributeValues'
+                };
+                mockStore.find.and.returnValue(utils.getPromise(q, mockDataElement));
+
+            });
 
             it('should get for the given data element id', function () {
-                var dataElementId = "someDataElementId";
                 dataElementRepository.get(dataElementId);
                 expect(mockStore.find).toHaveBeenCalled();
             });
 
             it('should add offlineSummaryType custom attribute to DataElement', function () {
-                var dataElementId = "someDataElementId";
-                var mockDataElement = {
-                    attributeValues: []
-                };
-                mockStore.find.and.returnValue(utils.getPromise(q, mockDataElement));
-
-                var dataElement;
-                dataElementRepository.get(dataElementId).then(function (de) {
-                    dataElement = de;
+                dataElementRepository.get(dataElementId).then(function (dataElement) {
+                    expect(dataElement.offlineSummaryType).toEqual(mockAttributeValue);
                 });
-                scope.$apply();
 
+                scope.$apply();
                 expect(CustomAttributes.getAttributeValue).toHaveBeenCalledWith(mockDataElement.attributeValues, CustomAttributes.LINE_LIST_OFFLINE_SUMMARY_CODE);
-                expect(dataElement.offlineSummaryType).toEqual(mockAttributeValue);
+            });
+
+            it('should add showInEventSummary custom attribute to DataElement', function () {
+                dataElementRepository.get(dataElementId).then(function (dataElement) {
+                    expect(dataElement.showInEventSummary).toEqual(mockAttributeValue);
+                });
+
+                scope.$apply();
+                expect(CustomAttributes.getBooleanAttributeValue).toHaveBeenCalledWith(mockDataElement.attributeValues, CustomAttributes.SHOW_IN_EVENT_SUMMARY_CODE);
             });
 
         });
 
         describe('findAll', function() {
-
             it('should get all data elements for the list of data elements', function() {
                 var dataElementIds = ["someDataElem1", "someDataElem2"];
 
                 dataElementRepository.findAll(dataElementIds);
 
                 expect(mockStore.each).toHaveBeenCalled();
-            });
-
-            it('should add offlineSummaryType custom attribute to DataElement', function() {
-                var dataElementIds = ["someDataElem1", "someDataElem2"];
-                var mockDataElement = {
-                    attributeValues: []
-                };
-                mockStore.each.and.returnValue(utils.getPromise(q, [mockDataElement]));
-
-                var actualDataElements;
-                dataElementRepository.findAll(dataElementIds).then(function (dataElements) {
-                    actualDataElements = dataElements;
-                });
-                scope.$apply();
-
-                expect(CustomAttributes.getAttributeValue).toHaveBeenCalledWith(mockDataElement.attributeValues, CustomAttributes.LINE_LIST_OFFLINE_SUMMARY_CODE);
-                expect(actualDataElements).toEqual([{
-                    attributeValues: [],
-                    offlineSummaryType: mockAttributeValue
-                }]);
             });
         });
 
