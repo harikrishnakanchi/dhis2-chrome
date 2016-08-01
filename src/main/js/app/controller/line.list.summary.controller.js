@@ -1,4 +1,4 @@
-define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, properties, orgUnitMapper) {
+define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], function(_, moment, properties, orgUnitMapper, interpolate) {
     return function($scope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, programRepository, programEventRepository, excludedDataElementsRepository,
         orgUnitRepository, approvalDataRepository, referralLocationsRepository, dataSyncFailureRepository, translationsService, filesystemService) {
 
@@ -195,7 +195,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             };
 
             var updateView = function() {
-                showResultMessage("success", submitableEvents.length + $scope.resourceBundle.eventSubmitSuccess);
+                showResultMessage("success", interpolate($scope.resourceBundle.eventSubmitSuccess, { number_of_events: submitableEvents.length }));
                 loadEventsView();
             };
 
@@ -232,7 +232,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             };
 
             var updateView = function() {
-                showResultMessage('success', submitableEvents.length + $scope.resourceBundle.eventSubmitAndApproveSuccess);
+                showResultMessage('success', interpolate($scope.resourceBundle.eventSubmitAndApproveSuccess, { number_of_events: submitableEvents.length }));
                 loadEventsView();
             };
 

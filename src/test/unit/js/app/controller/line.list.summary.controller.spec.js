@@ -1,7 +1,7 @@
-define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment", "programRepository", "programEventRepository", "excludedDataElementsRepository",
+define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment", "interpolate", "programRepository", "programEventRepository", "excludedDataElementsRepository",
         "orgUnitRepository", "approvalDataRepository", "referralLocationsRepository", "dataSyncFailureRepository", "translationsService", "filesystemService"
     ],
-    function(LineListSummaryController, mocks, utils, timecop, moment, ProgramRepository, ProgramEventRepository, ExcludedDataElementsRepository, OrgUnitRepository, ApprovalDataRepository, ReferralLocationsRepository, DataSyncFailureRepository, TranslationsService, FilesystemService) {
+    function(LineListSummaryController, mocks, utils, timecop, moment, interpolate, ProgramRepository, ProgramEventRepository, ExcludedDataElementsRepository, OrgUnitRepository, ApprovalDataRepository, ReferralLocationsRepository, DataSyncFailureRepository, TranslationsService, FilesystemService) {
         describe("lineListSummaryController ", function() {
             var scope, q, hustle, timeout, fakeModal, anchorScroll, location, routeParams, window, currentTime,
                 lineListSummaryController,
@@ -50,8 +50,8 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                     uploadApprovalDataDesc: 'approve data at coordination level for ',
                     uploadCompletionDataDesc: 'approve data at project level for ',
                     deleteApprovalsDesc: 'restart approval process for ',
-                    eventSubmitAndApproveSuccess: 'some success message',
-                    eventSubmitSuccess: 'some other success message',
+                    eventSubmitAndApproveSuccess: '{{number_of_events}} some success message',
+                    eventSubmitSuccess: '{{number_of_events}} some other success message',
                     eventDateLabel: 'Event Date',
                     yesLabel: 'YES'
                 };
@@ -273,7 +273,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                 expect(hustle.publishOnce).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEventA.period), 'dataValues');
                 expect(hustle.publishOnce).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEventB.period), 'dataValues');
                 expect(scope.resultMessageType).toEqual('success');
-                expect(scope.resultMessage).toEqual('2' + scope.resourceBundle.eventSubmitSuccess);
+                expect(scope.resultMessage).toEqual(interpolate(scope.resourceBundle.eventSubmitSuccess, { number_of_events: 2 }));
             });
 
             it("should submit and auto approve event details", function() {
@@ -303,7 +303,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                 expect(hustle.publishOnce).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEventA.period), 'dataValues');
                 expect(hustle.publishOnce).toHaveBeenCalledWith(createMockHustleMessage(currentModule, mockEventB.period), 'dataValues');
                 expect(scope.resultMessageType).toEqual('success');
-                expect(scope.resultMessage).toEqual('2' + scope.resourceBundle.eventSubmitAndApproveSuccess);
+                expect(scope.resultMessage).toEqual(interpolate(scope.resourceBundle.eventSubmitAndApproveSuccess, { number_of_events: 2 }));
             });
 
             it("should soft-delete event which exists on DHIS", function() {
