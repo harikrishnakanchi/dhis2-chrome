@@ -440,13 +440,17 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                     scope.exportToCSV();
                 });
 
+                var escapeString = function(string) {
+                    return '"' + string + '"';
+                };
+
                 it('should build headers for listed events while exporting to CSV', function () {
-                    var expectedCsvContent = [scope.resourceBundle.eventDateLabel, mockDataValue.formName].join(',');
+                    var expectedCsvContent = [escapeString(scope.resourceBundle.eventDateLabel), escapeString(mockDataValue.formName)].join(',');
                     expect(csvContent).toContain(expectedCsvContent);
                 });
 
                 it('should contain data for listed events while exporting data', function () {
-                    var expectedCsvContent = [moment(mockEvent.eventDate).toDate().toLocaleDateString(), mockDataValue.value].join(',');
+                    var expectedCsvContent = [moment(mockEvent.eventDate).toDate().toLocaleDateString(), escapeString(mockDataValue.value)].join(',');
                     expect(csvContent).toContain(expectedCsvContent);
                 });
 

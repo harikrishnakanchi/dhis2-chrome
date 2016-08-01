@@ -304,21 +304,21 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             var NEW_LINE = '\n',
                 DELIMITER = ',';
 
-            var buildCSVRow = function (initialValue, values) {
-                return [initialValue].concat(values).join(DELIMITER);
+            var escapeString = function (string) {
+                return '"' + string + '"';
             };
 
             var buildHeaders = function () {
                 var event = _.first($scope.events);
-                var eventDateLabel = $scope.resourceBundle.eventDateLabel;
-                var formNames = _.map(event.dataValues, 'formName');
-                return buildCSVRow(eventDateLabel, formNames);
+                var eventDateLabel = escapeString($scope.resourceBundle.eventDateLabel);
+                var formNames = _.map(_.map(event.dataValues, 'formName'), escapeString);
+                return [eventDateLabel].concat(formNames).join(DELIMITER);
             };
 
             var buildData = function (event) {
-                var values = _.map(event.dataValues, $scope.getDisplayValue);
+                var values = _.map(_.map(event.dataValues, $scope.getDisplayValue), escapeString);
                 var eventDate = $scope.getFormattedDate(event.eventDate);
-                return buildCSVRow(eventDate, values);
+                return [eventDate].concat(values).join(DELIMITER);
             };
 
             var csvContent = _.flatten([buildHeaders(), _.map($scope.events, buildData)]).join(NEW_LINE);
