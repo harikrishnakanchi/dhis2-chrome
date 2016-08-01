@@ -142,7 +142,7 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
         };
 
         $scope.exportToCSV = function () {
-            var fileName = [$scope.orgUnit.name, $scope.selectedDataset.name, 'export', moment().format('YYYYMMDD')].join('_'),
+            var fileName = [$scope.orgUnit.name, $scope.selectedDataset.name, 'export', moment().format('DD-MMM-YYYY')].join('.'),
                 csvContent = buildCsvContent();
 
             return filesystemService.promptAndWriteFile(fileName, new Blob([csvContent], { type: 'text/csv' }), filesystemService.FILE_TYPE_OPTIONS.CSV);
