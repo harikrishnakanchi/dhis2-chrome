@@ -415,7 +415,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
             });
 
             describe('exportToCSV', function() {
-                var csvContent, mockDataValue, mockEvent;
+                var csvContent, mockDataValue, mockEvent, mockDataElement;
 
                 beforeEach(function () {
                     spyOn(scope, "getDisplayValue").and.callFake(function (data) {
@@ -435,6 +435,10 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                         eventDate: moment('2016-07-31T12:00:00Z').toISOString(),
                         dataValues: [mockDataValue]
                     });
+                    mockDataElement = {
+                        formName: 'someDataElementFormName'
+                    };
+                    scope.summaryDataElements = [mockDataElement];
                     scope.events = [mockEvent];
                     scope.selectedModuleName = 'someModuleName';
                     scope.exportToCSV();
@@ -445,7 +449,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                 };
 
                 it('should build headers for listed events while exporting to CSV', function () {
-                    var expectedCsvContent = [escapeString(scope.resourceBundle.eventDateLabel), escapeString(mockDataValue.formName)].join(',');
+                    var expectedCsvContent = [escapeString(scope.resourceBundle.eventDateLabel), escapeString(mockDataElement.formName)].join(',');
                     expect(csvContent).toContain(expectedCsvContent);
                 });
 

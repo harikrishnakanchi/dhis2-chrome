@@ -112,8 +112,8 @@
                                         <tr>
                                             <th>{{ resourceBundle.eventDateLabel }}</th>
                                             <th ng-if="showPatientOriginInSummaryTable()">{{ resourceBundle.patientOriginLabel }}</th>
-                                            <th ng-repeat="dataValue in events[0].dataValues" ng-if="dataValue.showInEventSummary">
-                                                {{ dataValue.formName }}
+                                            <th ng-repeat="dataElement in summaryDataElements">
+                                                {{ dataElement.formName }}
                                             </th>
                                             <th></th>
                                             <th></th>

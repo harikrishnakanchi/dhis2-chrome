@@ -309,9 +309,8 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             };
 
             var buildHeaders = function () {
-                var event = _.first($scope.events);
                 var eventDateLabel = escapeString($scope.resourceBundle.eventDateLabel);
-                var formNames = _.map(_.map(event.dataValues, 'formName'), escapeString);
+                var formNames = _.map(_.map($scope.summaryDataElements, 'formName'), escapeString);
                 return [eventDateLabel].concat(formNames).join(DELIMITER);
             };
 
@@ -355,6 +354,12 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             };
 
             var loadPrograms = function() {
+                var getSummaryDataElementFromProgram = function (program) {
+                    var sections = _.flatten(_.map(program.programStages, 'programStageSections')),
+                        programStageDataElements = _.flatten(_.map(sections, 'programStageDataElements'));
+                    return _.filter(_.map(programStageDataElements, 'dataElement'), 'showInEventSummary');
+                };
+
                 var getExcludedDataElementsForModule = function() {
                     return excludedDataElementsRepository.get($scope.selectedModuleId).then(function(data) {
                         return data ? _.pluck(data.dataElements, "id") : [];
@@ -366,6 +371,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                         return programRepository.get(program.id, excludedDataElements).then(function(program) {
                             $scope.program = translationsService.translate(program);
                             $scope.associatedProgramId = $scope.program.id;
+                            $scope.summaryDataElements = getSummaryDataElementFromProgram($scope.program);
                         });
                     });
                 };
