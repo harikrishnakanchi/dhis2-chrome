@@ -1,12 +1,11 @@
 define(['footerController', 'systemSettingRepository', 'chromeUtils', 'angularMocks'], function(FooterController, SystemSettingRepository, chromeUtils, mocks) {
     describe('FooterController', function() {
-        var controller, rootScope, scope, interpolate,
+        var controller, rootScope, scope,
             systemSettingRepository;
 
-        beforeEach(mocks.inject(function($rootScope, $interpolate) {
+        beforeEach(mocks.inject(function($rootScope) {
             rootScope = $rootScope;
             scope = rootScope.$new();
-            interpolate = $interpolate;
 
             rootScope.resourceBundle = {
                 versionAndConnectionMessage: "{{praxis_version}} and {{dhis_url}}"
@@ -17,7 +16,7 @@ define(['footerController', 'systemSettingRepository', 'chromeUtils', 'angularMo
 
             spyOn(chromeUtils, 'getPraxisVersion').and.returnValue('someVersion');
 
-            controller = new FooterController(rootScope, scope, interpolate, systemSettingRepository);
+            controller = new FooterController(rootScope, scope, systemSettingRepository);
         }));
 
         describe('versionAndConnectionMessage', function() {
