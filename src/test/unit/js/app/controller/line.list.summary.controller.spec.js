@@ -459,7 +459,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                 });
 
                 it('should prompt user to export data values into CSV', function () {
-                    var expectedFilename = scope.selectedModuleName + '_summary_' + currentTime.format('YYYYMMDD') + '.csv';
+                    var expectedFilename = scope.selectedModuleName + '.summary.' + currentTime.format('DD-MMM-YYYY') + '.csv';
                     expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
                 });
 
