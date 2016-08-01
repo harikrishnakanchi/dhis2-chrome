@@ -340,13 +340,11 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
                 'eventDate': '2014-11-26T00:00:00',
                 'dataValues': [{
                     'shortName': 'Age',
-                    'showInEventSummary': true,
                     'dataElement': 'de1',
                     'value': '20',
                     'offlineSummaryType': "age"
                 }, {
                     'shortName': 'PatientId',
-                    'showInEventSummary': false,
                     'dataElement': 'de2',
                     'offlineSummaryType': 'code'
                 }]
@@ -355,12 +353,10 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
                 'eventDate': '2014-11-24T00:00:00',
                 'dataValues': [{
                     'shortName': 'Age',
-                    'showInEventSummary': true,
                     'dataElement': 'de1',
                     'offlineSummaryType': "age"
                 }, {
                     'shortName': 'PatientId',
-                    'showInEventSummary': false,
                     'dataElement': 'de2',
                     'offlineSummaryType': 'code',
                     'value': 'ABC1',
@@ -421,13 +417,11 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
                 'orgUnit': 'ou1',
                 'dataValues': [{
                     'shortName': 'Age',
-                    'showInEventSummary': true,
                     'dataElement': 'de1',
                     'value': '20',
                     'offlineSummaryType': 'age'
                 }, {
                     'shortName': 'PatientId',
-                    'showInEventSummary': false,
                     'dataElement': 'de2',
                     'offlineSummaryType': 'code'
                 }]
@@ -437,12 +431,10 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
                 'orgUnit': 'ou2',
                 'dataValues': [{
                     'shortName': 'Age',
-                    'showInEventSummary': true,
                     'dataElement': 'de1',
                     'offlineSummaryType': 'age'
                 }, {
                     'shortName': 'PatientId',
-                    'showInEventSummary': false,
                     'dataElement': 'de2',
                     'value': 'ABC1',
                     'offlineSummaryType': 'code'

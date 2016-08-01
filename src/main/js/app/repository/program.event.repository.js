@@ -244,7 +244,6 @@ define(["moment", "lodash", "properties", "dateUtils", "customAttributes"], func
 
                     return $q.all(_.map(dataElementIds, function(dataElementId) {
                         return dataElementRepository.get(dataElementId).then(function(dataElement) {
-                            dataElement.showInEventSummary = CustomAttributes.getBooleanAttributeValue(dataElement.attributeValues, CustomAttributes.SHOW_IN_EVENT_SUMMARY_CODE);
                             dataElement.dataElement = dataElement.id;
                             return _.omit(dataElement, ["id", "attributeValues"]);
                         });
