@@ -166,6 +166,7 @@ require.config({
         "appSettingsUtils": "app/utils/app.settings.utils",
         "authenticationUtils": "app/utils/authentication.utils",
         "dataURItoBlob": "app/utils/data.uri.to.blob",
+        "interpolate": "app/utils/interpolate",
 
         //Helpers
         "helpers": "app/helpers/helpers",
