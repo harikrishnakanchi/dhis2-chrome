@@ -25,8 +25,11 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
             dataSyncFailureRepository = new DataSyncFailureRepository();
             spyOn(dataSyncFailureRepository, "add").and.returnValue(utils.getPromise(q, undefined));
             ngI18nResourceBundle = {
-                "get": jasmine.createSpy("ngI18nResourceBundle").and.returnValue(utils.getPromise(q, {
-                    "data": {}
+                get: jasmine.createSpy('ngI18nResourceBundle').and.returnValue(utils.getPromise(q, {
+                    data: {
+                        notificationRetryMessage: 'some message',
+                        notificationAbortRetryMessage: 'another message'
+                    }
                 }))
             };
 

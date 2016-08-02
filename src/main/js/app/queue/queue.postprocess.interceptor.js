@@ -1,4 +1,4 @@
-define(["properties", "chromeUtils", "moment", "lodash"], function(properties, chromeUtils, moment, _) {
+define(["properties", "chromeUtils", "interpolate", "moment", "lodash"], function(properties, chromeUtils, interpolate, moment, _) {
     return function($log, ngI18nResourceBundle, dataRepository, dataSyncFailureRepository) {
         var getResourceBundle = function(locale) {
             return ngI18nResourceBundle.get({
@@ -30,13 +30,19 @@ define(["properties", "chromeUtils", "moment", "lodash"], function(properties, c
                 getResourceBundle(job.data.locale).then(function(data) {
                     var resourceBundle = data;
                     var notificationMessage = getCurrentDateTime();
-                    notificationMessage += resourceBundle.failedToLabel + job.data.desc + resourceBundle.notificationRetryMessagePrefix + getRetryDelayInHours(3) + resourceBundle.notificationRetryMessageSuffix;
+                    notificationMessage += interpolate(resourceBundle.notificationRetryMessage, {
+                        job_description: job.data.desc,
+                        retry_delay: getRetryDelayInHours(3)
+                    });
                     chromeUtils.createNotification(resourceBundle.notificationTitle, notificationMessage);
                 });
             } else if (job.releases === properties.queue.maxretries) {
                 getResourceBundle(job.data.locale).then(function(data) {
                     var resourceBundle = data;
-                    var notificationMessage = getCurrentDateTime() + resourceBundle.failedToLabel + job.data.desc + resourceBundle.notificationAbortRetryMessageSuffix;
+                    var notificationMessage = getCurrentDateTime();
+                    notificationMessage += interpolate(resourceBundle.notificationAbortRetryMessage, {
+                        job_description: job.data.desc
+                    });
                     chromeUtils.createNotification(resourceBundle.notificationTitle, notificationMessage);
                 });
             }
