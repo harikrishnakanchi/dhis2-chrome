@@ -1,5 +1,5 @@
 define(["lodash"], function(_) {
-    return function($scope, $q, $rootScope, userPreferenceRepository, chartRepository, orgUnitRepository) {
+    return function($scope, $q, $rootScope, userPreferenceRepository, chartRepository, orgUnitRepository, translationService) {
 
         var allCharts;
         $scope.allDataElementValues = [];
@@ -145,7 +145,7 @@ define(["lodash"], function(_) {
                 $scope.allDataElementValues.push({
                     "moduleName": module.parent.name + " - " + module.name,
                     "dataElementId": dataElementId,
-                    "dataElementName": chartData.metaData.names[dataElementId],
+                    "dataElementName": translationService.getTranslationForProperty(dataElementId, 'name', chartData.metaData.names[dataElementId]),
                     "dataElementDescription": (dataElement && dataElement.description) ? dataElement.description : '',
                     "weeklyData": weeklyData,
                     "showInNotifications": showInNotifications
