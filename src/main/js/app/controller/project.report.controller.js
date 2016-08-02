@@ -193,7 +193,7 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
                 .then(getDataForPivotTables)
                 .then(translatePivotTables)
                 .then(function(pivotTables) {
-                    $scope.pivotTables = pivotTables;
+                    $scope.pivotTables = _.sortBy(pivotTables, 'definition.displayPosition');
                     $scope.isReportAvailable = _.any(pivotTables, { isTableDataAvailable: true });
                 });
         };
