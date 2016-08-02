@@ -1,139 +1,119 @@
-define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
-    return function($scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService) {
+define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURItoBlob"], function(d3, _, moment, CustomAttributes, SVGUtils, dataURItoBlob) {
+    return function($scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService) {
 
         var formatYAxisTicks = function(datum) {
             var isFraction = function(x) { return x % 1 !== 0; };
             return isFraction(datum) ? '' : d3.format('.0f')(datum);
         };
 
-        $scope.isReportOpen = false;
-
-        $scope.barChartOptions = {
-            "chart": {
-                "type": "multiBarChart",
-                "height": 450,
-                "margin": {
-                    "top": 20,
-                    "right": 20,
-                    "bottom": 60,
-                    "left": 45
-                },
-                "clipEdge": true,
-                "staggerLabels": false,
-                "transitionDuration": 500,
-
-                "x": function(d) {
-                    return d.label;
-                },
-                "y": function(d) {
-                    return d.value;
-                },
-                "xAxis": {
-                    "axisLabel": "Period",
-                    "tickFormat": function(d) {
-                        return moment.unix(d).format('GGGG[W]W');
-                    }
-                },
-                "yAxis": {
-                    "tickFormat": formatYAxisTicks
-                },
-                "legend": {
-                    "maxKeyLength": 50
-                },
-                "reduceXTicks": false
-            }
-        };
-
-        $scope.stackedBarChartOptions = {
-            "chart": {
-                "type": "multiBarChart",
-                "height": 450,
-                "margin": {
-                    "top": 20,
-                    "right": 20,
-                    "bottom": 60,
-                    "left": 45
-                },
-                "stacked": true,
-                "clipEdge": true,
-                "staggerLabels": false,
-                "transitionDuration": 500,
-                "x": function(d) {
-                    return d.label;
-                },
-                "y": function(d) {
-                    return d.value;
-                },
-                "xAxis": {
-                    "axisLabel": "Period",
-                    "tickFormat": function(d) {
-                        return moment.unix(d).format('GGGG[W]W');
-                    }
-                },
-                "yAxis": {
-                    "tickFormat": formatYAxisTicks
-                },
-                "legend": {
-                    "maxKeyLength": 50
-                },
-                "reduceXTicks": false
-            }
-        };
-
-        $scope.lineChartOptions = {
-            "chart": {
-                "type": "lineChart",
-                "height": 450,
-                "margin": {
-                    "top": 20,
-                    "right": 45,
-                    "bottom": 60,
-                    "left": 45
-                },
-                "useInteractiveGuideline": true,
-                "x": function(d) {
-                    return d.label;
-                },
-                "y": function(d) {
-                    return d.value;
-                },
-                "xAxis": {
-                    "axisLabel": "Period",
-                    "tickFormat": function(d) {
-                        return moment.unix(d).format('GGGG[W]W');
+        var getChartOptions = function (chartOptions, isWeeklyChart) {
+            var defaultChartOptions = {
+                chart: {
+                    height: 450,
+                    margin: {top: 20, right: 20, bottom: 60, left: 45},
+                    x: function (d) {
+                        return d.label;
                     },
-                    "tickValues": function(d) {
+                    y: function (d) {
+                        return d.value;
+                    },
+                    xAxis: {
+                        axisLabel: $scope.resourceBundle.xAxisLabel,
+                        tickFormat: function (d) {
+                            return isWeeklyChart ? moment.unix(d).format('GGGG[W]W') : moment.localeData($scope.locale).monthsShort(moment.unix(d)) + ' ' +moment.unix(d).format('YY');
+                        }
+                    },
+                    legend: {maxKeyLength: 50}
+                }
+            };
+
+            return _.merge(defaultChartOptions, chartOptions);
+        };
+
+        var barChartOptions = {
+            chart: {
+                type: 'multiBarChart',
+                clipEdge: true,
+                staggerLabels: false,
+                transitionDuration: 500,
+                reduceXTicks: false,
+                controlLabels: {
+                    grouped: $scope.resourceBundle.grouped,
+                    stacked: $scope.resourceBundle.stacked
+                },
+                yAxis: {tickFormat: formatYAxisTicks}
+            }
+        };
+
+        var stackedBarChartOptions = {
+            chart: {
+                type: 'multiBarChart',
+                clipEdge: true,
+                staggerLabels: false,
+                transitionDuration: 500,
+                reduceXTicks: false,
+                stacked: true,
+                controlLabels: {
+                    grouped: $scope.resourceBundle.grouped,
+                    stacked: $scope.resourceBundle.stacked
+                },
+                yAxis: {tickFormat: formatYAxisTicks}
+            }
+        };
+
+        var lineChartOptions = {
+            chart: {
+                type: 'lineChart',
+                useInteractiveGuideline: true,
+                xAxis: {
+                    tickValues: function(d) {
                         return _.pluck(d[0].values, 'label');
                     }
-                },
-                "yAxis": {
-                    "tickFormat": formatYAxisTicks
-                },
-                "legend": {
-                    "maxKeyLength": 50
                 }
             }
         };
 
-        $scope.isMonthlyPivotTablesAvailable = false;
-        $scope.isWeeklyPivotTablesAvailable = false;
+        $scope.weeklyBarChartOptions = getChartOptions(barChartOptions, true);
+        $scope.weeklyStackedBarChartOptions = getChartOptions(stackedBarChartOptions, true);
+        $scope.weeklyLineChartOptions = getChartOptions(lineChartOptions, true);
 
-        $scope.resizeCharts = function() {
-            window.dispatchEvent(new Event('resize'));
+        $scope.monthlyBarChartOptions = getChartOptions(barChartOptions, false);
+        $scope.monthlyStackedBarChartOptions = getChartOptions(stackedBarChartOptions, false);
+        $scope.monthlyLineChartOptions = getChartOptions(lineChartOptions, false);
+
+        $scope.downloadChartAsPng = function(chartDefinition) {
+            var svgElement = document.getElementById(chartDefinition.id).firstElementChild;
+
+            var getPNGFileName = function() {
+                var regex = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]\s([a-zA-Z0-9\s]+)/;
+                var match = regex.exec(chartDefinition.name);
+                if (match) {
+                    var serviceName = match[1];
+                    var chartName = match[2];
+                    return [serviceName, chartName, moment().format("DD-MMM-YYYY"), 'png'].join('.');
+                } else {
+                    return "";
+                }
+            };
+
+            SVGUtils.svgAsPngUri(svgElement, {}, function(uri) {
+                var blob = dataURItoBlob(uri);
+                filesystemService.promptAndWriteFile(getPNGFileName(), blob, filesystemService.FILE_TYPE_OPTIONS.PNG);
+            });
         };
 
-        $scope.downloadChartAsPng = function(event) {
-            saveSvgAsPng(event.currentTarget.parentElement.parentElement.getElementsByTagName("svg")[0], "chart.png");
+        var filterReportsForCurrentModule = function (allReports) {
+            var allDatsasetCodes = _.map($scope.datasets, 'code');
+            return _.filter(allReports, function(report) {
+                return _.contains(allDatsasetCodes, report.dataSetCode);
+            });
         };
 
-        var loadChartData = function() {
+        var loadChartsWithData = function() {
 
             var insertMissingPeriods = function(chartData, periodsForXAxis) {
                 _.each(chartData, function(chartDataForKey) {
-                    var periodsWithData = _.reduce(chartDataForKey.values, function(result, data) {
-                        result.push(data.label);
-                        return result;
-                    }, []);
+                    var periodsWithData = _.map(chartDataForKey.values, 'label');
 
                     var missingPeriods = _.difference(periodsForXAxis, periodsWithData);
                     _.each(missingPeriods, function(period) {
@@ -142,9 +122,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                             "value": 0
                         });
                     });
-                    chartDataForKey.values = _.sortBy(chartDataForKey.values, function(value) {
-                        return value.label;
-                    });
+                    chartDataForKey.values = _.sortBy(chartDataForKey.values, 'label');
                 });
 
                 return chartData;
@@ -157,10 +135,10 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                         return chartData.metaData.names[id];
                     };
 
-                    var periodsForXAxis = _.reduce(chartData.metaData.pe, function(result, period) {
-                        result.push(parseInt(moment(period, 'GGGG[W]W').format('X')));
-                        return result;
-                    }, []);
+                    var parseFormat = chart.weeklyChart ? 'GGGG[W]W' : 'YYYYMM';
+                    var periodsForXAxis = _.map(chartData.metaData.pe, function (period) {
+                        return parseInt(moment(period, parseFormat).format('X'));
+                    });
 
                     var transformedChartData = _.transform(chartData.rows, function(result, row) {
 
@@ -182,12 +160,12 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                         var periodIndex = _.findIndex(chartData.headers, {
                             "name": "pe"
                         });
-                        var chartDataPeriod = parseInt(moment(row[periodIndex], 'GGGG[W]W').format('X'));
+                        var chartDataPeriod = parseInt(moment(row[periodIndex], parseFormat).format('X'));
 
                         var valueIndex = _.findIndex(chartData.headers, {
                             "name": "value"
                         });
-                        var chartDataValue = parseInt(row[valueIndex]);
+                        var chartDataValue = parseFloat(row[valueIndex]);
 
                         var existingItem = _.find(result, {
                             'key': chartDataKey
@@ -213,10 +191,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     transformedChartData = insertMissingPeriods(transformedChartData, periodsForXAxis);
 
                     return {
-                        "title": chart.title,
-                        "dataSetCode": chart.dataSetCode,
-                        "displayPosition": chart.displayPosition,
-                        "type": chart.type,
+                        "definition": chart,
                         "data": transformedChartData
                     };
                 };
@@ -227,8 +202,10 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
 
                 var getChartDataPromises = _.map(charts, function(chart) {
                     return chartRepository.getDataForChart(chart.name, $scope.orgUnit.id).then(function(chartData) {
-                        if (!_.isEmpty(chartData))
+                        if (!_.isEmpty(chartData)) {
+                            translationsService.translateCharts(chartData);
                             return transform(chart, chartData);
+                        }
                     });
                 });
 
@@ -236,9 +213,10 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             };
 
             return chartRepository.getAll()
+                .then(filterReportsForCurrentModule)
                 .then(getChartData)
                 .then(function(chartData) {
-                    $scope.chartData = chartData;
+                    $scope.charts = chartData;
                 });
         };
 
@@ -247,7 +225,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             var loadDatasetsForModules = function(orgUnits) {
                 return datasetRepository.findAllForOrgUnits(_.pluck(orgUnits, "id")).then(function(dataSets) {
                     var filteredDataSets = _.filter(dataSets, function(ds) {
-                        return !(ds.isOriginDataset || ds.isPopulationDataset || ds.isReferralDataset);
+                        return !ds.isPopulationDataset;
                     });
                     
                     var translatedDataSets = translationsService.translate(filteredDataSets);
@@ -281,6 +259,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             return orgUnitRepository.get(orgUnitId).then(function(ou) {
                 if (isOfType(ou, 'Module'))
                     ou.displayName = ou.parent.name + ' - ' + ou.name;
+                ou.lineListService = CustomAttributes.getBooleanAttributeValue(ou.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
                 $scope.orgUnit = ou;
             });
         };
@@ -302,8 +281,9 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             return translationsService.translateReports(pivotTables);
         };
 
-        var loadPivotTables = function() {
+        var loadPivotTablesWithData = function() {
             return pivotTableRepository.getAll()
+                .then(filterReportsForCurrentModule)
                 .then(transformTables)
                 .then(translatePivotTables)
                 .then(function(pivotTables) {
@@ -314,16 +294,22 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
         var prepareDataForView = function() {
             _.each($scope.datasets, function(eachDataSet) {
 
-                var filteredCharts = _.filter($scope.chartData, {
-                    dataSetCode: eachDataSet.code
+                var filteredCharts = _.filter($scope.charts, {
+                    definition: {
+                        dataSetCode: eachDataSet.code
+                    }
                 });
 
                 var filteredPivotTables = _.filter($scope.pivotTables, {
                     dataSetCode: eachDataSet.code
                 });
 
-                eachDataSet.isChartsAvailable = _.any(filteredCharts, function(chart) {
-                    return chart.data && chart.data.length > 0;
+                eachDataSet.isWeeklyChartsAvailable = _.any(filteredCharts, function(chart) {
+                    return chart.definition.weeklyChart && chart.data && chart.data.length > 0;
+                });
+
+                eachDataSet.isMonthlyChartsAvailable = _.any(filteredCharts, function(chart) {
+                    return chart.definition.monthlyChart && chart.data && chart.data.length > 0;
                 });
 
                 eachDataSet.isWeeklyPivotTablesAvailable = _.any(filteredPivotTables, function(table) {
@@ -334,25 +320,26 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     return table.definition.monthlyReport && table.isTableDataAvailable;
                 });
 
-                eachDataSet.isReportsAvailable = eachDataSet.isChartsAvailable || eachDataSet.isMonthlyPivotTablesAvailable || eachDataSet.isWeeklyPivotTablesAvailable;
+                eachDataSet.isReportsAvailable = eachDataSet.isWeeklyChartsAvailable || eachDataSet.isMonthlyChartsAvailable || eachDataSet.isMonthlyPivotTablesAvailable || eachDataSet.isWeeklyPivotTablesAvailable;
             });
+            
+            $scope.datasets = _.sortByOrder($scope.datasets, ['name', 'isReportsAvailable'], ['asc' ,'desc']);
 
-            $scope.datasets = _.sortBy($scope.datasets, "name").reverse();
-            $scope.datasets = _.sortBy($scope.datasets, "isReportsAvailable").reverse();
-
-            if (!_.isEmpty($scope.datasets))
-                $scope.selectedDataset = $scope.datasets[0];
+            $scope.selectedDataset = _.find($scope.datasets, { isOriginDataset: false, isReferralDataset: false });
 
             return $q.when();
         };
 
         var init = function() {
             $scope.loading = true;
+
+            $scope.currentTab = 'weeklyReport';
             $scope.selectedDataset = null;
+
             loadOrgUnit()
                 .then(loadRelevantDatasets)
-                .then(loadChartData)
-                .then(loadPivotTables)
+                .then(loadChartsWithData)
+                .then(loadPivotTablesWithData)
                 .then(prepareDataForView)
                 .finally(function() {
                     $scope.loading = false;

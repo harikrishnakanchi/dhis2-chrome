@@ -10,7 +10,7 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
                 return datasets;
             });
         };
-
+        
         this.findAllForOrgUnits = function(orgUnitIds) {
             var store = db.objectStore("dataSets");
             var query = db.queryBuilder().$in(orgUnitIds).$index("by_organisationUnit").compile();

@@ -3,11 +3,12 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         this.moduleId = orgUnit.id;
         this.period = period;
         this.moduleName = parseModuleName(orgUnit);
-        this.lineListService = CustomAttributes.parseAttribute(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
+        this.lineListService = CustomAttributes.getBooleanAttributeValue(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
         this.active = isActive(this.period, orgUnit.openingDate);
 
         this.dataValues = getAggregateDataValues(aggregateDataValues);
         this.dataValuesHaveBeenModifiedLocally = dataValuesHaveBeenModifiedLocally(this.dataValues);
+        this.events = lineListEvents || [];
         this.approvalData = approvalData || null;
 
         this.submitted = isSubmitted(this.dataValues, lineListEvents, this.lineListService);
@@ -17,28 +18,32 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         this.approvedAtCoordinationLevel = !!(approvalData && approvalData.isApproved);
         this.approvedAtCoordinationLevelBy = this.approvedAtCoordinationLevel ? approvalData.approvedBy : null;
         this.approvedAtCoordinationLevelAt = this.approvedAtCoordinationLevel ? moment(approvalData.approvedOn) : null;
+        this.approvedAtAnyLevel = this.approvedAtProjectLevel || this.approvedAtCoordinationLevel;
 
-        this.failedToSync = isFailedToSync(this.lineListService, aggregateDataValues, failedToSyncData);
+        this.failedToSync = isFailedToSync(this.lineListService, aggregateDataValues, failedToSyncData, this.approvedAtAnyLevel);
 
         this.awaitingActionAtDataEntryLevel = isWaitingForActionAtDataEntryLevel(this.submitted, this.approvedAtProjectLevel, this.approvedAtCoordinationLevel, this.failedToSync);
         this.awaitingActionAtProjectLevelApprover = isWaitingForActionAtProjectLevel(this.submitted, this.approvedAtProjectLevel, this.approvedAtCoordinationLevel, this.failedToSync);
         this.awaitingActionAtCoordinationLevelApprover = isWaitingForActionAtCoordinationLevel(this.submitted, this.approvedAtProjectLevel, this.approvedAtCoordinationLevel, this.failedToSync);
     };
 
-    var isFailedToSync = function(lineListService, aggregateDataValues, failedToSyncData) {
-
-        //This can be removed after v6.0 has been released
-        var aggregateDataValuesFailedToSyncAsPerDeprecatedLocalStatus = !!aggregateDataValues && _.any(aggregateDataValues, { localStatus: 'FAILED_TO_SYNC' });
+    var isFailedToSync = function(lineListService, aggregateDataValues, failedToSyncData, approvedAtAnyLevel) {
         var failedToSync = !_.isEmpty(failedToSyncData);
 
-        return !lineListService && (failedToSync || aggregateDataValuesFailedToSyncAsPerDeprecatedLocalStatus);
+        if(lineListService) {
+            return failedToSync && approvedAtAnyLevel;
+        } else {
+            //This can be removed after v6.0 has been released
+            var aggregateDataValuesFailedToSyncAsPerDeprecatedLocalStatus = !!aggregateDataValues && _.any(aggregateDataValues, { localStatus: 'FAILED_TO_SYNC' });
+            return failedToSync || aggregateDataValuesFailedToSyncAsPerDeprecatedLocalStatus;
+        }
     };
 
     var isWaitingForActionAtDataEntryLevel = function(submitted, approvedAtProject, approvedAtCoordination, failedToSync) {
         if(failedToSync) {
             return submitted && !approvedAtProject && !approvedAtCoordination;
         } else {
-            return !submitted && !approvedAtCoordination;
+            return !submitted && !approvedAtProject && !approvedAtCoordination;
         }
     };
 
@@ -71,7 +76,7 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
 
     var isSubmitted = function (dataValues, lineListEvents, lineListService) {
         if(lineListService) {
-            return !!(lineListEvents && lineListEvents.length > 0 && _.all(lineListEvents, eventIsSubmitted));
+            return !!(lineListEvents && lineListEvents.length > 0 && _.any(lineListEvents, eventIsSubmitted));
         } else {
             return !!(dataValues.length > 0 && !_.some(dataValues, { isDraft: true }));
         }

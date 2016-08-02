@@ -1,13 +1,6 @@
-define(["chromeUtils", "lodash"], function(chromeUtils, _) {
-    return function($q, $scope, $location, $rootScope, $hustle, $timeout, ngI18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor) {
+define(["lodash"], function(_) {
+    return function($q, $scope, $location, $rootScope, $hustle, $timeout, db, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor) {
         $scope.projects = [];
-
-        $scope.getConnectedToMessage = function() {
-            var praxisVersionMessage = 'Version ' + chromeUtils.getPraxisVersion() + ' ';
-            var dhisUrl = systemSettingRepository.getDhisUrl();
-            var message = $scope.resourceBundle ? $scope.resourceBundle.connectedTo + " " + dhisUrl : "";
-            return dhisUrl ? praxisVersionMessage + message : praxisVersionMessage;
-        };
 
         $scope.canChangeProject = function(hasUserLoggedIn, isCoordinationApprover) {
             return hasUserLoggedIn && isCoordinationApprover;
@@ -19,23 +12,12 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
         };
 
         $scope.hasSelectedProject = function() {
-            if (_.isUndefined($rootScope.currentUser.selectedProject))
-                return false;
-
-            return true;
+            return !!$rootScope.currentUser.selectedProject;
         };
 
         $scope.showTestLogo = function() {
             return !systemSettingRepository.isKeyGeneratedFromProd();
         };
-
-        var buildResourceBundle = $rootScope.$watch("locale", function() {
-            ngI18nResourceBundle.get({
-                "locale": $rootScope.locale
-            }).then(function(data) {
-                $rootScope.resourceBundle = data.data;
-            });
-        });
 
         var loadProjects = function() {
             if ($rootScope.currentUser && $rootScope.currentUser.organisationUnits) {
@@ -94,17 +76,12 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             $location.path("/dashboard");
         };
 
-        var deregisterUserPreferencesListener = $rootScope.$on('userPreferencesUpdated', function() {
+        $rootScope.$on('userPreferencesUpdated', function() {
             loadProjects();
             if ($rootScope.currentUser && $rootScope.currentUser.selectedProject) {
                 loadUserLineListModules();
                 loadReportOpunitAndModules();
             }
-        });
-
-        $scope.$on('$destroy', function() {
-            deregisterUserPreferencesListener();
-            buildResourceBundle();
         });
 
         var checkConnectionQuality = function() {
@@ -120,22 +97,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
         };
 
         var init = function() {
-
-            var validateAndContinue = function(isProductKeySet) {
-                if (!isProductKeySet) {
-                    $location.path("/productKeyPage");
-                } else {
-                    chromeUtils.sendMessage("dbReady");
-                    $location.path("/login");
-                }
-            };
-
             checkConnectionQuality();
-
-            $scope.allUserLineListModules = [];
-            packagedDataImporter.run()
-                .then(systemSettingRepository.isProductKeySet)
-                .then(validateAndContinue);
         };
 
         init();

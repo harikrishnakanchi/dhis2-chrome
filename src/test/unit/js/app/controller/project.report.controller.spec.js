@@ -1,27 +1,50 @@
-define(["orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "translationsService", "timecop", "orgUnitGroupSetRepository", "systemSettingRepository"], function(OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, TranslationsService, timecop, OrgUnitGroupSetRepository, SystemSettingRepository) {
+define(["moment", "orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "translationsService", "timecop", "orgUnitGroupSetRepository", "filesystemService"],
+    function(moment, OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, TranslationsService, timecop, OrgUnitGroupSetRepository, FilesystemService) {
     describe("projectReportController", function() {
-        var scope, rootScope, projectReportController, orgUnitRepository, pivotTableRepository, translationsService, pivotTables, data, q, orgUnitGroupSetRepository, systemSettingRepository;
+        var scope, rootScope, q,
+            projectReportController,
+            orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository, filesystemService,
+            mockPivotTables, pivotTableData, mockProjectOrgUnit, orgUnitGroupSets, currentTime;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             rootScope = $rootScope;
+            scope = rootScope.$new();
             q = $q;
 
+            currentTime = moment('2015-10-29T12:43:54.972Z');
             Timecop.install();
-            Timecop.freeze(new Date("2015-10-29T12:43:54.972Z"));
+            Timecop.freeze(currentTime);
 
             rootScope.currentUser = {
-                userCredentials: {
-                    username: "test_user"
-                },
                 selectedProject: {
                     id: "xyz",
                     name: "Aweil - SS153"
                 }
             };
 
-            scope = rootScope.$new();
+            scope.resourceBundle = {
+                country: 'Country',
+                nameLabel: 'Name',
+                projectInformationLabel: 'Project Information',
+                projectCodeLabel: 'Project Code',
+                projectTypeLabel: 'Project Type',
+                contextLabel: 'Context',
+                typeOfPopulationLabel: 'Type of population',
+                reasonForInterventionLabel: 'Reason For Intervention',
+                modeOfOperationLabel: 'Mode Of Operation',
+                modelOfManagementLabel: 'Model Of Management',
+                openingDateLabel: 'Opening Date',
+                endDateLabel: 'End Date'
+            };
 
-            var projectBasicInfo = {
+            mockProjectOrgUnit = {
+                "id": "xyz",
+                "name": "Aweil - SS153",
+                "openingDate": "2007-12-31",
+                "parent": {
+                    "id": "a18da381f7d",
+                    "name": "SOUDAN Sud"
+                },
                 "attributeValues": [
                     {
                         "attribute": {
@@ -86,24 +109,28 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
                         },
                         "value": "Northern Bar El Ghazal"
                     }
-                ],
-                "id": "xyz",
-                "name": "Aweil - SS153",
-                "openingDate": "2007-12-31",
-                "parent": {
-                    "id": "a18da381f7d",
-                    "name": "SOUDAN Sud"
-                }
+                ]
             };
-            pivotTables = [{
+
+            mockPivotTables = [{
                 id: 'pivotTable1',
                 projectReport: true,
-                title: 'Hospitalization'
+                title: 'Hospitalization',
+                rows: [{
+                    items: [{
+                        id: 'adf6cf9405c',
+                        name: 'Average bed occupation rate (%) - Adult IPD Ward'
+                    }, {
+                        id: 'ae70aadc5cf',
+                        name: 'Average length of bed use (days) - Adult IPD Ward'
+                    }]
+                }]
             }, {
                 id: 'pivotTable2',
                 projectReport: false
             }];
-            data = {
+
+            pivotTableData = {
                 "headers": [{
                     "name": "dx",
                     "column": "Data"
@@ -142,76 +169,7 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
                 "width": 3
             };
 
-            scope.resourceBundle = {
-                country: 'Country',
-                nameLabel: 'Name',
-                projectInformationLabel: 'Project Information',
-                projectCodeLabel: 'Project Code',
-                projectTypeLabel: 'Project Type',
-                contextLabel: 'Context',
-                typeOfPopulationLabel: 'Type of population',
-                reasonForInterventionLabel: 'Reason For Intervention',
-                modeOfOperationLabel: 'Mode Of Operation',
-                modelOfManagementLabel: 'Model Of Management',
-                openingDateLabel: 'Opening Date',
-                endDateLabel: 'End Date'
-            };
-
-            orgUnitRepository = new OrgUnitRepository();
-            spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise($q, projectBasicInfo));
-
-            pivotTableRepository = new PivotTableRepository();
-            spyOn(pivotTableRepository, "getAll").and.returnValue(utils.getPromise($q, pivotTables));
-            spyOn(pivotTableRepository, "getDataForPivotTable").and.returnValue(utils.getPromise($q, data));
-
-            var translatedReport = [
-                {"definition": {
-                    "id":"pivotTable1",
-                    "projectReport":true,
-                    "title":"Hospitalization"},
-                    "data":{
-                        "headers":[{"name":"dx","column":"Data"},{"name":"pe","column":"Period"},{"name":"value","column":"Value"}],
-                        "metaData":{
-                            "names":{"201511":"November 2015",
-                                "201512":"December 2015",
-                                "adf6cf9405c":"Average bed occupation rate (%) - Adult IPD Ward",
-                                "ae70aadc5cf":"Average length of bed use (days) - Adult IPD Ward",
-                                "dx":"Data","pe":"Period"},
-                            "dx":["adf6cf9405c","ae70aadc5cf"],
-                            "pe":["201511","201512"]},
-                        "rows":[
-                            ["adf6cf9405c","201511","1.1"],
-                            ["adf6cf9405c","201512","1.2"],
-                            ["ae70aadc5cf","201511","2.1"],
-                            ["ae70aadc5cf","201512","2.2"]],
-                        "height":132,
-                        "width":3},
-                    "isTableDataAvailable":true
-                }];
-
-            var mockDB = utils.getMockDB($q);
-            mockStore = mockDB.objectStore;
-
-            var translationResponse = [{
-                objectId: 'a16b4a97ce4',
-                name:'hello'
-            }, {
-                objectId: 'ac606ebc28f'
-            }];
-
-
-            var ngI18nResourceBundle = {
-                get: jasmine.createSpy("get").and.returnValue(utils.getPromise(q, {}))
-            };
-
-            systemSettingRepository = new SystemSettingRepository();
-            spyOn(systemSettingRepository, 'upsertLocale');
-            translationsService = new TranslationsService(q, mockDB.db, rootScope, ngI18nResourceBundle, systemSettingRepository);
-            mockStore.each.and.returnValue(utils.getPromise(q, translationResponse));
-
-            spyOn(translationsService, "translateReports").and.returnValue(utils.getPromise(q, translatedReport));
-
-            var orgUnitGroupSets = [{
+            orgUnitGroupSets = [{
                 "code": "project_type",
                 "id": "D6yNgLkqIKR",
                 "name": "Project Type",
@@ -300,51 +258,73 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
                 }]
             }];
 
+            orgUnitRepository = new OrgUnitRepository();
+            spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise($q, mockProjectOrgUnit));
+
+            pivotTableRepository = new PivotTableRepository();
+            spyOn(pivotTableRepository, "getAll").and.returnValue(utils.getPromise($q, mockPivotTables));
+            spyOn(pivotTableRepository, "getDataForPivotTable").and.returnValue(utils.getPromise($q, pivotTableData));
+
+            translationsService = new TranslationsService();
+            spyOn(translationsService, "translateReports").and.callFake(function(object) { return object; });
+            spyOn(translationsService, 'translate').and.callFake(function(object) { return object; });
+
             orgUnitGroupSetRepository = new OrgUnitGroupSetRepository();
             spyOn(orgUnitGroupSetRepository, 'getAll').and.returnValue(utils.getPromise(q, orgUnitGroupSets));
 
-            projectReportController = new ProjectReportController(rootScope, $q, scope, orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository);
+            filesystemService = new FilesystemService();
+            spyOn(filesystemService, 'promptAndWriteFile').and.returnValue(utils.getPromise(q, {}));
+
+            projectReportController = new ProjectReportController(rootScope, q, scope, orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository, filesystemService);
         }));
 
-        it("should get csv file name in expected format", function() {
-            expect(scope.getCsvFileName()).toEqual("Aweil - SS153_ProjectReport_29-Oct-2015.csv");
+        afterEach(function () {
+            Timecop.returnToPresent();
+            Timecop.uninstall();
         });
 
-        it('should get data for csv file', function() {
-            var expectedData = [
-                ['Project Information'],
-                ['Country', 'SOUDAN Sud'],
-                ['Name', 'Aweil - SS153'],
-                ['Project Code', 'SS153'],
-                ['Project Type', 'Regular Project'],
-                ['Context', 'Cross-border instability'],
-                ['Type of population', 'General Population'],
-                ['Reason For Intervention', 'Access to health care'],
-                ['Mode Of Operation', 'Direct operation'],
-                ['Model Of Management', 'Collaboration'],
-                ['Opening Date', new Date("12/31/2007").toLocaleDateString()],
-                ['End Date', ''],
-                [],
-                ['Hospitalization', ['November 2015'],
-                    ['December 2015']
-                ],
-                ['Average bed occupation rate (%) - Adult IPD Ward', '1.1', '1.2'],
-                ['Average length of bed use (days) - Adult IPD Ward', '2.1', '2.2'],
-                []
-            ];
+        describe('CSV Export', function () {
+            var csvContent;
 
-            translationsService.setLocale('fr');
-            scope.$apply();
-            scope.pivotTables[0].currentOrderOfItems = ["adf6cf9405c", "ae70aadc5cf"];
-            expect(scope.getCsvFileData()).toEqual(expectedData);
+            beforeEach(function () {
+                scope.$apply();
+                scope.pivotTables[0].currentOrderOfItems = ["adf6cf9405c", "ae70aadc5cf"];
+                
+                spyOn(window, 'Blob').and.callFake(function (contentArray) {
+                    this.value = contentArray.join();
+                });
+
+                filesystemService.promptAndWriteFile.and.callFake(function (fileName, blob) {
+                    csvContent = blob.value;
+                });
+
+                scope.exportToCSV();
+            });
+            
+            it('should prompt the user to save the CSV file with suggested filename', function () {
+                var expectedFilename = 'Aweil - SS153.ProjectReport.' + currentTime.format('DD-MMM-YYYY') + '.csv';
+                expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
+            });
+
+            describe('CSV contents', function () {
+                it('should contain project basic information', function () {
+                    expect(csvContent).toContain('"Project Information"\n"Country","SOUDAN Sud"');
+                });
+
+                it('should contain pivot table headers', function () {
+                    expect(csvContent).toContain('"Hospitalization","November 2015","December 2015"');
+                });
+
+                it('should contain pivot table data', function () {
+                    expect(csvContent).toContain('"Average bed occupation rate (%) - Adult IPD Ward",1.1,1.2\n"Average length of bed use (days) - Adult IPD Ward",2.1,2.2');
+                });
+            });
         });
 
         it('should filter out project report tables from pivot tables', function() {
-
-            translationsService.setLocale('fr');
             scope.$apply();
-            expect(scope.pivotTables[0].definition).toEqual(pivotTables[0]);
-            expect(scope.pivotTables[0].data).toEqual(data);
+            expect(scope.pivotTables[0].definition).toEqual(mockPivotTables[0]);
+            expect(scope.pivotTables[0].data).toEqual(pivotTableData);
         });
 
         it("should add the projectAttributes which lists all the project basic info into the scope", function() {
@@ -390,7 +370,6 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
                 }
             ];
 
-            translationsService.setLocale('fr');
             scope.$apply();
             expect(orgUnitRepository.get).toHaveBeenCalledWith("xyz");
             expect(scope.projectAttributes).toEqual(expectedProjectAttributes);

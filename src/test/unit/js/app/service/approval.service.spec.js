@@ -1,6 +1,6 @@
 define(["approvalService", "angularMocks", "properties", "utils", "moment", "lodash"], function(ApprovalService, mocks, properties, utils, moment, _) {
     describe("approval service", function() {
-        var http, httpBackend, db, q, mockStore, dataSets, orgUnits;
+        var http, httpBackend, db, q, mockStore, dataSets, orgUnits, approvalService;
 
         beforeEach(mocks.inject(function($injector) {
             http = $injector.get('$http');
@@ -13,6 +13,8 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             mockStore = mockDB.objectStore;
             dataSets = ["d1", "d2"];
             orgUnits = ["ou1", "ou2"];
+
+            approvalService = new ApprovalService(http, db, q);
         }));
 
         afterEach(function() {
@@ -64,7 +66,6 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 "orgUnit": "17yugc"
             }];
 
-            var approvalService = new ApprovalService(http, db, q);
             approvalService.markAsComplete(["170b8cd5e53", "wqeb8cd5e53"], periodsAndOrgUnits, "testproj_approver_l1", moment().toISOString());
             httpBackend.flush();
         });
@@ -107,419 +108,295 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 "orgUnit": "17yugc"
             }];
 
-            var approvalService = new ApprovalService(http, db, q);
             approvalService.markAsApproved(["170b8cd5e53", "wqeb8cd5e53"], periodsAndOrgUnits, "currentUserName", "2014-01-01");
 
             httpBackend.flush();
         });
 
-        it("should get completion data", function() {
-            var startDate = moment().subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
-            var endDate = moment().format("YYYY-MM-DD");
-
-            var dhisApprovalData = {
-                "completeDataSetRegistrations": [{
-                    "dataSet": {
-                        "id": "d1"
+        describe('getCompletionData', function () {
+            var createMockDhisCompletionData = function(options) {
+                return _.merge({
+                    dataSet: {
+                        id: 'someDataSetId'
                     },
-                    "period": {
-                        "id": "2014W1"
+                    period: {
+                        id: '2016W23'
                     },
-                    "organisationUnit": {
-                        "id": "ou1"
+                    organisationUnit: {
+                        id: 'ou1'
                     },
-                    "date": "2014-01-03T00:00:00.000+0000",
-                    "lastModifiedTime": "2014-01-03T00:00:00.000+0000",
-                    "storedBy": "testproj_approver_l1"
-                }, {
-                    "dataSet": {
-                        "id": "d2"
-                    },
-                    "period": {
-                        "id": "2014W1"
-                    },
-                    "organisationUnit": {
-                        "id": "ou1"
-                    },
-                    "date": "2014-01-03T00:00:00.000+0000",
-                    "lastModifiedTime": "2014-01-03T00:00:00.000+0000",
-                    "storedBy": "testproj_approver_l1"
-                }, {
-                    "dataSet": {
-                        "id": "d1"
-                    },
-                    "period": {
-                        "id": "2014W2"
-                    },
-                    "organisationUnit": {
-                        "id": "ou1"
-                    },
-                    "date": "2014-01-10T00:00:00.000+0000",
-                    "lastModifiedTime": "2014-01-10T00:00:00.000+0000",
-                    "storedBy": "testproj_approver_l1"
-                }, {
-                    "dataSet": {
-                        "id": "d2"
-                    },
-                    "period": {
-                        "id": "2014W2"
-                    },
-                    "organisationUnit": {
-                        "id": "ou1"
-                    },
-                    "date": "2014-01-10z",
-                    "lastModifiedTime": "2014-01-10T00:00:00.000+0000",
-                    "storedBy": "testproj_approver_l1"
-                }]
+                    storedBy: "ss153_medref",
+                    date: "2016-04-19T00:53:52.972+0000"
+                }, options);
             };
 
-            httpBackend.expectGET(properties.dhis.url + "/api/completeDataSetRegistrations?children=true&dataSet=d1&dataSet=d2&endDate=" + endDate + "&orgUnit=ou1&orgUnit=ou2&startDate=" + startDate).respond(200, dhisApprovalData);
+            it('should download completion data for specified org units and data sets', function() {
+                var expectedStartDate = moment().subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD"),
+                    expectedEndDate = moment().format("YYYY-MM-DD"),
+                    dataSetId = 'someDataSetId',
+                    orgUnitId = 'someOrgUnitId',
+                    originOrgUnits = [];
 
-            var actualApprovalData;
-            approvalService = new ApprovalService(http, db, q);
-            approvalService.getCompletionData(orgUnits, [], dataSets).then(function(data) {
-                actualApprovalData = data;
+                httpBackend.expectGET(properties.dhis.url + "/api/completeDataSetRegistrations" +
+                    "?children=" +  true +
+                    "&dataSet=" + dataSetId +
+                    "&endDate=" + expectedEndDate +
+                    "&fields=period%5Bid%5D,organisationUnit%5Bid,name%5D,storedBy,dataSet%5Bid,name%5D,date" +
+                    "&orgUnit=" + orgUnitId +
+                    "&startDate=" + expectedStartDate
+                ).respond(200, {});
+
+                approvalService.getCompletionData([orgUnitId], originOrgUnits, [dataSetId]);
+                httpBackend.flush();
             });
 
-            httpBackend.flush();
+            it("should get completion data for specified period range", function() {
+                var periodRange = ["2014W01", "2014W02", "2014W05"],
+                    expectedStartDate = moment(_.first(periodRange), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
+                    expectedEndDate = moment(_.last(periodRange), 'GGGG[W]WW').endOf('isoWeek').format('YYYY-MM-DD'),
+                    dataSetId = 'someDataSetId',
+                    orgUnitId = 'someOrgUnitId',
+                    originOrgUnits = [];
 
-            var expectedApprovalData = [{
-                "period": "2014W01",
-                "orgUnit": "ou1",
-                "completedBy": "testproj_approver_l1",
-                "completedOn": "2014-01-03T00:00:00.000+0000",
-                "isComplete": true
-            }, {
-                "period": "2014W02",
-                "orgUnit": "ou1",
-                "completedBy": "testproj_approver_l1",
-                "completedOn": "2014-01-10T00:00:00.000+0000",
-                "isComplete": true
-            }];
+                httpBackend.expectGET(new RegExp('endDate=' + expectedEndDate + '.*startDate=' + expectedStartDate)).respond(200, {});
 
-            expect(actualApprovalData).toEqual(expectedApprovalData);
+                approvalService.getCompletionData([orgUnitId], originOrgUnits, [dataSetId], periodRange);
+
+                httpBackend.flush();
+            });
+
+            it('should return a completion object', function () {
+                var mockDhisCompletion = createMockDhisCompletionData();
+
+                httpBackend.expectGET(/.*/).respond(200, { completeDataSetRegistrations: [mockDhisCompletion] });
+
+                approvalService.getCompletionData().then(function(serviceResponse) {
+                    expect(_.first(serviceResponse)).toEqual({
+                        period: mockDhisCompletion.period.id,
+                        orgUnit: mockDhisCompletion.organisationUnit.id,
+                        completedBy: mockDhisCompletion.storedBy,
+                        completedOn: mockDhisCompletion.date,
+                        isComplete: true
+                    });
+                });
+                httpBackend.flush();
+            });
+
+            it('should get completion data for parent orgUnit when origin orgUnits is given', function() {
+                var originOrgunits = [{
+                    "id": "someOriginOrgUnitId",
+                    "parent": {
+                        "id": "someModuleId"
+                    }
+                }];
+
+                var mockDhisCompletionA = createMockDhisCompletionData({ organisationUnit: { id: 'someOriginOrgUnitId' } }),
+                    mockDhisCompletionB = createMockDhisCompletionData({ organisationUnit: { id: 'someModuleId' } }),
+                    mockDhisCompletionC = createMockDhisCompletionData({ organisationUnit: { id: 'someOtherModuleId' } });
+
+                httpBackend.expectGET(/.*/).respond(200, { completeDataSetRegistrations: [mockDhisCompletionA, mockDhisCompletionB, mockDhisCompletionC] });
+
+                approvalService.getCompletionData([], originOrgunits).then(function(serviceResponse) {
+                    expect(serviceResponse[0].orgUnit).toEqual('someModuleId');
+                    expect(serviceResponse[1].orgUnit).toEqual('someOtherModuleId');
+                });
+                httpBackend.flush();
+            });
+
+            it('should format the period in the completion object', function() {
+                var mockDhisCompletion = createMockDhisCompletionData({ period: { id: '2016W2' } });
+
+                httpBackend.expectGET(/.*/).respond(200, { completeDataSetRegistrations: [mockDhisCompletion] });
+
+                approvalService.getCompletionData().then(function(serviceResponse) {
+                    expect(_.first(serviceResponse).period).toEqual('2016W02');
+                });
+                httpBackend.flush();
+            });
+
+            it('should return an empty array if there are no completeDataSetRegistrations', function () {
+                var mockDhisCompletion = createMockDhisCompletionData();
+
+                httpBackend.expectGET(/.*/).respond(200, {});
+
+                approvalService.getCompletionData().then(function(serviceResponse) {
+                    expect(serviceResponse).toEqual([]);
+                });
+                httpBackend.flush();
+            });
+
+            it("should return a failure http promise if download completion data fails", function() {
+                httpBackend.expectGET().respond(500, {});
+
+                var status;
+                approvalService.getCompletionData().then(undefined, function(data) {
+                    status = data.status;
+                });
+
+                httpBackend.flush();
+
+                expect(status).toBe(500);
+            });
         });
 
-        it("should get completion data for line list modules", function() {
-            var startDate = moment().subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
-            var endDate = moment().format("YYYY-MM-DD");
-
-            var dhisApprovalData = {
-                "completeDataSetRegistrations": [{
-                    "dataSet": {
-                        "id": "d1"
+        describe('getApprovalData', function() {
+            var createMockDhisApproval = function(options) {
+                return _.merge({
+                    dataSet: {
+                        id: 'someDataSetId'
                     },
-                    "period": {
-                        "id": "2014W1"
+                    period: {
+                        id: '2016W23'
                     },
-                    "organisationUnit": {
-                        "id": "org1"
+                    organisationUnit: {
+                        id: 'ou1'
                     },
-                    "date": "2014-01-03T00:00:00.000+0000",
-                    "lastModifiedTime": "2014-01-03T00:00:00.000+0000",
-                    "storedBy": "testproj_approver_l1"
-                }, {
-                    "dataSet": {
-                        "id": "d2"
-                    },
-                    "period": {
-                        "id": "2014W1"
-                    },
-                    "organisationUnit": {
-                        "id": "org1"
-                    },
-                    "date": "2014-01-03T00:00:00.000+0000",
-                    "lastModifiedTime": "2014-01-03T00:00:00.000+0000",
-                    "storedBy": "testproj_approver_l1"
-                }, {
-                    "dataSet": {
-                        "id": "d1"
-                    },
-                    "period": {
-                        "id": "2014W1"
-                    },
-                    "organisationUnit": {
-                        "id": "org2"
-                    },
-                    "date": "2014-01-10T00:00:00.000+0000",
-                    "lastModifiedTime": "2014-01-10T00:00:00.000+0000",
-                    "storedBy": "testproj_approver_l1"
-                }, {
-                    "dataSet": {
-                        "id": "d2"
-                    },
-                    "period": {
-                        "id": "2014W1"
-                    },
-                    "organisationUnit": {
-                        "id": "org2"
-                    },
-                    "date": "2014-01-10T00:00:00.000+0000",
-                    "lastModifiedTime": "2014-01-10T00:00:00.000+0000",
-                    "storedBy": "testproj_approver_l1"
-                }]
+                    state: 'APPROVED_HERE',
+                    createdByUsername: 'msfadmin',
+                    createdDate: '2014-07-21T12:08:05.311+0000'
+                }, options);
             };
 
-            httpBackend.expectGET(properties.dhis.url + "/api/completeDataSetRegistrations?children=true&dataSet=d1&dataSet=d2&endDate=" + endDate + "&orgUnit=ou1&orgUnit=ou2&startDate=" + startDate).respond(200, dhisApprovalData);
+            it('should download approval data for specified org units and data sets', function() {
+                var expectedStartDate = moment().subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD"),
+                    expectedEndDate = moment().format("YYYY-MM-DD"),
+                    dataSetId = 'someDataSetId',
+                    orgUnitId = 'someOrgUnitId';
 
-            var originOrgUnits = [{
-                "id": "org1",
-                "parent": {
-                    "id": "mod1"
-                }
-            }, {
-                "id": "org2",
-                "parent": {
-                    "id": "mod1"
-                }
-            }, {
-                "id": "org3",
-                "parent": {
-                    "id": "mod2"
-                }
-            }];
+                httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status" +
+                    "?ds=" + dataSetId +
+                    "&endDate=" + expectedEndDate +
+                    "&fields=dataSet%5Bid,name%5D,period%5Bid%5D,organisationUnit%5Bid,name%5D,state,createdByUsername,createdDate" +
+                    "&ou=" + orgUnitId +
+                    "&pe=Weekly" +
+                    "&startDate=" + expectedStartDate
+                ).respond(200, {});
 
-            var actualApprovalData;
-            approvalService = new ApprovalService(http, db, q);
-            approvalService.getCompletionData(orgUnits, originOrgUnits, dataSets).then(function(data) {
-                actualApprovalData = data;
+                approvalService.getApprovalData([orgUnitId], [dataSetId]);
+                httpBackend.flush();
             });
 
-            httpBackend.flush();
+            it("should get approval data for specified period range", function() {
+                var periodRange = ["2014W01", "2014W02", "2014W05"],
+                    expectedStartDate = moment(_.first(periodRange), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
+                    expectedEndDate = moment(_.last(periodRange), 'GGGG[W]WW').endOf('isoWeek').format('YYYY-MM-DD');
 
-            var expectedApprovalData = [{
-                "period": "2014W01",
-                "orgUnit": "mod1",
-                "completedBy": "testproj_approver_l1",
-                "completedOn": "2014-01-03T00:00:00.000+0000",
-                "isComplete": true
-            }];
+                httpBackend.expectGET(new RegExp('endDate=' + expectedEndDate + '.*startDate=' + expectedStartDate)).respond(200, {});
 
-            expect(actualApprovalData).toEqual(expectedApprovalData);
-        });
+                approvalService.getApprovalData(orgUnits, dataSets, periodRange);
 
-        it("should get completion data for specified period range", function() {
-            var originOrgUnits = [{
-                "id": "org1",
-                "parent": {
-                    "id": "mod1"
-                }
-            }];
-            var periodRange = ["2014W01", "2014W02", "2014W05"],
-                expectedStartDate = moment(_.first(periodRange), 'YYYY[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
-                expectedEndDate = moment(_.last(periodRange), 'YYYY[W]WW').endOf('isoWeek').format('YYYY-MM-DD');
-
-            httpBackend.expectGET(properties.dhis.url + "/api/completeDataSetRegistrations?children=true&dataSet=d1&dataSet=d2&endDate=" + expectedEndDate + "&orgUnit=ou1&orgUnit=ou2&startDate=" + expectedStartDate).respond(200, {});
-
-            approvalService = new ApprovalService(http, db, q);
-            approvalService.getCompletionData(orgUnits, originOrgUnits, dataSets, periodRange);
-
-            httpBackend.flush();
-        });
-
-        it("should get approval data by considering the lowest approval level of associated datasets", function() {
-            var startDate = moment().subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
-            var endDate = moment().format("YYYY-MM-DD");
-
-            var dhisApprovalData = {
-                "dataApprovalStateResponses": [{
-                    "dataSet": {
-                        "id": "d1"
-                    },
-                    "period": {
-                        "id": "2014W1"
-                    },
-                    "organisationUnit": {
-                        "id": "ou1"
-                    },
-                    "state": "APPROVED_ABOVE",
-                    "createdByUsername": "msfadmin",
-                    "createdDate": "2014-07-21T12:08:05.311+0000",
-                    "mayApprove": false,
-                    "mayUnapprove": false,
-                    "mayAccept": false,
-                    "mayUnaccept": false
-                }, {
-                    "dataSet": {
-                        "id": "d2"
-                    },
-                    "period": {
-                        "id": "2014W1"
-                    },
-                    "organisationUnit": {
-                        "id": "ou1"
-                    },
-                    "state": "APPROVED_ABOVE",
-                    "createdByUsername": "msfadmin",
-                    "createdDate": "2014-07-21T12:08:05.311+0000",
-                    "mayApprove": false,
-                    "mayUnapprove": false,
-                    "mayAccept": false,
-                    "mayUnaccept": false
-                }, {
-                    "dataSet": {
-                        "id": "d1"
-                    },
-                    "period": {
-                        "id": "2014W2"
-                    },
-                    "organisationUnit": {
-                        "id": "ou1"
-                    },
-                    "state": "APPROVED_HERE",
-                    "createdByUsername": "msfadmin",
-                    "createdDate": "2014-07-21T12:08:05.311+0000",
-                    "mayApprove": true,
-                    "mayUnapprove": true,
-                    "mayAccept": true,
-                    "mayUnaccept": true
-                }, {
-                    "dataSet": {
-                        "id": "d1"
-                    },
-                    "period": {
-                        "id": "2014W3"
-                    },
-                    "organisationUnit": {
-                        "id": "ou1"
-                    },
-                    "state": "ACCEPTED_HERE",
-                    "createdByUsername": "msfadmin",
-                    "createdDate": "2014-07-21T12:08:05.311+0000",
-                    "mayApprove": true,
-                    "mayUnapprove": true,
-                    "mayAccept": true,
-                    "mayUnaccept": true
-                }, {
-                    "dataSet": {
-                        "id": "d1"
-                    },
-                    "period": {
-                        "id": "2014W4"
-                    },
-                    "organisationUnit": {
-                        "id": "ou1"
-                    },
-                    "state": "ACCEPTED_HERE",
-                    "createdByUsername": "msfadmin",
-                    "createdDate": "2014-07-21T12:08:05.311+0000",
-                    "mayApprove": true,
-                    "mayUnapprove": true,
-                    "mayAccept": true,
-                    "mayUnaccept": true
-                }, {
-                    "dataSet": {
-                        "id": "d1"
-                    },
-                    "period": {
-                        "id": "2014W5"
-                    },
-                    "organisationUnit": {
-                        "id": "ou1"
-                    },
-                    "state": "UNAPPROVABLE",
-                    "mayApprove": true,
-                    "mayUnapprove": true,
-                    "mayAccept": true,
-                    "mayUnaccept": true
-                }, {
-                    "dataSet": {
-                        "id": "d2"
-                    },
-                    "period": {
-                        "id": "2014W5"
-                    },
-                    "organisationUnit": {
-                        "id": "ou1"
-                    },
-                    "state": "UNAPPROVED_READY",
-                    "createdByUsername": "msfadmin",
-                    "createdDate": "2014-07-21T12:08:05.311+0000",
-                    "mayApprove": true,
-                    "mayUnapprove": true,
-                    "mayAccept": true,
-                    "mayUnaccept": true
-                }]
-            };
-
-            httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?ds=d1&ds=d2&endDate=" + endDate + "&ou=ou1&ou=ou2&pe=Weekly&startDate=" + startDate).respond(200, dhisApprovalData);
-
-            var actualApprovalData;
-            approvalService = new ApprovalService(http, db, q);
-            approvalService.getApprovalData(orgUnits, dataSets).then(function(data) {
-                actualApprovalData = data;
+                httpBackend.flush();
             });
 
-            httpBackend.flush();
+            it('should return an approval object', function () {
+                var mockDhisApproval = createMockDhisApproval();
 
-            var expectedApprovalData = [{
-                "period": "2014W01",
-                "orgUnit": "ou1",
-                "approvedBy": "msfadmin",
-                "approvedOn": "2014-07-21T12:08:05.311+0000",
-                "isApproved": true
-            }, {
-                "period": "2014W02",
-                "orgUnit": "ou1",
-                "approvedBy": "msfadmin",
-                "approvedOn": "2014-07-21T12:08:05.311+0000",
-                "isApproved": true
-            }, {
-                "period": "2014W03",
-                "orgUnit": "ou1",
-                "approvedBy": "msfadmin",
-                "approvedOn": "2014-07-21T12:08:05.311+0000",
-                "isApproved": true
-            }, {
-                "period": "2014W04",
-                "orgUnit": "ou1",
-                "approvedBy": "msfadmin",
-                "approvedOn": "2014-07-21T12:08:05.311+0000",
-                "isApproved": true
-            }];
+                httpBackend.expectGET(/.*/).respond(200, { dataApprovalStateResponses: [mockDhisApproval] });
 
-            expect(actualApprovalData).toEqual(expectedApprovalData);
-        });
-
-        it("should get approval data for specified period range", function() {
-            var periodRange = ["2014W01", "2014W02", "2014W05"],
-                expectedStartDate = moment(_.first(periodRange), 'YYYY[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
-                expectedEndDate = moment(_.last(periodRange), 'YYYY[W]WW').endOf('isoWeek').format('YYYY-MM-DD');
-
-            httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?ds=d1&ds=d2&endDate=" + expectedEndDate + "&ou=ou1&ou=ou2&pe=Weekly&startDate=" + expectedStartDate).respond(200, {});
-
-            approvalService = new ApprovalService(http, db, q);
-            approvalService.getApprovalData(orgUnits, dataSets, periodRange);
-
-            httpBackend.flush();
-        });
-
-        it("should return a failure http promise if download approval data fails", function() {
-            httpBackend.expectGET().respond(500, {});
-            approvalService = new ApprovalService(http, db, q);
-
-            var status;
-            approvalService.getApprovalData(orgUnits, dataSets).then(undefined, function(data) {
-                status = data.status;
+                approvalService.getApprovalData(orgUnits, dataSets).then(function(serviceResponse) {
+                    expect(_.first(serviceResponse)).toEqual({
+                        period: mockDhisApproval.period.id,
+                        orgUnit: mockDhisApproval.organisationUnit.id,
+                        approvedBy: mockDhisApproval.createdByUsername,
+                        approvedOn: mockDhisApproval.createdDate,
+                        isApproved: true
+                    });
+                });
+                httpBackend.flush();
             });
 
-            httpBackend.flush();
+            it('should format the period in the approval object', function() {
+                var mockDhisApproval = createMockDhisApproval({ period: { id: '2016W1' } });
 
-            expect(status).toBe(500);
-        });
+                httpBackend.expectGET(/.*/).respond(200, { dataApprovalStateResponses: [mockDhisApproval] });
 
-        it("should return a failure http promise if download completion data fails", function() {
-            httpBackend.expectGET().respond(500, {});
-            approvalService = new ApprovalService(http, db, q);
-
-            var status;
-            approvalService.getCompletionData(orgUnits, [], dataSets).then(undefined, function(data) {
-                status = data.status;
+                approvalService.getApprovalData(orgUnits, dataSets).then(function(serviceResponse) {
+                    expect(_.first(serviceResponse).period).toEqual('2016W01');
+                });
+                httpBackend.flush();
             });
 
-            httpBackend.flush();
+            it('should return an approval object if state is ACCEPTED_HERE', function () {
+                var mockDhisApproval = createMockDhisApproval({ state: 'ACCEPTED_HERE' });
 
-            expect(status).toBe(500);
+                httpBackend.expectGET(/.*/).respond(200, { dataApprovalStateResponses: [mockDhisApproval] });
+
+                approvalService.getApprovalData(orgUnits, dataSets).then(function(serviceResponse) {
+                    expect(serviceResponse.length).toEqual(1);
+                });
+                httpBackend.flush();
+            });
+
+            it('should return an approval object if state is APPROVED_HERE', function () {
+                var mockDhisApproval = createMockDhisApproval({ state: 'APPROVED_HERE' });
+
+                httpBackend.expectGET(/.*/).respond(200, { dataApprovalStateResponses: [mockDhisApproval] });
+
+                approvalService.getApprovalData(orgUnits, dataSets).then(function(serviceResponse) {
+                    expect(serviceResponse.length).toEqual(1);
+                });
+                httpBackend.flush();
+            });
+
+            it('should return an approval object if state is APPROVED_ABOVE', function () {
+                var mockDhisApproval = createMockDhisApproval({ state: 'APPROVED_ABOVE' });
+
+                httpBackend.expectGET(/.*/).respond(200, { dataApprovalStateResponses: [mockDhisApproval] });
+
+                approvalService.getApprovalData(orgUnits, dataSets).then(function(serviceResponse) {
+                    expect(serviceResponse.length).toEqual(1);
+                });
+                httpBackend.flush();
+            });
+
+            it('should not return an approval object if state is any other value', function () {
+                var mockDhisApproval = createMockDhisApproval({ state: 'SOME_OTHER_STATE' });
+
+                httpBackend.expectGET(/.*/).respond(200, { dataApprovalStateResponses: [mockDhisApproval] });
+
+                approvalService.getApprovalData(orgUnits, dataSets).then(function(serviceResponse) {
+                    expect(serviceResponse).toEqual([]);
+                });
+                httpBackend.flush();
+            });
+
+            it("should not return an approval object if any of the approval states are not one of the required values", function() {
+                httpBackend.expectGET(/.*/).respond(200, {
+                    dataApprovalStateResponses: [
+                        createMockDhisApproval({ state: 'APPROVED_HERE' }),
+                        createMockDhisApproval({ state: 'SOME_OTHER_STATE' })
+                    ]
+                });
+
+                approvalService.getApprovalData(orgUnits, dataSets).then(function(serviceResponse) {
+                    expect(serviceResponse).toEqual([]);
+                });
+                httpBackend.flush();
+            });
+
+            it('should return an empty array if there are no dataApprovalStateResponses', function () {
+                var mockDhisApproval = createMockDhisApproval({ state: 'SOME_OTHER_STATE' });
+
+                httpBackend.expectGET(/.*/).respond(200, {});
+
+                approvalService.getApprovalData(orgUnits, dataSets).then(function(serviceResponse) {
+                    expect(serviceResponse).toEqual([]);
+                });
+                httpBackend.flush();
+            });
+
+            it("should return a failure http promise if download approval data fails", function() {
+                httpBackend.expectGET().respond(500, {});
+
+                var status;
+                approvalService.getApprovalData(orgUnits, dataSets).then(undefined, function(data) {
+                    status = data.status;
+                });
+
+                httpBackend.flush();
+
+                expect(status).toBe(500);
+            });
         });
 
         it("should mark data as incomplete in dhis", function() {
@@ -528,7 +405,6 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             httpBackend.expectDELETE(properties.dhis.url + "/api/completeDataSetRegistrations?ds=170b8cd5e53&multiOu=true&ou=orgUnit2&pe=2014W02")
                 .respond(200, "ok");
 
-            var approvalService = new ApprovalService(http, db, q);
             approvalService.markAsIncomplete(["170b8cd5e53"], [{"period": "2014W01", "orgUnit": "orgUnit1"},{"period": "2014W02", "orgUnit": "orgUnit2"}]);
 
             httpBackend.flush();
@@ -556,7 +432,6 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 .respond(200, approvalStatusForOrgUnit2);
             httpBackend.expectDELETE(properties.dhis.url + "/api/dataApprovals?ds=170b8cd5e53&ou=orgUnit1&pe=2014W01").respond(200, "ok");
 
-            var approvalService = new ApprovalService(http, db, q);
             approvalService.markAsUnapproved(["170b8cd5e53"], [{"period": "2014W01", "orgUnit": "orgUnit1"},{"period": "2014W02", "orgUnit": "orgUnit2"}]);
 
             httpBackend.flush();

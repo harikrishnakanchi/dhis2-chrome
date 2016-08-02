@@ -43,22 +43,12 @@ define(["lodash"], function(_) {
             });
         };
 
-        var getCurrentUsersOriginOrgUnitIds = function() {
-            return getCurrentUsersModules().then(function(modules) {
-                var moduleIds = _.pluck(modules, "id");
-                return orgUnitRepository.findAllByParent(moduleIds).then(function(originOrgUnits) {
-                    return _.pluck(originOrgUnits, "id");
-                });
-            });
-        };
-
         return {
             'get': get,
             'save': save,
             'getCurrentUsersUsername': getCurrentUsersUsername,
             'getCurrentUsersProjectIds': getCurrentUsersProjectIds,
             'getCurrentUsersModules': getCurrentUsersModules,
-            'getCurrentUsersOriginOrgUnitIds': getCurrentUsersOriginOrgUnitIds,
             'getCurrentUsersPreferences': getCurrentUsersPreferences
         };
     };

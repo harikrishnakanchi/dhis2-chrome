@@ -123,50 +123,55 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
         });
 
         describe('getUpdatedCharts', function () {
-            it('should download field app charts modified since lastUpdated', function () {
-                var lastUpdatedTime = '2016-02-19T04:28:32.082Z';
+            var chartIds;
 
-                reportService.getUpdatedCharts(lastUpdatedTime).then(function (chartsFromService) {
-                    expect(chartsFromService).toEqual([chart1DetailsResponse, chart2DetailsResponse]);
-                });
-
-                var updatedChartsResponse = {
-                    'charts': [
-                        { 'id': 'chart1' },
-                        { 'id': 'chart2' }
+            beforeEach(function () {
+                chartIds = {
+                    charts: [
+                        { id: 'chart1' },
+                        { id: 'chart2' }
                     ]
                 };
+            });
 
-                var chart1DetailsResponse = {
-                    'id': 'chart1',
-                    'more': 'details',
-                    'rows': [],
-                    'columns': [],
-                    'filters': []
-                };
+            it('downloads the id of each chart', function () {
+                var expectedQueryParams = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false';
+                httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedQueryParams).respond(200, {});
 
-                var chart2DetailsResponse = {
-                    'id': 'chart2',
-                    'more': 'details',
-                    'rows': [],
-                    'columns': [],
-                    'filters': []
-                };
-
-                var expectedQueryParamsForUpdatedCharts = 'fields=id&filter=name:like:%5BFieldApp+-+&filter=lastUpdated:gte:' + lastUpdatedTime + '&paging=false';
-                httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedQueryParamsForUpdatedCharts).respond(200, updatedChartsResponse);
-
-                var expectedQueryParamsForChartDetails = 'fields=id,name,title,type,sortOrder,columns%5Bdimension,filter,items%5Bid,name,description%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D';
-                httpBackend.expectGET(properties.dhis.url + '/api/charts/chart1.json?' + expectedQueryParamsForChartDetails).respond(200, chart1DetailsResponse);
-                httpBackend.expectGET(properties.dhis.url + '/api/charts/chart2.json?' + expectedQueryParamsForChartDetails).respond(200, chart2DetailsResponse);
+                reportService.getUpdatedCharts();
                 httpBackend.flush();
             });
 
-            it('should download all field app charts if lastUpdated is not provided', function () {
-                reportService.getUpdatedCharts();
+            it('downloads the details of each chart', function () {
+                httpBackend.expectGET(/.*charts.json.*/).respond(200, chartIds);
 
-                var expectedQueryParams = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false';
-                httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedQueryParams).respond(200, {});
+                var expectedQueryParams = 'fields=id,name,title,relativePeriods,type,columns%5Bdimension,filter,items%5Bid,name,description%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D';
+                httpBackend.expectGET(properties.dhis.url + '/api/charts/chart1.json?' + expectedQueryParams).respond(200, {});
+                httpBackend.expectGET(properties.dhis.url + '/api/charts/chart2.json?' + expectedQueryParams).respond(200, {});
+
+                reportService.getUpdatedCharts();
+                httpBackend.flush();
+            });
+
+            it('returns the details of each chart', function () {
+                var chart1 = { id: 'chart1' },
+                    chart2 = { id: 'chart2' };
+
+                httpBackend.expectGET(/.*charts.json.*/).respond(200, chartIds);
+                httpBackend.expectGET(/.*chart1.json.*/).respond(200, chart1);
+                httpBackend.expectGET(/.*chart2.json.*/).respond(200, chart2);
+
+                reportService.getUpdatedCharts().then(function (response) {
+                    expect(response).toEqual([chart1, chart2]);
+                });
+
+                httpBackend.flush();
+            });
+
+            it('downloads the id of each chart modified since specific lastUpdated timestamp', function () {
+                reportService.getUpdatedCharts('someTimestamp');
+
+                httpBackend.expectGET(/.*filter=lastUpdated:gte:someTimestamp.*/).respond(200, {});
                 httpBackend.flush();
             });
         });
@@ -191,50 +196,55 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
         });
 
         describe('getUpdatedPivotTables', function () {
-            it('should download field app pivot tables modified since lastUpdated', function () {
-                var lastUpdatedTime = '2016-02-19T04:28:32.082Z';
+            var pivotTableIds;
 
-                reportService.getUpdatedPivotTables(lastUpdatedTime).then(function (pivotTablesFromService) {
-                    expect(pivotTablesFromService).toEqual([pivotTable1DetailsResponse, pivotTable2DetailsResponse]);
-                });
-
-                var updatedPivotTablesResponse = {
-                    'reportTables': [
-                        { 'id': 'pivotTable1' },
-                        { 'id': 'pivotTable2' }
+            beforeEach(function () {
+                pivotTableIds = {
+                    reportTables: [
+                        { id: 'pivotTable1' },
+                        { id: 'pivotTable2' }
                     ]
                 };
+            });
 
-                var pivotTable1DetailsResponse = {
-                    'id': 'pivotTable1',
-                    'more': 'details',
-                    'rows': [],
-                    'columns': [],
-                    'filters': []
-                };
+            it('downloads the id of each pivot table', function () {
+                var expectedQueryParams = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false';
+                httpBackend.expectGET(properties.dhis.url + '/api/reportTables.json?' + expectedQueryParams).respond(200, {});
 
-                var pivotTable2DetailsResponse = {
-                    'id': 'pivotTable2',
-                    'more': 'details',
-                    'rows': [],
-                    'columns': [],
-                    'filters': []
-                };
-
-                var expectedQueryParamsForUpdatedPivotTables = 'fields=id&filter=name:like:%5BFieldApp+-+&filter=lastUpdated:gte:' + lastUpdatedTime + '&paging=false';
-                httpBackend.expectGET(properties.dhis.url + '/api/reportTables.json?' + expectedQueryParamsForUpdatedPivotTables).respond(200, updatedPivotTablesResponse);
-
-                var expectedQueryParamsForPivotTableDetails = 'fields=id,name,sortOrder,categoryDimensions%5BdataElementCategory,categoryOptions%5B:identifiable%5D%5D,dataElements,indicators,dataDimensionItems,relativePeriods,columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name,description%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D';
-                httpBackend.expectGET(properties.dhis.url + '/api/reportTables/pivotTable1.json?' + expectedQueryParamsForPivotTableDetails).respond(200, pivotTable1DetailsResponse);
-                httpBackend.expectGET(properties.dhis.url + '/api/reportTables/pivotTable2.json?' + expectedQueryParamsForPivotTableDetails).respond(200, pivotTable2DetailsResponse);
+                reportService.getUpdatedPivotTables();
                 httpBackend.flush();
             });
 
-            it('should download all field app pivot tables if lastUpdated is not provided', function () {
-                reportService.getUpdatedPivotTables();
+            it('downloads the details of each pivot table', function () {
+                httpBackend.expectGET(/.*reportTables.json.*/).respond(200, pivotTableIds);
 
-                var expectedQueryParams = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false';
-                httpBackend.expectGET(properties.dhis.url + '/api/reportTables.json?' + expectedQueryParams).respond(200, {});
+                var expectedQueryParams = 'fields=id,name,sortOrder,categoryDimensions%5BdataElementCategory,categoryOptions%5B:identifiable%5D%5D,dataElements,indicators,dataDimensionItems,relativePeriods,columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name,description%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D';
+                httpBackend.expectGET(properties.dhis.url + '/api/reportTables/pivotTable1.json?' + expectedQueryParams).respond(200, {});
+                httpBackend.expectGET(properties.dhis.url + '/api/reportTables/pivotTable2.json?' + expectedQueryParams).respond(200, {});
+
+                reportService.getUpdatedPivotTables();
+                httpBackend.flush();
+            });
+
+            it('returns the details of each pivot table', function () {
+                var pivotTable1 = { id: 'table1' },
+                    pivotTable2 = { id: 'table2' };
+
+                httpBackend.expectGET(/.*reportTables.json.*/).respond(200, pivotTableIds);
+                httpBackend.expectGET(/.*pivotTable1.json.*/).respond(200, pivotTable1);
+                httpBackend.expectGET(/.*pivotTable2.json.*/).respond(200, pivotTable2);
+
+                reportService.getUpdatedPivotTables().then(function (response) {
+                    expect(response).toEqual([pivotTable1, pivotTable2]);
+                });
+
+                httpBackend.flush();
+            });
+
+            it('downloads the id of each pivot table modified since specified lastUpdated timestamp', function () {
+                reportService.getUpdatedPivotTables('someTimestamp');
+
+                httpBackend.expectGET(/.*filter=lastUpdated:gte:someTimestamp.*/).respond(200, {});
                 httpBackend.flush();
             });
         });

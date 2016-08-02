@@ -69,7 +69,7 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                 downloadChartsConsumer.run();
                 scope.$apply();
 
-                expect(chartRepository.deleteMultipleChartsById).toHaveBeenCalledWith(['chart1'], localDbCharts);
+                expect(chartRepository.deleteMultipleChartsById).toHaveBeenCalledWith(['chart1']);
             });
 
         });

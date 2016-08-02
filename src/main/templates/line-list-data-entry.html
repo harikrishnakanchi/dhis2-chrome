@@ -1,4 +1,4 @@
-<div class="dataentrypage">
+<div class="dataentrypage {{ layoutDirection.direction }}">
     <div class="loading" ng-show="loading">
         <img src="img/ajax-loader.gif" class="spinner" />
     </div>
@@ -65,12 +65,14 @@
                                                ng-pattern="getNumberPattern(programStageDE.dataElement)" />
 
                                         <input ng-model="dataValues[programStageDE.dataElement.id]"
+                                               ng-model-options="{timezone: 'UTC'}"
                                                class="form-control"
                                                name="{{psdeFormName}}"
                                                type="date"
                                                ng-if="programStageDE.dataElement.type === 'DATE' && !programStageDE.dataElement.optionSet && !isEventDateSubstitute(programStageDE.dataElement)" />
 
                                         <input ng-model="dataValues[programStageDE.dataElement.id]"
+                                               ng-model-options="{timezone: 'UTC'}"
                                                class="form-control"
                                                name="{{psdeFormName}}"
                                                type="date"

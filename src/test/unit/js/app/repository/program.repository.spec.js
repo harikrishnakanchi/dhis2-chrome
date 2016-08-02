@@ -1,6 +1,6 @@
-define(["programRepository", "angularMocks", "utils", "timecop"], function(ProgramRepository, mocks, utils, timecop) {
+define(["programRepository", "dataElementRepository", "angularMocks", "utils", "timecop"], function(ProgramRepository, DataElementRepository, mocks, utils, timecop) {
     describe("programRepository", function() {
-        var scope, q, programRepository;
+        var scope, q, programRepository, programData, attributeValues, dataElementRepository;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
@@ -8,7 +8,89 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
 
             var mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
-            programRepository = new ProgramRepository(mockDB.db, q);
+            dataElementRepository = new DataElementRepository(mockDB.db);
+            spyOn(dataElementRepository, "get");
+            programRepository = new ProgramRepository(mockDB.db, q, dataElementRepository);
+
+            programData = {
+                'id': 'p1',
+                'name': 'ER - Presenting Line List',
+                'displayName': 'ER - Presenting Line List',
+                'shortName': 'ER - Presenting Line List',
+                'programType': 'WITHOUT_REGISTRATION',
+                'programStages': [{
+                    'id': 'p1s1',
+                    'name': 'ER - Presenting Line List Stage 1',
+                    'programStageSections': [{
+                        'id': 'st1',
+                        'name': 'Arrival',
+                        'programStageDataElements': [{
+                            'dataElement': {
+                                'id': 'd1',
+                                'name': 'Date'
+                            }
+                        }, {
+                            'dataElement': {
+                                'id': 'd2',
+                                'name': 'Mode of Arrival'
+                            }
+                        }]
+                    }, {
+                        'id': 'st2',
+                        'name': 'Discharge',
+                        'programStageDataElements': [{
+                            'dataElement': {
+                                'id': 'd1',
+                                'name': 'Date'
+                            }
+                        }, {
+                            'dataElement': {
+                                'id': 'd3',
+                                'name': 'Mode of Discharge'
+                            }
+                        }]
+                    }]
+                }]
+            };
+
+            var dataElement1Data = {
+                'id': 'd1',
+                'name': 'Date',
+                'type': 'date',
+                'offlineSummaryType': 'showInOfflineSummary'
+            };
+
+            var dataElement2Data = {
+                'id': 'd2',
+                'name': 'Mode of Arrival',
+                'type': 'string',
+                'offlineSummaryType': undefined
+            };
+
+            var dataElement3Data = {
+                'id': 'd3',
+                'name': 'Mode of Discharge',
+                'type': 'string',
+                'offlineSummaryType': undefined
+            };
+
+            mockStore.getAll.and.returnValue(utils.getPromise(q, []));
+
+            mockStore.find.and.callFake(function(id) {
+                if (id === "p1")
+                    return utils.getPromise(q, programData);
+                return utils.getPromise(q, undefined);
+            });
+
+            dataElementRepository.get.and.callFake(function(id) {
+                if (id === "d1")
+                    return utils.getPromise(q, dataElement1Data);
+                if (id === "d2")
+                    return utils.getPromise(q, dataElement2Data);
+                if (id === "d3")
+                    return utils.getPromise(q, dataElement3Data);
+                return utils.getPromise(q, undefined);
+            });
 
             Timecop.install();
             Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
@@ -76,97 +158,9 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
         });
 
         it("should get program", function() {
-
-            var programData = {
-                'id': 'p1',
-                'name': 'ER - Presenting Line List',
-                'displayName': 'ER - Presenting Line List',
-                'shortName': 'ER - Presenting Line List',
-                'programType': 'WITHOUT_REGISTRATION',
-                'programStages': [{
-                    'id': 'p1s1',
-                    'name': 'ER - Presenting Line List Stage 1',
-                    'programStageSections': [{
-                        'id': 'st1',
-                        'name': 'Arrival',
-                        'programStageDataElements': [{
-                            'dataElement': {
-                                'id': 'd1',
-                                'name': 'Date'
-                            }
-                        }, {
-                            'dataElement': {
-                                'id': 'd2',
-                                'name': 'Mode of Arrival'
-                            }
-                        }]
-                    }, {
-                        'id': 'st2',
-                        'name': 'Discharge',
-                        'programStageDataElements': [{
-                            'dataElement': {
-                                'id': 'd1',
-                                'name': 'Date'
-                            }
-                        }, {
-                            'dataElement': {
-                                'id': 'd3',
-                                'name': 'Mode of Discharge'
-                            }
-                        }]
-                    }]
-
-                }, {
-                    'id': 'p1s2',
-                    'name': 'ER - Presenting Line List Stage 2',
-                    'programStageSections': [{
-                        'id': 'st3',
-                        'name': 'Default Section',
-                        'programStageDataElements': [{
-                            'dataElement': {
-                                'id': 'd1',
-                                'name': 'Date'
-                            }
-                        }]
-                    }]
-                }]
-            };
-
-            var dataElement1Data = {
-                'id': 'd1',
-                'name': 'Date',
-                'type': 'date'
-            };
-
-            var dataElement2Data = {
-                'id': 'd2',
-                'name': 'Mode of Arrival',
-                'type': 'string'
-            };
-
-            var dataElement3Data = {
-                'id': 'd3',
-                'name': 'Mode of Discharge',
-                'type': 'string'
-            };
-
-            mockStore.getAll.and.returnValue(utils.getPromise(q, []));
-
-            mockStore.find.and.callFake(function(id) {
-                if (id === "p1")
-                    return utils.getPromise(q, programData);
-                if (id === "d1")
-                    return utils.getPromise(q, dataElement1Data);
-                if (id === "d2")
-                    return utils.getPromise(q, dataElement2Data);
-                if (id === "d3")
-                    return utils.getPromise(q, dataElement3Data);
-                return utils.getPromise(q, undefined);
-            });
-
             var actualValues;
-            programRepository.get("p1").then(function(programData) {
-                actualValues = programData;
+            programRepository.get("p1").then(function(programdata) {
+                actualValues = programdata;
             });
 
             scope.$apply();
@@ -188,16 +182,16 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
                                 'id': 'd1',
                                 'name': 'Date',
                                 'type': 'date',
-                                'isIncluded': true
+                                'isIncluded': true,
+                                'offlineSummaryType': "showInOfflineSummary"
                             }
                         }, {
                             'dataElement': {
                                 'id': 'd2',
                                 'name': 'Mode of Arrival',
                                 'type': 'string',
-                                'isIncluded': true
-
-
+                                'isIncluded': true,
+                                'offlineSummaryType': undefined
                             }
                         }]
                     }, {
@@ -208,31 +202,16 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
                                 'id': 'd1',
                                 'name': 'Date',
                                 'type': 'date',
-                                'isIncluded': true
-
+                                'isIncluded': true,
+                                'offlineSummaryType': "showInOfflineSummary"
                             }
                         }, {
                             'dataElement': {
                                 'id': 'd3',
                                 'name': 'Mode of Discharge',
                                 'type': 'string',
-                                'isIncluded': true
-                            }
-                        }]
-                    }]
-
-                }, {
-                    'id': 'p1s2',
-                    'name': 'ER - Presenting Line List Stage 2',
-                    'programStageSections': [{
-                        'id': 'st3',
-                        'name': 'Default Section',
-                        'programStageDataElements': [{
-                            'dataElement': {
-                                'id': 'd1',
-                                'name': 'Date',
-                                'type': 'date',
-                                'isIncluded': true
+                                'isIncluded': true,
+                                'offlineSummaryType': undefined
                             }
                         }]
                     }]
@@ -244,79 +223,6 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
         it("should get program with excluded data elements", function() {
 
             var excludedDataElementIds = ['d2'];
-
-            var programData = {
-                'id': 'p1',
-                'name': 'ER - Presenting Line List',
-                'displayName': 'ER - Presenting Line List',
-                'shortName': 'ER - Presenting Line List',
-                'programType': 'WITHOUT_REGISTRATION',
-                'programStages': [{
-                    'id': 'p1s1',
-                    'name': 'ER - Presenting Line List Stage 1',
-                    'programStageSections': [{
-                        'id': 'st1',
-                        'name': 'Arrival',
-                        'programStageDataElements': [{
-                            'dataElement': {
-                                'id': 'd1',
-                                'name': 'Date'
-                            }
-                        }, {
-                            'dataElement': {
-                                'id': 'd2',
-                                'name': 'Mode of Arrival'
-                            }
-                        }]
-                    }, {
-                        'id': 'st2',
-                        'name': 'Discharge',
-                        'programStageDataElements': [{
-                            'dataElement': {
-                                'id': 'd1',
-                                'name': 'Date'
-                            }
-                        }, {
-                            'dataElement': {
-                                'id': 'd3',
-                                'name': 'Mode of Discharge'
-                            }
-                        }]
-                    }]
-                }]
-            };
-
-            var dataElement1Data = {
-                'id': 'd1',
-                'name': 'Date',
-                'type': 'date'
-            };
-
-            var dataElement2Data = {
-                'id': 'd2',
-                'name': 'Mode of Arrival',
-                'type': 'string'
-            };
-
-            var dataElement3Data = {
-                'id': 'd3',
-                'name': 'Mode of Discharge',
-                'type': 'string'
-            };
-
-            mockStore.getAll.and.returnValue(utils.getPromise(q, []));
-
-            mockStore.find.and.callFake(function(id) {
-                if (id === "p1")
-                    return utils.getPromise(q, programData);
-                if (id === "d1")
-                    return utils.getPromise(q, dataElement1Data);
-                if (id === "d2")
-                    return utils.getPromise(q, dataElement2Data);
-                if (id === "d3")
-                    return utils.getPromise(q, dataElement3Data);
-                return utils.getPromise(q, undefined);
-            });
 
             var actualValues;
             programRepository.get("p1", excludedDataElementIds).then(function(programData) {
@@ -342,14 +248,16 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
                                 'id': 'd1',
                                 'name': 'Date',
                                 'type': 'date',
-                                'isIncluded': true
+                                'isIncluded': true,
+                                'offlineSummaryType': "showInOfflineSummary",
                             }
                         }, {
                             'dataElement': {
                                 'id': 'd2',
                                 'name': 'Mode of Arrival',
                                 'type': 'string',
-                                'isIncluded': false
+                                'isIncluded': false,
+                                'offlineSummaryType': undefined
                             }
                         }]
                     }, {
@@ -360,14 +268,16 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
                                 'id': 'd1',
                                 'name': 'Date',
                                 'type': 'date',
-                                'isIncluded': true
+                                'isIncluded': true,
+                                'offlineSummaryType': "showInOfflineSummary",
                             }
                         }, {
                             'dataElement': {
                                 'id': 'd3',
                                 'name': 'Mode of Discharge',
                                 'type': 'string',
-                                'isIncluded': true
+                                'isIncluded': true,
+                                'offlineSummaryType': undefined
                             }
                         }]
                     }]

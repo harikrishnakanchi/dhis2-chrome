@@ -9,7 +9,7 @@ define(['moment'], function(moment) {
                 return pivotTableRepository.getAll().then(function(localDbPivotTables) {
                     var localDbPivotTableIds = _.pluck(localDbPivotTables, 'id');
                     var pivotTableIdsToRemove = _.difference(localDbPivotTableIds, remotePivotTableIds);
-                    return pivotTableRepository.deleteByIds(pivotTableIdsToRemove, localDbPivotTables);
+                    return pivotTableRepository.deleteByIds(pivotTableIdsToRemove);
                 });
             });
         };

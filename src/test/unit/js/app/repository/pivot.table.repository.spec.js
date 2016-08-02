@@ -27,20 +27,11 @@ define(["pivotTableRepository", "pivotTable", "angularMocks", "utils", "lodash"]
         });
 
         it('should remove pivot tables by id', function() {
-            var pivotTableIds = ['1', '2'];
-            var dbPivotTables = [{
-                "name": "pivot table 1",
-                "id": "1"
-            }, {
-                "name": "pivot table 2",
-                "id": "2"
-            }, {
-                "name": "pivot table 3",
-                "id": "3"
-            }];
-            pivotTableRepository.deleteByIds(pivotTableIds, dbPivotTables);
-            expect(mockStore.delete).toHaveBeenCalledWith('pivot table 1');
-            expect(mockStore.delete).toHaveBeenCalledWith('pivot table 2');
+            var pivotTableIdA = 'pivotTableIdA',
+                pivotTableIdB = 'pivotTableIdB';
+            pivotTableRepository.deleteByIds([pivotTableIdA, pivotTableIdB]);
+            expect(mockStore.delete).toHaveBeenCalledWith(pivotTableIdA);
+            expect(mockStore.delete).toHaveBeenCalledWith(pivotTableIdB);
         });
 
         it('should save table data', function() {

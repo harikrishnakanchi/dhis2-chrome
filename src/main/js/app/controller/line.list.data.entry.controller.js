@@ -61,9 +61,9 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 if (_.isObject(value) && value.code)
                     return value.code;
                 if (value && type === "DATE")
-                    return moment(new Date(value)).format("YYYY-MM-DD");
+                    return moment.utc(new Date(value)).format("YYYY-MM-DD");
                 if (value && type === "DATETIME")
-                    return moment(new Date(value)).toISOString();
+                    return moment.utc(new Date(value)).toISOString();
                 return value;
             };
 
@@ -218,8 +218,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                                     });
                                 });
                             });
-                            var translatedProgram = translationsService.translate([program]);
-                            $scope.program = translatedProgram[0];
+                            $scope.program = translationsService.translate(program);
                         });
                     });
                 };

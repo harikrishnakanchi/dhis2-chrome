@@ -1,12 +1,12 @@
 define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'datasetRepository', 'userPreferenceRepository', 'changeLogRepository', 'orgUnitRepository', 'moduleDataBlockFactory',
-        'moduleDataBlockMerger', 'angularMocks', 'dateUtils', 'utils', 'timecop'],
+        'moduleDataBlockMerger', 'eventService', 'angularMocks', 'dateUtils', 'utils', 'timecop', 'moment'],
     function(DownloadModuleDataBlocksConsumer, DataService, ApprovalService, DataSetRepository, UserPreferenceRepository, ChangeLogRepository, OrgUnitRepository, ModuleDataBlockFactory,
-             ModuleDataBlockMerger, mocks, dateUtils, utils, timecop) {
+             ModuleDataBlockMerger, EventService, mocks, dateUtils, utils, timecop, moment) {
         
         var downloadModuleDataBlocksConsumer, dataService, approvalService,
             userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository,
             moduleDataBlockFactory, moduleDataBlockMerger,
-            q, scope, aggregateDataSet, periodRange, projectIds, mockModule, mockOriginOrgUnits, someMomentInTime;
+            q, scope, aggregateDataSet, periodRange, mockProjectId, mockModule, mockOriginOrgUnits, mockAggregateModuleDataBlock, mockLineListModuleDataBlock, someMomentInTime, eventService;
 
         describe('downloadModuleDataBlocksConsumer', function() {
             beforeEach(mocks.inject(function($rootScope, $q) {
@@ -14,17 +14,33 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 scope = $rootScope.$new();
 
                 mockModule = {
-                    id: 'someModuleId'
+                    id: 'someModuleId',
+                    "attributeValues": [{
+                        "attribute": {
+                            "code": "isLineListService"
+                        },
+                        "value": "false"
+                    }]
                 };
                 mockOriginOrgUnits = [{
                     id: 'someOriginId'
                 }];
-                projectIds = ['projectId'];
+                mockProjectId = 'someProjectId';
                 aggregateDataSet = {
                     id: 'someAggregateDataSetId',
                     isLineListService: false
                 };
                 periodRange = ['2016W20', '2016W21'];
+                mockAggregateModuleDataBlock = {
+                    moduleId: 'someModuleId',
+                    period: '2016W24',
+                    lineListService: false
+                };
+                mockLineListModuleDataBlock = {
+                    moduleId: 'someModuleId',
+                    period: '2016W24',
+                    lineListService: true
+                };
                 someMomentInTime = '2016-05-20T15:48:00.888Z';
 
                 spyOn(dateUtils, "getPeriodRange").and.returnValue(periodRange);
@@ -44,20 +60,25 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 spyOn(datasetRepository, 'findAllForOrgUnits').and.returnValue(utils.getPromise(q, [aggregateDataSet]));
 
                 userPreferenceRepository = new UserPreferenceRepository();
-                spyOn(userPreferenceRepository, 'getCurrentUsersProjectIds').and.returnValue(utils.getPromise(q, projectIds));
+                spyOn(userPreferenceRepository, 'getCurrentUsersProjectIds').and.returnValue(utils.getPromise(q, [mockProjectId]));
 
                 changeLogRepository =  new ChangeLogRepository();
                 spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, someMomentInTime));
                 spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
 
                 moduleDataBlockFactory = new ModuleDataBlockFactory();
-                spyOn(moduleDataBlockFactory, 'createForModule').and.returnValue(utils.getPromise(q, []));
+                spyOn(moduleDataBlockFactory, 'createForModule').and.returnValue(utils.getPromise(q, [mockAggregateModuleDataBlock]));
 
                 moduleDataBlockMerger = new ModuleDataBlockMerger();
                 spyOn(moduleDataBlockMerger, 'mergeAndSaveToLocalDatabase').and.returnValue(utils.getPromise(q, {}));
 
+                eventService = new EventService();
+                spyOn(eventService, 'getEvents').and.returnValue(utils.getPromise(q, []));
+                spyOn(eventService, 'getEventIds').and.returnValue(utils.getPromise(q, []));
+
                 downloadModuleDataBlocksConsumer = new DownloadModuleDataBlocksConsumer(dataService, approvalService, datasetRepository,
-                    userPreferenceRepository, changeLogRepository, orgUnitRepository, moduleDataBlockFactory, moduleDataBlockMerger, q);
+                    userPreferenceRepository, changeLogRepository, orgUnitRepository, moduleDataBlockFactory, moduleDataBlockMerger, eventService, q);
+
             }));
 
             var runConsumer = function() {
@@ -65,9 +86,27 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 scope.$apply();
             };
 
-            it('should download data values from DHIS for each module', function() {
+            it('should retrieve the modules for each project', function() {
+                var mockProjectIds = ['projectIdA', 'projectIdB'];
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, mockProjectIds));
+
+                runConsumer();
+                expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['projectIdA']);
+                expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['projectIdB']);
+            });
+
+            it('should download data values from DHIS for each aggregate module', function() {
+                moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, [mockAggregateModuleDataBlock]));
+
                 runConsumer();
                 expect(dataService.downloadData).toHaveBeenCalledWith(mockModule.id, [aggregateDataSet.id], periodRange, someMomentInTime);
+            });
+
+            it('should not download data values from DHIS for linelist modules', function() {
+                moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, [mockLineListModuleDataBlock]));
+
+                runConsumer();
+                expect(dataService.downloadData).not.toHaveBeenCalled();
             });
 
             it('should download completion data from DHIS for each module', function () {
@@ -78,6 +117,34 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
             it('should download approval data from DHIS for each module', function () {
                 runConsumer();
                 expect(approvalService.getApprovalData).toHaveBeenCalledWith(mockModule.id, [aggregateDataSet.id], periodRange);
+            });
+
+            it('should download event data from DHIS for each line list module', function () {
+                moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, [mockLineListModuleDataBlock]));
+
+                runConsumer();
+                expect(eventService.getEvents).toHaveBeenCalledWith(mockModule.id, periodRange, someMomentInTime);
+            });
+
+            it('should download event ids from DHIS for each line list module', function () {
+                moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, [mockLineListModuleDataBlock]));
+
+                runConsumer();
+                expect(eventService.getEventIds).toHaveBeenCalledWith(mockModule.id, periodRange);
+            });
+
+            it('should not download event data from DHIS for aggregate modules', function () {
+                moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, [mockAggregateModuleDataBlock]));
+
+                runConsumer();
+                expect(eventService.getEvents).not.toHaveBeenCalled();
+            });
+
+            it('should not download event ids from DHIS for aggregate modules', function () {
+                moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, [mockAggregateModuleDataBlock]));
+
+                runConsumer();
+                expect(eventService.getEventIds).not.toHaveBeenCalled();
             });
 
             it('should not download data from DHIS for linelist summary datasets', function() {
@@ -154,8 +221,8 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 approvalService.getApprovalData.and.returnValue(utils.getPromise(q, [mockDhisApprovalA, mockDhisApprovalB]));
 
                 runConsumer();
-                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockA, [mockDhisDataValueA], mockDhisCompletionA, mockDhisApprovalA);
-                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockB, [mockDhisDataValueB], mockDhisCompletionB, mockDhisApprovalB);
+                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockA, [mockDhisDataValueA], mockDhisCompletionA, mockDhisApprovalA, undefined, undefined);
+                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockB, [mockDhisDataValueB], mockDhisCompletionB, mockDhisApprovalB, undefined, undefined);
             });
 
             it('should merge and save each module data block including origin data', function() {
@@ -170,8 +237,27 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 dataService.downloadData.and.returnValue(utils.getPromise(q, [mockDhisDataValueA, mockDhisDataValueB]));
 
                 runConsumer();
-                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockA, [mockDhisDataValueA], undefined, undefined);
-                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockB, [mockDhisDataValueB], undefined, undefined);
+                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockA, [mockDhisDataValueA], undefined, undefined, undefined, undefined);
+                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockB, [mockDhisDataValueB], undefined, undefined, undefined, undefined);
+            });
+
+            it('should merge and save line list events for each period', function (){
+                var periodA = '2016W20',
+                    periodB = '2016W21',
+                    mockModuleDataBlockA = { moduleId: mockModule.id, period: periodA, moduleName: 'someModuleNameA', lineListService:true },
+                    mockModuleDataBlockB = { moduleId: mockModule.id, period: periodB, moduleName: 'someModuleNameB', lineListService:true},
+                    mockEventA = { eventDate: moment(periodA, 'GGGG[W]WW').toISOString() },
+                    mockEventB = { eventDate: moment(periodB, 'GGGG[W]WW').toISOString()},
+                    mockEventIds = ['mockEventIdA', 'mockEventIdB', 'mockEventIdC'];
+
+                moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, [mockModuleDataBlockA, mockModuleDataBlockB]));
+                eventService.getEvents.and.returnValue(utils.getPromise(q, [mockEventA, mockEventB]));
+                eventService.getEventIds.and.returnValue(utils.getPromise(q, mockEventIds));
+
+                runConsumer();
+
+                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockA, undefined, undefined, undefined, [mockEventA], mockEventIds);
+                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockB, undefined, undefined, undefined, [mockEventB], mockEventIds);
             });
 
             it('should merge and save multiple modules', function() {
@@ -186,7 +272,7 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
             });
 
             it('should update the change log after merging all data', function() {
-                var changeLogKey = 'dataValues:' + projectIds.join(';'),
+                var changeLogKey = 'dataValues:' + mockProjectId,
                     currentTime = '2016-05-21T00:00:00.000Z';
 
                 Timecop.install();
@@ -224,9 +310,9 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 });
 
                 runConsumer();
-                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockA, undefined, undefined, undefined);
-                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).not.toHaveBeenCalledWith(mockModuleDataBlockB, undefined, undefined, undefined);
-                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockC, undefined, undefined, undefined);
+                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockA, undefined, undefined, undefined, undefined, undefined);
+                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).not.toHaveBeenCalledWith(mockModuleDataBlockB, undefined, undefined, undefined, undefined, undefined);
+                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockC, undefined, undefined, undefined, undefined, undefined);
             });
         });
     });

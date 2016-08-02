@@ -364,4 +364,4 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
                 });
             });
         });
-});
+    });

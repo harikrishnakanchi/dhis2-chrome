@@ -21,7 +21,6 @@ require.config({
         "JSZip": "lib/jszip/jszip",
         "sjcl": "lib/sjcl/sjcl",
         "saveSvgAsPng": "lib/save-svg-as-png/saveSvgAsPng",
-        "ng-csv": "lib/ng-csv/ng-csv.min",
         "angular-sanitize": "lib/angular-sanitize/angular-sanitize",
 
         //3rd party angular modules
@@ -58,7 +57,6 @@ require.config({
         "aggregateModuleController": "app/controller/aggregate.module.controller",
         "lineListModuleController": "app/controller/line.list.module.controller",
         "lineListOfflineApprovalController": "app/controller/line.list.offline.approval.controller",
-        "mainController": "app/controller/main.controller",
         "projectController": "app/controller/project.controller",
         "loginController": "app/controller/login.controller",
         "countryController": "app/controller/country.controller",
@@ -77,6 +75,9 @@ require.config({
         "pivotTableController": "app/controller/pivot.table.controller",
         "selectProjectPreferenceController": "app/controller/select.project.preference.controller",
         "projectReportController": "app/controller/project.report.controller",
+        "headerController": "app/controller/header.controller",
+        "footerController": "app/controller/footer.controller",
+        "exportRawDataController": "app/controller/export.raw.data.controller",
 
         //Services
         "services": "app/service/services",
@@ -118,6 +119,7 @@ require.config({
         "dataSyncFailureRepository": "app/repository/data.sync.failure.repository",
 
         //Models
+        "chart": "app/models/chart",
         "pivotTable": "app/models/pivot.table",
         "moduleDataBlock": "app/models/module.data.block",
         "customAttributes": "app/models/custom.attributes",
@@ -126,6 +128,7 @@ require.config({
         "factories": "app/factories/factories",
         "moduleDataBlockFactory": "app/factories/module.data.block.factory",
         "checkVersionCompatibility": "app/factories/check.version.compatibility",
+        "initializationRoutine": "app/factories/initialization.routine",
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",
@@ -162,6 +165,8 @@ require.config({
         "cipherUtils": "app/utils/cipher.utils",
         "appSettingsUtils": "app/utils/app.settings.utils",
         "authenticationUtils": "app/utils/authentication.utils",
+        "dataURItoBlob": "app/utils/data.uri.to.blob",
+        "interpolate": "app/utils/interpolate",
 
         //Helpers
         "helpers": "app/helpers/helpers",
@@ -249,9 +254,6 @@ require.config({
         },
         'angular-sanitize': {
             deps: ["angular"]
-        },
-        'ng-csv': {
-            deps: ["angular", "angular-sanitize"]
         }
     }
 });

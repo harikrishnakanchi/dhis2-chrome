@@ -1,21 +1,41 @@
 define(['lodash'], function(_){
     return function($q, db, $rootScope, ngI18nResourceBundle, systemSettingRepository) {
-        var translatableTypes = ["sections", "dataElements", "headers", "programStages", "programStageSections", "programStageDataElements", "dataElement", "optionSet", "options", "dataValues", "attribute"],
-            translatableProperties = ["name", "description", "formName", "shortName", "displayName"],
-            translations, _locale, self = this;
+        var TRANSLATABLE_ENTITIES = ["sections", "dataElements", "headers", "programStages", "programStageSections", "programStageDataElements", "dataElement", "optionSet", "options", "dataValues", "attribute"],
+            TRANSLATABLE_PROPERTIES = ["name", "description", "formName", "shortName", "displayName"],
+            translations, categoryOptionCombosAndOptions, _locale, self = this;
 
-        var setResourceBundleLocale = function (locale) {
-            return ngI18nResourceBundle.get({
-                "locale": locale
-            }).then(function (data) {
+        var refreshResourceBundle = function () {
+            return ngI18nResourceBundle.get({ locale: _locale }).then(function (data) {
                 $rootScope.resourceBundle = data.data;
-                return systemSettingRepository.upsertLocale($rootScope.locale);
+            });
+        };
+
+        var updateLocaleInSystemSettings = function() {
+            return systemSettingRepository.upsertLocale(_locale);
+        };
+
+        var buildCategoryOptionComboHash = function () {
+            if(categoryOptionCombosAndOptions) return;
+
+            var store = db.objectStore('categoryOptionCombos');
+            return store.getAll().then(function(categoryOptionCombos) {
+                categoryOptionCombosAndOptions = _.reduce(categoryOptionCombos, function (result, categoryOptionCombo) {
+                    var categoryOptions = categoryOptionCombo.name.split(", ");
+                    result[categoryOptionCombo.id] = _.map(categoryOptions, function (categoryOption) {
+                        var originalCategoryOption = _.find(categoryOptionCombo.categoryOptions, { name: categoryOption});
+                        return originalCategoryOption.id;
+                    });
+                    return result;
+                }, {});
             });
         };
 
         this.setLocale = function(locale){
             _locale = locale;
-            setResourceBundleLocale(locale);
+
+            refreshResourceBundle();
+            updateLocaleInSystemSettings();
+            buildCategoryOptionComboHash();
             
             var store = db.objectStore('translations');
             var query = db.queryBuilder().$index('by_locale').$eq(locale).compile();
@@ -35,10 +55,45 @@ define(['lodash'], function(_){
                 var namesHash = report.data ? report.data.metaData.names : {};
                 return _.each(items, function (item) {
                     var translationObject = translations[item.id];
-                    var translationsByProperty = _.filter(translationObject, {property: "shortName"});
-                    namesHash[item.id] = translationsByProperty.length > 0 ? translationsByProperty[0].value : item.name;
+                    if(item.description) {
+                        var descriptionTranslation = _.find(translationObject, {property: "description"});
+                        item.description = descriptionTranslation ? descriptionTranslation.value : item.description;
+                    }
+                    var shortNameTranslation = _.find(translationObject, {property: "shortName"});
+                    item.name = shortNameTranslation ? shortNameTranslation.value : item.name;
                 });
             });
+        };
+
+        var getTranslation = function (objectId, property) {
+            var translationObject = _.find(translations[objectId], { property: property });
+            return translationObject && translationObject.value;
+        };
+
+        this.getTranslationForProperty = function (objectId, property, defaultValue) {
+            return getTranslation(objectId, property) || defaultValue;
+        };
+
+        this.translateCharts = function (chartData) {
+            if(_locale == 'en') {
+                return chartData;
+            }
+
+            var translatablePropertyIds = _.keys(chartData.metaData.names);
+            _.each(translatablePropertyIds, function (id) {
+                var isCategoryOptionCombo = _.get(categoryOptionCombosAndOptions, id);
+                if (isCategoryOptionCombo) {
+                    var translatedOptions = _.map(categoryOptionCombosAndOptions[id], function (categoryOptionId) {
+                        return getTranslation(categoryOptionId, 'shortName');
+                    });
+                    if(translatedOptions.length == _.compact(translatedOptions).length)
+                        chartData.metaData.names[id] = translatedOptions.join(', ');
+                } else {
+                    chartData.metaData.names[id] = getTranslation(id, 'shortName') || chartData.metaData.names[id];
+                }
+
+            });
+            return chartData;
         };
 
         this.translateReferralLocations = function(arrayOfObjectsToBeTranslated) {
@@ -48,7 +103,7 @@ define(['lodash'], function(_){
             return _.map(arrayOfObjectsToBeTranslated, function (objectToBeTranslated) {
                 var translationObject = translations[objectToBeTranslated.id];
 
-                _.each(translatableProperties, function (property) {
+                _.each(TRANSLATABLE_PROPERTIES, function (property) {
                     if(objectToBeTranslated[property]) {
                         var translationsByProperty = _.filter(translationObject, {property: property});
                         objectToBeTranslated[property] = translationsByProperty[0] ? translationsByProperty[0].value : objectToBeTranslated[property];
@@ -89,33 +144,32 @@ define(['lodash'], function(_){
             return optionMap;
         };
 
-        this.translate = function(objectsToBeTranslated) {
-            if(_locale == 'en') {
-                return objectsToBeTranslated;
-            }
+        var translateObject = function (objectToBeTranslated) {
+            var translationsForObject = translations[objectToBeTranslated.id] || [];
 
-            _.each(objectsToBeTranslated, function (objectToBeTranslated) {
-                var translationObject = translations[objectToBeTranslated.id] || [];
-
-                _.each(translatableProperties, function (property) {
-                    if(objectToBeTranslated[property]) {
-                        var translationsByProperty = _.filter(translationObject, {property: property});
-                        objectToBeTranslated[property] = translationsByProperty[0] ? translationsByProperty[0].value : objectToBeTranslated[property];
-                    }
-                });
-
-                _.each(objectToBeTranslated, function (value, key) {
-                    if(_.isArray(value) && _.contains(translatableTypes, key)){
-                        _.each(value,function(object){
-                            self.translate(_.flatten([object]));
-                        });
-                    } else if(_.isObject(value) && _.contains(translatableTypes, key)){
-                        self.translate([value]);
-                    }
-                });
+            _.each(TRANSLATABLE_PROPERTIES, function (property) {
+                if(objectToBeTranslated[property]) {
+                    var translationForProperty = _.find(translationsForObject, { property: property });
+                    objectToBeTranslated[property] = translationForProperty && translationForProperty.value || objectToBeTranslated[property];
+                }
             });
 
-            return objectsToBeTranslated;
+            _.each(TRANSLATABLE_ENTITIES, function (entity) {
+                var nestedEntity = objectToBeTranslated[entity];
+                if(nestedEntity) {
+                    self.translate(nestedEntity);
+                }
+            });
+
+            return objectToBeTranslated;
+        };
+
+        this.translate = function (objectToBeTranslated) {
+            if(_locale == 'en' || _.isUndefined(objectToBeTranslated)) {
+                return objectToBeTranslated;
+            }
+
+            return _.isArray(objectToBeTranslated) ? _.map(objectToBeTranslated, self.translate) : translateObject(objectToBeTranslated);
         };
     };
 });

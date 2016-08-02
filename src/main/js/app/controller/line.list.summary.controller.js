@@ -1,6 +1,6 @@
-define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, properties, orgUnitMapper) {
+define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], function(_, moment, properties, orgUnitMapper, interpolate) {
     return function($scope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, programRepository, programEventRepository, excludedDataElementsRepository,
-        orgUnitRepository, approvalDataRepository, referralLocationsRepository, translationsService) {
+        orgUnitRepository, approvalDataRepository, referralLocationsRepository, dataSyncFailureRepository, translationsService, filesystemService) {
 
         $scope.filterParams = {};
         $scope.currentUrl = $location.path();
@@ -44,6 +44,13 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             scrollToTop();
         };
 
+        var translateAndFilterEventData = function (events) {
+            var translatedEvents = translationsService.translate(events);
+            $scope.events = _.map(translatedEvents, function (event) {
+                event.dataValues = _.filter(event.dataValues, 'showInEventSummary');
+                return event;
+            });
+        };
 
         var loadEventsView = function() {
             $scope.eventForm = {
@@ -54,29 +61,21 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 $scope.eventListTitle = $scope.resourceBundle.incompleteEventsTitle;
                 $scope.noCasesMsg = $scope.resourceBundle.noIncompleteEventsFound;
 
-                return programEventRepository.getDraftEventsFor($scope.program.id, _.pluck($scope.originOrgUnits, "id")).then(function(events) {
-                    var translatedEvents = translationsService.translate(events);
-                    $scope.events = translatedEvents;
-                });
+                return programEventRepository.getDraftEventsFor($scope.program.id, _.pluck($scope.originOrgUnits, "id"))
+                    .then(translateAndFilterEventData);
             }
             if ($scope.filterBy === "readyToSubmit") {
-                var acc = [];
                 $scope.eventListTitle = $scope.resourceBundle.readyToSubmitEventsTitle;
                 $scope.noCasesMsg = $scope.resourceBundle.noReadyToSubmitEventsFound;
-                return programEventRepository.getSubmitableEventsFor($scope.program.id, _.pluck($scope.originOrgUnits, "id")).then(function(data) {
-                    _.each(data, function(event) {
-                        if (event.localStatus === "NEW_DRAFT" || event.localStatus === "UPDATED_DRAFT")
-                            acc.push(event);
-                        if (event.localStatus === "READY_FOR_DHIS" && _.isUndefined(event.clientLastUpdated))
-                            acc.push(event);
-                        if (event.localStatus === "READY_FOR_DHIS" && !_.isUndefined(event.clientLastUpdated)) {
-                            if ((moment().diff(moment(event.clientLastUpdated), 'days')) > properties.eventsSync.numberOfDaysToAllowResubmit)
-                                acc.push(event);
-                        }
+                return programEventRepository.getSubmitableEventsFor($scope.program.id, _.pluck($scope.originOrgUnits, "id")).then(function(events) {
+                    return _.filter(events, function(event) {
+                        var eventIsADraft = event.localStatus === "NEW_DRAFT" || event.localStatus === "UPDATED_DRAFT",
+                            eventIsSubmittedButHasNoTimestamp = event.localStatus === "READY_FOR_DHIS" && _.isUndefined(event.clientLastUpdated),
+                            eventIsSubmittedButHasNotSynced = event.localStatus === "READY_FOR_DHIS" && !_.isUndefined(event.clientLastUpdated) &&
+                                                              moment().diff(moment(event.clientLastUpdated), 'days') > properties.eventsSync.numberOfDaysToAllowResubmit;
+                        return eventIsADraft || eventIsSubmittedButHasNoTimestamp || eventIsSubmittedButHasNotSynced;
                     });
-                    var translatedEvents = translationsService.translate(acc);
-                    $scope.events = translatedEvents;
-                });
+                }).then(translateAndFilterEventData);
             }
             if ($scope.filterBy === "dateRange") {
                 var startDate = $location.search().startDate;
@@ -84,10 +83,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 $scope.filterParams.startDate = moment(startDate).startOf('day').toDate();
                 $scope.filterParams.endDate = moment(endDate).endOf('day').toDate();
 
-                return programEventRepository.findEventsByDateRange($scope.program.id, _.pluck($scope.originOrgUnits, "id"), startDate, endDate).then(function(events) {
-                    var translatedEvents = translationsService.translate(events);
-                    $scope.events = translatedEvents;
-                });
+                $scope.filterByDateRange();
             }
 
             if ($scope.filterBy === "caseNumber") {
@@ -109,16 +105,6 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             });
         };
 
-        var getPeriodsAndOrgUnits = function(events) {
-            var periods = _.uniq(_.pluck(events, "period"));
-            return _.map(periods, function(period) {
-                return {
-                    "period": period,
-                    "orgUnit": $scope.selectedModuleId
-                };
-            });
-        };
-
         $scope.back = function() {
             $scope.viewRegistrationBook = false;
         };
@@ -134,10 +120,12 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
         };
 
         $scope.showPatientOriginInSummaryTable = function() {
-            return $scope.program.name === "Burn Unit" || $scope.program.name === "Cholera Treatment Centre";
+            return $scope.program.name === "Cholera Treatment Centre";
         };
 
         $scope.getDisplayValue = function(dataValue) {
+            var dataValueType = dataValue && dataValue.valueType;
+
             if (!dataValue.value) return "";
 
             if (_.endsWith(dataValue.code, "_referralLocations"))
@@ -148,7 +136,15 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     return o.code === dataValue.value;
                 });
                 return option ? option.name : "";
-            } else {
+            }
+            if (dataValueType === 'DATE') {
+                return $scope.getFormattedDate(dataValue.value);
+            }
+
+            if (dataValueType === 'BOOLEAN') {
+                return dataValue.value === 'true' ? $scope.resourceBundle.yesLabel : $scope.resourceBundle.noLabel;
+            }
+            else {
                 return dataValue.value;
             }
         };
@@ -157,56 +153,72 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             return date ? moment(date).toDate().toLocaleDateString() : "";
         };
 
-        $scope.submit = function() {
+        var getPeriodsAndOrgUnits = function(periods) {
+            return _.map(periods, function(period) {
+                return {
+                    period: period,
+                    orgUnit: $scope.selectedModuleId
+                };
+            });
+        };
 
-            var submitableEvents = $scope.events;
-            var periodsAndOrgUnits = getPeriodsAndOrgUnits(submitableEvents);
+        var publishMessageToSyncModuleDataBlock = function (period) {
+            return $hustle.publishOnce({
+                type: 'syncModuleDataBlock',
+                data: {
+                    moduleId: $scope.selectedModuleId,
+                    period: period
+                },
+                locale: $scope.locale,
+                desc: $scope.resourceBundle.syncModuleDataBlockDesc + period + ', ' + $scope.selectedModuleName
+            }, 'dataValues');
+        };
+
+        $scope.submit = function() {
+            var submitableEvents = $scope.events,
+                submitablePeriods = _.uniq(_.pluck(submitableEvents, 'period')),
+                periodsAndOrgUnits = getPeriodsAndOrgUnits(submitablePeriods);
 
             var clearAnyExisingApprovals = function() {
                 return approvalDataRepository.clearApprovals(periodsAndOrgUnits);
             };
 
+            var clearFailedToSync = function () {
+              return _.each(submitablePeriods, function (period) {
+                  dataSyncFailureRepository.delete($scope.selectedModuleId, period);
+              });
+            };
+
             var publishToDhis = function() {
-                var uploadEvents = function() {
-                    return $hustle.publish({
-                        "type": "uploadProgramEvents",
-                        "data": _.pluck(submitableEvents, 'event'),
-                        "locale": $scope.locale,
-                        "desc": $scope.resourceBundle.uploadProgramEventsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
-                    }, "dataValues");
-                };
-
-                var deleteApprovals = function() {
-                    return $hustle.publish({
-                        "data": periodsAndOrgUnits,
-                        "type": "deleteApprovals",
-                        "locale": $scope.locale,
-                        "desc": $scope.resourceBundle.deleteApprovalsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
-                    }, "dataValues");
-                };
-
-                return deleteApprovals()
-                    .then(uploadEvents);
+                var publishPromises = _.map(submitablePeriods, publishMessageToSyncModuleDataBlock);
+                return $q.all(publishPromises);
             };
 
             var updateView = function() {
-                showResultMessage("success", submitableEvents.length + $scope.resourceBundle.eventSubmitSuccess);
+                showResultMessage("success", interpolate($scope.resourceBundle.eventSubmitSuccess, { number_of_events: submitableEvents.length }));
                 loadEventsView();
             };
 
             programEventRepository.markEventsAsSubmitted(_.pluck(submitableEvents, 'event'))
                 .then(clearAnyExisingApprovals)
+                .then(clearFailedToSync)
                 .then(publishToDhis)
                 .then(updateView);
         };
 
         $scope.submitAndApprove = function() {
-
-            var submitableEvents = getSubmitableEvents();
-            var periodsAndOrgUnits = getPeriodsAndOrgUnits(submitableEvents);
+            var submitableEvents = getSubmitableEvents(),
+                submittablePeriods = _.uniq(_.pluck(submitableEvents, 'period')),
+                periodsAndOrgUnits = getPeriodsAndOrgUnits(submittablePeriods);
 
             var clearAnyExisingApprovals = function() {
                 return approvalDataRepository.clearApprovals(periodsAndOrgUnits);
+            };
+
+            var clearFailedToSync = function () {
+                return _.each(submittablePeriods, function (period) {
+                    dataSyncFailureRepository.delete($scope.selectedModuleId, period);
+                });
             };
 
             var markAsApproved = function() {
@@ -215,125 +227,65 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             };
 
             var publishToDhis = function() {
-
-                var deleteApprovals = function() {
-                    return $hustle.publish({
-                        "data": periodsAndOrgUnits,
-                        "type": "deleteApprovals",
-                        "locale": $scope.locale,
-                        "desc": $scope.resourceBundle.deleteApprovalsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
-                    }, "dataValues");
-                };
-
-                var uploadEvents = function() {
-                    return $hustle.publish({
-                        "type": "uploadProgramEvents",
-                        "data": _.pluck(submitableEvents, "event"),
-                        "locale": $scope.locale,
-                        "desc": $scope.resourceBundle.uploadProgramEventsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
-                    }, "dataValues");
-                };
-
-                var uploadCompletion = function() {
-                    return $hustle.publish({
-                        "data": periodsAndOrgUnits,
-                        "type": "uploadCompletionData",
-                        "locale": $scope.locale,
-                        "desc": $scope.resourceBundle.uploadCompletionDataDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
-                    }, "dataValues");
-                };
-
-                var uploadApproval = function() {
-                    return $hustle.publish({
-                        "data": periodsAndOrgUnits,
-                        "type": "uploadApprovalData",
-                        "locale": $scope.locale,
-                        "desc": $scope.resourceBundle.uploadApprovalDataDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
-                    }, "dataValues");
-                };
-
-                return deleteApprovals()
-                    .then(uploadEvents)
-                    .then(uploadCompletion)
-                    .then(uploadApproval);
+                var publishPromises = _.map(submittablePeriods, publishMessageToSyncModuleDataBlock);
+                return $q.all(publishPromises);
             };
 
             var updateView = function() {
-                showResultMessage("success", submitableEvents.length + $scope.resourceBundle.eventSubmitAndApproveSuccess);
+                showResultMessage('success', interpolate($scope.resourceBundle.eventSubmitAndApproveSuccess, { number_of_events: submitableEvents.length }));
                 loadEventsView();
             };
 
             programEventRepository.markEventsAsSubmitted(_.pluck(submitableEvents, 'event'))
                 .then(clearAnyExisingApprovals)
+                .then(clearFailedToSync)
                 .then(markAsApproved)
                 .then(publishToDhis)
                 .then(updateView);
         };
 
-        $scope.deleteEvent = function(ev) {
-            var eventId = ev.event;
-
-            var periodAndOrgUnit = {
-                "period": ev.period,
-                "orgUnit": $scope.selectedModuleId
-            };
-
-            var clearAnyExisingApprovals = function() {
-                return approvalDataRepository.clearApprovals(periodAndOrgUnit);
-            };
-
-            var publishToDhis = function() {
-                var deleteEventPromise = $hustle.publish({
-                    "data": eventId,
-                    "type": "deleteEvent",
-                    "locale": $scope.locale,
-                    "desc": $scope.resourceBundle.deleteEventDesc
-                }, "dataValues");
-
-                var deleteApprovalsPromise = $hustle.publish({
-                    "data": periodAndOrgUnit,
-                    "type": "deleteApprovals",
-                    "locale": $scope.locale,
-                    "desc": $scope.resourceBundle.deleteApprovalsDesc + periodAndOrgUnit.period + ", Module: " + $scope.selectedModuleName
-                }, "dataValues");
-
-                return $q.all([deleteEventPromise, deleteApprovalsPromise]);
-            };
-
+        $scope.deleteEvent = function(event) {
             var hardDelete = function() {
-                return programEventRepository.delete(eventId);
+                return programEventRepository.delete(event.event);
             };
 
             var softDelete = function() {
-                ev.localStatus = "DELETED";
-                return programEventRepository.upsert(ev)
-                    .then(clearAnyExisingApprovals)
-                    .then(publishToDhis);
+                var periodAndOrgUnit = {
+                    period: event.period,
+                    orgUnit: $scope.selectedModuleId
+                };
+                event.localStatus = 'DELETED';
+
+                var clearFailedToSync = function () {
+                    return dataSyncFailureRepository.delete($scope.selectedModuleId, periodAndOrgUnit.period);
+                };
+
+                return programEventRepository.upsert(event)
+                    .then(_.partial(approvalDataRepository.clearApprovals, periodAndOrgUnit))
+                    .then(clearFailedToSync)
+                    .then(_.partial(publishMessageToSyncModuleDataBlock, event.period));
             };
 
             var deleteOnConfirm = function() {
-                var deleteFunction = ev.localStatus === "NEW_DRAFT" || ev.localStatus === "NEW_INCOMPLETE_DRAFT" ? hardDelete : softDelete;
+                var deleteFunction = event.localStatus === 'NEW_DRAFT' || event.localStatus === 'NEW_INCOMPLETE_DRAFT' ? hardDelete : softDelete;
                 return deleteFunction.apply().then(function() {
-                    showResultMessage("success", $scope.resourceBundle.eventDeleteSuccess);
+                    showResultMessage('success', $scope.resourceBundle.eventDeleteSuccess);
                     loadEventsView();
                 });
             };
 
-            var modalMessages = {
+            confirmAndProceed(deleteOnConfirm, {
                 "confirmationMessage": $scope.resourceBundle.deleteEventConfirmation
-            };
-
-            confirmAndProceed(deleteOnConfirm, modalMessages);
+            });
         };
 
         $scope.filterByCaseNumber = function() {
             $scope.loadingResults = true;
-            programEventRepository.findEventsByCode($scope.program.id, _.pluck($scope.originOrgUnits, "id"), $scope.filterParams.caseNumber).then(function(events) {
-                var translatedEvents = translationsService.translate(events);
-                $scope.events = translatedEvents;
-                $scope.loadingResults = false;
-            });
-
+            programEventRepository.findEventsByCode($scope.program.id, _.pluck($scope.originOrgUnits, "id"), $scope.filterParams.caseNumber)
+                .then(translateAndFilterEventData)
+                .then(function() {
+                    $scope.loadingResults = false;
+                });
         };
 
         $scope.filterByDateRange = function() {
@@ -341,12 +293,42 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             var startDate = moment($scope.filterParams.startDate).format("YYYY-MM-DD");
             var endDate = moment($scope.filterParams.endDate).format("YYYY-MM-DD");
 
-            programEventRepository.findEventsByDateRange($scope.program.id, _.pluck($scope.originOrgUnits, "id"), startDate, endDate).then(function(events) {
-                var translatedEvents = translationsService.translate(events);
-                $scope.events = translatedEvents;
-                $scope.loadingResults = false;
-            });
+            programEventRepository.findEventsByDateRange($scope.program.id, _.pluck($scope.originOrgUnits, "id"), startDate, endDate)
+                .then(translateAndFilterEventData)
+                .then(function() {
+                    $scope.loadingResults = false;
+                });
+        };
 
+        $scope.filterSubmittedEvents = function (event) {
+            return !event.localStatus || event.localStatus==='READY_FOR_DHIS';
+        };
+
+        $scope.exportToCSV = function () {
+            var NEW_LINE = '\n',
+                DELIMITER = ',';
+
+            var escapeString = function (string) {
+                return '"' + string + '"';
+            };
+
+            var buildHeaders = function () {
+                var eventDateLabel = escapeString($scope.resourceBundle.eventDateLabel);
+                var formNames = _.map(_.map($scope.summaryDataElements, 'formName'), escapeString);
+                return [eventDateLabel].concat(formNames).join(DELIMITER);
+            };
+
+            var buildData = function (event) {
+                var values = _.map(_.map(event.dataValues, $scope.getDisplayValue), escapeString);
+                var eventDate = $scope.getFormattedDate(event.eventDate);
+                return [eventDate].concat(values).join(DELIMITER);
+            };
+
+            var eventsToBeExported = _.chain($scope.events).filter($scope.filterSubmittedEvents).map(buildData).value();
+
+            var csvContent = _.flatten([buildHeaders(), eventsToBeExported]).join(NEW_LINE);
+            var fileName = [$scope.selectedModuleName, 'summary', moment().format('DD-MMM-YYYY'), 'csv'].join('.');
+            return filesystemService.promptAndWriteFile(fileName, new Blob([csvContent], { type: 'text/csv' }), filesystemService.FILE_TYPE_OPTIONS.CSV);
         };
 
         $scope.getOriginName = function(orgUnitId) {
@@ -378,6 +360,12 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             };
 
             var loadPrograms = function() {
+                var getSummaryDataElementFromProgram = function (program) {
+                    var sections = _.flatten(_.map(program.programStages, 'programStageSections')),
+                        programStageDataElements = _.flatten(_.map(sections, 'programStageDataElements'));
+                    return _.filter(_.map(programStageDataElements, 'dataElement'), 'showInEventSummary');
+                };
+
                 var getExcludedDataElementsForModule = function() {
                     return excludedDataElementsRepository.get($scope.selectedModuleId).then(function(data) {
                         return data ? _.pluck(data.dataElements, "id") : [];
@@ -387,9 +375,9 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 var getProgram = function(excludedDataElements) {
                     return programRepository.getProgramForOrgUnit($scope.originOrgUnits[0].id).then(function(program) {
                         return programRepository.get(program.id, excludedDataElements).then(function(program) {
-                            var translatedProgram = translationsService.translate([program]);
-                            $scope.program = translatedProgram[0];
-                            $scope.associatedProgramId = translatedProgram[0].id;
+                            $scope.program = translationsService.translate(program);
+                            $scope.associatedProgramId = $scope.program.id;
+                            $scope.summaryDataElements = getSummaryDataElementFromProgram($scope.program);
                         });
                     });
                 };

@@ -145,18 +145,25 @@ define(["lodash", "migrations", "dateUtils", "properties", "moment"], function(_
             };
 
             var restoreMsf = function(data) {
-                var backupDataByStore = {};
-                _.each(data, function(val, key) {
-                    if (key != "hustle") {
-                        var store = key.split("__")[1];
-                        var index = key.split("__")[2];
-                        if (_.isEmpty(backupDataByStore[store])) {
-                            backupDataByStore[store] = [];
+                var parseBackupDataByStore = function (backUpData, existingStoreNames) {
+                    var backupDataByStore = {};
+                    _.each(backUpData, function(val, key) {
+                        if (key != "hustle") {
+                            var store = key.split("__")[1];
+                            var index = key.split("__")[2];
+                            if (_.contains(existingStoreNames, store)) {
+                                if (_.isEmpty(backupDataByStore[store])) {
+                                    backupDataByStore[store] = [];
+                                }
+                                backupDataByStore[store][index] = JSON.parse(val);
+                            }
                         }
-                        backupDataByStore[store][index] = JSON.parse(val);
-                    }
-                });
-                return restoreDB(backupDataByStore);
+                    });
+                    return backupDataByStore;
+                };
+                return getAllStoreNames()
+                    .then(_.partial(parseBackupDataByStore, data))
+                    .then(restoreDB);
             };
 
             var restoreHustle = function(data) {

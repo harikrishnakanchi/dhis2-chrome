@@ -61,43 +61,30 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
         };
 
         var getResourceDetails = function(resourceUrl, requiredFields, resourceIds) {
-            var config = {
-                params: {
-                    'fields': requiredFields
-                }
-            };
+            var downloadResource = function (id) {
+                var config = { params: { fields: requiredFields } };
 
-            var getIndividualResourceDetails = function(resourceId) {
-                return $http.get(resourceUrl + '/' + resourceId + '.json', config).then(function (response) {
-                    var resourceDetails = response.data;
-
-                    // TODO: Remove following three mappings after switching to DHIS 2.20 or greater
-                    resourceDetails.rows = _.map(resourceDetails.rows || [], function (row) {
-                        if (row.dimension === "in" || row.dimension === "de")
-                            row.dimension = "dx";
-                        return row;
-                    });
-                    resourceDetails.columns = _.map(resourceDetails.columns || [], function (column) {
-                        if (column.dimension === "in" || column.dimension === "de")
-                            column.dimension = "dx";
-                        return column;
-                    });
-                    resourceDetails.filters = _.map(resourceDetails.filters || [], function (filter) {
-                        if (filter.dimension === "in" || filter.dimension === "de")
-                            filter.dimension = "dx";
-                        return filter;
-                    });
-
-                    return resourceDetails;
+                return $http.get(resourceUrl + '/' + id + '.json', config).then(function (response) {
+                    return response.data;
                 });
             };
 
-            var allPromises = _.map(resourceIds, getIndividualResourceDetails);
-            return $q.all(allPromises);
+            var recursivelyLoopThroughResourceIds = function (ids, resources) {
+                if(_.isEmpty(ids)) {
+                    return $q.when(resources);
+                }
+
+                return downloadResource(ids.shift()).then(function (resource) {
+                    resources.push(resource);
+                    return recursivelyLoopThroughResourceIds(ids, resources);
+                });
+            };
+
+            return recursivelyLoopThroughResourceIds(resourceIds, []);
         };
 
         this.getUpdatedCharts = function(lastUpdatedTime) {
-            var requiredFields = 'id,name,title,type,sortOrder,columns[dimension,filter,items[id,name,description]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]]';
+            var requiredFields = 'id,name,title,relativePeriods,type,columns[dimension,filter,items[id,name,description]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]]';
             return getResourceIds(dhisUrl.charts, 'charts', lastUpdatedTime).then(_.partial(getResourceDetails, dhisUrl.charts, requiredFields));
         };
 

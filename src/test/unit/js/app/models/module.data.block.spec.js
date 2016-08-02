@@ -4,7 +4,7 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
 
         beforeEach(function() {
             isLineListService = false;
-            spyOn(CustomAttributes, 'parseAttribute').and.callFake(function() {
+            spyOn(CustomAttributes, 'getBooleanAttributeValue').and.callFake(function() {
                 return isLineListService;
             });
             orgUnit = {
@@ -73,11 +73,11 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                 orgUnit = {
                     attributeValues: 'someAttributeValue'
                 };
-                CustomAttributes.parseAttribute.and.returnValue('lineListServiceAttributeValue');
+                CustomAttributes.getBooleanAttributeValue.and.returnValue('lineListServiceAttributeValue');
 
                 moduleDataBlock = createModuleDataBlock();
 
-                expect(CustomAttributes.parseAttribute).toHaveBeenCalledWith(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
+                expect(CustomAttributes.getBooleanAttributeValue).toHaveBeenCalledWith(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
                 expect(moduleDataBlock.lineListService).toEqual('lineListServiceAttributeValue');
             });
         });
@@ -149,13 +149,25 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                     expect(moduleDataBlock.submitted).toEqual(false);
                 });
 
-                it('should be false if there are events with a localStatus not equal to READY_FOR_DHIS', function () {
+                it('should be false if there are no events with a localStatus equal to READY_FOR_DHIS', function () {
                     lineListEvents = [{
                         someEventInfo: 'someEventDetails',
                         localStatus: 'SOME_OTHER_STATUS'
                     }];
                     moduleDataBlock = createModuleDataBlock();
                     expect(moduleDataBlock.submitted).toEqual(false);
+                });
+
+                it('should be true if there are any event with a local status READY_FOR_DHIS', function () {
+                    lineListEvents = [{
+                        someEventInfo: 'someEventDetails',
+                        localStatus: 'READY_FOR_DHIS'
+                    }, {
+                        someEventInfo: 'someEventDetails',
+                        localStatus: 'SOME_OTHER_STATUS'
+                    }];
+                    moduleDataBlock = createModuleDataBlock();
+                    expect(moduleDataBlock.submitted).toEqual(true);
                 });
             });
         });
@@ -180,6 +192,22 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                 })];
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.dataValues).toEqual(dataValues);
+            });
+        });
+
+        describe('events', function() {
+            it('should return empty array if lineListEvents is undefined', function() {
+                lineListEvents = undefined;
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.events).toEqual([]);
+            });
+
+            it('should return lineListEvents', function() {
+                lineListEvents = [{
+                    event: 'someEvent'
+                }];
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.events).toEqual(lineListEvents);
             });
         });
 
@@ -337,6 +365,46 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
         });
 
+        describe('approvedAtAnyLevel', function() {
+            it('should be false if approvalData is not present', function() {
+                approvalData = undefined;
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvedAtAnyLevel).toEqual(false);
+            });
+
+            it('should be true if completed status is true', function() {
+                approvalData = {
+                    isComplete: true
+                };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvedAtAnyLevel).toEqual(true);
+            });
+
+            it('should be false if completed status is false', function() {
+                approvalData = {
+                    isComplete: false
+                };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvedAtAnyLevel).toEqual(false);
+            });
+
+            it('should be true if approved status is true', function() {
+                approvalData = {
+                    isApproved: true
+                };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvedAtAnyLevel).toEqual(true);
+            });
+
+            it('should be false if approved status is false', function() {
+                approvalData = {
+                    isApproved: false
+                };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.approvedAtAnyLevel).toEqual(false);
+            });
+        });
+
         describe('awaitingActionAt DataEntryLevel, ProjectLevelApprover, CoordinationLevelApprover', function() {
             it('should be waiting at dataEntryLevel if data has not been submitted', function() {
                 aggregateDataValues = null;
@@ -397,6 +465,18 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                 expect(moduleDataBlock.awaitingActionAtCoordinationLevelApprover).toEqual(false);
             });
 
+            it('should not be waiting at any level if data has not been submitted but has been erroneously approved only at project level by auto-approve job', function() {
+                aggregateDataValues = null;
+                approvalData = {
+                    isComplete: true
+                };
+                moduleDataBlock = createModuleDataBlock();
+
+                expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(false);
+                expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
+                expect(moduleDataBlock.awaitingActionAtCoordinationLevelApprover).toEqual(false);
+            });
+
             it('should not be waiting at any level if data has been submitted, not approved at project level, but approved at coordination level by auto-approve job', function() {
                 aggregateDataValues = [createMockDataValuesObject()];
                 approvalData = {
@@ -419,6 +499,7 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                 expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(true);
                 expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
                 expect(moduleDataBlock.awaitingActionAtCoordinationLevelApprover).toEqual(false);
+                expect(moduleDataBlock.failedToSync).toEqual(true);
             });
 
             it('should be waiting at projectLevel if data has been submitted, approved at project level, but failed to sync', function() {
@@ -472,6 +553,27 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                     })];
                     moduleDataBlock = createModuleDataBlock();
 
+                    expect(moduleDataBlock.failedToSync).toEqual(false);
+                });
+            });
+
+            describe('Line list module', function () {
+               beforeEach(function () {
+                  isLineListService = true;
+               });
+
+                it('should be true if module is failedToSync while approving', function () {
+                    failedToSyncData = {"moduleId": "someModuleId", "period": "period"};
+                    approvalData = {
+                        isComplete: true,
+                    };
+                    moduleDataBlock = createModuleDataBlock();
+                    expect(moduleDataBlock.failedToSync).toEqual(true);
+                });
+
+                it('should be false if module is failedToSync while data submission', function () {
+                    failedToSyncData = {"moduleId": "someModuleId", "period": "period"};
+                    moduleDataBlock = createModuleDataBlock();
                     expect(moduleDataBlock.failedToSync).toEqual(false);
                 });
             });

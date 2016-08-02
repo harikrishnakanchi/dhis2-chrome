@@ -1,4 +1,7 @@
-<a href="" tabindex="-1">{{resourceBundle.importExportMenuLabel}}</a>
+<a href="" class="dropdown-toggle" tabindex="-1">
+    {{resourceBundle.importExportMenuLabel}}
+    <i class="fa" ng-class="layoutDirection.direction == 'rtl' ? 'fa-caret-left' : 'fa-caret-right'"></i>
+</a>
 <ul ng-controller="appCloneController" class="dropdown-menu" role="menu">
     <li><a href="" ng-click="createClone()">{{resourceBundle.createCloneLabel}}</a></li>
     <li><a href="" ng-click="loadClone()">{{resourceBundle.loadCloneLabel}}</a></li>

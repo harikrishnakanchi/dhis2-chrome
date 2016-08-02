@@ -1,8 +1,8 @@
-define([], function () {
-    return function (moduleDataBlockFactory, dataService, datasetRepository, approvalService, orgUnitRepository, moduleDataBlockMerger) {
+define(['properties', 'dateUtils'], function (properties, dateUtils) {
+    return function (moduleDataBlockFactory, dataService, eventService, datasetRepository, approvalService, orgUnitRepository, changeLogRepository, moduleDataBlockMerger, $q) {
         var getModuleDataBlock = function(data) {
             return moduleDataBlockFactory.create(data.moduleId, data.period).then(function (moduleDataBlock) {
-                return _.merge({ moduleDataBlock: moduleDataBlock }, data);
+                return _.assign({}, data, { moduleDataBlock: moduleDataBlock });
             });
         };
 
@@ -13,6 +13,11 @@ define([], function () {
         };
 
         var getDataSetsForModulesAndOrigins = function (data) {
+            var getAggregateDataSetIds = function(allDataSets) {
+                var aggregateDataSets = _.filter(allDataSets, { isLineListService: false });
+                return _.pluck(aggregateDataSets, 'id');
+            };
+
             var originOrgUnitIds = _.pluck(data.originOrgUnits, 'id');
 
             return datasetRepository.findAllForOrgUnits(originOrgUnitIds.concat(data.moduleId)).then(function(allDataSets) {
@@ -24,15 +29,35 @@ define([], function () {
             });
         };
 
-        var getAggregateDataSetIds = function(allDataSets) {
-            var aggregateDataSets = _.filter(allDataSets, { isLineListService: false });
-            return _.pluck(aggregateDataSets, 'id');
+        var getLastUpdatedTime = function(data) {
+            return orgUnitRepository.getParentProject(data.moduleId).then(function(projectOrgUnit) {
+                return changeLogRepository.get('dataValues:' + projectOrgUnit.id).then(function(lastUpdatedTime) {
+                    return _.merge({ lastUpdatedTime: lastUpdatedTime }, data);
+                });
+            });
         };
 
-        var getDataValuesFromDhis = function(data) {
-            return dataService.downloadData(data.moduleId, data.aggregateDataSetIds, data.period, null).then(function (dataValues) {
-                return _.merge({ dhisDataValues: dataValues }, data);
-            });
+        var getModuleDataFromDhis = function(data) {
+            var getDataValuesFromDhis = function(data) {
+                return dataService.downloadData(data.moduleId, data.aggregateDataSetIds, data.period, data.lastUpdatedTime).then(function (dataValues) {
+                    return _.merge({ dhisDataValues: dataValues }, data);
+                });
+            };
+
+            var getEventsFromDhis = function(data) {
+                return eventService.getEvents(data.moduleId, [data.period], data.lastUpdatedTime).then(function (events) {
+                    return _.merge({ events: events }, data);
+                });
+            };
+
+            var getEventIdsFromDhis = function(data) {
+                var periodRange = dateUtils.getPeriodRange(properties.projectDataSync.numWeeksToSync);
+                return eventService.getEventIds(data.moduleId, periodRange).then(function (eventIds){
+                    return _.merge({ eventIds: eventIds }, data);
+                });
+            };
+
+            return data.moduleDataBlock.lineListService ? getEventsFromDhis(data).then(getEventIdsFromDhis) : getDataValuesFromDhis(data);
         };
 
         var getCompletionFromDhis = function (data) {
@@ -50,13 +75,13 @@ define([], function () {
         };
 
         var mergeAndSaveModuleDataBlock = function (data) {
-            return moduleDataBlockMerger.mergeAndSaveToLocalDatabase(data.moduleDataBlock, data.dhisDataValues, data.dhisCompletion, data.dhisApproval).then(function() {
+            return moduleDataBlockMerger.mergeAndSaveToLocalDatabase(data.moduleDataBlock, data.dhisDataValues, data.dhisCompletion, data.dhisApproval, data.events, data.eventIds).then(function() {
                 return data;
             });
         };
 
         var uploadModuleDataBlockToDhis = function (data) {
-            return moduleDataBlockMerger.uploadToDHIS(data.moduleDataBlock, data.dhisCompletion, data.dhisApproval);
+            return moduleDataBlockMerger.uploadToDHIS(data.moduleDataBlock, data.dhisCompletion, data.dhisApproval, data.eventIds);
         };
 
         this.run = function(message) {
@@ -68,7 +93,8 @@ define([], function () {
             })
                 .then(getOriginOrgUnits)
                 .then(getDataSetsForModulesAndOrigins)
-                .then(getDataValuesFromDhis)
+                .then(getLastUpdatedTime)
+                .then(getModuleDataFromDhis)
                 .then(getCompletionFromDhis)
                 .then(getApprovalFromDhis)
                 .then(mergeAndSaveModuleDataBlock)

@@ -1,6 +1,6 @@
 define(["lodash", "pivotTable"], function(_, PivotTableModel) {
     return function(db, $q) {
-        var PIVOT_TABLE_STORE_NAME = 'pivotTables';
+        var PIVOT_TABLE_STORE_NAME = 'pivotTableDefinitions';
         var PIVOT_TABLE_DATA_STORE_NAME = 'pivotTableData';
 
         this.upsert = function(pivotTables) {
@@ -8,13 +8,10 @@ define(["lodash", "pivotTable"], function(_, PivotTableModel) {
             return store.upsert(pivotTables);
         };
 
-        this.deleteByIds = function(idsToDelete, pivotTables) {
+        this.deleteByIds = function(idsToDelete) {
             var store = db.objectStore(PIVOT_TABLE_STORE_NAME);
-            return $q.all(_.map(idsToDelete, function(id) {
-                var pivotTableToDelete = _.find(pivotTables, {
-                    'id': id
-                });
-                return store.delete(pivotTableToDelete.name);
+            return $q.all(_.map(idsToDelete, function(pivotTableId) {
+                return store.delete(pivotTableId);
             }));
         };
 
@@ -36,14 +33,9 @@ define(["lodash", "pivotTable"], function(_, PivotTableModel) {
         };
 
         this.getDataForPivotTable = function(pivotTableName, orgUnitId) {
-            var query = db.queryBuilder().$eq(pivotTableName).$index("by_pivot_table").compile();
             var store = db.objectStore(PIVOT_TABLE_DATA_STORE_NAME);
-
-            return store.each(query).then(function(data) {
-                var output = _(data).filter({
-                    orgUnit: orgUnitId
-                }).map('data').first();
-                return output;
+            return store.find([pivotTableName, orgUnitId]).then(function (pivotTableData) {
+                return !!pivotTableData && pivotTableData.data;
             });
         };
     };

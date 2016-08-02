@@ -276,6 +276,61 @@ define([], function() {
         var dataSyncFailureStore = create_store_with_key("dataSyncFailure", ["moduleId", "period"], db);
     };
 
+    var delete_org_unit_level_data_store = function(db) {
+        db.deleteObjectStore("organisationUnitLevels");
+    };
+
+    var delete_pivot_table_data_and_chart_data_changelog = function (db, tx) {
+        var changeLogStore = tx.objectStore("changeLog");
+        changeLogStore.openCursor().onsuccess = function (e) {
+            var cursor = e.target.result;
+            if (cursor) {
+                var type = cursor.value.type;
+                if (_.startsWith(type, "chartData:") || _.startsWith(type, "pivotTableData:")) {
+                    cursor.delete();
+                }
+                cursor.continue();
+            }
+        };
+    };
+
+    var create_chart_definitions_store = function (db) {
+        create_store_with_key('chartDefinitions', 'id', db);
+    };
+
+    var create_pivot_table_definitions_store = function (db) {
+        create_store_with_key('pivotTableDefinitions', 'id', db);
+    };
+
+    var migrate_data_between_stores = function (tx, oldStoreName, newStoreName, callback) {
+        var oldStore = tx.objectStore(oldStoreName),
+            newStore = tx.objectStore(newStoreName);
+
+        oldStore.openCursor().onsuccess = function (e) {
+            var cursor = e.target.result;
+            if (cursor) {
+                var record = cursor.value;
+                newStore.put(record).onsuccess = function() {
+                    cursor.continue();
+                };
+            } else {
+                callback();
+            }
+        };
+    };
+
+    var migrate_and_delete_charts_store = function (db, tx) {
+        migrate_data_between_stores(tx, 'charts', 'chartDefinitions', function() {
+            db.deleteObjectStore('charts');
+        });
+    };
+
+    var migrate_and_delete_pivot_table_store = function (db, tx) {
+        migrate_data_between_stores(tx, 'pivotTables', 'pivotTableDefinitions', function() {
+            db.deleteObjectStore('pivotTables');
+        });
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -312,6 +367,13 @@ define([], function() {
         update_translations_store,
         change_role_to_projectadmin,
         delete_keys_chart_and_reports_from_changelog,
-        create_data_sync_failure
+        create_data_sync_failure,
+        delete_org_unit_level_data_store,
+        delete_pivot_table_data_and_chart_data_changelog,
+        create_chart_definitions_store,
+        create_pivot_table_definitions_store,
+        migrate_and_delete_charts_store,
+        migrate_and_delete_pivot_table_store,
+        delete_keys_chart_and_reports_from_changelog
     ];
 });

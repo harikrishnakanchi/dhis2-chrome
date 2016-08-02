@@ -78,28 +78,6 @@ define(["userPreferenceRepository", "angularMocks", "utils", "moment", "orgUnitR
             });
         });
 
-        describe('getCurrentUsersOriginOrgUnitIds', function() {
-            it('should return all patient origin org units for current user', function() {
-                var modules = [{
-                    'id': 'someModuleId'
-                }], originOrgUnits = [{
-                    'id': 'someOriginId'
-                }];
-
-                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
-                orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, originOrgUnits));
-
-                var result;
-                userPreferenceRepository.getCurrentUsersOriginOrgUnitIds().then(function(repositoryResponse) {
-                    result = repositoryResponse;
-                });
-                scope.$apply();
-
-                expect(orgUnitRepository.findAllByParent).toHaveBeenCalledWith(_.pluck(modules, 'id'));
-                expect(result).toEqual(_.pluck(originOrgUnits, 'id'));
-            });
-        });
-
         describe('getCurrentUserPreferences', function() {
             it('should return most recently updated user preference', function() {
                 var userPreferenceA = {
@@ -242,5 +220,6 @@ define(["userPreferenceRepository", "angularMocks", "utils", "moment", "orgUnitR
                 expect(result).toBeNull();
             });
         });
+
     });
 });

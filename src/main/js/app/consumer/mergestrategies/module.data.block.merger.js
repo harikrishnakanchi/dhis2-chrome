@@ -1,89 +1,64 @@
 define(['moment', 'lodash'],
     function(moment, _) {
-        return function(dataRepository, approvalDataRepository, mergeBy, dataService, $q, datasetRepository, approvalService, dataSyncFailureRepository) {
+        return function(dataRepository, approvalDataRepository, dataService, $q, datasetRepository, approvalService, dataSyncFailureRepository, programEventRepository, eventService,
+                        aggregateDataValuesMerger, lineListEventsMerger) {
 
-            var mergeAndSaveToLocalDatabase = function(moduleDataBlock, updatedDhisDataValues, dhisCompletion, dhisApproval) {
-                var updatedDhisDataValuesExist = updatedDhisDataValues && updatedDhisDataValues.length > 0;
+            var mergeAndSaveToLocalDatabase = function(moduleDataBlock, updatedDhisDataValues, dhisCompletion, dhisApproval, updatedDhisEvents, dhisEventIds) {
+                var dataMerger;
 
-                var dataValuesEquals = function(dv1, dv2) {
-                    return dv1.dataElement === dv2.dataElement &&
-                           dv1.period === dv2.period &&
-                           dv1.orgUnit === dv2.orgUnit &&
-                           dv1.categoryOptionCombo === dv2.categoryOptionCombo;
-                };
+                var mergeAndSaveDataForModule = function() {
+                    var saveAggregateData = function() {
+                        return dataMerger.updatedDhisDataValuesExist ? dataRepository.saveDhisData(dataMerger.mergedData) : $q.when();
+                    };
 
-                var dataValuesAreEqual = function(originalDataValues, mergedDataValues) {
-                    return originalDataValues.length === mergedDataValues.length && _.all(originalDataValues, function(dv) {
-                            return _.any(mergedDataValues, function(mergedDv) {
-                                return dataValuesEquals(dv, mergedDv) && dv.value === mergedDv.value;
-                            });
-                        });
-                };
+                    var saveLineListEvents = function () {
+                        return !_.isEmpty(dataMerger.eventsToUpsert) ? programEventRepository.upsert(dataMerger.eventsToUpsert) : $q.when();
+                    };
 
-                var mergeDataValues = function(dhisDataValues, localDataValues) {
-                    return mergeBy.lastUpdated({
-                        eq: dataValuesEquals
-                    }, dhisDataValues, localDataValues);
-                };
+                    var deleteLineListEvents = function () {
+                        return !_.isEmpty(dataMerger.eventIdsToDelete) ? programEventRepository.delete(dataMerger.eventIdsToDelete) : $q.when();
+                    };
 
-                var mergedDataValues = function() {
-                    return updatedDhisDataValuesExist ? mergeDataValues(updatedDhisDataValues, moduleDataBlock.dataValues) : moduleDataBlock.dataValues;
-                };
-
-                var mergedDataValuesAreEqualToExistingPraxisDataValues = function() {
-                    return updatedDhisDataValuesExist ? dataValuesAreEqual(moduleDataBlock.dataValues, mergedDataValues()) : true;
-                };
-
-                var mergedDataValuesAreEqualToDhisDataValues = function() {
-                    return _.all(mergedDataValues(), function(mergedDataValue) {
-                        return !mergedDataValue.clientLastUpdated;
-                    });
-                };
-
-                var mergeAndSaveDataValues = function() {
-                    if(updatedDhisDataValuesExist) {
-                        return dataRepository.saveDhisData(mergedDataValues());
+                    if(moduleDataBlock.lineListService) {
+                        dataMerger = lineListEventsMerger.create(moduleDataBlock.events, updatedDhisEvents, dhisEventIds);
+                        return saveLineListEvents().then(deleteLineListEvents);
                     } else {
-                        return $q.when([]);
+                        dataMerger = aggregateDataValuesMerger.create(moduleDataBlock.dataValues, updatedDhisDataValues);
+                        return saveAggregateData();
                     }
                 };
 
                 var mergeAndSaveApprovals = function() {
-                    return moduleDataBlock.lineListService ? mergeAndSaveCompletionAndApprovalForLineLists() : mergeAndSaveCompletionAndApprovalForAggregates();
-                };
+                    var mergeDhisAndPraxisApprovals = function() {
+                        var mergedApproval = _.merge({}, moduleDataBlock.approvalData, dhisCompletion, dhisApproval),
+                            mergedApprovalIsDifferent = !_.isEqual(mergedApproval, moduleDataBlock.approvalData);
 
-                var mergeAndSaveCompletionAndApprovalForAggregates = function() {
-                    var mergedDhisApprovalAndCompletion = _.merge({}, dhisCompletion, dhisApproval),
-                        dhisApprovalOrCompletionExists = !_.isEmpty(mergedDhisApprovalAndCompletion),
-                        localApprovalsExist = (moduleDataBlock.approvedAtProjectLevel || moduleDataBlock.approvedAtCoordinationLevel);
+                        return mergedApprovalIsDifferent ? approvalDataRepository.saveApprovalsFromDhis(mergedApproval) : $q.when();
+                    };
 
-                    if(mergedDataValuesAreEqualToExistingPraxisDataValues() && mergedDataValuesAreEqualToDhisDataValues()) {
-                        var mergedApproval = _.merge({}, moduleDataBlock.approvalData, dhisCompletion, dhisApproval);
-                        if(!_.isEqual(mergedApproval, moduleDataBlock.approvalData)) {
-                            return approvalDataRepository.saveApprovalsFromDhis(mergedApproval);
-                        }
-                    } else if (mergedDataValuesAreEqualToDhisDataValues()) {
-                        if(dhisApprovalOrCompletionExists) {
+                    var saveDhisApprovals = function() {
+                        var mergedDhisApprovalAndCompletion = _.merge({}, dhisCompletion, dhisApproval),
+                            dhisApprovalOrCompletionExists = !_.isEmpty(mergedDhisApprovalAndCompletion);
+
+                        if (dhisApprovalOrCompletionExists) {
                             return approvalDataRepository.saveApprovalsFromDhis(mergedDhisApprovalAndCompletion);
-                        } else if(localApprovalsExist) {
+                        } else if(moduleDataBlock.approvedAtAnyLevel) {
                             return approvalDataRepository.invalidateApproval(moduleDataBlock.period, moduleDataBlock.moduleId);
+                        } else {
+                            return $q.when();
                         }
-                    } else if(!mergedDataValuesAreEqualToExistingPraxisDataValues() && localApprovalsExist) {
-                        return approvalDataRepository.invalidateApproval(moduleDataBlock.period, moduleDataBlock.moduleId);
-                    }
-                };
+                    };
 
-                var mergeAndSaveCompletionAndApprovalForLineLists = function () {
-                    var mergedDhisApprovalAndCompletion = _.merge({}, dhisCompletion, dhisApproval),
-                        dhisApprovalOrCompletionExists = !_.isEmpty(mergedDhisApprovalAndCompletion);
+                    var invalidatePraxisApprovals = function() {
+                        return moduleDataBlock.approvedAtAnyLevel ? approvalDataRepository.invalidateApproval(moduleDataBlock.period, moduleDataBlock.moduleId) : $q.when();
+                    };
 
-                    // Can be removed once approval logic for line list modules is integrated properly into ModuleDataBlockMerger
-                    if(moduleDataBlock.approvalData && (moduleDataBlock.approvalData.status == 'NEW' || moduleDataBlock.approvalData.status == 'DELETED')) {
-                        //DO NOTHING
-                    } else if(dhisApprovalOrCompletionExists) {
-                        return approvalDataRepository.saveApprovalsFromDhis(mergedDhisApprovalAndCompletion);
-                    } else {
-                        return approvalDataRepository.invalidateApproval(moduleDataBlock.period, moduleDataBlock.moduleId);
+                    if (dataMerger.praxisAndDhisAreBothUpToDate) {
+                        return mergeDhisAndPraxisApprovals();
+                    } else if (dataMerger.dhisIsUpToDateAndPraxisIsOutOfDate) {
+                        return saveDhisApprovals();
+                    } else if(dataMerger.praxisAndDhisAreBothOutOfDate) {
+                        return invalidatePraxisApprovals();
                     }
                 };
 
@@ -92,31 +67,33 @@ define(['moment', 'lodash'],
                         approvedAtCoordinationLevelOnlyOnPraxis = moduleDataBlock.approvedAtCoordinationLevel && !dhisApproval;
 
                     if(moduleDataBlock.failedToSync) {
-                        if(mergedDataValuesAreEqualToExistingPraxisDataValues() && mergedDataValuesAreEqualToDhisDataValues()) {
+                        if(dataMerger.praxisAndDhisAreBothUpToDate) {
                             if(!approvedAtProjectLevelOnlyOnPraxis && !approvedAtCoordinationLevelOnlyOnPraxis) {
                                 return dataSyncFailureRepository.delete(moduleDataBlock.moduleId, moduleDataBlock.period);
                             }
-                        } else if (mergedDataValuesAreEqualToDhisDataValues()) {
+                        } else if (dataMerger.dhisIsUpToDateAndPraxisIsOutOfDate) {
                             return dataSyncFailureRepository.delete(moduleDataBlock.moduleId, moduleDataBlock.period);
                         }
                     }
                 };
 
-                return mergeAndSaveDataValues()
+                return mergeAndSaveDataForModule()
                     .then(mergeAndSaveApprovals)
                     .then(resetDataSyncFailure);
             };
 
-
-            var uploadToDHIS = function (moduleDataBlock, dhisCompletionData, dhisApprovalData) {
+            var uploadToDHIS = function (moduleDataBlock, dhisCompletionData, dhisApprovalData, dhisEventIds) {
                 var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId},
+                    eventsToUpload = _.filter(moduleDataBlock.events, { localStatus: 'READY_FOR_DHIS' }),
+                    eventIdsToDelete = _.pluck(_.filter(moduleDataBlock.events, { localStatus: 'DELETED' }), 'event'),
                     dataOnDhisNotPreviouslyCompleted = !dhisCompletionData,
                     dataOnDhisNotPreviouslyApproved = !dhisApprovalData,
-                    dataHasBeenCompletedLocallyButNotOnDhis = moduleDataBlock.approvedAtProjectLevel && dataOnDhisNotPreviouslyCompleted;
+                    dataHasBeenCompletedLocallyButNotOnDhis = moduleDataBlock.approvedAtProjectLevel && dataOnDhisNotPreviouslyCompleted,
+                    dataHasBeenModifiedLocally = moduleDataBlock.dataValuesHaveBeenModifiedLocally || !_.isEmpty(eventsToUpload) || !_.isEmpty(eventIdsToDelete);
 
 
                 var deleteApproval = function (dataSetIds) {
-                    if(dhisApprovalData && (moduleDataBlock.dataValuesHaveBeenModifiedLocally || dataHasBeenCompletedLocallyButNotOnDhis)) {
+                    if(dhisApprovalData && (dataHasBeenModifiedLocally || dataHasBeenCompletedLocallyButNotOnDhis)) {
                         return approvalService.markAsUnapproved(dataSetIds, [periodAndOrgUnit]);
                     } else {
                         return $q.when({});
@@ -124,7 +101,7 @@ define(['moment', 'lodash'],
                 };
 
                 var deleteCompletion = function (dataSetIds) {
-                    if(dhisCompletionData && moduleDataBlock.dataValuesHaveBeenModifiedLocally) {
+                    if(dhisCompletionData && dataHasBeenModifiedLocally) {
                         return approvalService.markAsIncomplete(dataSetIds, [periodAndOrgUnit]);
                     } else {
                         return $q.when({});
@@ -132,6 +109,13 @@ define(['moment', 'lodash'],
                 };
 
                 var uploadDataValues = function () {
+                    var removeLocallyModifiedTimestamp = function() {
+                        var dataValuesWithoutLocalTimestamps = _.map(moduleDataBlock.dataValues, function(dataValue) {
+                            return _.omit(dataValue, 'clientLastUpdated');
+                        });
+                        return dataRepository.saveDhisData(dataValuesWithoutLocalTimestamps);
+                    };
+
                     if(moduleDataBlock.dataValuesHaveBeenModifiedLocally) {
                         return dataService.save(moduleDataBlock.dataValues).then(removeLocallyModifiedTimestamp);
                     } else {
@@ -139,15 +123,57 @@ define(['moment', 'lodash'],
                     }
                 };
 
-                var removeLocallyModifiedTimestamp = function() {
-                    var dataValuesWithoutLocalTimestamps = _.map(moduleDataBlock.dataValues, function(dataValue) {
-                        return _.omit(dataValue, 'clientLastUpdated');
-                    });
-                    return dataRepository.saveDhisData(dataValuesWithoutLocalTimestamps);
+                var uploadEventData = function () {
+                    var mapOfDhisEventIds = _.indexBy(dhisEventIds);
+
+                    var eventExistsOnDhis = function(event) {
+                        return !!mapOfDhisEventIds[event.event];
+                    };
+
+                    var createNewEvents = function() {
+                        var newEvents = _.reject(eventsToUpload, eventExistsOnDhis);
+                        return _.isEmpty(newEvents) ? $q.when() : eventService.createEvents(newEvents);
+                    };
+
+                    var updateExistingEvents = function() {
+                        var existingEvents = _.filter(eventsToUpload, eventExistsOnDhis);
+                        return _.isEmpty(existingEvents) ? $q.when() : eventService.updateEvents(existingEvents);
+                    };
+
+                    var changeEventLocalStatus = function() {
+                        var updatedEvents = _.map(eventsToUpload, function(ev) {
+                            return _.omit(ev, ["localStatus", "clientLastUpdated"]);
+                        });
+                        return programEventRepository.upsert(updatedEvents);
+                    };
+
+                    return _.isEmpty(eventsToUpload) ? $q.when() : createNewEvents().then(updateExistingEvents).then(changeEventLocalStatus);
+                };
+
+                var deleteEvents = function () {
+                    var deleteEvent = function(eventId) {
+                        var deleteEventLocally = function () {
+                            return programEventRepository.delete(eventId);
+                        };
+
+                        return eventService.deleteEvent(eventId).then(deleteEventLocally);
+                    };
+
+                    var recursivelyDeleteEvents = function(eventIds) {
+                        if(_.isEmpty(eventIds)) {
+                            return $q.when();
+                        }
+
+                        return deleteEvent(eventIds.pop()).then(function() {
+                            return recursivelyDeleteEvents(eventIds);
+                        });
+                    };
+
+                    return recursivelyDeleteEvents(eventIdsToDelete);
                 };
 
                 var uploadCompletionData = function (dataSetIds) {
-                    if(moduleDataBlock.approvedAtProjectLevel && (dataOnDhisNotPreviouslyCompleted || moduleDataBlock.dataValuesHaveBeenModifiedLocally)) {
+                    if(moduleDataBlock.approvedAtProjectLevel && (dataOnDhisNotPreviouslyCompleted || dataHasBeenModifiedLocally)) {
                         var completedBy = moduleDataBlock.approvedAtProjectLevelBy;
                         var completedOn = moduleDataBlock.approvedAtProjectLevelAt.toISOString();
 
@@ -157,7 +183,7 @@ define(['moment', 'lodash'],
                 };
 
                 var uploadApprovalData = function (dataSetIds) {
-                  if(moduleDataBlock.approvedAtCoordinationLevel && (dataOnDhisNotPreviouslyApproved || moduleDataBlock.dataValuesHaveBeenModifiedLocally || dataHasBeenCompletedLocallyButNotOnDhis)) {
+                  if(moduleDataBlock.approvedAtCoordinationLevel && (dataOnDhisNotPreviouslyApproved || dataHasBeenModifiedLocally || dataHasBeenCompletedLocallyButNotOnDhis)) {
                       var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId};
                       var approvedBy = moduleDataBlock.approvedAtCoordinationLevelBy;
                       var approvedOn = moduleDataBlock.approvedAtCoordinationLevelAt.toISOString();
@@ -173,6 +199,8 @@ define(['moment', 'lodash'],
                     return deleteApproval(dataSetIds)
                         .then(_.partial(deleteCompletion, dataSetIds))
                         .then(uploadDataValues)
+                        .then(uploadEventData)
+                        .then(deleteEvents)
                         .then(_.partial(uploadCompletionData, dataSetIds))
                         .then(_.partial(uploadApprovalData, dataSetIds));
 

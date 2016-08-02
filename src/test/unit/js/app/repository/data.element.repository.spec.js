@@ -1,18 +1,67 @@
-define(["dataElementRepository", "angularMocks", "utils"], function(DataElementRepository, mocks, utils) {
+define(["dataElementRepository", "angularMocks", "utils", "customAttributes"], function(DataElementRepository, mocks, utils, CustomAttributes) {
     describe("data element repository", function() {
-        var db, mockStore, dataElementRepository;
+        var mockDb, mockStore, dataElementRepository, scope, q, mockAttributeValue;
+
         beforeEach(mocks.inject(function($q, $rootScope) {
-            var mockDB = utils.getMockDB($q);
-            mockStore = mockDB.objectStore;
-            dataElementRepository = new DataElementRepository(mockDB.db);
+            q = $q;
+            scope = $rootScope.$new();
+
+            mockDb = utils.getMockDB($q);
+            mockStore = mockDb.objectStore;
+
+            mockAttributeValue = 'mockAttributeValue';
+            spyOn(CustomAttributes, 'getAttributeValue').and.returnValue(mockAttributeValue);
+            spyOn(CustomAttributes, 'getBooleanAttributeValue').and.returnValue(mockAttributeValue);
+
+            dataElementRepository = new DataElementRepository(mockDb.db);
         }));
 
-        it("should get all data elements", function() {
-            dataElementRepository.getAll();
-            
-            expect(mockStore.getAll).toHaveBeenCalled();
+        describe('get', function() {
+            var dataElementId, mockDataElement;
+
+            beforeEach(function () {
+                dataElementId = "someDataElementId";
+                mockDataElement = {
+                    attributeValues: 'someAttributeValues'
+                };
+                mockStore.find.and.returnValue(utils.getPromise(q, mockDataElement));
+
+            });
+
+            it('should get for the given data element id', function () {
+                dataElementRepository.get(dataElementId);
+                expect(mockStore.find).toHaveBeenCalled();
+            });
+
+            it('should add offlineSummaryType custom attribute to DataElement', function () {
+                dataElementRepository.get(dataElementId).then(function (dataElement) {
+                    expect(dataElement.offlineSummaryType).toEqual(mockAttributeValue);
+                });
+
+                scope.$apply();
+                expect(CustomAttributes.getAttributeValue).toHaveBeenCalledWith(mockDataElement.attributeValues, CustomAttributes.LINE_LIST_OFFLINE_SUMMARY_CODE);
+            });
+
+            it('should add showInEventSummary custom attribute to DataElement', function () {
+                dataElementRepository.get(dataElementId).then(function (dataElement) {
+                    expect(dataElement.showInEventSummary).toEqual(mockAttributeValue);
+                });
+
+                scope.$apply();
+                expect(CustomAttributes.getBooleanAttributeValue).toHaveBeenCalledWith(mockDataElement.attributeValues, CustomAttributes.SHOW_IN_EVENT_SUMMARY_CODE);
+            });
+
         });
 
-       
+        describe('findAll', function() {
+            it('should get all data elements for the list of data elements', function() {
+                var dataElementIds = ["someDataElem1", "someDataElem2"];
+
+                dataElementRepository.findAll(dataElementIds);
+
+                expect(mockStore.each).toHaveBeenCalled();
+            });
+        });
+
     });
 });

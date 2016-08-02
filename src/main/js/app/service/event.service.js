@@ -1,43 +1,82 @@
-define(["moment", "dhisUrl"], function(moment, dhisUrl) {
+define(['dhisUrl', 'properties', 'moment', 'lodash'], function(dhisUrl, properties, moment, _) {
     return function($http, $q) {
-        this.getRecentEvents = function(startDate, orgUnitId) {
-            var onSuccess = function(response) {
-                return response.data;
-            };
+        var MAX_NUMBER_OF_EVENTS = properties.eventsSync.maximumNumberOfEventsToSync,
+            EVENT_ID_PAGE_SIZE = properties.eventsSync.pageSize.eventIds,
+            EVENT_DATA_PAGE_SIZE = properties.eventsSync.pageSize.eventData,
+            DEFAULT_PAGE_REQUESTS_MAX_LIMIT = 99;
 
-            return $http.get(dhisUrl.events, {
-                "params": {
-                    "startDate": startDate,
-                    "endDate": moment().add(1, 'days').format("YYYY-MM-DD"),
-                    "skipPaging": true,
-                    "orgUnit": orgUnitId,
-                    "ouMode": "DESCENDANTS",
-                    "fields": ":all,dataValues[value,dataElement,providedElsewhere,storedBy]"
+        var recursivelyDownloadPagedEvents = function(queryParams, maximumPageRequests, eventsResponses) {
+            queryParams.totalPages = true;
+            queryParams.page = queryParams.page || 1;
+            eventsResponses = eventsResponses || [];
+            maximumPageRequests = maximumPageRequests || DEFAULT_PAGE_REQUESTS_MAX_LIMIT;
+
+            return $http.get(dhisUrl.events, { params: queryParams }).then(function(response) {
+                var eventsResponse = response.data.events || [],
+                    totalPages = (response.data.pager && response.data.pager.pageCount) || 0,
+                    lastPageReached = queryParams.page >= totalPages,
+                    pageLimitReached = queryParams.page >= maximumPageRequests;
+
+                eventsResponses.push(eventsResponse);
+
+                if(lastPageReached || pageLimitReached || _.isEmpty(eventsResponse)) {
+                    return $q.when(_.flatten(eventsResponses));
+                } else {
+                    queryParams.page++;
+                    return recursivelyDownloadPagedEvents(queryParams, maximumPageRequests, eventsResponses);
                 }
-            }).then(onSuccess);
-
+            });
         };
 
-        this.upsertEvents = function(eventsPayload) {
-            var updatedEventsPayload = function() {
-                return _.map(eventsPayload.events, function(eventPayload) {
-                    return _.omit(eventPayload, ['period', 'localStatus', 'eventCode', 'clientLastUpdated']);
-                });
+        this.getEvents = function(orgUnitId, periodRange, lastUpdated) {
+            var startDate = moment(_.first(periodRange), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
+                endDate = moment(_.last(periodRange), 'GGGG[W]WW').endOf('isoWeek').format('YYYY-MM-DD'),
+                maximumPageRequests = MAX_NUMBER_OF_EVENTS / EVENT_DATA_PAGE_SIZE;
+
+            return recursivelyDownloadPagedEvents({
+                startDate: startDate,
+                endDate: endDate,
+                orgUnit: orgUnitId,
+                ouMode: "DESCENDANTS",
+                fields: ":all,dataValues[value,dataElement,providedElsewhere,storedBy]",
+                lastUpdated: lastUpdated,
+                pageSize: EVENT_DATA_PAGE_SIZE
+            }, maximumPageRequests);
+        };
+
+        this.getEventIds = function(orgUnitId, periodRange) {
+            var startDate = moment(_.first(periodRange), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
+                endDate = moment(_.last(periodRange), 'GGGG[W]WW').endOf('isoWeek').format('YYYY-MM-DD'),
+                maximumPageRequests = MAX_NUMBER_OF_EVENTS / EVENT_ID_PAGE_SIZE;
+
+            return recursivelyDownloadPagedEvents({
+                startDate: startDate,
+                endDate: endDate,
+                orgUnit: orgUnitId,
+                ouMode: "DESCENDANTS",
+                fields: "event",
+                pageSize: EVENT_ID_PAGE_SIZE
+            }, maximumPageRequests).then(function(events) {
+                return _.pluck(events, 'event');
+            });
+        };
+
+        this.createEvents = function(events) {
+            var eventsToUpload = _.map(events, function(event) {
+                return _.omit(event, ['period', 'localStatus', 'eventCode', 'clientLastUpdated']);
+            });
+
+            return $http.post(dhisUrl.events, { events: eventsToUpload });
+        };
+
+        this.updateEvents = function(events) {
+            var updateEvent = function(event) {
+                return $http.put(dhisUrl.events + '/' + event.event, event);
             };
 
-            var updatedPayload = {
-                "events": updatedEventsPayload()
-            };
-
-            var onSuccess = function(data) {
-                return eventsPayload;
-            };
-
-            var onFailure = function(data) {
-                return $q.reject(data);
-            };
-
-            return $http.post(dhisUrl.events, updatedPayload).then(onSuccess, onFailure);
+            return _.reduce(events, function(previousPromises, event) {
+                return previousPromises.then(_.partial(updateEvent, event));
+            }, $q.when());
         };
 
         this.deleteEvent = function(eventId) {

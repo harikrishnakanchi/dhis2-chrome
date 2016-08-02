@@ -1,8 +1,7 @@
-define(["lodash"], function(_) {
+define(['chart', 'lodash'], function(Chart, _) {
     return function(db, $q) {
-        var CHART_STORE_NAME = 'charts';
+        var CHART_STORE_NAME = 'chartDefinitions';
         var CHART_DATA_STORE_NAME = 'chartData';
-        var FIELD_APP_NAME_REGEX = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]([0-9\s]*)([a-zA-Z0-9-\s]+)/;
 
         this.upsert = function(charts) {
             var store = db.objectStore(CHART_STORE_NAME);
@@ -28,39 +27,24 @@ define(["lodash"], function(_) {
             });
         };
 
-        this.deleteMultipleChartsById = function(idsToDelete, charts) {
+        this.deleteMultipleChartsById = function(idsToDelete) {
             var store = db.objectStore(CHART_STORE_NAME);
-            return $q.all(_.map(idsToDelete, function(id) {
-                chartToDelete = _.find(charts, {
-                    "id": id
-                });
-                return store.delete(chartToDelete.name);
+            return $q.all(_.map(idsToDelete, function(chartId) {
+                return store.delete(chartId);
             }));
         };
 
         this.getAll = function() {
-            var parseChartName = function(allCharts) {
-                return _.map(allCharts, function(chart) {
-                    var matches = FIELD_APP_NAME_REGEX.exec(chart.name);
-                    chart.dataSetCode = matches && matches[1];
-                    chart.displayPosition = matches && parseInt(matches[2]);
-                    return chart;
-                });
-            };
-
             var store = db.objectStore(CHART_STORE_NAME);
-            return store.getAll().then(parseChartName);
+            return store.getAll().then(function(allCharts) {
+                return _.map(allCharts, Chart.create);
+            });
         };
 
         this.getDataForChart = function(chartName, orgUnitId) {
-            var query = db.queryBuilder().$eq(chartName).$index("by_chart").compile();
             var store = db.objectStore(CHART_DATA_STORE_NAME);
-
-            return store.each(query).then(function(data) {
-                var output = _(data).filter({
-                    orgUnit: orgUnitId
-                }).map('data').first();
-                return output;
+            return store.find([chartName, orgUnitId]).then(function (chartData) {
+                return !!chartData && chartData.data;
             });
         };
     };

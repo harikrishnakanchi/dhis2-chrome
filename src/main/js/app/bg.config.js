@@ -48,8 +48,10 @@ require.config({
         "referralLocationsRepository": "app/repository/referral.locations.repository",
         "pivotTableRepository": "app/repository/pivot.table.repository",
         "dataSyncFailureRepository": "app/repository/data.sync.failure.repository",
+        "dataElementRepository": "app/repository/data.element.repository",
 
         //Models
+        "chart": "app/models/chart",
         "pivotTable": "app/models/pivot.table",
         "moduleDataBlock": "app/models/module.data.block",
         "customAttributes": "app/models/custom.attributes",
@@ -58,6 +60,7 @@ require.config({
         "factories":"app/factories/factories",
         "moduleDataBlockFactory": "app/factories/module.data.block.factory",
         "checkVersionCompatibility": "app/factories/check.version.compatibility",
+        "initializationRoutine": "app/factories/initialization.routine",
 
         //Transformers
         "datasetTransformer": "app/transformers/dataset.transformer",
@@ -87,7 +90,6 @@ require.config({
         "updateUserConsumer": "app/consumer/update.user.consumer",
         "uploadProgramConsumer": "app/consumer/upload.program.consumer",
         "downloadProgramConsumer": "app/consumer/download.program.consumer",
-        "downloadEventDataConsumer": "app/consumer/download.event.data.consumer",
         "uploadEventDataConsumer": "app/consumer/upload.event.data.consumer",
         "deleteEventConsumer": "app/consumer/delete.event.consumer",
         "dispatcher": "app/consumer/dispatcher",
@@ -111,6 +113,8 @@ require.config({
         "mergeByUnion": "app/consumer/mergestrategies/merge.by.union",
         "mergeByLastUpdated": "app/consumer/mergestrategies/merge.by.lastupdated",
         "moduleDataBlockMerger": "app/consumer/mergestrategies/module.data.block.merger",
+        "aggregateDataValuesMerger": "app/consumer/mergestrategies/aggregate.data.values.merger",
+        "lineListEventsMerger": "app/consumer/mergestrategies/line.list.events.merger",
 
         "angular-indexedDB": "lib/angular-indexedDB/indexeddb",
 

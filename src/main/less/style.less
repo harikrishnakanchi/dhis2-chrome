@@ -68,15 +68,6 @@ body {
     .dropdown-submenu:hover>.dropdown-menu {
         display: block;
     }
-    .dropdown-submenu>a:after {
-        display: block;
-        font-family: FontAwesome;
-        content: "\f0da";
-        float: right;
-        width: 0;
-        height: 0;
-        margin-right: -7px;
-    }
     .dropdown-submenu:hover>a:after {
         border-left-color: #000;
     }
@@ -87,7 +78,7 @@ body {
     }
     .dropdown-submenu.pull-left>.dropdown-menu {
         left: -100%;
-        margin-left: 10px;
+        margin-left: 1px;
         width: 100%;
         -webkit-border-radius: 6px 0 6px 6px;
         -moz-border-radius: 6px 0 6px 6px;
@@ -213,7 +204,6 @@ body {
     .login-message {
         margin-top: 10px;
         margin-bottom: 0;
-        margin-right: 12px;
     }
     .dhis-status {
         padding: 8px 0px;
@@ -264,6 +254,9 @@ body {
             background-color: #afe6ee;
             border: 0;
             border-radius: 0;
+            a {
+                color: #000 !important;
+            }
         }
         .glyphicon {
             font-size: 11px;
@@ -286,7 +279,7 @@ body {
             }
         }
         .panel-group .panel {
-            border-radius: 0px;
+            border-radius: 0;
         }
         .panel-default {
             border: 0;
@@ -324,16 +317,8 @@ body {
         .panel-title {
             font-weight: 400;
             a {
-                color: #fff;
                 .glyphicon {
                     margin-right: 10px;
-                }
-            }
-        }
-        .panel-body {
-            .panel-title {
-                a {
-                    color: #000;
                 }
             }
         }
@@ -388,6 +373,7 @@ body {
                 a {
                     padding: 0px 6px;
                 }
+
                 a.active {
                     text-decoration: underline;
                     pointer-events: none;
@@ -410,6 +396,9 @@ body {
             background-color: #afe6ee;
             border: 0;
             border-radius: 0;
+            a {
+                color: #000 !important;
+            }
         }
         .submitted {
             font-size: 20px;
@@ -499,11 +488,6 @@ body {
             float: right;
         }
     }
-    .printRegistrationBookBtn {
-        margin-bottom: 10px;
-        margin-top: 10px;
-        margin-right: 10px;
-    }
     .registrationBook {
         button {
             margin-left: 20px;
@@ -567,11 +551,15 @@ body {
         .panel-heading {
             position: relative;
             background: @msf-green;
+            padding: 0;
             &:extend(.clearfix all);
             .panel-title {
-                color: #000;
                 a {
                     display: block;
+                    text-decoration: none;
+                    color: #fff;
+                    padding: 10px 15px;
+                    cursor: pointer;
                 }
             }
             .actions {
@@ -583,9 +571,6 @@ body {
     }
     .panel-body {
         border-top: none!important;
-    }
-    .panel-group .panel {
-        border-radius: 0px;
     }
     .well {
         position: relative;
@@ -758,6 +743,7 @@ body {
         }
         .panel-default .panel-heading .panel-title {
             color: #fff;
+            padding: 10px;
         }
     }
     //spinner
@@ -901,7 +887,7 @@ body {
 
 .msf-table {
     tr th {
-        background-color: #3d9282;
+        background-color: @msf-green;
         color: #fff;
     }
     tr:nth-child(even) td {
@@ -1064,6 +1050,12 @@ input[type="checkbox"].dashboard-form-checkbox {
             background: #EAEAEA;
         }
     }
+    .nav-tabs {
+        margin-bottom: 20px;
+        li a {
+            cursor: pointer;
+        }
+    }
 }
 .selectLanguage a
 {
@@ -1083,6 +1075,47 @@ input[type="checkbox"].dashboard-form-checkbox {
     }
 }
 
+.line-list{
+    .new-case-btn {
+        margin-left: 5px;
+    }
+    .line-list-menu {
+        padding-bottom: 20px;
+        .btn-group {
+            > .btn:not(.active) {
+                background-color: #ebebeb;
+            }
+            > .btn:hover:not(.active) {
+                background-color: #dddddd;
+            }
+        }
+    }
+}
+
+ul.main-menu >li >a {
+    >i {
+        padding-right: 5px;
+        margin-left: 0;
+    }
+}
+
+li.dropdown-submenu {
+    a {
+        cursor: pointer;
+        i {
+            float: right;
+            width: 0;
+            position: relative;
+            margin-right: -7px;
+            top: 3px;
+        }
+    }
+    &:hover {
+        > a.dropdown-toggle {
+            background: #ddd !important;
+        }
+    }
+}
 .rtl {
     direction: rtl;
 
@@ -1102,6 +1135,116 @@ input[type="checkbox"].dashboard-form-checkbox {
             }
         }
     }
+
+    &.line-list{
+        .new-case-btn {
+            margin-left: 0px;
+            margin-right: 5px;
+        }
+        .line-list-menu {
+            .btn-group {
+                > .btn {
+                    float: right;
+                }
+            }
+            .btn-group {
+                .btn + .btn,
+                .btn + .btn-group,
+                .btn-group + .btn,
+                .btn-group + .btn-group {
+                    margin-right: -1px;
+                    margin-left: 0;
+                }
+            }
+            .btn-group > .btn:first-child {
+                margin-right: 0;
+                &:not(:last-child):not(.dropdown-toggle) {
+                    border-top-right-radius: @border-radius-base;
+                    border-bottom-right-radius: @border-radius-base;
+                    .border-left-radius(0);
+                }
+            }
+            .btn-group > .btn:last-child:not(:first-child),
+            .btn-group > .dropdown-toggle:not(:first-child) {
+                border-top-left-radius: @border-radius-base;
+                border-bottom-left-radius: @border-radius-base;
+                .border-right-radius(0);
+            }
+            .btn-group > .btn-group:not(:first-child):not(:last-child) > .btn {
+                border-radius: 0;
+            }
+            .btn-group > .btn-group:first-child {
+                > .btn:last-child,
+                > .dropdown-toggle {
+                    border-top-right-radius: @border-radius-base;
+                    border-bottom-right-radius: @border-radius-base;
+                    .border-left-radius(0);
+                }
+            }
+            .btn-group > .btn-group:last-child > .btn:first-child {
+                border-top-left-radius: @border-radius-base;
+                border-bottom-left-radius: @border-radius-base;
+                .border-right-radius(0);
+            }
+        }
+    }
+
+    .nav.main-menu {
+        >li {
+            float: right;
+            >a:first-child {
+                margin-right: 0;
+            }
+
+            >ul.dropdown-menu {
+                left: initial;
+            }
+
+        }
+        padding-right: 0;
+    }
+
+    li.dropdown-submenu {
+        >a >i {
+            float: left;
+            margin-left: -7px;
+            margin-right: 0;
+        }
+        ul.dropdown-menu {
+            margin-left: -1px;
+        }
+        &.pull-left {
+            .dropdown-menu {
+                left: auto;
+                right: 100%;
+                width: auto;
+                margin-left: 0;
+                margin-right: -1px;
+            }
+        }
+    }
+
+    ul.main-menu >li >a >i {
+        padding-right: 0;
+        &:first-child{
+            margin-left: 10px;
+        }
+    }
+
+    .navbar-nav > li {
+        float: right;
+    }
+    .hamburger-menu {
+        padding-left: 0;
+        padding-right: 12px;
+    }
+}
+
+header .hamburger-menu {
+    padding-right: 0;
+    i {
+        margin-left: 0;
+    }
 }
 
 .linelistSummary {
@@ -1113,6 +1256,10 @@ input[type="checkbox"].dashboard-form-checkbox {
     }
     .module-week-selector {
         margin: 0;
+        padding-top: 0;
+    }
+    .panel-group .dataset-acc-wrapper + .dataset-acc-wrapper {
+        padding-top: 5px;
     }
 }
 
@@ -1148,4 +1295,14 @@ input[type="checkbox"].dashboard-form-checkbox {
 
 .closeLabelToLeft {
     float: left;
+}
+
+.approval-page {
+    .panel-group .dataset-acc-wrapper + .dataset-acc-wrapper {
+        padding-top: 5px;
+    }
+}
+
+.viewRegistrationBookBtn {
+    margin: -2px -7px 0;
 }

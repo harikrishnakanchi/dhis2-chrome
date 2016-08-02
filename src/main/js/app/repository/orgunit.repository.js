@@ -121,24 +121,6 @@ define(["moment", "lodashUtils"], function(moment, _) {
             return getAll().then(filterProjects);
         };
 
-        var getOrgUnitLevel = function(type) {
-            var store = db.objectStore("organisationUnitLevels");
-            return store.getAll().then(function(orgUnitLevels) {
-                var orgUnitLevel = _.find(orgUnitLevels, function(level) {
-                    return level.name === type;
-                });
-                return orgUnitLevel && orgUnitLevel.level;
-            });
-        };
-
-        var getAllOperationUnits = function() {
-            return getOrgUnitLevel("Operation Unit").then(function(level) {
-                var store = db.objectStore("organisationUnits");
-                var query = db.queryBuilder().$eq(level).$index("by_level").compile();
-                return store.each(query);
-            });
-        };
-
         var getParentProject = function(orgUnitId) {
             return get(orgUnitId).then(function(orgUnit) {
                 if (isOfType(orgUnit, 'Project')) {
@@ -289,7 +271,6 @@ define(["moment", "lodashUtils"], function(moment, _) {
             "getAllOpUnitsInOrgUnits": getAllOpUnitsInOrgUnits,
             "getChildOrgUnitNames": getChildOrgUnitNames,
             "getAllOriginsByName": getAllOriginsByName,
-            "getAllOperationUnits": getAllOperationUnits,
             "getAllOriginsInOrgUnits": getAllOriginsInOrgUnits,
             "getAllOrgUnitsUnderProject": getAllOrgUnitsUnderProject,
             "getOrgUnitAndDescendants": getOrgUnitAndDescendants

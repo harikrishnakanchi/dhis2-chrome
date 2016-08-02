@@ -1,9 +1,9 @@
- define(["notificationsController", "angularMocks", "utils", "userPreferenceRepository", "chartRepository", "orgUnitRepository"], function(NotificationsController, mocks, utils, UserPreferenceRepository, ChartRepository, OrgUnitRepository) {
+ define(["notificationsController", "angularMocks", "utils", "userPreferenceRepository", "chartRepository", "orgUnitRepository", "translationsService"], function(NotificationsController, mocks, utils, UserPreferenceRepository, ChartRepository, OrgUnitRepository, TranslationService) {
 
      describe("notifications controller", function() {
 
          var notificationsController, userPreferenceRepository, chartRepository, orgUnitRepository,
-             userModules, charts, chartData, rootScope, expectedValues;
+             userModules, charts, chartData, rootScope, expectedValues, translationService, dataElementId, dataElementName;
 
          beforeEach(mocks.inject(function($rootScope, $q) {
              rootScope = $rootScope;
@@ -17,18 +17,20 @@
                      "name": 'op1'
                  }
              }];
+             dataElementId = 'dataElementId';
+             dataElementName = 'dataElementName';
 
              chartData = {
                  "metaData": {
                      "pe": ["2015W25", "2015W26"],
                      "ou": ["a2cf79e8f13"],
                      "names": {
-                         "a3267f05ab8": "New Admission - Emergency Department - Admission - Pediatric IPD Ward",
+                         dataElementId: dataElementName,
                          "ou": "Organisation unit"
                      }
                  },
                  "rows": [
-                     ["a3267f05ab8", "2015W26", "24.0"]
+                     [dataElementId, "2015W26", "24.0"]
                  ]
              };
 
@@ -48,10 +50,15 @@
                  if (chartName === 'chart1')
                      return utils.getPromise(q, chartData);
              });
+
+             translationService = new TranslationService();
+             spyOn(translationService, 'getTranslationForProperty').and.callFake(function (objectId, property, defaultValue) {
+                 return defaultValue;
+             });
          }));
 
          var initiateNotificationController = function () {
-             notificationsController = new NotificationsController(scope, q, rootScope, userPreferenceRepository, chartRepository, orgUnitRepository);
+             notificationsController = new NotificationsController(scope, q, rootScope, userPreferenceRepository, chartRepository, orgUnitRepository, translationService);
              scope.$apply();
          };
 
@@ -62,8 +69,8 @@
                dataset: "ds1",
                columns: [{
                    items: [{
-                       id: "a3267f05ab8",
-                       name: "New Admission - Emergency Department - Admission - Pediatric IPD Ward",
+                       id: dataElementId,
+                       name: dataElementName,
                        description: ''
                    }]
                }]
@@ -73,8 +80,8 @@
          var getExpectedValues = function (options) {
              return [_.merge({
                  "moduleName": 'op1 - mod1',
-                 "dataElementId": 'a3267f05ab8',
-                 "dataElementName": 'New Admission - Emergency Department - Admission - Pediatric IPD Ward',
+                 "dataElementId": dataElementId,
+                 "dataElementName": dataElementName,
                  "dataElementDescription": '',
                  "weeklyData": {
                      "2015W25": {
@@ -113,6 +120,24 @@
 
              expect(scope.weeks).toEqual(["2015W25"]);
              expect(scope.allDataElementValues).toEqual(expectedValues);
+         });
+
+         it('should translate data element names', function () {
+             var translatedDataElementName = "translatedDataElementName";
+             var dataElementId = "dataElementId";
+             expectedValues = getExpectedValues({
+                 dataElementName: translatedDataElementName,
+                 dataElementId: dataElementId
+             });
+
+             charts = getChart();
+
+             chartRepository.getAllChartsForNotifications.and.returnValue(utils.getPromise(q, charts));
+             translationService.getTranslationForProperty.and.returnValue(translatedDataElementName);
+             initiateNotificationController();
+
+             expect(scope.allDataElementValues).toEqual(expectedValues);
+             expect(translationService.getTranslationForProperty).toHaveBeenCalledWith(dataElementId, 'name', dataElementName);
          });
      });
  });

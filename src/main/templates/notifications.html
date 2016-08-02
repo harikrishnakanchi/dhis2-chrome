@@ -1,4 +1,7 @@
 <div class="dataentrypage parent-margin {{ layoutDirection.direction}}">
+    <div class="loading" ng-show="loading">
+        <img src="img/ajax-loader.gif" class="spinner"/>
+    </div>
     <section class="tab-panel">
         <div class="alert alert-info" ng-if="noNotificationsForAnyModule"> {{resourceBundle.noNotificationsForAnyModule}} </div>
         <div ng-repeat="(moduleName, dataElementValues) in allDataElementValues | groupBy : 'moduleName'" ng-if="showTable(dataElementValues)">

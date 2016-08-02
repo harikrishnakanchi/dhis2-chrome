@@ -104,6 +104,11 @@ define(['pivotTable'], function(PivotTable) {
                expect(pivotTable.title).toEqual('SomePivotTableTitle');
            });
 
+           it('should parse the title from the pivot table name with special characters', function() {
+               pivotTable = PivotTable.create({ name: '[FieldApp - someDataSetCode] 1 Some\'Pi/vo>t< & Tab=le%Title' });
+               expect(pivotTable.title).toEqual('Some\'Pi/vo>t< & Tab=le%Title');
+           });
+
            it('should return an empty string if the pivot table name is malformed', function() {
                pivotTable = PivotTable.create({ name: 'some malformed pivot table name' });
                expect(pivotTable.title).toEqual('');

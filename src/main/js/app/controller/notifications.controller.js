@@ -1,5 +1,5 @@
 define(["lodash"], function(_) {
-    return function($scope, $q, $rootScope, userPreferenceRepository, chartRepository, orgUnitRepository) {
+    return function($scope, $q, $rootScope, userPreferenceRepository, chartRepository, orgUnitRepository, translationService) {
 
         var allCharts;
         $scope.allDataElementValues = [];
@@ -115,17 +115,15 @@ define(["lodash"], function(_) {
                 return;
             }
 
-            var dataElementIds = _.reduce(chartData.rows, function(result, row) {
+            var dataElementIds = _.chain(chartData.rows).reduce(function(result, row) {
                 result.push(row[0]);
-                return _.uniq(result);
-            }, []);
-            var dataElementValues = [];
+                return result;
+            }, []).uniq().value();
+
             _.forEach(dataElementIds, function(dataElementId) {
                 var dataElementRows = _.filter(chartData.rows, function(row) {
                     return row[0] === dataElementId;
                 });
-                // if (dataElementRows.length < 4)
-                //     return;
                 var weeklyData = getWeeklyData(dataElementRows);
                 var showInNotifications = false;
 
@@ -147,7 +145,7 @@ define(["lodash"], function(_) {
                 $scope.allDataElementValues.push({
                     "moduleName": module.parent.name + " - " + module.name,
                     "dataElementId": dataElementId,
-                    "dataElementName": chartData.metaData.names[dataElementId],
+                    "dataElementName": translationService.getTranslationForProperty(dataElementId, 'name', chartData.metaData.names[dataElementId]),
                     "dataElementDescription": (dataElement && dataElement.description) ? dataElement.description : '',
                     "weeklyData": weeklyData,
                     "showInNotifications": showInNotifications
@@ -157,17 +155,23 @@ define(["lodash"], function(_) {
         };
 
         var getChartData = function(userModules) {
+            var chartDataPromises = [];
             _.forEach(userModules, function(module) {
                 _.forEach(allCharts, function(chart) {
-                    loadChartData(chart, module.id).then(function(chartData) {
+                    var chartDataPromise = loadChartData(chart, module.id).then(function(chartData) {
                         getDataElementValues(chart, chartData, module);
                     });
+                    chartDataPromises.push(chartDataPromise);
                 });
             });
+            return $q.all(chartDataPromises);
         };
 
         var init = function() {
-            return getAllCharts().then(getUserModules).then(getChartData);
+            $scope.loading = true;
+            return getAllCharts().then(getUserModules).then(getChartData).then(function () {
+                $scope.loading = false;
+            });
         };
 
         init();

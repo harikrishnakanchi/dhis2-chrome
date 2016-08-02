@@ -142,25 +142,15 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             };
 
             var publishToDhis = function() {
-                if ($scope.isLineListModule) {
-                    return $hustle.publish({
-                        "data": [currentPeriodAndOrgUnit],
-                        "type": "uploadCompletionData",
-                        "locale": $scope.locale,
-                        "desc": $scope.resourceBundle.uploadCompletionDataDesc + currentPeriodAndOrgUnit.period + ", " + $scope.selectedModule.name
-                    }, "dataValues");
-                }
-                else {
-                    return $hustle.publishOnce({
-                        "data": {
-                            period: currentPeriod,
-                            moduleId: $scope.selectedModule.id
-                        },
-                        "type": "syncModuleDataBlock",
-                        "locale": $scope.locale,
-                        "desc": $scope.resourceBundle.syncModuleDataBlockDesc + currentPeriod + ", " + $scope.selectedModule.name
-                    }, "dataValues");
-                }
+                return $hustle.publishOnce({
+                    "data": {
+                        period: currentPeriod,
+                        moduleId: $scope.selectedModule.id
+                    },
+                    "type": "syncModuleDataBlock",
+                    "locale": $scope.locale,
+                    "desc": $scope.resourceBundle.syncModuleDataBlockDesc + currentPeriod + ", " + $scope.selectedModule.name
+                }, "dataValues");
             };
 
             var onSuccess = function() {
@@ -200,27 +190,15 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
 
 
             var publishToDhis = function() {
-                if($scope.isLineListModule) {
-                    // Can be removed once approval logic for line list modules is integrated into ModuleDataBlockMerger
-                    return $hustle.publish({
-                        "data": [currentPeriodAndOrgUnit],
-                        "type": "uploadApprovalData",
-                        "locale": $scope.locale,
-                        "desc": $scope.resourceBundle.uploadApprovalDataDesc + currentPeriodAndOrgUnit.period + ", " + $scope.selectedModule.name
-                    }, "dataValues");
-                }
-                else {
-                    return $hustle.publishOnce({
-                        "data": {
+                return $hustle.publishOnce({
+                    "data": {
                         moduleId: $scope.selectedModule.id,
-                            period: currentPeriod
-                        },
-                        "type": "syncModuleDataBlock",
-                        "locale": $scope.locale,
-                        "desc": $scope.resourceBundle.syncModuleDataBlockDesc + currentPeriod + ", " + $scope.selectedModule.name
-                    }, "dataValues");
-
-                }
+                        period: currentPeriod
+                    },
+                    "type": "syncModuleDataBlock",
+                    "locale": $scope.locale,
+                    "desc": $scope.resourceBundle.syncModuleDataBlockDesc + currentPeriod + ", " + $scope.selectedModule.name
+                }, "dataValues");
             };
 
             var approvedBy = $scope.currentUser.userCredentials.username;

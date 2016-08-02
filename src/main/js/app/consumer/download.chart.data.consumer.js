@@ -1,33 +1,26 @@
 define(["lodash", "moment"], function(_, moment) {
     return function(reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, $q) {
 
-        this.run = function(message) {
-
-            var updateChangeLog = function(changeLogKey) {
-                return changeLogRepository.upsert(changeLogKey, moment().toISOString());
-            };
-
-            var loadUserProjectsAndModuleIds = function() {
-                return $q.all({
-                    usersProjectIds: userPreferenceRepository.getCurrentUsersProjectIds(),
-                    usersModuleIds: userPreferenceRepository.getCurrentUsersModules().then(function(modules) {
-                        return _.pluck(modules, 'id');
-                    })
+        this.run = function() {
+            var updateChangeLogs = function(changeLogKeys) {
+                var upsertPromises = _.map(changeLogKeys, function (changeLogKey) {
+                    return changeLogRepository.upsert(changeLogKey, moment().toISOString());
                 });
+                return $q.all(upsertPromises);
             };
 
-            var downloadRelevantChartData = function(charts, userModuleIds, changeLogKey) {
-                var downloadOfAtLeastOneChartFailed = false;
+            var downloadRelevantChartData = function(charts, userModuleIds) {
+                var allDownloadsWereSuccessful = true;
 
                 var recursivelyDownloadAndUpsertChartData = function(modulesAndCharts) {
                     var onSuccess = function(data) {
-                        return chartRepository.upsertChartData(datum[1].name, datum[0], data).then(function() {
+                        return chartRepository.upsertChartData(datum.chart.name, datum.moduleId, data).then(function() {
                             return recursivelyDownloadAndUpsertChartData(modulesAndCharts);
                         });
                     };
 
                     var onFailure = function() {
-                        downloadOfAtLeastOneChartFailed = true;
+                        allDownloadsWereSuccessful = false;
                         return recursivelyDownloadAndUpsertChartData(modulesAndCharts);
                     };
 
@@ -35,73 +28,110 @@ define(["lodash", "moment"], function(_, moment) {
                         return $q.when({});
 
                     var datum = modulesAndCharts.pop();
-                    return reportService.getReportDataForOrgUnit(datum[1], datum[0]).then(onSuccess, onFailure);
+                    return reportService.getReportDataForOrgUnit(datum.chart, datum.moduleId).then(onSuccess, onFailure);
                 };
 
-                var getDatasetsRelevantToEachModule = function() {
-
+                var getDatasetsForEachModuleAndItsOrigins = function() {
                     var getAllDataSetsUnderModule = function(moduleIdAndOrigins) {
-                        var modulesAndAllDataSets = _.reduce(moduleIdAndOrigins, function(mapOfModuleIdsToDataSets, origins, moduleId) {
-                            var firstOriginId = _.pluck(origins, "id")[0];
-                            mapOfModuleIdsToDataSets[moduleId] = datasetRepository.findAllForOrgUnits([moduleId, firstOriginId]);
-                            return mapOfModuleIdsToDataSets;
+                        var modulesAndAllDataSets = _.transform(moduleIdAndOrigins, function(mapOfModuleIdsToDataSets, origins, moduleId) {
+                            var orgUnitIds = [moduleId];
+                            if(!_.isEmpty(origins)) {
+                                orgUnitIds.push(_.first(origins).id);
+                            }
+                            mapOfModuleIdsToDataSets[moduleId] = datasetRepository.findAllForOrgUnits(orgUnitIds);
                         }, {});
                         return $q.all(modulesAndAllDataSets);
                     };
 
-                    var moduleIdsAndOrigins = _.reduce(userModuleIds, function(mapOfModuleIdsToOrigins, moduleId) {
+                    var moduleIdsAndOrigins = _.transform(userModuleIds, function(mapOfModuleIdsToOrigins, moduleId) {
                         mapOfModuleIdsToOrigins[moduleId] = orgUnitRepository.findAllByParent([moduleId]);
-                        return mapOfModuleIdsToOrigins;
                     }, {});
 
                     return $q.all(moduleIdsAndOrigins)
                         .then(getAllDataSetsUnderModule);
-
                 };
 
                 var filterChartsForModules = function(datasetsByModule) {
                     var modulesAndCharts = [];
                     _.forEach(userModuleIds, function(userModuleId) {
-                        var dataSetCodesForModule = _.pluck(datasetsByModule[userModuleId], "code");
-                        _.forEach(charts, function(chart) {
-                            _.forEach(dataSetCodesForModule, function(datasetCode) {
-                                if (_.contains(chart.name, datasetCode))
-                                    modulesAndCharts.push([userModuleId, chart]);
+                        _.forEach(datasetsByModule[userModuleId], function (dataSet) {
+                            var filteredCharts = _.filter(charts, {dataSetCode: dataSet.code});
+                            _.forEach(filteredCharts, function (chart) {
+                                modulesAndCharts.push({
+                                    moduleId: userModuleId,
+                                    chart: chart
+                                });
                             });
                         });
                     });
                     return $q.when(modulesAndCharts);
                 };
 
-                return getDatasetsRelevantToEachModule()
+                return getDatasetsForEachModuleAndItsOrigins()
                     .then(filterChartsForModules)
                     .then(recursivelyDownloadAndUpsertChartData)
                     .then(function() {
-                        if (!downloadOfAtLeastOneChartFailed) {
-                            return updateChangeLog(changeLogKey);
-                        }
+                        return $q.when(allDownloadsWereSuccessful);
                     });
             };
 
-            return loadUserProjectsAndModuleIds().then(function(data) {
-                var projectIds = data.usersProjectIds,
-                    moduleIds = data.usersModuleIds,
-                    changeLogKey = "chartData:" + projectIds.join(';');
+            var applyDownloadFrequencyStrategy = function(projectId, charts) {
+                var weeklyChangeLogKey = "weeklyChartData:" + projectId,
+                    monthlyChangeLogKey = "monthlyChartData:" + projectId,
+                    changeLogKeys = [weeklyChangeLogKey, monthlyChangeLogKey];
 
-                if (_.isEmpty(moduleIds))
-                    return;
-
-                return changeLogRepository.get(changeLogKey).then(function(lastDownloadedTime) {
-                    if (lastDownloadedTime && moment().isSame(lastDownloadedTime, 'day')) {
-                        return;
+                return $q.all({
+                    weeklyChartsLastDownloaded: changeLogRepository.get(weeklyChangeLogKey),
+                    monthlyChartsLastDownloaded: changeLogRepository.get(monthlyChangeLogKey)
+                }).then(function(data) {
+                    var isWeeklyChartDownloadedInSameDay = moment().isSame(data.weeklyChartsLastDownloaded, 'day');
+                    var isMonthlyChartDownloadedInSameDay = moment().isSame(data.monthlyChartsLastDownloaded, 'day');
+                    if (data.weeklyChartsLastDownloaded && isWeeklyChartDownloadedInSameDay) {
+                        _.remove(charts, { weeklyChart: true });
+                        _.pull(changeLogKeys, weeklyChangeLogKey);
                     }
-
-                    return chartRepository.getAll().then(function(charts) {
-                        return downloadRelevantChartData(charts, moduleIds, changeLogKey);
+                    if(data.monthlyChartsLastDownloaded && isMonthlyChartDownloadedInSameDay) {
+                        _.remove(charts, { monthlyChart: true});
+                        _.pull(changeLogKeys, monthlyChangeLogKey);
+                    }
+                    return $q.when({
+                        charts: charts,
+                        changeLogKeys: changeLogKeys
                     });
                 });
+            };
 
-            });
+            var updateChartDataForProject = function(projectId) {
+                return $q.all({
+                    modules: orgUnitRepository.getAllModulesInOrgUnits([projectId]),
+                    charts: chartRepository.getAll()
+                }).then(function (data) {
+                    var moduleIds = _.pluck(data.modules, 'id');
+
+                    return applyDownloadFrequencyStrategy(projectId, data.charts).then(function(strategyResult) {
+                        var chartsToDownload = strategyResult.charts,
+                            changeLogKeysToUpdate = strategyResult.changeLogKeys;
+
+                        return downloadRelevantChartData(chartsToDownload, moduleIds).then(function(allDownloadsWereSuccessful) {
+                            if(allDownloadsWereSuccessful) {
+                                return updateChangeLogs(changeLogKeysToUpdate);
+                            }
+                        });
+                    });
+                });
+            };
+
+            var recursivelyLoopThroughProjects = function(projectIds) {
+                if(_.isEmpty(projectIds)) {
+                    return $q.when();
+                }
+
+                return updateChartDataForProject(projectIds.pop()).then(function() {
+                    return recursivelyLoopThroughProjects(projectIds);
+                });
+            };
+
+            return userPreferenceRepository.getCurrentUsersProjectIds().then(recursivelyLoopThroughProjects);
         };
     };
 });

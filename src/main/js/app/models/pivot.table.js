@@ -1,6 +1,6 @@
 define(['lodash'], function (_) {
     var FIELD_APP_DATASET_CODE_REGEX = /\[FieldApp - (.*)]/;
-    var FIELD_APP_TITLE_REGEX = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]([0-9\s]*)([a-zA-Z0-9-\s]+)/;
+    var FIELD_APP_TITLE_REGEX = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]([0-9\s]*)([a-zA-Z0-9-\s)><(&\/\\=%\+']+)/;
 
     var PivotTable = function (config) {
         this.id = config.id;

@@ -19,10 +19,12 @@ define(["moment", "lodash"], function(moment, _) {
         return moment().subtract(numberOfWeeks, 'week').format("YYYY-MM-DD");
     };
 
-    var getPeriodRange = function(numberOfWeeks) {
+    var getPeriodRange = function(numberOfWeeks, options) {
+        options = options || {};
+        var weeksToSubtract = options.excludeCurrentWeek ? numberOfWeeks : numberOfWeeks - 1;
+
         return _.times(numberOfWeeks, function(index) {
-            var weeksToSubtract = (numberOfWeeks - 1) - index;
-            return moment().subtract(weeksToSubtract, 'week').format("GGGG[W]WW");
+            return moment().subtract(weeksToSubtract - index, 'week').format("GGGG[W]WW");
         });
     };
 

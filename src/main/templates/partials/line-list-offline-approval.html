@@ -1,18 +1,44 @@
 <div ng-controller="lineListOfflineApprovalController">
     <section class="panel tab-panel {{ layoutDirection.direction }}">
-        <div class="alert alert-danger" ng-hide="showOfflineSummaryForViewOnly || (showFilters &amp;&amp; ((isCompleted &amp;&amp; hasRoles(['Coordination Level Approver','Observer'])) || (hasRoles(['Project Level Approver','Observer'])) ))">{{resourceBundle.noDataForApproval}}</div>
-        <div class="alert alert-info" ng-show="showOfflineSummaryForViewOnly &amp;&amp; !showFilters"> {{ resourceBundle.noCasesToSummarize}}</div>
-        <div ng-show="isCompleted &amp;&amp; !isApproved &amp;&amp; !hasRoles(['Coordination Level Approver'])" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
-        <div ng-show="!showOfflineSummaryForViewOnly &amp;&amp; isApproved &amp;&amp; !submitAndApprovalSuccess" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
-        <div ng-show="!showOfflineSummaryForViewOnly &amp;&amp; approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
-        <div ng-if="showFilters &amp;&amp; (showOfflineSummaryForViewOnly || (isCompleted &amp;&amp; hasRoles(['Coordination Level Approver','Observer'])) || (hasRoles(['Project Level Approver','Observer'])) )">
+
+        <div ng-if="hasRoles(['Observer'])">
+            <div class="alert alert-danger" ng-if="!isSubmitted">{{resourceBundle.noDataAvailable}}</div>
+        </div>
+
+        <div ng-if="hasRoles(['Project Level Approver'])">
+            <div ng-if="!syncError || moduleDataBlock.awaitingActionAtCoordinationLevelApprover">
+                <div ng-show="isCompleted && (!isApproved || moduleDataBlock.awaitingActionAtCoordinationLevelApprover)" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
+                <div ng-show="isApproved && !moduleDataBlock.awaitingActionAtCoordinationLevelApprover" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
+                <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
+                <div class="alert alert-danger" ng-if="!isSubmitted">{{resourceBundle.noDataForApproval}}</div>
+            </div>
+            <div ng-if="syncError && moduleDataBlock.awaitingActionAtProjectLevelApprover">
+                <div class="alert alert-danger">{{resourceBundle.dataApprovalSyncError}}</div>
+            </div>
+        </div>
+
+        <div ng-if="hasRoles(['Coordination Level Approver'])">
+            <div ng-if="!syncError">
+                <div ng-show="isApproved" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
+                <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
+                <div class="alert alert-danger" ng-if="!isCompleted || !isSubmitted">{{resourceBundle.noDataForApproval}}</div>
+            </div>
+            <div ng-if="syncError && moduleDataBlock.awaitingActionAtCoordinationLevelApprover">
+                <div class="alert alert-danger">{{resourceBundle.dataApprovalSyncError}}</div>
+            </div>
+            <div ng-if="syncError && !moduleDataBlock.awaitingActionAtCoordinationLevelApprover">
+                <div class="alert alert-danger">{{resourceBundle.noDataForApproval}}</div>
+            </div>
+        </div>
+
+            <div ng-if="showForm()">
             <accordion close-others="false">
                 <div ng-class="'dataset-acc-wrapper'">
-                    <accordion-group ng-repeat="dataSet in associatedDataSets | filter:{ isOriginDataset: false }" is-open="true">
+                    <accordion-group ng-repeat="dataSet in associatedDataSets | filter:{ isOriginDataset: false }" ng-init="dataSet.open=true" is-open="dataSet.open">
                         <accordion-heading>
                             <span>{{dataSet.name}}</span>
-                            <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-right': !isDatasetOpen[dataSet.id]}"></i>
-                            <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-left': !isDatasetOpen[dataSet.id]}"></i>
+                            <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': dataSet.open, 'glyphicon-chevron-right': !dataSet.open}"></i>
+                            <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': dataSet.open, 'glyphicon-chevron-left': !dataSet.open}"></i>
                         </accordion-heading>
                         <div class="filter">
                             <label>{{resourceBundle.filterBy}}</label>
@@ -145,7 +171,7 @@
                                                 <a class="description-popup-icon"
                                                    description-popup
                                                    dp-title="{{resourceBundle.proceduresPerformed}}"
-                                                   dp-desc="{{ getDescriptionsForProceduresPerformed() }}"
+                                                   dp-data = "proceduresPerformed"
                                                    >
                                                     <i class="fa fa-info-circle" tooltip-placement="top"></i>
                                                 </a>
@@ -221,7 +247,8 @@
                                                 <a class="description-popup-icon"
                                                    description-popup
                                                    dp-title="{{resourceBundle.proceduresPerformed}}"
-                                                   dp-desc="{{ getDescriptionsForProceduresPerformed() }}">
+                                                   dp-data = "proceduresPerformed"
+                                                >
                                                     <i class="fa fa-info-circle" tooltip-placement="top"></i>
                                                 </a>
                                                 <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
@@ -315,7 +342,8 @@
                                                 <a class="description-popup-icon"
                                                    description-popup
                                                    dp-title="{{resourceBundle.proceduresPerformed}}"
-                                                   dp-desc="{{ getDescriptionsForProceduresPerformed() }}">
+                                                   dp-data = "proceduresPerformed"
+                                                >
                                                     <i class="fa fa-info-circle" tooltip-placement="top"></i>
                                                 </a>
                                                 <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
@@ -361,11 +389,11 @@
                     </accordion-group>
                 </div>
                 <div ng-class="'dataset-acc-wrapper'">
-                    <accordion-group ng-repeat="dataSet in associatedDataSets | filter:{ isOriginDataset: true }" is-open="true">
+                    <accordion-group ng-repeat="dataSet in associatedDataSets | filter:{ isOriginDataset: true }" ng-init="dataSet.open=true" is-open="dataSet.open">
                         <accordion-heading>
-                            <span>{{ dataSet.name}}</span>
-                            <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-right': !isDatasetOpen[dataSet.id]}"></i>
-                            <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-left': !isDatasetOpen[dataSet.id]}"></i>
+                            <span>{{ dataSet.name }}</span>
+                            <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': dataSet.open, 'glyphicon-chevron-right': !dataSet.open}"></i>
+                            <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': dataSet.open, 'glyphicon-chevron-left': !dataSet.open}"></i>
                         </accordion-heading>
                         <div class="exp-coll-group">
                             <accordion close-others="false">
@@ -419,8 +447,14 @@
                 </accordion>
             </div>
             <div>
-                <input type="button" class="btn btn-primary" ng-click="firstLevelApproval()" ng-disabled="isCompleted" ng-if="hasRoles(['Project Level Approver'])" value="{{resourceBundle.approveBtnValue}}" />
-                <input type="button" class="btn btn-primary" ng-click="secondLevelApproval()" ng-disabled="isApproved" ng-if="hasRoles(['Coordination Level Approver'])" value="{{resourceBundle.approveBtnValue}}" />
+                <div ng-if="hasRoles(['Project Level Approver'])">
+                    <input ng-if="!syncError || moduleDataBlock.awaitingActionAtCoordinationLevelApprover" type="button" class="btn btn-primary" ng-click="firstLevelApproval()" ng-disabled="isCompleted" value="{{resourceBundle.approveBtnValue}}" />
+                    <input ng-if="syncError && moduleDataBlock.awaitingActionAtProjectLevelApprover" type="button" class="btn btn-primary" ng-click="firstLevelApproval()" value="{{resourceBundle.reApproveBtnValue}}" />
+                </div>
+                <div ng-if="hasRoles(['Coordination Level Approver'])">
+                    <input ng-if="!syncError && !(moduleDataBlock.awaitingActionAtDataEntryLevel || moduleDataBlock.awaitingActionAtProjectLevelApprover)" type="button" class="btn btn-primary" ng-click="secondLevelApproval()" ng-disabled="isApproved" value="{{resourceBundle.approveBtnValue}}" />
+                    <input ng-if="syncError && moduleDataBlock.awaitingActionAtCoordinationLevelApprover" type="button" class="btn btn-primary" ng-click="secondLevelApproval()" value="{{resourceBundle.reApproveBtnValue}}" />
+                </div>
             </div>
         </div>
     </section>

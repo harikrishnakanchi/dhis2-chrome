@@ -23,10 +23,18 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
             return "#/aggregate-data-entry/" + item.moduleId + "/" + item.period;
         };
 
-        $scope.toggleSelectAll = function(selectedAllItemsForApproval) {
-            _.each($scope.itemsAwaitingApprovalAtUserLevel, function(item) {
-                item.selectedForApproval = selectedAllItemsForApproval;
+        $scope.toggleSelectAll = function() {
+            var items = _.flatten(_.values($scope.itemsAwaitingApprovalAtUserLevel));
+
+            $scope.selectedAllItemsForApproval = !$scope.selectedAllItemsForApproval;
+            _.each(items, function(item) {
+                item.selectedForApproval = $scope.selectedAllItemsForApproval;
             });
+        };
+
+        $scope.toggleWeek = function () {
+            var items = _.flatten(_.values($scope.itemsAwaitingApprovalAtUserLevel));
+            $scope.selectedAllItemsForApproval = _.all(items, 'selectedForApproval');
         };
 
         $scope.bulkApprove = function() {
@@ -65,31 +73,15 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
 
                 var publishToDhis = function() {
                     var publishPromises = _.map(moduleDataBlocksToBeApproved, function(moduleDataBlock) {
-                        if(moduleDataBlock.lineListService) {
-                            var jobType = $rootScope.hasRoles(['Project Level Approver']) ? 'uploadCompletionData' : 'uploadApprovalData',
-                                descriptionKey = $rootScope.hasRoles(['Project Level Approver']) ? 'uploadCompletionDataDesc' : 'uploadApprovalDataDesc';
-
-                            // Can be removed once approval logic for line list modules is integrated into ModuleDataBlockMerger
-                            return $hustle.publish({
-                                data: [{
-                                    orgUnit: moduleDataBlock.moduleId,
-                                    period: moduleDataBlock.period
-                                }],
-                                type: jobType,
-                                locale: $scope.locale,
-                                desc: $scope.resourceBundle[descriptionKey] + moduleDataBlock.period
-                            }, "dataValues");
-                        } else {
-                            return $hustle.publishOnce({
-                                data: {
-                                    moduleId: moduleDataBlock.moduleId,
-                                    period: moduleDataBlock.period
-                                },
-                                type: 'syncModuleDataBlock',
-                                locale: $scope.locale,
-                                desc: $scope.resourceBundle.syncModuleDataBlockDesc + ' ' + moduleDataBlock.period
-                            }, "dataValues");
-                        }
+                        return $hustle.publishOnce({
+                            data: {
+                                moduleId: moduleDataBlock.moduleId,
+                                period: moduleDataBlock.period
+                            },
+                            type: 'syncModuleDataBlock',
+                            locale: $scope.locale,
+                            desc: $scope.resourceBundle.syncModuleDataBlockDesc + ' ' + moduleDataBlock.period
+                        }, "dataValues");
                     });
                     return $q.all(publishPromises);
                 };
@@ -131,6 +123,10 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
             return modalInstance.result.then(okCallback);
         };
 
+        $scope.itemsArePresent = function (object) {
+            return !_.isEmpty(object);
+        };
+
         var loadDashboard = function() {
             var periodRange = dateUtils.getPeriodRange(properties.weeksToDisplayStatusInDashboard);
 
@@ -138,23 +134,27 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                 moduleDataBlocks = _.sortByAll(moduleDataBlocks, "moduleName", "period");
                 $scope.moduleDataBlocks = moduleDataBlocks;
 
-                $scope.itemsAwaitingSubmission = _.sortBy(_.filter(moduleDataBlocks, { awaitingActionAtDataEntryLevel: true }), 'moduleName');
+                var itemsAwaitingSubmission = _.sortBy(_.filter(moduleDataBlocks, { awaitingActionAtDataEntryLevel: true }), 'moduleName');
 
-                $scope.itemsAwaitingApprovalAtUserLevel = [];
-                $scope.itemsAwaitingApprovalAtOtherLevels = _.sortBy(_.union(
+                var itemsAwaitingApprovalAtUserLevel = [];
+                var itemsAwaitingApprovalAtOtherLevels = _.sortBy(_.union(
                     _.filter(moduleDataBlocks, { awaitingActionAtProjectLevelApprover: true }),
                     _.filter(moduleDataBlocks, { awaitingActionAtCoordinationLevelApprover: true })
                 ), 'moduleName');
 
                 if ($rootScope.hasRoles(['Project Level Approver'])) {
-                    $scope.itemsAwaitingApprovalAtUserLevel = _.filter(moduleDataBlocks, { awaitingActionAtProjectLevelApprover: true });
-                    $scope.itemsAwaitingApprovalAtOtherLevels = _.filter(moduleDataBlocks, { awaitingActionAtCoordinationLevelApprover: true });
+                    itemsAwaitingApprovalAtUserLevel = _.filter(moduleDataBlocks, { awaitingActionAtProjectLevelApprover: true });
+                    itemsAwaitingApprovalAtOtherLevels = _.filter(moduleDataBlocks, { awaitingActionAtCoordinationLevelApprover: true });
                 }
 
                 if ($rootScope.hasRoles(['Coordination Level Approver'])) {
-                    $scope.itemsAwaitingApprovalAtUserLevel = _.filter(moduleDataBlocks, { awaitingActionAtCoordinationLevelApprover: true });
-                    $scope.itemsAwaitingApprovalAtOtherLevels = _.filter(moduleDataBlocks, { awaitingActionAtProjectLevelApprover: true });
+                    itemsAwaitingApprovalAtUserLevel = _.filter(moduleDataBlocks, { awaitingActionAtCoordinationLevelApprover: true });
+                    itemsAwaitingApprovalAtOtherLevels = _.filter(moduleDataBlocks, { awaitingActionAtProjectLevelApprover: true });
                 }
+
+                $scope.itemsAwaitingSubmission = _.groupBy(itemsAwaitingSubmission, 'moduleName');
+                $scope.itemsAwaitingApprovalAtUserLevel = _.groupBy(itemsAwaitingApprovalAtUserLevel, 'moduleName');
+                $scope.itemsAwaitingApprovalAtOtherLevels = _.groupBy(itemsAwaitingApprovalAtOtherLevels, 'moduleName');
             });
         };
 

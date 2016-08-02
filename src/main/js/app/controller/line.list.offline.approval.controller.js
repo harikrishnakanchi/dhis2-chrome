@@ -117,8 +117,9 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         $scope.shouldShowInOfflineSummary = function(dataElementId, allDataElements) {
+
             allDataElements = _.filter(allDataElements, function(de) {
-                return _.endsWith(de.dataElement.code, "_showInOfflineSummary") && de.dataElement.optionSet;
+                return (_.endsWith(de.dataElement.code, "_showInOfflineSummary") || de.dataElement.offlineSummaryType == 'showInOfflineSummary') && de.dataElement.optionSet;
             });
             var dataElementIds = _.pluck(_.pluck(allDataElements, 'dataElement'), 'id');
             return _.contains(dataElementIds, dataElementId);
@@ -132,8 +133,8 @@ define(["lodash", "moment"], function(_, moment) {
             var proceduresPerformed = _.uniq($scope.dataValues._procedures, 'formName');
             proceduresPerformed =  _.map(proceduresPerformed, function (procedurePerformed) {
                 return {
-                    "title" : procedurePerformed.formName,
-                    "description": procedurePerformed.description
+                    "title" : translationsService.getTranslationForProperty(procedurePerformed.dataElement, 'formName', procedurePerformed.formName),
+                    "description": translationsService.getTranslationForProperty(procedurePerformed.dataElement, 'description', procedurePerformed.description)
                 };
             });
             $scope.proceduresPerformed = _.groupBy(proceduresPerformed, 'description');
@@ -167,8 +168,7 @@ define(["lodash", "moment"], function(_, moment) {
 
             var getProgram = function(excludedDataElements) {
                 return programRepository.get($scope.associatedProgramId, excludedDataElements).then(function(program) {
-                    var translatedProgram = translationsService.translate([program]);
-                    $scope.program = translatedProgram[0];
+                    $scope.program = translationsService.translate(program);
                 });
             };
 
@@ -198,21 +198,15 @@ define(["lodash", "moment"], function(_, moment) {
             $scope.eventsMap = _.groupBy(allDataValues, "eventId");
 
             $scope.dataValues = _.groupBy(allDataValues, function(dv) {
-                if (_.endsWith(dv.code, "_showInOfflineSummary")) {
-                    return "_showInOfflineSummary";
-                }
-                if (_.endsWith(dv.code, "_age")) {
-                    return "_age";
-                }
-                if (_.endsWith(dv.code, "_sex")) {
-                    return "_sex";
-                }
-                if (_.endsWith(dv.code, "_procedures")) {
-                    return "_procedures";
-                }
-                if (_.endsWith(dv.code, "_referralLocations")) {
-                    return "_referralLocations";
-                }
+                var lineListSummaryfilters = {
+                    'showInOfflineSummary': '_showInOfflineSummary',
+                    'age': '_age',
+                    'sex': '_sex',
+                    'procedures': '_procedures',
+                    'referralLocations': '_referralLocations'
+                };
+
+                return lineListSummaryfilters[dv.offlineSummaryType];
             });
 
             $scope.originEvents = _.groupBy(events, "orgUnit");
@@ -240,8 +234,7 @@ define(["lodash", "moment"], function(_, moment) {
 
         var getAssociatedDataSets = function() {
             return datasetRepository.findAllForOrgUnits([$scope.originOrgUnits[0].id]).then(function(data) {
-                var translatedDataset = translationsService.translate(data);
-                $scope.associatedDataSets = translatedDataset;
+                $scope.associatedDataSets = translationsService.translate(data);
             });
         };
 
@@ -259,12 +252,10 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         var init = function() {
-            var submittedEvents = [];
             return $q.all([loadOriginsOrgUnits(), loadProgram(), getOptionSetMapping(), getReferralLocations()]).then(function() {
                 return programEventRepository.getEventsForPeriod($scope.associatedProgramId, _.pluck($scope.originOrgUnits, "id"), getPeriod()).then(function(events) {
-                    _.forEach(events, function(event) {
-                        if (event.localStatus === "READY_FOR_DHIS" || event.localStatus === undefined)
-                            submittedEvents.push(event);
+                    var submittedEvents = _.filter(events, function(event) {
+                        return event.localStatus === "READY_FOR_DHIS" || event.localStatus === undefined;
                     });
                     loadGroupedDataValues(submittedEvents);
                     setShowFilterFlag();
