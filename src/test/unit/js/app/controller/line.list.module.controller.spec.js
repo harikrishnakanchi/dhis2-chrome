@@ -555,46 +555,74 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(module, "disabledModule");
             });
 
-            it("should set program on scope", function() {
-                var program = {
-                    "id": "surgery1",
-                    "name": "Surgery",
-                    "programStages": [{
-                        "programStageSections": [{
-                            "id": "sectionId1",
-                            "programStageDataElements": [{
-                                "dataElement": {
-                                    "id": "de1"
-                                }
-                            }]
-                        }, {
-                            "id": "sectionId2",
-                            "programStageDataElements": [{
-                                "dataElement": {
-                                    "id": "de2"
-                                }
+            describe('onProgramSelect', function () {
+
+                var selectedObject, program, programStageDataElementA, programStageDataElementB, programStageDataElementC;
+                beforeEach(function () {
+                    var createProgramStageDataElement = function (options) {
+                        return _.merge({
+                            id: 'programStageDataElementId',
+                            "dataElement": {
+                                "id": "de1"
+                            }
+                        }, options);
+                    };
+                    programStageDataElementA = createProgramStageDataElement({'dataElement': {
+                        "optionSet": 'someOptionSet'
+                    }});
+                    programStageDataElementB = createProgramStageDataElement({'dataElement': {
+                        "optionSet": 'someOtherOptionSet'
+                    }});
+                    programStageDataElementC = createProgramStageDataElement();
+
+                    program = {
+                        "id": "surgery1",
+                        "name": "Surgery",
+                        "programStages": [{
+                            "programStageSections": [{
+                                "id": "sectionId1",
+                                "programStageDataElements": [programStageDataElementA, programStageDataElementB, programStageDataElementC]
+                            }, {
+                                "id": "sectionId2",
+                                "programStageDataElements": [programStageDataElementC]
                             }]
                         }]
-                    }]
-                };
+                    };
 
-                var selectedObject = {
-                    "originalObject": program
-                };
+                    selectedObject = {
+                        "originalObject": program
+                    };
 
-                programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, program));
-                programRepository.get.and.returnValue(utils.getPromise(q, program));
-                translationsService.translate.and.returnValue(program);
-
-                scope.onProgramSelect(selectedObject).then(function(data) {
-                    expect(scope.enrichedProgram).toEqual(program);
-                    expect(scope.collapseSection).toEqual({
-                        sectionId1: false,
-                        sectionId2: true
-                    });
+                    programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, program));
+                    programRepository.get.and.returnValue(utils.getPromise(q, program));
+                    translationsService.translate.and.returnValue(program);
                 });
 
-                scope.$apply();
+                it('should group dataElements with optionSet and set it to that programStageSection', function () {
+                    scope.onProgramSelect(selectedObject).then(function(data) {
+                        expect(scope.enrichedProgram.programStages[0].programStageSections[0].dataElementsWithOptions).toEqual([programStageDataElementA,programStageDataElementB]);
+                    });
+                    scope.$apply();
+                });
+
+                it('should group dataElements without optionSet and set it to that programStageSection', function () {
+                    scope.onProgramSelect(selectedObject).then(function(data) {
+                        expect(scope.enrichedProgram.programStages[0].programStageSections[0].dataElementsWithoutOptions).toEqual([programStageDataElementC]);
+                    });
+                    scope.$apply();
+                });
+
+                it("should set program on scope", function() {
+                    scope.onProgramSelect(selectedObject).then(function(data) {
+                        expect(scope.enrichedProgram).toEqual(program);
+                        expect(scope.collapseSection).toEqual({
+                            sectionId1: false,
+                            sectionId2: true
+                        });
+                    });
+                    scope.$apply();
+                });
+
             });
 
             it("should set program to blank on scope when the program name is cleared on the form", function() {
@@ -885,5 +913,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
                 expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(scope.orgUnit);
             });
+
         });
     });

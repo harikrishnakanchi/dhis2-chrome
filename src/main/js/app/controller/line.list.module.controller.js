@@ -78,6 +78,12 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 var getEnrichedProgram = function(progId) {
                     return programRepository.get(progId, $scope.excludedDataElements).then(function(data) {
                         $scope.enrichedProgram = translationsService.translate(data);
+                        _.forEach($scope.enrichedProgram.programStages, function(programStage) {
+                            _.forEach(programStage.programStageSections, function(programStageSection) {
+                                programStageSection.dataElementsWithOptions = _.filter(programStageSection.programStageDataElements, 'dataElement.optionSet');
+                                programStageSection.dataElementsWithoutOptions = _.reject(programStageSection.programStageDataElements, 'dataElement.optionSet');
+                            });
+                        });
                         resetCollapse();
                     });
                 };
