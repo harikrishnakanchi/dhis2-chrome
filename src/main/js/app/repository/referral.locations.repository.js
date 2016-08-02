@@ -7,9 +7,6 @@ define(["lodash"], function(_) {
             return store.upsert(payload);
         };
 
-        var enrichReferralLocations =  function (referralLocations) {
-        };
-
         var get = function(opUnitId) {
             if (!opUnitId) return $q.when([]);
             var store = db.objectStore(storeName);
