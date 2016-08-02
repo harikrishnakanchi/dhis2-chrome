@@ -66,16 +66,55 @@
                                             </div>
                                             <div collapse="getCollapsed(section.id)" class="collapse-body">
                                                 <ul>
-                                                    <li ng-repeat="de in section.programStageDataElements">
+                                                    <li ng-repeat="de in section.dataElementsWithOptions">
+                                                        <div class="collapse-head">
+                                                            <h5 ng-click="isDataElementExpanded[de.dataElement.id] = !isDataElementExpanded[de.dataElement.id]">
+                                                            <span class="glyphicon"
+                                                                  ng-class="{'glyphicon-chevron-right':!isDataElementExpanded[de.dataElement.id], 'glyphicon-chevron-down':isDataElementExpanded[de.dataElement.id]}" aria-hidden="true"></span>  {{ de.dataElement.formName}}
+                                                                <a class="description-popup-icon"
+                                                                   description-popup
+                                                                   dp-title="{{ de.dataElement.formName }}"
+                                                                   dp-desc="{{ de.dataElement.formName }}"
+                                                                >
+                                                                    <i class="fa fa-info-circle"
+                                                                       tooltip-placement="top"></i>
+                                                                </a>
+                                                            <input type="checkbox"
+                                                                   ng-disabled="de.compulsory || isDisabled==true"
+                                                                   ng-model="de.dataElement.isIncluded">
+                                                            </h5>
+                                                        </div>
+                                                        <div collapse="!isDataElementExpanded[de.dataElement.id]" class="collapse-body">
+                                                            <ul>
+                                                                <li ng-repeat="option in de.dataElement.optionSet.options">
+                                                                    <label>
+                                                                        <input type="checkbox">
+                                                                            {{ option.name}}
+                                                                    </label>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+
+                                                    </li>
+                                                    <li ng-repeat="de in section.dataElementsWithoutOptions">
+                                                        <div class = "description-popup">
                                                         <label>
-                                                            <input type="checkbox" ng-disabled="de.compulsory || isDisabled==true" ng-model="de.dataElement.isIncluded">
-                                                            <a class="changeColor"
+                                                            <input type="checkbox"
+                                                                   ng-disabled="de.compulsory || isDisabled==true"
+                                                                   ng-model="de.dataElement.isIncluded">
+                                                            <label dp-title="{{ de.dataElement.formName }}">
+                                                                {{ de.dataElement.formName }}
+                                                            </label>
+                                                            <a class="description-popup-icon"
                                                                description-popup
                                                                dp-title="{{ de.dataElement.formName }}"
-                                                               dp-desc="{{ de.dataElement.description }}">
-                                                            {{de.dataElement.formName}}
+                                                               dp-desc="{{ de.dataElement.formName }}"
+                                                            >
+                                                                <i class="fa fa-info-circle"
+                                                                   tooltip-placement="top"></i>
                                                             </a>
                                                         </label>
+                                                        </div>
                                                     </li>
                                                 </ul>
                                             </div>
