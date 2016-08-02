@@ -331,6 +331,10 @@ define([], function() {
         });
     };
 
+    var create_excluded_line_list_options_store = function (db) {
+        create_store_with_key('excludedLineListOptions', 'moduleId', db);
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -374,6 +378,7 @@ define([], function() {
         create_pivot_table_definitions_store,
         migrate_and_delete_charts_store,
         migrate_and_delete_pivot_table_store,
-        delete_keys_chart_and_reports_from_changelog
+        delete_keys_chart_and_reports_from_changelog,
+        create_excluded_line_list_options_store
     ];
 });
