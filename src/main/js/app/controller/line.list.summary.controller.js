@@ -300,6 +300,10 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
                 });
         };
 
+        $scope.filterSubmittedEvents = function (event) {
+            return !event.localStatus || event.localStatus==='READY_FOR_DHIS';
+        };
+
         $scope.exportToCSV = function () {
             var NEW_LINE = '\n',
                 DELIMITER = ',';
@@ -320,11 +324,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
                 return [eventDate].concat(values).join(DELIMITER);
             };
 
-            var filterSubmittedEvents = function (event) {
-                return !event.localStatus || event.localStatus==='READY_FOR_DHIS';
-            };
-
-            var eventsToBeExported = _.chain($scope.events).filter(filterSubmittedEvents).map(buildData).value();
+            var eventsToBeExported = _.chain($scope.events).filter($scope.filterSubmittedEvents).map(buildData).value();
 
             var csvContent = _.flatten([buildHeaders(), eventsToBeExported]).join(NEW_LINE);
             var fileName = [$scope.selectedModuleName, 'summary', moment().format('DD-MMM-YYYY'), 'csv'].join('.');

@@ -269,6 +269,7 @@
     "weeklyReports": "Rapports hebdomadaires",
     "monthlyReports": "Rapports Mensuels",
     "exportRawData": "Exporter des données",
+    "exportEventData": "Exporter les cas soumis",
     "weeksToExport": "Nombre de semaines à exporter",
     "exportRawDataToCSV": "Exporter les données en CSV",
     "noRawDataAvailable": "Pas de données disponibles pour les semaines sélectionnées",

@@ -71,9 +71,6 @@
                                ng-href="#/line-list-data-entry/{{selectedModuleId}}/new?returnTo={{currentUrl}}">
                                 {{resourceBundle.newCaseBtnValue}}
                             </a>
-                            <button class="btn btn-primary" ng-class="layoutDirection.direction != 'rtl' ? 'pull-right' : 'pull-left'"
-                                    ng-if="filterBy === 'caseNumber' || filterBy === 'dateRange'    "
-                                    type="button" ng-click="exportToCSV()" ng-disabled="!events.length"> {{ resourceBundle.exportRawData }}</button>
                         </div>
                     </div>
                     <div>
@@ -89,11 +86,16 @@
                                     </span>
                                     <span ng-if="filterBy === 'caseNumber'">
                                         <input type="text" class="form-control" ng-model="filterParams.caseNumber" />
-                                        <input type="button" value="{{resourceBundle.search}}" class="btn btn-default" ng-click="filterByCaseNumber()"/>
+                                        <button type="submit" class="btn btn-default" ng-click="filterByCaseNumber()">{{ resourceBundle.search }}</button>
                                     </span>
                                     <span ng-if="filterBy === 'dateRange'">
                                         <input type="date" class="form-control" ng-model="filterParams.startDate" /> {{resourceBundle.toLabel}} <input type="date" class="form-control" ng-model="filterParams.endDate" />
                                         <input type="button" value="{{resourceBundle.search}}" class="btn btn-default" ng-click="filterByDateRange()" ng-disabled="filterBy === 'dateRange' && dateRangeError" />
+                                    </span>
+                                    <span>
+                                        <button class="btn btn-primary" ng-class="layoutDirection.direction != 'rtl' ? 'pull-right' : 'pull-left'"
+                                            ng-if="filterBy === 'caseNumber' || filterBy === 'dateRange'"
+                                            type="button" ng-click="exportToCSV()" ng-disabled="!(events | filter:filterSubmittedEvents).length"> {{ resourceBundle.exportEventData }}</button>
                                     </span>
                                     <div class="errortxt" ng-if="filterBy === 'dateRange' && dateRangeError">{{resourceBundle.dateRangeError}}</div>
                                 </form>
