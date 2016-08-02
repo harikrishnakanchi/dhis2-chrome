@@ -415,7 +415,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
             });
 
             describe('exportToCSV', function() {
-                var csvContent, mockDataValue, mockEvent, mockDataElement;
+                var csvContent, mockDataValue, mockEventA, mockEventB, mockEventC, mockDataElement;
 
                 beforeEach(function () {
                     spyOn(scope, "getDisplayValue").and.callFake(function (data) {
@@ -431,15 +431,26 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                     });
 
                     mockDataValue = mockEventDataValue();
-                    mockEvent = createMockEvent({
+                    mockEventA = createMockEvent({
                         eventDate: moment('2016-07-31T12:00:00Z').toISOString(),
                         dataValues: [mockDataValue]
                     });
+                    mockEventB = createMockEvent({
+                        eventDate: moment('2016-07-30T12:00:00Z').toISOString(),
+                        dataValues: [mockDataValue],
+                        localStatus: 'NEW_DRAFT'
+                    });
+                    mockEventC = createMockEvent({
+                        eventDate: moment('2016-07-29T12:00:00Z').toISOString(),
+                        dataValues: [mockDataValue],
+                        localStatus: 'READY_FOR_DHIS'
+                    });
+
                     mockDataElement = {
                         formName: 'someDataElementFormName'
                     };
                     scope.summaryDataElements = [mockDataElement];
-                    scope.events = [mockEvent];
+                    scope.events = [mockEventA, mockEventB, mockEventC];
                     scope.selectedModuleName = 'someModuleName';
                     scope.exportToCSV();
                 });
@@ -454,7 +465,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                 });
 
                 it('should contain data for listed events while exporting data', function () {
-                    var expectedCsvContent = [moment(mockEvent.eventDate).toDate().toLocaleDateString(), escapeString(mockDataValue.value)].join(',');
+                    var expectedCsvContent = [moment(mockEventA.eventDate).toDate().toLocaleDateString(), escapeString(mockDataValue.value)].join(',');
                     expect(csvContent).toContain(expectedCsvContent);
                 });
 
@@ -467,6 +478,13 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                     expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
                 });
 
+                it('should save only submitted events to CSV', function () {
+                    var expectedCsvContentForEventB = [moment(mockEventB.eventDate).toDate().toLocaleDateString(), escapeString(mockDataValue.value)].join(',');
+                    var expectedCsvContentForEventC = [moment(mockEventC.eventDate).toDate().toLocaleDateString(), escapeString(mockDataValue.value)].join(',');
+
+                    expect(csvContent).not.toContain(expectedCsvContentForEventB);
+                    expect(csvContent).toContain(expectedCsvContentForEventC);
+                });
             });
         });
     });

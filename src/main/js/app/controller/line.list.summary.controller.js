@@ -320,7 +320,13 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
                 return [eventDate].concat(values).join(DELIMITER);
             };
 
-            var csvContent = _.flatten([buildHeaders(), _.map($scope.events, buildData)]).join(NEW_LINE);
+            var filterSubmittedEvents = function (event) {
+                return !event.localStatus || event.localStatus==='READY_FOR_DHIS';
+            };
+
+            var eventsToBeExported = _.chain($scope.events).filter(filterSubmittedEvents).map(buildData).value();
+
+            var csvContent = _.flatten([buildHeaders(), eventsToBeExported]).join(NEW_LINE);
             var fileName = [$scope.selectedModuleName, 'summary', moment().format('DD-MMM-YYYY'), 'csv'].join('.');
             return filesystemService.promptAndWriteFile(fileName, new Blob([csvContent], { type: 'text/csv' }), filesystemService.FILE_TYPE_OPTIONS.CSV);
         };
