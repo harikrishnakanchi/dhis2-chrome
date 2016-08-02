@@ -115,17 +115,15 @@ define(["lodash"], function(_) {
                 return;
             }
 
-            var dataElementIds = _.reduce(chartData.rows, function(result, row) {
+            var dataElementIds = _.chain(chartData.rows).reduce(function(result, row) {
                 result.push(row[0]);
-                return _.uniq(result);
-            }, []);
-            var dataElementValues = [];
+                return result;
+            }, []).uniq().value();
+
             _.forEach(dataElementIds, function(dataElementId) {
                 var dataElementRows = _.filter(chartData.rows, function(row) {
                     return row[0] === dataElementId;
                 });
-                // if (dataElementRows.length < 4)
-                //     return;
                 var weeklyData = getWeeklyData(dataElementRows);
                 var showInNotifications = false;
 
