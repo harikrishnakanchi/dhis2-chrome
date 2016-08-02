@@ -117,6 +117,7 @@ require.config({
         "excludedDataElementsRepository": "app/repository/excluded.dataelements.repository",
         "pivotTableRepository": "app/repository/pivot.table.repository",
         "dataSyncFailureRepository": "app/repository/data.sync.failure.repository",
+        "excludedLineListOptionsRepository": "app/repository/excluded.line.list.options.repository",
 
         //Models
         "chart": "app/models/chart",
