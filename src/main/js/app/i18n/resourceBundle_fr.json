@@ -311,5 +311,6 @@
     "grouped": "Groupées",
     "stacked": "Empilées",
     "xAxisLabel": "Période",
-    "downloadChart": "Télécharger le graphique"
+    "downloadChart": "Télécharger le graphique",
+    "atleastTwoOptionsMustBeSelected": "Please select atleast two options"
 }

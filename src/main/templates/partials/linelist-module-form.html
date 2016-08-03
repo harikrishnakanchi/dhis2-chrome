@@ -86,9 +86,9 @@
                                                         </div>
                                                         <div collapse="!isDataElementExpanded[de.dataElement.id]" class="collapse-body">
                                                             <ul>
-                                                                <li ng-repeat="option in de.dataElement.optionSet.options">
+                                                                <li ng-repeat="option in de.dataElement.optionSet.options" ng-init="option.isSelected = true">
                                                                     <label>
-                                                                        <input type="checkbox" ng-model="option.isSelected">
+                                                                        <input type="checkbox" ng-model="option.isSelected" ng-change="onOptionSelectionChange(de.dataElement.optionSet, option)">
                                                                             {{ option.name}}
                                                                     </label>
                                                                 </li>

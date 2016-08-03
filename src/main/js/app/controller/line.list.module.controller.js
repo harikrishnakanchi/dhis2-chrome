@@ -351,6 +351,14 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 return _.isEmpty($scope.program.name);
             };
 
+            $scope.onOptionSelectionChange = function (optionSet, option) {
+                var areAtleastTwoOptionsSelected = _.filter(optionSet.options, {isSelected: true}).length >= 2;
+                if(!areAtleastTwoOptionsSelected) {
+                    option.isSelected = true;
+                    showModal(function () {}, $scope.resourceBundle.atleastTwoOptionsMustBeSelected);
+                }
+            };
+
             init();
         };
     });

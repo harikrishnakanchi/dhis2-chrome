@@ -311,5 +311,6 @@
     "grouped": "Grouped",
     "stacked": "Stacked",
     "xAxisLabel": "Period",
-    "downloadChart": "Download Chart"
+    "downloadChart": "Download Chart",
+    "atleastTwoOptionsMustBeSelected": "Please select atleast two options"
 }

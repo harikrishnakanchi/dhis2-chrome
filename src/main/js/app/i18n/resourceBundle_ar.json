@@ -311,5 +311,6 @@
     "grouped": "مجمعة",
     "stacked": "مكدسة",
     "xAxisLabel": "فترة",
-    "downloadChart": "تحميل الرسم البياني"
+    "downloadChart": "تحميل الرسم البياني",
+    "atleastTwoOptionsMustBeSelected": "Please select atleast two options"
 }

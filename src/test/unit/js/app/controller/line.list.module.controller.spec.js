@@ -453,6 +453,38 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
                     expect(excludedLineListOptionsRepository.upsert).toHaveBeenCalledWith(excludedLineListOptions);
                 });
+
+                describe('onOptionSelectionChange', function () {
+                    beforeEach(function () {
+                        spyOn(fakeModal, "open").and.returnValue({
+                            result: utils.getPromise(q, {})
+                        });
+                    });
+
+                    describe('atleast two options are not selected', function () {
+                        var mockOptionSet, mockOption;
+
+                        beforeEach(function () {
+                            mockOption = {isSelected: false};
+                            mockOptionSet = {options: [mockOption, {isSelected: true}]};
+                            scope.onOptionSelectionChange(mockOptionSet, mockOption);
+                        });
+
+                        it('should show modal with a message', function () {
+                            expect(fakeModal.open).toHaveBeenCalled();
+                        });
+
+                        it('should reselect the option', function () {
+                            expect(mockOption.isSelected).toBe(true);
+                        });
+                    });
+
+                    it('should not show modal with a message if atleast two options are selected', function () {
+                        var mockOptionSet = {options: [{isSelected: false}, {isSelected: true}, {isSelected: true}]};
+                        scope.onOptionSelectionChange(mockOptionSet);
+                        expect(fakeModal.open).not.toHaveBeenCalled();
+                    });
+                });
             });
 
             it("should disable update and diable if orgunit is disabled", function() {
