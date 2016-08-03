@@ -1,7 +1,7 @@
 define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
     function(_, orgUnitMapper, moment, systemSettingsTransformer) {
         return function($scope, $hustle, orgUnitRepository, excludedDataElementsRepository, $q, $modal,
-            programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService) {
+            programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService, excludedLineListOptionsRepository) {
 
             $scope.module = {};
             $scope.isExpanded = {};
@@ -77,8 +77,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
                 var getEnrichedProgram = function(progId) {
                     var buildProgramDataElements = function () {
-                        _.forEach($scope.enrichedProgram.programStages, function(programStage) {
-                            _.forEach(programStage.programStageSections, function(programStageSection) {
+                        _.forEach($scope.enrichedProgram.programStages, function (programStage) {
+                            _.forEach(programStage.programStageSections, function (programStageSection) {
                                 programStageSection.dataElementsWithOptions = _.filter(programStageSection.programStageDataElements, 'dataElement.optionSet');
                                 programStageSection.dataElementsWithoutOptions = _.reject(programStageSection.programStageDataElements, 'dataElement.optionSet');
                                 $scope.isDataElementExpanded = _.map(programStageSection.dataElementsWithOptions, function (programStageDataElement) {
@@ -297,12 +297,36 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     });
                 };
 
+                var saveExcludedLineListOptions = function () {
+                    var dataElementsWithOptions = _.chain($scope.enrichedProgram.programStages)
+                        .map('programStageSections')
+                        .flatten()
+                        .map('dataElementsWithOptions')
+                        .flatten()
+                        .map('dataElement')
+                        .value();
+                    var excludedLineListOptions = {};
+                    excludedLineListOptions.moduleId = enrichedModule.id;
+                    excludedLineListOptions.clientLastUpdated = moment().toISOString();
+                    excludedLineListOptions.dataElements = _.transform(dataElementsWithOptions, function (dataElements, dataElement) {
+                        var excludedOptionIds = _.map(_.reject(dataElement.optionSet && dataElement.optionSet.options, 'isSelected'), 'id');
+                        if(excludedOptionIds.length) {
+                            dataElements.push({
+                                dataElementId: dataElement.id,
+                                excludedOptionIds: excludedOptionIds
+                            });
+                        }
+                    });
+                    return excludedLineListOptionsRepository.upsert(excludedLineListOptions);
+                };
+
                 $scope.loading = true;
                 return getEnrichedModule($scope.module)
                     .then(createModule)
                     .then(_.partial(saveExcludedDataElements, enrichedModule))
                     .then(createOriginOrgUnitsAndGroups)
                     .then(associateMandatoryDatasetsToModule)
+                    .then(saveExcludedLineListOptions)
                     .then(_.partial(onSuccess, enrichedModule), onError)
                     .finally(function() {
                         $scope.loading = false;

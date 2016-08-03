@@ -1,13 +1,13 @@
 /*global Date:true*/
 define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "timecop", "dhisId",
-        "orgUnitRepository", "datasetRepository", "originOrgunitCreator", "excludedDataElementsRepository", "programRepository", "translationsService"
+        "orgUnitRepository", "datasetRepository", "originOrgunitCreator", "excludedDataElementsRepository", "programRepository", "excludedLineListOptionsRepository", "translationsService"
     ],
     function(LineListModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, timecop, dhisId,
-        OrgUnitRepository, DatasetRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, ProgramRepository, TranslationsService) {
+        OrgUnitRepository, DatasetRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, ProgramRepository, ExcludedLineListOptionsRepository, TranslationsService) {
 
         describe("line list module controller", function() {
-            var scope, lineListModuleController, mockOrgStore, db, q, datasets, sections,
-                dataElements, sectionsdata, dataElementsdata, orgUnitRepository, hustle, excludedDataElementsRepository,
+            var scope, lineListModuleController, mockOrgStore, db, q, datasets, sections, dataElements, sectionsdata,
+                dataElementsdata, orgUnitRepository, hustle, excludedDataElementsRepository, excludedLineListOptionsRepository,
                 fakeModal, allPrograms, programRepository, datasetRepository, originOrgunitCreator, translationsService;
 
             beforeEach(module('hustle'));
@@ -73,6 +73,9 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 spyOn(datasetRepository, "associateOrgUnits").and.returnValue(utils.getPromise(q, {}));
                 spyOn(datasetRepository, "getAll").and.returnValue(utils.getPromise(q, allDatasets));
 
+                excludedLineListOptionsRepository = new ExcludedLineListOptionsRepository();
+                spyOn(excludedLineListOptionsRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
+
                 orgUnitGroupHelper = new OrgUnitGroupHelper();
                 spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
 
@@ -118,7 +121,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 };
 
                 scope.isNewMode = true;
-                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService);
+                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService, excludedLineListOptionsRepository);
             }));
 
             afterEach(function() {
@@ -189,7 +192,9 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                                     'isIncluded': true,
                                     'id': 'de4'
                                 }
-                            }]
+                            }],
+                            'dataElementsWithoutOptions': [],
+                            'dataElementsWithOptions':[]
                         }]
                     }]
                 };
@@ -313,6 +318,141 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 }, "dataValues");
 
                 expect(scope.saveFailure).toBe(false);
+            });
+
+            describe('excludedLineListOptions', function () {
+                it("should save excluded line list options", function() {
+                    var today = new Date();
+                    scope.$apply();
+
+                    scope.module = {
+                        'id': "Module2",
+                        'name': "Module2",
+                        'openingDate': today,
+                        'serviceType': "Linelist",
+                        'parent': scope.orgUnit
+                    };
+
+                    var program = {
+                        'id': 'prog1',
+                        'name': 'ER Linelist',
+                        'organisationUnits': [],
+                        'attributeValues': [{
+                            "attribute": {
+                                "code": "associatedDataSet"
+                            },
+                            "value": "Ds1"
+                        }]
+                    };
+
+                    var patientOrigins = {
+                        "origins": [{
+                            "id": "id",
+                            "name": "Unknown"
+                        }]
+                    };
+
+                    var originOrgUnit = [{
+                        "name": "Unknown",
+                        "shortName": "Unknown",
+                        "displayName": "Unknown",
+                        "id": "UnknownModule2someId",
+                        "level": 7,
+                        "openingDate": moment().toDate(),
+                        "attributeValues": [{
+                            "attribute": {
+                                "code": "Type",
+                                "name": "Type"
+                            },
+                            "value": "Patient Origin"
+                        }],
+                        "parent": {
+                            "id": "Module2someId"
+                        }
+                    }];
+
+                    scope.enrichedProgram = {
+                        programStages: [{
+                            programStageSections: [{
+                                dataElementsWithOptions: [{
+                                    dataElement: {
+                                        isIncluded: false,
+                                        id: 'de3',
+                                        optionSet: {
+                                            options: [{
+                                                id: 'someOptionId',
+                                                isSelected: true
+                                            }, {
+                                                id: 'someOtherOptionId',
+                                                isSelected: false
+                                            }]
+                                        }
+                                    }
+                                }, {
+                                    dataElement: {
+                                        isIncluded: true,
+                                        id: 'de4',
+                                        optionSet: {
+                                            options: [{
+                                                id: 'someOptionId',
+                                                isSelected: false
+                                            }, {
+                                                id: 'someOtherOptionId'
+                                            }]
+                                        }
+                                    }
+                                }]
+                            }, {
+                                dataElementsWithOptions: [{
+                                    dataElement: {
+                                        isIncluded: false,
+                                        id: 'de5',
+                                        optionSet: {
+                                            options: [{
+                                                id: 'someOptionId',
+                                                isSelected: true
+                                            }, {
+                                                id: 'someOtherOptionId',
+                                                isSelected: true
+                                            }]
+                                        }
+                                    }
+                                }]
+                            }]
+                        }]
+                    };
+
+                    scope.enrichedModule = {
+                        id: 'Module2someId'
+                    };
+
+                    spyOn(dhisId, "get").and.callFake(function(name) {
+                        return name;
+                    });
+
+                    programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, program));
+                    originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnit));
+
+                    scope.program = program;
+                    programRepository.get.and.returnValue(utils.getPromise(q, program));
+
+                    scope.save();
+                    scope.$apply();
+
+                    var excludedLineListOptions = {
+                        moduleId: scope.enrichedModule.id,
+                        clientLastUpdated: moment().toISOString(),
+                        dataElements: [{
+                            dataElementId: 'de3',
+                            excludedOptionIds: ['someOtherOptionId']
+                        }, {
+                            dataElementId: 'de4',
+                            excludedOptionIds: ['someOptionId', 'someOtherOptionId']
+                        }]
+                    };
+
+                    expect(excludedLineListOptionsRepository.upsert).toHaveBeenCalledWith(excludedLineListOptions);
+                });
             });
 
             it("should disable update and diable if orgunit is disabled", function() {
