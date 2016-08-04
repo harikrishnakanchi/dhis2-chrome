@@ -66,25 +66,25 @@
                                             </div>
                                             <div collapse="getCollapsed(section.id)" class="collapse-body">
                                                 <ul>
-                                                    <li ng-repeat="de in section.dataElementsWithOptions">
+                                                    <li ng-repeat="de in section.dataElementsWithOptions" ng-init="de.dataElement.isDataElementExpanded = false">
                                                         <div class="collapse-head">
-                                                            <h5 ng-click="isDataElementExpanded[de.dataElement.id] = !isDataElementExpanded[de.dataElement.id]">
+                                                            <h5 ng-click="de.dataElement.isDataElementExpanded = !de.dataElement.isDataElementExpanded">
                                                             <span class="glyphicon"
-                                                                  ng-class="{'glyphicon-chevron-right':!isDataElementExpanded[de.dataElement.id], 'glyphicon-chevron-down':isDataElementExpanded[de.dataElement.id]}" aria-hidden="true"></span>  {{ de.dataElement.formName}}
+                                                                  ng-class="{'glyphicon-chevron-right':!de.dataElement.isDataElementExpanded, 'glyphicon-chevron-down':de.dataElement.isDataElementExpanded}" aria-hidden="true"></span>  {{ de.dataElement.formName}}
                                                                 <a class="description-popup-icon"
                                                                    description-popup
                                                                    dp-title="{{ de.dataElement.formName }}"
-                                                                   dp-desc="{{ de.dataElement.formName }}"
-                                                                >
+                                                                   dp-desc="{{ de.dataElement.formName }}">
                                                                     <i class="fa fa-info-circle"
                                                                        tooltip-placement="top"></i>
                                                                 </a>
                                                             <input type="checkbox"
                                                                    ng-disabled="de.compulsory || isDisabled==true"
-                                                                   ng-model="de.dataElement.isIncluded">
+                                                                   ng-model="de.dataElement.isIncluded"
+                                                                   ng-click="stopPropagation($event)" />
                                                             </h5>
                                                         </div>
-                                                        <div collapse="!isDataElementExpanded[de.dataElement.id]" class="collapse-body">
+                                                        <div collapse="!de.dataElement.isDataElementExpanded" class="collapse-body">
                                                             <ul>
                                                                 <li ng-repeat="option in de.dataElement.optionSet.options" ng-init="option.isSelected = true">
                                                                     <label>

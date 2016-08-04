@@ -93,12 +93,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                             _.forEach(programStage.programStageSections, function (programStageSection) {
                                 programStageSection.dataElementsWithOptions = _.filter(programStageSection.programStageDataElements, 'dataElement.optionSet');
                                 programStageSection.dataElementsWithoutOptions = _.reject(programStageSection.programStageDataElements, 'dataElement.optionSet');
-                                $scope.isDataElementExpanded = _.map(programStageSection.dataElementsWithOptions, function (programStageDataElement) {
-                                    return {
-                                        id: programStageDataElement.dataElement.id,
-                                        value: false
-                                    };
-                                });
                             });
                         });
                     };
@@ -370,6 +364,10 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     option.isSelected = true;
                     showModal(function () {}, $scope.resourceBundle.atleastTwoOptionsMustBeSelected);
                 }
+            };
+
+            $scope.stopPropagation = function (event) {
+                event.stopPropagation();
             };
 
             init();
