@@ -111,10 +111,12 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                             var excludedOptionsByDataElement = _.indexBy($scope.excludedLineListOptions.dataElements, 'dataElementId');
                             _.each(allDataElements, function (dataElement) {
                                 var dataElementExcludedOptions = excludedOptionsByDataElement[dataElement.id];
-                                var dataElementOptions = dataElementExcludedOptions.excludedOptionIds;
-                                _.each(dataElement.optionSet.options, function (option) {
-                                    option.isSelected = !_.contains(dataElementOptions, option.id);
-                                });
+                                if(dataElementExcludedOptions) {
+                                    var dataElementOptions = dataElementExcludedOptions.excludedOptionIds;
+                                    _.each(dataElement.optionSet.options, function (option) {
+                                        option.isSelected = !_.contains(dataElementOptions, option.id);
+                                    });
+                                }
                             });
                         } else {
                             _.each(allDataElements, function (dataElement) {

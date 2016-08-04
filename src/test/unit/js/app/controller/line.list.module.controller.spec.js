@@ -496,25 +496,11 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             describe('init', function () {
 
                 describe('for existing module', function () {
+                    var program, moduleId;
 
-                    it('should get excludedLineListOptions', function () {
-                        var excludedLineListOptions = 'SomeLineListOptions';
-                        excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, excludedLineListOptions));
-
-                        createLineListModuleController();
-                        scope.module.id = 'someModuleId';
-                        scope.$apply();
-
-                        expect(excludedLineListOptionsRepository.get).toHaveBeenCalledWith(scope.module.id);
-                        expect(scope.excludedLineListOptions).toBe(excludedLineListOptions);
-                    });
-
-                    it('should enrich the program dataElements with the excluded line list options', function () {
-
-                        scope.$apply();
-
-                        var moduleId = 'Module2';
-                        var program = {
+                    beforeEach(function () {
+                        moduleId = 'Module2';
+                        program = {
                             programStages: [{
                                 programStageSections: [{
                                     programStageDataElements: [{
@@ -536,7 +522,24 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
                         programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, program));
                         programRepository.get.and.returnValue(utils.getPromise(q, program));
+                        translationsService.translate.and.returnValue(program);
+                    });
 
+                    it('should get excludedLineListOptions', function () {
+                        var excludedLineListOptions = {
+                            dataElements: []
+                        };
+                        excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, excludedLineListOptions));
+
+                        createLineListModuleController();
+                        scope.module.id = 'someModuleId';
+                        scope.$apply();
+
+                        expect(excludedLineListOptionsRepository.get).toHaveBeenCalledWith(scope.module.id);
+                        expect(scope.excludedLineListOptions).toBe(excludedLineListOptions);
+                    });
+
+                    it('should enrich the program dataElements with the excluded line list options', function () {
                         var excludedLineListOptions = {
                             moduleId: moduleId,
                             dataElements: [{
@@ -545,8 +548,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                             }]
                         };
                         excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, excludedLineListOptions));
-
-                        translationsService.translate.and.returnValue(program);
 
                         createLineListModuleController();
                         scope.module = {
@@ -596,36 +597,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     });
 
                     it('should enrich the program dataElements as all options are selected if no excluded line list options are available', function () {
-
-                        scope.$apply();
-
-                        var moduleId = 'Module2';
-                        var program = {
-                            programStages: [{
-                                programStageSections: [{
-                                    programStageDataElements: [{
-                                        dataElement: {
-                                            isIncluded: true,
-                                            id: 'someDataElementId',
-                                            optionSet: {
-                                                options: [{
-                                                    id: 'someOptionId'
-                                                }, {
-                                                    id: 'someOtherOptionId'
-                                                }]
-                                            }
-                                        }
-                                    }]
-                                }]
-                            }]
-                        };
-
-                        programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, program));
-                        programRepository.get.and.returnValue(utils.getPromise(q, program));
-
                         excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, undefined));
-
-                        translationsService.translate.and.returnValue(program);
 
                         createLineListModuleController();
                         scope.module = {
