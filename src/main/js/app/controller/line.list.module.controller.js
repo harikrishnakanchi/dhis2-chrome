@@ -116,6 +116,10 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                                     _.each(dataElement.optionSet.options, function (option) {
                                         option.isSelected = !_.contains(dataElementOptions, option.id);
                                     });
+                                } else {
+                                    _.each(dataElement.optionSet.options, function (option) {
+                                        option.isSelected = true;
+                                    });
                                 }
                             });
                         } else {

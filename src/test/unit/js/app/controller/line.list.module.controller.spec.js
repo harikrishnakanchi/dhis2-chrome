@@ -646,6 +646,61 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         expect(scope.enrichedProgram).toEqual(expectedProgram);
                     });
 
+                    it('should enrich the program dataElement as all options are selected if no excluded line list options are available for a dataElement', function () {
+                        var excludedLineListOptions = {
+                            moduleId: moduleId,
+                            dataElements: [{
+                            }]
+                        };
+                        excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, excludedLineListOptions));
+
+                        createLineListModuleController();
+                        scope.module = {
+                            'id': moduleId,
+                            'parent': scope.orgUnit
+                        };
+                        scope.$apply();
+
+                        var expectedProgram = {
+                            programStages: [{
+                                programStageSections: [{
+                                    programStageDataElements: [{
+                                        dataElement: {
+                                            isIncluded: true,
+                                            id: 'someDataElementId',
+                                            optionSet: {
+                                                options: [{
+                                                    id: 'someOptionId',
+                                                    isSelected: true
+                                                }, {
+                                                    id: 'someOtherOptionId',
+                                                    isSelected: true
+                                                }]
+                                            }
+                                        }
+                                    }],
+                                    dataElementsWithoutOptions: [],
+                                    dataElementsWithOptions: [{
+                                        dataElement: {
+                                            isIncluded: true,
+                                            id: 'someDataElementId',
+                                            optionSet: {
+                                                options: [{
+                                                    id: 'someOptionId',
+                                                    isSelected: true
+                                                }, {
+                                                    id: 'someOtherOptionId',
+                                                    isSelected: true
+                                                }]
+                                            }
+                                        }
+                                    }]
+                                }]
+                            }]
+                        };
+                        expect(scope.enrichedProgram).toEqual(expectedProgram);
+                    });
+
                 });
 
                 it('should not get excludedLineListOptions for the newly creating module', function () {
