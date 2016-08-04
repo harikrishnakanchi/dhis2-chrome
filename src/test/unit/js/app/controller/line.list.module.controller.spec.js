@@ -79,6 +79,8 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 orgUnitGroupHelper = new OrgUnitGroupHelper();
                 spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
 
+                spyOn(excludedLineListOptionsRepository, 'get').and.returnValue(utils.getPromise(q, {}));
+
                 mockOrgStore = {
                     upsert: function() {},
                     getAll: function() {}
@@ -487,6 +489,26 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 });
             });
 
+            describe('init', function () {
+
+                it('should get excludedLineListOptions for the existing module', function () {
+                    var excludedLineListOptions = 'SomeLineListOptions';
+                    excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, excludedLineListOptions));
+
+                    lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService, excludedLineListOptionsRepository);
+                    scope.module.id = 'someModuleId';
+                    scope.$apply();
+
+                    expect(excludedLineListOptionsRepository.get).toHaveBeenCalledWith(scope.module.id);
+                    expect(scope.excludedLineListOptions).toBe(excludedLineListOptions);
+                });
+
+                it('should not get excludedLineListOptions for the newly creating module', function () {
+                    scope.$apply();
+                    expect(excludedLineListOptionsRepository.get).not.toHaveBeenCalled();
+                });
+            });
+
             it("should disable update and diable if orgunit is disabled", function() {
                 var program = {
                     'id': 'prog1',
@@ -520,7 +542,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 programRepository.get.and.returnValue(utils.getPromise(q, program));
                 translationsService.translate.and.returnValue(program);
 
-                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService);
+                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService, excludedLineListOptionsRepository);
 
                 scope.$apply();
                 expect(scope.isDisabled).toBeTruthy();
@@ -530,7 +552,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 scope.$apply();
 
                 scope.isNewMode = false;
-                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService);
+                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService, excludedLineListOptionsRepository);
                 var parent = {
                     "id": "par1",
                     "name": "Par1"
@@ -640,7 +662,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
                 scope.isNewMode = false;
 
-                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService);
+                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService, excludedLineListOptionsRepository);
                 scope.update(module);
                 scope.$apply();
 
@@ -718,7 +740,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 });
                 scope.isNewMode = false;
 
-                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService);
+                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService, excludedLineListOptionsRepository);
                 scope.disable(module);
                 scope.$apply();
 

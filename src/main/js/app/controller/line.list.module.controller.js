@@ -44,11 +44,23 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 };
 
                 var getExcludedDataElements = function() {
-                    if (!$scope.module.id)
-                        return;
                     return excludedDataElementsRepository.get($scope.module.id).then(function(excludedDataElementsSetting) {
                         $scope.excludedDataElements = excludedDataElementsSetting ? _.pluck(excludedDataElementsSetting.dataElements, "id") : undefined;
                     });
+                };
+
+                var getExcludedLineListOptions = function () {
+                    return excludedLineListOptionsRepository.get($scope.module.id).then(function (excludedLineListOptions) {
+                        $scope.excludedLineListOptions = excludedLineListOptions;
+                    });
+                };
+
+                var getExcludedModuleData = function () {
+                    if (!$scope.module.id) {
+                        return;
+                    }
+                    return getExcludedDataElements()
+                        .then(getExcludedLineListOptions);
                 };
 
                 var getAssociatedProgram = function() {
@@ -133,11 +145,12 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     return $q.all([programRepository.getAll()]);
                 };
 
+
                 initModule().then(getPrograms)
                     .then(translatePrograms)
                     .then(setPrograms)
                     .then(getAllModules)
-                    .then(getExcludedDataElements)
+                    .then(getExcludedModuleData)
                     .then(getAssociatedProgram)
                     .then(setUpModule);
             };
