@@ -274,7 +274,7 @@
     "exportRawDataToCSV": "Exporter les données en CSV",
     "noRawDataAvailable": "Pas de données disponibles pour les semaines sélectionnées",
     "noExportRawDataForLineLists": "Vous pouvez exporter des données individuelles depuis la 'barre de recherche' d'un programme spécifique",
-    "noExportRawDataForLineListsForApprovers": "Linelist aggregated data cannot be exported as of now.",
+    "noExportRawDataForLineListsForApprovers": "Les données individuelles des données agrégées ne peuvent pas être exportés à partir de maintenant.",
     "lastOneWeek": "Dernière semaine",
     "lastFourWeeks": "4 dernières semaines",
     "lastEightWeeks": "8 dernières semaines",
