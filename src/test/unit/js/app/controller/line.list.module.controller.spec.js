@@ -495,22 +495,112 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
             describe('init', function () {
 
-                it('should get excludedLineListOptions for the existing module', function () {
-                    var excludedLineListOptions = 'SomeLineListOptions';
-                    excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, excludedLineListOptions));
+                describe('for existing module', function () {
 
-                    createLineListModuleController();
-                    scope.module.id = 'someModuleId';
-                    scope.$apply();
+                    it('should get excludedLineListOptions', function () {
+                        var excludedLineListOptions = 'SomeLineListOptions';
+                        excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, excludedLineListOptions));
 
-                    expect(excludedLineListOptionsRepository.get).toHaveBeenCalledWith(scope.module.id);
-                    expect(scope.excludedLineListOptions).toBe(excludedLineListOptions);
+                        createLineListModuleController();
+                        scope.module.id = 'someModuleId';
+                        scope.$apply();
+
+                        expect(excludedLineListOptionsRepository.get).toHaveBeenCalledWith(scope.module.id);
+                        expect(scope.excludedLineListOptions).toBe(excludedLineListOptions);
+                    });
+
+                    it('should enrich the program dataElements with the excluded line list options', function () {
+
+                        scope.$apply();
+
+                        var moduleId = 'Module2';
+                        var program = {
+                            programStages: [{
+                                programStageSections: [{
+                                    programStageDataElements: [{
+                                        dataElement: {
+                                            isIncluded: true,
+                                            id: 'someDataElementId',
+                                            optionSet: {
+                                                options: [{
+                                                    id: 'someOptionId'
+                                                }, {
+                                                    id: 'someOtherOptionId'
+                                                }]
+                                            }
+                                        }
+                                    }]
+                                }]
+                            }]
+                        };
+
+                        programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, program));
+                        programRepository.get.and.returnValue(utils.getPromise(q, program));
+
+                        var excludedLineListOptions = {
+                            moduleId: moduleId,
+                            dataElements: [{
+                                dataElementId: 'someDataElementId',
+                                excludedOptionIds: ['someOptionId']
+                            }]
+                        };
+                        excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, excludedLineListOptions));
+
+                        translationsService.translate.and.returnValue(program);
+
+                        createLineListModuleController();
+                        scope.module = {
+                            'id': moduleId,
+                            'parent': scope.orgUnit
+                        };
+                        scope.$apply();
+
+                        var expectedProgram = {
+                            programStages: [{
+                                programStageSections: [{
+                                    programStageDataElements: [{
+                                        dataElement: {
+                                            isIncluded: true,
+                                            id: 'someDataElementId',
+                                            optionSet: {
+                                                options: [{
+                                                    id: 'someOptionId',
+                                                    isSelected: false
+                                                }, {
+                                                    id: 'someOtherOptionId',
+                                                    isSelected: true
+                                                }]
+                                            }
+                                        }
+                                    }],
+                                    dataElementsWithoutOptions: [],
+                                    dataElementsWithOptions: [{
+                                        dataElement: {
+                                            isIncluded: true,
+                                            id: 'someDataElementId',
+                                            optionSet: {
+                                                options: [{
+                                                    id: 'someOptionId',
+                                                    isSelected: false
+                                                }, {
+                                                    id: 'someOtherOptionId',
+                                                    isSelected: true
+                                                }]
+                                            }
+                                        }
+                                    }]
+                                }]
+                            }]
+                        };
+                        expect(scope.enrichedProgram).toEqual(expectedProgram);
+                    });
                 });
 
                 it('should not get excludedLineListOptions for the newly creating module', function () {
                     scope.$apply();
                     expect(excludedLineListOptionsRepository.get).not.toHaveBeenCalled();
                 });
+
             });
 
             it("should disable update and diable if orgunit is disabled", function() {

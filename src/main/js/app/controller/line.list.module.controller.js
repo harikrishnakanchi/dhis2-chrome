@@ -9,6 +9,9 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
             $scope.allModules = [];
             $scope.collapseSection = {};
             $scope.excludedDataElements = [];
+            $scope.excludedLineListOptions = {
+                dataElements:[]
+            };
             $scope.allPrograms = [];
             $scope.program = {};
             $scope.enrichedProgram = {};
@@ -97,9 +100,33 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                         });
                     };
 
+                    var setDataElementOptionStatus = function () {
+
+                        var excludedOptionsByDataElement = _.indexBy($scope.excludedLineListOptions.dataElements, 'dataElementId');
+                        var allDataElements = _.chain($scope.enrichedProgram.programStages)
+                            .map('programStageSections')
+                            .flatten()
+                            .map('dataElementsWithOptions')
+                            .flatten()
+                            .map('dataElement')
+                            .value();
+
+                        _.each(allDataElements, function (dataElement) {
+                            var dataElementExcludedOptions = excludedOptionsByDataElement[dataElement.id];
+                            if (!dataElementExcludedOptions) {
+                                return;
+                            }
+                            var dataElementOptions = dataElementExcludedOptions.excludedOptionIds;
+                            _.each(dataElement.optionSet.options, function (option) {
+                                option.isSelected = !_.contains(dataElementOptions, option.id);
+                            });
+                        });
+                    };
+
                     return programRepository.get(progId, $scope.excludedDataElements).then(function(data) {
                         $scope.enrichedProgram = translationsService.translate(data);
                         buildProgramDataElements();
+                        setDataElementOptionStatus();
                         resetCollapse();
                     });
                 };
