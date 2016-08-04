@@ -1,23 +1,22 @@
 define(["reportService", "angularMocks", "properties", "utils", "lodash", "timecop", "moment"], function(ReportService, mocks, properties, utils, _, timecop, moment) {
     describe("report service", function() {
-        var http, httpBackend, reportService, q, scope, lastUpdatedAt;
+        var http, httpBackend, reportService, q, currentMomentInTime;
 
         beforeEach(mocks.inject(function($injector) {
             http = $injector.get('$http');
             q = $injector.get('$q');
             httpBackend = $injector.get('$httpBackend');
-            reportService = new ReportService(http, q);
-            thisMoment = moment("2014-01-01T");
-            lastUpdatedAt = thisMoment.toISOString();
+
+            currentMomentInTime = moment("2014-01-01T");
             Timecop.install();
-            Timecop.freeze(thisMoment.toDate());
+            Timecop.freeze(currentMomentInTime);
+
+            reportService = new ReportService(http, q);
         }));
 
         afterEach(function() {
             Timecop.returnToPresent();
             Timecop.uninstall();
-            httpBackend.verifyNoOutstandingExpectation();
-            httpBackend.verifyNoOutstandingRequest();
         });
 
         it("should get report data for specified orgunit", function() {
@@ -74,7 +73,7 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                 }]
             };
 
-            var expectedUrl = properties.dhis.url + "/api/analytics?dimension=ad3af7f9d95:a3902b51dab;a7a336284aa&dimension=pe:LAST_12_WEEKS&filter=ou:" + orgUnitId + "&filter=dx:a7c6e2bd082;a0321bb4608;a5c577497f4;a551c464fcb;ad3d3b10115;afa1c3eff7b&lastUpdatedAt=" + lastUpdatedAt;
+            var expectedUrl = properties.dhis.url + "/api/analytics?dimension=ad3af7f9d95:a3902b51dab;a7a336284aa&dimension=pe:LAST_12_WEEKS&filter=ou:" + orgUnitId + "&filter=dx:a7c6e2bd082;a0321bb4608;a5c577497f4;a551c464fcb;ad3d3b10115;afa1c3eff7b&lastUpdatedAt=" + currentMomentInTime.toISOString();
 
             httpBackend.expectGET(expectedUrl).respond(200, chartDefinition);
 
@@ -113,7 +112,7 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                 "filters": []
             };
 
-            var expectedUrl = properties.dhis.url + "/api/analytics?dimension=ad3af7f9d95:a3902b51dab&dimension=pe:LAST_12_WEEKS&filter=ou:" + orgUnitId + "&lastUpdatedAt=" + lastUpdatedAt;
+            var expectedUrl = properties.dhis.url + "/api/analytics?dimension=ad3af7f9d95:a3902b51dab&dimension=pe:LAST_12_WEEKS&filter=ou:" + orgUnitId + "&lastUpdatedAt=" + currentMomentInTime.toISOString();
 
             httpBackend.expectGET(expectedUrl).respond(200, chartDefinition);
 
