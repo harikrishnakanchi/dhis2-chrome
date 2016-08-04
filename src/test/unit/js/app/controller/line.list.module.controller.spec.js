@@ -594,6 +594,86 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         };
                         expect(scope.enrichedProgram).toEqual(expectedProgram);
                     });
+
+                    it('should enrich the program dataElements as all options are selected if no excluded line list options are available', function () {
+
+                        scope.$apply();
+
+                        var moduleId = 'Module2';
+                        var program = {
+                            programStages: [{
+                                programStageSections: [{
+                                    programStageDataElements: [{
+                                        dataElement: {
+                                            isIncluded: true,
+                                            id: 'someDataElementId',
+                                            optionSet: {
+                                                options: [{
+                                                    id: 'someOptionId'
+                                                }, {
+                                                    id: 'someOtherOptionId'
+                                                }]
+                                            }
+                                        }
+                                    }]
+                                }]
+                            }]
+                        };
+
+                        programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, program));
+                        programRepository.get.and.returnValue(utils.getPromise(q, program));
+
+                        excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, undefined));
+
+                        translationsService.translate.and.returnValue(program);
+
+                        createLineListModuleController();
+                        scope.module = {
+                            'id': moduleId,
+                            'parent': scope.orgUnit
+                        };
+                        scope.$apply();
+
+                        var expectedProgram = {
+                            programStages: [{
+                                programStageSections: [{
+                                    programStageDataElements: [{
+                                        dataElement: {
+                                            isIncluded: true,
+                                            id: 'someDataElementId',
+                                            optionSet: {
+                                                options: [{
+                                                    id: 'someOptionId',
+                                                    isSelected: true
+                                                }, {
+                                                    id: 'someOtherOptionId',
+                                                    isSelected: true
+                                                }]
+                                            }
+                                        }
+                                    }],
+                                    dataElementsWithoutOptions: [],
+                                    dataElementsWithOptions: [{
+                                        dataElement: {
+                                            isIncluded: true,
+                                            id: 'someDataElementId',
+                                            optionSet: {
+                                                options: [{
+                                                    id: 'someOptionId',
+                                                    isSelected: true
+                                                }, {
+                                                    id: 'someOtherOptionId',
+                                                    isSelected: true
+                                                }]
+                                            }
+                                        }
+                                    }]
+                                }]
+                            }]
+                        };
+                        expect(scope.enrichedProgram).toEqual(expectedProgram);
+                    });
+
                 });
 
                 it('should not get excludedLineListOptions for the newly creating module', function () {
@@ -846,20 +926,34 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             describe('onProgramSelect', function () {
 
                 var selectedObject, program, programStageDataElementA, programStageDataElementB, programStageDataElementC;
+
+                var createProgramStageDataElement = function (options) {
+                    return _.merge({
+                        id: 'programStageDataElementId',
+                        "dataElement": {
+                            "id": "de1"
+                        }
+                    }, options);
+                };
+
                 beforeEach(function () {
-                    var createProgramStageDataElement = function (options) {
-                        return _.merge({
-                            id: 'programStageDataElementId',
-                            "dataElement": {
-                                "id": "de1"
-                            }
-                        }, options);
-                    };
                     programStageDataElementA = createProgramStageDataElement({'dataElement': {
-                        "optionSet": 'someOptionSet'
+                        optionSet: {
+                            options: [{
+                                id: 'someOptionId'
+                            }, {
+                                id: 'someOtherOptionId'
+                            }]
+                        }
                     }});
                     programStageDataElementB = createProgramStageDataElement({'dataElement': {
-                        "optionSet": 'someOtherOptionSet'
+                        optionSet: {
+                            options: [{
+                                id: 'someOptionId'
+                            }, {
+                                id: 'someOtherOptionId'
+                            }]
+                        }
                     }});
                     programStageDataElementC = createProgramStageDataElement();
 
@@ -907,6 +1001,39 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                             sectionId1: false,
                             sectionId2: true
                         });
+                    });
+                    scope.$apply();
+                });
+
+                it('should mark all the dataElementOptions as selected for the newly creating module', function () {
+                    var programStageDataElementWithOptionSelectedA, programStageDataElementWithOptionSelectedB;
+
+                    scope.onProgramSelect(selectedObject).then(function(data) {
+                        programStageDataElementWithOptionSelectedA = createProgramStageDataElement({'dataElement': {
+                            optionSet: {
+                                options: [{
+                                    id: 'someOptionId',
+                                    isSelected: true
+                                }, {
+                                    id: 'someOtherOptionId',
+                                    isSelected: true
+                                }]
+                            }
+                        }});
+                        programStageDataElementWithOptionSelectedB = createProgramStageDataElement({'dataElement': {
+                            optionSet: {
+                                options: [{
+                                    id: 'someOptionId',
+                                    isSelected: true
+                                }, {
+                                    id: 'someOtherOptionId',
+                                    isSelected: true
+                                }]
+                            }
+                        }});
+
+                        expect(scope.enrichedProgram.programStages[0].programStageSections[0].dataElementsWithOptions)
+                            .toEqual([programStageDataElementWithOptionSelectedA, programStageDataElementWithOptionSelectedB]);
                     });
                     scope.$apply();
                 });
