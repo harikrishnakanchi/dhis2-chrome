@@ -274,6 +274,7 @@
     "exportRawDataToCSV": "تصدير البيانات كما CSV",
     "noRawDataAvailable": "لا توجد بيانات متاحة لأسابيع المختارة",
     "noExportRawDataForLineLists": "يمكنك تصدير البيانات من حالة 'علامة تبويب البحث \"برنامج معين.",
+    "noExportRawDataForLineListsForApprovers": "Linelist aggregated data cannot be exported as of now.",
     "lastOneWeek": "الاسبوع الماضى",
     "lastFourWeeks": "مشاركة أربعة أسابيع",
     "lastEightWeeks": "الثمانية أسابيع",
