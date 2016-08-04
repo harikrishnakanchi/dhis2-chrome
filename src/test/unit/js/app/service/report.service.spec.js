@@ -19,106 +19,108 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
             Timecop.uninstall();
         });
 
-        it("should get report data for specified orgunit", function() {
-            var orgUnitId = "ou1";
-            var chartDefinition = {
-                "id": "iRSWeHOmLgv",
-                "name": "[FieldApp - AdultIPDWard] 1 Admission by age group",
-                "type": "column",
-                "title": "Admission by age group - Adult IPD Ward",
-                "columns": [{
-                    "dimension": "ad3af7f9d95",
-                    "items": [{
-                        "id": "a3902b51dab",
-                        "name": "15-48 years"
+        describe('getReportDataForOrgUnit', function () {
+            it("should get report data for specified orgunit", function() {
+                var orgUnitId = "ou1";
+                var chartDefinition = {
+                    "id": "iRSWeHOmLgv",
+                    "name": "[FieldApp - AdultIPDWard] 1 Admission by age group",
+                    "type": "column",
+                    "title": "Admission by age group - Adult IPD Ward",
+                    "columns": [{
+                        "dimension": "ad3af7f9d95",
+                        "items": [{
+                            "id": "a3902b51dab",
+                            "name": "15-48 years"
+                        }, {
+                            "id": "a7a336284aa",
+                            "name": ">49 years"
+                        }]
+                    }],
+                    "rows": [{
+                        "dimension": "pe",
+                        "items": [{
+                            "id": "LAST_12_WEEKS",
+                            "name": "LAST_12_WEEKS"
+                        }]
+                    }],
+                    "filters": [{
+                        "dimension": "ou",
+                        "items": [{
+                            "id": "a2cf79e8f13",
+                            "name": "MSF"
+                        }]
                     }, {
-                        "id": "a7a336284aa",
-                        "name": ">49 years"
+                        "dimension": "dx",
+                        "items": [{
+                            "id": "a7c6e2bd082",
+                            "name": "New Admission - Emergency Department - Admission - Adult IPD Ward"
+                        }, {
+                            "id": "a0321bb4608",
+                            "name": "New Admission - Other Facilities - Admission - Adult IPD Ward"
+                        }, {
+                            "id": "a5c577497f4",
+                            "name": "New Admission - Out-Patient Department - Admission - Adult IPD Ward"
+                        }, {
+                            "id": "a551c464fcb",
+                            "name": "Referred-in Admission - Intensive Care Unit - Admission - Adult IPD Ward"
+                        }, {
+                            "id": "ad3d3b10115",
+                            "name": "Referred-in Admission - Operating Theatre - Admission - Adult IPD Ward"
+                        }, {
+                            "id": "afa1c3eff7b",
+                            "name": "Referred-in Admission - Other Wards - Admission - Adult IPD Ward"
+                        }]
                     }]
-                }],
-                "rows": [{
-                    "dimension": "pe",
-                    "items": [{
-                        "id": "LAST_12_WEEKS",
-                        "name": "LAST_12_WEEKS"
-                    }]
-                }],
-                "filters": [{
-                    "dimension": "ou",
-                    "items": [{
-                        "id": "a2cf79e8f13",
-                        "name": "MSF"
-                    }]
-                }, {
-                    "dimension": "dx",
-                    "items": [{
-                        "id": "a7c6e2bd082",
-                        "name": "New Admission - Emergency Department - Admission - Adult IPD Ward"
-                    }, {
-                        "id": "a0321bb4608",
-                        "name": "New Admission - Other Facilities - Admission - Adult IPD Ward"
-                    }, {
-                        "id": "a5c577497f4",
-                        "name": "New Admission - Out-Patient Department - Admission - Adult IPD Ward"
-                    }, {
-                        "id": "a551c464fcb",
-                        "name": "Referred-in Admission - Intensive Care Unit - Admission - Adult IPD Ward"
-                    }, {
-                        "id": "ad3d3b10115",
-                        "name": "Referred-in Admission - Operating Theatre - Admission - Adult IPD Ward"
-                    }, {
-                        "id": "afa1c3eff7b",
-                        "name": "Referred-in Admission - Other Wards - Admission - Adult IPD Ward"
-                    }]
-                }]
-            };
+                };
 
-            var expectedUrl = properties.dhis.url + "/api/analytics?dimension=ad3af7f9d95:a3902b51dab;a7a336284aa&dimension=pe:LAST_12_WEEKS&filter=ou:" + orgUnitId + "&filter=dx:a7c6e2bd082;a0321bb4608;a5c577497f4;a551c464fcb;ad3d3b10115;afa1c3eff7b&lastUpdatedAt=" + currentMomentInTime.toISOString();
+                var expectedUrl = properties.dhis.url + "/api/analytics?dimension=ad3af7f9d95:a3902b51dab;a7a336284aa&dimension=pe:LAST_12_WEEKS&filter=ou:" + orgUnitId + "&filter=dx:a7c6e2bd082;a0321bb4608;a5c577497f4;a551c464fcb;ad3d3b10115;afa1c3eff7b&lastUpdatedAt=" + currentMomentInTime.toISOString();
 
-            httpBackend.expectGET(expectedUrl).respond(200, chartDefinition);
+                httpBackend.expectGET(expectedUrl).respond(200, chartDefinition);
 
-            var actualData;
-            reportService.getReportDataForOrgUnit(chartDefinition, orgUnitId).then(function(data) {
-                actualData = data;
+                var actualData;
+                reportService.getReportDataForOrgUnit(chartDefinition, orgUnitId).then(function(data) {
+                    actualData = data;
+                });
+
+                httpBackend.flush();
+
+                expect(_.omit(actualData, 'url')).toEqual(chartDefinition);
+                expect(actualData.url).toEqual(expectedUrl);
             });
 
-            httpBackend.flush();
+            it("should insert appropriate ou filter in the analytics GET url if it does not exist in chart definition", function() {
+                var orgUnitId = "ou1";
+                var chartDefinition = {
+                    "id": "iRSWeHOmLgv",
+                    "name": "[FieldApp - AdultIPDWard] 1 Admission by age group",
+                    "type": "column",
+                    "title": "Admission by age group - Adult IPD Ward",
+                    "columns": [{
+                        "dimension": "ad3af7f9d95",
+                        "items": [{
+                            "id": "a3902b51dab",
+                            "name": "Number"
+                        }]
+                    }],
+                    "rows": [{
+                        "dimension": "pe",
+                        "items": [{
+                            "id": "LAST_12_WEEKS",
+                            "name": "LAST_12_WEEKS"
+                        }]
+                    }],
+                    "filters": []
+                };
 
-            expect(_.omit(actualData, 'url')).toEqual(chartDefinition);
-            expect(actualData.url).toEqual(expectedUrl);
-        });
+                var expectedUrl = properties.dhis.url + "/api/analytics?dimension=ad3af7f9d95:a3902b51dab&dimension=pe:LAST_12_WEEKS&filter=ou:" + orgUnitId + "&lastUpdatedAt=" + currentMomentInTime.toISOString();
 
-        it("should insert appropriate ou filter in the analytics GET url if it does not exist in chart definition", function() {
-            var orgUnitId = "ou1";
-            var chartDefinition = {
-                "id": "iRSWeHOmLgv",
-                "name": "[FieldApp - AdultIPDWard] 1 Admission by age group",
-                "type": "column",
-                "title": "Admission by age group - Adult IPD Ward",
-                "columns": [{
-                    "dimension": "ad3af7f9d95",
-                    "items": [{
-                        "id": "a3902b51dab",
-                        "name": "Number"
-                    }]
-                }],
-                "rows": [{
-                    "dimension": "pe",
-                    "items": [{
-                        "id": "LAST_12_WEEKS",
-                        "name": "LAST_12_WEEKS"
-                    }]
-                }],
-                "filters": []
-            };
+                httpBackend.expectGET(expectedUrl).respond(200, chartDefinition);
 
-            var expectedUrl = properties.dhis.url + "/api/analytics?dimension=ad3af7f9d95:a3902b51dab&dimension=pe:LAST_12_WEEKS&filter=ou:" + orgUnitId + "&lastUpdatedAt=" + currentMomentInTime.toISOString();
+                reportService.getReportDataForOrgUnit(chartDefinition, orgUnitId);
 
-            httpBackend.expectGET(expectedUrl).respond(200, chartDefinition);
-
-            reportService.getReportDataForOrgUnit(chartDefinition, orgUnitId);
-
-            httpBackend.flush();
+                httpBackend.flush();
+            });
         });
 
         describe('getUpdatedCharts', function () {
