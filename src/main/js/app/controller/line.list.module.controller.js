@@ -107,26 +107,31 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                             .map('dataElement')
                             .value();
 
-                        if ($scope.excludedLineListOptions) {
+                        var markAllOptionsAsTrue = function (options) {
+                            _.each(options, function (option) {
+                                option.isSelected = true;
+                            });
+                        };
+
+                        var isModuleConfiguredWithExcludedLineListOptions = !!$scope.excludedLineListOptions;
+
+                        if (isModuleConfiguredWithExcludedLineListOptions) {
                             var excludedOptionsByDataElement = _.indexBy($scope.excludedLineListOptions.dataElements, 'dataElementId');
                             _.each(allDataElements, function (dataElement) {
                                 var dataElementExcludedOptions = excludedOptionsByDataElement[dataElement.id];
-                                if(dataElementExcludedOptions) {
+                                var isAnyDataElementOptionsUnSelected = !!dataElementExcludedOptions;
+                                if(isAnyDataElementOptionsUnSelected) {
                                     var dataElementOptions = dataElementExcludedOptions.excludedOptionIds;
                                     _.each(dataElement.optionSet.options, function (option) {
                                         option.isSelected = !_.contains(dataElementOptions, option.id);
                                     });
                                 } else {
-                                    _.each(dataElement.optionSet.options, function (option) {
-                                        option.isSelected = true;
-                                    });
+                                    markAllOptionsAsTrue(dataElement.optionSet.options);
                                 }
                             });
                         } else {
                             _.each(allDataElements, function (dataElement) {
-                                _.each(dataElement.optionSet.options, function (option) {
-                                    option.isSelected = true;
-                                });
+                                markAllOptionsAsTrue(dataElement.optionSet.options);
                             });
                         }
                     };
