@@ -1,4 +1,3 @@
-/*global Date:true*/
 define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "timecop", "dhisId",
         "orgUnitRepository", "datasetRepository", "originOrgunitCreator", "excludedDataElementsRepository", "programRepository", "excludedLineListOptionsRepository", "translationsService"
     ],
@@ -443,7 +442,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     programRepository.get.and.returnValue(utils.getPromise(q, program));
                 });
                 
-                it("should save excluded line list options", function() {
+                it("should save excluded line list options for new module", function() {
                     scope.save();
                     scope.$apply();
 

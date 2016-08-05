@@ -296,7 +296,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 return excludedLineListOptionsRepository.upsert(excludedLineListOptions);
             };
 
-            $scope.save = function(module) {
+            $scope.save = function() {
                 var enrichedModule = {};
                 var populationDatasetId, referralDatasetId;
 
