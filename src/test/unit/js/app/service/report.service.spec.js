@@ -20,57 +20,11 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
         });
 
         describe('getReportDataForOrgUnit', function () {
-            it("should get report data for specified orgunit", function() {
-                var orgUnitId = "specifiedOrgUnitId",
-                    chartDefinition = {
-                        columns: [{
-                            dimension: 'columnDimensionId',
-                            items: [{
-                                id: 'columnDimensionItemA'
-                            }, {
-                                id: 'columnDimensionItemB'
-                            }]
-                        }],
-                        rows: [{
-                            dimension: 'rowDimensionId',
-                            items: [{
-                                id: 'rowDimensionItemA'
-                            }]
-                        }],
-                        filters: [{
-                            dimension: 'ou',
-                            items: [{
-                                id: 'configuredOrgUnitId'
-                            }]
-                        }, {
-                            dimension: 'filterDimensionId',
-                            items: [{
-                                id: 'filterDimensionItemA'
-                            }, {
-                                id: 'filterDimensionItemB'
-                            }]
-                        }]
-                    },
-                    chartData = { some: 'data' };
+            var chartDefinition, orgUnitId;
 
-                var expectedUrl = properties.dhis.url + "/api/analytics?dimension=columnDimensionId:columnDimensionItemA;columnDimensionItemB&" +
-                                                                       "dimension=rowDimensionId:rowDimensionItemA&" +
-                                                                       "filter=ou:" + orgUnitId + "&" +
-                                                                       "filter=filterDimensionId:filterDimensionItemA;filterDimensionItemB&" +
-                                                                       "lastUpdatedAt=" + currentMomentInTime.toISOString();
-
-                httpBackend.expectGET(expectedUrl).respond(200, chartData);
-
-                reportService.getReportDataForOrgUnit(chartDefinition, orgUnitId).then(function(reportData) {
-                    expect(reportData).toEqual(_.merge(chartData, { url: expectedUrl }));
-                });
-
-                httpBackend.flush();
-            });
-
-            it("should insert appropriate ou filter in the analytics GET url if it does not exist in chart definition", function() {
-                var orgUnitId = "ou1";
-                var chartDefinition = {
+            beforeEach(function () {
+                orgUnitId = 'someOrgUnitId';
+                chartDefinition = {
                     columns: [{
                         dimension: 'columnDimensionId',
                         items: [{
@@ -85,18 +39,72 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                             id: 'rowDimensionItemA'
                         }]
                     }],
-                    filters: []
+                    filters: [{
+                        dimension: 'ou',
+                        items: [{
+                            id: 'configuredOrgUnitId'
+                        }]
+                    }, {
+                        dimension: 'filterDimensionId',
+                        items: [{
+                            id: 'filterDimensionItemA'
+                        }, {
+                            id: 'filterDimensionItemB'
+                        }]
+                    }]
                 };
+            });
 
-                var expectedUrl = properties.dhis.url + "/api/analytics?dimension=columnDimensionId:columnDimensionItemA;columnDimensionItemB&" +
-                                                                       "dimension=rowDimensionId:rowDimensionItemA&" +
-                                                                       "filter=ou:" + orgUnitId + "&" +
-                                                                       "lastUpdatedAt=" + currentMomentInTime.toISOString();
-
-                httpBackend.expectGET(expectedUrl).respond(200, chartDefinition);
+            it('should download data for the specified dimensions and filters', function () {
+                httpBackend.expectGET(new RegExp(properties.dhis.url + '/api/analytics' +
+                    '.*dimension=columnDimensionId:columnDimensionItemA;columnDimensionItemB' +
+                    '.*dimension=rowDimensionId:rowDimensionItemA' +
+                    '.*filter=filterDimensionId:filterDimensionItemA;filterDimensionItemB'
+                )).respond(200, {});
 
                 reportService.getReportDataForOrgUnit(chartDefinition, orgUnitId);
+                httpBackend.flush();
+            });
 
+            it('should add a timestamp to the URL for cache-busting', function () {
+                httpBackend.expectGET(new RegExp('lastUpdatedAt=' + currentMomentInTime.toISOString())).respond(200, {});
+
+                reportService.getReportDataForOrgUnit(chartDefinition, orgUnitId);
+                httpBackend.flush();
+            });
+
+            it('should replace the existing orgUnit filter with the specified orgUnit', function () {
+                httpBackend.expectGET(new RegExp('filter=ou:' + orgUnitId)).respond(200, {});
+
+                reportService.getReportDataForOrgUnit(chartDefinition, orgUnitId);
+                httpBackend.flush();
+            });
+
+            it('should return the report data', function () {
+                var mockReportData = { some: 'data' };
+
+                httpBackend.expectGET(/.*/).respond(200, mockReportData);
+
+                reportService.getReportDataForOrgUnit(chartDefinition, orgUnitId).then(function(reportData) {
+                    expect(_.omit(reportData, 'url')).toEqual(mockReportData);
+                });
+                httpBackend.flush();
+            });
+
+            it('should return the url of the request', function () {
+                httpBackend.expectGET(/.*/).respond(200, {});
+
+                reportService.getReportDataForOrgUnit(chartDefinition, orgUnitId).then(function(reportData) {
+                    expect(reportData.url).toContain(properties.dhis.url);
+                });
+                httpBackend.flush();
+            });
+
+            it('should insert the orgUnit filter if it does not exist in chart definition', function() {
+                chartDefinition.filters = [];
+                httpBackend.expectGET(new RegExp('filter=ou:' + orgUnitId)).respond(200, {});
+
+                reportService.getReportDataForOrgUnit(chartDefinition, orgUnitId);
                 httpBackend.flush();
             });
         });
