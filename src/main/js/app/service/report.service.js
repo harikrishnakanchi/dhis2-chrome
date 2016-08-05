@@ -30,15 +30,7 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
             };
 
             return $http.get(dhisUrl.analytics, config).then(function(response) {
-                var queryString = _.map(config.params, function(values, key) {
-                    return _.map(_.flatten([values]), function(value) {
-                        return key + '=' + value;
-                    }).join("&");
-                }).join("&");
-
-                return _.merge(response.data, {
-                    "url": dhisUrl.analytics + "?" + queryString
-                });
+                return response.data;
             });
         };
 

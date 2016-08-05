@@ -91,15 +91,6 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                 httpBackend.flush();
             });
 
-            it('should return the url of the request', function () {
-                httpBackend.expectGET(/.*/).respond(200, {});
-
-                reportService.getReportDataForOrgUnit(chartDefinition, orgUnitId).then(function(reportData) {
-                    expect(reportData.url).toContain(properties.dhis.url);
-                });
-                httpBackend.flush();
-            });
-
             it('should insert the orgUnit filter if it does not exist in chart definition', function() {
                 chartDefinition.filters = [];
                 httpBackend.expectGET(new RegExp('filter=ou:' + orgUnitId)).respond(200, {});
