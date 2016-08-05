@@ -61,6 +61,7 @@ require.config({
         "loginController": "app/controller/login.controller",
         "countryController": "app/controller/country.controller",
         "confirmDialogController": "app/controller/confirm.dialog.controller",
+        "alertDialogController": "app/controller/alert.dialog.controller",
         "notificationDialogController": "app/controller/notification.dialog.controller",
         "projectUserController": "app/controller/project.user.controller",
         "indicatorController": "app/controller/indicator.controller",
