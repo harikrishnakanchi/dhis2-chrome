@@ -407,22 +407,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                                         }
                                     }
                                 }]
-                            }, {
-                                dataElementsWithOptions: [{
-                                    dataElement: {
-                                        isIncluded: false,
-                                        id: 'de5',
-                                        optionSet: {
-                                            options: [{
-                                                id: 'someOptionId',
-                                                isSelected: true
-                                            }, {
-                                                id: 'someOtherOptionId',
-                                                isSelected: true
-                                            }]
-                                        }
-                                    }
-                                }]
                             }]
                         }]
                     };
@@ -477,6 +461,40 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         }]
                     };
 
+                    expect(excludedLineListOptionsRepository.upsert).toHaveBeenCalledWith(excludedLineListOptions);
+                });
+
+                it("should save the empty excluded line list option if no option was unSelected", function () {
+                    scope.enrichedProgram = {
+                        programStages: [{
+                            programStageSections: [{
+                                dataElementsWithOptions: [{
+                                    dataElement: {
+                                        isIncluded: false,
+                                        id: 'de3',
+                                        optionSet: {
+                                            options: [{
+                                                id: 'someOptionId',
+                                                isSelected: true
+                                            }, {
+                                                id: 'someOtherOptionId',
+                                                isSelected: true
+                                            }]
+                                        }
+                                    }
+                                }]
+                            }]
+                        }]
+                    };
+
+                    scope.save();
+                    scope.$apply();
+
+                    var excludedLineListOptions = {
+                        moduleId: scope.enrichedModule.id,
+                        clientLastUpdated: moment().toISOString(),
+                        dataElements: []
+                    };
                     expect(excludedLineListOptionsRepository.upsert).toHaveBeenCalledWith(excludedLineListOptions);
                 });
             });
