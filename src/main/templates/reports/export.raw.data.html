@@ -1,5 +1,8 @@
-<div class="alert alert-danger" ng-if="orgUnit.lineListService">
+<div class="alert alert-danger" ng-if="orgUnit.lineListService && hasRoles(['Data entry user'])">
     {{ resourceBundle.noExportRawDataForLineLists }}
+</div>
+<div class="alert alert-danger" ng-if="orgUnit.lineListService && hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver'])">
+    {{ resourceBundle.noExportRawDataForLineListsForApprovers }}
 </div>
 <div ng-controller="exportRawDataController" ng-if="!orgUnit.lineListService">
     <div class="loading" ng-show="loading">
