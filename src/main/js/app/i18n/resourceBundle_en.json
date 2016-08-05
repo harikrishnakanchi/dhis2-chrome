@@ -317,5 +317,5 @@
     "stacked": "Stacked",
     "xAxisLabel": "Period",
     "downloadChart": "Download Chart",
-    "atleastTwoOptionsMustBeSelected": "Please select atleast two options"
+    "atleastTwoOptionsMustBeSelected": "At least two options need to be selected"
 }
