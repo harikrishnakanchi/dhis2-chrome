@@ -273,6 +273,29 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                         $scope.resourceBundle.uploadSystemSettingDesc + enrichedModule.name));
             };
 
+            var saveExcludedLineListOptions = function (enrichedModule) {
+                var dataElementsWithOptions = _.chain($scope.enrichedProgram.programStages)
+                    .map('programStageSections')
+                    .flatten()
+                    .map('dataElementsWithOptions')
+                    .flatten()
+                    .map('dataElement')
+                    .value();
+                var excludedLineListOptions = {};
+                excludedLineListOptions.moduleId = enrichedModule.id;
+                excludedLineListOptions.clientLastUpdated = moment().toISOString();
+                excludedLineListOptions.dataElements = _.transform(dataElementsWithOptions, function (dataElements, dataElement) {
+                    var excludedOptionIds = _.map(_.reject(dataElement.optionSet && dataElement.optionSet.options, 'isSelected'), 'id');
+                    if(excludedOptionIds.length) {
+                        dataElements.push({
+                            dataElementId: dataElement.id,
+                            excludedOptionIds: excludedOptionIds
+                        });
+                    }
+                });
+                return excludedLineListOptionsRepository.upsert(excludedLineListOptions);
+            };
+
             $scope.save = function(module) {
                 var enrichedModule = {};
                 var populationDatasetId, referralDatasetId;
@@ -344,36 +367,13 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     });
                 };
 
-                var saveExcludedLineListOptions = function () {
-                    var dataElementsWithOptions = _.chain($scope.enrichedProgram.programStages)
-                        .map('programStageSections')
-                        .flatten()
-                        .map('dataElementsWithOptions')
-                        .flatten()
-                        .map('dataElement')
-                        .value();
-                    var excludedLineListOptions = {};
-                    excludedLineListOptions.moduleId = enrichedModule.id;
-                    excludedLineListOptions.clientLastUpdated = moment().toISOString();
-                    excludedLineListOptions.dataElements = _.transform(dataElementsWithOptions, function (dataElements, dataElement) {
-                        var excludedOptionIds = _.map(_.reject(dataElement.optionSet && dataElement.optionSet.options, 'isSelected'), 'id');
-                        if(excludedOptionIds.length) {
-                            dataElements.push({
-                                dataElementId: dataElement.id,
-                                excludedOptionIds: excludedOptionIds
-                            });
-                        }
-                    });
-                    return excludedLineListOptionsRepository.upsert(excludedLineListOptions);
-                };
-
                 $scope.loading = true;
                 return getEnrichedModule($scope.module)
                     .then(createModule)
                     .then(_.partial(saveExcludedDataElements, enrichedModule))
                     .then(createOriginOrgUnitsAndGroups)
                     .then(associateMandatoryDatasetsToModule)
-                    .then(saveExcludedLineListOptions)
+                    .then(_.partial(saveExcludedLineListOptions, enrichedModule))
                     .then(_.partial(onSuccess, enrichedModule), onError)
                     .finally(function() {
                         $scope.loading = false;
