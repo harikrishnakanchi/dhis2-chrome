@@ -461,6 +461,25 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     expect(excludedLineListOptionsRepository.upsert).toHaveBeenCalledWith(excludedLineListOptions);
                 });
 
+                it('should update excluded line list options for existing module', function () {
+                    scope.update(scope.module);
+                    scope.$apply();
+
+                    var excludedLineListOptions = {
+                        moduleId: scope.module.id,
+                        clientLastUpdated: moment().toISOString(),
+                        dataElements: [{
+                            dataElementId: 'de3',
+                            excludedOptionIds: ['someOtherOptionId']
+                        }, {
+                            dataElementId: 'de4',
+                            excludedOptionIds: ['someOptionId', 'someOtherOptionId']
+                        }]
+                    };
+
+                    expect(excludedLineListOptionsRepository.upsert).toHaveBeenCalledWith(excludedLineListOptions);
+                });
+
                 describe('onOptionSelectionChange', function () {
                     beforeEach(function () {
                         spyOn(fakeModal, "open").and.returnValue({
@@ -769,6 +788,17 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     'programStages': [{
                         'programStageSections': [{
                             'programStageDataElements': [{
+                                'dataElement': {
+                                    'isIncluded': false,
+                                    'id': 'de3'
+                                }
+                            }, {
+                                'dataElement': {
+                                    'isIncluded': true,
+                                    'id': 'de4'
+                                }
+                            }],
+                            'dataElementsWithOptions': [{
                                 'dataElement': {
                                     'isIncluded': false,
                                     'id': 'de3'

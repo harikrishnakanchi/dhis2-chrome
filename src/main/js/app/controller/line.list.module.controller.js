@@ -384,10 +384,12 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 var enrichedModule = orgUnitMapper.mapToModule(module, module.id, 6);
 
                 $scope.loading = true;
-                return $q.all([saveExcludedDataElements(enrichedModule),
-                        orgUnitRepository.upsert(enrichedModule),
-                        publishMessage(enrichedModule, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + enrichedModule.name)
-                    ])
+                return $q.all([
+                    saveExcludedDataElements(enrichedModule),
+                    saveExcludedLineListOptions(enrichedModule),
+                    orgUnitRepository.upsert(enrichedModule),
+                    publishMessage(enrichedModule, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + enrichedModule.name)
+                ])
                     .then(_.partial(onSuccess, enrichedModule), onError)
                     .finally(function() {
                         $scope.loading = false;
