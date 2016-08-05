@@ -1,31 +1,23 @@
 define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
     return function($http, $q) {
+        var ORG_UNIT_DIMENSION = 'ou';
+
         this.getReportDataForOrgUnit = function(report, orgUnit) {
-            var buildDimension = function() {
-                var columnDimensions = _.map(report.columns, function(col) {
-                    return col.dimension + ":" + _.pluck(col.items, "id").join(";");
+            var buildDimensions = function (dimensionConfig) {
+                return _.map(dimensionConfig, function (config) {
+                    var items = config.dimension == ORG_UNIT_DIMENSION ? [orgUnit] : _.map(config.items, 'id');
+                    return config.dimension + ":" + items.join(';');
                 });
-
-                var rowDimensions = _.map(report.rows, function(row) {
-                    return row.dimension + ":" + _.pluck(row.items, "id").join(";");
-                });
-
-                return _.flatten([columnDimensions, rowDimensions]);
-            };
-
-            var buildFilters = function() {
-                return _.transform(report.filters, function(result, filter) {
-                    if (filter.dimension === "ou")
-                        return;
-                    result.push(filter.dimension + ":" + _.pluck(filter.items, "id").join(";"));
-                }, ["ou:" + orgUnit]);
             };
 
             var config = {
                 params: {
-                    "dimension": buildDimension(),
-                    "filter": buildFilters(),
-                    "lastUpdatedAt": moment().toISOString() //required for cache-busting purposes
+                    dimension: _.flatten([
+                        buildDimensions(report.columns),
+                        buildDimensions(report.rows)
+                    ]),
+                    filter: buildDimensions(report.filters),
+                    lastUpdatedAt: moment().toISOString() //required for cache-busting purposes
                 }
             };
 

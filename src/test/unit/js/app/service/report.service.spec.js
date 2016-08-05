@@ -80,6 +80,21 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                 httpBackend.flush();
             });
 
+            it('should replace the existing orgUnit row dimensions', function () {
+                chartDefinition = {
+                    rows: [{
+                        dimension: 'ou',
+                        items: [{
+                            id: 'configuredOrgUnitId'
+                        }]
+                    }]
+                };
+                httpBackend.expectGET(new RegExp('dimension=ou:' + orgUnitId)).respond(200, {});
+
+                reportService.getReportDataForOrgUnit(chartDefinition, orgUnitId);
+                httpBackend.flush();
+            });
+
             it('should return the report data', function () {
                 var mockReportData = { some: 'data' };
 
@@ -88,14 +103,6 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                 reportService.getReportDataForOrgUnit(chartDefinition, orgUnitId).then(function(reportData) {
                     expect(_.omit(reportData, 'url')).toEqual(mockReportData);
                 });
-                httpBackend.flush();
-            });
-
-            it('should insert the orgUnit filter if it does not exist in chart definition', function() {
-                chartDefinition.filters = [];
-                httpBackend.expectGET(new RegExp('filter=ou:' + orgUnitId)).respond(200, {});
-
-                reportService.getReportDataForOrgUnit(chartDefinition, orgUnitId);
                 httpBackend.flush();
             });
         });
