@@ -243,6 +243,15 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 modalInstance.result.then(okCallback);
             };
 
+            var showAlert = function(messages) {
+                $scope.modalMessages = messages;
+                $modal.open({
+                    templateUrl: 'templates/alert-dialog.html',
+                    controller: 'alertDialogController',
+                    scope: $scope
+                });
+            };
+
             $scope.disable = function(module) {
                 var modalMessages = {
                     "confirmationMessage": $scope.resourceBundle.disableOrgUnitConfirmationMessage
@@ -404,7 +413,11 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 var areAtleastTwoOptionsSelected = _.filter(optionSet.options, {isSelected: true}).length >= 2;
                 if(!areAtleastTwoOptionsSelected) {
                     option.isSelected = true;
-                    showModal(function () {}, $scope.resourceBundle.atleastTwoOptionsMustBeSelected);
+                    var modalMessages = {
+                        confirmationMessage: $scope.resourceBundle.atleastTwoOptionsMustBeSelected,
+                        ok: $scope.resourceBundle.okLabel
+                    };
+                    showAlert(modalMessages);
                 }
             };
 
