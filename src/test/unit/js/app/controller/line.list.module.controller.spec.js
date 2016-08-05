@@ -327,7 +327,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             });
 
             describe('excludedLineListOptions', function () {
-                it("should save excluded line list options", function() {
+                beforeEach(function () {
                     var today = new Date();
                     scope.$apply();
 
@@ -441,7 +441,9 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
                     scope.program = program;
                     programRepository.get.and.returnValue(utils.getPromise(q, program));
-
+                });
+                
+                it("should save excluded line list options", function() {
                     scope.save();
                     scope.$apply();
 
