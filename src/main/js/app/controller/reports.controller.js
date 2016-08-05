@@ -1,5 +1,5 @@
 define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURItoBlob"], function(d3, _, moment, CustomAttributes, SVGUtils, dataURItoBlob) {
-    return function($scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService) {
+    return function($rootScope, $scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService, changeLogRepository) {
 
         var formatYAxisTicks = function(datum) {
             var isFraction = function(x) { return x % 1 !== 0; };
@@ -330,6 +330,21 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             return $q.when();
         };
 
+        var loadLastUpdatedForChartsAndReports = function () {
+            var projectId = $rootScope.currentUser.selectedProject.id;
+            return $q.all({
+                monthlyChartsLastUpdated: changeLogRepository.get('monthlyChartData:' + projectId),
+                weeklyChartsLastUpdated: changeLogRepository.get('weeklyChartData:' + projectId),
+                monthlyPivotTableLastUpdated: changeLogRepository.get('monthlyPivotTableData:' + projectId),
+                weeklyPivotTableDataLastUpdated: changeLogRepository.get('weeklyPivotTableData:' + projectId)
+            }).then(function (data) {
+                $scope.updatedForWeeklyChart = data.weeklyChartsLastUpdated;
+                $scope.updatedForWeeklyPivotTable = data.weeklyPivotTableDataLastUpdated;
+                $scope.updatedForMonthlyChart = data.monthlyChartsLastUpdated;
+                $scope.updatedForMonthlyPivotTable = data.monthlyPivotTableLastUpdated;
+            });
+        };
+
         var init = function() {
             $scope.loading = true;
 
@@ -340,6 +355,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 .then(loadRelevantDatasets)
                 .then(loadChartsWithData)
                 .then(loadPivotTablesWithData)
+                .then(loadLastUpdatedForChartsAndReports)
                 .then(prepareDataForView)
                 .finally(function() {
                     $scope.loading = false;
