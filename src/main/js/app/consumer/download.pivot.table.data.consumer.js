@@ -21,7 +21,7 @@ define(["lodash", "moment"], function(_, moment) {
                         return $q.when({});
 
                     var datum = orgUnitsAndTables.pop();
-                    return reportService.getReportDataForOrgUnit(datum.pivotTable, datum.orgUnitId).then(onSuccess, onFailure);
+                    return reportService.getReportDataForOrgUnit(datum.pivotTable, datum.orgUnitDimensionItems).then(onSuccess, onFailure);
                 };
 
                 var getModuleInformation = function() {
@@ -57,7 +57,8 @@ define(["lodash", "moment"], function(_, moment) {
                             _.forEach(pivotTablesForDataSet, function(pivotTable) {
                                 modulesAndPivotTables.push({
                                     orgUnitId: moduleId,
-                                    pivotTable: pivotTable
+                                    pivotTable: pivotTable,
+                                    orgUnitDimensionItems: pivotTable.geographicOriginReport ? _.map(moduleInformation[moduleId].origins, 'id') : moduleId
                                 });
                             });
                         });
@@ -71,7 +72,8 @@ define(["lodash", "moment"], function(_, moment) {
                     _.forEach(projectReportPivotTables, function(pivotTable) {
                         orgUnitsAndTables.push({
                             orgUnitId: projectId,
-                            pivotTable: pivotTable
+                            pivotTable: pivotTable,
+                            orgUnitDimensionItems: projectId
                         });
                     });
                     return $q.when(orgUnitsAndTables);

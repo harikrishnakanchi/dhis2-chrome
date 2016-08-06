@@ -135,6 +135,26 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModule.id, mockOrigin.id]);
             });
 
+            it('should download pivot table data using origin orgUnits for geographicOriginReports', function () {
+                var mockOrigin = {
+                    'id': 'mockOriginId'
+                };
+                var geographicOriginPivotTable = {
+                    id: 'mockTableId',
+                    name: 'mockTableName',
+                    dataSetCode: mockDataSet.code,
+                    weeklyReport: true,
+                    geographicOriginReport: true
+                };
+                orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, [mockOrigin]));
+                pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [geographicOriginPivotTable]));
+
+                downloadPivotTableDataConsumer.run();
+                scope.$apply();
+
+                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(geographicOriginPivotTable, [mockOrigin.id]);
+            });
+
             it('should retrieve the lastUpdated time in the changeLog', function () {
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();
