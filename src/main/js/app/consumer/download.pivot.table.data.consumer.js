@@ -24,32 +24,35 @@ define(["lodash", "moment"], function(_, moment) {
                     return reportService.getReportDataForOrgUnit(datum.pivotTable, datum.orgUnitId).then(onSuccess, onFailure);
                 };
 
-                var getDatasetsForEachModuleAndItsOrigins = function() {
-                    var moduleIdsAndOrigins = _.transform(userModuleIds, function(mapOfModuleIdsToOrigins, moduleId) {
-                        mapOfModuleIdsToOrigins[moduleId] = orgUnitRepository.findAllByParent([moduleId]);
-                    }, {});
-
-                    var getAllDataSetsUnderModule = function(moduleIdAndOrigins) {
-                        var modulesAndAllDataSets = _.transform(moduleIdAndOrigins, function(mapOfModuleIdsToDataSets, origins, moduleId) {
-                            var orgUnitIds = [moduleId];
-                            if(!_.isEmpty(origins)) {
-                                orgUnitIds.push(_.first(origins).id);
-                            }
-                            mapOfModuleIdsToDataSets[moduleId] = datasetRepository.findAllForOrgUnits(orgUnitIds);
-                        }, {});
-
-                        return $q.all(modulesAndAllDataSets);
+                var getModuleInformation = function() {
+                    var getOriginsForModule = function (data) {
+                        return orgUnitRepository.findAllByParent([data.moduleId]).then(function (origins) {
+                            return _.merge({ origins: origins }, data);
+                        });
                     };
 
-                    return $q.all(moduleIdsAndOrigins)
-                        .then(getAllDataSetsUnderModule);
+                    var getDataSetsForModuleAndOrigins = function (data) {
+                        var orgUnitIds = [data.moduleId];
+                        if(!_.isEmpty(data.origins)) {
+                            orgUnitIds.push(_.first(data.origins).id);
+                        }
+                        return datasetRepository.findAllForOrgUnits(orgUnitIds).then(function (dataSets) {
+                            return _.merge({ dataSets: dataSets }, data);
+                        });
+                    };
+
+                    var moduleInfoPromises = _.transform(userModuleIds, function (promises, moduleId) {
+                        promises[moduleId] = getOriginsForModule({ moduleId: moduleId }).then(getDataSetsForModuleAndOrigins);
+                    }, {});
+
+                    return $q.all(moduleInfoPromises);
                };
 
-                var filterPivotTablesForEachModule = function(datasetsByModule) {
+                var filterPivotTablesForEachModule = function(moduleInformation) {
                     var modulesAndPivotTables = [];
 
                     _.forEach(userModuleIds, function(moduleId) {
-                        _.forEach(datasetsByModule[moduleId], function(dataSet) {
+                        _.forEach(moduleInformation[moduleId].dataSets, function(dataSet) {
                             var pivotTablesForDataSet = _.filter(pivotTables, { dataSetCode: dataSet.code });
                             _.forEach(pivotTablesForDataSet, function(pivotTable) {
                                 modulesAndPivotTables.push({
@@ -74,7 +77,7 @@ define(["lodash", "moment"], function(_, moment) {
                     return $q.when(orgUnitsAndTables);
                 };
 
-                return getDatasetsForEachModuleAndItsOrigins()
+                return getModuleInformation()
                     .then(filterPivotTablesForEachModule)
                     .then(addProjectReportPivotTables)
                     .then(recursivelyDownloadAndUpsertPivotTableData)
