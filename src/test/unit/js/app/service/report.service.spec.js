@@ -80,6 +80,14 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                 httpBackend.flush();
             });
 
+            it('should replace the existing orgUnit filter with multiple specified orgUnits', function () {
+                var orgUnitIds = ['someOrgUnitIdA', 'someOrgUnitIdB'];
+                httpBackend.expectGET(new RegExp('filter=ou:' + orgUnitIds.join(';'))).respond(200, {});
+
+                reportService.getReportDataForOrgUnit(chartDefinition, orgUnitIds);
+                httpBackend.flush();
+            });
+
             it('should replace the existing orgUnit row dimensions', function () {
                 chartDefinition = {
                     rows: [{
