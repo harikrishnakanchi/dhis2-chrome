@@ -3,9 +3,11 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
         var ORG_UNIT_DIMENSION = 'ou';
 
         this.getReportDataForOrgUnit = function(report, orgUnit) {
+            var orgUnits = _.isArray(orgUnit) ? orgUnit : [orgUnit];
+
             var buildDimensions = function (dimensionConfig) {
                 return _.map(dimensionConfig, function (config) {
-                    var items = config.dimension == ORG_UNIT_DIMENSION ? [orgUnit] : _.map(config.items, 'id');
+                    var items = config.dimension == ORG_UNIT_DIMENSION ? orgUnits : _.map(config.items, 'id');
                     return config.dimension + ":" + items.join(';');
                 });
             };
