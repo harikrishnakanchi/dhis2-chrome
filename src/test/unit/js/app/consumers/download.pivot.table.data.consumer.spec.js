@@ -131,7 +131,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
-                expect(orgUnitRepository.findAllByParent).toHaveBeenCalledWith([mockModule.id]);
+                expect(orgUnitRepository.findAllByParent).toHaveBeenCalledWith(mockModule.id);
                 expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModule.id, mockOrigin.id]);
             });
 
@@ -259,6 +259,5 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
 
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(mockProjectReport, mockProjectId);
             });
-
         });
     });

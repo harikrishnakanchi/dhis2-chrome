@@ -26,7 +26,7 @@ define(["lodash", "moment"], function(_, moment) {
 
                 var getModuleInformation = function() {
                     var getOriginsForModule = function (data) {
-                        return orgUnitRepository.findAllByParent([data.moduleId]).then(function (origins) {
+                        return orgUnitRepository.findAllByParent(data.moduleId).then(function (origins) {
                             return _.merge({ origins: origins }, data);
                         });
                     };
