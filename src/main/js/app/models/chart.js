@@ -13,6 +13,7 @@ define([], function() {
         this.dataSetCode = parseDataSetCode(this.name);
         this.displayPosition = parseDisplayPosition(this.name);
 
+        this.geographicOriginChart = this.dataSetCode == 'GeographicOrigin';
         this.monthlyChart = isMonthlyChart(config.relativePeriods);
         this.weeklyChart = !this.monthlyChart;
     };

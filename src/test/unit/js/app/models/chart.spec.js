@@ -40,6 +40,18 @@ define(['chart'], function(Chart) {
             });
         });
 
+        describe('geographicOriginChart', function() {
+            it('should return true if chart name contains GeographicOrigin', function() {
+                chart = Chart.create({ name: '[FieldApp - GeographicOrigin] # Name' });
+                expect(chart.geographicOriginChart).toBeTruthy();
+            });
+
+            it('should return false if chart name does not contain GeographicOrigin', function() {
+                chart = Chart.create({ name: 'some malformed chart name' });
+                expect(chart.geographicOriginChart).toBeFalsy();
+            });
+        });
+
         describe('displayPosition', function() {
             it('should parse the position from the chart name', function() {
                 chart = Chart.create({

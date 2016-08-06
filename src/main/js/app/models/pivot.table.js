@@ -19,6 +19,7 @@ define(['lodash'], function (_) {
 
         this.dataSetCode = parseDatasetCode(this.name);
         this.projectReport = this.dataSetCode == 'ProjectReport';
+        this.geographicOriginReport = this.dataSetCode == 'GeographicOrigin';
         this.monthlyReport = isMonthlyReport(config.relativePeriods);
         this.weeklyReport = !this.monthlyReport;
 
