@@ -74,6 +74,18 @@ define(['pivotTable'], function(PivotTable) {
            });
        });
 
+       describe('geographicOriginReport', function() {
+           it('should return true if pivot table name contains GeographicOrigin', function() {
+               pivotTable = PivotTable.create({ name: '[FieldApp - GeographicOrigin] # Name' });
+               expect(pivotTable.geographicOriginReport).toBeTruthy();
+           });
+
+           it('should return false if pivot table name does not contain GeographicOrigin', function() {
+               pivotTable = PivotTable.create({ name: 'some malformed pivot table name' });
+               expect(pivotTable.geographicOriginReport).toBeFalsy();
+           });
+       });
+
        describe('monthlyReport', function() {
            it('should return true if relativePeriods contains Months', function () {
                pivotTable = PivotTable.create({ relativePeriods: { last12Months: true } });
