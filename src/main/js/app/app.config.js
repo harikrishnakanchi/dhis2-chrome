@@ -176,6 +176,7 @@ require.config({
         "packagedDataImporter": "app/helpers/packaged.data.importer",
         "sessionHelper": "app/helpers/session.helper",
         "originOrgunitCreator": "app/helpers/origin.orgunit.creator",
+        "historyHelper": "app/helpers/history.helper",
 
         //Directives
         "directives": "app/directives/directives",
