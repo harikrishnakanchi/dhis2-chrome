@@ -11,11 +11,12 @@ define(["lodash"], function (_) {
             });
         };
 
-        this.back = function () {
+        this.back = function (searchParams) {
             var previousState = history.pop();
             if (!previousState)
                 return;
-            $location.path(previousState.path).search(previousState.search);
+            var mergedSearchParams = _.assign({}, previousState.search, searchParams);
+            $location.path(previousState.path).search(mergedSearchParams);
         };
     };
 });

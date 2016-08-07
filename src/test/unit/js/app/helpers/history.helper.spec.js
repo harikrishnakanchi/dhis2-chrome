@@ -28,6 +28,14 @@ define(['historyHelper', 'angularMocks'], function (HistoryHelper, mocks) {
             expect(location.path).toHaveBeenCalledWith(mockPath);
         });
 
+        it('should merge the search params to last url', function() {
+            var searchParams = { c : 3};
+            var expectedSearchParams = _.assign({}, mockSearch, searchParams);
+            historyHelper.pushState();
+            historyHelper.back( searchParams );
+            expect(location.search).toHaveBeenCalledWith(expectedSearchParams);
+        });
+
         it('should not go back any page if there is no pushed state', function() {
             historyHelper.back();
             expect(location.search).not.toHaveBeenCalled();
