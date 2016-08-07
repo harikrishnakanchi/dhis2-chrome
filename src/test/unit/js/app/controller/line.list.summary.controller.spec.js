@@ -1,12 +1,12 @@
 define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment", "interpolate", "programRepository", "programEventRepository", "excludedDataElementsRepository",
-        "orgUnitRepository", "approvalDataRepository", "referralLocationsRepository", "dataSyncFailureRepository", "translationsService", "filesystemService"
+        "orgUnitRepository", "approvalDataRepository", "referralLocationsRepository", "dataSyncFailureRepository", "translationsService", "filesystemService", "historyHelper"
     ],
-    function(LineListSummaryController, mocks, utils, timecop, moment, interpolate, ProgramRepository, ProgramEventRepository, ExcludedDataElementsRepository, OrgUnitRepository, ApprovalDataRepository, ReferralLocationsRepository, DataSyncFailureRepository, TranslationsService, FilesystemService) {
+    function(LineListSummaryController, mocks, utils, timecop, moment, interpolate, ProgramRepository, ProgramEventRepository, ExcludedDataElementsRepository, OrgUnitRepository, ApprovalDataRepository, ReferralLocationsRepository, DataSyncFailureRepository, TranslationsService, FilesystemService, HistoryHelper) {
         describe("lineListSummaryController ", function() {
             var scope, q, hustle, timeout, fakeModal, anchorScroll, location, routeParams, window, currentTime,
                 lineListSummaryController,
                 programRepository, programEventRepository, referralLocationsRepository, approvalDataRepository, excludedDataElementsRepository, orgUnitRepository, dataSyncFailureRepository, translationsService,
-                systemSettings, currentModule, originOrgUnits, program, project, mockEvent, filesystemService;
+                systemSettings, currentModule, originOrgUnits, program, project, mockEvent, filesystemService, historyHelper;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout, $location, $window) {
@@ -98,6 +98,8 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                 filesystemService = new FilesystemService();
                 spyOn(filesystemService, 'promptAndWriteFile').and.returnValue(utils.getPromise(q, {}));
 
+                historyHelper = new HistoryHelper(location);
+
                 systemSettings = {
                     "orgUnit": "ou1",
                     "clientLastUpdated": "2014-12-29T05:06:30.950+0000",
@@ -175,7 +177,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
             });
 
             var createLineListSummary = function () {
-                lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, excludedDataElementsRepository, orgUnitRepository, approvalDataRepository, referralLocationsRepository, dataSyncFailureRepository, translationsService, filesystemService);
+                lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, historyHelper, programRepository, programEventRepository, excludedDataElementsRepository, orgUnitRepository, approvalDataRepository, referralLocationsRepository, dataSyncFailureRepository, translationsService, filesystemService);
             };
 
             var createMockEvent = function (options) {

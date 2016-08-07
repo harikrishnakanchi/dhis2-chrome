@@ -68,7 +68,8 @@
 
                         <div class="col-md-4" ng-class="layoutDirection.direction == 'rtl' ? 'pull-right' : 'pull-left'">
                             <a class="btn btn-primary new-case-btn" ng-class="layoutDirection.direction != 'rtl' ? 'pull-right' : 'pull-left'"
-                               ng-href="#/line-list-data-entry/{{selectedModuleId}}/new?returnTo={{currentUrl}}">
+                               ng-click="pushToHistory()"
+                               ng-href="#/line-list-data-entry/{{selectedModuleId}}/new">
                                 {{resourceBundle.newCaseBtnValue}}
                             </a>
                         </div>
@@ -135,7 +136,7 @@
                                                 <a href title="Complete" ng-if="event.localStatus==='NEW_DRAFT' || event.localStatus==='UPDATED_DRAFT'" class="submitted disabled-link"><span class="glyphicon glyphicon-star"></span></a>
                                             </td>
                                             <td>
-                                                <a href title="{{resourceBundle.editLabel}}" ng-href="#/line-list-data-entry/{{selectedModuleId}}/{{event.event}}?returnTo={{currentUrl}}" class="edit"><span class="glyphicon glyphicon-edit"></span></a>
+                                                <a href title="{{resourceBundle.editLabel}}" ng-click="pushToHistory()" ng-href="#/line-list-data-entry/{{selectedModuleId}}/{{event.event}}" class="edit"><span class="glyphicon glyphicon-edit"></span></a>
                                             </td>
                                             <td>
                                                 <a href title="{{resourceBundle.deleteLabel}}" ng-click="deleteEvent(event)" title="Delete" class="delete"><span class="glyphicon glyphicon-trash"></span></a>

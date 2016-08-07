@@ -1,8 +1,8 @@
-define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timecop", "programEventRepository", "optionSetRepository", "orgUnitRepository", "excludedDataElementsRepository", "programRepository", "translationsService"],
-    function(LineListDataEntryController, mocks, utils, moment, timecop, ProgramEventRepository, OptionSetRepository, OrgUnitRepository, ExcludedDataElementsRepository, ProgramRepository, TranslationsService) {
+define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timecop", "programEventRepository", "optionSetRepository", "orgUnitRepository", "excludedDataElementsRepository", "programRepository", "translationsService", "historyHelper"],
+    function(LineListDataEntryController, mocks, utils, moment, timecop, ProgramEventRepository, OptionSetRepository, OrgUnitRepository, ExcludedDataElementsRepository, ProgramRepository, TranslationsService, HistoryHelper) {
         describe("lineListDataEntryController ", function() {
 
-            var scope, lineListDataEntryController, q, routeparams, location, programEventRepository, mockStore, allEvents, optionSets, originOrgUnits, optionSetRepository, optionSetMapping, orgUnitRepository, excludedDataElementsRepository, programRepository, anchorScroll, translationsService;
+            var scope, lineListDataEntryController, q, routeparams, location, programEventRepository, mockStore, allEvents, optionSets, originOrgUnits, optionSetRepository, optionSetMapping, orgUnitRepository, excludedDataElementsRepository, programRepository, anchorScroll, translationsService, historyHelper;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $location, $anchorScroll) {
@@ -29,9 +29,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     }]
                 };
 
-                spyOn(location, "path").and.returnValue(location);
-                spyOn(location, "search").and.returnValue("something");
-
+                spyOn(location, "hash");
 
                 programEventRepository = new ProgramEventRepository();
                 spyOn(programEventRepository, "upsert").and.returnValue(utils.getPromise(q, []));
@@ -44,6 +42,8 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 optionSetRepository = new OptionSetRepository();
                 spyOn(optionSetRepository, "getOptionSetMapping").and.returnValue(utils.getPromise(q, optionSetMapping));
 
+                historyHelper = new HistoryHelper(location);
+                spyOn(historyHelper, "back");
 
                 var module = {
                     "id": "mod1",
@@ -66,7 +66,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, module));
                 spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, originOrgUnits));
                 spyOn(orgUnitRepository, "getParentProject").and.returnValue(utils.getPromise(q, {}));
-
 
                 excludedDataElementsRepository = new ExcludedDataElementsRepository();
                 spyOn(excludedDataElementsRepository, "get").and.returnValue(utils.getPromise(q, {}));
@@ -131,7 +130,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 Timecop.install();
                 Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
 
-                lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
+                lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, historyHelper, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
                 scope.$apply();
             }));
 
@@ -196,7 +195,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 optionSetRepository.getOptionSetMapping.and.returnValue(utils.getPromise(q, optionSetMapping));
                 translationsService.translateOptionSetMap.and.returnValue(optionSetMapping.optionSetMap);
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
+                var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, historyHelper, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
                 scope.$apply();
 
                 expect(scope.dataValues).toEqual({
@@ -213,9 +212,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
             });
 
             it("should save event details as newDraft and show summary view", function() {
-                var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
-                scope.$apply();
-
                 scope.dataValues = {
                     'de1': "2015-02-03",
                     'de2': "someValue",
@@ -259,18 +255,13 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     "dataElement": 'de5',
                     "value": moment('2015-02-05 20:00:00').toISOString()
                 }]);
-                expect(location.path).toHaveBeenCalledWith("/line-list-summary/mod1");
-                expect(location.search).toHaveBeenCalledWith({
+                expect(historyHelper.back).toHaveBeenCalledWith({
                     "messageType": "success",
                     "message": scope.resourceBundle.eventSaveSuccess
                 });
             });
 
             it("should save event details as newDraft and show data entry form again", function() {
-                spyOn(location, "hash");
-                var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
-                scope.$apply();
-
                 scope.patientOrigin = {
                     "selected": originOrgUnits[0]
                 };
@@ -282,17 +273,13 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 scope.save(true);
 
-                expect(location.path).not.toHaveBeenCalledWith("/line-list-summary/mod1");
-                expect(location.search).not.toHaveBeenCalled();
+                expect(historyHelper.back).not.toHaveBeenCalled();
                 expect(location.hash).toHaveBeenCalled();
 
                 scope.$apply();
             });
 
             it("should update event details", function() {
-                var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
-                scope.$apply();
-
                 scope.patientOrigin = {
                     "selected": originOrgUnits[0]
                 };
@@ -335,8 +322,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
             });
 
             it("should save incomplete events", function() {
-                var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
-                scope.$apply();
                 scope.dataValues = {
                     'de1': "2015-02-03",
                     'de2': undefined,

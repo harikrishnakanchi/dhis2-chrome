@@ -1,5 +1,5 @@
 define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, moment, dhisId, dateUtils, properties) {
-    return function($scope, $rootScope, $routeParams, $location, $anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService) {
+    return function($scope, $rootScope, $routeParams, $location, $anchorScroll, historyHelper, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService) {
 
         var resetForm = function() {
             $scope.form = $scope.form || {};
@@ -106,7 +106,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
         };
 
         $scope.loadEventsView = function() {
-            $location.path($routeParams.returnTo);
+            historyHelper.back();
         };
 
         $scope.isEventDateSubstitute = function(dataElement) {
@@ -130,7 +130,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             $scope.event.dataValues = dataValuesAndEventDate.dataValues;
 
             programEventRepository.upsert($scope.event).then(function() {
-                $location.path($routeParams.returnTo).search({
+                historyHelper.back({
                     'messageType': 'success',
                     "message": $scope.resourceBundle.eventSaveSuccess
                 });
@@ -163,7 +163,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                     setEventMinAndMaxDate();
                     scrollToTop(eventId);
                 } else {
-                    $location.path($routeParams.returnTo).search({
+                    historyHelper.back({
                         'messageType': 'success',
                         "message": $scope.resourceBundle.eventSaveSuccess
                     });

@@ -1,9 +1,8 @@
 define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], function(_, moment, properties, orgUnitMapper, interpolate) {
-    return function($scope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, programRepository, programEventRepository, excludedDataElementsRepository,
+    return function($scope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, historyHelper, programRepository, programEventRepository, excludedDataElementsRepository,
         orgUnitRepository, approvalDataRepository, referralLocationsRepository, dataSyncFailureRepository, translationsService, filesystemService) {
 
         $scope.filterParams = {};
-        $scope.currentUrl = $location.path();
         $scope.loadingResults = false;
         $scope.showOfflineSummaryForViewOnly = true;
         $scope.viewRegistrationBook = false;
@@ -87,8 +86,8 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
             }
 
             if ($scope.filterBy === "caseNumber") {
-                $scope.filterParams.caseNumber = "";
-                $scope.events = undefined;
+                $scope.filterParams.caseNumber = $location.search().caseNumber;
+                $scope.filterByCaseNumber();
             }
 
         };
@@ -342,6 +341,16 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
             $scope.week = data[1];
             init();
         });
+
+        $scope.pushToHistory = function () {
+            var currentSearchState = {
+                filterBy : $scope.filterBy,
+                startDate: $scope.filterParams.startDate,
+                endDate: $scope.filterParams.endDate,
+                caseNumber: $scope.filterParams.caseNumber
+            };
+            historyHelper.pushState(currentSearchState);
+        };
 
         var init = function() {
 
