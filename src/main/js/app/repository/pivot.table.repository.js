@@ -1,4 +1,4 @@
-define(["lodash", "pivotTable"], function(_, PivotTableModel) {
+define(["lodash", "pivotTable", "pivotTableData"], function(_, PivotTableModel, PivotTableData) {
     return function(db, $q) {
         var PIVOT_TABLE_STORE_NAME = 'pivotTableDefinitions';
         var PIVOT_TABLE_DATA_STORE_NAME = 'pivotTableData';
@@ -36,6 +36,13 @@ define(["lodash", "pivotTable"], function(_, PivotTableModel) {
             var store = db.objectStore(PIVOT_TABLE_DATA_STORE_NAME);
             return store.find([pivotTableName, orgUnitId]).then(function (pivotTableData) {
                 return !!pivotTableData && pivotTableData.data;
+            });
+        };
+
+        this.getPivotTableData = function (pivotTableDefinition, orgUnitId) {
+            var store = db.objectStore(PIVOT_TABLE_DATA_STORE_NAME);
+            return store.find([pivotTableDefinition.name, orgUnitId]).then(function (pivotTableData) {
+                return PivotTableData.create(pivotTableDefinition, pivotTableData.data);
             });
         };
     };
