@@ -7,6 +7,8 @@ define(['pivotTableData'], function(PivotTableData) {
                 title: 'someTitle',
                 dataSetCode: 'someDataSetCode',
                 displayPosition: 'someDisplayPosition',
+                weeklyReport: 'someBooleanValue',
+                monthlyReport: 'anotherBooleanValue',
                 dataDimensionItems: [{
                     dataElement: {
                         id: 'someDataElementId',
@@ -60,6 +62,8 @@ define(['pivotTableData'], function(PivotTableData) {
                 expect(pivotTableData.title).toEqual(definition.title);
                 expect(pivotTableData.dataSetCode).toEqual(definition.dataSetCode);
                 expect(pivotTableData.displayPosition).toEqual(definition.displayPosition);
+                expect(pivotTableData.weeklyReport).toEqual(definition.weeklyReport);
+                expect(pivotTableData.monthlyReport).toEqual(definition.monthlyReport);
             });
         });
 
@@ -72,6 +76,22 @@ define(['pivotTableData'], function(PivotTableData) {
                     ou: 'someOrgUnitId',
                     value: 'someValue'
                 }]);
+            });
+        });
+
+        describe('isTableDataAvailable', function () {
+            it('should return true if data values exist', function() {
+                data.rows = ['someDataValue'];
+                pivotTableData = PivotTableData.create({}, data);
+
+                expect(pivotTableData.isTableDataAvailable).toEqual(true);
+            });
+
+            it('should return false if data values do not exist', function() {
+                data.rows = [];
+                pivotTableData = PivotTableData.create({}, data);
+
+                expect(pivotTableData.isTableDataAvailable).toEqual(false);
             });
         });
 

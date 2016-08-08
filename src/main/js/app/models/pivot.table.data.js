@@ -4,7 +4,11 @@ define(['lodash'], function(_) {
         this.title = definition.title;
         this.dataSetCode = definition.dataSetCode;
         this.displayPosition = definition.displayPosition;
+        this.weeklyReport = definition.weeklyReport;
+        this.monthlyReport = definition.monthlyReport;
+
         this.dataValues = mapDataValues(data.headers, data.rows);
+        this.isTableDataAvailable = !_.isEmpty(this.dataValues);
         this.rows = mapRows(definition, data);
         this.columns = mapColumns(definition, data);
     };
