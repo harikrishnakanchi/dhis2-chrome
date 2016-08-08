@@ -256,7 +256,7 @@ define(["moment", "lodash", "properties", "dateUtils", "customAttributes"], func
                     return event.localStatus === "DELETED";
                 };
 
-                return _.chain(events).reject(isDeletedEvent).map(function(programEvent) {
+                var mapEventAndDataElements = function(programEvent) {
                     var mappedEvent = _.omit(programEvent, "dataValues");
                     mappedEvent.dataValues = _.cloneDeep(programDataElements);
                     _.each(programEvent.dataValues, function(programEventDataValue) {
@@ -266,7 +266,9 @@ define(["moment", "lodash", "properties", "dateUtils", "customAttributes"], func
                         mappedEventDataValue.value = programEventDataValue.value;
                     });
                     return mappedEvent;
-                }).value();
+                };
+
+                return _.chain(events).reject(isDeletedEvent).map(mapEventAndDataElements).value();
             });
         };
     };
