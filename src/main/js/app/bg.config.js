@@ -55,6 +55,7 @@ require.config({
         "pivotTable": "app/models/pivot.table",
         "moduleDataBlock": "app/models/module.data.block",
         "customAttributes": "app/models/custom.attributes",
+        "pivotTableData": "app/models/pivot.table.data",
 
         //Factories
         "factories":"app/factories/factories",
