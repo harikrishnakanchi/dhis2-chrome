@@ -26,7 +26,9 @@ define(['lodash'], function(_) {
                 var dataDimensionItem = _.find(dataDimensionItems, { id: item.id });
                 return _.merge(dataDimensionItem, {
                     id: item.id,
-                    dimension: 'dx'
+                    dataValuesFilter: {
+                        dx: item.id
+                    }
                 });
             });
         },
@@ -35,7 +37,9 @@ define(['lodash'], function(_) {
                 return {
                     id: orgUnitId,
                     name: data.metaData.names[orgUnitId],
-                    dimension: 'ou'
+                    dataValuesFilter: {
+                        ou: orgUnitId
+                    }
                 };
             });
         },
@@ -44,17 +48,23 @@ define(['lodash'], function(_) {
                 return {
                     id: periodId,
                     name: data.metaData.names[periodId],
-                    dimension: 'pe'
+                    dataValuesFilter: {
+                        pe: periodId
+                    }
+
                 };
             });
         },
         category: function (definition, data, dimensionConfiguration) {
             var categoryOptions = _.flatten(_.map(definition.categoryDimensions, 'categoryOptions'));
             return _.map(dimensionConfiguration.items, function (item) {
-                var categoryOption = _.find(categoryOptions, { id: item.id });
+                var categoryOption = _.find(categoryOptions, { id: item.id }),
+                    dataValuesFilter = {};
+
+                dataValuesFilter[dimensionConfiguration.dimension] = item.id;
                 return _.merge(categoryOption, {
                     id: item.id,
-                    dimension: dimensionConfiguration.dimension
+                    dataValuesFilter: dataValuesFilter
                 });
             });
         }
@@ -74,12 +84,26 @@ define(['lodash'], function(_) {
     };
 
     var mapColumns = function (definition, data) {
-        return _.map(definition.columns, function (columnConfiguration) {
+        var mappedColumns = _.map(definition.columns, function (columnConfiguration) {
             var dimensionId = columnConfiguration.dimension,
                 mappingFunction = isCategoryDimension(definition, dimensionId) ? DIMENSION_MAPPING_FUNCTIONS.category : DIMENSION_MAPPING_FUNCTIONS[dimensionId];
 
             return mappingFunction ? mappingFunction(definition, data, columnConfiguration) : [];
         });
+
+        return _.transform(mappedColumns, function (transformedColumns, thisColumn) {
+            var previousColumn = _.last(transformedColumns);
+            if(previousColumn) {
+                var cartesianProductOfColumns = _.flatten(_.map(previousColumn, function (parentColumnItem) {
+                    return _.map(thisColumn, function (columnItem) {
+                        return _.merge({}, { dataValuesFilter: parentColumnItem.dataValuesFilter }, columnItem);
+                    });
+                }));
+                transformedColumns.push(cartesianProductOfColumns);
+            } else {
+                transformedColumns.push(thisColumn);
+            }
+        }, []);
     };
 
     PivotTableData.create = function () {

@@ -94,11 +94,15 @@ define(['pivotTableData'], function(PivotTableData) {
                 expect(pivotTableData.rows).toEqual([{
                     id: 'someDataElementId',
                     name: 'someDataElementName',
-                    dimension: 'dx'
+                    dataValuesFilter: {
+                        dx: 'someDataElementId'
+                    }
                 }, {
                     id: 'someIndicatorId',
                     name: 'someIndicatorName',
-                    dimension: 'dx'
+                    dataValuesFilter: {
+                        dx: 'someIndicatorId'
+                    }
                 }]);
             });
 
@@ -111,11 +115,15 @@ define(['pivotTableData'], function(PivotTableData) {
                 expect(pivotTableData.rows).toEqual([{
                     id: 'someOrgUnitId',
                     name: 'someOrgUnitName',
-                    dimension: 'ou'
+                    dataValuesFilter: {
+                        ou: 'someOrgUnitId'
+                    }
                 }, {
                     id: 'someOtherOrgUnitId',
                     name: 'someOtherOrgUnitName',
-                    dimension: 'ou'
+                    dataValuesFilter: {
+                        ou: 'someOtherOrgUnitId'
+                    }
                 }]);
             });
 
@@ -128,11 +136,15 @@ define(['pivotTableData'], function(PivotTableData) {
                 expect(pivotTableData.rows).toEqual([{
                     id: 'somePeriodId',
                     name: 'somePeriodName',
-                    dimension: 'pe'
+                    dataValuesFilter: {
+                        pe: 'somePeriodId'
+                    }
                 }, {
                     id: 'someOtherPeriodId',
                     name: 'someOtherPeriodName',
-                    dimension: 'pe'
+                    dataValuesFilter: {
+                        pe: 'someOtherPeriodId'
+                    }
                 }]);
             });
 
@@ -150,11 +162,15 @@ define(['pivotTableData'], function(PivotTableData) {
                 expect(pivotTableData.rows).toEqual([{
                     id: 'someCategoryOptionId',
                     name: 'someCategoryOptionName',
-                    dimension: 'someCategoryId'
+                    dataValuesFilter: {
+                        someCategoryId: 'someCategoryOptionId'
+                    }
                 }, {
                     id: 'someOtherCategoryOptionId',
                     name: 'someOtherCategoryOptionName',
-                    dimension: 'someCategoryId'
+                    dataValuesFilter: {
+                        someCategoryId: 'someOtherCategoryOptionId'
+                    }
                 }]);
             });
         });
@@ -172,17 +188,19 @@ define(['pivotTableData'], function(PivotTableData) {
 
                 pivotTableData = PivotTableData.create(definition, data);
 
-                expect(pivotTableData.columns).toEqual([
-                    [{
-                        id: 'somePeriodId',
-                        name: 'somePeriodName',
-                        dimension: 'pe'
-                    }, {
-                        id: 'someOtherPeriodId',
-                        name: 'someOtherPeriodName',
-                        dimension: 'pe'
-                    }]
-                ]);
+                expect(_.first(pivotTableData.columns)).toEqual([{
+                    id: 'somePeriodId',
+                    name: 'somePeriodName',
+                    dataValuesFilter: {
+                        pe: 'somePeriodId'
+                    }
+                }, {
+                    id: 'someOtherPeriodId',
+                    name: 'someOtherPeriodName',
+                    dataValuesFilter: {
+                        pe: 'someOtherPeriodId'
+                    }
+                }]);
             });
 
             it('should map the items from metaData if dimension is ou', function () {
@@ -192,17 +210,19 @@ define(['pivotTableData'], function(PivotTableData) {
 
                 pivotTableData = PivotTableData.create(definition, data);
 
-                expect(pivotTableData.columns).toEqual([
-                    [{
-                        id: 'someOrgUnitId',
-                        name: 'someOrgUnitName',
-                        dimension: 'ou'
-                    }, {
-                        id: 'someOtherOrgUnitId',
-                        name: 'someOtherOrgUnitName',
-                        dimension: 'ou'
-                    }]
-                ]);
+                expect(_.first(pivotTableData.columns)).toEqual([{
+                    id: 'someOrgUnitId',
+                    name: 'someOrgUnitName',
+                    dataValuesFilter: {
+                        ou: 'someOrgUnitId'
+                    }
+                }, {
+                    id: 'someOtherOrgUnitId',
+                    name: 'someOtherOrgUnitName',
+                    dataValuesFilter: {
+                        ou: 'someOtherOrgUnitId'
+                    }
+                }]);
             });
 
             it('should map the items to dataDimensionItems if dimension is dx', function () {
@@ -215,17 +235,19 @@ define(['pivotTableData'], function(PivotTableData) {
                 }];
                 pivotTableData = PivotTableData.create(definition, {});
 
-                expect(pivotTableData.columns).toEqual([
-                    [{
-                        id: 'someDataElementId',
-                        name: 'someDataElementName',
-                        dimension: 'dx'
-                    }, {
-                        id: 'someIndicatorId',
-                        name: 'someIndicatorName',
-                        dimension: 'dx'
-                    }]
-                ]);
+                expect(_.first(pivotTableData.columns)).toEqual([{
+                    id: 'someDataElementId',
+                    name: 'someDataElementName',
+                    dataValuesFilter: {
+                        dx: 'someDataElementId'
+                    }
+                }, {
+                    id: 'someIndicatorId',
+                    name: 'someIndicatorName',
+                    dataValuesFilter: {
+                        dx: 'someIndicatorId'
+                    }
+                }]);
             });
 
             it('should map the items from categoryDimensions if dimension is a category', function () {
@@ -239,16 +261,64 @@ define(['pivotTableData'], function(PivotTableData) {
 
                 pivotTableData = PivotTableData.create(definition, data);
 
-                expect(pivotTableData.columns).toEqual([
-                    [{
+                expect(_.first(pivotTableData.columns)).toEqual([{
+                    id: 'someCategoryOptionId',
+                    name: 'someCategoryOptionName',
+                    dataValuesFilter: {
+                        someCategoryId: 'someCategoryOptionId'
+                    }
+                }, {
+                    id: 'someOtherCategoryOptionId',
+                    name: 'someOtherCategoryOptionName',
+                    dataValuesFilter: {
+                        someCategoryId: 'someOtherCategoryOptionId'
+                    }
+                }]);
+            });
+
+            it('should map the cartesian product if there are multiple columns', function () {
+                definition.columns = [{
+                    dimension: 'pe'
+                }, {
+                    dimension: 'someCategoryId',
+                    items: [
+                        { id: 'someCategoryOptionId' },
+                        { id: 'someOtherCategoryOptionId' }
+                    ]
+                }];
+
+                pivotTableData = PivotTableData.create(definition, data);
+
+                expect(_.last(pivotTableData.columns)).toEqual([
+                    {
                         id: 'someCategoryOptionId',
                         name: 'someCategoryOptionName',
-                        dimension: 'someCategoryId'
+                        dataValuesFilter: {
+                            pe: 'somePeriodId',
+                            someCategoryId: 'someCategoryOptionId'
+                        }
                     }, {
                         id: 'someOtherCategoryOptionId',
                         name: 'someOtherCategoryOptionName',
-                        dimension: 'someCategoryId'
-                    }]
+                        dataValuesFilter: {
+                            pe: 'somePeriodId',
+                            someCategoryId: 'someOtherCategoryOptionId'
+                        }
+                    }, {
+                        id: 'someCategoryOptionId',
+                        name: 'someCategoryOptionName',
+                        dataValuesFilter: {
+                            pe: 'someOtherPeriodId',
+                            someCategoryId: 'someCategoryOptionId'
+                        }
+                    }, {
+                        id: 'someOtherCategoryOptionId',
+                        name: 'someOtherCategoryOptionName',
+                        dataValuesFilter: {
+                            pe: 'someOtherPeriodId',
+                            someCategoryId: 'someOtherCategoryOptionId'
+                        }
+                    }
                 ]);
             });
         });
