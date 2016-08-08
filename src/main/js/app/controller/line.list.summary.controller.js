@@ -1,5 +1,5 @@
 define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], function(_, moment, properties, orgUnitMapper, interpolate) {
-    return function($scope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, historyHelper, programRepository, programEventRepository, excludedDataElementsRepository,
+    return function($scope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, historyService, programRepository, programEventRepository, excludedDataElementsRepository,
         orgUnitRepository, approvalDataRepository, referralLocationsRepository, dataSyncFailureRepository, translationsService, filesystemService) {
 
         $scope.filterParams = {};
@@ -349,7 +349,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
                 endDate: $scope.filterParams.endDate,
                 caseNumber: $scope.filterParams.caseNumber
             };
-            historyHelper.pushState(currentSearchState);
+            historyService.pushState(currentSearchState);
         };
 
         var init = function() {
