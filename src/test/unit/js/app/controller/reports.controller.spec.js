@@ -633,12 +633,14 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
         });
 
         describe('download chart', function () {
-            var svgElement, blobObject;
+            var svgElement, blobObject, currentDate;
 
             beforeEach(function () {
                 Timecop.install();
                 Timecop.freeze(new Date("2016-07-21T12:43:54.972Z"));
 
+                var CHART_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm A";
+                currentDate = moment().format(CHART_LAST_UPDATED_TIME_FORMAT);
                 var mockdataURI = 'data:text/plain;charset=utf-8;base64,aGVsbG8gd29ybGQ=';
                 spyOn(SVGUtils, 'svgAsPngUri').and.callFake(function(svgEl, options, callback) {
                     callback(mockdataURI);
@@ -658,7 +660,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                 reportsController = new ReportsController(rootScope, scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService);
 
                 var mockChartDefinition = {id: 'chartId', name: '[FieldApp - ServiceName] ChartName'};
-                scope.downloadChartAsPng(mockChartDefinition);
+                scope.downloadChartAsPng(mockChartDefinition, currentDate);
             });
 
             afterEach(function() {
@@ -671,7 +673,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             });
 
             it('should prompt user to save chart as PNG with suggested name', function () {
-                expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith('ServiceName.ChartName.21-Jul-2016.png', blobObject, filesystemService.FILE_TYPE_OPTIONS.PNG);
+                expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith('ServiceName.ChartName.updated.21-Jul-2016.png', blobObject, filesystemService.FILE_TYPE_OPTIONS.PNG);
             });
         });
 
