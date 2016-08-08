@@ -376,40 +376,34 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         }
                     }];
 
-                    scope.enrichedProgram = {
-                        programStages: [{
-                            programStageSections: [{
-                                dataElementsWithOptions: [{
-                                    dataElement: {
-                                        isIncluded: false,
-                                        id: 'de3',
-                                        optionSet: {
-                                            options: [{
-                                                id: 'someOptionId',
-                                                isSelected: true
-                                            }, {
-                                                id: 'someOtherOptionId',
-                                                isSelected: false
-                                            }]
-                                        }
-                                    }
-                                }, {
-                                    dataElement: {
-                                        isIncluded: true,
-                                        id: 'de4',
-                                        optionSet: {
-                                            options: [{
-                                                id: 'someOptionId',
-                                                isSelected: false
-                                            }, {
-                                                id: 'someOtherOptionId'
-                                            }]
-                                        }
-                                    }
+                    var selectedDataElementA = createDataElement({
+                        dataElement: {
+                            id: 'de3',
+                            optionSet: {
+                                options: [{
+                                    id: 'someOtherOptionId',
+                                    isSelected: false
                                 }]
-                            }]
-                        }]
-                    };
+                            }
+                        }
+                    });
+                    var selectedDataElementB = createDataElement({
+                        dataElement: {
+                            id: 'de4',
+                            optionSet: {
+                                options: [{
+                                    id: 'someOptionId',
+                                    isSelected: false
+                                }, {
+                                    id: 'someOtherOptionId',
+                                    isSelected:false
+                                }]
+                            }
+                        }
+                    });
+
+                    scope.enrichedProgram = createEnrichedProgram([selectedDataElementA, selectedDataElementB]);
+
 
                     scope.enrichedModule = {
                         id: 'Module2someId'
@@ -425,7 +419,36 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     scope.program = program;
                     programRepository.get.and.returnValue(utils.getPromise(q, program));
                 });
-                
+
+                var createEnrichedProgram = function (dataElements) {
+                    return {
+                        programStages: [{
+                            programStageSections: [{
+                                dataElementsWithOptions: dataElements
+
+                            }]
+                        }]
+                    };
+                };
+
+                var createDataElement = function (dataElementOptions) {
+                    return _.merge({
+                        dataElement: {
+                            isIncluded: true,
+                            id: 'someDataElementId',
+                            optionSet: {
+                                options: [{
+                                    id: 'someOptionId',
+                                    isSelected: true
+                                }, {
+                                    id: 'someOtherOptionId',
+                                    isSelected: true
+                                }]
+                            }
+                        }
+                    }, dataElementOptions);
+                };
+
                 it("should save excluded line list options for new module", function() {
                     scope.save();
                     scope.$apply();
@@ -465,27 +488,8 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 });
 
                 it("should save the empty excluded line list option if no option was unSelected", function () {
-                    scope.enrichedProgram = {
-                        programStages: [{
-                            programStageSections: [{
-                                dataElementsWithOptions: [{
-                                    dataElement: {
-                                        isIncluded: false,
-                                        id: 'de3',
-                                        optionSet: {
-                                            options: [{
-                                                id: 'someOptionId',
-                                                isSelected: true
-                                            }, {
-                                                id: 'someOtherOptionId',
-                                                isSelected: true
-                                            }]
-                                        }
-                                    }
-                                }]
-                            }]
-                        }]
-                    };
+                    var selectedDataElement = createDataElement({dataElement: {id: 'de3'}});
+                    scope.enrichedProgram = createEnrichedProgram([selectedDataElement]);
 
                     scope.save();
                     scope.$apply();
@@ -494,6 +498,49 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         moduleId: scope.enrichedModule.id,
                         clientLastUpdated: moment().toISOString(),
                         dataElements: []
+                    };
+                    expect(excludedLineListOptionsRepository.upsert).toHaveBeenCalledWith(excludedLineListOptions);
+                });
+
+                it("should not save excluded line list option if data element is unSelected", function () {
+                    var unSelectedDataElementA = createDataElement({
+                        dataElement: {
+                            isIncluded: false,
+                            id: 'de3',
+                            optionSet: {
+                                options: [{
+                                    id: 'someOtherOptionId',
+                                    isSelected: false
+                                }]
+                            }
+                        }
+                    });
+                    var selectedDataElementB = createDataElement({
+                        dataElement: {
+                            id: 'de4',
+                            optionSet: {
+                                options: [{
+                                    id: 'someOptionId',
+                                    isSelected: false
+                                }, {
+                                    id: 'someOtherOptionId',
+                                    isSelected: false
+                                }]
+                            }
+                        }
+                    });
+                    scope.enrichedProgram = createEnrichedProgram([unSelectedDataElementA, selectedDataElementB]);
+
+                    scope.save();
+                    scope.$apply();
+
+                    var excludedLineListOptions = {
+                        moduleId: scope.enrichedModule.id,
+                        clientLastUpdated: moment().toISOString(),
+                        dataElements: [{
+                            dataElementId: selectedDataElementB.dataElement.id,
+                            excludedOptionIds: ['someOptionId', 'someOtherOptionId']
+                        }]
                     };
                     expect(excludedLineListOptionsRepository.upsert).toHaveBeenCalledWith(excludedLineListOptions);
                 });

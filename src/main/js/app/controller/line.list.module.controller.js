@@ -289,6 +289,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     .map('dataElementsWithOptions')
                     .flatten()
                     .map('dataElement')
+                    .filter('isIncluded')
                     .value();
                 var excludedLineListOptions = {};
                 excludedLineListOptions.moduleId = enrichedModule.id;
