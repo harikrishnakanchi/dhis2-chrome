@@ -1,7 +1,8 @@
 define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper) {
-    return function($rootScope, $q, $scope, orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository, filesystemService) {
+    return function($rootScope, $q, $scope, orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService) {
         $scope.selectedProject = $rootScope.currentUser.selectedProject;
 
+        var CHART_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm A";
         var getNumberOfISOWeeksInMonth = function (period) {
             var m = moment(period, 'YYYYMM');
 
@@ -187,6 +188,18 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
             return translationsService.translateReports(pivotTables);
         };
 
+        var loadLastUpdatedTimeForProjectReport = function() {
+            var formatlastUpdatedTime = function (date) {
+                return date ? moment(date).format(CHART_LAST_UPDATED_TIME_FORMAT) : undefined;
+            };
+
+            return changeLogRepository.get('monthlyPivotTableData:' +  $scope.selectedProject.id)
+                .then(formatlastUpdatedTime)
+                .then(function(lastUpdated) {
+                $scope.lastUpdatedTimeForProjectReport = lastUpdated;
+            });
+        };
+
         var loadPivotTables = function() {
             return pivotTableRepository.getAll()
                 .then(filterProjectReportTables)
@@ -195,6 +208,7 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
                 .then(function(pivotTables) {
                     $scope.pivotTables = _.sortBy(pivotTables, 'definition.displayPosition');
                     $scope.isReportAvailable = _.any(pivotTables, { isTableDataAvailable: true });
+                    loadLastUpdatedTimeForProjectReport();
                 });
         };
 

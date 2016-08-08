@@ -1,9 +1,9 @@
-define(["moment", "orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "translationsService", "timecop", "orgUnitGroupSetRepository", "filesystemService"],
-    function(moment, OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, TranslationsService, timecop, OrgUnitGroupSetRepository, FilesystemService) {
+define(["moment", "orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "changeLogRepository", "translationsService", "timecop", "orgUnitGroupSetRepository", "filesystemService"],
+    function(moment, OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, ChangeLogRepository, TranslationsService, timecop, OrgUnitGroupSetRepository, FilesystemService) {
     describe("projectReportController", function() {
         var scope, rootScope, q,
             projectReportController,
-            orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository, filesystemService,
+            orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService,
             mockPivotTables, pivotTableData, mockProjectOrgUnit, orgUnitGroupSets, currentTime;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
@@ -265,6 +265,9 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             spyOn(pivotTableRepository, "getAll").and.returnValue(utils.getPromise($q, mockPivotTables));
             spyOn(pivotTableRepository, "getDataForPivotTable").and.returnValue(utils.getPromise($q, pivotTableData));
 
+            changeLogRepository = new ChangeLogRepository();
+            spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise($q, {}));
+
             translationsService = new TranslationsService();
             spyOn(translationsService, "translateReports").and.callFake(function(object) { return object; });
             spyOn(translationsService, 'translate').and.callFake(function(object) { return object; });
@@ -275,7 +278,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             filesystemService = new FilesystemService();
             spyOn(filesystemService, 'promptAndWriteFile').and.returnValue(utils.getPromise(q, {}));
 
-            projectReportController = new ProjectReportController(rootScope, q, scope, orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository, filesystemService);
+            projectReportController = new ProjectReportController(rootScope, q, scope, orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService);
         }));
 
         afterEach(function () {
@@ -373,6 +376,15 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             scope.$apply();
             expect(orgUnitRepository.get).toHaveBeenCalledWith("xyz");
             expect(scope.projectAttributes).toEqual(expectedProjectAttributes);
+        });
+
+        it('should get the lastUpdated', function () {
+            var lastUpdatedTime = currentTime, projectId = rootScope.currentUser.selectedProject.id,
+            CHART_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm A";
+            changeLogRepository.get.and.returnValue(utils.getPromise(q, lastUpdatedTime));
+            scope.$apply();
+            expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyPivotTableData:' + projectId);
+            expect(scope.lastUpdatedTimeForProjectReport).toEqual(moment(lastUpdatedTime).format(CHART_LAST_UPDATED_TIME_FORMAT));
         });
     });
 });
