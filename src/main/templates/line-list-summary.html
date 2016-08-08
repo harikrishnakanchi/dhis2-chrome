@@ -45,22 +45,22 @@
                             <div class="btn-group">
                                 <a class="btn btn-default"
                                    href="#/line-list-summary/{{selectedModuleId}}/caseNumber"
-                                   ng-class="{'active btn-primary': (filterBy === 'caseNumber' || filterBy === 'dateRange')}">
+                                   ng-class="{'active btn-primary': (filterParams.filterBy === 'caseNumber' || filterParams.filterBy === 'dateRange')}">
                                     {{resourceBundle.findCases}}
                                 </a>
                                 <a class="btn btn-default"
                                    href="#/line-list-summary/{{selectedModuleId}}/incomplete"
-                                   ng-class="{'active btn-primary': (filterBy === 'incomplete')}">
+                                   ng-class="{'active btn-primary': (filterParams.filterBy === 'incomplete')}">
                                     {{resourceBundle.incompleteCases}}
                                 </a>
                                 <a class="btn btn-default"
                                    href="#/line-list-summary/{{selectedModuleId}}/readyToSubmit"
-                                   ng-class="{'active btn-primary': (filterBy === 'readyToSubmit')}">
+                                   ng-class="{'active btn-primary': (filterParams.filterBy === 'readyToSubmit')}">
                                     {{resourceBundle.casesReadyToSubmit}}
                                 </a>
                                 <a class="btn btn-default"
                                    href="#/line-list-summary/{{selectedModuleId}}/eventSummary"
-                                   ng-class="{'active btn-primary': (filterBy === 'eventSummary')}">
+                                   ng-class="{'active btn-primary': (filterParams.filterBy === 'eventSummary')}">
                                     {{resourceBundle.caseSummary}}
                                 </a>
                             </div>
@@ -75,30 +75,30 @@
                         </div>
                     </div>
                     <div>
-                        <div class="row form-inline event-search-form" ng-if="filterBy === 'caseNumber' || filterBy === 'dateRange'">
+                        <div class="row form-inline event-search-form" ng-show="filterParams.filterBy === 'caseNumber' || filterParams.filterBy === 'dateRange'">
                             <div class="col-md-12 ">
                                 <form name="eventfilterForm" id="eventfilterForm" class="well">
                                     <span>{{resourceBundle.findCaseBy}}</span>
                                     <span>
-                                        <select class="form-control" ng-model="filterBy">
+                                        <select class="form-control" ng-model="filterParams.filterBy">
                                           <option value="caseNumber">{{resourceBundle.caseNumber}}</option>
                                           <option value="dateRange">{{resourceBundle.dateRange}}</option>
                                         </select>
                                     </span>
-                                    <span ng-if="filterBy === 'caseNumber'">
+                                    <span ng-show="filterParams.filterBy === 'caseNumber'">
                                         <input type="text" class="form-control" ng-model="filterParams.caseNumber" />
                                         <button type="submit" class="btn btn-default" ng-click="filterByCaseNumber()">{{ resourceBundle.search }}</button>
                                     </span>
-                                    <span ng-if="filterBy === 'dateRange'">
+                                    <span ng-show="filterParams.filterBy === 'dateRange'">
                                         <input type="date" class="form-control" ng-model="filterParams.startDate" /> {{resourceBundle.toLabel}} <input type="date" class="form-control" ng-model="filterParams.endDate" />
-                                        <input type="button" value="{{resourceBundle.search}}" class="btn btn-default" ng-click="filterByDateRange()" ng-disabled="filterBy === 'dateRange' && dateRangeError" />
+                                        <input type="button" value="{{resourceBundle.search}}" class="btn btn-default" ng-click="filterByDateRange()" ng-disabled="filterParams.filterBy === 'dateRange' && dateRangeError" />
                                     </span>
                                     <span>
                                         <button class="btn btn-primary" ng-class="layoutDirection.direction != 'rtl' ? 'pull-right' : 'pull-left'"
-                                            ng-if="filterBy === 'caseNumber' || filterBy === 'dateRange'"
+                                            ng-if="filterParams.filterBy === 'caseNumber' || filterParams.filterBy === 'dateRange'"
                                             type="button" ng-click="exportToCSV()" ng-disabled="!(events | filter:filterSubmittedEvents).length"> {{ resourceBundle.exportEventData }}</button>
                                     </span>
-                                    <div class="errortxt" ng-if="filterBy === 'dateRange' && dateRangeError">{{resourceBundle.dateRangeError}}</div>
+                                    <div class="errortxt" ng-if="filterParams.filterBy === 'dateRange' && dateRangeError">{{resourceBundle.dateRangeError}}</div>
                                 </form>
                             </div>
                         </div>
@@ -148,8 +148,8 @@
                                     <ul>
                                         <li>
                                             <div class="text-center">
-                                                <input type="button" class="btn btn-main" value="{{ resourceBundle.submitBtnValue }}" ng-click="submit()" ng-if="!projectIsAutoApproved &amp;&amp; filterBy === 'readyToSubmit'" />
-                                                <input type="button" class="btn btn-main" value="{{ resourceBundle.submitBtnValue }}" ng-click="submitAndApprove()" ng-if="projectIsAutoApproved &amp;&amp; filterBy === 'readyToSubmit'" />
+                                                <input type="button" class="btn btn-main" value="{{ resourceBundle.submitBtnValue }}" ng-click="submit()" ng-if="!projectIsAutoApproved &amp;&amp; filterParams.filterBy === 'readyToSubmit'" />
+                                                <input type="button" class="btn btn-main" value="{{ resourceBundle.submitBtnValue }}" ng-click="submitAndApprove()" ng-if="projectIsAutoApproved &amp;&amp; filterParams.filterBy === 'readyToSubmit'" />
                                             </div>
                                         </li>
                                     </ul>
@@ -157,7 +157,7 @@
                             </div>
                         </div>
                     </div>
-                    <div ng-if="filterBy === 'eventSummary'"  class="linelistSummary">
+                    <div ng-if="filterParams.filterBy === 'eventSummary'"  class="linelistSummary">
                         <div ng-include=" 'templates/partials/module-week-selector.html'"></div>
                         <div ng-if="!loading &amp;&amp; week &amp;&amp; selectedModule" ng-include="'templates/partials/line-list-offline-case-summary.html'">
                         </div>

@@ -56,14 +56,14 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
                 allEvents: []
             };
 
-            if ($scope.filterBy === "incomplete") {
+            if ($scope.filterParams.filterBy === "incomplete") {
                 $scope.eventListTitle = $scope.resourceBundle.incompleteEventsTitle;
                 $scope.noCasesMsg = $scope.resourceBundle.noIncompleteEventsFound;
 
                 return programEventRepository.getDraftEventsFor($scope.program.id, _.pluck($scope.originOrgUnits, "id"))
                     .then(translateAndFilterEventData);
             }
-            if ($scope.filterBy === "readyToSubmit") {
+            if ($scope.filterParams.filterBy === "readyToSubmit") {
                 $scope.eventListTitle = $scope.resourceBundle.readyToSubmitEventsTitle;
                 $scope.noCasesMsg = $scope.resourceBundle.noReadyToSubmitEventsFound;
                 return programEventRepository.getSubmitableEventsFor($scope.program.id, _.pluck($scope.originOrgUnits, "id")).then(function(events) {
@@ -76,7 +76,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
                     });
                 }).then(translateAndFilterEventData);
             }
-            if ($scope.filterBy === "dateRange") {
+            if ($scope.filterParams.filterBy === "dateRange") {
                 var startDate = $location.search().startDate;
                 var endDate = $location.search().endDate;
                 $scope.filterParams.startDate = moment(startDate).startOf('day').toDate();
@@ -85,7 +85,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
                 $scope.filterByDateRange();
             }
 
-            if ($scope.filterBy === "caseNumber") {
+            if ($scope.filterParams.filterBy === "caseNumber") {
                 $scope.filterParams.caseNumber = $location.search().caseNumber;
                 $scope.filterByCaseNumber();
             }
@@ -344,7 +344,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
 
         $scope.pushToHistory = function () {
             var currentSearchState = {
-                filterBy : $scope.filterBy,
+                filterBy : $scope.filterParams.filterBy,
                 startDate: $scope.filterParams.startDate,
                 endDate: $scope.filterParams.endDate,
                 caseNumber: $scope.filterParams.caseNumber
@@ -413,9 +413,9 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
 
             showResultMessage($location.search().messageType, $location.search().message);
 
-            $scope.filterBy = $routeParams.filterBy;
-            if (!$scope.filterBy)
-                $scope.filterBy = 'caseNumber';
+            $scope.filterParams.filterBy = $routeParams.filterBy;
+            if (!$scope.filterParams.filterBy)
+                $scope.filterParams.filterBy = 'caseNumber';
             $scope.eventListTitle = $scope.resourceBundle.eventListTitle;
             $scope.noCasesMsg = $scope.resourceBundle.noCasesFound;
             $scope.loading = true;
