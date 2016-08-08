@@ -84,7 +84,7 @@
                                                                    ng-click="stopPropagation($event)" />
                                                             </h5>
                                                         </div>
-                                                        <div collapse="!de.dataElement.isDataElementExpanded" class="collapse-body">
+                                                        <div collapse="!de.dataElement.isDataElementExpanded" class="collapse-body" ng-class="{'disabled': !de.dataElement.isIncluded}">
                                                             <ul>
                                                                 <li ng-repeat="option in de.dataElement.optionSet.options">
                                                                     <label>
