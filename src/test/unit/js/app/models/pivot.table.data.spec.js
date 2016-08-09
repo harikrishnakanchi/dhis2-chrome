@@ -9,6 +9,9 @@ define(['pivotTableData'], function(PivotTableData) {
                 displayPosition: 'someDisplayPosition',
                 weeklyReport: 'someBooleanValue',
                 monthlyReport: 'anotherBooleanValue',
+                sortAscending: 'sortAscendingBooleanValue',
+                sortDescending: 'sortDescendingBooleanValue',
+                sortable: 'sortableBooleanValue',
                 dataDimensionItems: [{
                     dataElement: {
                         id: 'someDataElementId',
@@ -66,6 +69,9 @@ define(['pivotTableData'], function(PivotTableData) {
                 expect(pivotTableData.displayPosition).toEqual(definition.displayPosition);
                 expect(pivotTableData.weeklyReport).toEqual(definition.weeklyReport);
                 expect(pivotTableData.monthlyReport).toEqual(definition.monthlyReport);
+                expect(pivotTableData.sortAscending).toEqual(definition.sortAscending);
+                expect(pivotTableData.sortDescending).toEqual(definition.sortDescending);
+                expect(pivotTableData.sortable).toEqual(definition.sortable);
             });
         });
 

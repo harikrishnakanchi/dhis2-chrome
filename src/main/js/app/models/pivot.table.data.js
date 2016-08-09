@@ -6,6 +6,9 @@ define(['lodash'], function(_) {
         this.displayPosition = definition.displayPosition;
         this.weeklyReport = definition.weeklyReport;
         this.monthlyReport = definition.monthlyReport;
+        this.sortAscending = definition.sortAscending;
+        this.sortDescending = definition.sortDescending;
+        this.sortable = definition.sortable;
 
         this.dataValues = mapDataValues(data.headers, data.rows);
         this.isTableDataAvailable = !_.isEmpty(this.dataValues);
@@ -58,7 +61,6 @@ define(['lodash'], function(_) {
                     dataValuesFilter: {
                         pe: periodId
                     }
-
                 };
             });
         },
