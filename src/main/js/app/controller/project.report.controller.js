@@ -3,6 +3,7 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
         $scope.selectedProject = $rootScope.currentUser.selectedProject;
 
         var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm A";
+        var REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY HH[:]mm A";
         var getNumberOfISOWeeksInMonth = function (period) {
             var m = moment(period, 'YYYYMM');
 
@@ -32,6 +33,12 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
 
             var escapeString = function (string) {
                 return '"' + string + '"';
+            };
+
+            var addLastUpdatedTimeDetails = function () {
+                var formattedTime = moment($scope.lastUpdatedTimeForProjectReport, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
+                var lastUpdatedTimeContent = [escapeString('Updated'), escapeString(formattedTime)].join(DELIMITER);
+                csvData.push(lastUpdatedTimeContent);
             };
 
             var addProjectBasicInfo = function() {
@@ -84,6 +91,9 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
                 });
             };
 
+            if ($scope.lastUpdatedTimeForProjectReport) {
+                addLastUpdatedTimeDetails();
+            }
             addProjectBasicInfo();
             csvData.push([]);
             addPivotTableData();
@@ -92,7 +102,8 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
         };
 
         $scope.exportToCSV = function () {
-            var filename = [$scope.selectedProject.name, 'ProjectReport', moment().format("DD-MMM-YYYY"), 'csv'].join('.');
+            var lastUpdatedDate = moment($scope.lastUpdatedTimeForProjectReport, REPORTS_LAST_UPDATED_TIME_FORMAT).format("DD-MMM-YYYY");
+            var filename = [$scope.selectedProject.name, 'ProjectReport', 'updated', lastUpdatedDate, 'csv'].join('.');
             filesystemService.promptAndWriteFile(filename, new Blob([buildCsvContent()], {type: 'text/csv'}), filesystemService.FILE_TYPE_OPTIONS.CSV);
         };
 

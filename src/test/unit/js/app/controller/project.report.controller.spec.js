@@ -4,7 +4,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
         var scope, rootScope, q,
             projectReportController,
             orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService,
-            mockPivotTables, pivotTableData, mockProjectOrgUnit, orgUnitGroupSets, currentTime;
+            mockPivotTables, pivotTableData, mockProjectOrgUnit, orgUnitGroupSets, currentTime, lastUpdatedTime;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             rootScope = $rootScope;
@@ -14,6 +14,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             currentTime = moment('2015-10-29T12:43:54.972Z');
             Timecop.install();
             Timecop.freeze(currentTime);
+            lastUpdatedTime = '2015-10-28T12:43:54.972Z';
 
             rootScope.currentUser = {
                 selectedProject: {
@@ -266,7 +267,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             spyOn(pivotTableRepository, "getDataForPivotTable").and.returnValue(utils.getPromise($q, pivotTableData));
 
             changeLogRepository = new ChangeLogRepository();
-            spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise($q, {}));
+            spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise($q, lastUpdatedTime));
 
             translationsService = new TranslationsService();
             spyOn(translationsService, "translateReports").and.callFake(function(object) { return object; });
@@ -305,13 +306,18 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             });
             
             it('should prompt the user to save the CSV file with suggested filename', function () {
-                var expectedFilename = 'Aweil - SS153.ProjectReport.' + currentTime.format('DD-MMM-YYYY') + '.csv';
+                var expectedFilename = 'Aweil - SS153.ProjectReport.updated.' + moment(lastUpdatedTime).format('DD-MMM-YYYY') + '.csv';
                 expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
             });
 
             describe('CSV contents', function () {
                 it('should contain project basic information', function () {
                     expect(csvContent).toContain('"Project Information"\n"Country","SOUDAN Sud"');
+                });
+
+                it('should contain project last downloaded time information', function () {
+                    var expectedContent = '"Updated","28 October 2015 18:13 PM"';
+                    expect(csvContent).toContain(expectedContent);
                 });
 
                 it('should contain pivot table headers', function () {
