@@ -12,8 +12,8 @@ define(['lodash'], function(_) {
 
         this.dataValues = mapDataValues(data.headers, data.rows);
         this.isTableDataAvailable = !_.isEmpty(this.dataValues);
-        this.rows = mapRows(definition, data);
-        this.columns = mapColumns(definition, data);
+        this.rows = mapRows(definition, data, this.dataValues);
+        this.columns = mapColumns(definition, data, this.dataValues);
     };
 
     var mapDataValues = function (headers, rows) {
@@ -24,12 +24,18 @@ define(['lodash'], function(_) {
         });
     };
 
+    var filterItemsWithDataValues = function (items, dataValues) {
+        return _.filter(items, function (item) {
+            return _.any(dataValues, item.dataValuesFilter);
+        });
+    };
+
     var DIMENSION_MAPPING_FUNCTIONS = {
-        dx: function (definition, data, dimensionConfiguration) {
+        dx: function (definition, data, dataValues, dimensionConfiguration) {
             var dataDimensionItems = _.map(definition.dataDimensionItems, function (item) {
                 return item.dataElement || item.indicator;
             });
-            return _.map(dimensionConfiguration.items, function (item) {
+            var mappedItems = _.map(dimensionConfiguration.items, function (item) {
                 var dataDimensionItem = _.find(dataDimensionItems, { id: item.id });
                 //ToDo: Remove item.name and item.description once all Praxis instances have re-downloaded all pivotTables (probably after 8.0 release).
                 return _.merge({
@@ -41,9 +47,10 @@ define(['lodash'], function(_) {
                     }
                 }, dataDimensionItem);
             });
+            return filterItemsWithDataValues(mappedItems, dataValues);
         },
-        ou: function (definition, data) {
-            return _.map(data.metaData.ou, function (orgUnitId) {
+        ou: function (definition, data, dataValues) {
+            var mappedOrgUnits = _.map(data.metaData.ou, function (orgUnitId) {
                 return {
                     id: orgUnitId,
                     name: data.metaData.names[orgUnitId],
@@ -52,9 +59,10 @@ define(['lodash'], function(_) {
                     }
                 };
             });
+            return filterItemsWithDataValues(mappedOrgUnits, dataValues);
         },
-        pe: function (definition, data) {
-            return _.map(data.metaData.pe, function (periodId) {
+        pe: function (definition, data, dataValues) {
+            var mappedPeriods = _.map(data.metaData.pe, function (periodId) {
                 return {
                     id: periodId,
                     name: data.metaData.names[periodId],
@@ -63,8 +71,9 @@ define(['lodash'], function(_) {
                     }
                 };
             });
+            return filterItemsWithDataValues(mappedPeriods, dataValues);
         },
-        category: function (definition, data, dimensionConfiguration) {
+        category: function (definition, data, dataValues, dimensionConfiguration) {
             var categoryOptions = _.flatten(_.map(definition.categoryDimensions, 'categoryOptions'));
             return _.map(dimensionConfiguration.items, function (item) {
                 var categoryOption = _.find(categoryOptions, { id: item.id }),
@@ -84,20 +93,20 @@ define(['lodash'], function(_) {
         return _.includes(categoryIds, dimensionId);
     };
 
-    var mapRows = function (definition, data) {
+    var mapRows = function (definition, data, dataValues) {
         var rowConfiguration = _.first(definition.rows),
             dimensionId = rowConfiguration && rowConfiguration.dimension,
             mappingFunction = isCategoryDimension(definition, dimensionId) ? DIMENSION_MAPPING_FUNCTIONS.category : DIMENSION_MAPPING_FUNCTIONS[dimensionId];
 
-        return mappingFunction ? mappingFunction(definition, data, rowConfiguration) : [];
+        return mappingFunction ? mappingFunction(definition, data, dataValues, rowConfiguration) : [];
     };
 
-    var mapColumns = function (definition, data) {
+    var mapColumns = function (definition, data, dataValues) {
         var mappedColumns = _.map(definition.columns, function (columnConfiguration) {
             var dimensionId = columnConfiguration.dimension,
                 mappingFunction = isCategoryDimension(definition, dimensionId) ? DIMENSION_MAPPING_FUNCTIONS.category : DIMENSION_MAPPING_FUNCTIONS[dimensionId];
 
-            return mappingFunction ? mappingFunction(definition, data, columnConfiguration) : [];
+            return mappingFunction ? mappingFunction(definition, data, dataValues, columnConfiguration) : [];
         });
 
         return _.transform(mappedColumns, function (transformedColumns, thisColumn) {

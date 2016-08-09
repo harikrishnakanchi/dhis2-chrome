@@ -42,6 +42,7 @@ define(['pivotTableData'], function(PivotTableData) {
                 headers: [
                     { name: 'pe' },
                     { name: 'ou' },
+                    { name: 'dx' },
                     { name: 'value' }
                 ],
                 metaData: {
@@ -55,7 +56,8 @@ define(['pivotTableData'], function(PivotTableData) {
                     }
                 },
                 rows: [
-                    ['somePeriod', 'someOrgUnitId', 'someValue']
+                    ['somePeriodId', 'someOrgUnitId', 'someDataElementId', 'someValue'],
+                    ['someOtherPeriodId', 'someOtherOrgUnitId', 'someIndicatorId', 'someValue']
                 ]
             };
         });
@@ -80,8 +82,14 @@ define(['pivotTableData'], function(PivotTableData) {
                 pivotTableData = PivotTableData.create({}, data);
 
                 expect(pivotTableData.dataValues).toEqual([{
-                    pe: 'somePeriod',
+                    pe: 'somePeriodId',
                     ou: 'someOrgUnitId',
+                    dx: 'someDataElementId',
+                    value: 'someValue'
+                }, {
+                    pe: 'someOtherPeriodId',
+                    ou: 'someOtherOrgUnitId',
+                    dx: 'someIndicatorId',
                     value: 'someValue'
                 }]);
             });
@@ -117,7 +125,7 @@ define(['pivotTableData'], function(PivotTableData) {
                         { id: 'someIndicatorId' }
                     ]
                 }];
-                pivotTableData = PivotTableData.create(definition, {});
+                pivotTableData = PivotTableData.create(definition, data);
 
                 expect(pivotTableData.rows).toEqual([{
                     id: 'someDataElementId',
@@ -134,6 +142,23 @@ define(['pivotTableData'], function(PivotTableData) {
                         dx: 'someIndicatorId'
                     }
                 }]);
+            });
+
+            it('should filter out rows without data if dimension is dx', function () {
+                definition.rows = [{
+                    dimension: 'dx',
+                    items: [
+                        { id: 'someDataElementId' },
+                        { id: 'someIndicatorId' }
+                    ]
+                }];
+                data.rows = [
+                    ['somePeriodId', 'someOrgUnitId', 'someDataElementId', 'someValue']
+                ];
+
+                pivotTableData = PivotTableData.create(definition, data);
+
+                expect(_.map(pivotTableData.rows, 'id')).toEqual(['someDataElementId']);
             });
 
             it('should map the items from metaData if dimension is ou', function () {
@@ -157,6 +182,19 @@ define(['pivotTableData'], function(PivotTableData) {
                 }]);
             });
 
+            it('should filter out rows without data if dimension is ou', function () {
+                definition.rows = [{
+                    dimension: 'ou'
+                }];
+                data.rows = [
+                    ['somePeriodId', 'someOrgUnitId', 'someDataElementId', 'someValue']
+                ];
+
+                pivotTableData = PivotTableData.create(definition, data);
+
+                expect(_.map(pivotTableData.rows, 'id')).toEqual(['someOrgUnitId']);
+            });
+
             it('should map the items from metaData if dimension is pe', function () {
                 definition.rows = [{
                     dimension: 'pe'
@@ -176,6 +214,19 @@ define(['pivotTableData'], function(PivotTableData) {
                         pe: 'someOtherPeriodId'
                     }
                 }]);
+            });
+
+            it('should filter out rows without data if dimension is pe', function () {
+                definition.rows = [{
+                    dimension: 'pe'
+                }];
+                data.rows = [
+                    ['somePeriodId', 'someOrgUnitId', 'someDataElementId', 'someValue']
+                ];
+
+                pivotTableData = PivotTableData.create(definition, data);
+
+                expect(_.map(pivotTableData.rows, 'id')).toEqual(['somePeriodId']);
             });
 
             it('should map the items from categoryDimensions if dimension is a category', function () {
@@ -263,7 +314,7 @@ define(['pivotTableData'], function(PivotTableData) {
                         { id: 'someIndicatorId' }
                     ]
                 }];
-                pivotTableData = PivotTableData.create(definition, {});
+                pivotTableData = PivotTableData.create(definition, data);
 
                 expect(_.first(pivotTableData.columns)).toEqual([{
                     id: 'someDataElementId',
