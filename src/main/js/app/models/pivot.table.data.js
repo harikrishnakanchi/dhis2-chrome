@@ -98,9 +98,10 @@ define(['lodash'], function(_) {
     var mapRows = function (definition, data, dataValues) {
         var rowConfiguration = _.first(definition.rows),
             dimensionId = rowConfiguration && rowConfiguration.dimension,
-            mappingFunction = isCategoryDimension(definition, dimensionId) ? DIMENSION_MAPPING_FUNCTIONS.category : DIMENSION_MAPPING_FUNCTIONS[dimensionId];
+            mappingFunction = isCategoryDimension(definition, dimensionId) ? DIMENSION_MAPPING_FUNCTIONS.category : DIMENSION_MAPPING_FUNCTIONS[dimensionId],
+            mappedRows = mappingFunction ? mappingFunction(definition, data, dataValues, rowConfiguration) : [];
 
-        return mappingFunction ? mappingFunction(definition, data, dataValues, rowConfiguration) : [];
+        return _.map(mappedRows, function (row, index) { return _.set(row, 'rowNumber', index + 1); });
     };
 
     var mapColumns = function (definition, data, dataValues) {

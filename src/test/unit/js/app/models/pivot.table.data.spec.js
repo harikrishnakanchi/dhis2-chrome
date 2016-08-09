@@ -123,6 +123,7 @@ define(['pivotTableData'], function(PivotTableData) {
                 pivotTableData = PivotTableData.create(definition, data);
 
                 expect(pivotTableData.rows).toEqual([{
+                    rowNumber: 1,
                     id: 'someDataElementId',
                     name: 'someDataElementName',
                     description: 'someDataElementDescription',
@@ -131,6 +132,7 @@ define(['pivotTableData'], function(PivotTableData) {
                         dx: 'someDataElementId'
                     }
                 }, {
+                    rowNumber: 2,
                     id: 'someIndicatorId',
                     name: 'someIndicatorName',
                     description: 'someIndicatorDescription',
@@ -165,12 +167,14 @@ define(['pivotTableData'], function(PivotTableData) {
                 pivotTableData = PivotTableData.create(definition, data);
 
                 expect(pivotTableData.rows).toEqual([{
+                    rowNumber: 1,
                     id: 'someOrgUnitId',
                     name: 'someOrgUnitName',
                     dataValuesFilter: {
                         ou: 'someOrgUnitId'
                     }
                 }, {
+                    rowNumber: 2,
                     id: 'someOtherOrgUnitId',
                     name: 'someOtherOrgUnitName',
                     dataValuesFilter: {
@@ -199,6 +203,7 @@ define(['pivotTableData'], function(PivotTableData) {
                 pivotTableData = PivotTableData.create(definition, data);
 
                 expect(pivotTableData.rows).toEqual([{
+                    rowNumber: 1,
                     id: 'somePeriodId',
                     name: 'somePeriodName',
                     periodDimension: true,
@@ -206,6 +211,7 @@ define(['pivotTableData'], function(PivotTableData) {
                         pe: 'somePeriodId'
                     }
                 }, {
+                    rowNumber: 2,
                     id: 'someOtherPeriodId',
                     name: 'someOtherPeriodName',
                     periodDimension: true,
@@ -240,12 +246,14 @@ define(['pivotTableData'], function(PivotTableData) {
                 pivotTableData = PivotTableData.create(definition, data);
 
                 expect(pivotTableData.rows).toEqual([{
+                    rowNumber: 1,
                     id: 'someCategoryOptionId',
                     name: 'someCategoryOptionName',
                     dataValuesFilter: {
                         someCategoryId: 'someCategoryOptionId'
                     }
                 }, {
+                    rowNumber: 2,
                     id: 'someOtherCategoryOptionId',
                     name: 'someOtherCategoryOptionName',
                     dataValuesFilter: {
