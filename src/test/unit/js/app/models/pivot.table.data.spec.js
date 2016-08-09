@@ -12,12 +12,14 @@ define(['pivotTableData'], function(PivotTableData) {
                 dataDimensionItems: [{
                     dataElement: {
                         id: 'someDataElementId',
-                        name: 'someDataElementName'
+                        name: 'someDataElementName',
+                        description: 'someDataElementDescription'
                     }
                 }, {
                     indicator: {
                         id: 'someIndicatorId',
-                        name: 'someIndicatorName'
+                        name: 'someIndicatorName',
+                        description: 'someIndicatorDescription'
                     }
                 }],
                 categoryDimensions: [{
@@ -114,12 +116,14 @@ define(['pivotTableData'], function(PivotTableData) {
                 expect(pivotTableData.rows).toEqual([{
                     id: 'someDataElementId',
                     name: 'someDataElementName',
+                    description: 'someDataElementDescription',
                     dataValuesFilter: {
                         dx: 'someDataElementId'
                     }
                 }, {
                     id: 'someIndicatorId',
                     name: 'someIndicatorName',
+                    description: 'someIndicatorDescription',
                     dataValuesFilter: {
                         dx: 'someIndicatorId'
                     }
@@ -258,12 +262,14 @@ define(['pivotTableData'], function(PivotTableData) {
                 expect(_.first(pivotTableData.columns)).toEqual([{
                     id: 'someDataElementId',
                     name: 'someDataElementName',
+                    description: 'someDataElementDescription',
                     dataValuesFilter: {
                         dx: 'someDataElementId'
                     }
                 }, {
                     id: 'someIndicatorId',
                     name: 'someIndicatorName',
+                    description: 'someIndicatorDescription',
                     dataValuesFilter: {
                         dx: 'someIndicatorId'
                     }

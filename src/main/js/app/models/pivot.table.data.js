@@ -28,12 +28,15 @@ define(['lodash'], function(_) {
             });
             return _.map(dimensionConfiguration.items, function (item) {
                 var dataDimensionItem = _.find(dataDimensionItems, { id: item.id });
-                return _.merge(dataDimensionItem, {
+                //ToDo: Remove item.name and item.description once all Praxis instances have re-downloaded all pivotTables (probably after 8.0 release).
+                return _.merge({
                     id: item.id,
+                    name: item.name,
+                    description: item.description,
                     dataValuesFilter: {
                         dx: item.id
                     }
-                });
+                }, dataDimensionItem);
             });
         },
         ou: function (definition, data) {
