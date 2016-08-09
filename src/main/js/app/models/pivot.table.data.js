@@ -42,6 +42,7 @@ define(['lodash'], function(_) {
                     id: item.id,
                     name: item.name,
                     description: item.description,
+                    dataDimension: true,
                     dataValuesFilter: {
                         dx: item.id
                     }
@@ -66,6 +67,7 @@ define(['lodash'], function(_) {
                 return {
                     id: periodId,
                     name: data.metaData.names[periodId],
+                    periodDimension: true,
                     dataValuesFilter: {
                         pe: periodId
                     }

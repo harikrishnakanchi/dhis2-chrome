@@ -126,6 +126,7 @@ define(['pivotTableData'], function(PivotTableData) {
                     id: 'someDataElementId',
                     name: 'someDataElementName',
                     description: 'someDataElementDescription',
+                    dataDimension: true,
                     dataValuesFilter: {
                         dx: 'someDataElementId'
                     }
@@ -133,6 +134,7 @@ define(['pivotTableData'], function(PivotTableData) {
                     id: 'someIndicatorId',
                     name: 'someIndicatorName',
                     description: 'someIndicatorDescription',
+                    dataDimension: true,
                     dataValuesFilter: {
                         dx: 'someIndicatorId'
                     }
@@ -199,12 +201,14 @@ define(['pivotTableData'], function(PivotTableData) {
                 expect(pivotTableData.rows).toEqual([{
                     id: 'somePeriodId',
                     name: 'somePeriodName',
+                    periodDimension: true,
                     dataValuesFilter: {
                         pe: 'somePeriodId'
                     }
                 }, {
                     id: 'someOtherPeriodId',
                     name: 'someOtherPeriodName',
+                    periodDimension: true,
                     dataValuesFilter: {
                         pe: 'someOtherPeriodId'
                     }
