@@ -136,8 +136,8 @@ define(["angularMocks", "utils", "lodash", "moment", "pivotTableController", "ti
             });
 
             it('should prompt the user to download tabular data to CSV with lastUpdated date in the filename', function () {
-                var CHART_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm A";
-                scope.updatedTime = moment('2015-10-29').format(CHART_LAST_UPDATED_TIME_FORMAT);
+                var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm A";
+                scope.updatedTime = moment('2015-10-29').format(REPORTS_LAST_UPDATED_TIME_FORMAT);
                 scope.$apply();
                 scope.exportToCSV();
                 expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith('NewConsultations.Consultations.updated.29-Oct-2015.csv', jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
@@ -174,8 +174,8 @@ define(["angularMocks", "utils", "lodash", "moment", "pivotTableController", "ti
 
                 it("should include lastUpdated time", function () {
                     scope.isCategoryPresent = false;
-                    var CHART_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY HH[:]mm A";
-                    scope.updatedTime = moment('2015-10-29').format(CHART_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
+                    var REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY HH[:]mm A";
+                    scope.updatedTime = moment('2015-10-29').format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
                     var expected = '"Updated","' + scope.updatedTime + '"';
 
                     scope.$apply();

@@ -1,7 +1,7 @@
 define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURItoBlob"], function(d3, _, moment, CustomAttributes, SVGUtils, dataURItoBlob) {
     return function($rootScope, $scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService, changeLogRepository) {
 
-        var CHART_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm A";
+        var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm A";
         var formatYAxisTicks = function(datum) {
             var isFraction = function(x) { return x % 1 !== 0; };
             return isFraction(datum) ? '' : d3.format('.0f')(datum);
@@ -91,7 +91,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 if (match) {
                     var serviceName = match[1];
                     var chartName = match[2];
-                    return [serviceName, chartName, "updated", moment(date, CHART_LAST_UPDATED_TIME_FORMAT).format("DD-MMM-YYYY"), 'png'].join('.');
+                    return [serviceName, chartName, "updated", moment(date, REPORTS_LAST_UPDATED_TIME_FORMAT).format("DD-MMM-YYYY"), 'png'].join('.');
                 } else {
                     return "";
                 }
@@ -333,7 +333,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
 
         var loadLastUpdatedForChartsAndReports = function () {
             var formatlastUpdatedTime = function (date) {
-                return date ? moment(date).format(CHART_LAST_UPDATED_TIME_FORMAT) : undefined;
+                return date ? moment(date).format(REPORTS_LAST_UPDATED_TIME_FORMAT) : undefined;
             };
             var projectId = $rootScope.currentUser.selectedProject.id;
             return $q.all({

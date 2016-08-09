@@ -380,11 +380,11 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
 
         it('should get the lastUpdated', function () {
             var lastUpdatedTime = currentTime, projectId = rootScope.currentUser.selectedProject.id,
-            CHART_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm A";
+            REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm A";
             changeLogRepository.get.and.returnValue(utils.getPromise(q, lastUpdatedTime));
             scope.$apply();
             expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyPivotTableData:' + projectId);
-            expect(scope.lastUpdatedTimeForProjectReport).toEqual(moment(lastUpdatedTime).format(CHART_LAST_UPDATED_TIME_FORMAT));
+            expect(scope.lastUpdatedTimeForProjectReport).toEqual(moment(lastUpdatedTime).format(REPORTS_LAST_UPDATED_TIME_FORMAT));
         });
     });
 });

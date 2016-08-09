@@ -2,7 +2,7 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
     return function($rootScope, $q, $scope, orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService) {
         $scope.selectedProject = $rootScope.currentUser.selectedProject;
 
-        var CHART_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm A";
+        var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm A";
         var getNumberOfISOWeeksInMonth = function (period) {
             var m = moment(period, 'YYYYMM');
 
@@ -190,7 +190,7 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
 
         var loadLastUpdatedTimeForProjectReport = function() {
             var formatlastUpdatedTime = function (date) {
-                return date ? moment(date).format(CHART_LAST_UPDATED_TIME_FORMAT) : undefined;
+                return date ? moment(date).format(REPORTS_LAST_UPDATED_TIME_FORMAT) : undefined;
             };
 
             return changeLogRepository.get('monthlyPivotTableData:' +  $scope.selectedProject.id)

@@ -2,15 +2,15 @@ define(["lodash", "moment"], function(_, moment) {
     return function($scope, $rootScope, translationsService, filesystemService) {
         $scope.resourceBundle = $rootScope.resourceBundle;
         var DEFAULT_SORT_KEY = 'dataElementIndex';
-        var CHART_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm A";
-        var CHART_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY HH[:]mm A";
+        var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm A";
+        var REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY HH[:]mm A";
 
         $scope.showDownloadButton = $scope.disableDownload != 'true';
 
         var getCsvFileName = function() {
             var formatDate = function (date) {
                 date = date || moment();
-                return moment(date, CHART_LAST_UPDATED_TIME_FORMAT).format("DD-MMM-YYYY");
+                return moment(date, REPORTS_LAST_UPDATED_TIME_FORMAT).format("DD-MMM-YYYY");
             };
 
             var regex = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]\s([a-zA-Z0-9\s]+)/;
@@ -35,7 +35,7 @@ define(["lodash", "moment"], function(_, moment) {
 
             var getCSVHeaders = function() {
                 var getLastUpdatedTimeContent = function () {
-                    var formattedTime = moment($scope.updatedTime, CHART_LAST_UPDATED_TIME_FORMAT).format(CHART_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
+                    var formattedTime = moment($scope.updatedTime, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
                     return [escapeString('Updated'), escapeString(formattedTime)].join(DELIMITER);
                 };
                 var headers = [escapeString($scope.resourceBundle.dataElement)];
