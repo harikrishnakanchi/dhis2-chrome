@@ -172,6 +172,17 @@ define(["angularMocks", "utils", "lodash", "moment", "pivotTableController", "ti
                     expect(csvContent).toContain(expected);
                 });
 
+                it("should include lastUpdated time", function () {
+                    scope.isCategoryPresent = false;
+                    var CHART_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY HH[:]mm A";
+                    scope.updatedTime = moment('2015-10-29').format(CHART_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
+                    var expected = '"Updated","' + scope.updatedTime + '"';
+
+                    scope.$apply();
+                    scope.exportToCSV();
+                    expect(csvContent).toContain(expected);
+                });
+
                 it("should get headers if category not present", function () {
                     scope.isCategoryPresent = false;
                     scope.exportToCSV();

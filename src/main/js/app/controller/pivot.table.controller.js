@@ -3,6 +3,7 @@ define(["lodash", "moment"], function(_, moment) {
         $scope.resourceBundle = $rootScope.resourceBundle;
         var DEFAULT_SORT_KEY = 'dataElementIndex';
         var CHART_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm A";
+        var CHART_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY HH[:]mm A";
 
         $scope.showDownloadButton = $scope.disableDownload != 'true';
 
@@ -33,6 +34,10 @@ define(["lodash", "moment"], function(_, moment) {
             };
 
             var getCSVHeaders = function() {
+                var getLastUpdatedTimeContent = function () {
+                    var formattedTime = moment($scope.updatedTime, CHART_LAST_UPDATED_TIME_FORMAT).format(CHART_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
+                    return [escapeString('Updated'), escapeString(formattedTime)].join(DELIMITER);
+                };
                 var headers = [escapeString($scope.resourceBundle.dataElement)];
                 if ($scope.isCategoryPresent)
                     headers.push(escapeString($scope.resourceBundle.category));
@@ -48,7 +53,11 @@ define(["lodash", "moment"], function(_, moment) {
                         headers.push(escapeString(name));
                     }
                 });
-                return headers.join(DELIMITER);
+                var headerContent = headers.join(DELIMITER);
+                if ($scope.updatedTime) {
+                    return [getLastUpdatedTimeContent(), headerContent].join(NEW_LINE);
+                }
+                return headerContent;
             };
             var getCSVData = function () {
                 var sortedViewMap;
