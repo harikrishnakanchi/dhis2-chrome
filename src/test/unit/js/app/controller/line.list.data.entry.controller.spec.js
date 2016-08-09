@@ -139,75 +139,78 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 Timecop.uninstall();
             });
 
-            it("should set scope variables on init", function() {
-                expect(scope.selectedModuleId).toBeDefined();
-                expect(scope.selectedModuleName).toBeDefined();
-                expect(scope.originOrgUnits).toBeDefined();
-                expect(scope.program).toBeDefined();
-                expect(scope.optionSetMapping).toBeDefined();
-            });
+            describe('init', function () {
 
-            it("should load dataValues on init", function() {
+                it("should set scope variables on init", function() {
+                    expect(scope.selectedModuleId).toBeDefined();
+                    expect(scope.selectedModuleName).toBeDefined();
+                    expect(scope.originOrgUnits).toBeDefined();
+                    expect(scope.program).toBeDefined();
+                    expect(scope.optionSetMapping).toBeDefined();
+                });
 
-                var ev = {
-                    "event": "event1",
-                    "dataValues": [{
-                        "name": "Case Number - Measles Outbreak",
-                        "type": "TEXT",
-                        "value": "66",
-                        "dataElement": "de1"
-                    }, {
-                        "name": "Date of admission - Measles Outbreak",
-                        "type": "DATE",
-                        "value": "2015-04-15",
-                        "dataElement": "de2"
-                    }, {
-                        "name": "Age at visit - Measles Outbreak",
-                        "type": "INTEGER",
-                        "value": 3,
-                        "dataElement": "de3"
-                    }, {
-                        "name": "Sex - Measles Outbreak",
-                        "type": "TEXT",
-                        "value": "os1o1",
-                        "dataElement": "de4"
-                    }]
-                };
-                programEventRepository.findEventById.and.returnValue(utils.getPromise(q, [ev]));
+                it("should load dataValues on init", function() {
 
-
-                var optionSetMapping = {
-                    "optionSetMap": {
-                        "os1": [{
-                            "id": 'os1o1',
-                            "code": 'os1o1',
-                            "name": 'os1o1 name',
-                            "displayName": 'os1o1 name',
-                        }],
-                        "os2": [{
-                            "id": 'os2o1',
-                            "code": 'os2o1',
-                            "name": 'os2o1 name',
-                            "displayName": 'os2o1 translated name'
+                    var ev = {
+                        "event": "event1",
+                        "dataValues": [{
+                            "name": "Case Number - Measles Outbreak",
+                            "type": "TEXT",
+                            "value": "66",
+                            "dataElement": "de1"
+                        }, {
+                            "name": "Date of admission - Measles Outbreak",
+                            "type": "DATE",
+                            "value": "2015-04-15",
+                            "dataElement": "de2"
+                        }, {
+                            "name": "Age at visit - Measles Outbreak",
+                            "type": "INTEGER",
+                            "value": 3,
+                            "dataElement": "de3"
+                        }, {
+                            "name": "Sex - Measles Outbreak",
+                            "type": "TEXT",
+                            "value": "os1o1",
+                            "dataElement": "de4"
                         }]
-                    }
-                };
-                optionSetRepository.getOptionSetMapping.and.returnValue(utils.getPromise(q, optionSetMapping));
-                translationsService.translateOptionSetMap.and.returnValue(optionSetMapping.optionSetMap);
+                    };
+                    programEventRepository.findEventById.and.returnValue(utils.getPromise(q, [ev]));
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
-                scope.$apply();
 
-                expect(scope.dataValues).toEqual({
-                    'de1': '66',
-                    'de2': "2015-04-15",
-                    'de3': 3,
-                    'de4': {
-                        'id': 'os1o1',
-                        'code': 'os1o1',
-                        'name': 'os1o1 name',
-                        'displayName': 'os1o1 name'
-                    }
+                    var optionSetMapping = {
+                        "optionSetMap": {
+                            "os1": [{
+                                "id": 'os1o1',
+                                "code": 'os1o1',
+                                "name": 'os1o1 name',
+                                "displayName": 'os1o1 name',
+                            }],
+                            "os2": [{
+                                "id": 'os2o1',
+                                "code": 'os2o1',
+                                "name": 'os2o1 name',
+                                "displayName": 'os2o1 translated name'
+                            }]
+                        }
+                    };
+                    optionSetRepository.getOptionSetMapping.and.returnValue(utils.getPromise(q, optionSetMapping));
+                    translationsService.translateOptionSetMap.and.returnValue(optionSetMapping.optionSetMap);
+
+                    var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
+                    scope.$apply();
+
+                    expect(scope.dataValues).toEqual({
+                        'de1': '66',
+                        'de2': "2015-04-15",
+                        'de3': 3,
+                        'de4': {
+                            'id': 'os1o1',
+                            'code': 'os1o1',
+                            'name': 'os1o1 name',
+                            'displayName': 'os1o1 name'
+                        }
+                    });
                 });
             });
 
