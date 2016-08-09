@@ -38,9 +38,9 @@
                 <div ng-show="!selectedDataset.isMonthlyPivotTablesAvailable">
                     <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
                 </div>
-                <span ng-show="updatedForMonthlyPivotTable && selectedDataset.isMonthlyPivotTablesAvailable" class="text-info">
+                <div ng-show="updatedForMonthlyPivotTable && selectedDataset.isMonthlyPivotTablesAvailable" class="text-info mb15">
                     <strong> Updated: {{ updatedForMonthlyPivotTable }} </strong>
-                </span>
+                </div>
                 <div class="exp-coll-group">
                     <div ng-if="table.definition.monthlyReport && table.isTableDataAvailable" ng-repeat="table in pivotTables | filter: {dataSetCode: selectedDataset.code} | orderBy: 'definition.displayPosition'" class="exportCSV-container">
                         <accordion close-others="false">
@@ -50,7 +50,7 @@
                                     <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                                 </accordion-heading>
                                 <div>
-                                    <pivot-table definition="table.definition" data="table.data" resource-bundle="resourceBundle"></pivot-table>
+                                    <pivot-table definition="table.definition" data="table.data" updated-time="{{ updatedForMonthlyPivotTable }}" resource-bundle="resourceBundle"></pivot-table>
                                 </div>
                             </accordion-group>
                         </accordion>
