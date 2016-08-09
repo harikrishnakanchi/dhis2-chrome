@@ -79,7 +79,12 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
         };
 
         this.getUpdatedPivotTables = function(lastUpdatedTime) {
-            var requiredFields = 'id,name,sortOrder,categoryDimensions[dataElementCategory,categoryOptions[:identifiable]],dataElements,indicators,dataDimensionItems,relativePeriods,columns[dimension,filter,items[id,name]],rows[dimension,filter,items[id,name,description]],filters[dimension,filter,items[id,name]]';
+            var requiredFields = 'id,name,sortOrder,relativePeriods,' +
+                                 'categoryDimensions[dataElementCategory,categoryOptions[:identifiable]],' +
+                                 'dataDimensionItems[dataElement[id,name,formName,description],indicator[id,name,description]],' +
+                                 'columns[dimension,filter,items[id]],' +
+                                 'rows[dimension,filter,items[id]],' +
+                                 'filters[dimension,filter,items[id]]';
             return getResourceIds(dhisUrl.pivotTables, 'reportTables', lastUpdatedTime).then(_.partial(getResourceDetails, dhisUrl.pivotTables, requiredFields));
         };
 

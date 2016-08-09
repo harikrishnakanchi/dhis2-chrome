@@ -211,7 +211,11 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
             it('downloads the details of each pivot table', function () {
                 httpBackend.expectGET(/.*reportTables.json.*/).respond(200, pivotTableIds);
 
-                var expectedQueryParams = 'fields=id,name,sortOrder,categoryDimensions%5BdataElementCategory,categoryOptions%5B:identifiable%5D%5D,dataElements,indicators,dataDimensionItems,relativePeriods,columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name,description%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D';
+                var expectedQueryParams = encodeURI('fields=id,name,sortOrder,relativePeriods,' +
+                                                    'categoryDimensions[dataElementCategory,categoryOptions[:identifiable]],' +
+                                                    'dataDimensionItems[dataElement[id,name,formName,description],indicator[id,name,description]],' +
+                                                    'columns[dimension,filter,items[id]],rows[dimension,filter,items[id]],' +
+                                                    'filters[dimension,filter,items[id]]');
                 httpBackend.expectGET(properties.dhis.url + '/api/reportTables/pivotTable1.json?' + expectedQueryParams).respond(200, {});
                 httpBackend.expectGET(properties.dhis.url + '/api/reportTables/pivotTable2.json?' + expectedQueryParams).respond(200, {});
 
