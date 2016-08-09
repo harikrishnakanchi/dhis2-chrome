@@ -111,12 +111,7 @@ define(['pivotTableData'], function(PivotTableData) {
             });
         });
 
-        describe('rows', function () {
-            it('should return an empty array if no row dimensions exist', function () {
-                pivotTableData = PivotTableData.create({}, {});
-                expect(pivotTableData.rows).toEqual([]);
-            });
-
+        describe('mapping of dimensions for rows and columns', function () {
             it('should map the items to dataDimensionItems if dimension is dx', function () {
                 definition.rows = [{
                     dimension: 'dx',
@@ -144,7 +139,7 @@ define(['pivotTableData'], function(PivotTableData) {
                 }]);
             });
 
-            it('should filter out rows without data if dimension is dx', function () {
+            it('should filter out data dimension items without data', function () {
                 definition.rows = [{
                     dimension: 'dx',
                     items: [
@@ -182,7 +177,7 @@ define(['pivotTableData'], function(PivotTableData) {
                 }]);
             });
 
-            it('should filter out rows without data if dimension is ou', function () {
+            it('should filter out orgUnits without data', function () {
                 definition.rows = [{
                     dimension: 'ou'
                 }];
@@ -216,7 +211,7 @@ define(['pivotTableData'], function(PivotTableData) {
                 }]);
             });
 
-            it('should filter out rows without data if dimension is pe', function () {
+            it('should filter out periods without data', function () {
                 definition.rows = [{
                     dimension: 'pe'
                 }];
@@ -256,107 +251,18 @@ define(['pivotTableData'], function(PivotTableData) {
             });
         });
 
+        describe('rows', function () {
+            it('should return an empty array if no row dimensions exist', function () {
+                pivotTableData = PivotTableData.create({}, {});
+                expect(pivotTableData.rows).toEqual([]);
+            });
+
+        });
+
         describe('columns', function () {
             it('should return an empty array if no column dimensions exist', function () {
                 pivotTableData = PivotTableData.create({}, {});
                 expect(pivotTableData.columns).toEqual([]);
-            });
-
-            it('should map the items from metaData if dimension is pe', function () {
-                definition.columns = [{
-                    dimension: 'pe'
-                }];
-
-                pivotTableData = PivotTableData.create(definition, data);
-
-                expect(_.first(pivotTableData.columns)).toEqual([{
-                    id: 'somePeriodId',
-                    name: 'somePeriodName',
-                    dataValuesFilter: {
-                        pe: 'somePeriodId'
-                    }
-                }, {
-                    id: 'someOtherPeriodId',
-                    name: 'someOtherPeriodName',
-                    dataValuesFilter: {
-                        pe: 'someOtherPeriodId'
-                    }
-                }]);
-            });
-
-            it('should map the items from metaData if dimension is ou', function () {
-                definition.columns = [{
-                    dimension: 'ou'
-                }];
-
-                pivotTableData = PivotTableData.create(definition, data);
-
-                expect(_.first(pivotTableData.columns)).toEqual([{
-                    id: 'someOrgUnitId',
-                    name: 'someOrgUnitName',
-                    dataValuesFilter: {
-                        ou: 'someOrgUnitId'
-                    }
-                }, {
-                    id: 'someOtherOrgUnitId',
-                    name: 'someOtherOrgUnitName',
-                    dataValuesFilter: {
-                        ou: 'someOtherOrgUnitId'
-                    }
-                }]);
-            });
-
-            it('should map the items to dataDimensionItems if dimension is dx', function () {
-                definition.columns = [{
-                    dimension: 'dx',
-                    items: [
-                        { id: 'someDataElementId' },
-                        { id: 'someIndicatorId' }
-                    ]
-                }];
-                pivotTableData = PivotTableData.create(definition, data);
-
-                expect(_.first(pivotTableData.columns)).toEqual([{
-                    id: 'someDataElementId',
-                    name: 'someDataElementName',
-                    description: 'someDataElementDescription',
-                    dataValuesFilter: {
-                        dx: 'someDataElementId'
-                    }
-                }, {
-                    id: 'someIndicatorId',
-                    name: 'someIndicatorName',
-                    description: 'someIndicatorDescription',
-                    dataValuesFilter: {
-                        dx: 'someIndicatorId'
-                    }
-                }]);
-            });
-
-            it('should map the items from categoryDimensions if dimension is a category', function () {
-                definition.columns = [{
-                    dimension: 'someCategoryId',
-                    items: [
-                        { id: 'someCategoryOptionId' },
-                        { id: 'someOtherCategoryOptionId' }
-                    ]
-                }];
-
-                pivotTableData = PivotTableData.create(definition, data);
-
-                expect(_.first(pivotTableData.columns)).toEqual([{
-                    id: 'someCategoryOptionId',
-                    name: 'someCategoryOptionName',
-                    dataValuesFilter: {
-                        someCategoryId: 'someCategoryOptionId'
-                    }
-                }, {
-                    id: 'someOtherCategoryOptionId',
-                    name: 'someOtherCategoryOptionName',
-                    dataValuesFilter: {
-                        someCategoryId: 'someOtherCategoryOptionId'
-                    }
-                }]);
             });
 
             it('should map the cartesian product if there are multiple columns', function () {
