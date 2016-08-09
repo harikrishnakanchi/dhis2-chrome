@@ -38,7 +38,7 @@
                     <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
                 </div>
                 <div class="exp-coll-group" ng-if="selectedDataset.isWeeklyPivotTablesAvailable">
-                    <div  class="text-info mb15">
+                    <div  class="text-info mb15" ng-show="updatedForWeeklyPivotTable">
                         <strong> Updated: {{ updatedForWeeklyPivotTable }} </strong>
                     </div>
                     <div ng-if="table.definition.weeklyReport && table.isTableDataAvailable" ng-repeat="table in pivotTables | filter: {dataSetCode: selectedDataset.code} | orderBy: 'definition.displayPosition'" class="exportCSV-container">

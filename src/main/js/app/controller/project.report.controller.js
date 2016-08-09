@@ -103,8 +103,14 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
         };
 
         $scope.exportToCSV = function () {
-            var lastUpdatedDate = moment($scope.lastUpdatedTimeForProjectReport, REPORTS_LAST_UPDATED_TIME_FORMAT).format("DD-MMM-YYYY");
-            var filename = [$scope.selectedProject.name, 'ProjectReport', 'updated', lastUpdatedDate, 'csv'].join('.');
+            var lastUpdatedTimeDetails;
+            if ($scope.lastUpdatedTimeForProjectReport) {
+                lastUpdatedTimeDetails = ['updated', moment($scope.lastUpdatedTimeForProjectReport, REPORTS_LAST_UPDATED_TIME_FORMAT).format("DD-MMM-YYYY")].join('.');
+            }
+            else {
+                lastUpdatedTimeDetails = moment().format("DD-MMM-YYYY");
+            }
+            var filename = [$scope.selectedProject.name, 'ProjectReport', lastUpdatedTimeDetails, 'csv'].join('.');
             filesystemService.promptAndWriteFile(filename, new Blob([buildCsvContent()], {type: 'text/csv'}), filesystemService.FILE_TYPE_OPTIONS.CSV);
         };
 

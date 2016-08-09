@@ -83,15 +83,21 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
         $scope.monthlyLineChartOptions = getChartOptions(lineChartOptions, false);
 
         $scope.downloadChartAsPng = function(chartDefinition, date) {
-            var svgElement = document.getElementById(chartDefinition.id).firstElementChild;
+            var svgElement = document.getElementById(chartDefinition.id).firstElementChild, lastUpdatedTimeDetails;
 
             var getPNGFileName = function() {
                 var regex = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]\s([a-zA-Z0-9\s]+)/;
                 var match = regex.exec(chartDefinition.name);
+                if (date) {
+                    lastUpdatedTimeDetails = ['updated', moment(date, REPORTS_LAST_UPDATED_TIME_FORMAT).format("DD-MMM-YYYY")].join('.');
+                }
+                else {
+                    lastUpdatedTimeDetails = moment().format("DD-MMM-YYYY");
+                }
                 if (match) {
                     var serviceName = match[1];
                     var chartName = match[2];
-                    return [serviceName, chartName, "updated", moment(date, REPORTS_LAST_UPDATED_TIME_FORMAT).format("DD-MMM-YYYY"), 'png'].join('.');
+                    return [serviceName, chartName, lastUpdatedTimeDetails, 'png'].join('.');
                 } else {
                     return "";
                 }
