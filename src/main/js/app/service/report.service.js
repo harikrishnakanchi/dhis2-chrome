@@ -70,7 +70,10 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
         };
 
         this.getUpdatedCharts = function(lastUpdatedTime) {
-            var requiredFields = 'id,name,title,relativePeriods,type,columns[dimension,filter,items[id,name,description]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]]';
+            var requiredFields = 'id,name,title,relativePeriods,type,' +
+                                 'columns[dimension,items[id,name,description]],' +
+                                 'rows[dimension,items[id,name]],' +
+                                 'filters[dimension,items[id,name]]';
             return getResourceIds(dhisUrl.charts, 'charts', lastUpdatedTime).then(_.partial(getResourceDetails, dhisUrl.charts, requiredFields));
         };
 
@@ -82,9 +85,9 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
             var requiredFields = 'id,name,sortOrder,relativePeriods,' +
                                  'categoryDimensions[dataElementCategory,categoryOptions[:identifiable]],' +
                                  'dataDimensionItems[dataElement[id,name,formName,description],indicator[id,name,description]],' +
-                                 'columns[dimension,filter,items[id]],' +
-                                 'rows[dimension,filter,items[id]],' +
-                                 'filters[dimension,filter,items[id]]';
+                                 'columns[dimension,items[id]],' +
+                                 'rows[dimension,items[id]],' +
+                                 'filters[dimension,items[id]]';
             return getResourceIds(dhisUrl.pivotTables, 'reportTables', lastUpdatedTime).then(_.partial(getResourceDetails, dhisUrl.pivotTables, requiredFields));
         };
 
