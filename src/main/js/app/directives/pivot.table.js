@@ -6,7 +6,8 @@ define([], function() {
                 definition: "=",
                 resourceBundle:"=",
                 disableDownload: "@?",
-                orderOfItems:"=?"
+                orderOfItems:"=?",
+                updatedTime:"@?"
             },
             link: function(scope, element, attrs) {
                 if(attrs.orderOfItems) {

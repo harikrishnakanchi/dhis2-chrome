@@ -2,16 +2,23 @@ define(["lodash", "moment"], function(_, moment) {
     return function($scope, $rootScope, translationsService, filesystemService) {
         $scope.resourceBundle = $rootScope.resourceBundle;
         var DEFAULT_SORT_KEY = 'dataElementIndex';
+        var CHART_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm A";
 
         $scope.showDownloadButton = $scope.disableDownload != 'true';
 
         var getCsvFileName = function() {
+            var formatDate = function (date) {
+                date = date || moment();
+                return moment(date, CHART_LAST_UPDATED_TIME_FORMAT).format("DD-MMM-YYYY");
+            };
+
             var regex = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]\s([a-zA-Z0-9\s]+)/;
             var match = regex.exec($scope.definition.name);
             if (match) {
                 var serviceName = match[1];
                 var tableName = match[2];
-                return [serviceName, tableName, moment().format("DD-MMM-YYYY"), 'csv'].join('.');
+                var updatedTimeDetails = $scope.updatedTime ? ['updated', formatDate($scope.updatedTime)] : [formatDate()];
+                return _.flatten([serviceName, tableName, updatedTimeDetails, 'csv']).join('.');
             } else {
                 return "";
             }
