@@ -79,14 +79,14 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
             if ($scope.filterParams.filterBy === "dateRange") {
                 var startDate = $location.search().startDate;
                 var endDate = $location.search().endDate;
-                $scope.filterParams.startDate = moment(startDate).startOf('day').toDate();
-                $scope.filterParams.endDate = moment(endDate).endOf('day').toDate();
+                $scope.filterParams.startDate = $scope.filterParams.startDate || moment(startDate).startOf('day').toDate();
+                $scope.filterParams.endDate = $scope.filterParams.endDate || moment(endDate).endOf('day').toDate();
 
                 $scope.filterByDateRange();
             }
 
             if ($scope.filterParams.filterBy === "caseNumber") {
-                $scope.filterParams.caseNumber = $location.search().caseNumber;
+                $scope.filterParams.caseNumber = $scope.filterParams.caseNumber || $location.search().caseNumber;
                 $scope.filterByCaseNumber();
             }
 
