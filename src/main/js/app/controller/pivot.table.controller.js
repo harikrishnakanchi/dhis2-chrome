@@ -55,7 +55,7 @@ define(["lodash", "moment"], function(_, moment) {
                 });
                 var headerContent = headers.join(DELIMITER);
                 if ($scope.updatedTime) {
-                    return [getLastUpdatedTimeContent(), headerContent].join(NEW_LINE);
+                    return [getLastUpdatedTimeContent(), "",headerContent].join(NEW_LINE);
                 }
                 return headerContent;
             };

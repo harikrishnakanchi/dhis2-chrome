@@ -93,6 +93,7 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
 
             if ($scope.lastUpdatedTimeForProjectReport) {
                 addLastUpdatedTimeDetails();
+                csvData.push([]);
             }
             addProjectBasicInfo();
             csvData.push([]);
