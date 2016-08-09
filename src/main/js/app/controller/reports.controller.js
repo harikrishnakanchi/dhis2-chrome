@@ -1,7 +1,8 @@
 define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURItoBlob"], function(d3, _, moment, CustomAttributes, SVGUtils, dataURItoBlob) {
     return function($rootScope, $scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService, changeLogRepository) {
 
-        var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm A";
+        var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
+        var REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY hh[.]mm A";
         var formatYAxisTicks = function(datum) {
             var isFraction = function(x) { return x % 1 !== 0; };
             return isFraction(datum) ? '' : d3.format('.0f')(datum);
@@ -89,7 +90,8 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 var regex = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]\s([a-zA-Z0-9\s]+)/;
                 var match = regex.exec(chartDefinition.name);
                 if (date) {
-                    lastUpdatedTimeDetails = ['updated', moment(date, REPORTS_LAST_UPDATED_TIME_FORMAT).format("DD-MMM-YYYY")].join('.');
+                    var formattedDate = moment(date, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
+                    lastUpdatedTimeDetails = '[updated ' + formattedDate + ']';
                 }
                 else {
                     lastUpdatedTimeDetails = moment().format("DD-MMM-YYYY");

@@ -639,7 +639,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                 Timecop.install();
                 Timecop.freeze(new Date("2016-07-21T12:43:54.972Z"));
 
-                var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm A";
+                var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm";
                 currentDate = moment().format(REPORTS_LAST_UPDATED_TIME_FORMAT);
                 var mockdataURI = 'data:text/plain;charset=utf-8;base64,aGVsbG8gd29ybGQ=';
                 spyOn(SVGUtils, 'svgAsPngUri').and.callFake(function(svgEl, options, callback) {
@@ -673,7 +673,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             });
 
             it('should prompt user to save chart as PNG with suggested name', function () {
-                expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith('ServiceName.ChartName.updated.21-Jul-2016.png', blobObject, filesystemService.FILE_TYPE_OPTIONS.PNG);
+                expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith('ServiceName.ChartName.[updated 21 July 2016 06.13 PM].png', blobObject, filesystemService.FILE_TYPE_OPTIONS.PNG);
             });
         });
 

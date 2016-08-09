@@ -2,8 +2,8 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
     return function($rootScope, $q, $scope, orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService) {
         $scope.selectedProject = $rootScope.currentUser.selectedProject;
 
-        var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm A";
-        var REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY HH[:]mm A";
+        var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
+        var REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY hh[.]mm A";
         var getNumberOfISOWeeksInMonth = function (period) {
             var m = moment(period, 'YYYYMM');
 
@@ -105,7 +105,8 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
         $scope.exportToCSV = function () {
             var lastUpdatedTimeDetails;
             if ($scope.lastUpdatedTimeForProjectReport) {
-                lastUpdatedTimeDetails = ['updated', moment($scope.lastUpdatedTimeForProjectReport, REPORTS_LAST_UPDATED_TIME_FORMAT).format("DD-MMM-YYYY")].join('.');
+                var formattedDate = moment($scope.lastUpdatedTimeForProjectReport, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
+                lastUpdatedTimeDetails = '[updated ' + formattedDate + ']';
             }
             else {
                 lastUpdatedTimeDetails = moment().format("DD-MMM-YYYY");

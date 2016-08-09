@@ -306,7 +306,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             });
             
             it('should prompt the user to save the CSV file with suggested filename', function () {
-                var expectedFilename = 'Aweil - SS153.ProjectReport.updated.' + moment(lastUpdatedTime).format('DD-MMM-YYYY') + '.csv';
+                var expectedFilename = 'Aweil - SS153.ProjectReport.[updated 28 October 2015 06.13 PM].csv';
                 expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
             });
 
@@ -316,7 +316,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
                 });
 
                 it('should contain project last downloaded time information', function () {
-                    var expectedContent = '"Updated","28 October 2015 18:13 PM"';
+                    var expectedContent = '"Updated","28 October 2015 06.13 PM"';
                     expect(csvContent).toContain(expectedContent);
                 });
 
@@ -386,7 +386,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
 
         it('should get the lastUpdated', function () {
             var lastUpdatedTime = currentTime, projectId = rootScope.currentUser.selectedProject.id,
-            REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm A";
+            REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
             changeLogRepository.get.and.returnValue(utils.getPromise(q, lastUpdatedTime));
             scope.$apply();
             expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyPivotTableData:' + projectId);
