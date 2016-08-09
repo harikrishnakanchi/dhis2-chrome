@@ -33,15 +33,15 @@
                     <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
                 </div>
                 <div class="exp-coll-group" ng-if="selectedDataset.isWeeklyPivotTablesAvailable">
-                    <div ng-if="table.definition.weeklyReport && table.isTableDataAvailable" ng-repeat="table in pivotTables | filter: {dataSetCode: selectedDataset.code} | orderBy: 'definition.displayPosition'" class="exportCSV-container">
+                    <div ng-repeat="table in pivotTables | filter: { weeklyReport: true, dataSetCode: selectedDataset.code, isTableDataAvailable: true } | orderBy: 'displayPosition'" class="exportCSV-container">
                         <accordion close-others="false">
                             <accordion-group is-open="status.open">
                                 <accordion-heading>
-                                    <span>{{ table.definition.title }}</span>
+                                    <span>{{ table.title }}</span>
                                     <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                                 </accordion-heading>
                                 <div>
-                                    <pivot-table definition="table.definition" data="table.data" resource-bundle="resourceBundle"></pivot-table>
+                                    <pivot-table table="table" resource-bundle="resourceBundle"></pivot-table>
                                 </div>
                             </accordion-group>
                         </accordion>

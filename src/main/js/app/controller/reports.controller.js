@@ -266,14 +266,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
 
         var transformTables = function(tables) {
             return $q.all(_.map(tables, function(tableDefinition) {
-                return pivotTableRepository.getDataForPivotTable(tableDefinition.name, $routeParams.orgUnit).then(function(data) {
-                    return {
-                        definition: tableDefinition,
-                        data: data,
-                        dataSetCode: tableDefinition.dataSetCode,
-                        isTableDataAvailable: !!(data && data.rows && data.rows.length > 0)
-                    };
-                });
+                return pivotTableRepository.getPivotTableData(tableDefinition, $routeParams.orgUnit);
             }));
         };
 
@@ -312,13 +305,8 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                     return chart.definition.monthlyChart && chart.data && chart.data.length > 0;
                 });
 
-                eachDataSet.isWeeklyPivotTablesAvailable = _.any(filteredPivotTables, function(table) {
-                    return table.definition.weeklyReport && table.isTableDataAvailable;
-                });
-
-                eachDataSet.isMonthlyPivotTablesAvailable = _.any(filteredPivotTables, function(table) {
-                    return table.definition.monthlyReport && table.isTableDataAvailable;
-                });
+                eachDataSet.isWeeklyPivotTablesAvailable = _.any(filteredPivotTables, { weeklyReport: true, isTableDataAvailable: true });
+                eachDataSet.isMonthlyPivotTablesAvailable = _.any(filteredPivotTables, { monthlyReport: true, isTableDataAvailable: true });
 
                 eachDataSet.isReportsAvailable = eachDataSet.isWeeklyChartsAvailable || eachDataSet.isMonthlyChartsAvailable || eachDataSet.isMonthlyPivotTablesAvailable || eachDataSet.isWeeklyPivotTablesAvailable;
             });
