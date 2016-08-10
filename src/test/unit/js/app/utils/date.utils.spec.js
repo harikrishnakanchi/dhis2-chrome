@@ -60,5 +60,14 @@ define(['dateUtils', 'moment', 'timecop'], function(dateUtils, moment, timecop) 
                 expect(actualResult).toEqual(['2015W52', '2015W53', '2016W01']);
             });
         });
+
+        describe('getNumberOfISOWeeksInMonth', function () {
+            it('should return the number of weeks for a given month', function () {
+                var monthWith4Weeks = '201601',
+                    monthWith5Weeks = '201608';
+                expect(dateUtils.getNumberOfISOWeeksInMonth(monthWith4Weeks)).toEqual(4);
+                expect(dateUtils.getNumberOfISOWeeksInMonth(monthWith5Weeks)).toEqual(5);
+            });
+        });
     });
 });
