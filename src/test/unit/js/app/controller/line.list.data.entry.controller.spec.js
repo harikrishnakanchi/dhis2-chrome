@@ -149,7 +149,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     expect(scope.selectedModuleName).toBeDefined();
                     expect(scope.originOrgUnits).toBeDefined();
                     expect(scope.program).toBeDefined();
-                    expect(scope.optionSetMapping).toBeDefined();
                 });
 
                 it("should load dataValues on init", function() {

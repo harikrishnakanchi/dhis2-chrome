@@ -117,9 +117,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
         };
 
         $scope.isReferralLocationPresent = function(dataElement) {
-            if ($scope.loading === false && _.endsWith(dataElement.code, "_referralLocations") && _.isUndefined($scope.optionSetMapping[dataElement.optionSet.id]))
-                return false;
-            return true;
+            return !($scope.loading === false && _.endsWith(dataElement.code, "_referralLocations") && _.isUndefined($scope.dataElementOptions[dataElement.id]));
         };
 
         $scope.update = function() {
@@ -234,8 +232,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             var loadOptionSets = function() {
                 var isNewCase = $routeParams.eventId ? false : true;
                 return optionSetRepository.getOptionSetMapping($scope.opUnitId, isNewCase).then(function(data) {
-                    var translatedOptionSetMap = translationsService.translateOptionSetMap(data.optionSetMap);
-                    $scope.optionSetMapping = translatedOptionSetMap;
+                    return translationsService.translateOptionSetMap(data.optionSetMap);
                 });
             };
 
@@ -243,18 +240,18 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 var formatValue = function(dv) {
 
                     var filterOptions = function() {
-                        $scope.optionSetMapping[de.optionSet.id] = _.filter($scope.optionSetMapping[de.optionSet.id], {
+                        $scope.dataElementOptions[de.id] = _.filter($scope.dataElementOptions[de.id], {
                             "isDisabled": false
                         });
                     };
 
                     var de = allDataElementsMap[dv.dataElement];
                     if (de && de.optionSet) {
-                        return _.find($scope.optionSetMapping[de.optionSet.id], function(optionSet) {
+                        return _.find($scope.dataElementOptions[de.id], function(optionSet) {
                             if (_.endsWith(de.optionSet.code, "_referralLocations")) {
                                 filterOptions();
-                                if (!_.contains($scope.optionSetMapping[de.optionSet.id], optionSet))
-                                    $scope.optionSetMapping[de.optionSet.id].push(optionSet);
+                                if (!_.contains($scope.dataElementOptions[de.id], optionSet))
+                                    $scope.dataElementOptions[de.id].push(optionSet);
                             }
                             return optionSet.code === dv.value;
                         });
@@ -283,13 +280,13 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 }
             };
 
-            var loadExcludedOptions = function () {
+            var loadExcludedOptions = function (translatedOptionSetMapping) {
                 var buildDataElementOptions = function (excludedLinelistOptions) {
                     $scope.dataElementOptions = {};
                     var dataElementsWithOptions = _.filter(allDataElementsMap, 'optionSet');
                     var indexedExcludedLineListOptions = excludedLinelistOptions && _.indexBy(excludedLinelistOptions.dataElements, 'dataElementId');
                     _.forEach(dataElementsWithOptions, function (dataElement) {
-                        var options = $scope.optionSetMapping[dataElement.optionSet.id];
+                        var options = translatedOptionSetMapping[dataElement.optionSet.id];
                         if (!_.isUndefined(excludedLinelistOptions)) {
                             var excludedOptionIds = indexedExcludedLineListOptions[dataElement.id] && indexedExcludedLineListOptions[dataElement.id].excludedOptionIds;
                             options = _.reject(options, function (option) {
@@ -312,9 +309,9 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 .then(loadPrograms)
                 .then(loadAllDataElements)
                 .then(loadOptionSets)
+                .then(loadExcludedOptions)
                 .then(loadEvent)
                 .then(setEventMinAndMaxDate)
-                .then(loadExcludedOptions)
                 .finally(function() {
                     $scope.loading = false;
                 });
