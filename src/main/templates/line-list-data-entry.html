@@ -106,12 +106,12 @@
                                         </div>
 
                                         <div angucomplete-alt=""
-                                             ng-if="programStageDE.dataElement.optionSet && (optionSetMapping[programStageDE.dataElement.optionSet.id] !== undefined) && !isReferralLocationOptionSet(programStageDE.dataElement.optionSet)"
+                                             ng-if="programStageDE.dataElement.optionSet && (dataElementOptions[programStageDE.dataElement.id] !== undefined) && !isReferralLocationOptionSet(programStageDE.dataElement.optionSet)"
                                              name="{{programStageDE.dataElement.id}}"
                                              placeholder="{{ resourceBundle.startTypingLabel }}"
                                              pause="100"
                                              selected-object="dataValues[programStageDE.dataElement.id]"
-                                             local-data="optionSetMapping[programStageDE.dataElement.optionSet.id]"
+                                             local-data="dataElementOptions[programStageDE.dataElement.id]"
                                              search-fields="name"
                                              title-field="name"
                                              initial-value="{{dataValues[programStageDE.dataElement.id].name}}"
@@ -122,12 +122,12 @@
                                         </div>
 
                                         <div angucomplete-alt=""
-                                             ng-if="programStageDE.dataElement.optionSet && (optionSetMapping[programStageDE.dataElement.optionSet.id] !== undefined) && isReferralLocationOptionSet(programStageDE.dataElement.optionSet)"
+                                             ng-if="programStageDE.dataElement.optionSet && (dataElementOptions[programStageDE.dataElement.id] !== undefined) && isReferralLocationOptionSet(programStageDE.dataElement.optionSet)"
                                              name="{{programStageDE.dataElement.id}}"
                                              placeholder="{{ resourceBundle.startTypingLabel }}"
                                              pause="100"
                                              selected-object="dataValues[programStageDE.dataElement.id]"
-                                             local-data="optionSetMapping[programStageDE.dataElement.optionSet.id]"
+                                             local-data="dataElementOptions[programStageDE.dataElement.id]"
                                              search-fields="displayName"
                                              title-field="displayName"
                                              initial-value="{{dataValues[programStageDE.dataElement.id].displayName}}"
