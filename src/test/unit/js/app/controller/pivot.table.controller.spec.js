@@ -1,4 +1,4 @@
-define(["angularMocks", "utils", "lodash", "moment", "pivotTableController", "timecop", "translationsService", "filesystemService"], function (mocks, utils, lodash, moment, PivotTableController, timecop, TranslationsService, FilesystemService) {
+define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableController", "timecop", "translationsService", "filesystemService"], function (mocks, dateUtils, utils, lodash, moment, PivotTableController, timecop, TranslationsService, FilesystemService) {
     describe("pivotTableController", function () {
 
         var scope, rootScope, q, pivotTableController, translationsService, filesystemService,
@@ -175,26 +175,41 @@ define(["angularMocks", "utils", "lodash", "moment", "pivotTableController", "ti
                         ]
                     };
                     scope.baseColumnConfiguration = _.last(scope.table.columns);
-
-                    scope.exportToCSV();
                 });
 
                 it('should contain the outer column headers', function () {
+                    scope.exportToCSV();
+
                     var expectedHeader = [EMPTY_CELL, escapeString(outerColumnA.name), escapeString(outerColumnA.name)].join(DELIMETER);
                     expect(csvContent).toContain(expectedHeader);
                 });
 
                 it('should contain the inner column headers', function () {
+                    scope.exportToCSV();
+
                     var expectedHeader = [EMPTY_CELL, escapeString(innerColumnA1.name), escapeString(innerColumnA2.name)].join(DELIMETER);
                     expect(csvContent).toContain(expectedHeader);
                 });
 
+                it('should append the number of isoweeks to the column headers if column is a periodDimension and pivotTable is a monthlyReport', function () {
+                    spyOn(dateUtils, 'getNumberOfISOWeeksInMonth').and.returnValue(4);
+                    outerColumnA.periodDimension = true;
+                    scope.table.monthlyReport = true;
+                    scope.exportToCSV();
+
+                    expect(csvContent).toContain(escapeString(outerColumnA.name + ' [4 '+ scope.resourceBundle.weeksLabel + ']'));
+                });
+
                 xit("should get headers if category is present", function () {
+                    scope.exportToCSV();
+
                     var expected = '"Data Element","Category","July 2015 (4 weeks)","August 2015 (5 weeks)"';
                     expect(csvContent).toContain(expected);
                 });
 
                 it('should contain dataValues for rows', function () {
+                    scope.exportToCSV();
+
                     var expectedRowA = [escapeString(rowA.name), 4, 5].join(DELIMETER);
                     var expectedRowB = [escapeString(rowB.name), 16, 25].join(DELIMETER);
 

@@ -21,7 +21,11 @@ define(["lodash", "dateUtils", "moment"], function(_, dateUtils, moment) {
 
                     _.each(columnConfiguration, function (column) {
                         _.times(columnWidth, function () {
-                            cells.push(escapeString(column.name));
+                            if($scope.table.monthlyReport && column.periodDimension) {
+                                cells.push(escapeString(column.name + ' ' + $scope.getNumberOfWeeksLabel(column.id)));
+                            } else {
+                                cells.push(escapeString(column.name));
+                            }
                         });
                     });
                     return cells.join(DELIMITER);
