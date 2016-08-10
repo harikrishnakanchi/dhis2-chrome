@@ -10,17 +10,24 @@ define(['lodash'], function(_) {
         this.sortDescending = definition.sortDescending;
         this.sortable = definition.sortable;
 
-        this.dataValues = mapDataValues(data.headers, data.rows);
+        this.dataValues = mapDataValues(data.headers, data.rows, getExcludedCategoryOptionIds(definition));
         this.isTableDataAvailable = !_.isEmpty(this.dataValues);
         this.rows = mapRows(definition, data, this.dataValues);
         this.columns = mapColumns(definition, data, this.dataValues);
     };
 
-    var mapDataValues = function (headers, rows) {
+    var mapDataValues = function (headers, rows, excludedCategoryOptionIds) {
+        var dataValueIsExcludedFromTotals = function (row) {
+            return _.any(row, function (rowItems) {
+                return _.contains(excludedCategoryOptionIds, rowItems);
+            });
+        };
+
         return _.map(rows, function (row) {
-            return _.transform(headers, function (dataValueObject, header, index) {
+            var dataValueObject = _.transform(headers, function (dataValueObject, header, index) {
                 dataValueObject[header.name] = row[index];
             }, {});
+            return dataValueIsExcludedFromTotals(row) ? _.merge(dataValueObject, { excludedFromTotals: true }) : dataValueObject;
         });
     };
 
@@ -88,6 +95,13 @@ define(['lodash'], function(_) {
                 });
             });
         }
+    };
+
+    var getExcludedCategoryOptionIds = function(definition) {
+        var allCategoryOptions = _.flatten(_.map(definition.categoryDimensions, 'categoryOptions'));
+        return _.map(_.filter(allCategoryOptions, function (categoryOption) {
+            return _.endsWith(categoryOption.code, '_excludeFromTotal');
+        }), 'id');
     };
 
     var isCategoryDimension = function (definition, dimensionId) {

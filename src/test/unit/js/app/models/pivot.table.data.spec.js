@@ -93,6 +93,46 @@ define(['pivotTableData'], function(PivotTableData) {
                     value: 'someValue'
                 }]);
             });
+
+            it('should mark the data values that are that are excluded from totals', function () {
+                var categoryDimension = _.first(definition.categoryDimensions);
+                categoryDimension.categoryOptions = [{
+                    id: 'someCategoryOptionId',
+                    name: 'someCategoryOptionName',
+                    code: 'someCode_excludeFromTotal'
+                }, {
+                    id: 'someOtherCategoryOptionId',
+                    name: 'someOtherCategoryOptionName',
+                    code: 'someOtherCode'
+                }];
+                data = {
+                    headers: [
+                        { name: 'pe' },
+                        { name: 'categoryId' },
+                        { name: 'dx' },
+                        { name: 'value' }
+                    ],
+                    rows: [
+                        ['somePeriodId', 'someCategoryOptionId', 'someDataElementId', 'someValue'],
+                        ['someOtherPeriodId', 'someOtherCategoryOptionId', 'someIndicatorId', 'someValue']
+                    ]
+                };
+
+                pivotTableData = PivotTableData.create(definition, data);
+
+                expect(pivotTableData.dataValues).toEqual([{
+                    pe: 'somePeriodId',
+                    categoryId: 'someCategoryOptionId',
+                    dx: 'someDataElementId',
+                    value: 'someValue',
+                    excludedFromTotals: true,
+                }, {
+                    pe: 'someOtherPeriodId',
+                    categoryId: 'someOtherCategoryOptionId',
+                    dx: 'someIndicatorId',
+                    value: 'someValue'
+                }]);
+            });
         });
 
         describe('isTableDataAvailable', function () {

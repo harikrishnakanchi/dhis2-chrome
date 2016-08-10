@@ -86,6 +86,20 @@ define(["angularMocks", "utils", "lodash", "moment", "pivotTableController", "ti
                 expect(scope.table.rows).toEqual([rowA, rowB]);
                 expect(columnA.sorted).toEqual(false);
             });
+
+            it('should exclude data values with matching excluded category options', function () {
+                scope.table = {
+                    sortDescending: true,
+                    dataValues: [
+                        { dx: rowA.id, pe: columnA.id, value: 1 }, { dx: rowA.id, pe: columnB.id, value: 4, excludedFromTotals: true },
+                        { dx: rowB.id, pe: columnA.id, value: 2 }, { dx: rowB.id, pe: columnB.id, value: 3 }
+                    ],
+                    columns: [[columnA, columnB]],
+                    rows: [rowA, rowB]
+                };
+                scope.sortByColumn(columnB);
+                expect(scope.table.rows).toEqual([rowB, rowA]);
+            });
         });
 
         xdescribe("Export as csv", function () {
