@@ -331,6 +331,11 @@ define([], function() {
         });
     };
 
+    var force_pivot_tables_to_redownload = function (db, tx) {
+        var changeLogStore = tx.objectStore("changeLog");
+        changeLogStore.delete("pivotTables");
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -374,6 +379,7 @@ define([], function() {
         create_pivot_table_definitions_store,
         migrate_and_delete_charts_store,
         migrate_and_delete_pivot_table_store,
-        delete_keys_chart_and_reports_from_changelog
+        delete_keys_chart_and_reports_from_changelog,
+        force_pivot_tables_to_redownload
     ];
 });
