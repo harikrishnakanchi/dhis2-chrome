@@ -173,13 +173,7 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
 
         var getDataForPivotTables = function(tables) {
             return $q.all(_.map(tables, function(tableDefinition) {
-                return pivotTableRepository.getDataForPivotTable(tableDefinition.name, $scope.selectedProject.id).then(function(data) {
-                    return {
-                        definition: tableDefinition,
-                        data: data,
-                        isTableDataAvailable: !!(data && data.rows && data.rows.length > 0)
-                    };
-                });
+                return pivotTableRepository.getPivotTableData(tableDefinition, $scope.selectedProject.id);
             }));
         };
 
@@ -193,7 +187,7 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
                 .then(getDataForPivotTables)
                 .then(translatePivotTables)
                 .then(function(pivotTables) {
-                    $scope.pivotTables = _.sortBy(pivotTables, 'definition.displayPosition');
+                    $scope.pivotTables = _.sortBy(pivotTables, 'displayPosition');
                     $scope.isReportAvailable = _.any(pivotTables, { isTableDataAvailable: true });
                 });
         };
