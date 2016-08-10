@@ -187,12 +187,12 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
                 .then(getDataForPivotTables)
                 .then(translatePivotTables)
                 .then(function(pivotTables) {
-                    $scope.pivotTables = _.sortBy(pivotTables, 'displayPosition');
-                    $scope.isReportAvailable = _.any(pivotTables, { isTableDataAvailable: true });
+                    $scope.pivotTables = _.sortBy(_.filter(pivotTables, { isTableDataAvailable: true }), 'displayPosition');
                 });
         };
 
         var init = function() {
+            $scope.pivotTables= [];
             $scope.loading = true;
             $q.all([loadProjectBasicInfo(), loadPivotTables()]).finally(function () {
                 $scope.loading = false;

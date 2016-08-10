@@ -121,7 +121,8 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             }];
 
             pivotTableData = {
-                some: 'data'
+                some: 'data',
+                isTableDataAvailable: true
             };
 
             orgUnitGroupSets = [{
