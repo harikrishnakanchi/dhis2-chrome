@@ -22,6 +22,12 @@ define(['lodash'], function(_) {
             var dataValue = _.find(_this.dataValues, _.merge({}, row.dataValuesFilter, column.dataValuesFilter));
             return dataValue && dataValue.value;
         };
+
+        this.getTotalOfDataValues = function (row, column) {
+            var dataValues = _.filter(_this.dataValues, _.merge({}, row.dataValuesFilter, column.dataValuesFilter)),
+                eligibleDataValues = _.reject(dataValues, { excludedFromTotals: true });
+            return _.sum(eligibleDataValues, 'value');
+        };
     };
 
     var mapDataValues = function (headers, rows, excludedCategoryOptionIds) {

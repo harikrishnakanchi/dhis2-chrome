@@ -93,46 +93,6 @@ define(['pivotTableData'], function(PivotTableData) {
                     value: 1
                 }]);
             });
-
-            it('should mark the data values that are that are excluded from totals', function () {
-                var categoryDimension = _.first(definition.categoryDimensions);
-                categoryDimension.categoryOptions = [{
-                    id: 'someCategoryOptionId',
-                    name: 'someCategoryOptionName',
-                    code: 'someCode_excludeFromTotal'
-                }, {
-                    id: 'someOtherCategoryOptionId',
-                    name: 'someOtherCategoryOptionName',
-                    code: 'someOtherCode'
-                }];
-                data = {
-                    headers: [
-                        { name: 'pe' },
-                        { name: 'categoryId' },
-                        { name: 'dx' },
-                        { name: 'value' }
-                    ],
-                    rows: [
-                        ['somePeriodId', 'someCategoryOptionId', 'someDataElementId', '1.0'],
-                        ['someOtherPeriodId', 'someOtherCategoryOptionId', 'someIndicatorId', '1.0']
-                    ]
-                };
-
-                pivotTableData = PivotTableData.create(definition, data);
-
-                expect(pivotTableData.dataValues).toEqual([{
-                    pe: 'somePeriodId',
-                    categoryId: 'someCategoryOptionId',
-                    dx: 'someDataElementId',
-                    value: 1,
-                    excludedFromTotals: true
-                }, {
-                    pe: 'someOtherPeriodId',
-                    categoryId: 'someOtherCategoryOptionId',
-                    dx: 'someIndicatorId',
-                    value: 1
-                }]);
-            });
         });
 
         describe('getDataValue', function () {
@@ -147,6 +107,59 @@ define(['pivotTableData'], function(PivotTableData) {
 
                 expect(pivotTableData.getDataValue(row,column)).toEqual(1);
             });
+        });
+
+        describe('getTotalOfDataValues', function () {
+            it('should return total of data values matching the given row and column', function () {
+                var row = {
+                    dataValuesFilter: { pe: 'somePeriodId' }
+                },  column = {
+                    dataValuesFilter: { ou: 'someOrgUnitId' }
+                };
+
+                pivotTableData = PivotTableData.create(definition, data);
+
+                expect(pivotTableData.getTotalOfDataValues(row,column)).toEqual(1);
+            });
+
+            it('should ignore data values that are that are excluded from totals', function () {
+                var row = {
+                    dataValuesFilter: { pe: 'somePeriodId' }
+                },  column = {
+                    dataValuesFilter: { ou: 'someOrgUnitId' }
+                };
+                definition = {
+                    categoryDimensions: [{
+                        dataElementCategory: {
+                            id: 'someCategoryId'
+                        },
+                        categoryOptions: [{
+                            id: 'someCategoryOptionId',
+                            code: 'someCode_excludeFromTotal'
+                        }, {
+                            id: 'someOtherCategoryOptionId',
+                            code: 'someOtherCode'
+                        }]
+                    }]
+                };
+                data = {
+                    headers: [
+                        { name: 'pe' },
+                        { name: 'ou' },
+                        { name: 'categoryId' },
+                        { name: 'value' }
+                    ],
+                    rows: [
+                        ['somePeriodId', 'someOrgUnitId', 'someCategoryOptionId', '1.0'],
+                        ['somePeriodId', 'someOrgUnitId', 'someOtherCategoryOptionId', '2.0']
+                    ]
+                };
+
+                pivotTableData = PivotTableData.create(definition, data);
+
+                expect(pivotTableData.getTotalOfDataValues(row,column)).toEqual(2);
+            });
+
         });
 
         describe('isTableDataAvailable', function () {

@@ -63,8 +63,7 @@ define(["lodash", "dateUtils", "moment"], function(_, dateUtils, moment) {
 
         $scope.sortByColumn = function (column) {
             var sumOfDataValues = function (row) {
-                var matchingDataValues = _.filter($scope.table.dataValues, _.merge({}, row.dataValuesFilter, column.dataValuesFilter));
-                return _.sum(_.reject(matchingDataValues, { excludedFromTotals: true }), 'value');
+                return $scope.table.getTotalOfDataValues(row, column);
             };
 
             var updateSortedFlags = function (sortedColumn) {
