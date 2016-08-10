@@ -56,8 +56,8 @@ define(['pivotTableData'], function(PivotTableData) {
                     }
                 },
                 rows: [
-                    ['somePeriodId', 'someOrgUnitId', 'someDataElementId', 'someValue'],
-                    ['someOtherPeriodId', 'someOtherOrgUnitId', 'someIndicatorId', 'someValue']
+                    ['somePeriodId', 'someOrgUnitId', 'someDataElementId', '1.0'],
+                    ['someOtherPeriodId', 'someOtherOrgUnitId', 'someIndicatorId', '1.0']
                 ]
             };
         });
@@ -85,12 +85,12 @@ define(['pivotTableData'], function(PivotTableData) {
                     pe: 'somePeriodId',
                     ou: 'someOrgUnitId',
                     dx: 'someDataElementId',
-                    value: 'someValue'
+                    value: 1
                 }, {
                     pe: 'someOtherPeriodId',
                     ou: 'someOtherOrgUnitId',
                     dx: 'someIndicatorId',
-                    value: 'someValue'
+                    value: 1
                 }]);
             });
 
@@ -113,8 +113,8 @@ define(['pivotTableData'], function(PivotTableData) {
                         { name: 'value' }
                     ],
                     rows: [
-                        ['somePeriodId', 'someCategoryOptionId', 'someDataElementId', 'someValue'],
-                        ['someOtherPeriodId', 'someOtherCategoryOptionId', 'someIndicatorId', 'someValue']
+                        ['somePeriodId', 'someCategoryOptionId', 'someDataElementId', '1.0'],
+                        ['someOtherPeriodId', 'someOtherCategoryOptionId', 'someIndicatorId', '1.0']
                     ]
                 };
 
@@ -124,13 +124,13 @@ define(['pivotTableData'], function(PivotTableData) {
                     pe: 'somePeriodId',
                     categoryId: 'someCategoryOptionId',
                     dx: 'someDataElementId',
-                    value: 'someValue',
-                    excludedFromTotals: true,
+                    value: 1,
+                    excludedFromTotals: true
                 }, {
                     pe: 'someOtherPeriodId',
                     categoryId: 'someOtherCategoryOptionId',
                     dx: 'someIndicatorId',
-                    value: 'someValue'
+                    value: 1
                 }]);
             });
         });
@@ -145,7 +145,7 @@ define(['pivotTableData'], function(PivotTableData) {
 
                 pivotTableData = PivotTableData.create(definition, data);
 
-                expect(pivotTableData.getDataValue(row,column)).toEqual('someValue');
+                expect(pivotTableData.getDataValue(row,column)).toEqual(1);
             });
         });
 
@@ -206,7 +206,7 @@ define(['pivotTableData'], function(PivotTableData) {
                     ]
                 }];
                 data.rows = [
-                    ['somePeriodId', 'someOrgUnitId', 'someDataElementId', 'someValue']
+                    ['somePeriodId', 'someOrgUnitId', 'someDataElementId', '1.0']
                 ];
 
                 pivotTableData = PivotTableData.create(definition, data);
@@ -242,7 +242,7 @@ define(['pivotTableData'], function(PivotTableData) {
                     dimension: 'ou'
                 }];
                 data.rows = [
-                    ['somePeriodId', 'someOrgUnitId', 'someDataElementId', 'someValue']
+                    ['somePeriodId', 'someOrgUnitId', 'someDataElementId', '1.0']
                 ];
 
                 pivotTableData = PivotTableData.create(definition, data);
@@ -280,7 +280,7 @@ define(['pivotTableData'], function(PivotTableData) {
                     dimension: 'pe'
                 }];
                 data.rows = [
-                    ['somePeriodId', 'someOrgUnitId', 'someDataElementId', 'someValue']
+                    ['somePeriodId', 'someOrgUnitId', 'someDataElementId', '1.0']
                 ];
 
                 pivotTableData = PivotTableData.create(definition, data);

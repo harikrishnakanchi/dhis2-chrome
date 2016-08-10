@@ -1,4 +1,5 @@
 define(['lodash'], function(_) {
+    var VALUE_HEADER = 'value';
 
     var PivotTableData = function(definition, data) {
         var _this = this;
@@ -32,7 +33,7 @@ define(['lodash'], function(_) {
 
         return _.map(rows, function (row) {
             var dataValueObject = _.transform(headers, function (dataValueObject, header, index) {
-                dataValueObject[header.name] = row[index];
+                dataValueObject[header.name] = header.name == VALUE_HEADER ? parseFloat(row[index]) : row[index] ;
             }, {});
             return dataValueIsExcludedFromTotals(row) ? _.merge(dataValueObject, { excludedFromTotals: true }) : dataValueObject;
         });
