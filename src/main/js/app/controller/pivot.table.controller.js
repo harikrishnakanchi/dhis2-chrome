@@ -1,4 +1,4 @@
-define(["lodash", "moment"], function(_, moment) {
+define(["lodash", "dateUtils", "moment"], function(_, dateUtils, moment) {
     return function($scope, $rootScope, translationsService, filesystemService) {
         $scope.resourceBundle = $rootScope.resourceBundle;
         var DEFAULT_SORT_KEY = 'dataElementIndex';
@@ -91,30 +91,8 @@ define(["lodash", "moment"], function(_, moment) {
             }
         };
 
-        var getNumberOfISOWeeksInMonth = function (period) {
-            var m = moment(period, 'YYYYMM');
-
-            var year = parseInt(m.format('YYYY'));
-            var month = parseInt(m.format('M')) - 1;
-            var day = 1,
-                mondays = 0;
-
-            var date = new Date(year, month, day);
-
-            while (date.getMonth() == month) {
-                if (date.getDay() === 1) {
-                    mondays += 1;
-                    day += 7;
-                } else {
-                    day++;
-                }
-                date = new Date(year, month, day);
-            }
-            return mondays;
-        };
-
-        $scope.getNumberOfWeeksLabel = function (period) {
-            return '[' + getNumberOfISOWeeksInMonth(period) + ' ' + $scope.resourceBundle.weeksLabel + ']';
+        $scope.getNumberOfWeeksLabel = function (month) {
+            return '[' + dateUtils.getNumberOfISOWeeksInMonth(month) + ' ' + $scope.resourceBundle.weeksLabel + ']';
         };
 
         if ($scope.table) {
