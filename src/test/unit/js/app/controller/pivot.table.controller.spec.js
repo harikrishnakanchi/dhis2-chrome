@@ -200,13 +200,6 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
                     expect(csvContent).toContain(escapeString(outerColumnA.name + ' [4 '+ scope.resourceBundle.weeksLabel + ']'));
                 });
 
-                xit("should get headers if category is present", function () {
-                    scope.exportToCSV();
-
-                    var expected = '"Data Element","Category","July 2015 (4 weeks)","August 2015 (5 weeks)"';
-                    expect(csvContent).toContain(expected);
-                });
-
                 it('should contain dataValues for rows', function () {
                     scope.exportToCSV();
 
