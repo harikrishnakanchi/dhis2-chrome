@@ -239,7 +239,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             Timecop.uninstall();
         });
 
-        xdescribe('CSV Export', function () {
+        describe('CSV Export', function () {
             var csvContent;
 
             beforeEach(function () {
@@ -265,14 +265,6 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             describe('CSV contents', function () {
                 it('should contain project basic information', function () {
                     expect(csvContent).toContain('"Project Information"\n"Country","SOUDAN Sud"');
-                });
-
-                it('should contain pivot table headers', function () {
-                    expect(csvContent).toContain('"Hospitalization","November 2015","December 2015"');
-                });
-
-                it('should contain pivot table data', function () {
-                    expect(csvContent).toContain('"Average bed occupation rate (%) - Adult IPD Ward",1.1,1.2\n"Average length of bed use (days) - Adult IPD Ward",2.1,2.2');
                 });
             });
         });

@@ -1,93 +1,93 @@
-define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper) {
+define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, dateUtils, _, orgUnitMapper) {
     return function($rootScope, $q, $scope, orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository, filesystemService) {
         $scope.selectedProject = $rootScope.currentUser.selectedProject;
 
-        var getNumberOfISOWeeksInMonth = function (period) {
-            var m = moment(period, 'YYYYMM');
-
-            var year = parseInt(m.format('YYYY'));
-            var month = parseInt(m.format('M')) - 1;
-            var day = 1,
-                mondays = 0;
-
-            var date = new Date(year, month, day);
-
-            while (date.getMonth() == month) {
-                if (date.getDay() === 1) {
-                    mondays += 1;
-                    day += 7;
-                } else {
-                    day++;
-                }
-                date = new Date(year, month, day);
-            }
-            return mondays;
-        };
-
         var buildCsvContent = function () {
-            var csvData = [],
-                DELIMITER = ',',
-                NEW_LINE = '\n';
+            var DELIMITER = ',',
+                NEW_LINE = '\n',
+                EMPTY_CELL = '';
 
             var escapeString = function (string) {
                 return '"' + string + '"';
             };
 
-            var addProjectBasicInfo = function() {
-                csvData.push([escapeString($scope.resourceBundle.projectInformationLabel)]);
+            var getProjectBasicInfo = function() {
+                var buildProjectAttribute = function(projectAttribute) {
+                    return [
+                        escapeString(projectAttribute.name),
+                        escapeString(projectAttribute.value)
+                    ].join(DELIMITER);
+                };
 
-                _.forEach($scope.projectAttributes, function(projectAttribute) {
-                    var csvRow = [escapeString(projectAttribute.name), escapeString(projectAttribute.value)].join(DELIMITER);
-                    csvData.push(csvRow);
-                });
+                return _.flatten([
+                    escapeString($scope.resourceBundle.projectInformationLabel),
+                    _.map($scope.projectAttributes, buildProjectAttribute)
+                ]).join(NEW_LINE);
             };
 
-            var addPivotTableData = function () {
-                var pivotTablesWithData = _.filter($scope.pivotTables, 'isTableDataAvailable');
-                _.forEach(pivotTablesWithData, function (pivotTable) {
-                    var headers = [];
-                    if(pivotTable.definition.monthlyReport) {
-                        _.forEach(pivotTable.data.metaData.pe, function (period) {
+            var getNumberOfWeeksLabel = function (month) {
+                return '[' + dateUtils.getNumberOfISOWeeksInMonth(month) + ' ' + $scope.resourceBundle.weeksLabel + ']';
+            };
 
-                            var month = $scope.resourceBundle[pivotTable.data.metaData.names[period].split(' ')[0]],
-                                year = pivotTable.data.metaData.names[period].split(' ')[1],
-                                name = _.isUndefined(month) ? pivotTable.data.metaData.names[period] : month + ' ' + year,
+            var getDataDimensionName = function(name) {
+                //TODO: Remove this formatting of names after we start using dataElement and indicators formName
+                var HYPHEN_SEPARATOR = ' - ';
+                return _.first(name.split(HYPHEN_SEPARATOR));
+            };
 
-                                numberOfISOWeeks = getNumberOfISOWeeksInMonth(period);
+            var getPivotTableData = function () {
+                var pivotTableCSVs = _.map($scope.pivotTables, function (pivotTable) {
+                    var baseColumnConfiguration = _.last(pivotTable.columns);
 
-                            headers.push([escapeString(name + ' (' + numberOfISOWeeks + $scope.resourceBundle.weeksLabel + ')')]);
-                        });
-                    } else {
-                        _.forEach(pivotTable.data.metaData.pe, function (period) {
-                            headers.push(escapeString(pivotTable.data.metaData.names[period]));
-                        });
-                    }
+                    var getDataValue = function (rowDataValuesFilter, columnDataValuesFilter) {
+                        var dataValue = _.find(pivotTable.dataValues, _.merge({}, rowDataValuesFilter, columnDataValuesFilter));
+                        return dataValue && dataValue.value;
+                    };
 
-                    csvData.push([escapeString(pivotTable.definition.title)].concat(headers).join(DELIMITER));
+                    var buildHeaders = function() {
+                        return _.map(pivotTable.columns, function (columnConfiguration) {
+                            var columnWidth = baseColumnConfiguration.length / columnConfiguration.length,
+                                cells = [pivotTable.title];
 
-                    var dataDimensionIndex = _.findIndex(pivotTable.data.headers, { name: 'dx' }),
-                        periodIndex = _.findIndex(pivotTable.data.headers, { name: 'pe' }),
-                        valueIndex = _.findIndex(pivotTable.data.headers, { name: 'value' }),
-                        rowItems = _.flatten(_.map(pivotTable.definition.rows, 'items'));
-
-                    _.forEach(pivotTable.currentOrderOfItems, function (itemId) {
-                        var values = _.map(pivotTable.data.metaData.pe, function (period) {
-                            var row = _.find(pivotTable.data.rows, function (row) {
-                                return itemId == row[dataDimensionIndex] && period == row[periodIndex];
+                            _.each(columnConfiguration, function (column) {
+                                _.times(columnWidth, function () {
+                                    if(pivotTable.monthlyReport && column.periodDimension) {
+                                        cells.push(escapeString(column.name + ' ' + getNumberOfWeeksLabel(column.id)));
+                                    } else {
+                                        cells.push(escapeString(column.name));
+                                    }
+                                });
                             });
-                            return row && row[valueIndex];
+                            return cells.join(DELIMITER);
                         });
-                        csvData.push([escapeString(_.find(rowItems, { id: itemId }).name)].concat(values).join(DELIMITER));
-                    });
-                    csvData.push([]);
+                    };
+
+                    var buildRows = function () {
+                        return _.map(pivotTable.rows, function (row) {
+                            var cells = [escapeString(getDataDimensionName(row.name))];
+
+                            _.each(baseColumnConfiguration, function (column) {
+                                var value = getDataValue(row.dataValuesFilter, column.dataValuesFilter);
+                                cells.push(value);
+                            });
+                            return cells.join(DELIMITER);
+                        });
+                    };
+
+                    return _.flatten([
+                        buildHeaders(),
+                        buildRows()
+                    ]).join(NEW_LINE);
                 });
+
+                return pivotTableCSVs.join(NEW_LINE + NEW_LINE);
             };
 
-            addProjectBasicInfo();
-            csvData.push([]);
-            addPivotTableData();
-
-            return csvData.join(NEW_LINE);
+            return [
+                getProjectBasicInfo(),
+                EMPTY_CELL,
+                getPivotTableData()
+            ].join(NEW_LINE);
         };
 
         $scope.exportToCSV = function () {
