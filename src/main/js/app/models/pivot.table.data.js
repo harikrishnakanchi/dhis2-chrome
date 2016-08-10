@@ -1,6 +1,8 @@
 define(['lodash'], function(_) {
 
     var PivotTableData = function(definition, data) {
+        var _this = this;
+
         this.title = definition.title;
         this.dataSetCode = definition.dataSetCode;
         this.displayPosition = definition.displayPosition;
@@ -14,6 +16,11 @@ define(['lodash'], function(_) {
         this.isTableDataAvailable = !_.isEmpty(this.dataValues);
         this.rows = mapRows(definition, data, this.dataValues);
         this.columns = mapColumns(definition, data, this.dataValues);
+
+        this.getDataValue = function (row, column) {
+            var dataValue = _.find(_this.dataValues, _.merge({}, row.dataValuesFilter, column.dataValuesFilter));
+            return dataValue && dataValue.value;
+        };
     };
 
     var mapDataValues = function (headers, rows, excludedCategoryOptionIds) {

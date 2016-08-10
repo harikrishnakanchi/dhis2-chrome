@@ -36,7 +36,7 @@
             </span>
        </td>
         <td ng-repeat="column in baseColumnConfiguration" ng-class="{ 'info' : column.sorted }">
-            <span ng-class="{ 'font-bold': column.sorted }">{{ getDataValue(row.dataValuesFilter, column.dataValuesFilter) }}</span>
+            <span ng-class="{ 'font-bold': column.sorted }">{{ table.getDataValue(row, column) }}</span>
         </td>
     </tr>
     </tbody>

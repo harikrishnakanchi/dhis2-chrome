@@ -116,7 +116,7 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
             });
 
             describe('CSV Contents', function () {
-                var csvContent, outerColumnA, innerColumnA1, innerColumnA2, rowA, rowB,
+                var csvContent, outerColumnA, innerColumnA1, innerColumnA2, rowA, rowB, mockValue,
                     DELIMETER = ',',
                     EMPTY_CELL = '';
 
@@ -163,16 +163,16 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
                             dx: 'dataElementIdB'
                         }
                     };
+                    mockValue = 'mockValue';
                     scope.table = {
                         columns: [
                             [outerColumnA],
                             [innerColumnA1, innerColumnA2]
                         ],
                         rows: [rowA, rowB],
-                        dataValues: [
-                            { dx: 'dataElementIdA', pe: 'periodA', genderCategory: 'male', value: 4 }, { dx: 'dataElementIdA', pe: 'periodA', genderCategory: 'female', value: 5 },
-                            { dx: 'dataElementIdB', pe: 'periodA', genderCategory: 'male', value: 16 }, { dx: 'dataElementIdB', pe: 'periodA', genderCategory: 'female', value: 25 }
-                        ]
+                        getDataValue: function () {
+                            return mockValue;
+                        }
                     };
                     scope.baseColumnConfiguration = _.last(scope.table.columns);
                 });
@@ -203,8 +203,8 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
                 it('should contain dataValues for rows', function () {
                     scope.exportToCSV();
 
-                    var expectedRowA = [escapeString(rowA.name), 4, 5].join(DELIMETER);
-                    var expectedRowB = [escapeString(rowB.name), 16, 25].join(DELIMETER);
+                    var expectedRowA = [escapeString(rowA.name), mockValue, mockValue].join(DELIMETER);
+                    var expectedRowB = [escapeString(rowB.name), mockValue, mockValue].join(DELIMETER);
 
                     expect(csvContent).toContain(expectedRowA);
                     expect(csvContent).toContain(expectedRowB);

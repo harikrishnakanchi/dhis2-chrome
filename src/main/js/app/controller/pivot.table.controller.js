@@ -37,7 +37,7 @@ define(["lodash", "dateUtils", "moment"], function(_, dateUtils, moment) {
                     var cells = [escapeString($scope.getDataDimensionName(row.name))];
 
                     _.each($scope.baseColumnConfiguration, function (column) {
-                        var value = $scope.getDataValue(row.dataValuesFilter, column.dataValuesFilter);
+                        var value = $scope.table.getDataValue(row, column);
                         cells.push(value);
                     });
                     return cells.join(DELIMITER);
@@ -59,11 +59,6 @@ define(["lodash", "dateUtils", "moment"], function(_, dateUtils, moment) {
             //TODO: Remove this formatting of names after we start using dataElement and indicators formName
             var HYPHEN_SEPARATOR = ' - ';
             return _.first(name.split(HYPHEN_SEPARATOR));
-        };
-
-        $scope.getDataValue = function (rowDataValuesFilter, columnDataValuesFilter) {
-            var dataValue = _.find($scope.table.dataValues, _.merge({}, rowDataValuesFilter, columnDataValuesFilter));
-            return dataValue && dataValue.value;
         };
 
         $scope.sortByColumn = function (column) {

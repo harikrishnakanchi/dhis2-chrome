@@ -135,6 +135,20 @@ define(['pivotTableData'], function(PivotTableData) {
             });
         });
 
+        describe('getDataValue', function () {
+            it('should return the data value for the given row and column', function () {
+                var row = {
+                    dataValuesFilter: { pe: 'somePeriodId' }
+                },  column = {
+                    dataValuesFilter: { ou: 'someOrgUnitId' }
+                };
+
+                pivotTableData = PivotTableData.create(definition, data);
+
+                expect(pivotTableData.getDataValue(row,column)).toEqual('someValue');
+            });
+        });
+
         describe('isTableDataAvailable', function () {
             it('should return true if data values exist', function() {
                 data.rows = ['someDataValue'];

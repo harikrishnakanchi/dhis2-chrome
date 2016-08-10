@@ -27,7 +27,7 @@
             </span>
         </td>
         <td ng-repeat="column in baseColumnConfiguration">
-            <span>{{ getDataValue(row.dataValuesFilter, column.dataValuesFilter) }}</span>
+            <span>{{ table.getDataValue(row, column) }}</span>
         </td>
     </tr>
     </tbody>

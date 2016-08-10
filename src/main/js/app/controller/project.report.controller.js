@@ -39,11 +39,6 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, date
                 var pivotTableCSVs = _.map($scope.pivotTables, function (pivotTable) {
                     var baseColumnConfiguration = _.last(pivotTable.columns);
 
-                    var getDataValue = function (rowDataValuesFilter, columnDataValuesFilter) {
-                        var dataValue = _.find(pivotTable.dataValues, _.merge({}, rowDataValuesFilter, columnDataValuesFilter));
-                        return dataValue && dataValue.value;
-                    };
-
                     var buildHeaders = function() {
                         return _.map(pivotTable.columns, function (columnConfiguration) {
                             var columnWidth = baseColumnConfiguration.length / columnConfiguration.length,
@@ -67,7 +62,7 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, date
                             var cells = [escapeString(getDataDimensionName(row.name))];
 
                             _.each(baseColumnConfiguration, function (column) {
-                                var value = getDataValue(row.dataValuesFilter, column.dataValuesFilter);
+                                var value = pivotTable.getDataValue(row, column);
                                 cells.push(value);
                             });
                             return cells.join(DELIMITER);
