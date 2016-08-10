@@ -5,81 +5,50 @@ define(["lodash", "moment"], function(_, moment) {
 
         $scope.showDownloadButton = $scope.disableDownload != 'true';
 
-        var getCsvFileName = function() {
-            var regex = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]\s([a-zA-Z0-9\s]+)/;
-            var match = regex.exec($scope.definition.name);
-            if (match) {
-                var serviceName = match[1];
-                var tableName = match[2];
-                return [serviceName, tableName, moment().format("DD-MMM-YYYY"), 'csv'].join('.');
-            } else {
-                return "";
-            }
-        };
-
         var getCSVContents = function() {
             var DELIMITER = ',',
-                NEW_LINE = '\n';
+                NEW_LINE = '\n',
+                EMPTY_CELL = '';
 
             var escapeString = function (string) {
                 return '"' + string + '"';
             };
 
-            var getCSVHeaders = function() {
-                var headers = [escapeString($scope.resourceBundle.dataElement)];
-                if ($scope.isCategoryPresent)
-                    headers.push(escapeString($scope.resourceBundle.category));
-                _.each($scope.periods, function (period) {
-                    var month = $scope.resourceBundle[$scope.data.metaData.names[period].split(' ')[0]];
-                    var year = $scope.data.metaData.names[period].split(' ')[1];
-                    var name = _.isUndefined(month) ? $scope.data.metaData.names[period] : month + ' ' + year;
+            var buildHeaders = function() {
+                return _.map($scope.table.columns, function (columnConfiguration) {
+                    var columnWidth = $scope.baseColumnConfiguration.length / columnConfiguration.length,
+                        cells = [EMPTY_CELL];
 
-                    if ($scope.showWeeks) {
-                        var numberofWeeks = getNumberOfISOWeeksInMonth(period);
-                        headers.push(escapeString(name + " (" + numberofWeeks + " " + $scope.resourceBundle.weeksLabel + ")"));
-                    } else {
-                        headers.push(escapeString(name));
-                    }
-                });
-                return headers.join(DELIMITER);
-            };
-            var getCSVData = function () {
-                var sortedViewMap;
-                if($scope.selectedSortKey == DEFAULT_SORT_KEY) {
-                    sortedViewMap = _.sortBy($scope.viewMap, DEFAULT_SORT_KEY);
-                } else {
-                    var ascOrDesc = $scope.definition.sortAscending ? 'asc' : 'desc';
-                    sortedViewMap = _.sortByOrder($scope.viewMap, [$scope.selectedSortKey, DEFAULT_SORT_KEY], [ascOrDesc, 'asc']);
-                }
-                var dataValues = [];
-                _.each(sortedViewMap, function(datum) {
-                    if ($scope.isCategoryPresent) {
-                        _.each(getSortedCategories(), function(category) {
-                            var value = [];
-                            value.push(escapeString($scope.getDataElementName(datum.dataElementName)));
-                            value.push(escapeString(category.name));
-                            _.each($scope.periods, function(period) {
-                                value.push($scope.getValue(category.id, datum.dataElement, period));
-                            });
-                            dataValues.push(value.join(DELIMITER));
+                    _.each(columnConfiguration, function (column) {
+                        _.times(columnWidth, function () {
+                            cells.push(escapeString(column.name));
                         });
-                    } else {
-                        var value = [];
-                        value.push(escapeString($scope.getDataElementName(datum.dataElementName)));
-                        _.each($scope.periods, function(period) {
-                            value.push($scope.getValue(datum.category, datum.dataElement, period));
-                        });
-                        dataValues.push(value.join(DELIMITER));
-                    }
+                    });
+                    return cells.join(DELIMITER);
                 });
-                return dataValues.join(NEW_LINE);
             };
 
-            return [getCSVHeaders(), getCSVData()].join(NEW_LINE);
+            var buildRows = function () {
+                return _.map($scope.table.rows, function (row) {
+                    var cells = [escapeString(row.name)];
+
+                    _.each($scope.baseColumnConfiguration, function (column) {
+                        var value = $scope.getDataValue(row.dataValuesFilter, column.dataValuesFilter);
+                        cells.push(value);
+                    });
+                    return cells.join(DELIMITER);
+                });
+            };
+
+            return _.flatten([
+                buildHeaders(),
+                buildRows()
+            ]).join(NEW_LINE);
         };
 
         $scope.exportToCSV = function () {
-            filesystemService.promptAndWriteFile(getCsvFileName(), new Blob([getCSVContents()], {type: 'text/csv'}), filesystemService.FILE_TYPE_OPTIONS.CSV);
+            var fileName = [$scope.table.dataSetCode, $scope.table.title, moment().format("DD-MMM-YYYY"), 'csv'].join('.');
+            filesystemService.promptAndWriteFile(fileName, new Blob([getCSVContents()], {type: 'text/csv'}), filesystemService.FILE_TYPE_OPTIONS.CSV);
         };
 
         $scope.getDataElementName = function(dataElementName) {
