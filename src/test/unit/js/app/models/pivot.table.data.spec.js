@@ -122,6 +122,18 @@ define(['pivotTableData'], function(PivotTableData) {
                 expect(pivotTableData.getTotalOfDataValues(row,column)).toEqual(1);
             });
 
+            it('should return null if there are no matching data values', function () {
+                var row = {
+                    dataValuesFilter: { pe: 'someInvalidPeriodId' }
+                },  column = {
+                    dataValuesFilter: { ou: 'someOrgUnitId' }
+                };
+
+                pivotTableData = PivotTableData.create(definition, data);
+
+                expect(pivotTableData.getTotalOfDataValues(row,column)).toBeNull();
+            });
+
             it('should ignore data values that are that are excluded from totals', function () {
                 var row = {
                     dataValuesFilter: { pe: 'somePeriodId' }

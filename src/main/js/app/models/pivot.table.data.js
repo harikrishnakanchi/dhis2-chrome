@@ -26,7 +26,7 @@ define(['lodash'], function(_) {
         this.getTotalOfDataValues = function (row, column) {
             var dataValues = _.filter(_this.dataValues, _.merge({}, row.dataValuesFilter, column.dataValuesFilter)),
                 eligibleDataValues = _.reject(dataValues, { excludedFromTotals: true });
-            return _.sum(eligibleDataValues, 'value');
+            return _.isEmpty(eligibleDataValues) ? null : _.sum(eligibleDataValues, 'value');
         };
     };
 

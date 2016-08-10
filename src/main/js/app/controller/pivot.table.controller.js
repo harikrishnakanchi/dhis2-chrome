@@ -63,7 +63,8 @@ define(["lodash", "dateUtils", "moment"], function(_, dateUtils, moment) {
 
         $scope.sortByColumn = function (column) {
             var sumOfDataValues = function (row) {
-                return $scope.table.getTotalOfDataValues(row, column);
+                var sum = $scope.table.getTotalOfDataValues(row, column);
+                return _.isNumber(sum) ? sum : ($scope.table.sortAscending ? Infinity : -Infinity);
             };
 
             var updateSortedFlags = function (sortedColumn) {
