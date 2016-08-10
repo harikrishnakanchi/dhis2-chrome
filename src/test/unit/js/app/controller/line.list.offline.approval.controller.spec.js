@@ -1,7 +1,7 @@
-define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEventRepository", "orgUnitRepository", "programRepository", "optionSetRepository", "datasetRepository", "referralLocationsRepository", "excludedDataElementsRepository", "translationsService"],
-    function(LineListOfflineApprovalController, mocks, utils, ProgramEventRepository, OrgUnitRepository, ProgramRepository, OptionSetRepository, DatasetRepository, ReferralLocationsRepository, ExcludedDataElementsRepository, TranslationsService) {
+define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEventRepository", "orgUnitRepository", "programRepository", "optionSetRepository", "datasetRepository", "referralLocationsRepository", "excludedDataElementsRepository", "excludedLineListOptionsRepository", "translationsService"],
+    function(LineListOfflineApprovalController, mocks, utils, ProgramEventRepository, OrgUnitRepository, ProgramRepository, OptionSetRepository, DatasetRepository, ReferralLocationsRepository, ExcludedDataElementsRepository, ExcludedLineListOptionsRepository, TranslationsService) {
         describe("lineListOfflineApprovalController", function() {
-            var lineListOfflineApprovalController, scope, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, q, origins, program, optionSetMapping, events, origin1, origin2, origin3, origin4, dataSetRepository, associatedDataSets, referralLocationsRepository, excludedDataElementsRepository, translationsService;
+            var lineListOfflineApprovalController, scope, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, q, origins, program, optionSetMapping, events, origin1, origin2, origin3, origin4, dataSetRepository, associatedDataSets, referralLocationsRepository, excludedDataElementsRepository, excludedLineListOptionsRepository, translationsService;
 
             beforeEach(mocks.inject(function($rootScope, $q) {
                 scope = $rootScope.$new();
@@ -169,6 +169,9 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 excludedDataElementsRepository = new ExcludedDataElementsRepository();
                 spyOn(excludedDataElementsRepository, "get").and.returnValue(utils.getPromise(q, []));
 
+                excludedLineListOptionsRepository = new ExcludedLineListOptionsRepository();
+                spyOn(excludedLineListOptionsRepository, "get").and.returnValue(utils.getPromise(q, {}));
+
                 translationsService = new TranslationsService();
                 spyOn(translationsService, "translate").and.returnValue(program);
                 spyOn(translationsService, "translateOptionSetMap").and.returnValue(optionSetMapping);
@@ -198,7 +201,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 };
                 scope.associatedProgramId = "Emergency Department";
 
-                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService);
+                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository, excludedLineListOptionsRepository, translationsService);
                 scope.$apply();
             }));
 
@@ -207,7 +210,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 expect(scope.program).toEqual(program);
 
                 translationsService.translate.and.returnValue(associatedDataSets);
-                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService);
+                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository, excludedLineListOptionsRepository, translationsService);
 
                 scope.$apply();
 
@@ -373,6 +376,46 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 expect(scope.associatedDataSets).toEqual(associatedDataSets);
             });
 
+            it('should filter excluded linelist options from optionSet mapping', function () {
+                var excludedLineListOptions = {
+                    dataElements: [{
+                        optionSetId:'os1',
+                        excludedOptionIds: ['os1o1']
+                    }]
+                };
+
+                var expectedOptionSetMapping = {
+                    "os1": [],
+                    "os2": [{
+                        "id": 'os2o1',
+                        "name": 'os2o1 name',
+                        "displayName": 'os2o1 translated name'
+                    }],
+                    "gender_id": [{
+                        "id": 'male_id',
+                        "name": 'Male',
+                        "displayName": 'Male'
+                    }, {
+                        "id": 'female_id',
+                        "name": 'Female',
+                        "displayName": 'Female'
+                    }],
+                    "ref_id": [{
+                        "id": 'ref_id',
+                        "name": 'ref 1',
+                        "displayName": 'ref 1'
+                    }]
+                };
+
+                excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, excludedLineListOptions));
+                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository, excludedLineListOptionsRepository, translationsService);
+
+                scope.$apply();
+
+                expect(excludedLineListOptionsRepository.get).toHaveBeenCalledWith(scope.selectedModule.id);
+                expect(scope.optionSetMapping).toEqual(expectedOptionSetMapping);
+            });
+
             it("should translate procedure dataElements formName and description", function () {
                 var translatedValue = "translatedValue";
                 expect(scope.originOrgUnits).toEqual([origin2, origin1, origin4, origin3]);
@@ -380,7 +423,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
 
                 translationsService.translate.and.returnValue(associatedDataSets);
                 translationsService.getTranslationForProperty.and.returnValue(translatedValue);
-                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService);
+                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository, excludedLineListOptionsRepository, translationsService);
 
                 scope.$apply();
 
@@ -397,7 +440,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
 
             it("should return set showFilters to false if there are no events", function() {
                 programEventRepository.getEventsForPeriod.and.returnValue(utils.getPromise(q, []));
-                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService);
+                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository, excludedLineListOptionsRepository, translationsService);
                 scope.$apply();
 
                 expect(scope.showFilters).toEqual(false);
@@ -409,7 +452,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
 
             it("should return false if there are no procedure data values", function() {
                 programEventRepository.getEventsForPeriod.and.returnValue(utils.getPromise(q, []));
-                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService);
+                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository, excludedLineListOptionsRepository, translationsService);
                 scope.$apply();
 
                 expect(scope.shouldShowProceduresInOfflineSummary()).toEqual(false);

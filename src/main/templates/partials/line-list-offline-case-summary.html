@@ -270,32 +270,19 @@
                                                         <thead>
                                                             <tr>
                                                                 <th rowspan="2">{{resourceBundle.optionName}}</th>
-                                                                <th colspan="3" ng-repeat="genderOption in genderOptions"> {{genderOption.name}}
-                                                                </th>
+                                                                <th colspan="3" ng-repeat="genderOption in genderOptions"> {{genderOption.name}} </th>
                                                             </tr>
                                                             <tr>
-                                                                <th>{{resourceBundle.lessThanFive}}</th>
+                                                                <th ng-repeat-start="genderOption in genderOptions">{{resourceBundle.lessThanFive}}</th>
                                                                 <th>{{resourceBundle.fiveToFourtenn}}</th>
-                                                                <th>{{resourceBundle.greaterThanFifteen}}</th>
-                                                                <th>{{resourceBundle.lessThanFive}}</th>
-                                                                <th>{{resourceBundle.fiveToFourtenn}}</th>
-                                                                <th>{{resourceBundle.greaterThanFifteen}}</th>
-                                                                <th>{{resourceBundle.lessThanFive}}</th>
-                                                                <th>{{resourceBundle.fiveToFourtenn}}</th>
-                                                                <th>{{resourceBundle.greaterThanFifteen}}</th>
+                                                                <th ng-repeat-end>{{resourceBundle.greaterThanFifteen}}</th>
                                                             </tr>
                                                         </thead>
                                                         <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]">
                                                             <td>{{option.name}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [0,5])}}</td>
+                                                            <td ng-repeat-start="genderOption in genderOptions">{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [0,5])}}</td>
                                                             <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [4,15])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [14, 9999])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[1].id, [0,5])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[1].id, [4,15])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[1].id, [14, 9999])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[2].id, [0,5])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[2].id, [4,15])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[2].id, [14, 9999])}}</td>
+                                                            <td ng-repeat-end>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [14, 9999])}}</td>
                                                         </tr>
                                                     </table>
                                                 </accordion-group>
@@ -328,28 +315,16 @@
                                                     </th>
                                                 </tr>
                                                 <tr>
-                                                    <th>{{resourceBundle.lessThanFive}}</th>
+                                                    <th ng-repeat-start="genderOption in genderOptions">{{resourceBundle.lessThanFive}}</th>
                                                     <th>{{resourceBundle.fiveToFourtenn}}</th>
-                                                    <th>{{resourceBundle.greaterThanFifteen}}</th>
-                                                    <th>{{resourceBundle.lessThanFive}}</th>
-                                                    <th>{{resourceBundle.fiveToFourtenn}}</th>
-                                                    <th>{{resourceBundle.greaterThanFifteen}}</th>
-                                                    <th>{{resourceBundle.lessThanFive}}</th>
-                                                    <th>{{resourceBundle.fiveToFourtenn}}</th>
-                                                    <th>{{resourceBundle.greaterThanFifteen}}</th>
+                                                    <th ng-repeat-end>{{resourceBundle.greaterThanFifteen}}</th>
                                                 </tr>
                                             </thead>
                                             <tr ng-repeat="pdv in procedureOptions">
                                                 <td>{{optionMapping[pdv.id]}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[0].id, [0,5])}}</td>
+                                                <td ng-repeat-start="genderOption in genderOptions">{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[0].id, [0,5])}}</td>
                                                 <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[0].id, [4,15])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[0].id, [14, 9999])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[1].id, [0,5])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[1].id, [4,15])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[1].id, [14, 9999])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[2].id, [0,5])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[2].id, [4,15])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[2].id, [14, 9999])}}</td>
+                                                <td ng-repeat-end>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[0].id, [14, 9999])}}</td>
                                             </tr>
                                         </table>
                                     </accordion-group>
