@@ -1,8 +1,8 @@
-define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timecop", "programEventRepository", "optionSetRepository", "orgUnitRepository", "excludedDataElementsRepository", "programRepository", "translationsService", "historyService"],
-    function(LineListDataEntryController, mocks, utils, moment, timecop, ProgramEventRepository, OptionSetRepository, OrgUnitRepository, ExcludedDataElementsRepository, ProgramRepository, TranslationsService, HistoryService) {
+define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timecop", "programEventRepository", "optionSetRepository", "orgUnitRepository", "excludedDataElementsRepository", "programRepository", "translationsService", "historyService", "excludedLineListOptionsRepository"],
+    function(LineListDataEntryController, mocks, utils, moment, timecop, ProgramEventRepository, OptionSetRepository, OrgUnitRepository, ExcludedDataElementsRepository, ProgramRepository, TranslationsService, HistoryService, ExcludedLineListOptionsRepository) {
         describe("lineListDataEntryController ", function() {
 
-            var scope, lineListDataEntryController, q, routeparams, location, programEventRepository, mockStore, allEvents, optionSets, originOrgUnits, optionSetRepository, optionSetMapping, orgUnitRepository, excludedDataElementsRepository, programRepository, anchorScroll, translationsService, historyService;
+            var scope, lineListDataEntryController, q, routeparams, location, programEventRepository, mockStore, allEvents, optionSets, originOrgUnits, mockModule, mockProgram, optionSetRepository, optionSetMapping, orgUnitRepository, excludedDataElementsRepository, programRepository, anchorScroll, translationsService, historyService,excludedLineListOptionsRepository;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $location, $anchorScroll) {
@@ -45,7 +45,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 historyService = new HistoryService(location);
                 spyOn(historyService, "back");
 
-                var module = {
+                mockModule = {
                     "id": "mod1",
                     "name": "Mod 1",
                     "openingDate": "2015-06-01",
@@ -63,14 +63,14 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 }];
 
                 orgUnitRepository = new OrgUnitRepository();
-                spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, module));
+                spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, mockModule));
                 spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, originOrgUnits));
                 spyOn(orgUnitRepository, "getParentProject").and.returnValue(utils.getPromise(q, {}));
 
                 excludedDataElementsRepository = new ExcludedDataElementsRepository();
                 spyOn(excludedDataElementsRepository, "get").and.returnValue(utils.getPromise(q, {}));
 
-                var program = {
+                mockProgram = {
                     "id": "Prg1",
                     'programStages': [{
                         'id': 'PrgStage1',
@@ -120,17 +120,20 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 };
 
                 programRepository = new ProgramRepository();
-                spyOn(programRepository, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, program));
-                spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, program));
+                spyOn(programRepository, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, mockProgram));
+                spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, mockProgram));
 
                 translationsService = new TranslationsService();
-                spyOn(translationsService, "translate").and.returnValue(program);
+                spyOn(translationsService, "translate").and.returnValue(mockProgram);
                 spyOn(translationsService, "translateOptionSetMap").and.returnValue(optionSetMapping.optionSetMap);
+
+                excludedLineListOptionsRepository = new ExcludedLineListOptionsRepository();
+                spyOn(excludedLineListOptionsRepository, 'get').and.returnValue(utils.getPromise(q, []));
 
                 Timecop.install();
                 Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
 
-                lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
+                lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
                 scope.$apply();
             }));
 
@@ -184,7 +187,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                                 "id": 'os1o1',
                                 "code": 'os1o1',
                                 "name": 'os1o1 name',
-                                "displayName": 'os1o1 name',
+                                "displayName": 'os1o1 name'
                             }],
                             "os2": [{
                                 "id": 'os2o1',
@@ -197,7 +200,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     optionSetRepository.getOptionSetMapping.and.returnValue(utils.getPromise(q, optionSetMapping));
                     translationsService.translateOptionSetMap.and.returnValue(optionSetMapping.optionSetMap);
 
-                    var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
+                    var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
                     scope.$apply();
 
                     expect(scope.dataValues).toEqual({
@@ -212,6 +215,135 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                         }
                     });
                 });
+
+                it('should load excluded linelist options', function () {
+                    expect(excludedLineListOptionsRepository.get).toHaveBeenCalledWith(mockModule.id);
+                });
+
+                describe('dataElementOptions', function () {
+                    var excludedOptions;
+                    beforeEach(function () {
+                        var optionSetMapping = {
+                            "optionSetMap": {
+                                "os1": [{
+                                    "id": 'os1o1',
+                                    "code": 'os1o1',
+                                    "name": 'os1o1 name',
+                                    "displayName": 'os1o1 name'
+                                }, {
+                                    "id": 'os1o2',
+                                    "code": 'os1o2',
+                                    "name": 'os1o2 name',
+                                    "displayName": 'os1o2 name'
+                                },{
+                                    "id": 'os1o3',
+                                    "code": 'os1o3',
+                                    "name": 'os1o3 name',
+                                    "displayName": 'os1o3 name'
+                                }],
+                                "os2": [{
+                                    "id": 'os2o1',
+                                    "code": 'os2o1',
+                                    "name": 'os2o1 name',
+                                    "displayName": 'os2o1 translated name'
+                                }]
+                            }
+                        };
+                        optionSetRepository.getOptionSetMapping.and.returnValue(utils.getPromise(q, optionSetMapping));
+                        translationsService.translateOptionSetMap.and.returnValue(optionSetMapping.optionSetMap);
+                    });
+
+                    it('should set dataElementOptions to scope', function () {
+                        excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, undefined));
+                        var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
+                        scope.$apply();
+
+                        var expectedDataElementOptions = {
+                            de4:[{
+                                "id": 'os1o1',
+                                "code": 'os1o1',
+                                "name": 'os1o1 name',
+                                "displayName": 'os1o1 name'
+                            }, {
+                                "id": 'os1o2',
+                                "code": 'os1o2',
+                                "name": 'os1o2 name',
+                                "displayName": 'os1o2 name'
+                            }, {
+                                "id": 'os1o3',
+                                "code": 'os1o3',
+                                "name": 'os1o3 name',
+                                "displayName": 'os1o3 name'
+                            }]
+                        };
+                        expect(scope.dataElementOptions).toEqual(expectedDataElementOptions);
+                    });
+
+                    it('should not set the excludedOptions to the dataElementOptions', function () {
+                        excludedOptions = {
+                            moduleId: mockModule.id,
+                            dataElements: [{
+                                dataElementId: 'de4',
+                                excludedOptionIds: ['os1o2']
+                            }]
+                        };
+                        excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, excludedOptions));
+                        var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
+
+                        scope.$apply();
+                        var expectedDataElementOptions = {
+                            de4: [{
+                                "id": 'os1o1',
+                                "code": 'os1o1',
+                                "name": 'os1o1 name',
+                                "displayName": 'os1o1 name'
+                            }, {
+                                "id": 'os1o3',
+                                "code": 'os1o3',
+                                "name": 'os1o3 name',
+                                "displayName": 'os1o3 name'
+                            }]
+                        };
+
+                        expect(scope.dataElementOptions).toEqual(expectedDataElementOptions);
+                    });
+
+                    it('should set all the dataElementOptions if there are no excluded options for a data element', function () {
+                        excludedOptions = {
+                            moduleId: mockModule.id,
+                            dataElements: [{
+                                dataElementId: 'de3',
+                                excludedOptionIds: ['os1o2']
+                            }]
+                        };
+                        excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, excludedOptions));
+                        var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
+
+                        scope.$apply();
+                        var expectedDataElementOptions = {
+                            de4: [{
+                                "id": 'os1o1',
+                                "code": 'os1o1',
+                                "name": 'os1o1 name',
+                                "displayName": 'os1o1 name'
+                            }, {
+                                "id": 'os1o2',
+                                "code": 'os1o2',
+                                "name": 'os1o2 name',
+                                "displayName": 'os1o2 name'
+                            }, {
+                                "id": 'os1o3',
+                                "code": 'os1o3',
+                                "name": 'os1o3 name',
+                                "displayName": 'os1o3 name'
+                            }]
+                        };
+
+                        expect(scope.dataElementOptions).toEqual(expectedDataElementOptions);
+
+                    });
+                });
+
             });
 
             it("should save event details as newDraft and show summary view", function() {

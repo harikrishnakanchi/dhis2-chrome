@@ -1,5 +1,5 @@
 define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, moment, dhisId, dateUtils, properties) {
-    return function($scope, $rootScope, $routeParams, $location, $anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService) {
+    return function($scope, $rootScope, $routeParams, $location, $anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService) {
 
         var resetForm = function() {
             $scope.form = $scope.form || {};
@@ -283,6 +283,28 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 }
             };
 
+            var loadExcludedOptions = function () {
+                var buildDataElementOptions = function (excludedLinelistOptions) {
+                    $scope.dataElementOptions = {};
+                    var dataElementsWithOptions = _.filter(allDataElementsMap, 'optionSet');
+                    var indexedExcludedLineListOptions = excludedLinelistOptions && _.indexBy(excludedLinelistOptions.dataElements, 'dataElementId');
+                    _.forEach(dataElementsWithOptions, function (dataElement) {
+                        var options = $scope.optionSetMapping[dataElement.optionSet.id];
+                        if (!_.isUndefined(excludedLinelistOptions)) {
+                            var excludedOptionIds = indexedExcludedLineListOptions[dataElement.id] && indexedExcludedLineListOptions[dataElement.id].excludedOptionIds;
+                            options = _.reject(options, function (option) {
+                                return _.contains(excludedOptionIds, option.id);
+                            });
+                        }
+                        $scope.dataElementOptions[dataElement.id] = options;
+                    });
+                };
+
+               return excludedLineListOptionsRepository.get($scope.selectedModuleId).then(buildDataElementOptions);
+            };
+
+
+
             $scope.loading = true;
             resetForm();
             loadModule()
@@ -292,6 +314,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 .then(loadOptionSets)
                 .then(loadEvent)
                 .then(setEventMinAndMaxDate)
+                .then(loadExcludedOptions)
                 .finally(function() {
                     $scope.loading = false;
                 });
