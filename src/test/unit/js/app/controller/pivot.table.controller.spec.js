@@ -204,11 +204,11 @@ define(["angularMocks", "utils", "lodash", "moment", "pivotTableController", "ti
             });
         });
 
-        it("should get data element name", function() {
-            var dataElementName = "FieldApp - test";
-            var actualdataelementName = scope.getDataElementName(dataElementName);
-
-            expect("FieldApp").toEqual(actualdataelementName);
+        describe('getDataDimensionName', function () {
+            it('should return the first part of the name before a hyphen', function() {
+                var name = 'SomeName - FollowedBySomethingElse - EndingWithSomethingMore';
+                expect(scope.getDataDimensionName(name)).toEqual('SomeName');
+            });
         });
 
         it("should not display the download button if download is disabled", function() {
