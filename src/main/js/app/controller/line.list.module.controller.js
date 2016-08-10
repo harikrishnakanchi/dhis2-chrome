@@ -299,6 +299,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     if(excludedOptionIds.length) {
                         dataElements.push({
                             dataElementId: dataElement.id,
+                            optionSetId: dataElement.optionSet.id,
                             excludedOptionIds: excludedOptionIds
                         });
                     }

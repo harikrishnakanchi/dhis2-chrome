@@ -380,6 +380,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         dataElement: {
                             id: 'de3',
                             optionSet: {
+                                id: 'someOptionSetId',
                                 options: [{
                                     id: 'someOtherOptionId',
                                     isSelected: false
@@ -391,6 +392,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         dataElement: {
                             id: 'de4',
                             optionSet: {
+                                id: 'someOtherOptionSetId',
                                 options: [{
                                     id: 'someOptionId',
                                     isSelected: false
@@ -458,9 +460,11 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         clientLastUpdated: moment().toISOString(),
                         dataElements: [{
                             dataElementId: 'de3',
+                            optionSetId: 'someOptionSetId',
                             excludedOptionIds: ['someOtherOptionId']
                         }, {
                             dataElementId: 'de4',
+                            optionSetId: 'someOtherOptionSetId',
                             excludedOptionIds: ['someOptionId', 'someOtherOptionId']
                         }]
                     };
@@ -477,9 +481,11 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         clientLastUpdated: moment().toISOString(),
                         dataElements: [{
                             dataElementId: 'de3',
+                            optionSetId: 'someOptionSetId',
                             excludedOptionIds: ['someOtherOptionId']
                         }, {
                             dataElementId: 'de4',
+                            optionSetId: 'someOtherOptionSetId',
                             excludedOptionIds: ['someOptionId', 'someOtherOptionId']
                         }]
                     };
@@ -508,6 +514,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                             isIncluded: false,
                             id: 'de3',
                             optionSet: {
+                                id: 'someOptionId',
                                 options: [{
                                     id: 'someOtherOptionId',
                                     isSelected: false
@@ -519,6 +526,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         dataElement: {
                             id: 'de4',
                             optionSet: {
+                                id: 'someOtherOptionId',
                                 options: [{
                                     id: 'someOptionId',
                                     isSelected: false
@@ -539,6 +547,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         clientLastUpdated: moment().toISOString(),
                         dataElements: [{
                             dataElementId: selectedDataElementB.dataElement.id,
+                            optionSetId: 'someOtherOptionId',
                             excludedOptionIds: ['someOptionId', 'someOtherOptionId']
                         }]
                     };
