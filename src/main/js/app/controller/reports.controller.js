@@ -225,7 +225,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             var loadDatasetsForModules = function(orgUnits) {
                 return datasetRepository.findAllForOrgUnits(_.pluck(orgUnits, "id")).then(function(dataSets) {
                     var filteredDataSets = _.filter(dataSets, function(ds) {
-                        return !(ds.isOriginDataset || ds.isPopulationDataset || ds.isReferralDataset);
+                        return !(ds.isPopulationDataset || ds.isReferralDataset);
                     });
                     
                     var translatedDataSets = translationsService.translate(filteredDataSets);
