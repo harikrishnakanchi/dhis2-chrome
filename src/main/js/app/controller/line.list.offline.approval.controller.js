@@ -1,5 +1,5 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function($scope, $q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, datasetRepository, referralLocationsRepository, excludedDataElementsRepository, excludedLineListOptionsRepository, translationsService) {
+    return function($scope, $q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, datasetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService) {
 
         $scope.isGenderFilterApplied = false;
         $scope.isAgeFilterApplied = false;
@@ -176,32 +176,12 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         var getOptionSetMapping = function() {
-            return $q.all({
-                optionMapping: optionSetRepository.getOptionSetMapping($scope.selectedModule.parent.id),
-                excludedOptions: excludedLineListOptionsRepository.get($scope.selectedModule.id)
-            }).then(function(data) {
-                var optionMapping = data.optionMapping,
-                    excludedOptions = data.excludedOptions;
+            return optionSetRepository.getOptionSetMapping($scope.selectedModule.parent.id).then(function(data) {
+                var translatedOptionSetMap = translationsService.translateOptionSetMap(data.optionSetMap);
+                $scope.optionSetMapping = translatedOptionSetMap;
 
-                var excludedOptionMapByOptionSet = _.reduce(excludedOptions.dataElements, function (map, dataElement) {
-                    map[dataElement.optionSetId] = dataElement.excludedOptionIds;
-                    return map;
-                }, {});
-
-                var optionSetMapping = translationsService.translateOptionSetMap(optionMapping.optionSetMap);
-
-                // console.info(JSON.stringify(optionSetMapping, undefined, 3));
-
-                _.each(excludedOptionMapByOptionSet, function (excludedOptionIds, optionSetId) {
-                    optionSetMapping[optionSetId] = _.reject(optionSetMapping[optionSetId], function (option) {
-                        return _.contains(excludedOptionIds, option.id);
-                    });
-                });
-
-                // console.info(JSON.stringify(optionSetMapping, undefined, 3));
-
-                $scope.optionSetMapping = optionSetMapping;
-                $scope.optionMapping = translationsService.translateOptionMap(optionMapping.optionMap);
+                var translatedOptionMap = translationsService.translateOptionMap(data.optionMap);
+                $scope.optionMapping = translatedOptionMap;
             });
         };
 
@@ -217,7 +197,6 @@ define(["lodash", "moment"], function(_, moment) {
 
             $scope.eventsMap = _.groupBy(allDataValues, "eventId");
 
-            console.log(allDataValues);
             $scope.dataValues = _.groupBy(allDataValues, function(dv) {
                 var lineListSummaryfilters = {
                     'showInOfflineSummary': '_showInOfflineSummary',
