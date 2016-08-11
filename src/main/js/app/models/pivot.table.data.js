@@ -112,13 +112,11 @@ define(['lodash'], function(_) {
         category: function (definition, data, dataValues, dimensionConfiguration) {
             var categoryOptions = _.flatten(_.map(definition.categoryDimensions, 'categoryOptions'));
             return _.map(dimensionConfiguration.items, function (item) {
-                var categoryOption = _.find(categoryOptions, { id: item.id }),
-                    dataValuesFilter = {};
+                var categoryOption = _.find(categoryOptions, { id: item.id });
 
-                dataValuesFilter[dimensionConfiguration.dimension] = item.id;
                 return _.merge(categoryOption, {
                     id: item.id,
-                    dataValuesFilter: dataValuesFilter
+                    dataValuesFilter: _.zipObject([dimensionConfiguration.dimension], [item.id])
                 });
             });
         }
