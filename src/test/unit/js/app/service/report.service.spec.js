@@ -216,7 +216,7 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
 
                 var expectedQueryParams = encodeURI('fields=id,name,sortOrder,relativePeriods,' +
                                                     'categoryDimensions[dataElementCategory,categoryOptions[:identifiable]],' +
-                                                    'dataDimensionItems[dataElement[id,name,formName,description],indicator[id,name,shortName,description]],' +
+                                                    'dataDimensionItems[dataElement[id,name,formName,description],indicator[id,name,shortName,description],programIndicator[id,name,shortName,description]],' +
                                                     'columns[dimension,items[id]],' +
                                                     'rows[dimension,items[id]],' +
                                                     'filters[dimension,items[id]]');

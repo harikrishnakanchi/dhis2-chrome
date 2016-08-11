@@ -24,6 +24,12 @@ define(['pivotTableData'], function(PivotTableData) {
                         name: 'someIndicatorName',
                         description: 'someIndicatorDescription'
                     }
+                }, {
+                    programIndicator: {
+                        id: 'someProgramIndicatorId',
+                        name: 'someProgramIndicatorName',
+                        description: 'someProgramIndicatorDescription'
+                    }
                 }],
                 categoryDimensions: [{
                     dataElementCategory: {
@@ -235,9 +241,16 @@ define(['pivotTableData'], function(PivotTableData) {
                     dimension: 'dx',
                     items: [
                         { id: 'someDataElementId' },
-                        { id: 'someIndicatorId' }
+                        { id: 'someIndicatorId' },
+                        { id: 'someProgramIndicatorId' }
                     ]
                 }];
+                data.rows = [
+                    ['somePeriodId', 'someOrgUnitId', 'someDataElementId', '1.0'],
+                    ['somePeriodId', 'someOrgUnitId', 'someIndicatorId', '1.0'],
+                    ['somePeriodId', 'someOrgUnitId', 'someProgramIndicatorId', '1.0']
+                ];
+
                 pivotTableData = PivotTableData.create(definition, data);
 
                 expect(pivotTableData.rows).toEqual([{
@@ -257,6 +270,15 @@ define(['pivotTableData'], function(PivotTableData) {
                     dataDimension: true,
                     dataValuesFilter: {
                         dx: 'someIndicatorId'
+                    }
+                }, {
+                    rowNumber: 3,
+                    id: 'someProgramIndicatorId',
+                    name: 'someProgramIndicatorName',
+                    description: 'someProgramIndicatorDescription',
+                    dataDimension: true,
+                    dataValuesFilter: {
+                        dx: 'someProgramIndicatorId'
                     }
                 }]);
             });

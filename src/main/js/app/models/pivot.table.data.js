@@ -67,7 +67,7 @@ define(['lodash'], function(_) {
     var DIMENSION_MAPPING_FUNCTIONS = {
         dx: function (definition, data, dataValues, dimensionConfiguration) {
             var dataDimensionItems = _.map(definition.dataDimensionItems, function (item) {
-                return item.dataElement || item.indicator;
+                return item.dataElement || item.indicator || item.programIndicator;
             });
             var mappedItems = _.map(dimensionConfiguration.items, function (item) {
                 var dataDimensionItem = _.find(dataDimensionItems, { id: item.id });
