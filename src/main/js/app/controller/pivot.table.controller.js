@@ -1,8 +1,6 @@
 define(["lodash", "dateUtils", "moment"], function(_, dateUtils, moment) {
     return function($scope, $rootScope, translationsService, filesystemService) {
         $scope.resourceBundle = $rootScope.resourceBundle;
-        var DEFAULT_SORT_KEY = 'dataElementIndex';
-
         $scope.showDownloadButton = $scope.disableDownload != 'true';
 
         var getCSVContents = function() {
