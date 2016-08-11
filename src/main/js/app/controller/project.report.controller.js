@@ -29,12 +29,6 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, date
                 return '[' + dateUtils.getNumberOfISOWeeksInMonth(month) + ' ' + $scope.resourceBundle.weeksLabel + ']';
             };
 
-            var getDataDimensionName = function(name) {
-                //TODO: Remove this formatting of names after we start using dataElement and indicators formName
-                var HYPHEN_SEPARATOR = ' - ';
-                return _.first(name.split(HYPHEN_SEPARATOR));
-            };
-
             var getPivotTableData = function () {
                 var pivotTableCSVs = _.map($scope.pivotTables, function (pivotTable) {
                     var baseColumnConfiguration = _.last(pivotTable.columns);
@@ -59,7 +53,7 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, date
 
                     var buildRows = function () {
                         return _.map(pivotTable.rows, function (row) {
-                            var cells = [escapeString(getDataDimensionName(row.name))];
+                            var cells = [escapeString(pivotTable.getDisplayName(row))];
 
                             _.each(baseColumnConfiguration, function (column) {
                                 var value = pivotTable.getDataValue(row, column);

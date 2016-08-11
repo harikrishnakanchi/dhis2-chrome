@@ -18,12 +18,12 @@
                id="rowLabel_{{row.rowNumber}}"
                class="changeColor"
                description-popup
-               dp-title="{{getDataDimensionName(row.name)}}"
-               dp-desc="{{row.description}}">
-                {{ getDataDimensionName(row.name) }}
+               dp-title="{{  table.getDisplayName(row)  }}"
+               dp-desc="{{ row.description }}">
+                {{  table.getDisplayName(row)  }}
             </a>
             <span ng-if="!row.dataDimension">
-                {{ getDataDimensionName(row.name) }}
+                {{  table.getDisplayName(row)  }}
             </span>
         </td>
         <td ng-repeat="column in baseColumnConfiguration">

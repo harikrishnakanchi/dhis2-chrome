@@ -32,7 +32,7 @@ define(["lodash", "dateUtils", "moment"], function(_, dateUtils, moment) {
 
             var buildRows = function () {
                 return _.map($scope.table.rows, function (row) {
-                    var cells = [escapeString($scope.getDataDimensionName(row.name))];
+                    var cells = [escapeString($scope.table.getDisplayName(row))];
 
                     _.each($scope.baseColumnConfiguration, function (column) {
                         var value = $scope.table.getDataValue(row, column);
@@ -51,12 +51,6 @@ define(["lodash", "dateUtils", "moment"], function(_, dateUtils, moment) {
         $scope.exportToCSV = function () {
             var fileName = [$scope.table.dataSetCode, $scope.table.title, moment().format("DD-MMM-YYYY"), 'csv'].join('.');
             filesystemService.promptAndWriteFile(fileName, new Blob([getCSVContents()], {type: 'text/csv'}), filesystemService.FILE_TYPE_OPTIONS.CSV);
-        };
-
-        $scope.getDataDimensionName = function(name) {
-            //TODO: Remove this formatting of names after we start using dataElement and indicators formName
-            var HYPHEN_SEPARATOR = ' - ';
-            return _.first(name.split(HYPHEN_SEPARATOR));
         };
 
         $scope.sortByColumn = function (column) {

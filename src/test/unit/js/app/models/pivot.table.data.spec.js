@@ -174,6 +174,37 @@ define(['pivotTableData'], function(PivotTableData) {
 
         });
 
+        describe('getDisplayName', function () {
+            var pivotTableData, item;
+
+            beforeEach(function () {
+                pivotTableData = PivotTableData.create({}, {});
+            });
+
+            it('should use formName if its available', function () {
+                item = { formName: 'someName' };
+                expect(pivotTableData.getDisplayName(item)).toEqual(item.formName);
+            });
+
+            it('should use shortName if formName is not available', function () {
+                item = { shortName: 'someShortName' };
+                expect(pivotTableData.getDisplayName(item)).toEqual(item.shortName);
+            });
+
+            it('should use name if formName and shortName is not available', function () {
+                item = { name: 'someName' };
+                expect(pivotTableData.getDisplayName(item)).toEqual(item.name);
+            });
+
+            it('should split the name by hyphen if item is a data dimension', function () {
+                item = {
+                    name: 'someName - someOtherName - yetAnotherName',
+                    dataDimension: true
+                };
+                expect(pivotTableData.getDisplayName(item)).toEqual('someName');
+            });
+        });
+
         describe('isTableDataAvailable', function () {
             it('should return true if data values exist', function() {
                 data.rows = ['someDataValue'];

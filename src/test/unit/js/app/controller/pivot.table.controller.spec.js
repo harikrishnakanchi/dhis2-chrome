@@ -159,6 +159,9 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
                             [innerColumnA1, innerColumnA2]
                         ],
                         rows: [rowA, rowB],
+                        getDisplayName: function (item) {
+                            return item.name;
+                        },
                         getDataValue: function () {
                             return mockValue;
                         }
@@ -198,13 +201,6 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
                     expect(csvContent).toContain(expectedRowA);
                     expect(csvContent).toContain(expectedRowB);
                 });
-            });
-        });
-
-        describe('getDataDimensionName', function () {
-            it('should return the first part of the name before a hyphen', function() {
-                var name = 'SomeName - FollowedBySomethingElse - EndingWithSomethingMore';
-                expect(scope.getDataDimensionName(name)).toEqual('SomeName');
             });
         });
 

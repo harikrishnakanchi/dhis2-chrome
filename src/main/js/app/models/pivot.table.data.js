@@ -1,5 +1,6 @@
 define(['lodash'], function(_) {
-    var VALUE_HEADER = 'value';
+    var VALUE_HEADER = 'value',
+        DATA_DIMENSION_NAME_SEPARATOR = ' - ';
 
     var PivotTableData = function(definition, data) {
         var _this = this;
@@ -27,6 +28,12 @@ define(['lodash'], function(_) {
             var dataValues = _.filter(_this.dataValues, _.merge({}, row.dataValuesFilter, column.dataValuesFilter)),
                 eligibleDataValues = _.reject(dataValues, { excludedFromTotals: true });
             return _.isEmpty(eligibleDataValues) ? null : _.sum(eligibleDataValues, 'value');
+        };
+
+        this.getDisplayName = function (item) {
+            //TODO: Remove this formatting of names after we complete transition to using formName for dataElement and shortName for indicators
+            var itemName = item.dataDimension ? _.first(item.name.split(DATA_DIMENSION_NAME_SEPARATOR)) : item.name;
+            return item.formName || item.shortName || itemName;
         };
     };
 
