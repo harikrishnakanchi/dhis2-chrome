@@ -18,7 +18,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             spyOn(chartRepository, "getAll").and.returnValue(utils.getPromise(q, []));
             pivotTableRepository = new PivotTableRepository();
             spyOn(pivotTableRepository, "getAll").and.returnValue(utils.getPromise(q, []));
-            spyOn(pivotTableRepository, "getPivotTableData").and.returnValue(utils.getPromise(q, []));
+            spyOn(pivotTableRepository, "getPivotTableData").and.returnValue(utils.getPromise(q, {}));
 
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, {}));
@@ -507,8 +507,60 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             expect(scope.datasets[2].isMonthlyChartsAvailable).toBeFalsy();
         });
 
-        it("should load pivot tables into the scope", function() {
-            //ToDo: write spec for loading pivot table data
+        describe('loading of pivot tables', function () {
+            var dataSet, pivotTableA, pivotTableB, pivotTableData;
+
+            beforeEach(function () {
+                routeParams = {
+                    orgUnit: 'mod1'
+                };
+                dataSet = {
+                    code: 'someDataSetCode'
+                };
+                pivotTableA = {
+                    dataSetCode: 'someDataSetCode'
+                };
+                pivotTableB = {
+                    dataSetCode: 'someOtherDataSetCode'
+                };
+                pivotTableData = {
+                    some: 'data'
+                };
+
+                datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [dataSet]));
+                pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [pivotTableA, pivotTableB]));
+                pivotTableRepository.getPivotTableData.and.returnValue(utils.getPromise(q, pivotTableData));
+
+                spyOn(translationsService, 'translate').and.callFake(function (object) { return object; });
+
+                reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService);
+            });
+
+            it('should load all pivot table definitions', function () {
+                scope.$apply();
+                expect(pivotTableRepository.getAll).toHaveBeenCalled();
+            });
+
+            it('should get pivotTableData for relevant dataSets of the module', function () {
+                scope.$apply();
+                expect(pivotTableRepository.getPivotTableData).toHaveBeenCalledWith(pivotTableA, routeParams.orgUnit);
+                expect(pivotTableRepository.getPivotTableData).toHaveBeenCalledTimes(1);
+            });
+
+            it('should translate the pivot tables', function () {
+                scope.$apply();
+                expect(translationsService.translateReports).toHaveBeenCalledWith([pivotTableData]);
+            });
+
+            it('should set the pivot tables on the scope', function () {
+                var translatedPivotTableData = {
+                    some: 'translatedData'
+                };
+                translationsService.translateReports.and.returnValue([translatedPivotTableData]);
+
+                scope.$apply();
+                expect(scope.pivotTables).toEqual([translatedPivotTableData]);
+            });
         });
 
         describe('download chart', function () {
