@@ -1126,6 +1126,44 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     scope.$apply();
                 });
 
+                it('should group referral location dataElement into data dataElements without optionSet', function () {
+                    var programStageDataElement = createProgramStageDataElement({
+                        dataElement: {
+                            offlineSummaryType: "referralLocations",
+                            optionSet: {
+                                options: [{
+                                    id: 'someOptionId'
+                                }, {
+                                    id: 'someOtherOptionId'
+                                }]
+                            }
+                        }
+                    });
+                    program = {
+                        "id": "surgery1",
+                        "name": "Surgery",
+                        "programStages": [{
+                            "programStageSections": [{
+                                "id": "sectionId1",
+                                "programStageDataElements": [programStageDataElement]
+                            }]
+                        }]
+                    };
+
+                    selectedObject = {
+                        "originalObject": program
+                    };
+
+                    programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, program));
+                    programRepository.get.and.returnValue(utils.getPromise(q, program));
+                    translationsService.translate.and.returnValue(program);
+
+                    scope.onProgramSelect(selectedObject).then(function(data) {
+                        expect(scope.enrichedProgram.programStages[0].programStageSections[0].dataElementsWithoutOptions).toEqual([programStageDataElement]);
+                    });
+                    scope.$apply();
+                });
+
                 it("should set program on scope", function() {
                     scope.onProgramSelect(selectedObject).then(function(data) {
                         expect(scope.enrichedProgram).toEqual(program);

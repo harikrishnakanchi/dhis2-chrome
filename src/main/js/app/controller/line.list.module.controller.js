@@ -89,10 +89,16 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
                 var getEnrichedProgram = function(progId) {
                     var buildProgramDataElements = function () {
+                        var isDataElementWithOptions = function (programStageDataElement) {
+                            var dataElementHasOptions = !!programStageDataElement.dataElement.optionSet;
+                            var isReferralLocation = programStageDataElement.dataElement.offlineSummaryType == 'referralLocations';
+                            return dataElementHasOptions && !isReferralLocation;
+                        };
+
                         _.forEach($scope.enrichedProgram.programStages, function (programStage) {
                             _.forEach(programStage.programStageSections, function (programStageSection) {
-                                programStageSection.dataElementsWithOptions = _.filter(programStageSection.programStageDataElements, 'dataElement.optionSet');
-                                programStageSection.dataElementsWithoutOptions = _.reject(programStageSection.programStageDataElements, 'dataElement.optionSet');
+                                programStageSection.dataElementsWithOptions = _.filter(programStageSection.programStageDataElements, isDataElementWithOptions);
+                                programStageSection.dataElementsWithoutOptions = _.reject(programStageSection.programStageDataElements, isDataElementWithOptions);
                             });
                         });
                     };
