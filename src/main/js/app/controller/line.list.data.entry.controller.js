@@ -247,13 +247,13 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
 
                     var de = allDataElementsMap[dv.dataElement];
                     if (de && de.optionSet) {
-                        return _.find($scope.dataElementOptions[de.id], function(optionSet) {
+                        return _.find($scope.dataElementOptions[de.id], function(option) {
                             if (_.endsWith(de.optionSet.code, "_referralLocations")) {
                                 filterOptions();
-                                if (!_.contains($scope.dataElementOptions[de.id], optionSet))
-                                    $scope.dataElementOptions[de.id].push(optionSet);
+                                if (!_.contains($scope.dataElementOptions[de.id], option))
+                                    $scope.dataElementOptions[de.id].push(option);
                             }
-                            return optionSet.code === dv.value;
+                            return option.code === dv.value;
                         });
                     }
                     //TODO remove date, datetime and int checks after DHIS 2.21
