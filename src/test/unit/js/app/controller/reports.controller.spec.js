@@ -12,12 +12,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             mockModule = {
                 id: 'someModuleId',
                 name: 'Some Module Name',
-                attributeValues: [{
-                    attribute: {
-                        code: 'Type'
-                    },
-                    value: 'Module'
-                }],
+                attributeValues: 'someAttributeValues',
                 parent: {
                     name: 'Some Parent Name'
                 }

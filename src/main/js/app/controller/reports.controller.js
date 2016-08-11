@@ -247,20 +247,10 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
         var loadOrgUnit = function() {
             var orgUnitId = $routeParams.orgUnit;
 
-            var isOfType = function(orgUnit, type) {
-                return _.any(orgUnit.attributeValues, {
-                    attribute: {
-                        "code": "Type"
-                    },
-                    value: type
-                });
-            };
-
-            return orgUnitRepository.get(orgUnitId).then(function(ou) {
-                if (isOfType(ou, 'Module'))
-                    ou.displayName = ou.parent.name + ' - ' + ou.name;
-                ou.lineListService = CustomAttributes.getBooleanAttributeValue(ou.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
-                $scope.orgUnit = ou;
+            return orgUnitRepository.get(orgUnitId).then(function(orgUnit) {
+                orgUnit.displayName = orgUnit.parent.name + ' - ' + orgUnit.name;
+                orgUnit.lineListService = CustomAttributes.getBooleanAttributeValue(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
+                $scope.orgUnit = orgUnit;
             });
         };
 
