@@ -20,9 +20,9 @@ define(["lodash", "dateUtils", "moment"], function(_, dateUtils, moment) {
                     _.each(columnConfiguration, function (column) {
                         _.times(columnWidth, function () {
                             if($scope.table.monthlyReport && column.periodDimension) {
-                                cells.push(escapeString(column.name + ' ' + $scope.getNumberOfWeeksLabel(column.id)));
+                                cells.push(escapeString($scope.table.getDisplayName(column) + ' ' + $scope.getNumberOfWeeksLabel(column.id)));
                             } else {
-                                cells.push(escapeString(column.name));
+                                cells.push(escapeString($scope.table.getDisplayName(column)));
                             }
                         });
                     });

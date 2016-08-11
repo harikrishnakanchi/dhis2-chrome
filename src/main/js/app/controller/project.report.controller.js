@@ -41,9 +41,9 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, date
                             _.each(columnConfiguration, function (column) {
                                 _.times(columnWidth, function () {
                                     if(pivotTable.monthlyReport && column.periodDimension) {
-                                        cells.push(escapeString(column.name + ' ' + getNumberOfWeeksLabel(column.id)));
+                                        cells.push(escapeString(pivotTable.getDisplayName(column) + ' ' + getNumberOfWeeksLabel(column.id)));
                                     } else {
-                                        cells.push(escapeString(column.name));
+                                        cells.push(escapeString(pivotTable.getDisplayName(column)));
                                     }
                                 });
                             });
