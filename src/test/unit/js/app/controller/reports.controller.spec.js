@@ -49,7 +49,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
 
             translationsService = new TranslationsService();
             spyOn(translationsService, 'translate').and.callFake(function (object) { return object; });
-            spyOn(translationsService, 'translateReports').and.callFake(function (object) { return object; });
+            spyOn(translationsService, 'translatePivotTableData').and.callFake(function (object) { return object; });
             spyOn(translationsService, 'translateCharts').and.callFake(function (object) { return object; });
 
             reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService);
@@ -433,14 +433,14 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
 
             it('should translate the pivot tables', function () {
                 scope.$apply();
-                expect(translationsService.translateReports).toHaveBeenCalledWith([pivotTableData]);
+                expect(translationsService.translatePivotTableData).toHaveBeenCalledWith([pivotTableData]);
             });
 
             it('should set the pivot tables on the scope', function () {
                 var translatedPivotTableData = {
                     some: 'translatedData'
                 };
-                translationsService.translateReports.and.returnValue([translatedPivotTableData]);
+                translationsService.translatePivotTableData.and.returnValue([translatedPivotTableData]);
 
                 scope.$apply();
                 expect(scope.pivotTables).toEqual([translatedPivotTableData]);

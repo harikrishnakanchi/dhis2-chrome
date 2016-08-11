@@ -260,15 +260,11 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             }));
         };
 
-        var translatePivotTables = function (pivotTables) {
-            return translationsService.translateReports(pivotTables);
-        };
-
         var loadPivotTablesWithData = function() {
             return pivotTableRepository.getAll()
                 .then(filterReportsForCurrentModule)
                 .then(getPivotTableData)
-                .then(translatePivotTables)
+                .then(translationsService.translatePivotTableData)
                 .then(function(pivotTables) {
                     $scope.pivotTables = pivotTables;
                 });

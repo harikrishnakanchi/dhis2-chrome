@@ -222,7 +222,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             spyOn(pivotTableRepository, "getPivotTableData").and.returnValue(utils.getPromise($q, pivotTableData));
 
             translationsService = new TranslationsService();
-            spyOn(translationsService, "translateReports").and.callFake(function(object) { return object; });
+            spyOn(translationsService, 'translatePivotTableData').and.callFake(function(object) { return object; });
             spyOn(translationsService, 'translate').and.callFake(function(object) { return object; });
 
             orgUnitGroupSetRepository = new OrgUnitGroupSetRepository();

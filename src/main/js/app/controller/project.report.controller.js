@@ -166,15 +166,11 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, date
             }));
         };
 
-        var translatePivotTables = function (pivotTables) {
-            return translationsService.translateReports(pivotTables);
-        };
-
         var loadPivotTables = function() {
             return pivotTableRepository.getAll()
                 .then(filterProjectReportTables)
                 .then(getDataForPivotTables)
-                .then(translatePivotTables)
+                .then(translationsService.translatePivotTableData)
                 .then(function(pivotTables) {
                     $scope.pivotTables = _.sortBy(_.filter(pivotTables, { isTableDataAvailable: true }), 'displayPosition');
                 });
