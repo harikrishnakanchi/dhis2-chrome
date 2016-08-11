@@ -103,9 +103,9 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
         };
 
         var filterReportsForCurrentModule = function (allReports) {
-            var allDatsasetCodes = _.map($scope.datasets, 'code');
+            var allDataSetCodes = _.map($scope.datasets, 'code');
             return _.filter(allReports, function(report) {
-                return _.contains(allDatsasetCodes, report.dataSetCode);
+                return _.contains(allDataSetCodes, report.dataSetCode);
             });
         };
 
@@ -264,7 +264,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             });
         };
 
-        var transformTables = function(tables) {
+        var getPivotTableData = function(tables) {
             return $q.all(_.map(tables, function(tableDefinition) {
                 return pivotTableRepository.getPivotTableData(tableDefinition, $routeParams.orgUnit);
             }));
@@ -277,7 +277,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
         var loadPivotTablesWithData = function() {
             return pivotTableRepository.getAll()
                 .then(filterReportsForCurrentModule)
-                .then(transformTables)
+                .then(getPivotTableData)
                 .then(translatePivotTables)
                 .then(function(pivotTables) {
                     $scope.pivotTables = pivotTables;
