@@ -307,6 +307,63 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                         expect(scope.dataElementOptions).toEqual(expectedDataElementOptions);
                     });
 
+                    it('should not filter out the excluded option from the dataElementOptions if the selected option for data element is in the list of excluded options', function () {
+                        excludedOptions = {
+                            moduleId: mockModule.id,
+                            dataElements: [{
+                                dataElementId: 'de4',
+                                excludedOptionIds: ['os1o2', 'os1o3']
+                            }]
+                        };
+
+                        var ev = {
+                            "dataValues": [{
+                                "value": "os1o2",
+                                "dataElement": "de4",
+                                "optionSet": {
+                                    options: [{
+                                        "id": 'os1o1',
+                                        "code": 'os1o1',
+                                        "name": 'os1o1 name',
+                                        "displayName": 'os1o1 name'
+                                    }, {
+                                        "id": 'os1o2',
+                                        "code": 'os1o2',
+                                        "name": 'os1o2 name',
+                                        "displayName": 'os1o2 name'
+                                    }, {
+                                        "id": 'os1o3',
+                                        "code": 'os1o3',
+                                        "name": 'os1o3 name',
+                                        "displayName": 'os1o3 name'
+                                    }]
+                                }
+                            }]
+                        };
+                        programEventRepository.findEventById.and.returnValue(utils.getPromise(q, [ev]));
+
+                        excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, excludedOptions));
+                        lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
+
+                        scope.$apply();
+
+                        var expectedDataElementOptions = {
+                            de4: [{
+                                "id": 'os1o1',
+                                "code": 'os1o1',
+                                "name": 'os1o1 name',
+                                "displayName": 'os1o1 name'
+                            }, {
+                                "id": 'os1o2',
+                                "code": 'os1o2',
+                                "name": 'os1o2 name',
+                                "displayName": 'os1o2 name'
+                            }]
+                        };
+
+                        expect(scope.dataElementOptions).toEqual(expectedDataElementOptions);
+                    });
+
                     it('should set all the dataElementOptions if there are no excluded options for a data element', function () {
                         excludedOptions = {
                             moduleId: mockModule.id,
