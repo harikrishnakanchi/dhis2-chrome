@@ -10,9 +10,13 @@ define(["lodash", "moment"], function(_, moment) {
 
         $scope.getTotalCount = function(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilters, ageFilter) {
             var genderfilterIds = _.map(genderFilters, 'id');
-            return _.reduce(genderfilterIds, function (totalCount, genderFilterId) {
-                return totalCount + $scope.getCount(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter);
-            }, 0);
+            if(_.isUndefined(genderFilters)) {
+                return $scope.getCount(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionId, undefined, ageFilter);
+            } else {
+                return _.reduce(genderfilterIds, function (totalCount, genderFilterId) {
+                    return totalCount + $scope.getCount(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter);
+                }, 0);
+            }
         };
 
         $scope.getCount = function(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter) {
@@ -65,9 +69,13 @@ define(["lodash", "moment"], function(_, moment) {
 
         $scope.getTotalProcedureCount = function (isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilters, ageFilter) {
             var genderfilterIds = _.map(genderFilters, 'id');
-            return _.reduce(genderfilterIds, function (totalCount, genderFilterId) {
-                return totalCount + $scope.getProcedureCount(isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter);
-            }, 0);
+            if(_.isUndefined(genderFilters)) {
+                return $scope.getProcedureCount(isGenderFilterApplied, isAgeFilterApplied, optionId, undefined, ageFilter);
+            } else {
+                return _.reduce(genderfilterIds, function (totalCount, genderFilterId) {
+                    return totalCount + $scope.getProcedureCount(isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter);
+                }, 0);
+            }
         };
 
         $scope.getProcedureCount = function(isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter) {

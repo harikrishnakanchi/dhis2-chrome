@@ -446,6 +446,14 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 expect(total).toEqual(4);
             });
 
+            it("should get total count when gender filter is undefined", function () {
+                spyOn(scope, 'getCount').and.returnValue(2);
+                var total = scope.getTotalCount("Triage Status", true, true, "Green", undefined, [0, 9999]);
+
+                expect(scope.getCount).toHaveBeenCalledWith("Triage Status", true, true, "Green", undefined, [0, 9999]);
+                expect(total).toEqual(2);
+            });
+
             it("should get procedure count when no filters are applied", function() {
                 expect(scope.getProcedureCount(false, false, "procedure 1")).toEqual(3);
                 expect(scope.getProcedureCount(false, false, "procedure 2")).toEqual(1);
@@ -474,6 +482,14 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 expect(scope.getProcedureCount).toHaveBeenCalledWith(true, true, "Green", "Female_er", [0, 9999]);
                 expect(scope.getProcedureCount).toHaveBeenCalledWith(true, true, "Green", "Male_er", [0, 9999]);
                 expect(total).toEqual(4);
+            });
+
+            it("should get total procedure count when gender filter is undefined", function () {
+                spyOn(scope, 'getProcedureCount').and.returnValue(2);
+                var total = scope.getTotalProcedureCount(true, true, "Green", undefined, [0, 9999]);
+
+                expect(scope.getProcedureCount).toHaveBeenCalledWith(true, true, "Green", undefined, [0, 9999]);
+                expect(total).toEqual(2);
             });
 
             it("should return true if it should be shown in offline summary else false", function() {
