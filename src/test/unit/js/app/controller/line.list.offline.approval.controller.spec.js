@@ -424,32 +424,14 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
             });
 
             it("should get count when gender filter is applied", function() {
-                scope.isGenderFilterApplied = true;
-                scope.program = {
-                    "name": "er"
-                };
-                scope.$apply();
-
                 expect(scope.getCount("Triage Status", true, false, "Green", "Male_er")).toEqual(1);
             });
 
             it("should get count when age filter is applied", function() {
-                scope.isAgeFilterApplied = true;
-                scope.program = {
-                    "name": "er"
-                };
-                scope.$apply();
-
                 expect(scope.getCount("Triage Status", false, true, "Green", "Triage Status", [0, 5])).toEqual(1);
             });
 
             it("should get count when age and gender filter is applied", function() {
-                scope.isAgeFilterApplied = true;
-                scope.program = {
-                    "name": "er"
-                };
-                scope.$apply();
-
                 expect(scope.getCount("Triage Status", true, true, "Green", "Female_er", [0, 5])).toEqual(1);
                 expect(scope.getCount("Triage Status", true, true, "Green", "Male_er", [4, 15])).toEqual(1);
             });
@@ -470,34 +452,16 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
             });
 
             it("should get procedure count when gender filter is applied", function() {
-                scope.isGenderFilterApplied = true;
-                scope.program = {
-                    "name": "er"
-                };
-                scope.$apply();
-
                 expect(scope.getProcedureCount(true, false, "procedure 1", "Male_er")).toEqual(2);
                 expect(scope.getProcedureCount(true, false, "procedure 1", "Female_er")).toEqual(1);
                 expect(scope.getProcedureCount(true, false, "procedure 2", "Female_er")).toEqual(1);
             });
 
             it("should get procedure count when age filter is applied", function() {
-                scope.isAgeFilterApplied = true;
-                scope.program = {
-                    "name": "er"
-                };
-                scope.$apply();
-
                 expect(scope.getProcedureCount(false, true, "procedure 1", "", [0, 5])).toEqual(1);
             });
 
             it("should get procedure count when age and gender filter is applied", function() {
-                scope.isAgeFilterApplied = true;
-                scope.program = {
-                    "name": "er"
-                };
-                scope.$apply();
-
                 expect(scope.getProcedureCount(true, true, "procedure 1", "Female_er", [0, 5])).toEqual(1);
                 expect(scope.getProcedureCount(true, true, "procedure 1", "Male_er", [4, 15])).toEqual(2);
             });
