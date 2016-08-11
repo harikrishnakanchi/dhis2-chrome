@@ -8,6 +8,13 @@ define(["lodash", "moment"], function(_, moment) {
         };
         var groupedProcedureDataValues, groupedDataValues;
 
+        $scope.getTotalCount = function(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilters, ageFilter) {
+            var genderfilterIds = _.map(genderFilters, 'id');
+            return _.reduce(genderfilterIds, function (totalCount, genderFilterId) {
+                return totalCount + $scope.getCount(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter);
+            }, 0);
+        };
+
         $scope.getCount = function(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter) {
             var count;
 
@@ -54,6 +61,13 @@ define(["lodash", "moment"], function(_, moment) {
             count = _.isEmpty(groupedDataValues[optionId][dataElementId]) ? 0 : groupedDataValues[optionId][dataElementId].length;
 
             return count;
+        };
+
+        $scope.getTotalProcedureCount = function (isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilters, ageFilter) {
+            var genderfilterIds = _.map(genderFilters, 'id');
+            return _.reduce(genderfilterIds, function (totalCount, genderFilterId) {
+                return totalCount + $scope.getProcedureCount(isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter);
+            }, 0);
         };
 
         $scope.getProcedureCount = function(isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter) {
