@@ -181,27 +181,35 @@ define(['pivotTableData'], function(PivotTableData) {
                 pivotTableData = PivotTableData.create({}, {});
             });
 
-            it('should use formName if its available', function () {
-                item = { formName: 'someName' };
-                expect(pivotTableData.getDisplayName(item)).toEqual(item.formName);
-            });
-
-            it('should use shortName if formName is not available', function () {
-                item = { shortName: 'someShortName' };
-                expect(pivotTableData.getDisplayName(item)).toEqual(item.shortName);
-            });
-
-            it('should use name if formName and shortName is not available', function () {
+            it('should use name if item is not a data dimension', function () {
                 item = { name: 'someName' };
                 expect(pivotTableData.getDisplayName(item)).toEqual(item.name);
             });
 
-            it('should split the name by hyphen if item is a data dimension', function () {
-                item = {
-                    name: 'someName - someOtherName - yetAnotherName',
-                    dataDimension: true
-                };
-                expect(pivotTableData.getDisplayName(item)).toEqual('someName');
+            describe('item is a data dimension', function () {
+                it('should use formName if its available', function () {
+                    item = {
+                        formName: 'someName',
+                        dataDimension: true
+                    };
+                    expect(pivotTableData.getDisplayName(item)).toEqual(item.formName);
+                });
+
+                it('should split the shortName by hyphen if formName is not available', function () {
+                    item = {
+                        shortName: 'someShortName - someOtherName - yetAnotherName',
+                        dataDimension: true
+                    };
+                    expect(pivotTableData.getDisplayName(item)).toEqual('someShortName');
+                });
+
+                it('should split the name by hyphen if formName and shortName is not available', function () {
+                    item = {
+                        name: 'someName - someOtherName - yetAnotherName',
+                        dataDimension: true
+                    };
+                    expect(pivotTableData.getDisplayName(item)).toEqual('someName');
+                });
             });
         });
 

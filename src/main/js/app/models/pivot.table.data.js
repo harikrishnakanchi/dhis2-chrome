@@ -31,9 +31,15 @@ define(['lodash'], function(_) {
         };
 
         this.getDisplayName = function (item) {
-            //TODO: Remove this formatting of names after we complete transition to using formName for dataElement and shortName for indicators
-            var itemName = item.dataDimension ? _.first(item.name.split(DATA_DIMENSION_NAME_SEPARATOR)) : item.name;
-            return item.formName || item.shortName || itemName;
+            if(item.dataDimension) {
+                //TODO: Remove this formatting of names after we complete transition to using formName for dataElement and shortName for indicators
+                var itemName = item.name && _.first(item.name.split(DATA_DIMENSION_NAME_SEPARATOR)),
+                    itemShortName = item.shortName && _.first(item.shortName.split(DATA_DIMENSION_NAME_SEPARATOR));
+
+                return item.formName || itemShortName || itemName;
+            } else {
+                return item.name;
+            }
         };
     };
 
