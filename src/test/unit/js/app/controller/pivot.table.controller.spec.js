@@ -1,7 +1,6 @@
-define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableController", "timecop", "translationsService", "filesystemService"], function (mocks, dateUtils, utils, lodash, moment, PivotTableController, timecop, TranslationsService, FilesystemService) {
+define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableController", "timecop", "translationsService", "filesystemService", "pivotTableCsvBuilder"], function (mocks, dateUtils, utils, lodash, moment, PivotTableController, timecop, TranslationsService, FilesystemService, PivotTableCsvBuilder) {
     describe("pivotTableController", function () {
-
-        var scope, rootScope, q, pivotTableController, translationsService, filesystemService,
+        var scope, rootScope, q, pivotTableController, translationsService, filesystemService, pivotTableCsvBuilder,
             currentTime;
 
         beforeEach(mocks.inject(function ($rootScope, $q) {
@@ -16,16 +15,7 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
             scope.locale = "en";
 
             rootScope.resourceBundle = {
-                label: {
-                    category: 'categoryLabel',
-                    dataDimension: 'dataDimensionLabel',
-                    period: 'periodLabel',
-                    organisationUnit: 'orgUnitLabel'
-                },
-                weeksLabel: "weeks",
-                July: "July",
-                August: "August",
-                September: "September"
+                weeksLabel: "weeks"
             };
 
             translationsService = new TranslationsService();
@@ -34,7 +24,10 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
             filesystemService = new FilesystemService();
             spyOn(filesystemService, 'promptAndWriteFile').and.returnValue(utils.getPromise(q, {}));
 
-            pivotTableController = new PivotTableController(scope, rootScope, translationsService, filesystemService);
+            pivotTableCsvBuilder = new PivotTableCsvBuilder();
+            spyOn(pivotTableCsvBuilder, 'build');
+
+            pivotTableController = new PivotTableController(scope, rootScope, translationsService, filesystemService, pivotTableCsvBuilder);
             scope.$apply();
         }));
 
@@ -100,13 +93,7 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
         });
 
         describe("Export as csv", function () {
-            var csvContent, outerColumnA, innerColumnA1, innerColumnA2, rowA, rowB, mockValue,
-                DELIMETER = ',',
-                EMPTY_CELL = '';
-
-            var escapeString = function (string) {
-                return '"' + string + '"';
-            };
+            var csvContent, mockPivotTableCsv;
 
             beforeEach(function () {
                 spyOn(window, 'Blob').and.callFake(function (contentArray) {
@@ -117,57 +104,13 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
                     csvContent = blob.value;
                 });
 
-                outerColumnA = {
-                    name: 'periodA',
-                    dataValuesFilter: {
-                        pe: 'periodA'
-                    }
-                };
-                innerColumnA1 = {
-                    name: 'male',
-                    categoryDimension: true,
-                    dataValuesFilter: {
-                        genderCategory: 'male'
-                    }
-                };
-                innerColumnA2 = {
-                    name: 'female',
-                    categoryDimension: true,
-                    dataValuesFilter: {
-                        genderCategory: 'female'
-                    }
-                };
-                rowA = {
-                    name: 'dataElementA',
-                    dataDimension: true,
-                    dataValuesFilter: {
-                        dx: 'dataElementIdA'
-                    }
-                };
-                rowB = {
-                    name: 'dataElementB',
-                    dataDimension: true,
-                    dataValuesFilter: {
-                        dx: 'dataElementIdB'
-                    }
-                };
-                mockValue = 'mockValue';
+                mockPivotTableCsv = 'mockCSVData';
+                pivotTableCsvBuilder.build.and.returnValue(mockPivotTableCsv);
+
                 scope.table = {
                     title: 'A table named T. Able',
-                    dataSetCode: 'someDataSetCode',
-                    columns: [
-                        [outerColumnA],
-                        [innerColumnA1, innerColumnA2]
-                    ],
-                    rows: [rowA, rowB],
-                    getDisplayName: function (item) {
-                        return item.name;
-                    },
-                    getDataValue: function () {
-                        return mockValue;
-                    }
+                    dataSetCode: 'someDataSetCode'
                 };
-                scope.baseColumnConfiguration = _.last(scope.table.columnConfigurations);
             });
 
             it('should prompt the user to download tabular data to CSV with suggested filename', function () {
@@ -175,34 +118,9 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
                 expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith([scope.table.dataSetCode, scope.table.title, currentTime.format('DD-MMM-YYYY'), 'csv'].join('.'), jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
             });
 
-            it('should contain the main column headers', function () {
+            it('should contain results of csv builder', function () {
                 scope.exportToCSV();
-
-                var expectedHeader = [escapeString(scope.resourceBundle.label.dataDimension), escapeString(scope.resourceBundle.label.category), escapeString(outerColumnA.name)].join(DELIMETER);
-                expect(csvContent).toContain(expectedHeader);
-            });
-
-            it('should append the number of isoweeks to the column headers if column is a periodDimension and pivotTable is a monthlyReport', function () {
-                spyOn(dateUtils, 'getNumberOfISOWeeksInMonth').and.returnValue(4);
-                outerColumnA.periodDimension = true;
-                scope.table.monthlyReport = true;
-                scope.exportToCSV();
-
-                expect(csvContent).toContain(escapeString(outerColumnA.name + ' [4 '+ scope.resourceBundle.weeksLabel + ']'));
-            });
-
-            it('should contain dataValues for rows', function () {
-                scope.exportToCSV();
-
-                var expectedRowA1 = [escapeString(rowA.name), escapeString(innerColumnA1.name), mockValue].join(DELIMETER),
-                    expectedRowA2 = [escapeString(rowA.name), escapeString(innerColumnA2.name), mockValue].join(DELIMETER),
-                    expectedRowB1 = [escapeString(rowB.name), escapeString(innerColumnA1.name), mockValue].join(DELIMETER),
-                    expectedRowB2 = [escapeString(rowB.name), escapeString(innerColumnA2.name), mockValue].join(DELIMETER);
-
-                expect(csvContent).toContain(expectedRowA1);
-                expect(csvContent).toContain(expectedRowA2);
-                expect(csvContent).toContain(expectedRowB1);
-                expect(csvContent).toContain(expectedRowB2);
+                expect(csvContent).toContain(mockPivotTableCsv);
             });
         });
 

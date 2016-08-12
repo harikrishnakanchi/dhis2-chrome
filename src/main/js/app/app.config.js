@@ -175,6 +175,7 @@ require.config({
         "packagedDataImporter": "app/helpers/packaged.data.importer",
         "sessionHelper": "app/helpers/session.helper",
         "originOrgunitCreator": "app/helpers/origin.orgunit.creator",
+        "pivotTableCsvBuilder": "app/helpers/pivot.table.csv.builder",
 
         //Directives
         "directives": "app/directives/directives",
