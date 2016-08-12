@@ -89,6 +89,7 @@ define(['lodash'], function(_) {
                 return {
                     id: orgUnitId,
                     name: data.metaData.names[orgUnitId],
+                    orgUnitDimension: true,
                     dataValuesFilter: {
                         ou: orgUnitId
                     }
@@ -116,6 +117,7 @@ define(['lodash'], function(_) {
 
                 return _.merge(categoryOption, {
                     id: item.id,
+                    categoryDimension: true,
                     dataValuesFilter: _.zipObject([dimensionConfiguration.dimension], [item.id])
                 });
             });

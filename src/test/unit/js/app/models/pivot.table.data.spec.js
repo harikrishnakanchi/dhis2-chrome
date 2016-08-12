@@ -333,6 +333,7 @@ define(['pivotTableData'], function(PivotTableData) {
                     rowNumber: 1,
                     id: 'someOrgUnitId',
                     name: 'someOrgUnitName',
+                    orgUnitDimension: true,
                     dataValuesFilter: {
                         ou: 'someOrgUnitId'
                     }
@@ -340,6 +341,7 @@ define(['pivotTableData'], function(PivotTableData) {
                     rowNumber: 2,
                     id: 'someOtherOrgUnitId',
                     name: 'someOtherOrgUnitName',
+                    orgUnitDimension: true,
                     dataValuesFilter: {
                         ou: 'someOtherOrgUnitId'
                     }
@@ -412,6 +414,7 @@ define(['pivotTableData'], function(PivotTableData) {
                     rowNumber: 1,
                     id: 'someCategoryOptionId',
                     name: 'someCategoryOptionName',
+                    categoryDimension: true,
                     dataValuesFilter: {
                         someCategoryId: 'someCategoryOptionId'
                     }
@@ -419,6 +422,7 @@ define(['pivotTableData'], function(PivotTableData) {
                     rowNumber: 2,
                     id: 'someOtherCategoryOptionId',
                     name: 'someOtherCategoryOptionName',
+                    categoryDimension: true,
                     dataValuesFilter: {
                         someCategoryId: 'someOtherCategoryOptionId'
                     }
@@ -459,6 +463,7 @@ define(['pivotTableData'], function(PivotTableData) {
                     {
                         id: 'someCategoryOptionId',
                         name: 'someCategoryOptionName',
+                        categoryDimension: true,
                         dataValuesFilter: {
                             pe: 'somePeriodId',
                             someCategoryId: 'someCategoryOptionId'
@@ -466,6 +471,7 @@ define(['pivotTableData'], function(PivotTableData) {
                     }, {
                         id: 'someOtherCategoryOptionId',
                         name: 'someOtherCategoryOptionName',
+                        categoryDimension: true,
                         dataValuesFilter: {
                             pe: 'somePeriodId',
                             someCategoryId: 'someOtherCategoryOptionId'
@@ -473,6 +479,7 @@ define(['pivotTableData'], function(PivotTableData) {
                     }, {
                         id: 'someCategoryOptionId',
                         name: 'someCategoryOptionName',
+                        categoryDimension: true,
                         dataValuesFilter: {
                             pe: 'someOtherPeriodId',
                             someCategoryId: 'someCategoryOptionId'
@@ -480,6 +487,7 @@ define(['pivotTableData'], function(PivotTableData) {
                     }, {
                         id: 'someOtherCategoryOptionId',
                         name: 'someOtherCategoryOptionName',
+                        categoryDimension: true,
                         dataValuesFilter: {
                             pe: 'someOtherPeriodId',
                             someCategoryId: 'someOtherCategoryOptionId'
