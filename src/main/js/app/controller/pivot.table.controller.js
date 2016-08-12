@@ -13,7 +13,7 @@ define(["lodash", "dateUtils", "moment"], function(_, dateUtils, moment) {
             };
 
             var buildHeaders = function() {
-                return _.map($scope.table.columns, function (columnConfiguration) {
+                return _.map($scope.table.columnConfigurations, function (columnConfiguration) {
                     var columnWidth = $scope.baseColumnConfiguration.length / columnConfiguration.length,
                         cells = [EMPTY_CELL];
 
@@ -60,7 +60,7 @@ define(["lodash", "dateUtils", "moment"], function(_, dateUtils, moment) {
             };
 
             var updateSortedFlags = function (sortedColumn) {
-                var allColumns = _.flatten($scope.table.columns);
+                var allColumns = _.flatten($scope.table.columnConfigurations);
                 _.each(allColumns, function (column) {
                     if(sortedColumn) {
                         var sortedColumnFilterDimensions = _.keys(sortedColumn.dataValuesFilter);
@@ -87,9 +87,9 @@ define(["lodash", "dateUtils", "moment"], function(_, dateUtils, moment) {
         };
 
         if ($scope.table) {
-            $scope.baseColumnConfiguration = _.last($scope.table.columns);
+            $scope.baseColumnConfiguration = _.last($scope.table.columnConfigurations);
 
-            var sortableColumns = _.first($scope.table.columns);
+            var sortableColumns = _.first($scope.table.columnConfigurations);
             _.each(sortableColumns, function (column) {
                 column.sortable = true;
             });

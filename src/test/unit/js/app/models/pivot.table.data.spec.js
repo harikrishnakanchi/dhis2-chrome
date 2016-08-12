@@ -439,8 +439,10 @@ define(['pivotTableData'], function(PivotTableData) {
                 pivotTableData = PivotTableData.create({}, {});
                 expect(pivotTableData.columns).toEqual([]);
             });
+        });
 
-            it('should map the cartesian product if there are multiple columns', function () {
+        describe('columnConfigurations', function () {
+            it('should map the cartesian product of the columns', function () {
                 definition.columns = [{
                     dimension: 'pe'
                 }, {
@@ -453,7 +455,7 @@ define(['pivotTableData'], function(PivotTableData) {
 
                 pivotTableData = PivotTableData.create(definition, data);
 
-                expect(_.last(pivotTableData.columns)).toEqual([
+                expect(_.last(pivotTableData.columnConfigurations)).toEqual([
                     {
                         id: 'someCategoryOptionId',
                         name: 'someCategoryOptionName',

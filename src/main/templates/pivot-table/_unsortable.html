@@ -1,6 +1,6 @@
 <table class="table table-bordered table-striped sortable" locked-table-header freeze-first-column="true">
     <thead>
-    <tr ng-repeat="columnConfiguration in table.columns">
+    <tr ng-repeat="columnConfiguration in table.columnConfigurations">
         <th class="display-print"></th>
         <th ng-repeat="column in columnConfiguration"
             colspan="{{ baseColumnConfiguration.length / columnConfiguration.length}}">

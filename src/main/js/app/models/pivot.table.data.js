@@ -18,6 +18,7 @@ define(['lodash'], function(_) {
         this.isTableDataAvailable = !_.isEmpty(this.dataValues);
         this.rows = mapRows(definition, data, this.dataValues);
         this.columns = mapColumns(definition, data, this.dataValues);
+        this.columnConfigurations = transformColumns(this.columns);
 
         this.getDataValue = function (row, column) {
             var dataValue = _.find(_this.dataValues, _.merge({}, row.dataValuesFilter, column.dataValuesFilter));
@@ -143,14 +144,16 @@ define(['lodash'], function(_) {
     };
 
     var mapColumns = function (definition, data, dataValues) {
-        var mappedColumns = _.map(definition.columns, function (columnConfiguration) {
+        return _.map(definition.columns, function (columnConfiguration) {
             var dimensionId = columnConfiguration.dimension,
                 mappingFunction = isCategoryDimension(definition, dimensionId) ? DIMENSION_MAPPING_FUNCTIONS.category : DIMENSION_MAPPING_FUNCTIONS[dimensionId];
 
             return mappingFunction ? mappingFunction(definition, data, dataValues, columnConfiguration) : [];
         });
+    };
 
-        return _.transform(mappedColumns, function (transformedColumns, thisColumn) {
+    var transformColumns = function (columns) {
+        return _.transform(columns, function (transformedColumns, thisColumn) {
             var previousColumn = _.last(transformedColumns);
             if(previousColumn) {
                 var cartesianProductOfColumns = _.flatten(_.map(previousColumn, function (parentColumnItem) {
@@ -160,7 +163,7 @@ define(['lodash'], function(_) {
                 }));
                 transformedColumns.push(cartesianProductOfColumns);
             } else {
-                transformedColumns.push(thisColumn);
+                transformedColumns.push(_.cloneDeep(thisColumn));
             }
         }, []);
     };

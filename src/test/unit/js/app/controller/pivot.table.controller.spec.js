@@ -54,7 +54,7 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
                         };
                         return mockDataValues[row.id][column.id];
                     },
-                    columns: [[columnA, columnB]],
+                    columnConfigurations: [[columnA, columnB]],
                     rows: [rowA, rowB]
                 };
             });
@@ -154,7 +154,7 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
                     };
                     mockValue = 'mockValue';
                     scope.table = {
-                        columns: [
+                        columnConfigurations: [
                             [outerColumnA],
                             [innerColumnA1, innerColumnA2]
                         ],
@@ -166,7 +166,7 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
                             return mockValue;
                         }
                     };
-                    scope.baseColumnConfiguration = _.last(scope.table.columns);
+                    scope.baseColumnConfiguration = _.last(scope.table.columnConfigurations);
                 });
 
                 it('should contain the outer column headers', function () {

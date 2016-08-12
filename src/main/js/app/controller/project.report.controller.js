@@ -31,10 +31,10 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, date
 
             var getPivotTableData = function () {
                 var pivotTableCSVs = _.map($scope.pivotTables, function (pivotTable) {
-                    var baseColumnConfiguration = _.last(pivotTable.columns);
+                    var baseColumnConfiguration = _.last(pivotTable.columnConfigurations);
 
                     var buildHeaders = function() {
-                        return _.map(pivotTable.columns, function (columnConfiguration) {
+                        return _.map(pivotTable.columnConfigurations, function (columnConfiguration) {
                             var columnWidth = baseColumnConfiguration.length / columnConfiguration.length,
                                 cells = [pivotTable.title];
 

@@ -347,7 +347,7 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
         });
 
         describe('translate pivotTableData', function () {
-            var mockPivotTableData, rowItem, columnItem;
+            var mockPivotTableData, rowItem, columnItem, columnConfigurationItem;
 
             beforeEach(function () {
                 rowItem = {
@@ -358,10 +358,17 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                     id: 'someColumnId',
                     name: 'someColumnName'
                 };
+                columnConfigurationItem = {
+                    id: 'someColumnId',
+                    name: 'someColumnName'
+                };
                 mockPivotTableData = {
                     rows: [rowItem],
                     columns: [
                         [columnItem]
+                    ],
+                    columnConfigurations: [
+                        [columnConfigurationItem]
                     ]
                 };
 
@@ -373,6 +380,7 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                 expect(translatedObject).toEqual([mockPivotTableData]);
                 expect(rowItem.name).toEqual('frenchRowName');
                 expect(columnItem.name).toEqual('frenchColumnName');
+                expect(columnConfigurationItem.name).toEqual('frenchColumnName');
             });
 
             describe('row or column is a period dimension', function () {

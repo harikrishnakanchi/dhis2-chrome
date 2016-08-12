@@ -61,7 +61,7 @@ define(['lodash'], function(_){
             }
 
             return _.map(pivotTableDataObjects, function (pivotTableDataObject) {
-                var rowsAndColumns = _.flattenDeep([pivotTableDataObject.rows, pivotTableDataObject.columns]),
+                var rowsAndColumns = _.flattenDeep([pivotTableDataObject.rows,  pivotTableDataObject.columns, pivotTableDataObject.columnConfigurations]),
                     translatableDimensions = _.reject(rowsAndColumns, 'periodDimension'),
                     periodDimensions = _.filter(rowsAndColumns, 'periodDimension');
 
