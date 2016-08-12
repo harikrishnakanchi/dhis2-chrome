@@ -1,9 +1,9 @@
-define(["moment", "orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "translationsService", "timecop", "orgUnitGroupSetRepository", "filesystemService"],
-    function(moment, OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, TranslationsService, timecop, OrgUnitGroupSetRepository, FilesystemService) {
+define(["moment", "orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "translationsService", "timecop", "orgUnitGroupSetRepository", "filesystemService", "pivotTableCsvBuilder"],
+    function(moment, OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, TranslationsService, timecop, OrgUnitGroupSetRepository, FilesystemService, PivotTableCsvBuilder) {
     describe("projectReportController", function() {
         var scope, rootScope, q,
             projectReportController,
-            orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository, filesystemService,
+            orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository, filesystemService, pivotTableCsvBuilder,
             mockPivotTables, pivotTableData, mockProjectOrgUnit, orgUnitGroupSets, currentTime;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
@@ -122,6 +122,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
 
             pivotTableData = {
                 some: 'data',
+                title: 'someTitle',
                 isTableDataAvailable: true
             };
 
@@ -231,7 +232,10 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             filesystemService = new FilesystemService();
             spyOn(filesystemService, 'promptAndWriteFile').and.returnValue(utils.getPromise(q, {}));
 
-            projectReportController = new ProjectReportController(rootScope, q, scope, orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository, filesystemService);
+            pivotTableCsvBuilder = new PivotTableCsvBuilder();
+            spyOn(pivotTableCsvBuilder, 'build');
+
+            projectReportController = new ProjectReportController(rootScope, q, scope, orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository, filesystemService, pivotTableCsvBuilder);
         }));
 
         afterEach(function () {
@@ -244,8 +248,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
 
             beforeEach(function () {
                 scope.$apply();
-                scope.pivotTables[0].currentOrderOfItems = ["adf6cf9405c", "ae70aadc5cf"];
-                
+
                 spyOn(window, 'Blob').and.callFake(function (contentArray) {
                     this.value = contentArray.join();
                 });
@@ -253,19 +256,33 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
                 filesystemService.promptAndWriteFile.and.callFake(function (fileName, blob) {
                     csvContent = blob.value;
                 });
-
-                scope.exportToCSV();
             });
             
             it('should prompt the user to save the CSV file with suggested filename', function () {
+                scope.exportToCSV();
+
                 var expectedFilename = 'Aweil - SS153.ProjectReport.' + currentTime.format('DD-MMM-YYYY') + '.csv';
                 expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
             });
 
-            describe('CSV contents', function () {
-                it('should contain project basic information', function () {
-                    expect(csvContent).toContain('"Project Information"\n"Country","SOUDAN Sud"');
-                });
+            it('should contain project basic information', function () {
+                scope.exportToCSV();
+
+                expect(csvContent).toContain('"Project Information"\n"Country","SOUDAN Sud"');
+            });
+
+            it('should contain the title of each table', function () {
+                scope.exportToCSV();
+
+                expect(csvContent).toContain(pivotTableData.title);
+            });
+
+            it('should contain the results of the csv builder', function () {
+                var mockPivotTableCsvData = 'someCSVData';
+                pivotTableCsvBuilder.build.and.returnValue(mockPivotTableCsvData);
+                scope.exportToCSV();
+
+                expect(csvContent).toContain(mockPivotTableCsvData);
             });
         });
 

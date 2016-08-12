@@ -1,5 +1,5 @@
 define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, dateUtils, _, orgUnitMapper) {
-    return function($rootScope, $q, $scope, orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository, filesystemService) {
+    return function($rootScope, $q, $scope, orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository, filesystemService, pivotTableCsvBuilder) {
         $scope.selectedProject = $rootScope.currentUser.selectedProject;
 
         var buildCsvContent = function () {
@@ -25,51 +25,13 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, date
                 ]).join(NEW_LINE);
             };
 
-            var getNumberOfWeeksLabel = function (month) {
-                return '[' + dateUtils.getNumberOfISOWeeksInMonth(month) + ' ' + $scope.resourceBundle.weeksLabel + ']';
-            };
-
             var getPivotTableData = function () {
-                var pivotTableCSVs = _.map($scope.pivotTables, function (pivotTable) {
-                    var baseColumnConfiguration = _.last(pivotTable.columnConfigurations);
-
-                    var buildHeaders = function() {
-                        return _.map(pivotTable.columnConfigurations, function (columnConfiguration) {
-                            var columnWidth = baseColumnConfiguration.length / columnConfiguration.length,
-                                cells = [pivotTable.title];
-
-                            _.each(columnConfiguration, function (column) {
-                                _.times(columnWidth, function () {
-                                    if(pivotTable.monthlyReport && column.periodDimension) {
-                                        cells.push(escapeString(pivotTable.getDisplayName(column) + ' ' + getNumberOfWeeksLabel(column.id)));
-                                    } else {
-                                        cells.push(escapeString(pivotTable.getDisplayName(column)));
-                                    }
-                                });
-                            });
-                            return cells.join(DELIMITER);
-                        });
-                    };
-
-                    var buildRows = function () {
-                        return _.map(pivotTable.rows, function (row) {
-                            var cells = [escapeString(pivotTable.getDisplayName(row))];
-
-                            _.each(baseColumnConfiguration, function (column) {
-                                var value = pivotTable.getDataValue(row, column);
-                                cells.push(value);
-                            });
-                            return cells.join(DELIMITER);
-                        });
-                    };
-
-                    return _.flatten([
-                        buildHeaders(),
-                        buildRows()
-                    ]).join(NEW_LINE);
-                });
-
-                return pivotTableCSVs.join(NEW_LINE + NEW_LINE);
+                return _.map($scope.pivotTables, function (pivotTable) {
+                    return [
+                        escapeString(pivotTable.title),
+                        pivotTableCsvBuilder.build(pivotTable)
+                    ].join(NEW_LINE);
+                }).join(NEW_LINE + NEW_LINE);
             };
 
             return [
