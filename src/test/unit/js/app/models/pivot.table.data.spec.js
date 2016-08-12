@@ -283,6 +283,29 @@ define(['pivotTableData'], function(PivotTableData) {
                 }]);
             });
 
+            it('should retain the item name if there are no dataDimensionItems', function () {
+                definition = {
+                    dataDimensionItems: [],
+                    rows: [{
+                        dimension: 'dx',
+                        items: [
+                            { id: 'someDataElementId', name: 'someDataElementName' }
+                        ]
+                    }]
+                };
+                pivotTableData = PivotTableData.create(definition, data);
+
+                expect(pivotTableData.rows).toEqual([{
+                    rowNumber: 1,
+                    id: 'someDataElementId',
+                    name: 'someDataElementName',
+                    dataDimension: true,
+                    dataValuesFilter: {
+                        dx: 'someDataElementId'
+                    }
+                }]);
+            });
+
             it('should filter out data dimension items without data', function () {
                 definition.rows = [{
                     dimension: 'dx',

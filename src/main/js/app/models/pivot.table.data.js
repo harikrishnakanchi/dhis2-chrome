@@ -71,11 +71,10 @@ define(['lodash'], function(_) {
             });
             var mappedItems = _.map(dimensionConfiguration.items, function (item) {
                 var dataDimensionItem = _.find(dataDimensionItems, { id: item.id });
-                //ToDo: Remove item.name and item.description once all Praxis instances have re-downloaded all pivotTables (probably after 8.0 release).
-                return _.merge({
+                //TODO: Remove item.description once all Praxis instances have re-downloaded all pivotTables (probably after 7.1 release).
+                return _.merge(_.pick(item, 'description'),{
                     id: item.id,
                     name: item.name,
-                    description: item.description,
                     dataDimension: true,
                     dataValuesFilter: {
                         dx: item.id

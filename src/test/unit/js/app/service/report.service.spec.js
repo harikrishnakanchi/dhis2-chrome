@@ -217,8 +217,8 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                 var expectedQueryParams = encodeURI('fields=id,name,sortOrder,relativePeriods,' +
                                                     'categoryDimensions[dataElementCategory,categoryOptions[:identifiable]],' +
                                                     'dataDimensionItems[dataElement[id,name,formName,description],indicator[id,name,shortName,description],programIndicator[id,name,shortName,description]],' +
-                                                    'columns[dimension,items[id]],' +
-                                                    'rows[dimension,items[id]],' +
+                                                    'columns[dimension,items[id,name]],' +
+                                                    'rows[dimension,items[id,name]],' +
                                                     'filters[dimension,items[id]]');
                 httpBackend.expectGET(properties.dhis.url + '/api/reportTables/pivotTable1.json?' + expectedQueryParams).respond(200, {});
                 httpBackend.expectGET(properties.dhis.url + '/api/reportTables/pivotTable2.json?' + expectedQueryParams).respond(200, {});
