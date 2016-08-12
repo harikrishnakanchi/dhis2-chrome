@@ -16,6 +16,12 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
             scope.locale = "en";
 
             rootScope.resourceBundle = {
+                label: {
+                    category: 'categoryLabel',
+                    dataDimension: 'dataDimensionLabel',
+                    period: 'periodLabel',
+                    organisationUnit: 'orgUnitLabel'
+                },
                 weeksLabel: "weeks",
                 July: "July",
                 August: "August",
@@ -94,113 +100,109 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
         });
 
         describe("Export as csv", function () {
-            it('should prompt the user to download tabular data to CSV with suggested filename', function () {
-                scope.table = {
-                    dataSetCode: 'someDataSetCode',
-                    title: 'A table named T. Able'
-                };
+            var csvContent, outerColumnA, innerColumnA1, innerColumnA2, rowA, rowB, mockValue,
+                DELIMETER = ',',
+                EMPTY_CELL = '';
 
+            var escapeString = function (string) {
+                return '"' + string + '"';
+            };
+
+            beforeEach(function () {
+                spyOn(window, 'Blob').and.callFake(function (contentArray) {
+                    this.value = contentArray.join();
+                });
+
+                filesystemService.promptAndWriteFile.and.callFake(function (fileName, blob) {
+                    csvContent = blob.value;
+                });
+
+                outerColumnA = {
+                    name: 'periodA',
+                    dataValuesFilter: {
+                        pe: 'periodA'
+                    }
+                };
+                innerColumnA1 = {
+                    name: 'male',
+                    categoryDimension: true,
+                    dataValuesFilter: {
+                        genderCategory: 'male'
+                    }
+                };
+                innerColumnA2 = {
+                    name: 'female',
+                    categoryDimension: true,
+                    dataValuesFilter: {
+                        genderCategory: 'female'
+                    }
+                };
+                rowA = {
+                    name: 'dataElementA',
+                    dataDimension: true,
+                    dataValuesFilter: {
+                        dx: 'dataElementIdA'
+                    }
+                };
+                rowB = {
+                    name: 'dataElementB',
+                    dataDimension: true,
+                    dataValuesFilter: {
+                        dx: 'dataElementIdB'
+                    }
+                };
+                mockValue = 'mockValue';
+                scope.table = {
+                    title: 'A table named T. Able',
+                    dataSetCode: 'someDataSetCode',
+                    columns: [
+                        [outerColumnA],
+                        [innerColumnA1, innerColumnA2]
+                    ],
+                    rows: [rowA, rowB],
+                    getDisplayName: function (item) {
+                        return item.name;
+                    },
+                    getDataValue: function () {
+                        return mockValue;
+                    }
+                };
+                scope.baseColumnConfiguration = _.last(scope.table.columnConfigurations);
+            });
+
+            it('should prompt the user to download tabular data to CSV with suggested filename', function () {
                 scope.exportToCSV();
                 expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith([scope.table.dataSetCode, scope.table.title, currentTime.format('DD-MMM-YYYY'), 'csv'].join('.'), jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
             });
 
-            describe('CSV Contents', function () {
-                var csvContent, outerColumnA, innerColumnA1, innerColumnA2, rowA, rowB, mockValue,
-                    DELIMETER = ',',
-                    EMPTY_CELL = '';
+            it('should contain the main column headers', function () {
+                scope.exportToCSV();
 
-                var escapeString = function (string) {
-                    return '"' + string + '"';
-                };
+                var expectedHeader = [escapeString(scope.resourceBundle.label.dataDimension), escapeString(scope.resourceBundle.label.category), escapeString(outerColumnA.name)].join(DELIMETER);
+                expect(csvContent).toContain(expectedHeader);
+            });
 
-                beforeEach(function () {
-                    spyOn(window, 'Blob').and.callFake(function (contentArray) {
-                        this.value = contentArray.join();
-                    });
+            it('should append the number of isoweeks to the column headers if column is a periodDimension and pivotTable is a monthlyReport', function () {
+                spyOn(dateUtils, 'getNumberOfISOWeeksInMonth').and.returnValue(4);
+                outerColumnA.periodDimension = true;
+                scope.table.monthlyReport = true;
+                scope.exportToCSV();
 
-                    filesystemService.promptAndWriteFile.and.callFake(function (fileName, blob) {
-                        csvContent = blob.value;
-                    });
+                expect(csvContent).toContain(escapeString(outerColumnA.name + ' [4 '+ scope.resourceBundle.weeksLabel + ']'));
+            });
 
-                    outerColumnA = {
-                        name: 'periodA',
-                        dataValuesFilter: {
-                            pe: 'periodA'
-                        }
-                    };
-                    innerColumnA1 = {
-                        name: 'male',
-                        dataValuesFilter: {
-                            genderCategory: 'male'
-                        }
-                    };
-                    innerColumnA2 = {
-                        name: 'female',
-                        dataValuesFilter: {
-                            genderCategory: 'female'
-                        }
-                    };
-                    rowA = {
-                        name: 'dataElementA',
-                        dataValuesFilter: {
-                            dx: 'dataElementIdA'
-                        }
-                    };
-                    rowB = {
-                        name: 'dataElementB',
-                        dataValuesFilter: {
-                            dx: 'dataElementIdB'
-                        }
-                    };
-                    mockValue = 'mockValue';
-                    scope.table = {
-                        columnConfigurations: [
-                            [outerColumnA],
-                            [innerColumnA1, innerColumnA2]
-                        ],
-                        rows: [rowA, rowB],
-                        getDisplayName: function (item) {
-                            return item.name;
-                        },
-                        getDataValue: function () {
-                            return mockValue;
-                        }
-                    };
-                    scope.baseColumnConfiguration = _.last(scope.table.columnConfigurations);
-                });
+            it('should contain dataValues for rows', function () {
+                scope.exportToCSV();
 
-                it('should contain the outer column headers', function () {
-                    scope.exportToCSV();
+                var expectedRowA1 = [escapeString(rowA.name), escapeString(innerColumnA1.name), mockValue].join(DELIMETER),
+                    expectedRowA2 = [escapeString(rowA.name), escapeString(innerColumnA2.name), mockValue].join(DELIMETER),
+                    expectedRowB1 = [escapeString(rowB.name), escapeString(innerColumnA1.name), mockValue].join(DELIMETER),
+                    expectedRowB2 = [escapeString(rowB.name), escapeString(innerColumnA2.name), mockValue].join(DELIMETER);
 
-                    var expectedHeader = [EMPTY_CELL, escapeString(outerColumnA.name), escapeString(outerColumnA.name)].join(DELIMETER);
-                    expect(csvContent).toContain(expectedHeader);
-                });
-
-                it('should contain the inner column headers', function () {
-                    scope.exportToCSV();
-
-                    var expectedHeader = [EMPTY_CELL, escapeString(innerColumnA1.name), escapeString(innerColumnA2.name)].join(DELIMETER);
-                    expect(csvContent).toContain(expectedHeader);
-                });
-
-                it('should append the number of isoweeks to the column headers if column is a periodDimension and pivotTable is a monthlyReport', function () {
-                    spyOn(dateUtils, 'getNumberOfISOWeeksInMonth').and.returnValue(4);
-                    outerColumnA.periodDimension = true;
-                    scope.table.monthlyReport = true;
-                    scope.exportToCSV();
-
-                    expect(csvContent).toContain(escapeString(outerColumnA.name + ' [4 '+ scope.resourceBundle.weeksLabel + ']'));
-                });
-
-                it('should contain dataValues for rows', function () {
-                    scope.exportToCSV();
-
-                    var expectedRowA = [escapeString(rowA.name), mockValue, mockValue].join(DELIMETER);
-                    var expectedRowB = [escapeString(rowB.name), mockValue, mockValue].join(DELIMETER);
-
-                    expect(csvContent).toContain(expectedRowA);
-                    expect(csvContent).toContain(expectedRowB);
-                });
+                expect(csvContent).toContain(expectedRowA1);
+                expect(csvContent).toContain(expectedRowA2);
+                expect(csvContent).toContain(expectedRowB1);
+                expect(csvContent).toContain(expectedRowB2);
             });
         });
 

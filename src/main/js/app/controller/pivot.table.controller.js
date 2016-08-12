@@ -6,43 +6,66 @@ define(["lodash", "dateUtils", "moment"], function(_, dateUtils, moment) {
         var getCSVContents = function() {
             var DELIMITER = ',',
                 NEW_LINE = '\n',
-                EMPTY_CELL = '';
+                mainColumns = _.first($scope.table.columns),
+                subColumns = _.slice($scope.table.columns, 1);
 
             var escapeString = function (string) {
                 return '"' + string + '"';
             };
 
-            var buildHeaders = function() {
-                return _.map($scope.table.columnConfigurations, function (columnConfiguration) {
-                    var columnWidth = $scope.baseColumnConfiguration.length / columnConfiguration.length,
-                        cells = [EMPTY_CELL];
+            var getColumnHeader = function (items) {
+                var firstItem = _.first(items);
 
-                    _.each(columnConfiguration, function (column) {
-                        _.times(columnWidth, function () {
-                            if($scope.table.monthlyReport && column.periodDimension) {
-                                cells.push(escapeString($scope.table.getDisplayName(column) + ' ' + $scope.getNumberOfWeeksLabel(column.id)));
-                            } else {
-                                cells.push(escapeString($scope.table.getDisplayName(column)));
-                            }
-                        });
-                    });
-                    return cells.join(DELIMITER);
+                return (firstItem.categoryDimension && $scope.resourceBundle.label.category) ||
+                       (firstItem.dataDimension && $scope.resourceBundle.label.dataDimension) ||
+                       (firstItem.orgUnitDimension && $scope.resourceBundle.label.organisationUnit) ||
+                       (firstItem.periodDimension && $scope.resourceBundle.label.period);
+            };
+
+            var buildHeaders = function() {
+                var cells = _.map([$scope.table.rows].concat(subColumns), function(items) {
+                    return escapeString(getColumnHeader(items));
                 });
+
+                _.each(mainColumns, function (column) {
+                    if($scope.table.monthlyReport && column.periodDimension) {
+                        cells.push(escapeString($scope.table.getDisplayName(column) + ' ' + $scope.getNumberOfWeeksLabel(column.id)));
+                    } else {
+                        cells.push(escapeString($scope.table.getDisplayName(column)));
+                    }
+                });
+                return cells.join(DELIMITER);
             };
 
             var buildRows = function () {
-                return _.map($scope.table.rows, function (row) {
-                    var cells = [escapeString($scope.table.getDisplayName(row))];
+                var buildRowsForSubColumns = function (subColumns, rowSpecifiers) {
+                    if(_.isEmpty(subColumns)) {
+                        var cells = _.map(rowSpecifiers, function (rowSpecifier) {
+                            return escapeString($scope.table.getDisplayName(rowSpecifier));
+                        });
 
-                    _.each($scope.baseColumnConfiguration, function (column) {
-                        var value = $scope.table.getDataValue(row, column);
-                        cells.push(value);
-                    });
-                    return cells.join(DELIMITER);
+                        _.each(mainColumns, function (column) {
+                            var combinedRow = _.reduce(rowSpecifiers, _.merge, {});
+                            var value = $scope.table.getDataValue(combinedRow, column);
+                            cells.push(value);
+                        });
+                        return cells.join(DELIMITER);
+                    } else {
+                        var thisSubColumn = _.first(subColumns),
+                            remainingSubColumns = _.slice(subColumns, 1);
+
+                        return _.map(thisSubColumn, function(columnItem) {
+                            return buildRowsForSubColumns(remainingSubColumns, rowSpecifiers.concat(columnItem));
+                        });
+                    }
+                };
+
+                return _.map($scope.table.rows, function (row) {
+                    return buildRowsForSubColumns(subColumns, [row]);
                 });
             };
 
-            return _.flatten([
+            return _.flattenDeep([
                 buildHeaders(),
                 buildRows()
             ]).join(NEW_LINE);

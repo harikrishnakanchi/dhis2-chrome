@@ -314,5 +314,11 @@
     "grouped": "Grouped",
     "stacked": "Stacked",
     "xAxisLabel": "Period",
-    "downloadChart": "Download Chart"
+    "downloadChart": "Download Chart",
+    "label": {
+        "category": "Category",
+        "dataDimension": "Data",
+        "period": "Period",
+        "organisationUnit": "Organisation Unit"
+    }
 }

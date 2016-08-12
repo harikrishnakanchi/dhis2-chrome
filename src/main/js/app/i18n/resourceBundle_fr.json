@@ -314,5 +314,11 @@
     "grouped": "Groupées",
     "stacked": "Empilées",
     "xAxisLabel": "Période",
-    "downloadChart": "Télécharger le graphique"
+    "downloadChart": "Télécharger le graphique",
+    "label": {
+        "category": "Catégorie",
+        "dataDimension": "Données",
+        "period": "Période",
+        "organisationUnit": "L'unité organisationnelle"
+    }
 }

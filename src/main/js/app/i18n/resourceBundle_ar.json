@@ -314,5 +314,11 @@
     "grouped": "مجمعة",
     "stacked": "مكدسة",
     "xAxisLabel": "فترة",
-    "downloadChart": "تحميل الرسم البياني"
+    "downloadChart": "تحميل الرسم البياني",
+    "label": {
+        "category": "فئة",
+        "dataDimension": "البيانات",
+        "period": "فترة",
+        "organisationUnit": "الوحدة التنظيمية"
+    }
 }
