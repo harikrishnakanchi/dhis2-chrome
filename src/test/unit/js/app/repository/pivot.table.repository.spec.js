@@ -96,13 +96,14 @@ define(["pivotTableRepository", "pivotTable", "pivotTableData", "angularMocks", 
                 expect(PivotTableData.create).toHaveBeenCalledWith(pivotTableDefinition, mockPivotTableData.data);
             });
 
-            it('should get the pivotTableData even if data does not exist', function () {
+            it('should return null if the pivotTableData does not exist', function () {
                 mockStore.find.and.returnValue(utils.getPromise(q, null));
 
-                pivotTableRepository.getPivotTableData(pivotTableDefinition, orgUnitId);
+                pivotTableRepository.getPivotTableData(pivotTableDefinition, orgUnitId).then(function (pivotTableData) {
+                    expect(pivotTableData).toBeNull();
+                });
 
                 scope.$apply();
-                expect(PivotTableData.create).toHaveBeenCalledWith(pivotTableDefinition, {});
             });
         });
     });
