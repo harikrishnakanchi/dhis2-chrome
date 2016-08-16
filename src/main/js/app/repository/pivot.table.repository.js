@@ -42,7 +42,8 @@ define(["lodash", "pivotTable", "pivotTableData"], function(_, PivotTableModel, 
         this.getPivotTableData = function (pivotTableDefinition, orgUnitId) {
             var store = db.objectStore(PIVOT_TABLE_DATA_STORE_NAME);
             return store.find([pivotTableDefinition.name, orgUnitId]).then(function (pivotTableData) {
-                return PivotTableData.create(pivotTableDefinition, pivotTableData.data);
+                var data = pivotTableData && pivotTableData.data || {};
+                return PivotTableData.create(pivotTableDefinition, data);
             });
         };
     };
