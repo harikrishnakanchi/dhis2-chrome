@@ -106,7 +106,7 @@
                                         </div>
 
                                         <div angucomplete-alt=""
-                                             ng-if="programStageDE.dataElement.optionSet && (dataElementOptions[programStageDE.dataElement.id] !== undefined) && !isReferralLocationOptionSet(programStageDE.dataElement.optionSet)"
+                                             ng-if="programStageDE.dataElement.optionSet && (dataElementOptions[programStageDE.dataElement.id].length !== 0) && !isReferralLocationOptionSet(programStageDE.dataElement.optionSet)"
                                              name="{{programStageDE.dataElement.id}}"
                                              placeholder="{{ resourceBundle.startTypingLabel }}"
                                              pause="100"
@@ -122,7 +122,7 @@
                                         </div>
 
                                         <div angucomplete-alt=""
-                                             ng-if="programStageDE.dataElement.optionSet && (dataElementOptions[programStageDE.dataElement.id] !== undefined) && isReferralLocationOptionSet(programStageDE.dataElement.optionSet)"
+                                             ng-if="programStageDE.dataElement.optionSet && (dataElementOptions[programStageDE.dataElement.id].length !== 0) && isReferralLocationOptionSet(programStageDE.dataElement.optionSet)"
                                              name="{{programStageDE.dataElement.id}}"
                                              placeholder="{{ resourceBundle.startTypingLabel }}"
                                              pause="100"

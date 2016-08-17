@@ -117,7 +117,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
         };
 
         $scope.isReferralLocationPresent = function(dataElement) {
-            return !($scope.loading === false && _.endsWith(dataElement.code, "_referralLocations") && _.isUndefined($scope.dataElementOptions[dataElement.id]));
+            return !($scope.loading === false && _.eq(dataElement.offlineSummaryType, "referralLocations") && _.isEmpty($scope.dataElementOptions[dataElement.id]));
         };
 
         $scope.update = function() {
@@ -250,14 +250,16 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                         var value =_.find($scope.dataElementOptions[de.id], function(option) {
                             if (_.endsWith(de.optionSet.code, "_referralLocations")) {
                                 filterOptions();
-                                if (!_.contains($scope.dataElementOptions[de.id], option))
+                                if (!_.contains($scope.dataElementOptions[de.id], option) && option.code === dv.value)
                                     $scope.dataElementOptions[de.id].push(option);
                             }
                             return option.code === dv.value;
                         });
                         if(_.isUndefined(value)) {
                             var selectedOption = _.find(dv.optionSet.options, { id: dv.value });
-                            $scope.dataElementOptions[de.id].push(selectedOption);
+                            if (selectedOption) {
+                                $scope.dataElementOptions[de.id].push(selectedOption);
+                            }
                             return selectedOption;
                         } else {
                             return value;
@@ -293,7 +295,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                     var dataElementsWithOptions = _.filter(allDataElementsMap, 'optionSet');
                     var indexedExcludedLineListOptions = excludedLinelistOptions && _.indexBy(excludedLinelistOptions.dataElements, 'dataElementId');
                     _.forEach(dataElementsWithOptions, function (dataElement) {
-                        var options = translatedOptionSetMapping[dataElement.optionSet.id];
+                        var options = translatedOptionSetMapping[dataElement.optionSet.id] || [];
                         if (!_.isUndefined(excludedLinelistOptions)) {
                             var excludedOptionIds = indexedExcludedLineListOptions[dataElement.id] && indexedExcludedLineListOptions[dataElement.id].excludedOptionIds;
                             options = _.reject(options, function (option) {
