@@ -46,7 +46,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
 
             var successCallback = function(directory) {
                 var notificationMessages = {
-                    "notificationMessage": $scope.resourceBundle.createCloneSuccessMessage + directory.name,
+                    "notificationMessage": [$scope.resourceBundle.createCloneSuccessMessage, directory.name].join(' '),
                     "notificationTitle": $scope.resourceBundle.successNotification
                 };
                 showNotification(notificationMessages);
