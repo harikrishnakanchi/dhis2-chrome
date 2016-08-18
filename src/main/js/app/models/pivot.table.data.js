@@ -1,6 +1,7 @@
 define(['lodash'], function(_) {
     var VALUE_HEADER = 'value',
-        DATA_DIMENSION_NAME_SEPARATOR = ' - ';
+        DATA_DIMENSION_NAME_SEPARATOR = ' - ',
+        NOT_SPECIFIED_ORG_UNIT_NAME = 'Not Specified';
 
     var PivotTableData = function(definition, data) {
         var _this = this;
@@ -85,6 +86,10 @@ define(['lodash'], function(_) {
             return filterItemsWithDataValues(mappedItems, dataValues);
         },
         ou: function (definition, data, dataValues) {
+            var isNotSpecifiedOrgUnit = function (orgUnit) {
+                return orgUnit.name == NOT_SPECIFIED_ORG_UNIT_NAME;
+            };
+
             var mappedOrgUnits = _.map(data.metaData.ou, function (orgUnitId) {
                 return {
                     id: orgUnitId,
@@ -95,7 +100,7 @@ define(['lodash'], function(_) {
                     }
                 };
             });
-            return filterItemsWithDataValues(mappedOrgUnits, dataValues);
+            return _.sortByOrder(filterItemsWithDataValues(mappedOrgUnits, dataValues), [isNotSpecifiedOrgUnit, 'name']);
         },
         pe: function (definition, data, dataValues) {
             var mappedPeriods = _.map(data.metaData.pe, function (periodId) {

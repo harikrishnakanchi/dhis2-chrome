@@ -361,6 +361,34 @@ define(['pivotTableData'], function(PivotTableData) {
                 expect(_.map(pivotTableData.rows, 'id')).toEqual(['someOrgUnitId']);
             });
 
+            it('should sort the items by name if dimension is ou', function () {
+                definition.rows = [{
+                    dimension: 'ou'
+                }];
+                data.metaData.names = {
+                        someOrgUnitId: 'orgUnitBName',
+                        someOtherOrgUnitId: 'orgUnitAName'
+                };
+
+                pivotTableData = PivotTableData.create(definition, data);
+
+                expect(_.map(pivotTableData.rows, 'name')).toEqual(['orgUnitAName', 'orgUnitBName']);
+            });
+
+            it('should sort the Not Specified orgUnit last if dimension is ou', function () {
+                definition.rows = [{
+                    dimension: 'ou'
+                }];
+                data.metaData.names = {
+                    someOrgUnitId: 'Not Specified',
+                    someOtherOrgUnitId: 'Zebra Town'
+                };
+
+                pivotTableData = PivotTableData.create(definition, data);
+
+                expect(_.map(pivotTableData.rows, 'name')).toEqual(['Zebra Town', 'Not Specified']);
+            });
+
             it('should map the items from metaData if dimension is pe', function () {
                 definition.rows = [{
                     dimension: 'pe'
