@@ -471,6 +471,47 @@ define(['pivotTableData'], function(PivotTableData) {
                 pivotTableData = PivotTableData.create({}, {});
                 expect(pivotTableData.columns).toEqual([]);
             });
+
+            describe('filtering of columns', function () {
+                beforeEach(function () {
+                    definition.geographicOriginReport = true;
+                    definition.columns = [{
+                        dimension: 'dx',
+                        items: [
+                            { id: 'someDataElementId' }
+                        ]
+                    }, {
+                        dimension: 'pe'
+                    }];
+                });
+
+                it('should filter out columns with only one item', function () {
+                    pivotTableData = PivotTableData.create(definition, data);
+
+                    expect(pivotTableData.columns.length).toEqual(1);
+                });
+
+                it('should not filter out columns if it is not a GeographicOrigin report', function () {
+                    definition.geographicOriginReport = false;
+                    pivotTableData = PivotTableData.create(definition, data);
+
+                    expect(pivotTableData.columns.length).toEqual(2);
+                });
+
+                it('should not filter out columns if they are not a data dimension', function () {
+                    definition.columns = [{
+                        dimension: 'someCategoryId',
+                        items: [
+                            { id: 'someCategoryOptionId' }
+                        ]
+                    }, {
+                        dimension: 'pe'
+                    }];
+                    pivotTableData = PivotTableData.create(definition, data);
+
+                    expect(pivotTableData.columns.length).toEqual(2);
+                });
+            });
         });
 
         describe('columnConfigurations', function () {

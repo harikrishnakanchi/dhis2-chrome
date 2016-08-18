@@ -151,11 +151,15 @@ define(['lodash'], function(_) {
     };
 
     var mapColumns = function (definition, data, dataValues) {
-        return _.map(definition.columns, function (columnConfiguration) {
+        var mappedColumns = _.map(definition.columns, function (columnConfiguration) {
             var dimensionId = columnConfiguration.dimension,
                 mappingFunction = isCategoryDimension(definition, dimensionId) ? DIMENSION_MAPPING_FUNCTIONS.category : DIMENSION_MAPPING_FUNCTIONS[dimensionId];
 
             return mappingFunction ? mappingFunction(definition, data, dataValues, columnConfiguration) : [];
+        });
+
+        return _.reject(mappedColumns, function (column) {
+           return definition.geographicOriginReport && column.length == 1 && _.first(column).dataDimension;
         });
     };
 
