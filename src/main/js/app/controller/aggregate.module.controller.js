@@ -17,8 +17,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
             $scope.selectedDataset = {};
             $scope.enrichedDatasets = {};
             var excludedDataElements = [];
-            var referralDataset;
-            var populationDataset;
+            var referralDataset, populationDataset, associatedDatasets;
 
             var enrichSection = function(section) {
                 var unGroupedElements = _(section.dataElements)
@@ -140,6 +139,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                         });
 
                         $scope.associatedDatasets = partitionedDatasets[0];
+                        associatedDatasets = _.map(partitionedDatasets[0], 'id');
                         $scope.nonAssociatedDataSets = partitionedDatasets[1];
                         $scope.selectedDataset = $scope.associatedDatasets ? $scope.associatedDatasets[0] : [];
                     });
@@ -252,35 +252,24 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     $scope.resourceBundle.uploadSystemSettingDesc + enrichedModule.name));
             };
 
+            var associateToDatasets = function(datasetIds, orgUnits) {
+                return datasetRepository.associateOrgUnits(datasetIds, orgUnits).then(function() {
+                    var orgunitIdsAndDatasetIds = {
+                        "orgUnitIds": _.pluck(orgUnits, "id"),
+                        "dataSetIds": datasetIds
+                    };
+                    return publishMessage(orgunitIdsAndDatasetIds, "associateOrgUnitToDataset",
+                        $scope.resourceBundle.associateOrgUnitToDatasetDesc + $scope.orgUnit.name);
+                });
+            };
+
             $scope.save = function() {
 
                 var getDatasetsToAssociate = function() {
-                    var datasets = _.cloneDeep($scope.associatedDatasets);
-
-                    var addDataSet = function(dataset) {
-                        if (!_.isEmpty(dataset))
-                            datasets.push(dataset);
-                    };
-
-                    addDataSet(referralDataset);
-                    addDataSet(populationDataset);
-
-                    return datasets;
+                    return _.compact([].concat($scope.associatedDatasets).concat(referralDataset).concat(populationDataset));
                 };
 
                 var enrichedModule = {};
-
-                var associateToDatasets = function(datasets, orgUnits) {
-                    var datasetIds = _.pluck(datasets, "id");
-                    return datasetRepository.associateOrgUnits(datasetIds, orgUnits).then(function() {
-                        var orgunitIdsAndDatasetIds = {
-                            "orgUnitIds": _.pluck(orgUnits, "id"),
-                            "dataSetIds": datasetIds
-                        };
-                        return publishMessage(orgunitIdsAndDatasetIds, "associateOrgUnitToDataset",
-                            $scope.resourceBundle.associateOrgUnitToDatasetDesc + $scope.orgUnit.name);
-                    });
-                };
 
                 var getEnrichedModule = function(module) {
                     enrichedModule = orgUnitMapper.mapToModule(module);
@@ -300,16 +289,16 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 var createOriginOrgUnits = function() {
                     return originOrgunitCreator.create(enrichedModule).then(function(originOrgUnits) {
                         return publishMessage(originOrgUnits, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + _.pluck(originOrgUnits, "name"))
-                            .then(_.partial(associateToDatasets, $scope.originDatasets, originOrgUnits));
+                            .then(_.partial(associateToDatasets, _.map($scope.originDatasets, 'id'), originOrgUnits));
                     });
                 };
 
-                var datasetsToAssociate = getDatasetsToAssociate();
+                var datasetIdsToAssociate = _.map(getDatasetsToAssociate(), 'id');
 
                 $scope.loading = true;
                 return getEnrichedModule($scope.module)
                     .then(createModules)
-                    .then(_.partial(associateToDatasets, datasetsToAssociate, [enrichedModule]))
+                    .then(_.partial(associateToDatasets, datasetIdsToAssociate, [enrichedModule]))
                     .then(_.partial(saveExcludedDataElements, enrichedModule))
                     .then(createOrgUnitGroups)
                     .then(createOriginOrgUnits)
@@ -321,10 +310,17 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
             $scope.update = function() {
                 var enrichedModule = orgUnitMapper.mapToModule($scope.module, $scope.module.id, 6);
+
+                var associateNewDatasets = function () {
+                    var newlyAddedDatasetIds = _.difference(_.map($scope.associatedDatasets, 'id') ,associatedDatasets);
+                    return associateToDatasets(newlyAddedDatasetIds, [enrichedModule]);
+                };
+
                 $scope.loading = true;
                 return $q.all([saveExcludedDataElements(enrichedModule), orgUnitRepository.upsert(enrichedModule),
                         publishMessage(enrichedModule, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + enrichedModule.name)
                     ])
+                    .then(associateNewDatasets)
                     .then(_.partial(onSuccess, enrichedModule), onError)
                     .finally(function() {
                         $scope.loading = false;

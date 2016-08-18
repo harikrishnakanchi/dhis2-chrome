@@ -603,6 +603,58 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 }, "dataValues");
             });
 
+            it('should update assoscaiated dataset when a new dataset is added to existing module', function () {
+                var datasetOne = {
+                    "id": "ds1",
+                    "organisationUnits": [{
+                        "id": "mod1"
+                    }],
+                    "isAggregateService": true,
+                    "sections": []
+                };
+                var datasetTwo = {
+                    "id": "ds2",
+                    "organisationUnits": [{
+                        "id": "mod2"
+                    }],
+                    "isAggregateService": true,
+                    "sections": []
+                };
+
+                var dataSets = [datasetOne, datasetTwo];
+
+                scope.orgUnit = {
+                    id: 'mod1',
+                    name: 'module name',
+                    parent: {
+                        id : "org1",
+                        name: 'parent'
+                    }
+                };
+
+                scope.isNewMode = false;
+
+                dataSetRepo.getAll.and.returnValue(utils.getPromise(q, dataSets));
+                dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, dataSets));
+                dataSetRepo.includeDataElements.and.returnValue(utils.getPromise(q, dataSets));
+                translationsService.translate.and.returnValue(dataSets);
+
+                initialiseController();
+                scope.$apply();
+
+                scope.associatedDatasets = [datasetOne, datasetTwo];
+
+                scope.update();
+                scope.$apply();
+
+                expect(hustle.publish.calls.argsFor(2)).toEqual([{
+                    data: {"orgUnitIds":["mod1"], "dataSetIds":["ds2"]},
+                    type: "associateOrgUnitToDataset",
+                    locale: "en",
+                    desc: "associate selected services to origins of Op Unit module name"
+                }, "dataValues"]);
+            });
+
             it("should return false if datasets for modules are selected", function() {
                 scope.$apply();
                 scope.associatedDatasets = [{
