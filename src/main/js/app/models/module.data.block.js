@@ -1,8 +1,8 @@
 define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, CustomAttributes, moment, properties) {
-    var ModuleDataBlock = function (orgUnit, period, aggregateDataValues, lineListEvents, approvalData, failedToSyncData) {
+    var ModuleDataBlock = function (orgUnit, period, aggregateDataValues, lineListEvents, approvalData, failedToSyncData, parentOrgUnit) {
         this.moduleId = orgUnit.id;
         this.period = period;
-        this.moduleName = parseModuleName(orgUnit);
+        this.moduleName = parseModuleName(orgUnit, parentOrgUnit);
         this.lineListService = CustomAttributes.getBooleanAttributeValue(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
         this.active = isActive(this.period, orgUnit.openingDate);
 
@@ -86,9 +86,9 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         return _.isUndefined(event.localStatus) || event.localStatus == 'READY_FOR_DHIS';
     };
 
-    var parseModuleName = function (orgUnit) {
-        if(orgUnit.parent) {
-            return [orgUnit.parent.name, orgUnit.name].join(' - ');
+    var parseModuleName = function (orgUnit, parentOrgUnit) {
+        if(parentOrgUnit) {
+            return [parentOrgUnit.name, orgUnit.name].join(' - ');
         } else {
             return orgUnit.name;
         }

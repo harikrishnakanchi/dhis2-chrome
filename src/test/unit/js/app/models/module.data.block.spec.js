@@ -1,6 +1,6 @@
 define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(ModuleDataBlock, CustomAttributes, moment, timecop) {
     describe('ModuleDataBlock', function () {
-        var moduleDataBlock, orgUnit, period, aggregateDataValues, lineListEvents, approvalData, someMomentInTime, isLineListService, failedToSyncData;
+        var moduleDataBlock, orgUnit, parentOrgUnit, period, aggregateDataValues, lineListEvents, approvalData, someMomentInTime, isLineListService, failedToSyncData;
 
         beforeEach(function() {
             isLineListService = false;
@@ -9,6 +9,9 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
             orgUnit = {
                 id: 'someOrgUnitId'
+            };
+            parentOrgUnit = {
+                name: 'parentOrgUnitName'
             };
             period = 'somePeriod';
             aggregateDataValues = undefined;
@@ -19,7 +22,7 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
         });
 
         var createModuleDataBlock = function() {
-            return ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData, failedToSyncData);
+            return ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData, failedToSyncData, parentOrgUnit);
         };
 
         var createMockDataValue = function(options) {
@@ -56,13 +59,14 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                     }
                 };
                 moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.moduleName).toEqual('parentName - orgUnitName');
+                expect(moduleDataBlock.moduleName).toEqual('parentOrgUnitName - orgUnitName');
             });
 
             it('should return just the orgUnit name if it has no parent', function () {
                 orgUnit = {
                     name: 'orgUnitName'
                 };
+                parentOrgUnit = undefined;
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.moduleName).toEqual('orgUnitName');
             });
