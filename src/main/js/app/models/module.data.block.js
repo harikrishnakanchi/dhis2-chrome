@@ -65,8 +65,8 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
 
     var isActive = function (period, openingDate) {
         var date12WeeksEarlier = moment().subtract(properties.weeksToDisplayStatusInDashboard, 'weeks');
-        openingDate = moment(openingDate, 'YYYY-MM-DD');
-        var dateToCompare = openingDate <= date12WeeksEarlier ? date12WeeksEarlier : openingDate;
+        openingDate = moment(openingDate);
+        var dateToCompare = date12WeeksEarlier.isAfter(openingDate) ? date12WeeksEarlier : openingDate;
         return moment(period, "GGGG[W]W").isoWeek() >= dateToCompare.isoWeek();
     };
 
