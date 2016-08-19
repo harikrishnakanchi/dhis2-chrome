@@ -2,7 +2,7 @@ define(["metadataService", "filesystemService", "datasetService", "programServic
     var init = function(app) {
         app.service('metadataService', ['$http', metadataService]);
         app.service('systemSettingService', ['$http', '$q', systemSettingService]);
-        app.service('datasetService', ['$http', datasetService]);
+        app.service('datasetService', ['$http', '$q', datasetService]);
         app.service('programService', ['$http', programService]);
         app.service('filesystemService', ['$q', filesystemService]);
         app.service('historyService', ['$location', historyService]);

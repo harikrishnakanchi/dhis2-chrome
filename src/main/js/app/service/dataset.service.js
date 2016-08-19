@@ -1,9 +1,19 @@
 define(["dhisUrl"], function(dhisUrl) {
-    return function($http) {
+    return function($http, $q) {
 
         this.assignOrgUnitToDataset = function(datasetId, orgUnitId) {
             return $http.post(dhisUrl.dataSets + '/' + datasetId + '/organisationUnits/' + orgUnitId);
         };
+
+        this.removeOrgUnitFromDataset = function(datasetId, orgUnitId) {
+            return $http.delete(dhisUrl.dataSets + '/' + datasetId + '/organisationUnits/' + orgUnitId)
+                .catch(function (response) {
+                    if (response.status != 404) {
+                        return $q.reject();
+                    }
+                });
+        };
+
         this.getAll = function(lastUpdatedTime) {
             var url = dhisUrl.dataSets + '.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]],organisationUnits[:identifiable]&paging=false';
             url = lastUpdatedTime ? url + "&filter=lastUpdated:gte:" + lastUpdatedTime : url;

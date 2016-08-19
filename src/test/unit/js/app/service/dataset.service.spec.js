@@ -1,11 +1,12 @@
 define(["datasetService", "angularMocks", "properties"], function(DatasetService, mocks, properties) {
     describe("dataset service", function() {
-        var http, httpBackend, datasetService;
+        var http, httpBackend, datasetService, q;
 
-        beforeEach(mocks.inject(function($httpBackend, $http) {
+        beforeEach(mocks.inject(function($httpBackend, $http, $q) {
             http = $http;
+            q = $q;
             httpBackend = $httpBackend;
-            datasetService = new DatasetService(http);
+            datasetService = new DatasetService(http, q);
         }));
 
         afterEach(function() {
@@ -76,6 +77,30 @@ define(["datasetService", "angularMocks", "properties"], function(DatasetService
 
             httpBackend.expectPOST(properties.dhis.url + '/api/dataSets/' + datasetId + '/organisationUnits/' + orgUnitId).respond(204);
             httpBackend.flush();
+        });
+
+        it('should remove orgunit from dataset', function() {
+            var datasetId = 'datasetId';
+            var orgUnitId = 'orgUnitId';
+
+            datasetService.removeOrgUnitFromDataset(datasetId, orgUnitId);
+
+            httpBackend.expectDELETE(properties.dhis.url + '/api/dataSets/' + datasetId + '/organisationUnits/' + orgUnitId).respond(204);
+            httpBackend.flush();
+        });
+
+        it('should not fail if orgunit is already removed from dataset', function() {
+            var datasetId = 'datasetId';
+            var orgUnitId = 'orgUnitId';
+
+            var success = false;
+            datasetService.removeOrgUnitFromDataset(datasetId, orgUnitId).then(function () {
+                success = true;
+            });
+
+            httpBackend.expectDELETE(properties.dhis.url + '/api/dataSets/' + datasetId + '/organisationUnits/' + orgUnitId).respond(404);
+            httpBackend.flush();
+            expect(success).toBeTruthy();
         });
 
     });
