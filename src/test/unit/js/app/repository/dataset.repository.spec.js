@@ -313,5 +313,40 @@ define(["datasetRepository", "datasetTransformer", "testData", "angularMocks", "
 
             expect(mockStore.upsert).toHaveBeenCalledWith(expectedDatasetUpsert);
         });
+
+        it("should remove org units from datasets", function () {
+            var datasets = [{
+                "id": "ds1",
+                "name": "NeoNat",
+                "organisationUnits": [{
+                    "id": "ou1",
+                    "name": "ou1"
+                }, {
+                    "id": "ou2",
+                    "name": "ou2"
+                }]
+            }];
+
+            var orgunits = [{
+                "id": "ou1",
+                "name": "ou1"
+            }];
+
+            var expectedDatasetUpsert = [{
+                "id": "ds1",
+                "name": "NeoNat",
+                "organisationUnits": [{
+                    "id": "ou2",
+                    "name": "ou2"
+                }],
+                "orgUnitIds": ["ou2"]
+            }];
+
+            mockStore.each.and.returnValue(utils.getPromise(q, datasets));
+            datasetRepository.removeOrgUnits(["ds1"], ["ou1"]);
+            scope.$apply();
+
+            expect(mockStore.upsert).toHaveBeenCalledWith(expectedDatasetUpsert);
+        });
     });
 });

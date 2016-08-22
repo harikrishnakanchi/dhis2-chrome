@@ -95,6 +95,19 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             });
         };
 
+        this.removeOrgUnits = function (datasetIds, orgUnitIds) {
+            return self.findAllDhisDatasets(datasetIds).then(function(datasets) {
+                var updatedDatasets = _.map(datasets, function(ds) {
+                    ds.organisationUnits = ds.organisationUnits || [];
+                    ds.organisationUnits = _.reject(ds.organisationUnits, function(orgUnit) {
+                        return _.contains(orgUnitIds, orgUnit.id);
+                    });
+                    return ds;
+                });
+                return self.upsertDhisDownloadedData(updatedDatasets);
+            });
+        };
+
         this.findAllDhisDatasets = function(datasetIds) {
             var store = db.objectStore("dataSets");
             var query = db.queryBuilder().$in(datasetIds).compile();
