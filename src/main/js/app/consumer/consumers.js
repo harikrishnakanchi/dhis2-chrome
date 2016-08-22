@@ -4,14 +4,14 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
         "uploadEventDataConsumer", "downloadApprovalConsumer", "downloadMetadataConsumer", "downloadOrgUnitGroupConsumer", "deleteApprovalConsumer", "downloadSystemSettingConsumer", "metadataService",
         "metadataRepository", "uploadPatientOriginConsumer", "mergeBy", "downloadPivotTableDataConsumer", "downloadChartDataConsumer", "excludedDataElementsRepository", "uploadExcludedDataElementsConsumer", "uploadReferralLocationsConsumer",
         "referralLocationsRepository", "downloadProjectSettingsConsumer", "downloadChartsConsumer", "downloadPivotTablesConsumer", "downloadModuleDataBlocksConsumer", "moduleDataBlockMerger",
-        "syncModuleDataBlockConsumer", "aggregateDataValuesMerger", "lineListEventsMerger"
+        "syncModuleDataBlockConsumer", "aggregateDataValuesMerger", "lineListEventsMerger", "removeOrgunitDatasetAssociationConsumer"
     ],
     function(uploadApprovalDataConsumer, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, updateDatasetConsumer, createUserConsumer,
         updateUserConsumer, dispatcher, consumerRegistry, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, orgUnitRepository, programRepository, uploadProgramConsumer,
         downloadProgramConsumer, deleteEventConsumer, eventService, programEventRepository, uploadEventDataConsumer, downloadApprovalConsumer, downloadMetadataConsumer,
         downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, metadataService, metadataRepository, uploadPatientOriginConsumer, mergeBy, downloadPivotTableDataConsumer,
         downloadChartDataConsumer, excludedDataElementsRepository, uploadExcludedDataElementsConsumer, uploadReferralLocationsConsumer, referralLocationsRepository, downloadProjectSettingsConsumer,
-        downloadChartsConsumer, downloadPivotTablesConsumer, downloadModuleDataBlocksConsumer, moduleDataBlockMerger, syncModuleDataBlockConsumer, aggregateDataValuesMerger, lineListEventsMerger) {
+        downloadChartsConsumer, downloadPivotTablesConsumer, downloadModuleDataBlocksConsumer, moduleDataBlockMerger, syncModuleDataBlockConsumer, aggregateDataValuesMerger, lineListEventsMerger, removeOrgunitDatasetAssociationConsumer) {
 
         var init = function(app) {
             app.service('mergeBy', ['$log', mergeBy]);
@@ -29,6 +29,7 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
             app.service("uploadOrgUnitGroupConsumer", ["orgUnitGroupService", "orgUnitGroupRepository", "$q", uploadOrgUnitGroupConsumer]);
             app.service("downloadDatasetConsumer", ["datasetService", "datasetRepository", "$q", "changeLogRepository", "mergeBy", downloadDatasetConsumer]);
             app.service("updateDatasetConsumer", ["datasetService", "$q", updateDatasetConsumer]);
+            app.service("removeOrgunitDatasetAssociationConsumer", ["datasetService", "$q", removeOrgunitDatasetAssociationConsumer]);
             app.service("createUserConsumer", ["userService", createUserConsumer]);
             app.service("updateUserConsumer", ["userService", updateUserConsumer]);
             app.service("downloadSystemSettingConsumer", ["systemSettingService", "systemSettingRepository", "mergeBy", downloadSystemSettingConsumer]);

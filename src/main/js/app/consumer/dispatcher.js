@@ -4,7 +4,7 @@ define(["lodash"], function(_) {
         downloadProgramConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer,
         downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
         uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
-        downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer) {
+        downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, removeOrgunitDatasetAssociationConsumer) {
 
         this.run = function(message) {
             $log.info("Processing message: " + message.data.type, message.data);
@@ -70,6 +70,9 @@ define(["lodash"], function(_) {
 
                 case "associateOrgUnitToDataset":
                     return updateDatasetConsumer.run(message);
+
+                case "removeOrgUnitFromDataset":
+                    return removeOrgunitDatasetAssociationConsumer.run(message);
 
                 case "createUser":
                     return createUserConsumer.run(message);
