@@ -313,5 +313,11 @@
     "stacked": "Empilées",
     "xAxisLabel": "Période",
     "downloadChart": "Télécharger le graphique",
-    "atleastTwoOptionsMustBeSelected": "At least two options need to be selected. (Fr)"
+    "atleastTwoOptionsMustBeSelected": "At least two options need to be selected. (Fr)",
+    "label": {
+        "category": "Catégorie",
+        "dataDimension": "Données",
+        "period": "Période",
+        "organisationUnit": "L'unité organisationnelle"
+    }
 }

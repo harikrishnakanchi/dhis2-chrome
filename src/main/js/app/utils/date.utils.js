@@ -28,11 +28,21 @@ define(["moment", "lodash"], function(moment, _) {
         });
     };
 
+    var getNumberOfISOWeeksInMonth = function (month) {
+        var monthMoment = moment(month, 'YYYYMM'),
+            daysInMonth = _.range(1, monthMoment.daysInMonth() + 1);
+
+        return _.reduce(daysInMonth, function(numberOfMondays, day) {
+            return numberOfMondays + (monthMoment.date(day).day() == 1 ? 1 : 0);
+        }, 0);
+    };
+
     return {
-        "toDhisFormat": toDhisFormat,
-        "max": max,
-        "getFormattedPeriod": getFormattedPeriod,
-        "subtractWeeks": subtractWeeks,
-        "getPeriodRange": getPeriodRange
+        toDhisFormat: toDhisFormat,
+        max: max,
+        getFormattedPeriod: getFormattedPeriod,
+        subtractWeeks: subtractWeeks,
+        getPeriodRange: getPeriodRange,
+        getNumberOfISOWeeksInMonth: getNumberOfISOWeeksInMonth
     };
 });

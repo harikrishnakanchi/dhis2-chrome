@@ -1,29 +1,33 @@
 <table class="table table-bordered table-striped sortable" locked-table-header freeze-first-column="true">
     <thead>
-    <tr ng-repeat="header in headersForTable" ng-show="header.showHeader">
+    <tr ng-repeat="columnConfiguration in table.columnConfigurations">
         <th class="display-print"></th>
-        <th ng-repeat="item in header.headers" ng-show="periodBasedValues[item.period] !== undefined"
-            colspan="{{ maxColumnsHeader.headers.length / header.headers.length}}">
-            <div ng-class="{ 'header-cell-with-weeks' : showWeeks }">
-                <span>{{ item.name }}</span>
-                <p ng-if="$parent.$index == 0 && showWeeks" class="small weeks">[{{ item.numberOfISOWeeks + ' ' + resourceBundle.weeksLabel}}]</p>
+        <th ng-repeat="column in columnConfiguration"
+            colspan="{{ baseColumnConfiguration.length / columnConfiguration.length}}">
+            <div ng-class="{ 'header-cell-with-weeks' : table.monthlyReport }">
+                <span>{{ table.getDisplayName(column) }}</span>
+                <p ng-if="column.periodDimension && table.monthlyReport" class="small weeks">{{ getNumberOfWeeksLabel(column.id) }}</p>
             </div>
         </th>
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="datum in viewMap | orderBy : orderBySortKeys">
+    <tr ng-repeat="row in table.rows">
         <td>
-            <a id="elementId_{{$index}}"
+            <a ng-if="row.dataDimension"
+               id="rowLabel_{{row.rowNumber}}"
                class="changeColor"
                description-popup
-               dp-title="{{getDataElementName(datum.dataElementName)}}"
-               dp-desc="{{datum.dataElementDescription}}">
-                {{getDataElementName(datum.dataElementName)}}
+               dp-title="{{  table.getDisplayName(row)  }}"
+               dp-desc="{{ row.description }}">
+                {{  table.getDisplayName(row)  }}
             </a>
+            <span ng-if="!row.dataDimension">
+                {{  table.getDisplayName(row)  }}
+            </span>
         </td>
-        <td ng-repeat="item in maxColumnsHeader.headers" ng-show="periodBasedValues[item.period] !== undefined">
-            <span> {{getValue(item.category, datum.dataElement, item.period)}}</span>
+        <td ng-repeat="column in baseColumnConfiguration">
+            <span>{{ table.getDataValue(row, column) }}</span>
         </td>
     </tr>
     </tbody>

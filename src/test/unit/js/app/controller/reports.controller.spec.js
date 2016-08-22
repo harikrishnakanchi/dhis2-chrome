@@ -1,12 +1,31 @@
-define(["angularMocks", "utils", "moment", "timecop", "reportsController", "datasetRepository", "orgUnitRepository", "chartRepository", "pivotTableRepository", "translationsService", "systemSettingRepository", "changeLogRepository", "customAttributes", "filesystemService", "saveSvgAsPng", "dataURItoBlob"], function(mocks, utils, moment, timecop, ReportsController, DatasetRepository, OrgUnitRepository, ChartRepository, PivotTableRepository, TranslationsService, SystemSettingRepository, ChangeLogRepository, CustomAttributes, FilesystemService, SVGUtils, dataURItoBlob) {
-    describe("reportsControllerspec", function() {
-
-        var scope, q, rootScope, routeParams, reportsController, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, systemSettingRepository, changeLogRepository, filesystemService;
+define(["angularMocks", "utils", "moment", "timecop", "reportsController", "datasetRepository", "orgUnitRepository", "chartRepository", "pivotTableRepository", "translationsService", "changeLogRepository", "customAttributes", "filesystemService", "saveSvgAsPng", "dataURItoBlob"], function(mocks, utils, moment, timecop, ReportsController, DatasetRepository, OrgUnitRepository, ChartRepository, PivotTableRepository, TranslationsService, ChangeLogRepository, CustomAttributes, FilesystemService, SVGUtils, dataURItoBlob) {
+    describe("reportsController", function() {
+        var scope, q, rootScope, routeParams,
+            mockModule, mockDataSet,
+            reportsController, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, changeLogRepository, filesystemService;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             rootScope = $rootScope;
             scope = $rootScope.$new();
             q = $q;
+
+            mockModule = {
+                id: 'someModuleId',
+                name: 'Some Module Name',
+                attributeValues: 'someAttributeValues',
+                parent: {
+                    name: 'Some Parent Name'
+                }
+            };
+
+            mockDataSet = {
+                id: 'someDataSetId',
+                code: 'someDataSetCode'
+            };
+
+            routeParams = {
+                orgUnit: mockModule.id
+            };
 
             rootScope.resourceBundle = {};
 
@@ -14,24 +33,21 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                 selectedProject: { id: 'someProjectId' }
             };
 
-            routeParams = {
-                "orgUnit": "mod1"
-            };
-
             datasetRepository = new DatasetRepository();
-            spyOn(datasetRepository, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
+            spyOn(datasetRepository, 'findAllForOrgUnits').and.returnValue(utils.getPromise(q, [mockDataSet]));
 
             chartRepository = new ChartRepository();
-            spyOn(chartRepository, "getDataForChart").and.returnValue(utils.getPromise(q, []));
-            spyOn(chartRepository, "getAll").and.returnValue(utils.getPromise(q, []));
+            spyOn(chartRepository, 'getDataForChart').and.returnValue(utils.getPromise(q, []));
+            spyOn(chartRepository, 'getAll').and.returnValue(utils.getPromise(q, []));
+
             pivotTableRepository = new PivotTableRepository();
-            spyOn(pivotTableRepository, "getAll").and.returnValue(utils.getPromise(q, []));
-            spyOn(pivotTableRepository, "getDataForPivotTable").and.returnValue(utils.getPromise(q, []));
+            spyOn(pivotTableRepository, 'getAll').and.returnValue(utils.getPromise(q, []));
+            spyOn(pivotTableRepository, 'getPivotTableData').and.returnValue(utils.getPromise(q, {}));
 
             orgUnitRepository = new OrgUnitRepository();
-            spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, {}));
-            spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
-            spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, []));
+            spyOn(orgUnitRepository, 'get').and.returnValue(utils.getPromise(q, mockModule));
+            spyOn(orgUnitRepository, 'getAllModulesInOrgUnits').and.returnValue(utils.getPromise(q, [mockModule]));
+            spyOn(orgUnitRepository, 'findAllByParent').and.returnValue(utils.getPromise(q, []));
 
             changeLogRepository = new ChangeLogRepository();
             spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, {}));
@@ -40,152 +56,35 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
 
             spyOn(CustomAttributes, 'getBooleanAttributeValue').and.returnValue(false);
 
-            var mockDB = utils.getMockDB($q);
-            mockStore = mockDB.objectStore;
+            translationsService = new TranslationsService();
+            spyOn(translationsService, 'translate').and.callFake(function (object) { return object; });
+            spyOn(translationsService, 'translatePivotTableData').and.callFake(function (object) { return object; });
+            spyOn(translationsService, 'translateCharts').and.callFake(function (object) { return object; });
 
-            var translationResponse = [{
-                objectId: 'a16b4a97ce4',
-                name:'hello'
-            }, {
-                objectId: 'ac606ebc28f'
-            }];
-
-
-            var ngI18nResourceBundle = {
-                get: jasmine.createSpy("get").and.returnValue(utils.getPromise(q, {}))
-            };
-
-            systemSettingRepository = SystemSettingRepository();
-            spyOn(systemSettingRepository, 'upsertLocale');
-            translationsService = new TranslationsService(q, mockDB.db, rootScope, ngI18nResourceBundle, systemSettingRepository);
-            mockStore.each.and.returnValue(utils.getPromise(q, translationResponse));
-            spyOn(translationsService, "translateReports").and.returnValue(utils.getPromise(q, []));
+            reportsController = new ReportsController(rootScope, scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService, changeLogRepository);
         }));
 
-        it("should set the orgunit display name for modules", function() {
-            var mod1 = {
-                "id": "mod1",
-                "name": "module 1",
-                "displayName": "module 1",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "Type"
-                    },
-                    "value": "Module"
-                }],
-                "parent": {
-                    "name": "op unit",
-                }
-            };
-
-            orgUnitRepository.get.and.returnValue(utils.getPromise(q, mod1));
-            reportsController = new ReportsController(rootScope, scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService,filesystemService, changeLogRepository);
+        it('should set the orgunit display name for modules', function() {
             scope.$apply();
-
-            expect(scope.orgUnit.displayName).toEqual("op unit - module 1");
+            expect(scope.orgUnit.displayName).toEqual(mockModule.parent.name + ' - ' + mockModule.name);
         });
 
-        it("should set the flag whether current orgUnit is a linelist module", function() {
-            var mockModule = {
-                id: 'mod1',
-                name: 'module 1',
-                attributeValues: ['someAttributeValue']
-            };
-
-            routeParams = {
-                orgUnit: mockModule.id
-            };
-
-            orgUnitRepository.get.and.returnValue(utils.getPromise(q, mockModule));
+        it('should set the flag whether current orgUnit is a linelist module', function() {
             CustomAttributes.getBooleanAttributeValue.and.returnValue('someBooleanValue');
-
-            reportsController = new ReportsController(rootScope, scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService,filesystemService, changeLogRepository);
             scope.$apply();
 
             expect(CustomAttributes.getBooleanAttributeValue).toHaveBeenCalledWith(mockModule.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
             expect(scope.orgUnit.lineListService).toEqual('someBooleanValue');
         });
 
-        it("should set the orgunit display name for project", function() {
-            routeParams = {
-                "orgUnit": "prj1"
-            };
-
-            var prj1 = {
-                "id": "prj1",
-                "name": "project 1",
-                "displayName": "project 1",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "Type"
-                    },
-                    "value": "Project"
-                }]
-            };
-
-            orgUnitRepository.get.and.returnValue(utils.getPromise(q, prj1));
-            reportsController = new ReportsController(rootScope, scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService,filesystemService, changeLogRepository);
+        it("should load datasets ", function() {
             scope.$apply();
 
-            expect(scope.orgUnit.displayName).toEqual("project 1");
-        });
-
-        it("should load datasets into scope along with their translated names", function() {
-            routeParams = {
-                "orgUnit": "prj1"
-            };
-
-            var prj1 = {
-                "id": "prj1"
-            };
-
-            var mod1 = {
-                "id": "mod1"
-            };
-
-            var datasets = [{
-                "id": "ds1",
-                "name": "ds1",
-                "isOriginDataset": false,
-                "isPopulationDataset": false,
-                "isReferralDataset": false
-            }];
-
-            var expectedDatasets = [{
-                "id": "ds1",
-                "name": "ds1",
-                "isOriginDataset": false,
-                "isPopulationDataset": false,
-                "isReferralDataset": false,
-                "isWeeklyChartsAvailable": false,
-                "isMonthlyChartsAvailable": false,
-                "isWeeklyPivotTablesAvailable": false,
-                "isMonthlyPivotTablesAvailable": false,
-                "isReportsAvailable": false
-            }];
-
-            orgUnitRepository.get.and.returnValue(utils.getPromise(q, prj1));
-            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [mod1]));
-            datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasets));
-
-            translationsService.setLocale('en');
-            reportsController = new ReportsController(rootScope, scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService,filesystemService, changeLogRepository);
-            scope.$apply();
-
-            expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith("prj1");
-            expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(["mod1"]);
-            expect(scope.datasets).toEqual(expectedDatasets);
+            expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModule.id]);
+            expect(_.map(scope.datasets, 'id')).toEqual([mockDataSet.id]);
         });
 
         it("should load Chart data", function() {
-            routeParams = {
-                "orgUnit": "mod1"
-            };
-
-            var mod1 = {
-                "id": "mod1"
-            };
-
             var datasets = [{
                 "id": "ds1",
                 "code": "dataSetCode1",
@@ -356,8 +255,6 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                 "width": 3
             };
 
-            orgUnitRepository.get.and.returnValue(utils.getPromise(q, mod1));
-            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [mod1]));
             datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasets));
             chartRepository.getAll.and.returnValue(utils.getPromise(q, charts));
             chartRepository.getDataForChart.and.callFake(function(chartName, orgUnit) {
@@ -369,12 +266,10 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                     return utils.getPromise(q);
             });
 
-            translationsService.setLocale('en');
-            reportsController = new ReportsController(rootScope, scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService,filesystemService, changeLogRepository);
             scope.$apply();
 
-            expect(chartRepository.getDataForChart).toHaveBeenCalledWith(charts[0].name, "mod1");
-            expect(chartRepository.getDataForChart).toHaveBeenCalledWith(charts[1].name, "mod1");
+            expect(chartRepository.getDataForChart).toHaveBeenCalledWith(charts[0].name, mockModule.id);
+            expect(chartRepository.getDataForChart).toHaveBeenCalledWith(charts[1].name, mockModule.id);
 
             var unixTimestamp = function(period) {
                 return moment(period, 'GGGG[W]W').unix();
@@ -516,120 +411,50 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             expect(scope.datasets[2].isMonthlyChartsAvailable).toBeFalsy();
         });
 
-        it("should load pivot tables into the scope", function() {
-            var mod1 = {
-                "id": "mod1"
-            };
+        describe('loading of pivot tables', function () {
+            var pivotTableA, pivotTableB, pivotTableData;
 
-            var datasets = [{
-                "id": "ds1",
-                "code": "dataSetCode1",
-                "isOriginDataset": false
-            }, {
-                "id": "ds2",
-                "code": "dataSetCode2",
-                "isOriginDataset": false
-            }, {
-                "id": "ds3",
-                "code": "dataSetCode3",
-                "isOriginDataset": false
-            }];
+            beforeEach(function () {
+                pivotTableA = {
+                    dataSetCode: 'someDataSetCode'
+                };
+                pivotTableB = {
+                    dataSetCode: 'someOtherDataSetCode'
+                };
+                pivotTableData = {
+                    some: 'data'
+                };
 
-            var pivotTables = [{
-                "name": "Table 1",
-                "dataSetCode": "dataSetCode1"
-            }, {
-                "name": "Table 2",
-                "dataSetCode": "dataSetCode2",
-                "monthlyReport": true,
-                "weeklyReport": true
-            }, {
-                "name": "Table 3",
-                "dataSetCode": "dataSetCode3",
-                "monthlyReport": true,
-                "weeklyReport": true
-            }];
-
-            var pivotTableData1 = "table 1 data";
-            var pivotTableData2 = "table 2 data";
-            var pivotTableData3 = "table 3 data";
-
-            orgUnitRepository.get.and.returnValue(utils.getPromise(q, mod1));
-            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [mod1]));
-            datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasets));
-            pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, pivotTables));
-            pivotTableRepository.getDataForPivotTable.and.callFake(function(tableName, orgUnit) {
-                if (tableName === "Table 1")
-                    return utils.getPromise(q, pivotTableData1);
-                if (tableName === "Table 2")
-                    return utils.getPromise(q, pivotTableData2);
-                if (tableName === "Table 3")
-                    return utils.getPromise(q, pivotTableData3);
+                pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [pivotTableA, pivotTableB]));
+                pivotTableRepository.getPivotTableData.and.returnValue(utils.getPromise(q, pivotTableData));
             });
-            var translatedData = [{
-                "definition": {
-                    "name": "Table 1",
-                    "dataSetCode": "dataSetCode1"
-                },
-                "data": pivotTableData1,
-                "dataSetCode": "dataSetCode1",
-                "isTableDataAvailable": false
-            }, {
-                "definition": {
-                    "name": "Table 2",
-                    "dataSetCode": "dataSetCode2",
-                    "weeklyReport": true,
-                    "monthlyReport": true
-                },
-                "data": pivotTableData2,
-                "dataSetCode": "dataSetCode2",
-                "isTableDataAvailable": true
-            }, {
-                "definition": {
-                    "name": "Table 3",
-                    "dataSetCode": "dataSetCode3",
-                    "weeklyReport": true,
-                    "monthlyReport": true
-                },
-                "data": pivotTableData3,
-                "dataSetCode": "dataSetCode3",
-                "isTableDataAvailable": false
-            }];
 
-            translationsService.translateReports.and.returnValue(utils.getPromise(q, translatedData));
-            translationsService.setLocale('en');
 
-            var expectedPivotTableData = [{
-                "definition": pivotTables[0],
-                "dataSetCode": "dataSetCode1",
-                "data": pivotTableData1,
-                "isTableDataAvailable": false
-            }, {
-                "definition": pivotTables[1],
-                "dataSetCode": "dataSetCode2",
-                "data": pivotTableData2,
-                "isTableDataAvailable": true
-            }, {
-                "definition": pivotTables[2],
-                "dataSetCode": "dataSetCode3",
-                "data": pivotTableData3,
-                "isTableDataAvailable": false
-            }];
-            reportsController = new ReportsController(rootScope, scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService,filesystemService, changeLogRepository);
-            scope.$apply();
+            it('should load all pivot table definitions', function () {
+                scope.$apply();
+                expect(pivotTableRepository.getAll).toHaveBeenCalled();
+            });
 
-            expect(pivotTableRepository.getDataForPivotTable).toHaveBeenCalledWith(pivotTables[0].name, "mod1");
-            expect(pivotTableRepository.getDataForPivotTable).toHaveBeenCalledWith(pivotTables[1].name, "mod1");
-            expect(scope.pivotTables).toEqual(expectedPivotTableData);
+            it('should get pivotTableData for relevant dataSets of the module', function () {
+                scope.$apply();
+                expect(pivotTableRepository.getPivotTableData).toHaveBeenCalledWith(pivotTableA, mockModule.id);
+                expect(pivotTableRepository.getPivotTableData).toHaveBeenCalledTimes(1);
+            });
 
-            expect(scope.datasets[0].isWeeklyPivotTablesAvailable).toBeTruthy();
-            expect(scope.datasets[0].isMonthlyPivotTablesAvailable).toBeTruthy();
+            it('should translate the pivot tables', function () {
+                scope.$apply();
+                expect(translationsService.translatePivotTableData).toHaveBeenCalledWith([pivotTableData]);
+            });
 
-            expect(scope.datasets[1].isWeeklyPivotTablesAvailable).toBeFalsy();
-            expect(scope.datasets[1].isMonthlyPivotTablesAvailable).toBeFalsy();
+            it('should set the pivot tables on the scope', function () {
+                var translatedPivotTableData = {
+                    some: 'translatedData'
+                };
+                translationsService.translatePivotTableData.and.returnValue([translatedPivotTableData]);
 
-            expect(scope.datasets[2].isWeeklyPivotTablesAvailable).toBeFalsy();
-            expect(scope.datasets[2].isMonthlyPivotTablesAvailable).toBeFalsy();
+                scope.$apply();
+                expect(scope.pivotTables).toEqual([translatedPivotTableData]);
+            });
         });
 
         describe('download chart', function () {
@@ -657,7 +482,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                 filesystemService = new FilesystemService();
                 spyOn(filesystemService, 'promptAndWriteFile').and.returnValue(utils.getPromise(q, {}));
 
-                reportsController = new ReportsController(rootScope, scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService);
+                reportsController = new ReportsController(rootScope, scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService, changeLogRepository);
 
                 var mockChartDefinition = {id: 'chartId', name: '[FieldApp - ServiceName] ChartName'};
                 scope.downloadChartAsPng(mockChartDefinition, currentDate);

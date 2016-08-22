@@ -138,7 +138,10 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
             it('downloads the details of each chart', function () {
                 httpBackend.expectGET(/.*charts.json.*/).respond(200, chartIds);
 
-                var expectedQueryParams = 'fields=id,name,title,relativePeriods,type,columns%5Bdimension,filter,items%5Bid,name,description%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D';
+                var expectedQueryParams = encodeURI('fields=id,name,title,relativePeriods,type,' +
+                                                    'columns[dimension,items[id,name,description]],' +
+                                                    'rows[dimension,items[id,name]],' +
+                                                    'filters[dimension,items[id,name]]');
                 httpBackend.expectGET(properties.dhis.url + '/api/charts/chart1.json?' + expectedQueryParams).respond(200, {});
                 httpBackend.expectGET(properties.dhis.url + '/api/charts/chart2.json?' + expectedQueryParams).respond(200, {});
 
@@ -211,7 +214,12 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
             it('downloads the details of each pivot table', function () {
                 httpBackend.expectGET(/.*reportTables.json.*/).respond(200, pivotTableIds);
 
-                var expectedQueryParams = 'fields=id,name,sortOrder,categoryDimensions%5BdataElementCategory,categoryOptions%5B:identifiable%5D%5D,dataElements,indicators,dataDimensionItems,relativePeriods,columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name,description%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D';
+                var expectedQueryParams = encodeURI('fields=id,name,sortOrder,relativePeriods,' +
+                                                    'categoryDimensions[dataElementCategory,categoryOptions[:identifiable]],' +
+                                                    'dataDimensionItems[dataElement[id,name,formName,description],indicator[id,name,shortName,description],programIndicator[id,name,shortName,description]],' +
+                                                    'columns[dimension,items[id,name]],' +
+                                                    'rows[dimension,items[id,name]],' +
+                                                    'filters[dimension,items[id]]');
                 httpBackend.expectGET(properties.dhis.url + '/api/reportTables/pivotTable1.json?' + expectedQueryParams).respond(200, {});
                 httpBackend.expectGET(properties.dhis.url + '/api/reportTables/pivotTable2.json?' + expectedQueryParams).respond(200, {});
 

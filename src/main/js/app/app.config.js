@@ -126,6 +126,7 @@ require.config({
         "pivotTable": "app/models/pivot.table",
         "moduleDataBlock": "app/models/module.data.block",
         "customAttributes": "app/models/custom.attributes",
+        "pivotTableData": "app/models/pivot.table.data",
 
         //Factories
         "factories": "app/factories/factories",
@@ -177,6 +178,7 @@ require.config({
         "packagedDataImporter": "app/helpers/packaged.data.importer",
         "sessionHelper": "app/helpers/session.helper",
         "originOrgunitCreator": "app/helpers/origin.orgunit.creator",
+        "pivotTableCsvBuilder": "app/helpers/pivot.table.csv.builder",
 
         //Directives
         "directives": "app/directives/directives",

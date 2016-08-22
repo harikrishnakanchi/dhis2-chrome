@@ -112,9 +112,9 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
         };
 
         var filterReportsForCurrentModule = function (allReports) {
-            var allDatsasetCodes = _.map($scope.datasets, 'code');
+            var allDataSetCodes = _.map($scope.datasets, 'code');
             return _.filter(allReports, function(report) {
-                return _.contains(allDatsasetCodes, report.dataSetCode);
+                return _.contains(allDataSetCodes, report.dataSetCode);
             });
         };
 
@@ -234,7 +234,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             var loadDatasetsForModules = function(orgUnits) {
                 return datasetRepository.findAllForOrgUnits(_.pluck(orgUnits, "id")).then(function(dataSets) {
                     var filteredDataSets = _.filter(dataSets, function(ds) {
-                        return !ds.isPopulationDataset;
+                        return !(ds.isPopulationDataset || ds.isReferralDataset);
                     });
                     
                     var translatedDataSets = translationsService.translate(filteredDataSets);
@@ -256,45 +256,24 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
         var loadOrgUnit = function() {
             var orgUnitId = $routeParams.orgUnit;
 
-            var isOfType = function(orgUnit, type) {
-                return _.any(orgUnit.attributeValues, {
-                    attribute: {
-                        "code": "Type"
-                    },
-                    value: type
-                });
-            };
-
-            return orgUnitRepository.get(orgUnitId).then(function(ou) {
-                if (isOfType(ou, 'Module'))
-                    ou.displayName = ou.parent.name + ' - ' + ou.name;
-                ou.lineListService = CustomAttributes.getBooleanAttributeValue(ou.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
-                $scope.orgUnit = ou;
+            return orgUnitRepository.get(orgUnitId).then(function(orgUnit) {
+                orgUnit.displayName = orgUnit.parent.name + ' - ' + orgUnit.name;
+                orgUnit.lineListService = CustomAttributes.getBooleanAttributeValue(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
+                $scope.orgUnit = orgUnit;
             });
         };
 
-        var transformTables = function(tables) {
+        var getPivotTableData = function(tables) {
             return $q.all(_.map(tables, function(tableDefinition) {
-                return pivotTableRepository.getDataForPivotTable(tableDefinition.name, $routeParams.orgUnit).then(function(data) {
-                    return {
-                        definition: tableDefinition,
-                        data: data,
-                        dataSetCode: tableDefinition.dataSetCode,
-                        isTableDataAvailable: !!(data && data.rows && data.rows.length > 0)
-                    };
-                });
+                return pivotTableRepository.getPivotTableData(tableDefinition, $routeParams.orgUnit);
             }));
-        };
-
-        var translatePivotTables = function (pivotTables) {
-            return translationsService.translateReports(pivotTables);
         };
 
         var loadPivotTablesWithData = function() {
             return pivotTableRepository.getAll()
                 .then(filterReportsForCurrentModule)
-                .then(transformTables)
-                .then(translatePivotTables)
+                .then(getPivotTableData)
+                .then(translationsService.translatePivotTableData)
                 .then(function(pivotTables) {
                     $scope.pivotTables = pivotTables;
                 });
@@ -321,13 +300,8 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                     return chart.definition.monthlyChart && chart.data && chart.data.length > 0;
                 });
 
-                eachDataSet.isWeeklyPivotTablesAvailable = _.any(filteredPivotTables, function(table) {
-                    return table.definition.weeklyReport && table.isTableDataAvailable;
-                });
-
-                eachDataSet.isMonthlyPivotTablesAvailable = _.any(filteredPivotTables, function(table) {
-                    return table.definition.monthlyReport && table.isTableDataAvailable;
-                });
+                eachDataSet.isWeeklyPivotTablesAvailable = _.any(filteredPivotTables, { weeklyReport: true, isTableDataAvailable: true });
+                eachDataSet.isMonthlyPivotTablesAvailable = _.any(filteredPivotTables, { monthlyReport: true, isTableDataAvailable: true });
 
                 eachDataSet.isReportsAvailable = eachDataSet.isWeeklyChartsAvailable || eachDataSet.isMonthlyChartsAvailable || eachDataSet.isMonthlyPivotTablesAvailable || eachDataSet.isWeeklyPivotTablesAvailable;
             });

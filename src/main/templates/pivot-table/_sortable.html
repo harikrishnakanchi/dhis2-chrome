@@ -1,38 +1,42 @@
 <table class="table table-bordered table-striped sortable" locked-table-header bind-event="click" freeze-first-column="true">
     <thead>
-    <tr ng-repeat="header in headersForTable" ng-show="header.showHeader">
+
+    <tr ng-repeat="columnConfiguration in table.columnConfigurations">
         <th class="display-print"></th>
-        <th ng-repeat="subHeader in header.headers"
-            ng-show="periodBasedValues[subHeader.period] !== undefined"
-            ng-click="$parent.$index == 0 && sortByColumn(subHeader)"
-            ng-class="{ 'cursorPointer' : $parent.$index == 0 }"
-            colspan="{{ maxColumnsHeader.headers.length / header.headers.length}}">
-            <div ng-class="{ 'header-cell-with-weeks' : showWeeks }">
+        <th ng-repeat="column in columnConfiguration"
+            ng-click="column.sortable && sortByColumn(column)"
+            ng-class="{ 'cursorPointer' : column.sortable }"
+            colspan="{{ baseColumnConfiguration.length / columnConfiguration.length }}">
+            <div ng-class="{ 'header-cell-with-weeks' : table.monthlyReport }">
                 <span class="name">
-                    {{ subHeader.name }}
-                    <p ng-if="$parent.$index == 0 && showWeeks" class="small weeks">[{{ subHeader.numberOfISOWeeks + ' ' + resourceBundle.weeksLabel}}]</p>
+                    {{ table.getDisplayName(column) }}
+                    <p ng-if="column.periodDimension && table.monthlyReport" class="small weeks">{{ getNumberOfWeeksLabel(column.id) }}</p>
                 </span>
-                <span class="icon" ng-class="{ 'text-danger' : selectedSortKey == subHeader.sortKey }" ng-if="$parent.$index == 0">
-                    <i class="fa fa-sort-desc" ng-show="definition.sortDescending"></i>
-                    <i class="fa fa-sort-asc" ng-show="definition.sortAscending"></i>
+                <span class="icon" ng-class="{ 'text-danger': column.sorted }" ng-if="column.sortable">
+                    <i class="fa" ng-class="table.sortAscending ? 'fa-sort-asc' : 'fa-sort-desc'"></i>
                 </span>
             </div>
         </th>
     </tr>
+
     </thead>
     <tbody>
-    <tr ng-repeat="datum in viewMap | orderBy : orderBySortKeys">
+    <tr ng-repeat="row in table.rows">
        <td>
-           <a id="elementId_{{$index}}"
+           <a ng-if="row.dataDimension"
+              id="rowLabel_{{row.rowNumber}}"
               class="changeColor"
               description-popup
-              dp-title="{{getDataElementName(datum.dataElementName)}}"
-              dp-desc="{{datum.dataElementDescription}}">
-           {{getDataElementName(datum.dataElementName)}}
+              dp-title="{{ table.getDisplayName(row) }}"
+              dp-desc="{{ row.description }}">
+               {{  table.getDisplayName(row)  }}
            </a>
+            <span ng-if="!row.dataDimension">
+                {{  table.getDisplayName(row)  }}
+            </span>
        </td>
-        <td ng-class="{ 'info' : selectedSortKey == subHeader.sortKey }" ng-repeat="subHeader in maxColumnsHeader.headers" ng-show="periodBasedValues[subHeader.period] !== undefined">
-            <span ng-class="{'font-bold':selectedSortKey==subHeader.sortKey}"> {{getValue(subHeader.category, datum.dataElement, subHeader.period)}}</span>
+        <td ng-repeat="column in baseColumnConfiguration" ng-class="{ 'info' : column.sorted }">
+            <span ng-class="{ 'font-bold': column.sorted }">{{ table.getDataValue(row, column) }}</span>
         </td>
     </tr>
     </tbody>

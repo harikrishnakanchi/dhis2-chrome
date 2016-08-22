@@ -45,6 +45,33 @@ define(['lodash'], function(_){
             });
         };
 
+        var translateMonthlyPeriods = function (monthlyPeriods) {
+            var SEPARATOR = ' ';
+            _.each(monthlyPeriods, function (period) {
+                var monthToBeTranslated = _.first(period.name.split(SEPARATOR)),
+                    year = _.last(period.name.split(SEPARATOR));
+
+                period.name = $rootScope.resourceBundle[monthToBeTranslated] + SEPARATOR + year;
+            });
+        };
+
+        this.translatePivotTableData = function (pivotTableDataObjects) {
+            if(_locale == 'en') {
+                return pivotTableDataObjects;
+            }
+
+            return _.map(pivotTableDataObjects, function (pivotTableDataObject) {
+                var rowsAndColumns = _.flattenDeep([pivotTableDataObject.rows,  pivotTableDataObject.columns, pivotTableDataObject.columnConfigurations]),
+                    translatableDimensions = _.reject(rowsAndColumns, 'periodDimension'),
+                    periodDimensions = _.filter(rowsAndColumns, 'periodDimension');
+
+                self.translate(translatableDimensions);
+                if(pivotTableDataObject.monthlyReport) translateMonthlyPeriods(periodDimensions);
+
+                return pivotTableDataObject;
+            });
+        };
+
         this.translateReports = function (reportsToTranslate) {
             if(_locale == 'en') {
                 return reportsToTranslate;

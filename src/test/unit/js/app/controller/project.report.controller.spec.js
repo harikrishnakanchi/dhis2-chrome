@@ -1,9 +1,9 @@
-define(["moment", "orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "changeLogRepository", "translationsService", "timecop", "orgUnitGroupSetRepository", "filesystemService"],
-    function(moment, OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, ChangeLogRepository, TranslationsService, timecop, OrgUnitGroupSetRepository, FilesystemService) {
+define(["moment", "orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "changeLogRepository", "translationsService", "timecop", "orgUnitGroupSetRepository", "filesystemService", "pivotTableCsvBuilder"],
+    function(moment, OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, ChangeLogRepository, TranslationsService, timecop, OrgUnitGroupSetRepository, FilesystemService, PivotTableCsvBuilder) {
     describe("projectReportController", function() {
         var scope, rootScope, q,
             projectReportController,
-            orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService,
+            orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService, pivotTableCsvBuilder,
             mockPivotTables, pivotTableData, mockProjectOrgUnit, orgUnitGroupSets, currentTime, lastUpdatedTime;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
@@ -116,58 +116,15 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             mockPivotTables = [{
                 id: 'pivotTable1',
                 projectReport: true,
-                title: 'Hospitalization',
-                rows: [{
-                    items: [{
-                        id: 'adf6cf9405c',
-                        name: 'Average bed occupation rate (%) - Adult IPD Ward'
-                    }, {
-                        id: 'ae70aadc5cf',
-                        name: 'Average length of bed use (days) - Adult IPD Ward'
-                    }]
-                }]
             }, {
                 id: 'pivotTable2',
                 projectReport: false
             }];
 
             pivotTableData = {
-                "headers": [{
-                    "name": "dx",
-                    "column": "Data"
-                }, {
-                    "name": "pe",
-                    "column": "Period"
-                }, {
-                    "name": "value",
-                    "column": "Value"
-                }],
-                "metaData": {
-                    "names": {
-                        "201511": "November 2015",
-                        "201512": "December 2015",
-                        "adf6cf9405c": "Average bed occupation rate (%) - Adult IPD Ward",
-                        "ae70aadc5cf": "Average length of bed use (days) - Adult IPD Ward",
-                        "dx": "Data",
-                        "pe": "Period"
-                    },
-                    "dx": [
-                        "adf6cf9405c",
-                        "ae70aadc5cf"
-                    ],
-                    "pe": [
-                        "201511",
-                        "201512"
-                    ]
-                },
-                "rows": [
-                    ["adf6cf9405c", "201511", "1.1"],
-                    ["adf6cf9405c", "201512", "1.2"],
-                    ["ae70aadc5cf", "201511", "2.1"],
-                    ["ae70aadc5cf", "201512", "2.2"]
-                ],
-                "height": 132,
-                "width": 3
+                some: 'data',
+                title: 'someTitle',
+                isTableDataAvailable: true
             };
 
             orgUnitGroupSets = [{
@@ -264,13 +221,13 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
 
             pivotTableRepository = new PivotTableRepository();
             spyOn(pivotTableRepository, "getAll").and.returnValue(utils.getPromise($q, mockPivotTables));
-            spyOn(pivotTableRepository, "getDataForPivotTable").and.returnValue(utils.getPromise($q, pivotTableData));
+            spyOn(pivotTableRepository, "getPivotTableData").and.returnValue(utils.getPromise($q, pivotTableData));
 
             changeLogRepository = new ChangeLogRepository();
             spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise($q, lastUpdatedTime));
 
             translationsService = new TranslationsService();
-            spyOn(translationsService, "translateReports").and.callFake(function(object) { return object; });
+            spyOn(translationsService, 'translatePivotTableData').and.callFake(function(object) { return object; });
             spyOn(translationsService, 'translate').and.callFake(function(object) { return object; });
 
             orgUnitGroupSetRepository = new OrgUnitGroupSetRepository();
@@ -279,7 +236,10 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             filesystemService = new FilesystemService();
             spyOn(filesystemService, 'promptAndWriteFile').and.returnValue(utils.getPromise(q, {}));
 
-            projectReportController = new ProjectReportController(rootScope, q, scope, orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService);
+            pivotTableCsvBuilder = new PivotTableCsvBuilder();
+            spyOn(pivotTableCsvBuilder, 'build');
+
+            projectReportController = new ProjectReportController(rootScope, q, scope, orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService, pivotTableCsvBuilder);
         }));
 
         afterEach(function () {
@@ -292,8 +252,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
 
             beforeEach(function () {
                 scope.$apply();
-                scope.pivotTables[0].currentOrderOfItems = ["adf6cf9405c", "ae70aadc5cf"];
-                
+
                 spyOn(window, 'Blob').and.callFake(function (contentArray) {
                     this.value = contentArray.join();
                 });
@@ -301,39 +260,46 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
                 filesystemService.promptAndWriteFile.and.callFake(function (fileName, blob) {
                     csvContent = blob.value;
                 });
-
-                scope.exportToCSV();
             });
             
             it('should prompt the user to save the CSV file with suggested filename', function () {
+                scope.exportToCSV();
+
                 var expectedFilename = 'Aweil - SS153.ProjectReport.[updated 28 October 2015 06.13 PM].csv';
                 expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
             });
 
-            describe('CSV contents', function () {
-                it('should contain project basic information', function () {
-                    expect(csvContent).toContain('"Project Information"\n"Country","SOUDAN Sud"');
-                });
+            it('should contain project basic information', function () {
+                scope.exportToCSV();
+                expect(csvContent).toContain('"Project Information"\n"Country","SOUDAN Sud"');
+            });
 
-                it('should contain project last downloaded time information', function () {
-                    var expectedContent = '"Updated","28 October 2015 06.13 PM"';
-                    expect(csvContent).toContain(expectedContent);
-                });
+            it('should contain project last downloaded time information', function () {
+                var expectedContent = '"Updated","28 October 2015 06.13 PM"';
+                expect(csvContent).toContain(expectedContent);
+            });
 
-                it('should contain pivot table headers', function () {
-                    expect(csvContent).toContain('"Hospitalization","November 2015","December 2015"');
-                });
+            it('should contain the title of each table', function () {
+                scope.exportToCSV();
 
-                it('should contain pivot table data', function () {
-                    expect(csvContent).toContain('"Average bed occupation rate (%) - Adult IPD Ward",1.1,1.2\n"Average length of bed use (days) - Adult IPD Ward",2.1,2.2');
-                });
+                expect(csvContent).toContain(pivotTableData.title);
+            });
+
+            it('should contain the results of the csv builder', function () {
+                var mockPivotTableCsvData = 'someCSVData';
+                pivotTableCsvBuilder.build.and.returnValue(mockPivotTableCsvData);
+                scope.exportToCSV();
+
+                expect(csvContent).toContain(mockPivotTableCsvData);
             });
         });
 
         it('should filter out project report tables from pivot tables', function() {
+            var projectReportPivotTable = _.find(mockPivotTables, { projectReport: true });
             scope.$apply();
-            expect(scope.pivotTables[0].definition).toEqual(mockPivotTables[0]);
-            expect(scope.pivotTables[0].data).toEqual(pivotTableData);
+
+            expect(pivotTableRepository.getPivotTableData).toHaveBeenCalledWith(projectReportPivotTable, rootScope.currentUser.selectedProject.id);
+            expect(scope.pivotTables).toEqual([pivotTableData]);
         });
 
         it("should add the projectAttributes which lists all the project basic info into the scope", function() {
@@ -385,9 +351,9 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
         });
 
         it('should get the lastUpdated', function () {
-            var lastUpdatedTime = currentTime, projectId = rootScope.currentUser.selectedProject.id,
-            REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
-            changeLogRepository.get.and.returnValue(utils.getPromise(q, lastUpdatedTime));
+            var projectId = rootScope.currentUser.selectedProject.id,
+                REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
+
             scope.$apply();
             expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyPivotTableData:' + projectId);
             expect(scope.lastUpdatedTimeForProjectReport).toEqual(moment(lastUpdatedTime).format(REPORTS_LAST_UPDATED_TIME_FORMAT));

@@ -70,7 +70,10 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
         };
 
         this.getUpdatedCharts = function(lastUpdatedTime) {
-            var requiredFields = 'id,name,title,relativePeriods,type,columns[dimension,filter,items[id,name,description]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]]';
+            var requiredFields = 'id,name,title,relativePeriods,type,' +
+                                 'columns[dimension,items[id,name,description]],' +
+                                 'rows[dimension,items[id,name]],' +
+                                 'filters[dimension,items[id,name]]';
             return getResourceIds(dhisUrl.charts, 'charts', lastUpdatedTime).then(_.partial(getResourceDetails, dhisUrl.charts, requiredFields));
         };
 
@@ -79,7 +82,12 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
         };
 
         this.getUpdatedPivotTables = function(lastUpdatedTime) {
-            var requiredFields = 'id,name,sortOrder,categoryDimensions[dataElementCategory,categoryOptions[:identifiable]],dataElements,indicators,dataDimensionItems,relativePeriods,columns[dimension,filter,items[id,name]],rows[dimension,filter,items[id,name,description]],filters[dimension,filter,items[id,name]]';
+            var requiredFields = 'id,name,sortOrder,relativePeriods,' +
+                                 'categoryDimensions[dataElementCategory,categoryOptions[:identifiable]],' +
+                                 'dataDimensionItems[dataElement[id,name,formName,description],indicator[id,name,shortName,description],programIndicator[id,name,shortName,description]],' +
+                                 'columns[dimension,items[id,name]],' +
+                                 'rows[dimension,items[id,name]],' +
+                                 'filters[dimension,items[id]]';
             return getResourceIds(dhisUrl.pivotTables, 'reportTables', lastUpdatedTime).then(_.partial(getResourceDetails, dhisUrl.pivotTables, requiredFields));
         };
 

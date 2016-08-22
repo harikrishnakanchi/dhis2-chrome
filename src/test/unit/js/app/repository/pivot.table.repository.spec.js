@@ -1,4 +1,4 @@
-define(["pivotTableRepository", "pivotTable", "angularMocks", "utils", "lodash"], function(PivotTableRepository, PivotTable, mocks, utils, _) {
+define(["pivotTableRepository", "pivotTable", "pivotTableData", "angularMocks", "utils", "lodash"], function(PivotTableRepository, PivotTable, PivotTableData, mocks, utils, _) {
     describe('Pivot Table Repository', function() {
         var mockStore, pivotTableRepository, q, mockDB;
 
@@ -7,6 +7,8 @@ define(["pivotTableRepository", "pivotTable", "angularMocks", "utils", "lodash"]
             q = $q;
             scope = $rootScope.$new();
             mockStore = mockDB.objectStore;
+
+            spyOn(PivotTableData, 'create').and.returnValue({});
 
             pivotTableRepository = new PivotTableRepository(mockDB.db, q);
         }));
@@ -64,6 +66,44 @@ define(["pivotTableRepository", "pivotTable", "angularMocks", "utils", "lodash"]
                 scope.$apply();
 
                 expect(mockStore.getAll).toHaveBeenCalled();
+            });
+        });
+
+        describe('getPivotTableData', function () {
+            var orgUnitId, mockPivotTableData, mockPivotTableDataModel, pivotTableDefinition;
+
+            beforeEach(function () {
+                orgUnitId = 'someOrgUnitId';
+                mockPivotTableData = {
+                    data: 'someData'
+                };
+                mockPivotTableDataModel = 'someInstanceOfModel';
+                pivotTableDefinition = {
+                    name: 'somePivotTableName'
+                };
+
+                mockStore.find.and.returnValue(utils.getPromise(q, mockPivotTableData));
+                PivotTableData.create.and.returnValue(mockPivotTableDataModel);
+            });
+
+            it('should get the pivotTableData for the specified pivotTable and orgUnit', function () {
+                pivotTableRepository.getPivotTableData(pivotTableDefinition, orgUnitId).then(function (pivotTableData) {
+                    expect(pivotTableData).toEqual(mockPivotTableDataModel);
+                });
+
+                scope.$apply();
+                expect(mockStore.find).toHaveBeenCalledWith([pivotTableDefinition.name, orgUnitId]);
+                expect(PivotTableData.create).toHaveBeenCalledWith(pivotTableDefinition, mockPivotTableData.data);
+            });
+
+            it('should return null if the pivotTableData does not exist', function () {
+                mockStore.find.and.returnValue(utils.getPromise(q, null));
+
+                pivotTableRepository.getPivotTableData(pivotTableDefinition, orgUnitId).then(function (pivotTableData) {
+                    expect(pivotTableData).toBeNull();
+                });
+
+                scope.$apply();
             });
         });
     });

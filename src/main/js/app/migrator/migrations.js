@@ -335,6 +335,11 @@ define([], function() {
         create_store_with_key('excludedLineListOptions', 'moduleId', db);
     };
 
+    var force_pivot_tables_to_redownload = function (db, tx) {
+        var changeLogStore = tx.objectStore("changeLog");
+        changeLogStore.delete("pivotTables");
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -379,6 +384,7 @@ define([], function() {
         migrate_and_delete_charts_store,
         migrate_and_delete_pivot_table_store,
         delete_keys_chart_and_reports_from_changelog,
+        force_pivot_tables_to_redownload,
         create_excluded_line_list_options_store
     ];
 });

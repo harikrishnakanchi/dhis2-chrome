@@ -1,6 +1,6 @@
 define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository'], function (TranslationsService, mocks, utils, SystemSettingRepository) {
     describe('Translation Service', function () {
-        var q, rootScope, translationsService, mockDB, scope, mockStore, i18nResourceBundle, systemSettingRepository, getResourceBundleSpy, mockTranslations;
+        var q, rootScope, translationsService, mockDB, scope, mockStore, i18nResourceBundle, systemSettingRepository, mockTranslations;
         var ENGLISH = 'en', FRENCH = FRENCH;
 
         beforeEach(mocks.inject(function ($q, $rootScope) {
@@ -56,6 +56,16 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
             }, {
                 objectId: 'id6',
                 value: 'frenchHeader',
+                locale: FRENCH,
+                property: 'name'
+            }, {
+                objectId: 'someRowId',
+                value: 'frenchRowName',
+                locale: FRENCH,
+                property: 'name'
+            }, {
+                objectId: 'someColumnId',
+                value: 'frenchColumnName',
                 locale: FRENCH,
                 property: 'name'
             }];
@@ -333,6 +343,62 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
 
             it('should translate return english category option combo name in chart data if one of the option is missing translation', function () {
                 expect(chartData.metaData.names.categoryOptionComboId3).toEqual('some category option data 3');
+            });
+        });
+
+        describe('translate pivotTableData', function () {
+            var mockPivotTableData, rowItem, columnItem, columnConfigurationItem;
+
+            beforeEach(function () {
+                rowItem = {
+                    id: 'someRowId',
+                    name: 'someRowName'
+                };
+                columnItem = {
+                    id: 'someColumnId',
+                    name: 'someColumnName'
+                };
+                columnConfigurationItem = {
+                    id: 'someColumnId',
+                    name: 'someColumnName'
+                };
+                mockPivotTableData = {
+                    rows: [rowItem],
+                    columns: [
+                        [columnItem]
+                    ],
+                    columnConfigurations: [
+                        [columnConfigurationItem]
+                    ]
+                };
+
+                initialiseTranslationsServiceForLocale(FRENCH);
+            });
+
+            it('should translate the rows and columns of the pivotTableData', function () {
+                var translatedObject = translationsService.translatePivotTableData([mockPivotTableData]);
+                expect(translatedObject).toEqual([mockPivotTableData]);
+                expect(rowItem.name).toEqual('frenchRowName');
+                expect(columnItem.name).toEqual('frenchColumnName');
+                expect(columnConfigurationItem.name).toEqual('frenchColumnName');
+            });
+
+            describe('row or column is a period dimension', function () {
+                beforeEach(function () {
+                    rootScope.resourceBundle = {
+                        August: 'AugustInFrench'
+                    };
+                });
+
+                it('should translate the month name if pivotTable is a monthly report', function () {
+                    rowItem.id = 'somePeriodId';
+                    rowItem.name = 'August 2016';
+                    rowItem.periodDimension = true;
+                    mockPivotTableData.monthlyReport = true;
+
+                    translationsService.translatePivotTableData([mockPivotTableData]);
+                    expect(rowItem.name).toEqual('AugustInFrench 2016');
+                });
             });
         });
     });

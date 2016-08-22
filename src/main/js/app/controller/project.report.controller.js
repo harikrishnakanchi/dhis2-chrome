@@ -1,105 +1,58 @@
-define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper) {
-    return function($rootScope, $q, $scope, orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService) {
+define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, dateUtils, _, orgUnitMapper) {
+    return function($rootScope, $q, $scope, orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService, pivotTableCsvBuilder) {
         $scope.selectedProject = $rootScope.currentUser.selectedProject;
 
         var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
         var REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY hh[.]mm A";
-        var getNumberOfISOWeeksInMonth = function (period) {
-            var m = moment(period, 'YYYYMM');
-
-            var year = parseInt(m.format('YYYY'));
-            var month = parseInt(m.format('M')) - 1;
-            var day = 1,
-                mondays = 0;
-
-            var date = new Date(year, month, day);
-
-            while (date.getMonth() == month) {
-                if (date.getDay() === 1) {
-                    mondays += 1;
-                    day += 7;
-                } else {
-                    day++;
-                }
-                date = new Date(year, month, day);
-            }
-            return mondays;
-        };
 
         var buildCsvContent = function () {
-            var csvData = [],
-                DELIMITER = ',',
-                NEW_LINE = '\n';
+            var DELIMITER = ',',
+                NEW_LINE = '\n',
+                EMPTY_CELL = '';
 
             var escapeString = function (string) {
                 return '"' + string + '"';
             };
 
-            var addLastUpdatedTimeDetails = function () {
+            var getLastUpdatedTimeDetails = function () {
                 var formattedTime = moment($scope.lastUpdatedTimeForProjectReport, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
-                var lastUpdatedTimeContent = [escapeString('Updated'), escapeString(formattedTime)].join(DELIMITER);
-                csvData.push(lastUpdatedTimeContent);
+                return [escapeString('Updated'), escapeString(formattedTime)].join(DELIMITER);
             };
 
-            var addProjectBasicInfo = function() {
-                csvData.push([escapeString($scope.resourceBundle.projectInformationLabel)]);
+            var getProjectBasicInfo = function() {
+                var buildProjectAttribute = function(projectAttribute) {
+                    return [
+                        escapeString(projectAttribute.name),
+                        escapeString(projectAttribute.value)
+                    ].join(DELIMITER);
+                };
 
-                _.forEach($scope.projectAttributes, function(projectAttribute) {
-                    var csvRow = [escapeString(projectAttribute.name), escapeString(projectAttribute.value)].join(DELIMITER);
-                    csvData.push(csvRow);
-                });
+                return _.flatten([
+                    escapeString($scope.resourceBundle.projectInformationLabel),
+                    _.map($scope.projectAttributes, buildProjectAttribute)
+                ]).join(NEW_LINE);
             };
 
-            var addPivotTableData = function () {
-                var pivotTablesWithData = _.filter($scope.pivotTables, 'isTableDataAvailable');
-                _.forEach(pivotTablesWithData, function (pivotTable) {
-                    var headers = [];
-                    if(pivotTable.definition.monthlyReport) {
-                        _.forEach(pivotTable.data.metaData.pe, function (period) {
-
-                            var month = $scope.resourceBundle[pivotTable.data.metaData.names[period].split(' ')[0]],
-                                year = pivotTable.data.metaData.names[period].split(' ')[1],
-                                name = _.isUndefined(month) ? pivotTable.data.metaData.names[period] : month + ' ' + year,
-
-                                numberOfISOWeeks = getNumberOfISOWeeksInMonth(period);
-
-                            headers.push([escapeString(name + ' (' + numberOfISOWeeks + $scope.resourceBundle.weeksLabel + ')')]);
-                        });
-                    } else {
-                        _.forEach(pivotTable.data.metaData.pe, function (period) {
-                            headers.push(escapeString(pivotTable.data.metaData.names[period]));
-                        });
-                    }
-
-                    csvData.push([escapeString(pivotTable.definition.title)].concat(headers).join(DELIMITER));
-
-                    var dataDimensionIndex = _.findIndex(pivotTable.data.headers, { name: 'dx' }),
-                        periodIndex = _.findIndex(pivotTable.data.headers, { name: 'pe' }),
-                        valueIndex = _.findIndex(pivotTable.data.headers, { name: 'value' }),
-                        rowItems = _.flatten(_.map(pivotTable.definition.rows, 'items'));
-
-                    _.forEach(pivotTable.currentOrderOfItems, function (itemId) {
-                        var values = _.map(pivotTable.data.metaData.pe, function (period) {
-                            var row = _.find(pivotTable.data.rows, function (row) {
-                                return itemId == row[dataDimensionIndex] && period == row[periodIndex];
-                            });
-                            return row && row[valueIndex];
-                        });
-                        csvData.push([escapeString(_.find(rowItems, { id: itemId }).name)].concat(values).join(DELIMITER));
-                    });
-                    csvData.push([]);
-                });
+            var getPivotTableData = function () {
+                return _.map($scope.pivotTables, function (pivotTable) {
+                    return [
+                        escapeString(pivotTable.title),
+                        pivotTableCsvBuilder.build(pivotTable)
+                    ].join(NEW_LINE);
+                }).join(NEW_LINE + NEW_LINE);
             };
+
+            var csvContent = [
+                getProjectBasicInfo(),
+                EMPTY_CELL,
+                getPivotTableData()
+            ];
 
             if ($scope.lastUpdatedTimeForProjectReport) {
-                addLastUpdatedTimeDetails();
-                csvData.push([]);
+                csvContent.unshift(getLastUpdatedTimeDetails(), EMPTY_CELL);
             }
-            addProjectBasicInfo();
-            csvData.push([]);
-            addPivotTableData();
 
-            return csvData.join(NEW_LINE);
+            return csvContent.join(NEW_LINE);
         };
 
         $scope.exportToCSV = function () {
@@ -193,18 +146,8 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
 
         var getDataForPivotTables = function(tables) {
             return $q.all(_.map(tables, function(tableDefinition) {
-                return pivotTableRepository.getDataForPivotTable(tableDefinition.name, $scope.selectedProject.id).then(function(data) {
-                    return {
-                        definition: tableDefinition,
-                        data: data,
-                        isTableDataAvailable: !!(data && data.rows && data.rows.length > 0)
-                    };
-                });
+                return pivotTableRepository.getPivotTableData(tableDefinition, $scope.selectedProject.id);
             }));
-        };
-
-        var translatePivotTables = function (pivotTables) {
-            return translationsService.translateReports(pivotTables);
         };
 
         var loadLastUpdatedTimeForProjectReport = function() {
@@ -223,17 +166,16 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
             return pivotTableRepository.getAll()
                 .then(filterProjectReportTables)
                 .then(getDataForPivotTables)
-                .then(translatePivotTables)
+                .then(translationsService.translatePivotTableData)
                 .then(function(pivotTables) {
-                    $scope.pivotTables = _.sortBy(pivotTables, 'definition.displayPosition');
-                    $scope.isReportAvailable = _.any(pivotTables, { isTableDataAvailable: true });
-                    loadLastUpdatedTimeForProjectReport();
+                    $scope.pivotTables = _.sortBy(_.filter(pivotTables, { isTableDataAvailable: true }), 'displayPosition');
                 });
         };
 
         var init = function() {
+            $scope.pivotTables= [];
             $scope.loading = true;
-            $q.all([loadProjectBasicInfo(), loadPivotTables()]).finally(function () {
+            $q.all([loadProjectBasicInfo(), loadPivotTables(), loadLastUpdatedTimeForProjectReport()]).finally(function () {
                 $scope.loading = false;
             });
         };

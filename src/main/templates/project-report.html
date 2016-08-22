@@ -8,7 +8,7 @@
             </div>
 
             <div class="col-md-4">
-                <button ng-disabled="!isReportAvailable" class="btn btn-sm btn-primary pull-right" ng-click="exportToCSV()">
+                <button ng-disabled="pivotTables | isEmpty" class="btn btn-sm btn-primary pull-right" ng-click="exportToCSV()">
                     {{resourceBundle.exportAsCsv}}
                 </button>
             </div>
@@ -33,19 +33,19 @@
             </div>
         </div>
 
-        <div ng-show="!isReportAvailable">
+        <div ng-show="pivotTables | isEmpty">
             <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
         </div>
-        <div ng-if="isReportAvailable" class="exp-coll-group">
-            <div ng-show="table.isTableDataAvailable" ng-repeat="table in pivotTables">
+        <div ng-if="!(pivotTables | isEmpty)" class="exp-coll-group">
+            <div ng-repeat="table in pivotTables" ng-show="table.isTableDataAvailable">
                 <accordion>
                     <accordion-group is-open="status.open">
                         <accordion-heading>
-                            <span>{{ table.definition.title }}</span>
+                            <span>{{ table.title }}</span>
                             <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                         </accordion-heading>
                         <div>
-                            <pivot-table definition="table.definition" data="table.data" resource-bundle="resourceBundle" disable-download="true" order-of-items="table.currentOrderOfItems"></pivot-table>
+                            <pivot-table table="table" resource-bundle="resourceBundle" disable-download="true"></pivot-table>
                         </div>
                     </accordion-group>
                 </accordion>
