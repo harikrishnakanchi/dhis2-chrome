@@ -36,6 +36,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 spyOn(dataSetRepo, "getAll").and.returnValue(utils.getPromise(q, []));
                 spyOn(dataSetRepo, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
                 spyOn(dataSetRepo, "associateOrgUnits").and.returnValue(utils.getPromise(q, undefined));
+                spyOn(dataSetRepo, "removeOrgUnits").and.returnValue(utils.getPromise(q, undefined));
                 spyOn(dataSetRepo, "includeDataElements").and.returnValue(utils.getPromise(q, []));
 
                 systemSettingRepository = new SystemSettingRepository();
@@ -90,7 +91,8 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     "disableOrgUnitDesc": "disable organisation unit: ",
                     "upsertOrgUnitDesc": "save organisation unit: ",
                     "uploadSystemSettingDesc": "upload sys settings for ",
-                    "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit "
+                    "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit ",
+                    "removeOrgUnitFromDatasetDesc": "remove selected services from module "
                 };
 
                 scope.isNewMode = true;
@@ -655,11 +657,63 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 }, "dataValues"]);
             });
 
+            it('should update assoscaiated datasets when a dataset is removed from existing module', function () {
+                var datasetOne = {
+                    "id": "ds1",
+                    "organisationUnits": [{
+                        "id": "mod1"
+                    }],
+                    "isAggregateService": true,
+                    "sections": []
+                };
+                var datasetTwo = {
+                    "id": "ds2",
+                    "organisationUnits": [{
+                        "id": "mod1"
+                    }],
+                    "isAggregateService": true,
+                    "sections": []
+                };
+
+                var dataSets = [datasetOne, datasetTwo];
+
+                scope.orgUnit = {
+                    id: 'mod1',
+                    name: 'moduleName',
+                    parent: {
+                        id: "org1",
+                        name: 'parent'
+                    }
+                };
+
+                scope.isNewMode = false;
+
+                dataSetRepo.getAll.and.returnValue(utils.getPromise(q, dataSets));
+                dataSetRepo.includeDataElements.and.returnValue(utils.getPromise(q, dataSets));
+                translationsService.translate.and.returnValue(dataSets);
+
+                initialiseController();
+                scope.$apply();
+
+                scope.associatedDatasets = [datasetOne];
+
+                scope.update();
+                scope.$apply();
+
+                expect(dataSetRepo.removeOrgUnits).toHaveBeenCalledWith(["ds2"], ["mod1"]);
+                expect(hustle.publish.calls.argsFor(3)).toEqual([{
+                    data: {"orgUnitIds": ["mod1"], "dataSetIds": ["ds2"]},
+                    type: "removeOrgUnitFromDataset",
+                    locale: "en",
+                    desc: "remove selected services from module moduleName"
+                }, "dataValues"]);
+            });
+
             it("should return false if datasets for modules are selected", function() {
                 scope.$apply();
                 scope.associatedDatasets = [{
                     'id': 'ds_11',
-                    'name': 'dataset11',
+                    'name': 'dataset11'
                 }, {
                     'id': 'ds_12',
                     'name': 'dataset12'

@@ -207,6 +207,7 @@
     "deleteEventDesc": "حذف الحالات",
     "uploadPatientOriginDetailsDesc": "إنشاء أصل المريض",
     "associateOrgUnitToDatasetDesc": "ربط الخدمات التي تم اختيارها لأصول وحدة أب",
+    "removeOrgUnitFromDatasetDesc": "remove selected services from module ",
     "uploadProgramDesc": "ربط البرنامج المحدد ل",
     "uploadSystemSettingDesc": "عناصر بيانات متزامنة استبعاد ل",
     "patientOriginValidation": "مطلوب أصل المريض",
