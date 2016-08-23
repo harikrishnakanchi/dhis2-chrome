@@ -215,7 +215,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                         },
                         "type": "syncModuleDataBlock",
                         "locale": "en",
-                        "desc": scope.resourceBundle.syncModuleDataBlockDesc + selectedPeriod + ', ' + scope.selectedModule.name
+                        "desc": scope.resourceBundle.syncModuleDataBlockDesc
 
                     }, "dataValues");
                 });
@@ -243,7 +243,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                         },
                         "type": "syncModuleDataBlock",
                         "locale": "en",
-                        "desc": scope.resourceBundle.syncModuleDataBlockDesc + selectedPeriod + ', ' + scope.selectedModule.name
+                        "desc": scope.resourceBundle.syncModuleDataBlockDesc
                     }, "dataValues");
                 });
             });
@@ -292,7 +292,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                         },
                         "type": "syncModuleDataBlock",
                         "locale": "en",
-                        "desc": scope.resourceBundle.syncModuleDataBlockDesc + selectedPeriod + ", " + scope.selectedModule.name
+                        "desc": scope.resourceBundle.syncModuleDataBlockDesc
                     }, "dataValues");
                 });
 
@@ -316,7 +316,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                         },
                         "type": "syncModuleDataBlock",
                         "locale": "en",
-                        "desc": scope.resourceBundle.syncModuleDataBlockDesc + selectedPeriod + ', ' + scope.selectedModule.name
+                        "desc": scope.resourceBundle.syncModuleDataBlockDesc
                     }, "dataValues");
                 });
             });

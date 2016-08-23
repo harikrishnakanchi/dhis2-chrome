@@ -1,4 +1,4 @@
-define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransformer", "properties"], function(_, dataValuesMapper, orgUnitMapper, moment, datasetTransformer, properties) {
+define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransformer", "properties", "interpolate"], function(_, dataValuesMapper, orgUnitMapper, moment, datasetTransformer, properties, interpolate) {
     return function($scope, $routeParams, $q, $hustle, dataRepository, excludedDataElementsRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
         $timeout, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository) {
 
@@ -149,7 +149,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                     },
                     "type": "syncModuleDataBlock",
                     "locale": $scope.locale,
-                    "desc": $scope.resourceBundle.syncModuleDataBlockDesc + currentPeriod + ", " + $scope.selectedModule.name
+                    "desc": interpolate($scope.resourceBundle.syncModuleDataBlockDesc, {period: currentPeriod + ", " + $scope.selectedModule.name})
                 }, "dataValues");
             };
 
@@ -197,7 +197,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                     },
                     "type": "syncModuleDataBlock",
                     "locale": $scope.locale,
-                    "desc": $scope.resourceBundle.syncModuleDataBlockDesc + currentPeriod + ", " + $scope.selectedModule.name
+                    "desc": interpolate($scope.resourceBundle.syncModuleDataBlockDesc, { period: currentPeriod + ", " + $scope.selectedModule.name })
                 }, "dataValues");
             };
 
