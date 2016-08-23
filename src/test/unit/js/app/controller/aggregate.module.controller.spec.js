@@ -138,7 +138,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     displayName: 'Project1 - Module1',
                     id: 'Module1someid',
                     level: NaN,
-                    openingDate: moment(new Date()).toDate(),
+                    openingDate: moment.utc(new Date()).format('YYYY-MM-DD'),
                     attributeValues: [{
                         created: moment().toISOString(),
                         lastUpdated: moment().toISOString(),
@@ -203,7 +203,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     "displayName": 'parent - mod1',
                     "id": 'mod1pid',
                     "level": 6,
-                    "openingDate": moment("2014-04-01").toDate(),
+                    "openingDate": moment.utc("2014-04-01").format('YYYY-MM-DD'),
                     "attributeValues": [{
                         "created": '2014-04-01T00:00:00.000Z',
                         "lastUpdated": '2014-04-01T00:00:00.000Z',
@@ -355,7 +355,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     "displayName": 'parent - mod1',
                     "id": 'mod1pid',
                     "level": 6,
-                    "openingDate": moment("2014-04-01").toDate(),
+                    "openingDate": moment.utc("2014-04-01").format('YYYY-MM-DD'),
                     "attributeValues": [{
                         "created": '2014-04-01T00:00:00.000Z',
                         "lastUpdated": '2014-04-01T00:00:00.000Z',
@@ -564,7 +564,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     displayName: 'Par1 - module NEW name',
                     id: oldid,
                     level: 6,
-                    openingDate: new Date(),
+                    openingDate: moment.utc().format('YYYY-MM-DD'),
                     attributeValues: [{
                         created: moment().toISOString(),
                         lastUpdated: moment().toISOString(),
@@ -948,7 +948,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     displayName: 'Par1 - test1',
                     id: 'projectId',
                     level: 6,
-                    openingDate: moment(new Date()).toDate(),
+                    openingDate: moment.utc(new Date()).format('YYYY-MM-DD'),
                     attributeValues: [{
                         created: moment().toISOString(),
                         lastUpdated: moment().toISOString(),
@@ -1044,7 +1044,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     displayName: 'parent - mod1',
                     id: 'mod1pid',
                     level: 6,
-                    openingDate: moment("2014-04-01").toDate(),
+                    openingDate: moment.utc("2014-04-01").format('YYYY-MM-DD'),
                     attributeValues: [{
                         created: moment().toISOString(),
                         lastUpdated: moment().toISOString(),

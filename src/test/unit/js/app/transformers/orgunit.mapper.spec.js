@@ -453,7 +453,6 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
             spyOn(dhisId, "get").and.callFake(function(name) {
                 return name;
             });
-
             var actualModule = orgUnitMapper.mapToModule(module);
 
             expect(actualModule).toEqual({
@@ -462,7 +461,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "shortName": "Module1",
                 "id": "Module1Par1",
                 "level": 4,
-                "openingDate": moment(new Date()).toDate(),
+                "openingDate": moment.utc(new Date()).format("YYYY-MM-DD"),
                 "attributeValues": [{
                     "created": moment().toISOString(),
                     "lastUpdated": moment().toISOString(),
@@ -525,7 +524,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "displayName": "Parent - Module1",
                 "id": "someId",
                 "level": "someLevel",
-                "openingDate": moment(new Date()).toDate(),
+                "openingDate": moment.utc(new Date()).format("YYYY-MM-DD"),
                 "attributeValues": [{
                     "created": moment().toISOString(),
                     "lastUpdated": moment().toISOString(),

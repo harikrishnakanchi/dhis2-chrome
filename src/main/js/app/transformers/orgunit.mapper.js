@@ -235,7 +235,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
             displayName: module.parent.name + " - " + module.name,
             id: moduleId || dhisId.get(module.name + module.parent.id),
             level: moduleLevel || parseInt(module.parent.level) + 1,
-            openingDate: moment(module.openingDate).toDate(),
+            openingDate: moment.utc(module.openingDate).format('YYYY-MM-DD'),
             attributeValues: [{
                 created: moment().toISOString(),
                 lastUpdated: moment().toISOString(),

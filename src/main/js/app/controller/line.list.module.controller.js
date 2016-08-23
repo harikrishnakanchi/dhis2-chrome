@@ -17,7 +17,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 var initModule = function() {
                     if ($scope.isNewMode) {
                         $scope.module = {
-                            'openingDate': moment().toDate(),
+                            'openingDate': moment.utc().toDate(),
                             'timestamp': new Date().getTime(),
                             "serviceType": "Linelist",
                             "dataModelType": "New",
@@ -27,7 +27,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                         $scope.module = {
                             'id': $scope.orgUnit.id,
                             'name': $scope.orgUnit.name,
-                            'openingDate': moment($scope.orgUnit.openingDate).toDate(),
+                            'openingDate': moment.utc($scope.orgUnit.openingDate).toDate(),
                             'serviceType': "Linelist",
                             "dataModelType": "New",
                             "parent": $scope.orgUnit.parent,

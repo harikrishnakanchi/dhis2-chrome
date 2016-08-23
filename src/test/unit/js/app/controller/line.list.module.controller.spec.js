@@ -282,7 +282,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "displayName": "Project1 - Module2",
                     "id": "Module2someid",
                     "level": 4,
-                    "openingDate": today,
+                    "openingDate": moment.utc(today).format('YYYY-MM-DD'),
                     "attributeValues": [{
                         "created": moment().toISOString(),
                         "lastUpdated": moment().toISOString(),
@@ -937,7 +937,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "displayName": "Par1 - new name",
                     "id": oldid,
                     "level": 6,
-                    "openingDate": moment(new Date()).toDate(),
+                    "openingDate": moment.utc(new Date()).format('YYYY-MM-DD'),
                     "attributeValues": [{
                         "created": moment().toISOString(),
                         "lastUpdated": moment().toISOString(),
@@ -1268,7 +1268,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "displayName": "SomeName - Module2",
                     "id": "Module2someId",
                     "level": NaN,
-                    "openingDate": moment().toDate(),
+                    "openingDate": moment.utc().format('YYYY-MM-DD'),
                     "attributeValues": [{
                         "created": "2014-04-01T00:00:00.000Z",
                         "lastUpdated": "2014-04-01T00:00:00.000Z",

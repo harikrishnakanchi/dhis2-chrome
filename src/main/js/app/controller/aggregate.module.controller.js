@@ -63,7 +63,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 var initModule = function() {
                     if ($scope.isNewMode) {
                         $scope.module = {
-                            'openingDate': moment().toDate(),
+                            'openingDate': moment.utc().toDate(),
                             'timestamp': new Date().getTime(),
                             "serviceType": "",
                             "parent": $scope.orgUnit
@@ -72,7 +72,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                         $scope.module = {
                             'id': $scope.orgUnit.id,
                             'name': $scope.orgUnit.name,
-                            'openingDate': moment($scope.orgUnit.openingDate).toDate(),
+                            'openingDate': moment.utc($scope.orgUnit.openingDate).toDate(),
                             'serviceType': "Aggregate",
                             'parent': $scope.orgUnit.parent,
                             "attributeValues": $scope.orgUnit.attributeValues
