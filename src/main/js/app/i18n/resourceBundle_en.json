@@ -186,7 +186,7 @@
     "enterProductKeyLabel": "Enter Product Key",
     "productKeyPlaceholder": "Product Key",
     "eventDateLabel": "Event Date",
-    "openingDateInFutureError": "The data collection for this module will begin from week ",
+    "openingDateInFutureError": "The data collection for this module will begin from week {{week}}",
     "confirmExport": "YES, I want to export the application.",
     "confirmExportTitle": "Export Confirmation",
     "confirmImport": "YES, I want to import application copy.",

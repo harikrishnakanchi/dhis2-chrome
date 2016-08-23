@@ -1,12 +1,12 @@
-define(["lodash", "moment"],
-    function(_, moment) {
+define(["lodash", "moment", "interpolate"],
+    function(_, moment, interpolate) {
         return function($scope, $routeParams, $q, $location, $rootScope, orgUnitRepository) {
 
             var deregisterWeekModulerWatcher = $scope.$watchCollection('[week, currentModule, resourceBundle]', function() {
                 $scope.errorMessage = undefined;
                 if ($scope.week && $scope.currentModule) {
                     if (isOpeningDateInFuture()) {
-                        $scope.errorMessage = $scope.resourceBundle.openingDateInFutureError + moment($scope.currentModule.openingDate).isoWeek();
+                        $scope.errorMessage = interpolate($scope.resourceBundle.openingDateInFutureError, { week: moment($scope.currentModule.openingDate).isoWeek() });
                         $scope.$emit('errorInfo', $scope.errorMessage);
                         return;
                     }
