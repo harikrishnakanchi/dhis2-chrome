@@ -1,0 +1,34 @@
+<table class="table dataentrytable" ng-if="itemsArePresent(itemsAwaitingSubmission)">
+    <thead>
+        <tr class="title">
+            <th colspan="2">{{resourceBundle.itemsAwaitingDataSubmissionLabel}}</th>
+            <th colspan="1">Awaiting Approval</th>
+        </tr>
+        <tr>
+            <th>{{resourceBundle.moduleLabel}}</th>
+            <th>{{resourceBundle.weekLabel}}</th>
+        </tr>
+    </thead>
+    <tbody>
+
+    <tr ng-repeat="moduleName in moduleNames">
+        <td>{{moduleName}}</td>
+        <td>
+            <ul class="list-unstyled">
+                <li ng-repeat="item in itemsAwaitingSubmission[moduleName] | orderBy: 'period'" ng-if="item.active">
+                    <a class="period" ng-class="{ 'error-label': item.failedToSync }" ng-href="{{getTemplateUrl(item)}}">{{formatPeriods(item.period)}}</a>
+                </li>
+            </ul>
+        </td>
+        <td>
+            <ul class="list-unstyled">
+                <li ng-repeat="item in itemsAwaitingApprovalAtOtherLevels[moduleName] | orderBy: 'period'" ng-if="item.active">
+                    <a class="period" ng-class="{ 'error-label': item.failedToSync }" ng-href="{{getTemplateUrl(item)}}">{{formatPeriods(item.period)}}</a>
+                    <span ng-if="item.awaitingActionAtProjectLevelApprover">{{ resourceBundle.itemsAwaitingApprovalAtProjectLevel }}</span>
+                    <span ng-if="item.awaitingActionAtCoordinationLevelApprover">{{ resourceBundle.itemsAwaitingApprovalAtCoordinationLevel }}</span>
+                </li>
+            </ul>
+        </td>
+    </tr>
+    </tbody>
+</table>

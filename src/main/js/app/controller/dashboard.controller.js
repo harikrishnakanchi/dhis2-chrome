@@ -155,6 +155,7 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                 $scope.itemsAwaitingSubmission = _.groupBy(itemsAwaitingSubmission, 'moduleName');
                 $scope.itemsAwaitingApprovalAtUserLevel = _.groupBy(itemsAwaitingApprovalAtUserLevel, 'moduleName');
                 $scope.itemsAwaitingApprovalAtOtherLevels = _.groupBy(itemsAwaitingApprovalAtOtherLevels, 'moduleName');
+                $scope.moduleNames = _.union(_.keys($scope.itemsAwaitingSubmission), _.keys($scope.itemsAwaitingApprovalAtOtherLevels));
             });
         };
 
