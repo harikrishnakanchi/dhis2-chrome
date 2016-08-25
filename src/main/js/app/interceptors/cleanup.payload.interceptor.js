@@ -4,6 +4,10 @@ define(["lodash"], function(_) {
             'request': function(config) {
 
                 var cleanUp = function(payload) {
+                    if (_.isString(payload) || _.isEmpty(payload)) {
+                        return payload;
+                    }
+
                     if (_.isArray(payload)) {
                         _.forEach(payload, function(item, index) {
                             payload[index] = cleanUp(item);
