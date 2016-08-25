@@ -4,7 +4,7 @@ define(["lodash"], function(_) {
         downloadProgramConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer,
         downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
         uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
-        downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, removeOrgunitDatasetAssociationConsumer) {
+        downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, removeOrgunitDatasetAssociationConsumer, syncExcludedLinelistOptionsConsumer) {
 
         this.run = function(message) {
             $log.info("Processing message: " + message.data.type, message.data);
@@ -98,6 +98,9 @@ define(["lodash"], function(_) {
 
                 case "uploadExcludedDataElements":
                     return uploadExcludedDataElementsConsumer.run(message);
+
+                case "uploadExcludedOptions":
+                    return syncExcludedLinelistOptionsConsumer.run(message);
 
                 default:
                     return $q.reject();
