@@ -109,6 +109,7 @@ require.config({
         "uploadReferralLocationsConsumer": "app/consumer/upload.referral.locations.consumer",
         "downloadModuleDataBlocksConsumer": "app/consumer/download.module.data.blocks.consumer",
         "syncModuleDataBlockConsumer": "app/consumer/sync.module.data.block.consumer",
+        "syncExcludedLinelistOptionsConsumer": "app/consumer/sync.excluded.linelist.options.consumer",
 
         //merge strategies
         "mergeBy": "app/consumer/mergestrategies/merge.by",
