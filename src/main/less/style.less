@@ -342,6 +342,9 @@ body {
                     color: black;
                     line-height: 2;
                 }
+                th:nth-child(2) {
+                    padding-left: 80px;
+                }
             }
             th {
                 text-transform: uppercase;
@@ -352,6 +355,9 @@ body {
             .period {
                 display: inline-block;
                 min-width: 195px;
+            }
+            td:nth-child(3) {
+                padding-left: 80px;
             }
         }
     }
@@ -1292,6 +1298,14 @@ li.dropdown-submenu {
     }
     &.dataentrypage {
         .dataentrytable {
+            .title {
+                th:nth-child(2) {
+                    padding-right: 80px;
+                }
+            }
+            td:nth-child(3) {
+                padding-right: 80px;
+            }
             th {
                 text-align: right;
             }

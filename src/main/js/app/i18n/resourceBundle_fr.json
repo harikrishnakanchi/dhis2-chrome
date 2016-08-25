@@ -152,6 +152,7 @@
     "itemsAwaitingApprovalAtProjectLevel": "Niveau Projet",
     "itemsAwaitingApprovalAtCoordinationLevel": "Niveau Coordination",
     "itemsAwaitingApproval": "Eléments en attente de validation",
+    "awaitingApproval": "En attente d'approbation",
     "awaitingApprovalAtLabel": "En attente de validation",
     "selectProgramLabel": "Sélectionner un Programme",
     "deleteEventConfirmation": "Etes-vous sûr de vouloir effacer ce cas?",

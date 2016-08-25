@@ -151,6 +151,7 @@
     "itemsAwaitingApprovalAtProjectLevel": "مستوى المشروع",
     "itemsAwaitingApprovalAtCoordinationLevel": "مستوى التنسيق",
     "itemsAwaitingApproval": "العناصر التي تنتظر الموافقة",
+    "awaitingApproval": "انتظر القبول",
     "awaitingApprovalAtLabel": "في انتظار الموافقة على",
     "selectProgramLabel": "اختر برنامج",
     "deleteEventConfirmation": "هل أنت متأكد أنك تريد حذف هذا الحدث؟",
