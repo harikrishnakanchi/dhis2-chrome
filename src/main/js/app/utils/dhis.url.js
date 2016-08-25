@@ -22,6 +22,7 @@ define(["properties"], function(properties) {
         "dataSets": with_host("/api/dataSets"),
         "charts": with_host("/api/charts"),
         "pivotTables": with_host("/api/reportTables"),
-        "analytics": with_host("/api/analytics")
+        "analytics": with_host("/api/analytics"),
+        "dataStore": with_host("/api/dataStore")
     };
 });
