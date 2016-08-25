@@ -50,6 +50,7 @@ require.config({
         "pivotTableRepository": "app/repository/pivot.table.repository",
         "dataSyncFailureRepository": "app/repository/data.sync.failure.repository",
         "dataElementRepository": "app/repository/data.element.repository",
+        "excludedLineListOptionsRepository": "app/repository/excluded.line.list.options.repository",
 
         //Models
         "chart": "app/models/chart",
