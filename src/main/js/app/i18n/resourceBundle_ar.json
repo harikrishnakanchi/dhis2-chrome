@@ -211,6 +211,7 @@
     "removeOrgUnitFromDatasetDesc": "remove selected services from module ",
     "uploadProgramDesc": "ربط البرنامج المحدد ل",
     "uploadSystemSettingDesc": "مزامنة عناصر البيانات المستبعدة ل",
+    "uploadExcludedOptionsDesc": "upload excluded options for module ",
     "patientOriginValidation": "مطلوب مكان قدوم المريض",
     "invalidDateRangeMessage": "يجب أن يكون تاريخ غضون 12 أسابيع الماضية",
     "productKeyExpiredMessage": "انتهت صلاحية مفتاح المنتج الخاص بك. يرجى الاتصال المشرف.",

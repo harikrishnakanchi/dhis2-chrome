@@ -310,7 +310,9 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                         });
                     }
                 });
-                return excludedLineListOptionsRepository.upsert(excludedLineListOptions);
+                return excludedLineListOptionsRepository.upsert(excludedLineListOptions).then(function () {
+                    return publishMessage(enrichedModule.id, "uploadExcludedOptions", $scope.resourceBundle.uploadExcludedOptionsDesc + enrichedModule.name);
+                });
             };
 
             $scope.save = function() {

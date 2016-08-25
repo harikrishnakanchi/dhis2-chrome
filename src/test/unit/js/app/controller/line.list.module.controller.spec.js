@@ -118,7 +118,8 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "upsertOrgUnitDesc": "save organisation unit: ",
                     "associateOrgUnitToDatasetDesc": "associate datasets for ",
                     "uploadSystemSettingDesc": "upload sys settings for ",
-                    "uploadProgramDesc": "associate selected program to "
+                    "uploadProgramDesc": "associate selected program to ",
+                    "uploadExcludedOptionsDesc": "upload excluded options for module "
                 };
 
                 scope.isNewMode = true;
@@ -326,6 +327,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             });
 
             describe('excludedLineListOptions', function () {
+                var enrichedModule;
                 beforeEach(function () {
                     var today = new Date();
                     scope.$apply();
@@ -347,13 +349,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                                 "code": "associatedDataSet"
                             },
                             "value": "Ds1"
-                        }]
-                    };
-
-                    var patientOrigins = {
-                        "origins": [{
-                            "id": "id",
-                            "name": "Unknown"
                         }]
                     };
 
@@ -407,7 +402,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     scope.enrichedProgram = createEnrichedProgram([selectedDataElementA, selectedDataElementB]);
 
 
-                    scope.enrichedModule = {
+                    enrichedModule = {
                         id: 'Module2someId'
                     };
 
@@ -456,7 +451,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     scope.$apply();
 
                     var excludedLineListOptions = {
-                        moduleId: scope.enrichedModule.id,
+                        moduleId: enrichedModule.id,
                         clientLastUpdated: moment().toISOString(),
                         dataElements: [{
                             dataElementId: 'de3',
@@ -470,6 +465,12 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     };
 
                     expect(excludedLineListOptionsRepository.upsert).toHaveBeenCalledWith(excludedLineListOptions);
+                    expect(hustle.publish).toHaveBeenCalledWith({
+                        "data": enrichedModule.id,
+                        "type": "uploadExcludedOptions",
+                        "locale": "en",
+                        "desc": "upload excluded options for module Module2"
+                    }, "dataValues");
                 });
 
                 it('should update excluded line list options for existing module', function () {
@@ -491,6 +492,12 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     };
 
                     expect(excludedLineListOptionsRepository.upsert).toHaveBeenCalledWith(excludedLineListOptions);
+                    expect(hustle.publish).toHaveBeenCalledWith({
+                        "data": scope.module.id,
+                        "type": "uploadExcludedOptions",
+                        "locale": "en",
+                        "desc": "upload excluded options for module Module2"
+                    }, "dataValues");
                 });
 
                 it("should save the empty excluded line list option if no option was unSelected", function () {
@@ -501,7 +508,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     scope.$apply();
 
                     var excludedLineListOptions = {
-                        moduleId: scope.enrichedModule.id,
+                        moduleId: enrichedModule.id,
                         clientLastUpdated: moment().toISOString(),
                         dataElements: []
                     };
@@ -543,7 +550,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     scope.$apply();
 
                     var excludedLineListOptions = {
-                        moduleId: scope.enrichedModule.id,
+                        moduleId: enrichedModule.id,
                         clientLastUpdated: moment().toISOString(),
                         dataElements: [{
                             dataElementId: selectedDataElementB.dataElement.id,
@@ -1318,7 +1325,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 scope.$apply();
 
                 expect(originOrgunitCreator.create).toHaveBeenCalledWith(enrichedModule);
-                expect(hustle.publish.calls.count()).toEqual(6);
                 expect(hustle.publish.calls.argsFor(2)).toEqual([{
                     "data": originOrgUnit,
                     "type": "upsertOrgUnit",

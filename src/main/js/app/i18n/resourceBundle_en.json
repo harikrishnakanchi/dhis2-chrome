@@ -211,6 +211,7 @@
     "removeOrgUnitFromDatasetDesc": "remove selected services from module ",
     "uploadProgramDesc": "associate selected program to ",
     "uploadSystemSettingDesc": "sync excluded data elements for ",
+    "uploadExcludedOptionsDesc": "upload excluded options for module ",
     "patientOriginValidation": "Patient origin is required",
     "invalidDateRangeMessage": "Date should be within the past 12 weeks",
     "productKeyExpiredMessage": "Your product key has expired. Please contact the admin.",
