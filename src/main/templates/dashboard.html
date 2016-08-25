@@ -18,8 +18,8 @@
             </div>
         </div>
 
-        <div ng-if="hasRoles(['Data entry user'])" ng-include="'templates/dashboard.data.entry.html'"></div>
-        <div ng-if="!hasRoles(['Data entry user'])" ng-include="'templates/dashboard.data.approval.html'"></div>
+        <div ng-if="hasRoles(['Data entry user', 'Observer'])" ng-include="'templates/dashboard.data.entry.html'"></div>
+        <div ng-if="!hasRoles(['Data entry user', 'Observer'])" ng-include="'templates/dashboard.data.approval.html'"></div>
 
     </div>
 </div>

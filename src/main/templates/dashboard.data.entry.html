@@ -16,7 +16,8 @@
         <td>
             <ul class="list-unstyled">
                 <li ng-repeat="item in itemsAwaitingSubmission[moduleName] | orderBy: 'period'" ng-if="item.active">
-                    <a class="period" ng-class="{ 'error-label': item.failedToSync }" ng-href="{{getTemplateUrl(item)}}">{{formatPeriods(item.period)}}</a>
+                    <a  ng-if="hasRoles(['Data entry user'])" class="period" ng-class="{ 'error-label': item.failedToSync }" ng-href="{{getTemplateUrl(item)}}">{{formatPeriods(item.period)}}</a>
+                    <span ng-if="!hasRoles(['Data entry user'])">{{formatPeriods(item.period)}}</span>
                 </li>
             </ul>
         </td>
