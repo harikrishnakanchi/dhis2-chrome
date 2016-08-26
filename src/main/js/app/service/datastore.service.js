@@ -7,11 +7,15 @@ define(["dhisUrl"], function (dhisUrl) {
             return response.data;
         };
 
-        this.updateExcludedOptions = function (moduleId, payload) {
+        var upsertDataToStore = function (moduleId, payload, uploadMethod) {
             var key = moduleId + EXCLUDED_OPTIONS;
             var url = [dhisUrl.dataStore, NAMESPACE, key].join("/");
-            return $http.post(url, payload);
+            return uploadMethod(url, payload);
         };
+
+        this.updateExcludedOptions = _.partial(upsertDataToStore, _, _, $http.put);
+
+        this.createExcludedOptions = _.partial(upsertDataToStore, _, _, $http.post);
 
         this.getExcludedOptions = function (moduleId) {
             var key = moduleId + EXCLUDED_OPTIONS;

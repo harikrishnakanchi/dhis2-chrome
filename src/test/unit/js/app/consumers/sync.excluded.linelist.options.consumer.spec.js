@@ -12,11 +12,11 @@ define(['syncExcludedLinelistOptionsConsumer', 'angularMocks', 'utils', 'exclude
             excludedLineListOptionsRepository = new ExcludedLineListOptionsRepository();
             spyOn(excludedLineListOptionsRepository, "get").and.returnValue(utils.getPromise(q, {}));
             spyOn(excludedLineListOptionsRepository, "upsert").and.returnValue(utils.getPromise(q, undefined));
-            dataStoreService = new DataStoreService();
+            dataStoreService = new DataStoreService({});
             spyOn(dataStoreService, 'updateExcludedOptions').and.returnValue(utils.getPromise(q, undefined));
             spyOn(dataStoreService, 'getLastUpdatedTimeForExcludedOptions').and.returnValue(utils.getPromise(q, undefined));
             spyOn(dataStoreService, 'getExcludedOptions').and.returnValue(utils.getPromise(q, undefined));
-            dataStoreService.createExcludedOptions = jasmine.createSpy("createExcludedOptions").and.returnValue(utils.getPromise(q, undefined));
+            spyOn(dataStoreService, 'createExcludedOptions').and.returnValue(utils.getPromise(q, undefined));
             syncExcludedLinelistOptionsConsumer = new SyncExcludedLinelistOptionsConsumer(q, excludedLineListOptionsRepository, dataStoreService);
         }));
 

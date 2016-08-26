@@ -22,10 +22,19 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl'], function (DataStoreServi
                 url = [dhisUrl.dataStore, storeNamespace, storeKey].join("/");
             });
 
-            it('should upload excluded options for specified module', function() {
+            it('should update excluded options for specified module', function() {
                 var mockExcludedLinelistOptions = {};
 
                 dataStoreService.updateExcludedOptions(moduleId, mockExcludedLinelistOptions);
+
+                httpBackend.expectPUT(url, mockExcludedLinelistOptions).respond(200);
+                httpBackend.flush();
+            });
+
+            it('should create excluded options for specified module', function() {
+                var mockExcludedLinelistOptions = {};
+
+                dataStoreService.createExcludedOptions(moduleId, mockExcludedLinelistOptions);
 
                 httpBackend.expectPOST(url, mockExcludedLinelistOptions).respond(200);
                 httpBackend.flush();
