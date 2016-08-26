@@ -84,5 +84,17 @@ define(['syncExcludedLinelistOptionsConsumer', 'angularMocks', 'utils', 'exclude
 
             expect(dataStoreService.createExcludedOptions).toHaveBeenCalledWith(moduleId, localExcludedLineListOptions);
         });
+
+        it('should gracefully return if remoteData and localData lastUpdatedTimes are same', function () {
+            var localExcludedLineListOptions = mockExcludedLineListOptions({clientLastUpdated: "2016-05-19T00:00:00.000Z"});
+            var remoteExcludedLineListOptions = mockExcludedLineListOptions({clientLastUpdated: "2016-05-19T00:00:00.000Z"});
+            dataStoreService.getExcludedOptions.and.returnValue(utils.getPromise(q, remoteExcludedLineListOptions));
+            excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, localExcludedLineListOptions));
+
+            initializeConsumer(moduleId);
+
+            expect(dataStoreService.updateExcludedOptions).not.toHaveBeenCalledWith(moduleId, localExcludedLineListOptions);
+            expect(excludedLineListOptionsRepository.upsert).not.toHaveBeenCalledWith(remoteExcludedLineListOptions);
+        });
     });
 });

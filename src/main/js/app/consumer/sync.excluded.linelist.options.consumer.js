@@ -17,6 +17,9 @@ define(["lodash", "moment"], function (_, moment) {
                         if (lastUpdatedTimeOnLocal.isAfter(lastUpdatedTimeOnRemote)) {
                             return dataStoreService.updateExcludedOptions(moduleId, localExcludedLineListOptions);
                         }
+                        else if (lastUpdatedTimeOnLocal.isSame(lastUpdatedTimeOnRemote)) {
+                            return $q.when();
+                        }
                         else {
                             return excludedLineListOptionsRepository.upsert(remoteExcludedLineListOptions);
                         }
