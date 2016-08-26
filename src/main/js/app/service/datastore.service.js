@@ -26,15 +26,5 @@ define(["dhisUrl"], function (dhisUrl) {
                 return response.status == 404 ? undefined : $q.reject();
             });
         };
-
-        this.getLastUpdatedTimeForExcludedOptions = function (moduleId) {
-            var key = moduleId + EXCLUDED_OPTIONS;
-            var url = [dhisUrl.dataStore, NAMESPACE, key, 'metaData'].join("/");
-            return $http.get(url).then(extractDataFromResponse).then(function (data) {
-                return data && data.lastUpdated;
-            }).catch(function (response) {
-                return response.status == 404 ? undefined : $q.reject();
-            });
-        };
     };
 });

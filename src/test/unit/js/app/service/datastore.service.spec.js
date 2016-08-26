@@ -78,51 +78,6 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl'], function (DataStoreServi
 
                 });
             });
-
-            describe('getLastUpdatedTimeForExcludedOptions', function () {
-                beforeEach(function () {
-                    url = url + '/metaData';
-                });
-
-                it('should return lastUpdatedTime for the given module id', function () {
-                    var mockResponse = {lastUpdated: "someLastUpdatedTime"};
-
-                    var lastUpdatedTime;
-                    dataStoreService.getLastUpdatedTimeForExcludedOptions(moduleId).then(function (data) {
-                        lastUpdatedTime = data;
-                    });
-
-                    httpBackend.expectGET(url).respond(200, mockResponse);
-                    httpBackend.flush();
-                    expect(lastUpdatedTime).toEqual("someLastUpdatedTime");
-                });
-
-                it('should return undefined for the given module if excludedOptions are not present', function () {
-                    var mockResponse = {};
-
-                    var lastUpdatedTime = "someRandomData";
-                    dataStoreService.getLastUpdatedTimeForExcludedOptions(moduleId).then(function (data) {
-                        lastUpdatedTime = data;
-                    });
-
-                    httpBackend.expectGET(url).respond(404, mockResponse);
-                    httpBackend.flush();
-                    expect(lastUpdatedTime).toBeUndefined();
-                });
-
-                it('should reject promise if returned status code is not 404', function () {
-                    var mockResponse = {};
-
-                    var lastUpdatedTime = "someValue";
-                    dataStoreService.getLastUpdatedTimeForExcludedOptions(moduleId).then(function (data) {
-                        lastUpdatedTime = data;
-                    });
-
-                    httpBackend.expectGET(url).respond(500, mockResponse);
-                    httpBackend.flush();
-                    expect(lastUpdatedTime).toEqual("someValue");
-                });
-            });
         });
     });
 });

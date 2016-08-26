@@ -5,18 +5,20 @@ define(["lodash", "moment"], function (_, moment) {
             if (!moduleId) {
                 return $q.when();
             }
-            return $q.all([excludedLineListOptionsRepository.get(moduleId), dataStoreService.getLastUpdatedTimeForExcludedOptions(moduleId)])
+            return $q.all([excludedLineListOptionsRepository.get(moduleId), dataStoreService.getExcludedOptions(moduleId)])
                 .then(function (data) {
                     var localExcludedLineListOptions = data[0];
-                    var lastUpdatedTimeOnLocal = moment(localExcludedLineListOptions.clientLastUpdated);
-                    var lastUpdatedTimeOnRemote = data[1];
-                    if (lastUpdatedTimeOnRemote) {
+                    var remoteExcludedLineListOptions = data[1];
+                    var lastUpdatedTimeOnLocal = localExcludedLineListOptions && localExcludedLineListOptions.clientLastUpdated;
+                    var lastUpdatedTimeOnRemote = remoteExcludedLineListOptions && remoteExcludedLineListOptions.clientLastUpdated;
+                    if (lastUpdatedTimeOnRemote && lastUpdatedTimeOnLocal) {
                         lastUpdatedTimeOnRemote = moment(lastUpdatedTimeOnRemote);
+                        lastUpdatedTimeOnLocal = moment(lastUpdatedTimeOnLocal);
                         if (lastUpdatedTimeOnLocal.isAfter(lastUpdatedTimeOnRemote)) {
                             return dataStoreService.updateExcludedOptions(moduleId, localExcludedLineListOptions);
                         }
                         else {
-                            return dataStoreService.getExcludedOptions(moduleId).then(excludedLineListOptionsRepository.upsert);
+                            return excludedLineListOptionsRepository.upsert(remoteExcludedLineListOptions);
                         }
                     }
                     else {

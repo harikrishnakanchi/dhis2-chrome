@@ -14,7 +14,6 @@ define(['syncExcludedLinelistOptionsConsumer', 'angularMocks', 'utils', 'exclude
             spyOn(excludedLineListOptionsRepository, "upsert").and.returnValue(utils.getPromise(q, undefined));
             dataStoreService = new DataStoreService({});
             spyOn(dataStoreService, 'updateExcludedOptions').and.returnValue(utils.getPromise(q, undefined));
-            spyOn(dataStoreService, 'getLastUpdatedTimeForExcludedOptions').and.returnValue(utils.getPromise(q, undefined));
             spyOn(dataStoreService, 'getExcludedOptions').and.returnValue(utils.getPromise(q, undefined));
             spyOn(dataStoreService, 'createExcludedOptions').and.returnValue(utils.getPromise(q, undefined));
             syncExcludedLinelistOptionsConsumer = new SyncExcludedLinelistOptionsConsumer(q, excludedLineListOptionsRepository, dataStoreService);
@@ -48,38 +47,37 @@ define(['syncExcludedLinelistOptionsConsumer', 'angularMocks', 'utils', 'exclude
         });
 
         it('should update excludedLinelist options on remote if remoteData is older than local data', function () {
-            var excludedLineListOptions = mockExcludedLineListOptions({clientLastUpdated: "2016-05-19T00:00:00.000Z"});
-            dataStoreService.getLastUpdatedTimeForExcludedOptions.and.returnValue(utils.getPromise(q, "2016-05-18T00:00:00.000Z"));
-            excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, excludedLineListOptions));
+            var localExcludedLineListOptions = mockExcludedLineListOptions({clientLastUpdated: "2016-05-19T00:00:00.000Z"});
+            var remoteExcludedLineListOptions = mockExcludedLineListOptions({clientLastUpdated: "2016-05-18T00:00:00.000Z"});
+            dataStoreService.getExcludedOptions.and.returnValue(utils.getPromise(q, remoteExcludedLineListOptions));
+            excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, localExcludedLineListOptions));
 
             initializeConsumer(moduleId);
 
-            expect(dataStoreService.updateExcludedOptions).toHaveBeenCalledWith(moduleId, excludedLineListOptions);
+            expect(dataStoreService.updateExcludedOptions).toHaveBeenCalledWith(moduleId, localExcludedLineListOptions);
         });
 
-        it('should get lastUpdated time on DHIS', function() {
+        it('should get remote excluded linelist options for speific module', function() {
             initializeConsumer(moduleId);
 
-            expect(dataStoreService.getLastUpdatedTimeForExcludedOptions).toHaveBeenCalledWith(moduleId);
+            expect(dataStoreService.getExcludedOptions).toHaveBeenCalledWith(moduleId);
         });
 
         it('should update excludedLinelist options on local if localData is older than remote data', function() {
             var localExcludedLineListOptions = mockExcludedLineListOptions({clientLastUpdated: "2016-05-19T00:00:00.000Z"});
             var remoteExcludedLineListOptions = mockExcludedLineListOptions({clientLastUpdated: "2016-05-20T00:00:00.000Z"});
-            dataStoreService.getLastUpdatedTimeForExcludedOptions.and.returnValue(utils.getPromise(q, "2016-05-20T00:00:00.000Z"));
             dataStoreService.getExcludedOptions.and.returnValue(utils.getPromise(q, remoteExcludedLineListOptions));
             excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, localExcludedLineListOptions));
 
             initializeConsumer(moduleId);
 
             expect(dataStoreService.updateExcludedOptions).not.toHaveBeenCalledWith(moduleId, localExcludedLineListOptions);
-            expect(dataStoreService.getExcludedOptions).toHaveBeenCalledWith(moduleId);
             expect(excludedLineListOptionsRepository.upsert).toHaveBeenCalledWith(remoteExcludedLineListOptions);
         });
 
         it('should create excludedOptions on DHIS if there is no remote data', function () {
             var localExcludedLineListOptions = mockExcludedLineListOptions({clientLastUpdated: "2016-05-19T00:00:00.000Z"});
-            dataStoreService.getLastUpdatedTimeForExcludedOptions.and.returnValue(utils.getPromise(q, undefined));
+            dataStoreService.getExcludedOptions.and.returnValue(utils.getPromise(q, undefined));
             excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, localExcludedLineListOptions));
 
             initializeConsumer(moduleId);
