@@ -32,13 +32,6 @@ define(["lodash", "pivotTable", "pivotTableData"], function(_, PivotTableModel, 
             });
         };
 
-        this.getDataForPivotTable = function(pivotTableName, orgUnitId) {
-            var store = db.objectStore(PIVOT_TABLE_DATA_STORE_NAME);
-            return store.find([pivotTableName, orgUnitId]).then(function (pivotTableData) {
-                return !!pivotTableData && pivotTableData.data;
-            });
-        };
-
         this.getPivotTableData = function (pivotTableDefinition, orgUnitId) {
             var store = db.objectStore(PIVOT_TABLE_DATA_STORE_NAME);
             return store.find([pivotTableDefinition.name, orgUnitId]).then(function (pivotTableData) {
