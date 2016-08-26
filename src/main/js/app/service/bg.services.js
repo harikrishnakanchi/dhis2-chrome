@@ -13,7 +13,7 @@ define(["dataService", "metadataService", "approvalService", "orgUnitService", "
             app.service('eventService', ['$http', '$q', eventService]);
             app.service('patientOriginService', ['$http', patientOriginService]);
             app.service('reportService', ['$http', '$q', reportService]);
-            app.service('dataStoreService', ['$http', dataStoreService]);
+            app.service('dataStoreService', ['$http', '$q', dataStoreService]);
         };
         return {
             init: init
