@@ -60,7 +60,7 @@ define(["lodash", "moment"], function(_, moment) {
                                 modulesAndCharts.push({
                                     moduleId: moduleId,
                                     chart: chart,
-                                    orgUnitDataDimensionItems: moduleId
+                                    orgUnitDataDimensionItems: chart.geographicOriginChart ? _.map(moduleInformation[moduleId].origins, 'id') : moduleId
                                 });
                             });
                         });
