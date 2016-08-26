@@ -31,44 +31,89 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl'], function (DataStoreServi
                 httpBackend.flush();
             });
 
-            it('should download excluded options for specified module', function() {
-                var mockExcludedLinelistOptions = {};
+            describe('getExcludedOptions', function () {
 
-                dataStoreService.getExcludedOptions(moduleId);
+                it('should download excluded options for specified module', function () {
+                    var mockExcludedLinelistOptions = {};
 
-                httpBackend.expectGET(url).respond(200, mockExcludedLinelistOptions);
-                httpBackend.flush();
-            });
+                    dataStoreService.getExcludedOptions(moduleId);
 
-            it('should gracefully return undefined if there is no excluded options for specified module', function() {
-                var mockErrorResponse = {};
-
-                var result = "someRandomValue";
-                dataStoreService.getExcludedOptions(moduleId).then(function (data) {
-                    result = data;
+                    httpBackend.expectGET(url).respond(200, mockExcludedLinelistOptions);
+                    httpBackend.flush();
                 });
 
-                httpBackend.expectGET(url).respond(404, mockErrorResponse);
-                httpBackend.flush();
-                expect(result).toBeUndefined();
-            });
+                it('should gracefully return undefined if there is no excluded options for specified module', function () {
+                    var mockErrorResponse = {};
 
-            it('should reject promise if there is some server error', function() {
-                var mockErrorResponse = {};
+                    var result = "someRandomValue";
+                    dataStoreService.getExcludedOptions(moduleId).then(function (data) {
+                        result = data;
+                    });
 
-                var result = "someRandomValue";
-                dataStoreService.getExcludedOptions(moduleId).then(function (data) {
-                    result = data;
+                    httpBackend.expectGET(url).respond(404, mockErrorResponse);
+                    httpBackend.flush();
+                    expect(result).toBeUndefined();
                 });
 
-                httpBackend.expectGET(url).respond(500, mockErrorResponse);
-                httpBackend.flush();
-                expect(result).toEqual("someRandomValue");
+                it('should reject promise if there is some server error', function () {
+                    var mockErrorResponse = {};
 
+                    var result = "someRandomValue";
+                    dataStoreService.getExcludedOptions(moduleId).then(function (data) {
+                        result = data;
+                    });
+
+                    httpBackend.expectGET(url).respond(500, mockErrorResponse);
+                    httpBackend.flush();
+                    expect(result).toEqual("someRandomValue");
+
+                });
             });
 
+            describe('getLastUpdatedTimeForExcludedOptions', function () {
+                beforeEach(function () {
+                    url = url + '/metaData';
+                });
+
+                it('should return lastUpdatedTime for the given module id', function () {
+                    var mockResponse = {lastUpdated: "someLastUpdatedTime"};
+
+                    var lastUpdatedTime;
+                    dataStoreService.getLastUpdatedTimeForExcludedOptions(moduleId).then(function (data) {
+                        lastUpdatedTime = data;
+                    });
+
+                    httpBackend.expectGET(url).respond(200, mockResponse);
+                    httpBackend.flush();
+                    expect(lastUpdatedTime).toEqual("someLastUpdatedTime");
+                });
+
+                it('should return undefined for the given module if excludedOptions are not present', function () {
+                    var mockResponse = {};
+
+                    var lastUpdatedTime = "someRandomData";
+                    dataStoreService.getLastUpdatedTimeForExcludedOptions(moduleId).then(function (data) {
+                        lastUpdatedTime = data;
+                    });
+
+                    httpBackend.expectGET(url).respond(404, mockResponse);
+                    httpBackend.flush();
+                    expect(lastUpdatedTime).toBeUndefined();
+                });
+
+                it('should reject promise if returned status code is not 404', function () {
+                    var mockResponse = {};
+
+                    var lastUpdatedTime = "someValue";
+                    dataStoreService.getLastUpdatedTimeForExcludedOptions(moduleId).then(function (data) {
+                        lastUpdatedTime = data;
+                    });
+
+                    httpBackend.expectGET(url).respond(500, mockResponse);
+                    httpBackend.flush();
+                    expect(lastUpdatedTime).toEqual("someValue");
+                });
+            });
         });
-
     });
-
 });
