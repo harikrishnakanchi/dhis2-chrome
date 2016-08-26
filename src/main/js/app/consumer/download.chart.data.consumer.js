@@ -28,38 +28,39 @@ define(["lodash", "moment"], function(_, moment) {
                         return $q.when({});
 
                     var datum = modulesAndCharts.pop();
-                    return reportService.getReportDataForOrgUnit(datum.chart, datum.moduleId).then(onSuccess, onFailure);
+                    return reportService.getReportDataForOrgUnit(datum.chart, datum.orgUnitDataDimensionItems).then(onSuccess, onFailure);
                 };
 
-                var getDatasetsForEachModuleAndItsOrigins = function() {
-                    var getAllDataSetsUnderModule = function(moduleIdAndOrigins) {
-                        var modulesAndAllDataSets = _.transform(moduleIdAndOrigins, function(mapOfModuleIdsToDataSets, origins, moduleId) {
-                            var orgUnitIds = [moduleId];
-                            if(!_.isEmpty(origins)) {
-                                orgUnitIds.push(_.first(origins).id);
-                            }
-                            mapOfModuleIdsToDataSets[moduleId] = datasetRepository.findAllForOrgUnits(orgUnitIds);
-                        }, {});
-                        return $q.all(modulesAndAllDataSets);
+                var getModuleInformation = function() {
+                    var getOriginsForModule = function (data) {
+                        return orgUnitRepository.findAllByParent(data.moduleId).then(function (origins) {
+                            return _.merge({ origins: origins }, data);
+                        });
                     };
 
-                    var moduleIdsAndOrigins = _.transform(userModuleIds, function(mapOfModuleIdsToOrigins, moduleId) {
-                        mapOfModuleIdsToOrigins[moduleId] = orgUnitRepository.findAllByParent([moduleId]);
-                    }, {});
+                    var getDataSetsForModuleAndOrigins = function (data) {
+                        var orgUnitIds = _.isEmpty(data.origins) ? [data.moduleId] : [data.moduleId, _.first(data.origins).id];
+                        return datasetRepository.findAllForOrgUnits(orgUnitIds).then(function (dataSets) {
+                            return _.merge({ dataSets: dataSets}, data);
+                        });
+                    };
 
-                    return $q.all(moduleIdsAndOrigins)
-                        .then(getAllDataSetsUnderModule);
+                    var promises = _.transform(userModuleIds, function (promises, moduleId) {
+                        promises[moduleId] = getOriginsForModule({ moduleId: moduleId}).then(getDataSetsForModuleAndOrigins);
+                    }, {});
+                    return $q.all(promises);
                 };
 
-                var filterChartsForModules = function(datasetsByModule) {
+                var filterChartsForModules = function(moduleInformation) {
                     var modulesAndCharts = [];
-                    _.forEach(userModuleIds, function(userModuleId) {
-                        _.forEach(datasetsByModule[userModuleId], function (dataSet) {
-                            var filteredCharts = _.filter(charts, {dataSetCode: dataSet.code});
+                    _.forEach(userModuleIds, function(moduleId) {
+                        _.forEach(moduleInformation[moduleId].dataSets, function (dataSet) {
+                            var filteredCharts = _.filter(charts, { dataSetCode: dataSet.code });
                             _.forEach(filteredCharts, function (chart) {
                                 modulesAndCharts.push({
-                                    moduleId: userModuleId,
-                                    chart: chart
+                                    moduleId: moduleId,
+                                    chart: chart,
+                                    orgUnitDataDimensionItems: moduleId
                                 });
                             });
                         });
@@ -67,7 +68,7 @@ define(["lodash", "moment"], function(_, moment) {
                     return $q.when(modulesAndCharts);
                 };
 
-                return getDatasetsForEachModuleAndItsOrigins()
+                return getModuleInformation()
                     .then(filterChartsForModules)
                     .then(recursivelyDownloadAndUpsertChartData)
                     .then(function() {
