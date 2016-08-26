@@ -1,44 +1,30 @@
 <div>
-    <form name="approvalForm">
-        <table class="table table-bordered msf-table" ng-if="itemsArePresent(itemsAwaitingApprovalAtUserLevel)">
-            <caption class="msf-table-caption">{{resourceBundle.itemsAwaitingApprovalAtUserLevelLabel}}</caption>
-            <thead>
-            <tr>
-                <th>{{resourceBundle.moduleLabel}}</th>
-                <th ng-model="weeks">
-                    <input type="checkbox" class="dashboard-form-checkbox select-all-checkbox"
-                           ng-click="toggleSelectAll()"
-                           ng-checked="selectedAllItemsForApproval" />
-                    {{resourceBundle.weekLabelForApproval}}
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="(moduleName, items) in itemsAwaitingApprovalAtUserLevel">
-                <td>{{moduleName}}</td>
-                <td>
-                    <ul class="list-unstyled">
-                        <li ng-repeat="item in items | orderBy: 'period'">
-                            <input type="checkbox" class="dashboard-form-checkbox"
-                                   ng-model="item.selectedForApproval"
-                                   ng-change="toggleWeek()"
-                            />
-                            <a ng-href="{{ getTemplateUrl(item) }}" ng-class="{ 'error-label': item.failedToSync }">{{formatPeriods(item.period)}}</a>
-                        </li>
-                    </ul>
-                </td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>
-                    <input type="submit"
-                           ng-disabled="(itemsAwaitingApprovalAtUserLevel | filter : { 'selectedForApproval': true}).length === 0"
-                           value="{{resourceBundle.approveBtnValue}}" class="btn btn-default"
-                           ng-click="bulkApprove()"/>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+    <form name="approvalForm" class="data-approval-form">
+        <div class="title">{{resourceBundle.itemsAwaitingApprovalAtUserLevelLabel}}</div>
+        <div><input type="submit"
+                    ng-disabled="(itemsAwaitingApprovalAtUserLevel | filter : { 'selectedForApproval': true}).length === 0"
+                    value="{{resourceBundle.approveBtnValue}}" class="btn btn-default"
+                    ng-click="bulkApprove()"/>
+        </div>
+        <div ng-if="itemsArePresent(itemsAwaitingApprovalAtUserLevel)">
+            <div ng-repeat="(opUnitName, modules) in itemsAwaitingApprovalAtUserLevelGroupedByOpUnit">
+                <div class="row">
+                    <h4>{{opUnitName}}</h4>
+                    <div class="col-md-4" ng-repeat="(moduleName, items) in modules">
+                        <ul class="list-unstyled">
+                            <li><h5>{{moduleName}}</h5></li>
+                            <li ng-repeat="item in items | orderBy: 'period'">
+                                <input type="checkbox" class="dashboard-form-checkbox"
+                                       ng-model="item.selectedForApproval"
+                                       ng-change="toggleWeek()"
+                                />
+                                <a ng-href="{{ getTemplateUrl(item) }}" ng-class="{ 'error-label': item.failedToSync }">{{formatPeriods(item.period)}}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </form>
     <form>
         <table class="table dataentrytable" ng-if="itemsArePresent(itemsAwaitingSubmission) || itemsArePresent(itemsAwaitingApprovalAtOtherLevels)">

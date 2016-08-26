@@ -156,6 +156,16 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                 $scope.itemsAwaitingApprovalAtUserLevel = _.groupBy(itemsAwaitingApprovalAtUserLevel, 'moduleName');
                 $scope.itemsAwaitingApprovalAtOtherLevels = _.groupBy(itemsAwaitingApprovalAtOtherLevels, 'moduleName');
                 $scope.moduleNames = _.union(_.keys($scope.itemsAwaitingSubmission), _.keys($scope.itemsAwaitingApprovalAtOtherLevels));
+
+                $scope.itemsAwaitingApprovalAtUserLevelGroupedByOpUnit = _.groupBy(itemsAwaitingApprovalAtUserLevel, function (item) {
+                    return item.moduleName.split(' - ')[0];
+                });
+                $scope.itemsAwaitingApprovalAtUserLevelGroupedByOpUnit = _.transform($scope.itemsAwaitingApprovalAtUserLevelGroupedByOpUnit, function (data, modulesAwaitingApproval, opUnitName) {
+                    data[opUnitName] = _.groupBy(modulesAwaitingApproval, function (item) {
+                        return item.moduleName.split(' - ')[1];
+                    });
+                }, {});
+
             });
         };
 
