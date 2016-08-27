@@ -4,28 +4,21 @@
             <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
         </div>
         <div ng-show="selectedDataset.isMonthlyChartsAvailable">
-            <span ng-show="updatedForMonthlyChart && charts" class="text-info">
-                    <strong> Updated: {{ updatedForMonthlyChart }} </strong>
+            <span ng-show="updatedForMonthlyChart" class="text-info">
+                <strong> Updated: {{ updatedForMonthlyChart }} </strong>
             </span>
-            <div ng-repeat="chart in charts | filter: {definition: {dataSetCode: selectedDataset.code}} | orderBy: 'definition.displayPosition'" ng-show="chart.definition.monthlyChart && chart.data && chart.data.length > 0">
+            <div ng-repeat="chart in charts | filter: { monthlyChart: true, dataSetCode: selectedDataset.code, isDataAvailable: true } | orderBy: 'displayPosition'">
                 <div class="row chart-title">
-                    <h3 class="col-md-6 col-md-offset-3 text-center">{{chart.definition.title}}</h3>
-                    <a class="col-md-1 col-md-offset-2" href="" title="{{ resourceBundle.downloadChart }}" ng-click="downloadChartAsPng(chart.definition, updatedForMonthlyChart)">
+                    <h3 class="col-md-6 col-md-offset-3 text-center">{{ chart.title }}</h3>
+                    <a class="col-md-1 col-md-offset-2" href="" title="{{ resourceBundle.downloadChart }}" ng-click="downloadChartAsPng(chart, updatedForMonthlyChart)">
                         <span class="glyphicon glyphicon-download-alt"></span>
                     </a>
                 </div>
-                <p ng-if="chart.definition.type === 'LINE'" class="lineChart-container">
-                    <nvd3 options="monthlyLineChartOptions" data="chart.data" id="{{ chart.definition.id }}"></nvd3>
-                </p>
-                <p ng-if="chart.definition.type === 'COLUMN'">
-                    <nvd3 options="monthlyBarChartOptions" data="chart.data" id="{{ chart.definition.id }}"></nvd3>
-                </p>
-                <p ng-if="chart.definition.type === 'STACKED_COLUMN'">
-                    <nvd3 options="monthlyStackedBarChartOptions" data="chart.data" id="{{ chart.definition.id }}"></nvd3>
+                <p ng-class="{ 'lineChart-container': chart.definition.type === 'LINE' }">
+                    <nvd3 options="chart.nvd3Options" data="chart.nvd3Data" id="{{ chart.id }}"></nvd3>
                 </p>
             </div>
         </div>
-
     </div>
 
     <div id="monthlyReports" class="margin-top">
