@@ -58,6 +58,7 @@ require.config({
         "moduleDataBlock": "app/models/module.data.block",
         "customAttributes": "app/models/custom.attributes",
         "pivotTableData": "app/models/pivot.table.data",
+        "chartData": "app/models/chart.data",
         "analyticsData": "app/models/analytics.data",
 
         //Factories
