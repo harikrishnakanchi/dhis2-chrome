@@ -11,8 +11,6 @@ define(['pivotTable'], function(PivotTable) {
                    rows: 'rowInfo',
                    filters: 'filterInfo',
                    categoryDimensions: 'categoryDimensionInfo',
-                   dataElements: 'dataElementInfo',
-                   indicators: 'indicatorInfo',
                    dataDimensionItems: 'dataDimensionItemInfo'
                };
                pivotTable = PivotTable.create(config);
@@ -23,8 +21,6 @@ define(['pivotTable'], function(PivotTable) {
                expect(pivotTable.filters).toEqual(config.filters);
 
                expect(pivotTable.categoryDimensions).toEqual(config.categoryDimensions);
-               expect(pivotTable.dataElements).toEqual(config.dataElements);
-               expect(pivotTable.indicators).toEqual(config.indicators);
                expect(pivotTable.dataDimensionItems).toEqual(config.dataDimensionItems);
            });
        });

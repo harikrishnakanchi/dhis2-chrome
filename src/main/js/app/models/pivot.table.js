@@ -9,8 +9,6 @@ define(['lodash'], function (_) {
         this.rows = config.rows;
         this.filters = config.filters;
         this.categoryDimensions = config.categoryDimensions;
-        this.dataElements = config.dataElements;
-        this.indicators = config.indicators;
         this.dataDimensionItems = config.dataDimensionItems;
 
         this.sortAscending = config.sortOrder == 1;
