@@ -94,7 +94,8 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                     dataSetCode: 'someOtherDataSetCode'
                 };
                 chartData = {
-                    some: 'data'
+                    some: 'data',
+                    categories: ['someCategory']
                 };
 
                 chartRepository.getAll.and.returnValue(utils.getPromise(q, [chartA, chartB]));

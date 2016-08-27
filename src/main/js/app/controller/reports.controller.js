@@ -14,13 +14,11 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 y: function (d) {
                     return d.value;
                 },
-                xAxis: {
-                    axisLabel: $scope.resourceBundle.xAxisLabel
-                },
                 legend: {maxKeyLength: 50}
             },
             WEEKLY: {
                 xAxis: {
+                    axisLabel: $scope.resourceBundle.xAxisLabel,
                     tickFormat: function (d) {
                         return moment.unix(d).format('GGGG[W]W');
                     }
@@ -28,6 +26,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             },
             MONTHLY: {
                 xAxis: {
+                    axisLabel: $scope.resourceBundle.xAxisLabel,
                     tickFormat: function (d) {
                         return moment.localeData($scope.locale).monthsShort(moment.unix(d)) + ' ' + moment.unix(d).format('YY');
                     }
@@ -125,12 +124,13 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 };
 
                 return _.map(charts, function (chart) {
+                    var chartIsPeriodBased =  _.first(chart.categories).periodDimension;
                     chart.nvd3Options = {
                         chart: _.merge(
                             {},
                             NVD3_CHART_OPTIONS.DEFAULT,
                             NVD3_CHART_OPTIONS[chart.type],
-                            chart.weeklyChart ? NVD3_CHART_OPTIONS.WEEKLY : NVD3_CHART_OPTIONS.MONTHLY
+                            chartIsPeriodBased ? (chart.weeklyChart ? NVD3_CHART_OPTIONS.WEEKLY : NVD3_CHART_OPTIONS.MONTHLY) : {}
                         )
                     };
                     chart.nvd3Data = _.map(chart.series, function (series) {
