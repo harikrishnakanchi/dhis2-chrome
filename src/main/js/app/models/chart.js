@@ -9,6 +9,8 @@ define([], function() {
         this.filters = config.filters;
         this.rows = config.rows;
         this.type = config.type;
+        this.categoryDimensions = config.categoryDimensions;
+        this.dataDimensionItems = config.dataDimensionItems;
 
         this.dataSetCode = parseDataSetCode(this.name);
         this.displayPosition = parseDisplayPosition(this.name);

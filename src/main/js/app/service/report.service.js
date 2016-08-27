@@ -71,9 +71,11 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
 
         this.getUpdatedCharts = function(lastUpdatedTime) {
             var requiredFields = 'id,name,title,relativePeriods,type,' +
-                                 'columns[dimension,items[id,name,description]],' +
+                                 'categoryDimensions[dataElementCategory,categoryOptions[:identifiable]],' +
+                                 'dataDimensionItems[dataElement[id,name,formName,description],indicator[id,name,shortName,description],programIndicator[id,name,shortName,description]],' +
+                                 'columns[dimension,items[id,name]],' +
                                  'rows[dimension,items[id,name]],' +
-                                 'filters[dimension,items[id,name]]';
+                                 'filters[dimension,items[id]]';
             return getResourceIds(dhisUrl.charts, 'charts', lastUpdatedTime).then(_.partial(getResourceDetails, dhisUrl.charts, requiredFields));
         };
 
