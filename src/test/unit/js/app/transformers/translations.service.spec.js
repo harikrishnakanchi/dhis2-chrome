@@ -216,42 +216,6 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
             }]);
         });
 
-        describe('translate reports', function () {
-            var mockReport, translatedReport;
-
-            beforeEach(function () {
-                mockReport = {
-                    definition: {
-                        rows: [{
-                            items: [{
-                                id: 'id4',
-                                name: 'someName'
-                            }]
-                        }]
-                    },
-                    data: {
-                        metaData: {
-                            names: {}
-                        }
-                    }
-                };
-
-                initialiseTranslationsServiceForLocale(FRENCH);
-            });
-
-            it('should translate the names for the rows in the reports', function () {
-                translatedReport = translationsService.translateReports([mockReport]);
-                expect(translatedReport[0].definition.rows[0].items[0].name).toEqual('frenchReport');
-            });
-
-            it('should translate the description of the item if translation exists', function () {
-                mockReport.definition.rows[0].items[0].description = 'someDescription';
-
-                translatedReport = translationsService.translateReports([mockReport]);
-                expect(translatedReport[0].definition.rows[0].items[0].description).toEqual('french description');
-            });
-        });
-
         describe('translateCharts', function () {
             var chartData;
 

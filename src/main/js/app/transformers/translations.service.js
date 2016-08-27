@@ -72,26 +72,6 @@ define(['lodash'], function(_){
             });
         };
 
-        this.translateReports = function (reportsToTranslate) {
-            if(_locale == 'en') {
-                return reportsToTranslate;
-            }
-
-            return _.each(reportsToTranslate, function (report) {
-                var items = report.definition.rows[0].items;
-                var namesHash = report.data ? report.data.metaData.names : {};
-                return _.each(items, function (item) {
-                    var translationObject = translations[item.id];
-                    if(item.description) {
-                        var descriptionTranslation = _.find(translationObject, {property: "description"});
-                        item.description = descriptionTranslation ? descriptionTranslation.value : item.description;
-                    }
-                    var shortNameTranslation = _.find(translationObject, {property: "shortName"});
-                    item.name = shortNameTranslation ? shortNameTranslation.value : item.name;
-                });
-            });
-        };
-
         var getTranslation = function (objectId, property) {
             var translationObject = _.find(translations[objectId], { property: property });
             return translationObject && translationObject.value;
