@@ -1,9 +1,9 @@
 <div>
     <div id="monthlyCharts">
-        <div ng-hide="selectedDataset.isMonthlyChartsAvailable">
+        <div ng-show="charts | filter: { monthlyChart: true, dataSetCode: selectedDataset.code } | isEmpty">
             <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
         </div>
-        <div ng-show="selectedDataset.isMonthlyChartsAvailable">
+        <div ng-hide="charts | filter: { monthlyChart: true, dataSetCode: selectedDataset.code } | isEmpty">
             <span ng-show="updatedForMonthlyChart" class="text-info">
                 <strong> Updated: {{ updatedForMonthlyChart }} </strong>
             </span>
@@ -28,13 +28,13 @@
                     <span>{{resourceBundle.tabularReports}}</span>
                     <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isReportOpen, 'glyphicon-chevron-right': !isReportOpen}"></i>
                 </accordion-heading>
-                <div ng-show="!selectedDataset.isMonthlyPivotTablesAvailable">
+                <div ng-show="pivotTables | filter: { monthlyReport: true, dataSetCode: selectedDataset.code } | isEmpty">
                     <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
                 </div>
-                <div ng-show="updatedForMonthlyPivotTable && selectedDataset.isMonthlyPivotTablesAvailable" class="text-info mb15">
-                    <strong> Updated: {{ updatedForMonthlyPivotTable }} </strong>
-                </div>
-                <div class="exp-coll-group">
+                <div ng-hide="pivotTables | filter: { monthlyReport: true, dataSetCode: selectedDataset.code } | isEmpty" class="exp-coll-group">
+                    <div ng-show="updatedForMonthlyPivotTable" class="text-info mb15">
+                        <strong> Updated: {{ updatedForMonthlyPivotTable }} </strong>
+                    </div>
                     <div ng-repeat="table in pivotTables | filter: { monthlyReport: true, dataSetCode: selectedDataset.code, isTableDataAvailable: true } | orderBy: 'displayPosition'" class="exportCSV-container">
                         <accordion close-others="false">
                             <accordion-group is-open="status.open">

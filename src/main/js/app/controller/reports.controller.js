@@ -165,14 +165,14 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
 
         var loadRelevantDatasets = function() {
 
-            var loadDatasetsForModules = function(orgUnits) {
+            var loadDataSetsForModules = function(orgUnits) {
                 return datasetRepository.findAllForOrgUnits(_.pluck(orgUnits, "id")).then(function(dataSets) {
-                    var filteredDataSets = _.filter(dataSets, function(ds) {
-                        return !(ds.isPopulationDataset || ds.isReferralDataset);
+                    var filteredDataSets = _.reject(dataSets, function(ds) {
+                        return ds.isPopulationDataset || ds.isReferralDataset;
                     });
                     
                     var translatedDataSets = translationsService.translate(filteredDataSets);
-                    $scope.datasets = translatedDataSets;
+                    $scope.datasets = _.sortByOrder(translatedDataSets, 'name');
                 });
             };
 
@@ -183,8 +183,9 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 });
             };
 
-            return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id).then(getOrigins)
-                .then(loadDatasetsForModules);
+            return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id)
+                .then(getOrigins)
+                .then(loadDataSetsForModules);
         };
 
         var loadOrgUnit = function() {
@@ -217,30 +218,6 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 });
         };
 
-        var prepareDataForView = function() {
-            _.each($scope.datasets, function(eachDataSet) {
-
-                var filteredCharts = _.filter($scope.charts, { dataSetCode: eachDataSet.code });
-
-                var filteredPivotTables = _.filter($scope.pivotTables, {
-                    dataSetCode: eachDataSet.code
-                });
-
-                eachDataSet.isWeeklyChartsAvailable = _.any(filteredCharts, { weeklyChart: true, isDataAvailable: true });
-                eachDataSet.isMonthlyChartsAvailable = _.any(filteredCharts, { monthlyChart: true, isDataAvailable: true });
-                eachDataSet.isWeeklyPivotTablesAvailable = _.any(filteredPivotTables, { weeklyReport: true, isTableDataAvailable: true });
-                eachDataSet.isMonthlyPivotTablesAvailable = _.any(filteredPivotTables, { monthlyReport: true, isTableDataAvailable: true });
-
-                eachDataSet.isReportsAvailable = eachDataSet.isWeeklyChartsAvailable || eachDataSet.isMonthlyChartsAvailable || eachDataSet.isMonthlyPivotTablesAvailable || eachDataSet.isWeeklyPivotTablesAvailable;
-            });
-            
-            $scope.datasets = _.sortByOrder($scope.datasets, ['name', 'isReportsAvailable'], ['asc' ,'desc']);
-
-            $scope.selectedDataset = _.find($scope.datasets, { isOriginDataset: false, isReferralDataset: false });
-
-            return $q.when();
-        };
-
         var loadLastUpdatedForChartsAndReports = function () {
             var formatlastUpdatedTime = function (date) {
                 return date ? moment(date).format(REPORTS_LAST_UPDATED_TIME_FORMAT) : undefined;
@@ -270,8 +247,8 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 .then(loadChartsWithData)
                 .then(loadPivotTablesWithData)
                 .then(loadLastUpdatedForChartsAndReports)
-                .then(prepareDataForView)
                 .finally(function() {
+                    $scope.selectedDataset = _.find($scope.datasets, { isOriginDataset: false });
                     $scope.loading = false;
                 });
         };
