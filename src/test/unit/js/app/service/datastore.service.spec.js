@@ -79,5 +79,26 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl'], function (DataStoreServi
                 });
             });
         });
+
+        describe('getKeysForExcludedOptions', function () {
+            var moduleId, storeKey, url;
+            beforeEach(function () {
+                moduleId = "someModuleId";
+                url = [dhisUrl.dataStore, storeNamespace].join("/");
+            });
+
+            it('should get keys only for excludedOptions', function () {
+                var keysFromRemote = ['key1_excludedOptions', 'key2_excludedOptions', 'key3_otherOption'];
+
+                var actualKeys;
+                dataStoreService.getKeysForExcludedOptions().then(function (data) {
+                    actualKeys = data;
+                });
+
+                httpBackend.expectGET(url).respond(200, keysFromRemote);
+                httpBackend.flush();
+                expect(actualKeys).toEqual(['key1_excludedOptions', 'key2_excludedOptions']);
+            });
+        });
     });
 });

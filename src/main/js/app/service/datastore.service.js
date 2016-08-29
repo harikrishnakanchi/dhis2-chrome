@@ -23,8 +23,20 @@ define(["dhisUrl"], function (dhisUrl) {
             return $http.get(url)
                 .then(extractDataFromResponse)
                 .catch(function (response) {
-                return response.status == 404 ? undefined : $q.reject();
+                    return response.status == 404 ? undefined : $q.reject();
+                });
+        };
+
+        var getAllKeys = function () {
+            var url = [dhisUrl.dataStore, NAMESPACE].join("/");
+            return $http.get(url).then(extractDataFromResponse);
+        };
+
+        this.getKeysForExcludedOptions = function () {
+            return getAllKeys().then(function (allKeys) {
+                return _.filter(allKeys, _.partial(_.contains, _, EXCLUDED_OPTIONS));
             });
         };
+
     };
 });

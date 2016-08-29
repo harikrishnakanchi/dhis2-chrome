@@ -18,7 +18,7 @@ define(['excludedLinelistOptionsMerger', 'angularMocks', 'utils', 'excludedLineL
             spyOn(dataStoreService, 'updateExcludedOptions').and.returnValue(utils.getPromise(q, undefined));
             spyOn(dataStoreService, 'getExcludedOptions').and.returnValue(utils.getPromise(q, undefined));
             spyOn(dataStoreService, 'createExcludedOptions').and.returnValue(utils.getPromise(q, undefined));
-            dataStoreService.getAllKeys = jasmine.createSpy("getAllKeys").and.returnValue(utils.getPromise(q, undefined));
+            spyOn(dataStoreService, 'getKeysForExcludedOptions').and.returnValue(utils.getPromise(q, undefined));
 
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, 'getAllModulesInOrgUnits').and.returnValue(utils.getPromise(q, {}));
@@ -120,7 +120,7 @@ define(['excludedLinelistOptionsMerger', 'angularMocks', 'utils', 'excludedLineL
 
             it('should get all existing keys from remote data store', function () {
                 initializeMerger(projectId);
-                expect(dataStoreService.getAllKeys).toHaveBeenCalled();
+                expect(dataStoreService.getKeysForExcludedOptions).toHaveBeenCalled();
             });
 
             it('should merge data only for modules that exist both in local and remote', function () {
@@ -131,7 +131,7 @@ define(['excludedLinelistOptionsMerger', 'angularMocks', 'utils', 'excludedLineL
                 ];
                 var moduleIds = [{id: 'mod2'}, {id: 'mod3'}, {id: 'mod4'}];
 
-                dataStoreService.getAllKeys.and.returnValue(utils.getPromise(q, remoteKeys));
+                dataStoreService.getKeysForExcludedOptions.and.returnValue(utils.getPromise(q, remoteKeys));
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, moduleIds));
                 initializeMerger(projectId);
 
@@ -153,7 +153,7 @@ define(['excludedLinelistOptionsMerger', 'angularMocks', 'utils', 'excludedLineL
                 ];
                 var moduleIds = [{id: 'mod2'}, {id: 'mod3'}, {id: 'mod4'}];
 
-                dataStoreService.getAllKeys.and.returnValue(utils.getPromise(q, remoteKeys));
+                dataStoreService.getKeysForExcludedOptions.and.returnValue(utils.getPromise(q, remoteKeys));
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, moduleIds));
                 initializeMerger(projectId);
 
@@ -172,7 +172,7 @@ define(['excludedLinelistOptionsMerger', 'angularMocks', 'utils', 'excludedLineL
                 ];
                 var moduleIds = [{id: 'mod2'}, {id: 'mod3'}, {id: 'mod4'}];
 
-                dataStoreService.getAllKeys.and.returnValue(utils.getPromise(q, remoteKeys));
+                dataStoreService.getKeysForExcludedOptions.and.returnValue(utils.getPromise(q, remoteKeys));
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, moduleIds));
                 initializeMerger(projectId);
 
