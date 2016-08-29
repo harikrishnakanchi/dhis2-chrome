@@ -16,6 +16,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
                 hustle = $hustle;
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+                spyOn(hustle, "publishOnce").and.returnValue(utils.getPromise(q, {}));
 
                 allPrograms = [{
                     'id': 'prog1',
@@ -465,7 +466,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     };
 
                     expect(excludedLineListOptionsRepository.upsert).toHaveBeenCalledWith(excludedLineListOptions);
-                    expect(hustle.publish).toHaveBeenCalledWith({
+                    expect(hustle.publishOnce).toHaveBeenCalledWith({
                         "data": enrichedModule.id,
                         "type": "uploadExcludedOptions",
                         "locale": "en",
@@ -492,7 +493,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     };
 
                     expect(excludedLineListOptionsRepository.upsert).toHaveBeenCalledWith(excludedLineListOptions);
-                    expect(hustle.publish).toHaveBeenCalledWith({
+                    expect(hustle.publishOnce).toHaveBeenCalledWith({
                         "data": scope.module.id,
                         "type": "uploadExcludedOptions",
                         "locale": "en",

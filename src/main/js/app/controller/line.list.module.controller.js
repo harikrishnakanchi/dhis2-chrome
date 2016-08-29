@@ -207,14 +207,18 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 $scope.$parent.closeNewForm($scope.orgUnit);
             };
 
-            var publishMessage = function(data, action, desc) {
-                return $hustle.publish({
+            var publishJob = function(publishMethod, data, action, desc) {
+                return publishMethod({
                     "data": data,
                     "type": action,
                     "locale": $scope.locale,
                     "desc": desc
                 }, "dataValues");
             };
+
+            var publishMessage = _.partial(publishJob, $hustle.publish);
+
+            var publishMessageOnlyOnce = _.partial(publishJob, $hustle.publishOnce);
 
             var resetCollapse = function() {
                 $scope.collapseSection = {};
@@ -311,7 +315,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     }
                 });
                 return excludedLineListOptionsRepository.upsert(excludedLineListOptions).then(function () {
-                    return publishMessage(enrichedModule.id, "uploadExcludedOptions", $scope.resourceBundle.uploadExcludedOptionsDesc + enrichedModule.name);
+                    return publishMessageOnlyOnce(enrichedModule.id, "uploadExcludedOptions", $scope.resourceBundle.uploadExcludedOptionsDesc + enrichedModule.name);
                 });
             };
 
