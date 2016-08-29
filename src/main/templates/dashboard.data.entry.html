@@ -4,15 +4,13 @@
             <th colspan="2">{{resourceBundle.itemsAwaitingDataSubmissionLabel}}</th>
             <th colspan="1">{{resourceBundle.awaitingApproval}}</th>
         </tr>
-        <tr>
-            <th>{{resourceBundle.moduleLabel}}</th>
-            <th>{{resourceBundle.weekLabel}}</th>
-        </tr>
     </thead>
-    <tbody>
-
-    <tr ng-repeat="moduleName in moduleNames">
-        <td>{{moduleName}}</td>
+    <tbody ng-repeat="(opUnitName, modules) in moduleNamesGroupedByOpunit">
+    <tr class = 'header-with-opunit'>
+        <th colspan="3">{{ opUnitName }}</th>
+    </tr>
+    <tr ng-repeat="moduleName in modules">
+        <td>{{getModuleName(moduleName)}}</td>
         <td>
             <ul class="list-unstyled">
                 <li ng-repeat="item in itemsAwaitingSubmission[moduleName] | orderBy: 'period'" ng-if="item.active">
