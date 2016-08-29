@@ -1,6 +1,8 @@
 define(['moment'], function (moment) {
-    return function ($q, excludedLineListOptionsRepository, dataStoreService) {
-        this.mergeAndSync = function (moduleId) {
+    return function ($q, excludedLineListOptionsRepository, dataStoreService, orgUnitRepository) {
+        var self = this;
+
+        var mergeAndSync = function (moduleId, upstreamSync) {
             if (!moduleId) {
                 return $q.when();
             }
@@ -14,7 +16,7 @@ define(['moment'], function (moment) {
                         lastUpdatedTimeOnRemote = moment(lastUpdatedTimeOnRemote);
                         lastUpdatedTimeOnLocal = moment(lastUpdatedTimeOnLocal);
                         if (lastUpdatedTimeOnLocal.isAfter(lastUpdatedTimeOnRemote)) {
-                            return dataStoreService.updateExcludedOptions(moduleId, localExcludedLineListOptions);
+                            return upstreamSync ? dataStoreService.updateExcludedOptions(moduleId, localExcludedLineListOptions) : $q.when();
                         }
                         else if (lastUpdatedTimeOnLocal.isSame(lastUpdatedTimeOnRemote)) {
                             return $q.when();
@@ -23,10 +25,32 @@ define(['moment'], function (moment) {
                             return excludedLineListOptionsRepository.upsert(remoteExcludedLineListOptions);
                         }
                     }
-                    else {
+                    else if (!lastUpdatedTimeOnRemote && upstreamSync) {
                         return dataStoreService.createExcludedOptions(moduleId, localExcludedLineListOptions);
                     }
+                    else {
+                        return excludedLineListOptionsRepository.upsert(remoteExcludedLineListOptions);
+                    }
                 });
+        };
+
+        self.mergeAndSync = _.partial(mergeAndSync, _, true);
+
+        self.mergeAndSaveForProject = function (projectId) {
+            return $q.all({
+                moduleIds: orgUnitRepository.getAllModulesInOrgUnits(projectId),
+                remoteKeys: dataStoreService.getAllKeys()
+            }).then(function (data) {
+                var moduleIds = _.map(data.moduleIds, 'id'),
+                    remoteKeys = _.map(data.remoteKeys, function (key) {
+                        return _.first(key.split('_'));
+                    });
+
+                var moduleIdsToBeMerged = _.intersection(moduleIds, remoteKeys);
+                return _.reduce(moduleIdsToBeMerged, function (promise, moduleId) {
+                    return promise.then(_.partial(mergeAndSync, moduleId, false));
+                }, $q.when());
+            });
         };
     };
 });
