@@ -1,16 +1,18 @@
 <div>
     <form name="approvalForm" class="data-approval-form">
-        <div class="title">{{resourceBundle.itemsAwaitingApprovalAtUserLevelLabel}}</div>
-        <div><input type="submit"
+        <div>
+        <span class="title">{{resourceBundle.itemsAwaitingApprovalAtUserLevelLabel}}</span>
+        <span><input type="submit"
                     ng-disabled="(itemsAwaitingApprovalAtUserLevel | filter : { 'selectedForApproval': true}).length === 0"
                     value="{{resourceBundle.approveBtnValue}}" class="btn btn-default"
                     ng-click="bulkApprove()"/>
-        </div>
+        </span>
+            </div>
         <div ng-if="itemsArePresent(itemsAwaitingApprovalAtUserLevel)">
             <div ng-repeat="(opUnitName, modules) in itemsAwaitingApprovalAtUserLevelGroupedByOpUnit">
                 <div class="row">
-                    <h4>{{opUnitName}}</h4>
-                    <div class="col-md-4" ng-repeat="(moduleName, items) in modules">
+                    <h4 class ='header-with-opunit'>{{opUnitName}}</h4>
+                    <div class="col-md-3" ng-repeat="(moduleName, items) in modules">
                         <ul class="list-unstyled">
                             <li><h5>{{moduleName}}</h5></li>
                             <li ng-repeat="item in items | orderBy: 'period'">
@@ -33,14 +35,13 @@
                 <th colspan="2">{{resourceBundle.itemsAwaitingDataSubmissionLabel}}</th>
                 <th colspan="1">{{resourceBundle.awaitingApproval}}</th>
             </tr>
-            <tr>
-                <th>{{resourceBundle.moduleLabel}}</th>
-                <th>{{resourceBundle.weekLabel}}</th>
-            </tr>
             </thead>
-            <tbody>
-            <tr ng-repeat="moduleName in moduleNames">
-                <td>{{moduleName}}</td>
+            <tbody ng-repeat="(opUnitName, modules) in moduleNamesGroupedByOpunit">
+            <tr class = 'header-with-opunit'>
+                <th colspan="3">{{ opUnitName }}</th>
+            </tr>
+            <tr ng-repeat="moduleName in modules">
+                <td>{{ getModuleName(moduleName) }}</td>
                 <td>
                     <ul class="list-unstyled">
                         <li ng-repeat="item in itemsAwaitingSubmission[moduleName] | orderBy: 'period'" ng-if="item.active">

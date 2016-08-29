@@ -126,6 +126,10 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
         $scope.itemsArePresent = function (object) {
             return !_.isEmpty(object);
         };
+        
+        $scope.getModuleName = function (moduleName) {
+            return moduleName.split(' - ')[1];
+        };
 
         var loadDashboard = function() {
             var periodRange = dateUtils.getPeriodRange(properties.weeksToDisplayStatusInDashboard);
@@ -156,16 +160,17 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                 $scope.itemsAwaitingApprovalAtUserLevel = _.groupBy(itemsAwaitingApprovalAtUserLevel, 'moduleName');
                 $scope.itemsAwaitingApprovalAtOtherLevels = _.groupBy(itemsAwaitingApprovalAtOtherLevels, 'moduleName');
                 $scope.moduleNames = _.union(_.keys($scope.itemsAwaitingSubmission), _.keys($scope.itemsAwaitingApprovalAtOtherLevels));
-
+                $scope.moduleNamesGroupedByOpunit = _.groupBy(_.union(_.keys($scope.itemsAwaitingSubmission), _.keys($scope.itemsAwaitingApprovalAtOtherLevels)), function (moduleName) {
+                    return moduleName.split(' - ')[0];
+                });
                 $scope.itemsAwaitingApprovalAtUserLevelGroupedByOpUnit = _.groupBy(itemsAwaitingApprovalAtUserLevel, function (item) {
                     return item.moduleName.split(' - ')[0];
                 });
                 $scope.itemsAwaitingApprovalAtUserLevelGroupedByOpUnit = _.transform($scope.itemsAwaitingApprovalAtUserLevelGroupedByOpUnit, function (data, modulesAwaitingApproval, opUnitName) {
                     data[opUnitName] = _.groupBy(modulesAwaitingApproval, function (item) {
-                        return item.moduleName.split(' - ')[1];
+                        return $scope.getModuleName(item.moduleName);
                     });
                 }, {});
-
             });
         };
 
