@@ -310,6 +310,27 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
             });
         });
 
+        describe('translateChartData', function () {
+            it('should translate the series and categories of the chartData', function () {
+                var seriesItem = {
+                    id: 'someRowId',
+                    name: 'someRowName'
+                },  categoryItem = {
+                    id: 'someColumnId',
+                    name: 'someColumnName'
+                },  mockChartData = {
+                    categories: [seriesItem],
+                    series: [categoryItem]
+                };
+                initialiseTranslationsServiceForLocale(FRENCH);
+
+                var translatedObjects = translationsService.translateChartData([mockChartData]);
+                expect(translatedObjects).toEqual([mockChartData]);
+                expect(seriesItem.name).toEqual('frenchRowName');
+                expect(categoryItem.name).toEqual('frenchColumnName');
+            });
+        });
+
         describe('translate pivotTableData', function () {
             var mockPivotTableData, rowItem, columnItem, columnConfigurationItem;
 

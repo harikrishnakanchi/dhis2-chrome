@@ -152,6 +152,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 .then(filterReportsForCurrentModule)
                 .then(filterOutNotificationCharts)
                 .then(getChartData)
+                .then(translationsService.translateChartData)
                 .then(transformForNVD3)
                 .then(function(chartData) {
                     $scope.charts = chartData;

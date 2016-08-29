@@ -59,6 +59,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             translationsService = new TranslationsService();
             spyOn(translationsService, 'translate').and.callFake(function (object) { return object; });
             spyOn(translationsService, 'translatePivotTableData').and.callFake(function (object) { return object; });
+            spyOn(translationsService, 'translateChartData').and.callFake(function (object) { return object; });
 
             reportsController = new ReportsController(rootScope, scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService, changeLogRepository);
         }));
@@ -113,7 +114,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                 expect(chartRepository.getChartData).toHaveBeenCalledTimes(1);
             });
 
-            xit('should translate the charts', function () {
+            it('should translate the charts', function () {
                 expect(translationsService.translateChartData).toHaveBeenCalledWith([chartData]);
             });
 

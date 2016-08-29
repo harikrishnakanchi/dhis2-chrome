@@ -103,6 +103,18 @@ define(['lodash'], function(_){
             return chartData;
         };
 
+        this.translateChartData = function (charts) {
+            if(_locale == 'en') {
+                return charts;
+            }
+
+            return _.map(charts, function (chart) {
+                self.translate(chart.series);
+                self.translate(chart.categories);
+                return chart;
+            });
+        };
+
         this.translateReferralLocations = function(arrayOfObjectsToBeTranslated) {
             if(_locale == 'en' && !_.isUndefined(arrayOfObjectsToBeTranslated)) {
                 return arrayOfObjectsToBeTranslated;
