@@ -81,28 +81,6 @@ define(['lodash'], function(_){
             return getTranslation(objectId, property) || defaultValue;
         };
 
-        this.translateCharts = function (chartData) {
-            if(_locale == 'en') {
-                return chartData;
-            }
-
-            var translatablePropertyIds = _.keys(chartData.metaData.names);
-            _.each(translatablePropertyIds, function (id) {
-                var isCategoryOptionCombo = _.get(categoryOptionCombosAndOptions, id);
-                if (isCategoryOptionCombo) {
-                    var translatedOptions = _.map(categoryOptionCombosAndOptions[id], function (categoryOptionId) {
-                        return getTranslation(categoryOptionId, 'shortName');
-                    });
-                    if(translatedOptions.length == _.compact(translatedOptions).length)
-                        chartData.metaData.names[id] = translatedOptions.join(', ');
-                } else {
-                    chartData.metaData.names[id] = getTranslation(id, 'shortName') || chartData.metaData.names[id];
-                }
-
-            });
-            return chartData;
-        };
-
         this.translateChartData = function (charts) {
             if(_locale == 'en') {
                 return charts;
