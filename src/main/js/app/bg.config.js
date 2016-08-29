@@ -120,6 +120,7 @@ require.config({
         "moduleDataBlockMerger": "app/consumer/mergestrategies/module.data.block.merger",
         "aggregateDataValuesMerger": "app/consumer/mergestrategies/aggregate.data.values.merger",
         "lineListEventsMerger": "app/consumer/mergestrategies/line.list.events.merger",
+        "excludedLinelistOptionsMerger": "app/consumer/mergestrategies/excluded.linelist.options.merger",
 
         "angular-indexedDB": "lib/angular-indexedDB/indexeddb",
 
