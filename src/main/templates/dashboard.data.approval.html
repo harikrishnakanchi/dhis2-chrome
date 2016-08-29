@@ -2,17 +2,17 @@
     <form name="approvalForm" class="data-approval-form">
         <div>
         <span class="title">{{resourceBundle.itemsAwaitingApprovalAtUserLevelLabel}}</span>
-        <span><input type="submit"
+        <span class="approval-button {{ layoutDirection.direction }}"><input type="submit"
                     ng-disabled="(itemsAwaitingApprovalAtUserLevel | filter : { 'selectedForApproval': true}).length === 0"
                     value="{{resourceBundle.approveBtnValue}}" class="btn btn-default"
                     ng-click="bulkApprove()"/>
         </span>
-            </div>
+        </div>
         <div ng-if="itemsArePresent(itemsAwaitingApprovalAtUserLevel)">
             <div ng-repeat="(opUnitName, modules) in itemsAwaitingApprovalAtUserLevelGroupedByOpUnit">
                 <div class="row">
                     <h4 class ='header-with-opunit'>{{opUnitName}}</h4>
-                    <div class="col-md-3" ng-repeat-start="(moduleName, items) in modules">
+                    <div class="col-md-3 {{ layoutDirection.direction }} dashboardDataApproval" ng-repeat-start="(moduleName, items) in modules">
                         <ul class="list-unstyled">
                             <li><h5>{{moduleName}}</h5></li>
                             <li ng-repeat="item in items | orderBy: 'period'">
