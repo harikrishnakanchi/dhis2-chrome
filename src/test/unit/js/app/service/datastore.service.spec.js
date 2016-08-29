@@ -99,6 +99,17 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl'], function (DataStoreServi
                 httpBackend.flush();
                 expect(actualKeys).toEqual(['key1_excludedOptions', 'key2_excludedOptions']);
             });
+
+            it('should return empty list if namespace is not exist', function () {
+                var actualKeys;
+                dataStoreService.getKeysForExcludedOptions().then(function (data) {
+                    actualKeys = data;
+                });
+
+                httpBackend.expectGET(url).respond(404, {});
+                httpBackend.flush();
+                expect(actualKeys).toEqual([]);
+            });
         });
     });
 });

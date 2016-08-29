@@ -29,7 +29,11 @@ define(["dhisUrl"], function (dhisUrl) {
 
         var getAllKeys = function () {
             var url = [dhisUrl.dataStore, NAMESPACE].join("/");
-            return $http.get(url).then(extractDataFromResponse);
+            return $http.get(url)
+                .then(extractDataFromResponse)
+                .catch(function (response) {
+                return response.status == 404 ? [] : $q.reject();
+            });
         };
 
         this.getKeysForExcludedOptions = function () {
