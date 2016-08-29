@@ -1,7 +1,8 @@
 define(["lodash"], function(_) {
-    return function($q, systemSettingService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository, excludedDataElementsRepository, mergeBy) {
+    return function($q, systemSettingService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository, excludedDataElementsRepository, mergeBy, excludedLinelistOptionsMerger) {
         this.run = function() {
             return getUserProjectIds()
+                .then(downloadAndMergeExcludedOptions)
                 .then(downloadedProjectSettings)
                 .then(function(projectSettings) {
                     return $q.all([saveReferrals(projectSettings), mergeAndSavePatientOriginDetails(projectSettings), saveExcludedDataElements(projectSettings)]);
@@ -17,6 +18,14 @@ define(["lodash"], function(_) {
                 return;
 
             return systemSettingService.getProjectSettings(projectIds);
+        };
+
+        var downloadAndMergeExcludedOptions = function (projectIds) {
+            return _.reduce(projectIds, function (promise, projectId) {
+                return promise.then(_.partial(excludedLinelistOptionsMerger.mergeAndSaveForProject, projectId));
+            }, $q.when()).then(function () {
+                return projectIds;
+            });
         };
 
         var saveReferrals = function(projectSettings) {
