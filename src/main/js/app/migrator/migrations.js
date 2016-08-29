@@ -340,6 +340,11 @@ define([], function() {
         changeLogStore.delete("pivotTables");
     };
 
+    var force_charts_to_redownload = function (db, tx) {
+        var changeLogStore = tx.objectStore("changeLog");
+        changeLogStore.delete("charts");
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -385,6 +390,7 @@ define([], function() {
         migrate_and_delete_pivot_table_store,
         delete_keys_chart_and_reports_from_changelog,
         force_pivot_tables_to_redownload,
-        create_excluded_line_list_options_store
+        create_excluded_line_list_options_store,
+        force_charts_to_redownload
     ];
 });
