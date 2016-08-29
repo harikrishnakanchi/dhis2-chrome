@@ -113,9 +113,13 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             };
 
             var getChartData = function(charts) {
-                return $q.all(_.map(charts, function(chartDefinition) {
-                    return chartRepository.getChartData(chartDefinition, $scope.orgUnit.id);
-                }));
+                var promises = _.map(charts, function(chart) {
+                    return chartRepository.getChartData(chart, $scope.orgUnit.id);
+                });
+
+                return $q.all(promises).then(function (charts) {
+                    return _.filter(charts, 'isDataAvailable');
+                });
             };
 
             var transformForNVD3 = function (charts) {
@@ -193,10 +197,14 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             });
         };
 
-        var getPivotTableData = function(tables) {
-            return $q.all(_.map(tables, function(tableDefinition) {
-                return pivotTableRepository.getPivotTableData(tableDefinition, $routeParams.orgUnit);
-            }));
+        var getPivotTableData = function(pivotTables) {
+            var promises = _.map(pivotTables, function(pivotTable) {
+                return pivotTableRepository.getPivotTableData(pivotTable, $routeParams.orgUnit);
+            });
+
+            return $q.all(promises).then(function (pivotTableData) {
+                return _.filter(pivotTableData, 'isTableDataAvailable');
+            });
         };
 
         var loadPivotTablesWithData = function() {

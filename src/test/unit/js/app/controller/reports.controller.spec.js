@@ -95,31 +95,40 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                     dataSetCode: 'someOtherDataSetCode'
                 };
                 chartData = {
-                    some: 'data',
+                    isDataAvailable: true,
                     categories: ['someCategory']
                 };
 
                 chartRepository.getAll.and.returnValue(utils.getPromise(q, [chartA, chartB]));
                 chartRepository.getChartData.and.returnValue(utils.getPromise(q, chartData));
-                scope.$apply();
             });
 
 
             it('should load all chart definitions', function () {
+                scope.$apply();
                 expect(chartRepository.getAll).toHaveBeenCalled();
             });
 
             it('should get chartData for relevant dataSets of the module', function () {
+                scope.$apply();
                 expect(chartRepository.getChartData).toHaveBeenCalledWith(chartA, mockModule.id);
                 expect(chartRepository.getChartData).toHaveBeenCalledTimes(1);
             });
 
             it('should translate the charts', function () {
+                scope.$apply();
                 expect(translationsService.translateChartData).toHaveBeenCalledWith([chartData]);
             });
 
             it('should set the charts on the scope', function () {
+                scope.$apply();
                 expect(scope.charts).toEqual([chartData]);
+            });
+
+            it('should filter out charts without data', function () {
+                chartData.isDataAvailable = false;
+                scope.$apply();
+                expect(scope.charts).toEqual([]);
             });
         });
 
@@ -134,30 +143,39 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                     dataSetCode: 'someOtherDataSetCode'
                 };
                 pivotTableData = {
-                    some: 'data'
+                    isTableDataAvailable: true
                 };
 
                 pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [pivotTableA, pivotTableB]));
                 pivotTableRepository.getPivotTableData.and.returnValue(utils.getPromise(q, pivotTableData));
-                scope.$apply();
             });
 
 
             it('should load all pivot table definitions', function () {
+                scope.$apply();
                 expect(pivotTableRepository.getAll).toHaveBeenCalled();
             });
 
             it('should get pivotTableData for relevant dataSets of the module', function () {
+                scope.$apply();
                 expect(pivotTableRepository.getPivotTableData).toHaveBeenCalledWith(pivotTableA, mockModule.id);
                 expect(pivotTableRepository.getPivotTableData).toHaveBeenCalledTimes(1);
             });
 
             it('should translate the pivot tables', function () {
+                scope.$apply();
                 expect(translationsService.translatePivotTableData).toHaveBeenCalledWith([pivotTableData]);
             });
 
             it('should set the pivot tables on the scope', function () {
+                scope.$apply();
                 expect(scope.pivotTables).toEqual([pivotTableData]);
+            });
+
+            it('should filter out pivot tables without data', function () {
+                pivotTableData.isTableDataAvailable = false;
+                scope.$apply();
+                expect(scope.pivotTables).toEqual([]);
             });
         });
 

@@ -144,10 +144,14 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, date
             return _.filter(tables, { 'projectReport': true });
         };
 
-        var getDataForPivotTables = function(tables) {
-            return $q.all(_.map(tables, function(tableDefinition) {
-                return pivotTableRepository.getPivotTableData(tableDefinition, $scope.selectedProject.id);
-            }));
+        var getDataForPivotTables = function(pivotTables) {
+            var promises = _.map(pivotTables, function(pivotTable) {
+                return pivotTableRepository.getPivotTableData(pivotTable, $scope.selectedProject.id);
+            });
+
+            return $q.all(promises).then(function (pivotTableData) {
+                return _.filter(pivotTableData, 'isTableDataAvailable');
+            });
         };
 
         var loadLastUpdatedTimeForProjectReport = function() {
@@ -168,7 +172,7 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, date
                 .then(getDataForPivotTables)
                 .then(translationsService.translatePivotTableData)
                 .then(function(pivotTables) {
-                    $scope.pivotTables = _.sortBy(_.filter(pivotTables, { isTableDataAvailable: true }), 'displayPosition');
+                    $scope.pivotTables = _.sortBy(pivotTables, 'displayPosition');
                 });
         };
 

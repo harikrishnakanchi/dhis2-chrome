@@ -302,6 +302,13 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             expect(scope.pivotTables).toEqual([pivotTableData]);
         });
 
+        it('should filter out project report tables without data', function() {
+            pivotTableData.isTableDataAvailable = false;
+            scope.$apply();
+
+            expect(scope.pivotTables).toEqual([]);
+        });
+
         it("should add the projectAttributes which lists all the project basic info into the scope", function() {
             var expectedProjectAttributes = [
                 {
