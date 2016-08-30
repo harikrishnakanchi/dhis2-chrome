@@ -368,7 +368,6 @@ body {
         }
         .data-approval-form {
             .title {
-                text-transform: uppercase;
                 font-weight: bold;
                 font-size: 14px;
                 color: black;
@@ -378,8 +377,14 @@ body {
                 margin: 0;
                 padding: 10px 0;
             }
+            .approval-button & .row {
+                padding: 0 10px 10px 10px;
+            }
             .btn {
-                float:right;
+                float:left;
+                &.rtl {
+                    float: right;
+                }
             }
             border-bottom: 1px #ddd solid;
         }
@@ -407,7 +412,10 @@ body {
             margin-bottom: 5px;
             th {
                 line-height: 1.0000;
-                // background: #EAEAEA;
+                &.header-with-opunit {
+                    padding: 9px 5px;
+                }
+
             }
         }
         .dataset-acc-wrapper {
@@ -1377,11 +1385,6 @@ header .hamburger-menu {
 .dashboardDataApproval.rtl {
     float: right;
 }
-
-.approval-button.rtl {
-    float: left;
-}
-
 
 .dashboardpage {
     .select-all-checkbox {
