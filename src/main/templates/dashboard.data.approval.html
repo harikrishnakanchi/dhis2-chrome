@@ -1,10 +1,10 @@
 <div>
     <form name="approvalForm" class="data-approval-form">
-        <div>
+        <div class="menu">
         <span class="title">{{resourceBundle.itemsAwaitingApprovalAtUserLevelLabel}}</span>
         <span class="approval-button {{ layoutDirection.direction }}"><input type="submit"
                     ng-disabled="(itemsAwaitingApprovalAtUserLevel | filter : { 'selectedForApproval': true}).length === 0"
-                    value="{{resourceBundle.approveBtnValue}}" class="btn btn-default"
+                    value="{{resourceBundle.approveBtnValue}}" class="btn btn-primary"
                     ng-click="bulkApprove()"/>
         </span>
         </div>
