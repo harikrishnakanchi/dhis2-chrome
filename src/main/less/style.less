@@ -338,17 +338,14 @@ body {
         .dataentrytable {
             .title {
                 font-size:14px;
-                text-transform: uppercase;
                 th {
                     color: black;
                     line-height: 2;
-                }
-                th:nth-child(2) {
-                    padding-left: 80px;
+                    border-bottom: 0px;
                 }
             }
             th {
-                padding-top: 15px;
+                padding-top: 10px;
                 text-align: left;
                 border: 0px;
             }
@@ -356,8 +353,17 @@ body {
                 display: inline-block;
                 min-width: 185px;
             }
-            td:nth-child(3) {
-                padding-left: 80px;
+            tbody {
+                border: 0px;
+            }
+            td {
+                border: 0px;
+            }
+            tr {
+                border-top: 1px solid #ddd;
+            }
+            tr:nth-child(-n+2) {
+                border-top: 0px;
             }
         }
         .data-approval-form {
