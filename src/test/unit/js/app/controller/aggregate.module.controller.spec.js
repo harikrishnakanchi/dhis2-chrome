@@ -657,7 +657,8 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 }, "dataValues"]);
             });
 
-            it('should update assoscaiated datasets when a dataset is removed from existing module', function () {
+            // TODO: This test is skipped until we play orgUnit-Dataset association removal as part of story #2017
+            xit('should update assoscaiated datasets when a dataset is removed from existing module', function () {
                 var datasetOne = {
                     "id": "ds1",
                     "organisationUnits": [{

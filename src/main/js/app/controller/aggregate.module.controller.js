@@ -263,6 +263,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 });
             };
 
+            // TODO: Use this method when we remove orgUnit-Dataset association as part of story #2017
             var removeOrgUnitsFromDataSets = function (datasetIds, orgUnitIds) {
                 return datasetRepository.removeOrgUnits(datasetIds, orgUnitIds).then(function () {
                     var orgunitIdsAndDatasetIds = {
@@ -327,9 +328,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     var associatedDatasetIds = _.map($scope.associatedDatasets, 'id');
                     var newlyAddedDatasetIds = _.difference(associatedDatasetIds ,existingAssociatedDatasetIds);
                     var removedDatasetIds = _.difference(existingAssociatedDatasetIds, associatedDatasetIds);
-                    return associateToDatasets(newlyAddedDatasetIds, [enrichedModule]).then(function () {
-                        return removeOrgUnitsFromDataSets(removedDatasetIds, [enrichedModule.id]);
-                    });
+                    return associateToDatasets(newlyAddedDatasetIds, [enrichedModule]);
                 };
 
                 $scope.loading = true;
