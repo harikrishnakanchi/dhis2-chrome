@@ -3,7 +3,7 @@
         <div ng-show="charts | filter: { weeklyChart: true, dataSetCode: selectedDataset.code } | isEmpty">
             <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
         </div>
-        <div ng-hide="charts | filter: { weeklyChart: true, dataSetCode: selectedDataset.code } | isEmpty">
+        <div ng-if="!(charts | filter: { weeklyChart: true, dataSetCode: selectedDataset.code } | isEmpty)">
             <span ng-show="updatedForWeeklyChart" class="text-info">
                 <strong> Updated: {{ updatedForWeeklyChart }} </strong>
             </span>

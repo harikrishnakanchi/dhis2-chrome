@@ -3,7 +3,7 @@
         <div ng-show="charts | filter: { monthlyChart: true, dataSetCode: selectedDataset.code } | isEmpty">
             <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
         </div>
-        <div ng-hide="charts | filter: { monthlyChart: true, dataSetCode: selectedDataset.code } | isEmpty">
+        <div ng-if="!(charts | filter: { monthlyChart: true, dataSetCode: selectedDataset.code } | isEmpty)">
             <span ng-show="updatedForMonthlyChart" class="text-info">
                 <strong> Updated: {{ updatedForMonthlyChart }} </strong>
             </span>
