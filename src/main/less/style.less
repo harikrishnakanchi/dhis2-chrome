@@ -221,7 +221,7 @@ body {
         font-size: large;
     }
     .info-error-section {
-        padding-top: 15px;
+        padding: 15px 0;
         .alert {
             margin-bottom: 0;
         }
@@ -336,6 +336,10 @@ body {
             padding: 0 20px;
         }
         .dataentrytable {
+            thead {
+                background-color: #fff;
+                border-bottom: 1px solid #ddd;
+            }
             .title {
                 font-size:14px;
                 th {
@@ -1341,14 +1345,6 @@ li.dropdown-submenu {
     }
     &.dataentrypage {
         .dataentrytable {
-            .title {
-                th:nth-child(2) {
-                    padding-right: 80px;
-                }
-            }
-            td:nth-child(3) {
-                padding-right: 80px;
-            }
             th {
                 text-align: right;
             }

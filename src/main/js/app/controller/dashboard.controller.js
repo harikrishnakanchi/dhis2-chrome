@@ -1,5 +1,5 @@
 define(["properties", "moment", "dateUtils", "lodash"], function(properties, moment, dateUtils, _) {
-    return function($scope, $hustle, $q, $rootScope, $modal, $timeout, $location, approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility, dataSyncFailureRepository) {
+    return function($scope, $hustle, $q, $rootScope, $modal, $timeout, $location, $anchorScroll, approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility, dataSyncFailureRepository) {
 
         $scope.formatPeriods = function(period) {
             m = moment(period, "GGGG[W]W");
@@ -35,6 +35,11 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
         $scope.toggleWeek = function () {
             var items = _.flatten(_.values($scope.itemsAwaitingApprovalAtUserLevel));
             $scope.selectedAllItemsForApproval = _.all(items, 'selectedForApproval');
+        };
+
+        var scrollToTop = function() {
+            $location.hash();
+            $anchorScroll();
         };
 
         $scope.bulkApprove = function() {
@@ -108,7 +113,7 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
             };
 
             showModal(function() {
-                approve().then(successPromise, errorPromise);
+                approve().then(successPromise, errorPromise).then(scrollToTop);
             }, modalMessages);
         };
 

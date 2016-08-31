@@ -1,9 +1,9 @@
-<table class="table dataentrytable" ng-if="itemsArePresent(itemsAwaitingSubmission) || itemsArePresent(itemsAwaitingApprovalAtOtherLevels)">
+<table class="table dataentrytable" ng-if="itemsArePresent(itemsAwaitingSubmission) || itemsArePresent(itemsAwaitingApprovalAtOtherLevels)" locked-table-header>
     <thead>
         <tr class="title">
-            <th class="col-md-4"></th>
-            <th class="col-md-4">{{resourceBundle.itemsAwaitingDataSubmissionLabel}}</th>
-            <th class="col-md-4">{{resourceBundle.awaitingApproval}}</th>
+            <th class="col-md-4">{{resourceBundle.moduleLabel|uppercase}}</th>
+            <th class="col-md-4">{{resourceBundle.itemsAwaitingDataSubmissionLabel|uppercase}}</th>
+            <th class="col-md-4">{{resourceBundle.awaitingApproval|uppercase}}</th>
         </tr>
     </thead>
     <tbody ng-repeat="(opUnitName, modules) in moduleNamesGroupedByOpunit">

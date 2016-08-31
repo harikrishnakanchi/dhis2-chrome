@@ -152,6 +152,8 @@
     "itemsAwaitingApprovalAtCoordinationLevel": "Coordination Level",
     "itemsAwaitingApproval": "Items awaiting approval",
     "awaitingApproval": "Awaiting Approval",
+    "awaitingApprovalAtOtherLevel": "Awaiting Approval at other levels",
+    "noWeeksAwaitingApproval": "There are no weeks for approval.",
     "awaitingApprovalAtLabel": "Awaiting Approval At",
     "selectProgramLabel": "Select Program",
     "deleteEventConfirmation": "Are you sure you want to delete this event?",

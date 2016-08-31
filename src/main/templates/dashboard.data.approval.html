@@ -1,7 +1,7 @@
 <div>
     <form name="approvalForm" class="data-approval-form">
         <div class="menu">
-        <span class="title">{{resourceBundle.itemsAwaitingApprovalAtUserLevelLabel}}</span>
+        <span class="title">{{resourceBundle.itemsAwaitingApprovalAtUserLevelLabel | uppercase}}</span>
         </div>
         <div ng-if="itemsArePresent(itemsAwaitingApprovalAtUserLevel)">
             <div ng-repeat="(opUnitName, modules) in itemsAwaitingApprovalAtUserLevelGroupedByOpUnit">
@@ -22,21 +22,25 @@
                     <div ng-class="{'clearfix': ($index+1)%4==0 }" ng-repeat-end></div>
                 </div>
             </div>
-            <div class="row approval-button"><input type="submit"
-                                                                                 ng-disabled="(itemsAwaitingApprovalAtUserLevel | filter : { 'selectedForApproval': true}).length === 0"
-                                                                                 value="{{ resourceBundle.approveBtnValue }}"
-                                                                                 class="btn btn-primary {{ layoutDirection.direction }}"
-                                                                                 ng-click="bulkApprove()"/>
+            <div class="row approval-button">
+                <input type="submit"
+                       ng-disabled="(itemsAwaitingApprovalAtUserLevel | filter : { 'selectedForApproval': true}).length === 0"
+                       value="{{ resourceBundle.approveBtnValue }}"
+                       class="btn btn-primary {{ layoutDirection.direction }}"
+                       ng-click="bulkApprove()"/>
             </div>
+        </div>
+        <div ng-if="!itemsArePresent(itemsAwaitingApprovalAtUserLevel)" class="alert alert-info">
+            {{ resourceBundle.noWeeksAwaitingApproval }}
         </div>
     </form>
     <form>
-        <table class="table dataentrytable" ng-if="itemsArePresent(itemsAwaitingSubmission) || itemsArePresent(itemsAwaitingApprovalAtOtherLevels)">
+        <table class="table dataentrytable" ng-if="itemsArePresent(itemsAwaitingSubmission) || itemsArePresent(itemsAwaitingApprovalAtOtherLevels)" locked-table-header="">
             <thead>
             <tr class="title">
-                <th class="col-md-4"></th>
-                <th class="col-md-4">{{resourceBundle.itemsAwaitingDataSubmissionLabel}}</th>
-                <th class="col-md-4">{{resourceBundle.awaitingApproval}}</th>
+                <th class="col-md-4">{{resourceBundle.moduleLabel|uppercase}}</th>
+                <th class="col-md-4">{{resourceBundle.itemsAwaitingDataSubmissionLabel|uppercase}}</th>
+                <th class="col-md-4">{{resourceBundle.awaitingApprovalAtOtherLevel|uppercase}}</th>
             </tr>
             </thead>
             <tbody ng-repeat="(opUnitName, modules) in moduleNamesGroupedByOpunit">
