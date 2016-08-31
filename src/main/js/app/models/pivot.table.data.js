@@ -29,7 +29,9 @@ define(['analyticsData', 'lodash'], function(AnalyticsData, _) {
 
     var mapRows = function (analyticsData) {
         var firstRow = _.first(analyticsData.rows);
-        return filterItemsWithDataValues(firstRow, analyticsData);
+        return _.map(filterItemsWithDataValues(firstRow, analyticsData), function (row, index) {
+            return _.set(row, 'rowNumber', index + 1);
+        });
     };
 
     var mapColumns = function (analyticsData, definition) {

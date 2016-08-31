@@ -15,7 +15,7 @@ define(['pivotTableData', 'analyticsData'], function(PivotTableData, AnalyticsDa
             };
             data = 'mockPivotTableData';
             mockAnalyticsData = {
-                rows: [['someRow']],
+                rows: [[{}]],
                 columns: [['someColumn']],
                 isDataAvailable: 'isDataAvailableBooleanValue',
                 getDataValue: function() {},
@@ -56,6 +56,12 @@ define(['pivotTableData', 'analyticsData'], function(PivotTableData, AnalyticsDa
             it('should map the first row', function () {
                 pivotTableData = PivotTableData.create(definition, data);
                 expect(pivotTableData.rows).toEqual(_.first(mockAnalyticsData.rows));
+            });
+
+            it('should add rowNumber to the rows', function () {
+                var expectedRow = [_.set({}, 'rowNumber', 1)];
+                pivotTableData = PivotTableData.create(definition, data);
+                expect(pivotTableData.rows).toEqual(expectedRow);
             });
         });
 
