@@ -161,21 +161,22 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                     itemsAwaitingApprovalAtOtherLevels = _.filter(moduleDataBlocks, { awaitingActionAtProjectLevelApprover: true });
                 }
 
-                $scope.itemsAwaitingSubmission = _.groupBy(itemsAwaitingSubmission, 'moduleName');
-                $scope.itemsAwaitingApprovalAtUserLevel = _.groupBy(itemsAwaitingApprovalAtUserLevel, 'moduleName');
-                $scope.itemsAwaitingApprovalAtOtherLevels = _.groupBy(itemsAwaitingApprovalAtOtherLevels, 'moduleName');
-                $scope.moduleNames = _.union(_.keys($scope.itemsAwaitingSubmission), _.keys($scope.itemsAwaitingApprovalAtOtherLevels));
-                $scope.moduleNamesGroupedByOpunit = _.groupBy(_.union(_.keys($scope.itemsAwaitingSubmission), _.keys($scope.itemsAwaitingApprovalAtOtherLevels)), function (moduleName) {
-                    return moduleName.split(' - ')[0];
+                var moduleMap = _.groupBy(moduleDataBlocks, 'opUnitName');
+                $scope.moduleMap = _.each(moduleMap, function (modules, opUnitName) {
+                    moduleMap[opUnitName] = _.uniq(_.map(modules, 'moduleName'));
                 });
-                $scope.itemsAwaitingApprovalAtUserLevelGroupedByOpUnit = _.groupBy(itemsAwaitingApprovalAtUserLevel, function (item) {
-                    return item.moduleName.split(' - ')[0];
-                });
-                $scope.itemsAwaitingApprovalAtUserLevelGroupedByOpUnit = _.transform($scope.itemsAwaitingApprovalAtUserLevelGroupedByOpUnit, function (data, modulesAwaitingApproval, opUnitName) {
-                    data[opUnitName] = _.groupBy(modulesAwaitingApproval, function (item) {
-                        return $scope.getModuleName(item.moduleName);
+
+                var groupItemsByOpUnitByModule = function (items) {
+                    var itemsByOpUnit = _.groupBy(items, 'opUnitName');
+                    return _.each(itemsByOpUnit, function (moduleDataBlocks, opUnit) {
+                        itemsByOpUnit[opUnit] = _.groupBy(moduleDataBlocks, 'moduleName');
                     });
-                }, {});
+                };
+
+                $scope.itemsAwaitingSubmission = groupItemsByOpUnitByModule(itemsAwaitingSubmission);
+                $scope.itemsAwaitingApprovalAtUserLevel = groupItemsByOpUnitByModule(itemsAwaitingApprovalAtUserLevel);
+                $scope.itemsAwaitingApprovalAtOtherLevels = groupItemsByOpUnitByModule(itemsAwaitingApprovalAtOtherLevels);
+
             });
         };
 

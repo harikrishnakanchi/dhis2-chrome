@@ -278,67 +278,126 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                     );
                 });
 
+                it('should create a map of modules grouped by op units', function () {
+                    var moduleDataBlocks = [{
+                        opUnitName: 'opUnitA',
+                        moduleName: 'moduleA'
+                    }, {
+                        opUnitName: 'opUnitA',
+                        moduleName: 'moduleB'
+                    }, {
+                        opUnitName: 'opUnitB',
+                        moduleName: 'moduleC'
+                    }, {
+                        opUnitName: 'opUnitB',
+                        moduleName: 'moduleD'
+                    }];
+
+                    moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, moduleDataBlocks));
+
+                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, anchorScroll, approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility, dataSyncFailureRepository);
+                    scope.$apply();
+
+                    expect(scope.moduleMap).toEqual({
+                        opUnitA: ['moduleA', 'moduleB'],
+                        opUnitB: ['moduleC', 'moduleD']
+                    });
+                });
+
                 it('should filter items awaiting at data entry level', function() {
                     var moduleDataBlockA = {
                         "moduleId": "moduleA",
                         "moduleName": "moduleAName",
+                        "opUnitName": "opUnitNameA",
                         "awaitingActionAtDataEntryLevel": true,
                         "notSynced": true
                     }, moduleDataBlockB = {
                         "moduleId": "moduleB",
                         "moduleName": "moduleBName",
+                        "opUnitName": "opUnitNameA",
                         "awaitingActionAtDataEntryLevel": false,
+                        "notSynced": false
+                    }, moduleDataBlockC = {
+                        "moduleId": "moduleC",
+                        "moduleName": "moduleCName",
+                        "opUnitName": "opUnitNameB",
+                        "awaitingActionAtDataEntryLevel": true,
                         "notSynced": false
                     };
 
-                    moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, [moduleDataBlockA, moduleDataBlockB]));
+                    moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, [moduleDataBlockA, moduleDataBlockB, moduleDataBlockC]));
 
                     dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, anchorScroll, approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility, dataSyncFailureRepository);
                     scope.$apply();
 
-                    expect(scope.itemsAwaitingSubmission).toEqual({ moduleAName: [moduleDataBlockA] });
+                    expect(scope.itemsAwaitingSubmission).toEqual({
+                        opUnitNameA: { moduleAName: [moduleDataBlockA] },
+                        opUnitNameB: { moduleCName: [moduleDataBlockC] }
+                    });
                 });
 
                 it('should filter items awaiting action at project level approval', function() {
                     var moduleDataBlockA = {
                         "moduleId": "moduleA",
                         "moduleName": "moduleAName",
+                        "opUnitName": "opUnitNameA",
                         "awaitingActionAtProjectLevelApprover": false,
                         "notSynced": false
                     }, moduleDataBlockB = {
                         "moduleId": "moduleB",
                         "moduleName": "moduleBName",
+                        "opUnitName": "opUnitNameA",
+                        "awaitingActionAtProjectLevelApprover": true,
+                        "notSynced": false
+                    }, moduleDataBlockC = {
+                        "moduleId": "moduleB",
+                        "moduleName": "moduleCName",
+                        "opUnitName": "opUnitNameB",
                         "awaitingActionAtProjectLevelApprover": true,
                         "notSynced": false
                     };
 
-                    moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, [moduleDataBlockA, moduleDataBlockB]));
+                    moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, [moduleDataBlockA, moduleDataBlockB, moduleDataBlockC]));
 
                     dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, anchorScroll, approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility, dataSyncFailureRepository);
                     scope.$apply();
 
-                    expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual({ moduleBName: [moduleDataBlockB] });
+                    expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual({
+                        opUnitNameA: {moduleBName: [moduleDataBlockB]},
+                        opUnitNameB: {moduleCName: [moduleDataBlockC]}
+                    });
                 });
 
                 it('should filter items awaiting action at coordination level approval', function() {
                     var moduleDataBlockA = {
                         "moduleId": "moduleA",
                         "moduleName": "moduleAName",
+                        "opUnitName": "opUnitNameA",
                         "awaitingActionAtCoordinationLevelApprover": false,
                         "notSynced": false
                     }, moduleDataBlockB = {
                         "moduleId": "moduleB",
                         "moduleName": "moduleBName",
+                        "opUnitName": "opUnitNameA",
+                        "awaitingActionAtCoordinationLevelApprover": true,
+                        "notSynced": false
+                    }, moduleDataBlockC = {
+                        "moduleId": "moduleB",
+                        "moduleName": "moduleCName",
+                        "opUnitName": "opUnitNameB",
                         "awaitingActionAtCoordinationLevelApprover": true,
                         "notSynced": false
                     };
 
-                    moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, [moduleDataBlockA, moduleDataBlockB]));
+                    moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, [moduleDataBlockA, moduleDataBlockB, moduleDataBlockC]));
 
                     dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, anchorScroll, approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility, dataSyncFailureRepository);
                     scope.$apply();
 
-                    expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual({ moduleBName: [moduleDataBlockB] });
+                    expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual({
+                        opUnitNameA: {moduleBName: [moduleDataBlockB]},
+                        opUnitNameB: {moduleCName: [moduleDataBlockC]}
+                    });
                 });
             });
 

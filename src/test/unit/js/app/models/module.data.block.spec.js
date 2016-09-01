@@ -59,16 +59,8 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                     }
                 };
                 moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.moduleName).toEqual('parentOrgUnitName - orgUnitName');
-            });
-
-            it('should return just the orgUnit name if it has no parent', function () {
-                orgUnit = {
-                    name: 'orgUnitName'
-                };
-                parentOrgUnit = undefined;
-                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.moduleName).toEqual('orgUnitName');
+                expect(moduleDataBlock.opUnitName).toEqual('parentOrgUnitName');
             });
         });
 

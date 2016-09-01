@@ -4,24 +4,24 @@
         <span class="title">{{resourceBundle.itemsAwaitingApprovalAtUserLevelLabel | uppercase}}</span>
         </div>
         <div ng-if="itemsArePresent(itemsAwaitingApprovalAtUserLevel)">
-            <div ng-repeat="(opUnitName, modules) in itemsAwaitingApprovalAtUserLevelGroupedByOpUnit">
+            <div ng-repeat="(opUnitName, modules) in moduleMap" ng-if="itemsAwaitingApprovalAtUserLevel[opUnitName]">
                 <div class="row">
                     <h4 class ='header-with-opunit'>{{opUnitName}}</h4>
-                    <div class="col-md-3 {{ layoutDirection.direction }} dashboardDataApproval" ng-repeat-start="(moduleName, items) in modules">
+                    <div class="col-md-4 {{ layoutDirection.direction }} dashboardDataApproval" ng-repeat-start="moduleName in modules" ng-if="itemsAwaitingApprovalAtUserLevel[opUnitName][moduleName].length > 0">
                         <ul class="list-unstyled">
                             <li><div class="data-approval">{{moduleName}}</div></li>
-                            <li ng-repeat="item in items | orderBy: 'period'">
+                            <li ng-repeat="week in itemsAwaitingApprovalAtUserLevel[opUnitName][moduleName] | orderBy: 'period'">
                                 <input type="checkbox" class="dashboard-form-checkbox"
-                                       ng-model="item.selectedForApproval"
-                                       ng-change="toggleWeek()"
-                                />
-                                <a ng-href="{{ getTemplateUrl(item) }}" ng-class="{ 'error-label': item.failedToSync }">{{formatPeriods(item.period)}}</a>
+                                       ng-model="week.selectedForApproval"
+                                       ng-change="toggleWeek()" />
+                                <a ng-href="{{ getTemplateUrl(week) }}" ng-class="{ 'error-label': week.failedToSync }">{{formatPeriods(week.period)}}</a>
                             </li>
                         </ul>
                     </div>
-                    <div ng-class="{'clearfix': ($index+1)%4==0 }" ng-repeat-end></div>
+                    <div ng-class="{'clearfix': ($index + 1) % 3 == 0 }" ng-repeat-end></div>
                 </div>
             </div>
+
             <div class="row approval-button">
                 <input type="submit"
                        ng-disabled="(itemsAwaitingApprovalAtUserLevel | filter : { 'selectedForApproval': true}).length === 0"
@@ -31,7 +31,7 @@
             </div>
         </div>
         <div ng-if="!itemsArePresent(itemsAwaitingApprovalAtUserLevel)" class="alert alert-info">
-            {{ resourceBundle.noWeeksAwaitingApproval }}
+            {{ resourceBundle.noItemsAwaitingApproval }}
         </div>
     </form>
     <form>
@@ -43,25 +43,26 @@
                 <th class="col-md-4">{{resourceBundle.awaitingApprovalAtOtherLevel|uppercase}}</th>
             </tr>
             </thead>
-            <tbody ng-repeat="(opUnitName, modules) in moduleNamesGroupedByOpunit">
-            <tr>
-                <th class="header-with-opunit col-md-4" colspan="3">{{ opUnitName }}</th>
+
+            <tbody ng-repeat="(opUnitName, modules) in moduleMap">
+            <tr class="header-with-opunit">
+                <th colspan="3" class="col-md-4">{{ opUnitName }}</th>
             </tr>
             <tr ng-repeat="moduleName in modules">
-                <td class="col-md-4">{{ getModuleName(moduleName) }}</td>
+                <td class="col-md-4"><strong>{{ moduleName }}</strong></td>
                 <td class="col-md-4">
                     <ul class="list-unstyled">
-                        <li ng-repeat="item in itemsAwaitingSubmission[moduleName] | orderBy: 'period'" ng-if="item.active">
-                            <span>{{formatPeriods(item.period)}}</span>
+                        <li ng-repeat="week in itemsAwaitingSubmission[opUnitName][moduleName] | orderBy: 'period'" ng-if="week.active">
+                            <span>{{formatPeriods(week.period)}}</span>
                         </li>
                     </ul>
                 </td>
                 <td class="col-md-4">
                     <ul class="list-unstyled">
-                        <li ng-repeat="item in itemsAwaitingApprovalAtOtherLevels[moduleName] | orderBy: 'period'" ng-if="item.active">
-                            <span class="period">{{formatPeriods(item.period)}}</span>
-                            <span ng-if="item.awaitingActionAtProjectLevelApprover">- {{ resourceBundle.itemsAwaitingApprovalAtProjectLevel }}</span>
-                            <span ng-if="item.awaitingActionAtCoordinationLevelApprover">- {{ resourceBundle.itemsAwaitingApprovalAtCoordinationLevel }}</span>
+                        <li ng-repeat="week in itemsAwaitingApprovalAtOtherLevels[opUnitName][moduleName] | orderBy: 'period'" ng-if="week.active">
+                            <span class="period">{{formatPeriods(week.period)}}</span>
+                            <span ng-if="week.awaitingActionAtProjectLevelApprover">- {{ resourceBundle.itemsAwaitingApprovalAtProjectLevel }}</span>
+                            <span ng-if="week.awaitingActionAtCoordinationLevelApprover">- {{ resourceBundle.itemsAwaitingApprovalAtCoordinationLevel }}</span>
                         </li>
                     </ul>
                 </td>

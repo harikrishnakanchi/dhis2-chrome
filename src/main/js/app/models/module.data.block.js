@@ -2,7 +2,8 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
     var ModuleDataBlock = function (orgUnit, period, aggregateDataValues, lineListEvents, approvalData, failedToSyncData, parentOrgUnit) {
         this.moduleId = orgUnit.id;
         this.period = period;
-        this.moduleName = parseModuleName(orgUnit, parentOrgUnit);
+        this.moduleName = orgUnit.name;
+        this.opUnitName = parentOrgUnit.name;
         this.lineListService = CustomAttributes.getBooleanAttributeValue(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
         this.active = isActive(this.period, orgUnit.openingDate);
 
@@ -84,14 +85,6 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
 
     var eventIsSubmitted = function(event) {
         return _.isUndefined(event.localStatus) || event.localStatus == 'READY_FOR_DHIS';
-    };
-
-    var parseModuleName = function (orgUnit, parentOrgUnit) {
-        if(parentOrgUnit) {
-            return [parentOrgUnit.name, orgUnit.name].join(' - ');
-        } else {
-            return orgUnit.name;
-        }
     };
 
     var dataValuesHaveBeenModifiedLocally = function(aggregateDataValues) {

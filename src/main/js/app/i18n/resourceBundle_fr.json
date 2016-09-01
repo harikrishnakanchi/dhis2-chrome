@@ -154,7 +154,7 @@
     "itemsAwaitingApproval": "Eléments en attente de validation",
     "awaitingApproval": "En attente d'approbation",
     "awaitingApprovalAtOtherLevel": "En attendant l'approbation à d'autres niveaux",
-    "noWeeksAwaitingApproval": "Il n'y a pas de semaines pour approbation.",
+    "noItemsAwaitingApproval": "Il n'y a pas d'articles pour approbation.",
     "awaitingApprovalAtLabel": "En attente de validation",
     "selectProgramLabel": "Sélectionner un Programme",
     "deleteEventConfirmation": "Etes-vous sûr de vouloir effacer ce cas?",
