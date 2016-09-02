@@ -324,5 +324,6 @@
         "dataDimension": "Données",
         "period": "Période",
         "organisationUnit": "L'unité organisationnelle"
-    }
+    },
+    "dataNotAvailableMessage": "There is no data for this week. One of the reasons might be because Praxis downloads only last 12 weeks of data. Any data collected before 12 weeks will not be available in data entry screen. However this data is available for use in the reports and chart sections. Contact {{ supportEmail }} for any questions."
 }

@@ -14,9 +14,13 @@
             <div class="alert alert-danger" ng-show="saveError">{{resourceBundle.dataSaveFailure}}</div>
             <div class="alert alert-danger" ng-show="submitError">{{resourceBundle.dataSubmitFailure}}</div>
 
+            <div class="alert alert-danger" ng-show="!(isDataAvailable || isDataEntryAllowed)">
+                {{ dataNotavailableMessage }}
+            </div>
+
             <div class="alert alert-danger" ng-show="syncError && moduleDataBlock.awaitingActionAtDataEntryLevel && !submitError">{{resourceBundle.aggregateDataSyncError}}</div>
 
-            <form name="dataentryForm" id="dataentry" ng-if="hasRoles(['Data entry user', 'Observer'])">
+            <form name="dataentryForm" id="dataentry" ng-if="hasRoles(['Data entry user', 'Observer']) && (isDataAvailable || isDataEntryAllowed)">
                 <div ng-class="layoutDirection.direction == 'rtl' ? 'text-left' : 'text-right'">
                     <button class="btn btn-sm btn-primary printTallySheetBtn" ng-click="printWindow()" ng-show="selectedModule">{{resourceBundle.printTallySheetBtnValue}}</button>
                 </div>
