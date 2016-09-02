@@ -35,7 +35,7 @@ define(['lodash', 'chromeUtils'], function(_, chromeUtils) {
 
         var promptAndWriteFile = function(fileName, contents, options) {
 
-            if(chromeUtils.getOS() == 'mac')
+            if(chromeUtils.getOS() == 'win')
                 fileName = replaceSpecialCharsInFileName(fileName);
 
             var deferred = $q.defer(),
