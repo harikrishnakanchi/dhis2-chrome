@@ -10,6 +10,7 @@ define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter'
 
                 spyOn(location, 'path');
                 spyOn(chromeUtils, 'sendMessage');
+                spyOn(chromeUtils, 'init');
 
                 packagedDataImporter = new PackagedDataImporter();
                 spyOn(packagedDataImporter, 'run').and.returnValue(utils.getPromise(q, {}));
@@ -123,6 +124,14 @@ define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter'
                 rootScope.$apply();
 
                 expect(packagedDataImporter.run).toHaveBeenCalled();
+            });
+
+            it('should initialize chromeUtils', function () {
+                initializationRoutine.run();
+
+                rootScope.$apply();
+
+                expect(chromeUtils.init).toHaveBeenCalled();
             });
         });
     });
