@@ -1,4 +1,4 @@
-define(["lodash", "moment"], function(_, moment) {
+define(["lodash", "moment", "properties", "interpolate"], function(_, moment, properties, interpolate) {
     return function($scope, $q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, datasetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService) {
 
         $scope.isGenderFilterApplied = false;
@@ -166,7 +166,10 @@ define(["lodash", "moment"], function(_, moment) {
             return !_.isEmpty($scope.procedureDataValueIds);
         };
 
+        $scope.noDataAvailableMessage = interpolate($scope.resourceBundle.dataNotAvailableMessage, { supportEmail:properties.support_email });
+
         var getPeriod = function() {
+            $scope.isValidWeek = moment($scope.week.startOfWeek).isAfter(moment().subtract(properties.projectDataSync.numWeeksToSync, 'week'));
             return moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
         };
 

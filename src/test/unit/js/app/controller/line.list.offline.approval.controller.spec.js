@@ -1,5 +1,5 @@
-define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEventRepository", "orgUnitRepository", "programRepository", "optionSetRepository", "datasetRepository", "referralLocationsRepository", "excludedDataElementsRepository", "translationsService"],
-    function(LineListOfflineApprovalController, mocks, utils, ProgramEventRepository, OrgUnitRepository, ProgramRepository, OptionSetRepository, DatasetRepository, ReferralLocationsRepository, ExcludedDataElementsRepository, TranslationsService) {
+define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEventRepository", "orgUnitRepository", "programRepository", "optionSetRepository", "datasetRepository", "referralLocationsRepository", "excludedDataElementsRepository", "translationsService", "timecop"],
+    function(LineListOfflineApprovalController, mocks, utils, ProgramEventRepository, OrgUnitRepository, ProgramRepository, OptionSetRepository, DatasetRepository, ReferralLocationsRepository, ExcludedDataElementsRepository, TranslationsService, timecop) {
         describe("lineListOfflineApprovalController", function() {
             var lineListOfflineApprovalController, scope, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, q, origins, program, optionSetMapping, events, origin1, origin2, origin3, origin4, dataSetRepository, associatedDataSets, referralLocationsRepository, excludedDataElementsRepository, translationsService;
 
@@ -153,6 +153,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         }
                     }]
                 }];
+
+                scope.resourceBundle = {};
 
                 programEventRepository = new ProgramEventRepository();
                 spyOn(programEventRepository, "getEventsForPeriod").and.returnValue(utils.getPromise(q, events));
@@ -513,6 +515,29 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 }];
                 expect(scope.shouldShowInOfflineSummary("Triage Status", allDataElements)).toEqual(true);
                 expect(scope.shouldShowInOfflineSummary("Case Number", allDataElements)).toEqual(false);
+            });
+
+            describe('isValidWeek', function () {
+                beforeEach(function () {
+                    Timecop.install();
+                    Timecop.freeze('2016-09-06T05:52:49.027Z'); // week 36
+                });
+
+                afterEach(function() {
+                    Timecop.returnToPresent();
+                    Timecop.uninstall();
+                });
+
+                it('should set isValidWeek to true if current week within last 12 weeks', function () {
+                    scope.$apply();
+                    scope.week = {
+                        weekNumber: 20,
+                        weekYear: 2016,
+                        startOfWeek: "2016-05-16"
+                    };
+
+                    expect(scope.isValidWeek).toBeTruthy();
+                });
             });
         });
     });
