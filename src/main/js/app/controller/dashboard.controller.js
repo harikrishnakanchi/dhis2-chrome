@@ -54,7 +54,7 @@ define(["properties", "moment", "dateUtils", "lodash", "interpolate"], function(
 
             var approve = function() {
                 var currentUsersUsername = $rootScope.currentUser.userCredentials.username,
-                    moduleDataBlocksToBeApproved = _.filter($scope.moduleDataBlocks, { selectedForApproval: true }),
+                    moduleDataBlocksToBeApproved = _.filter($scope.moduleDataBlocks, 'selectedForApproval'),
                     periodsAndOrgUnitsToBeApproved = _.map(moduleDataBlocksToBeApproved, function(moduleDataBlock) {
                         return {
                             "period": moduleDataBlock.period,

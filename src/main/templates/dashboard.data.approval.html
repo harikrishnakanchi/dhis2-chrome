@@ -11,7 +11,8 @@
                         <ul class="list-unstyled">
                             <li><div class="data-approval">{{moduleName}}</div></li>
                             <li ng-repeat="week in itemsAwaitingApprovalAtUserLevel[opUnitName][moduleName] | orderBy: 'period'">
-                                <input type="checkbox" class="dashboard-form-checkbox" ng-model="week.selectedForApproval" />
+                                <input type="checkbox" class="dashboard-form-checkbox"
+                                       ng-model="week.selectedForApproval" />
                                 <a ng-href="{{ getTemplateUrl(week) }}" ng-class="{ 'error-label': week.failedToSync }">{{formatPeriods(week.period)}}</a>
                             </li>
                         </ul>
@@ -22,7 +23,7 @@
 
             <div class="row approval-button">
                 <input type="submit"
-                       ng-disabled="(itemsAwaitingApprovalAtUserLevel | filter : { 'selectedForApproval': true}).length === 0"
+                       ng-disabled="moduleDataBlocks | filter: { selectedForApproval: true } | isEmpty"
                        value="{{ resourceBundle.approveBtnValue }}"
                        class="btn btn-primary {{ layoutDirection.direction }}"
                        ng-click="bulkApprove()"/>
