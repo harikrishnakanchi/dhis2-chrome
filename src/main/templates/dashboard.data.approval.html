@@ -4,20 +4,21 @@
         <span class="title">{{resourceBundle.itemsAwaitingApprovalAtUserLevelLabel | uppercase}}</span>
         </div>
         <div ng-if="itemsArePresent(itemsAwaitingApprovalAtUserLevel)">
-            <div ng-repeat="(opUnitName, modules) in moduleMap" ng-if="itemsAwaitingApprovalAtUserLevel[opUnitName]">
+            <div ng-repeat="(opUnitName, modules) in itemsAwaitingApprovalAtUserLevel">
                 <div class="row">
                     <h4 class ='header-with-opunit'>{{opUnitName}}</h4>
-                    <div class="col-md-4 {{ layoutDirection.direction }} dashboardDataApproval" ng-repeat-start="moduleName in modules" ng-if="itemsAwaitingApprovalAtUserLevel[opUnitName][moduleName].length > 0">
+                    <div class="col-md-4 {{ layoutDirection.direction }} dashboardDataApproval" ng-repeat-start="(moduleName, weeks) in modules">
                         <ul class="list-unstyled">
-                            <li><div class="data-approval">{{moduleName}}</div></li>
-                            <li ng-repeat="week in itemsAwaitingApprovalAtUserLevel[opUnitName][moduleName] | orderBy: 'period'">
-                                <input type="checkbox" class="dashboard-form-checkbox"
-                                       ng-model="week.selectedForApproval" />
+                            <li>
+                                <div class="data-approval">{{ moduleName }}</div>
+                            </li>
+                            <li ng-repeat="week in weeks | orderBy: 'period'">
+                                <input type="checkbox" class="dashboard-form-checkbox" ng-model="week.selectedForApproval" />
                                 <a ng-href="{{ getTemplateUrl(week) }}" ng-class="{ 'error-label': week.failedToSync }">{{formatPeriods(week.period)}}</a>
                             </li>
                         </ul>
                     </div>
-                    <div ng-class="{'clearfix': ($index + 1) % 3 == 0 }" ng-repeat-end></div>
+                    <div ng-class="{ 'clearfix': ($index + 1) % 3 == 0 }" ng-repeat-end></div>
                 </div>
             </div>
 
