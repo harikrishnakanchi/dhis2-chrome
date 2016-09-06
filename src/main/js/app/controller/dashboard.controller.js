@@ -1,4 +1,4 @@
-define(["properties", "moment", "dateUtils", "lodash"], function(properties, moment, dateUtils, _) {
+define(["properties", "moment", "dateUtils", "lodash", "interpolate"], function(properties, moment, dateUtils, _, interpolate) {
     return function($scope, $hustle, $q, $rootScope, $modal, $timeout, $location, $anchorScroll, approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility, dataSyncFailureRepository) {
 
         $scope.formatPeriods = function(period) {
@@ -181,7 +181,7 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
         };
 
         var init = function() {
-            $scope.support_email = properties.support_email;
+            $scope.contactSupport = interpolate($scope.resourceBundle.contactSupport, {supportEmail: properties.support_email});
 
             $scope.compatibilityInfo = {};
             checkVersionCompatibility($scope.compatibilityInfo);

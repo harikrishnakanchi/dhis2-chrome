@@ -1,4 +1,4 @@
-define(["md5", "properties", "lodash"], function(md5, properties, _) {
+define(["md5", "properties", "lodash", "interpolate"], function(md5, properties, _, interpolate) {
     return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility, translationsService) {
         var loadUserData = function(loginUsername) {
             var existingUserProjects = userPreferenceRepository.getCurrentUsersProjectIds();
@@ -140,8 +140,14 @@ define(["md5", "properties", "lodash"], function(md5, properties, _) {
                 .then(redirect);
         };
 
+        var stopWatch = $scope.$watch('resourceBundle.contactSupport', function (interpolationString) {
+            if(interpolationString) {
+                stopWatch();
+                $scope.contactSupport = interpolate(interpolationString, {supportEmail: properties.support_email});
+            }
+        });
+
         var init = function() {
-            $scope.support_email = properties.support_email;
             $scope.compatibilityInfo = {};
             checkVersionCompatibility($scope.compatibilityInfo);
         };

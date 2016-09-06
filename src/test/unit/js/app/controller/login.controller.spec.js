@@ -11,6 +11,8 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             hustle = $hustle;
             q = $q;
 
+            scope.resourceBundle = {};
+
             rootScope = {
                 "hasRoles": jasmine.createSpy("hasRoles").and.returnValue(false)
             };
