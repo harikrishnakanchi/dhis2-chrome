@@ -266,7 +266,7 @@
     "tabularReports": "تقارير مجدولة",
     "exportAsCsv": "تقرير تحميل",
     "invalidAccess": "المستخدم ليس لديه دخول الى نموذج ال Praxis هذا",
-    "versionAndConnectionMessage": "نسخة {{praxis_version}} متصلا {{dhis_url}}",
+    "connectionMessage": "متصلا {{dhis_url}}",
     "selectServiceNameLabel": "اختر الخدمة",
     "toLabel": "إلى",
     "weeklyReports": "تقارير أسبوعية",

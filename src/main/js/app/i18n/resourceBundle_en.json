@@ -266,7 +266,7 @@
     "tabularReports": "Tabular Reports",
     "exportAsCsv": "Download report",
     "invalidAccess": "User does not have access to this Praxis instance.",
-    "versionAndConnectionMessage": "Version {{praxis_version}} connected to {{dhis_url}}",
+    "connectionMessage": "Connected to {{dhis_url}}",
     "selectServiceNameLabel": "Select service",
     "toLabel": "to",
     "weeklyReports": "Weekly reports",
