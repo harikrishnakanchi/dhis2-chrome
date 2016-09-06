@@ -166,7 +166,7 @@ define(["lodash", "moment", "properties", "interpolate"], function(_, moment, pr
             return !_.isEmpty($scope.procedureDataValueIds);
         };
 
-        $scope.noDataAvailableMessage = interpolate($scope.resourceBundle.dataNotAvailableMessage, { supportEmail:properties.support_email });
+        $scope.contactSupport = interpolate($scope.resourceBundle.contactSupport, { supportEmail:properties.support_email });
 
         var getPeriod = function() {
             $scope.isValidWeek = moment($scope.week.startOfWeek).isAfter(moment().subtract(properties.projectDataSync.numWeeksToSync, 'week'));

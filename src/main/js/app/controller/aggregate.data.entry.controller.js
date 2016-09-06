@@ -22,7 +22,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             $scope.rowTotal = {};
         };
 
-        $scope.dataNotavailableMessage = interpolate($scope.resourceBundle.dataNotAvailableMessage, { supportEmail:properties.support_email });
+        $scope.contactSupport = interpolate($scope.resourceBundle.contactSupport, { supportEmail:properties.support_email });
 
         $scope.printWindow = function() {
             $scope.printingTallySheet = true;

@@ -14,8 +14,13 @@
             <div class="alert alert-danger" ng-show="saveError">{{resourceBundle.dataSaveFailure}}</div>
             <div class="alert alert-danger" ng-show="submitError">{{resourceBundle.dataSubmitFailure}}</div>
 
-            <div class="alert alert-danger" ng-show="!(isDataAvailable || isDataEntryAllowed)">
-                {{ dataNotavailableMessage }}
+            <div class="alert alert-danger" ng-if="!(isDataAvailable || isDataEntryAllowed)">{{ resourceBundle.aggregateDataNotAvailableMessage }}
+                <a href="" ng-click="messageExpanded=!messageExpanded">
+                    <span ng-if="!messageExpanded">{{ resourceBundle.moreLabel }}</span>
+                    <span ng-if="messageExpanded">{{ resourceBundle.lessLabel }}</span>
+                    {{ resourceBundle.infoLabel }}&hellip;</a>
+                <br>
+                <span ng-if="messageExpanded">{{ resourceBundle.praxisDownloadMessage }} <b>{{ contactSupport }}</b></span>
             </div>
 
             <div class="alert alert-danger" ng-show="syncError && moduleDataBlock.awaitingActionAtDataEntryLevel && !submitError">{{resourceBundle.aggregateDataSyncError}}</div>

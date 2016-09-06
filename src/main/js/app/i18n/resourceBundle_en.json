@@ -296,7 +296,6 @@
     "incompatiblePraxisVersion": "Current version of Praxis is no longer supported.",
     "praxis": "Praxis",
     "newUpgradeAvailable": "is now available. Your Praxis will be updated soon.",
-    "contactSupport": "Please contact HIS support",
     "weeksLabel": "weeks",
     "January": "January",
     "February": "February",
@@ -325,5 +324,11 @@
         "period": "Period",
         "organisationUnit": "Organisation Unit"
     },
-    "dataNotAvailableMessage": "There is no data for this week. One of the reasons might be because Praxis downloads only last 12 weeks of data. Any data collected before 12 weeks will not be available in data entry screen. However this data is available for use in the reports and chart sections. Contact {{supportEmail}} for any questions."
+    "moreLabel": "More",
+    "lessLabel": "Less",
+    "infoLabel": "info",
+    "aggregateDataNotAvailableMessage": "There is no data for this week.",
+    "linelistDataNotAvailableMessage": "There is no linelist data for this week.",
+    "praxisDownloadMessage": "One of the reasons might be because Praxis downloads only last 12 weeks of data. Any data collected before 12 weeks will not be available in data entry screen. However this data is available for use in the reports and chart sections.",
+    "contactSupport": "Contact {{supportEmail}} for any questions."
 }

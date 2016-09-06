@@ -1,8 +1,15 @@
 <div ng-controller="lineListOfflineApprovalController">
     <section class="panel tab-panel {{ layoutDirection.direction }}">
 
-        <div class="alert alert-info" ng-if="!showFilters && isValidWeek"> {{ resourceBundle.noCasesToSummarize }}</div>
-        <div class="alert alert-info" ng-if="!(showFilters || isValidWeek)"> {{ noDataAvailableMessage }}</div>
+        <div class="alert alert-info" ng-if="!showFilters && isValidWeek">{{ resourceBundle.noCasesToSummarize }}</div>
+        <div class="alert alert-danger" ng-if="!(showFilters || isValidWeek)">{{ resourceBundle.linelistDataNotAvailableMessage }}
+            <a href="" ng-click="messageExpanded=!messageExpanded">
+                <span ng-if="!messageExpanded">{{ resourceBundle.moreLabel }}</span>
+                <span ng-if="messageExpanded">{{ resourceBundle.lessLabel }}</span>
+                {{ resourceBundle.infoLabel }}&hellip;</a>
+            <br>
+            <span ng-if="messageExpanded">{{ resourceBundle.praxisDownloadMessage }} <b>{{ contactSupport }}</b></span>
+        </div>
 
         <div ng-if="showFilters">
             <accordion close-others="false">
