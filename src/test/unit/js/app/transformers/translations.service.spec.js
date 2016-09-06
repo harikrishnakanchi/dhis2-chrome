@@ -38,36 +38,6 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                 value: 'someFrenchDescriptionD',
                 locale: FRENCH,
                 property: 'description'
-            },{
-                objectId: 'someIdD',
-                value: 'someFrenchShortNameD',
-                locale: FRENCH,
-                property: 'shortName'
-            }, {
-                objectId: 'someIdD',
-                value: 'someFrenchNameD',
-                locale: FRENCH,
-                property: 'name'
-            }, {
-                objectId: 'someIdE',
-                value: 'someFrenchDescriptionE',
-                locale: FRENCH,
-                property: 'description'
-            }, {
-                objectId: 'someIdF',
-                value: 'someFrenchNameF',
-                locale: FRENCH,
-                property: 'name'
-            }, {
-                objectId: 'someRowId',
-                value: 'frenchRowName',
-                locale: FRENCH,
-                property: 'name'
-            }, {
-                objectId: 'someColumnId',
-                value: 'frenchColumnName',
-                locale: FRENCH,
-                property: 'name'
             }];
             mockStore.each.and.returnValue(utils.getPromise(q, mockTranslations));
 
@@ -85,16 +55,14 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
         });
 
         it('should return default value if translation for specified property in specified object is not present', function() {
-            var defaultValue = "defaultValue";
-
             initialiseTranslationsServiceForLocale(FRENCH);
-            expect(translationsService.getTranslationForProperty('someIdA', 'formName', defaultValue)).toEqual(defaultValue);
+            expect(translationsService.getTranslationForProperty('someInvalidId', 'name', 'defaultValue')).toEqual('defaultValue');
         });
 
         it('should translate name to french if locale is french', function () {
             var object = {
                 id: 'someIdA',
-                name: 'testName'
+                name: 'someEnglishNameA'
             };
             initialiseTranslationsServiceForLocale(FRENCH);
             expect(translationsService.translate(object).name).toEqual('someFrenchNameA');
@@ -103,10 +71,10 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
         it('should translate each element if object is an array', function () {
             var array = [{
                 id: 'someIdA',
-                name: 'testName'
+                name: 'someEnglishNameA'
             }, {
                 id: 'someIdB',
-                name: 'testName'
+                name: 'someEnglishNameB'
             }];
             initialiseTranslationsServiceForLocale(FRENCH);
             expect(_.map(translationsService.translate(array), 'name')).toEqual(['someFrenchNameA', 'someFrenchNameB']);
@@ -119,77 +87,62 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
         it('should not translate if locale is english', function () {
             var obj = {
                 id: 'someIdA',
-                name: 'testName'
+                name: 'someEnglishNameA'
             };
             initialiseTranslationsServiceForLocale(ENGLISH);
 
-            expect(translationsService.translate(obj).name).toEqual('testName');
+            expect(translationsService.translate(obj).name).toEqual('someEnglishNameA');
         });
 
-        it('should translate the name in the nested object structure if locale is anything other than english', function () {
+        it('should translate nested objects', function () {
             var obj = {
                 id: 'someIdA',
-                name: 'testName',
+                name: 'someEnglishNameA',
                 sections: [{
                     id: 'someIdB',
-                    name: 'testSection',
-                    dataElements: {
-                        id: 'someIdC',
-                        name: 'testDataElement'
-                    }
+                    name: 'someEnglishNameB'
                 }, {
-                    id: 'someIdD',
-                    name: 'testSection',
-                    dataElements: {
-                        id: 'someIdC',
-                        name: 'testDataElement'
-                    }
+                    id: 'someIdC',
+                    name: 'someEnglishNameC'
                 }]
             };
 
             initialiseTranslationsServiceForLocale(FRENCH);
 
             var translatedObject = translationsService.translate(obj);
-            expect(_.map(translatedObject.sections, 'name')).toEqual(['someFrenchNameB', 'someFrenchNameD']);
+            expect(_.map(translatedObject.sections, 'name')).toEqual(['someFrenchNameB', 'someFrenchNameC']);
         });
 
-        it('should set the default english name if there was no translation with the selected locale', function () {
+        it('should keep the default name if there was no translation with the selected locale', function () {
             var object = {
-                id: 'someObjectIdWithoutTranslation',
-                name: 'testName'
+                id: 'someInvalidId',
+                name: 'someEnglishName'
             };
             initialiseTranslationsServiceForLocale(FRENCH);
 
-            expect(translationsService.translate(object).name).toEqual('testName');
+            expect(translationsService.translate(object).name).toEqual('someEnglishName');
         });
 
-        it('should translate description property in the object with the selected locale', function () {
+        it('should translate the description property in the object', function () {
             var obj = {
                 id: 'someIdD',
-                description: 'english description'
+                description: 'someEnglishDescriptionD'
             };
             initialiseTranslationsServiceForLocale(FRENCH);
 
             expect(translationsService.translate(obj).description).toEqual('someFrenchDescriptionD');
         });
 
-        it('should not translate dataElements for referral datasets if locale is anything other than english', function () {
+        it('should not translate dataElements for referral dataDets', function () {
             var obj = [{
                 id: 'someIdA',
-                name: 'testName',
+                name: 'someEnglishNameA',
                 sections: [{
                     id: 'someIdB',
-                    name: 'testSection',
+                    name: 'someEnglishNameB',
                     dataElements: {
                         id: 'someIdC',
-                        name: 'testDataElement'
-                    }
-                }, {
-                    id: 'someIdD',
-                    name: 'testSection',
-                    dataElements: {
-                        id: 'someIdE',
-                        description: 'testDataElementDescription'
+                        name: 'someEnglishNameC'
                     }
                 }]
             }];
@@ -203,14 +156,7 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                     name: 'someFrenchNameB',
                     dataElements: {
                         id: 'someIdC',
-                        name: 'testDataElement'
-                    }
-                }, {
-                    id: 'someIdD',
-                    name: 'someFrenchNameD',
-                    dataElements: {
-                        id: 'someIdE',
-                        description: 'testDataElementDescription'
+                        name: 'someEnglishNameC'
                     }
                 }]
             }]);
@@ -219,11 +165,11 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
         describe('translateChartData', function () {
             it('should translate the series and categories of the chartData', function () {
                 var seriesItem = {
-                    id: 'someRowId',
-                    name: 'someRowName'
+                    id: 'someIdA',
+                    name: 'someEnglishNameA'
                 },  categoryItem = {
-                    id: 'someColumnId',
-                    name: 'someColumnName'
+                    id: 'someIdB',
+                    name: 'someEnglishNameB'
                 },  mockChartData = {
                     categories: [seriesItem],
                     series: [categoryItem]
@@ -232,8 +178,8 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
 
                 var translatedObjects = translationsService.translateChartData([mockChartData]);
                 expect(translatedObjects).toEqual([mockChartData]);
-                expect(seriesItem.name).toEqual('frenchRowName');
-                expect(categoryItem.name).toEqual('frenchColumnName');
+                expect(seriesItem.name).toEqual('someFrenchNameA');
+                expect(categoryItem.name).toEqual('someFrenchNameB');
             });
         });
 
@@ -242,16 +188,16 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
 
             beforeEach(function () {
                 rowItem = {
-                    id: 'someRowId',
-                    name: 'someRowName'
+                    id: 'someIdA',
+                    name: 'someEnglishNameA'
                 };
                 columnItem = {
-                    id: 'someColumnId',
-                    name: 'someColumnName'
+                    id: 'someIdB',
+                    name: 'someEnglishNameB'
                 };
                 columnConfigurationItem = {
-                    id: 'someColumnId',
-                    name: 'someColumnName'
+                    id: 'someIdC',
+                    name: 'someEnglishNameC'
                 };
                 mockPivotTableData = {
                     rows: [rowItem],
@@ -269,9 +215,9 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
             it('should translate the rows and columns of the pivotTableData', function () {
                 var translatedObject = translationsService.translatePivotTableData([mockPivotTableData]);
                 expect(translatedObject).toEqual([mockPivotTableData]);
-                expect(rowItem.name).toEqual('frenchRowName');
-                expect(columnItem.name).toEqual('frenchColumnName');
-                expect(columnConfigurationItem.name).toEqual('frenchColumnName');
+                expect(rowItem.name).toEqual('someFrenchNameA');
+                expect(columnItem.name).toEqual('someFrenchNameB');
+                expect(columnConfigurationItem.name).toEqual('someFrenchNameC');
             });
 
             describe('row or column is a period dimension', function () {
