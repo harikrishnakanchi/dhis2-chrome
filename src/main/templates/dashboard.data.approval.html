@@ -11,9 +11,7 @@
                         <ul class="list-unstyled">
                             <li><div class="data-approval">{{moduleName}}</div></li>
                             <li ng-repeat="week in itemsAwaitingApprovalAtUserLevel[opUnitName][moduleName] | orderBy: 'period'">
-                                <input type="checkbox" class="dashboard-form-checkbox"
-                                       ng-model="week.selectedForApproval"
-                                       ng-change="toggleWeek()" />
+                                <input type="checkbox" class="dashboard-form-checkbox" ng-model="week.selectedForApproval" />
                                 <a ng-href="{{ getTemplateUrl(week) }}" ng-class="{ 'error-label': week.failedToSync }">{{formatPeriods(week.period)}}</a>
                             </li>
                         </ul>

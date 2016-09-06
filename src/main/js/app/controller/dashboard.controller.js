@@ -23,20 +23,6 @@ define(["properties", "moment", "dateUtils", "lodash", "interpolate"], function(
             return "#/aggregate-data-entry/" + item.moduleId + "/" + item.period;
         };
 
-        $scope.toggleSelectAll = function() {
-            var items = _.flatten(_.values($scope.itemsAwaitingApprovalAtUserLevel));
-
-            $scope.selectedAllItemsForApproval = !$scope.selectedAllItemsForApproval;
-            _.each(items, function(item) {
-                item.selectedForApproval = $scope.selectedAllItemsForApproval;
-            });
-        };
-
-        $scope.toggleWeek = function () {
-            var items = _.flatten(_.values($scope.itemsAwaitingApprovalAtUserLevel));
-            $scope.selectedAllItemsForApproval = _.all(items, 'selectedForApproval');
-        };
-
         var scrollToTop = function() {
             $location.hash();
             $anchorScroll();
