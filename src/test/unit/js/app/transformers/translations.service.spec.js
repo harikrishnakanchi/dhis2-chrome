@@ -163,24 +163,48 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
         });
 
         describe('translateChartData', function () {
-            it('should translate the series and categories of the chartData', function () {
-                var seriesItem = {
+            var seriesItem, categoryItem, mockChartData;
+
+            beforeEach(function () {
+                seriesItem = {
                     id: 'someIdA',
                     name: 'someEnglishNameA'
-                },  categoryItem = {
+                };
+                categoryItem = {
                     id: 'someIdB',
                     name: 'someEnglishNameB'
-                },  mockChartData = {
+                };
+                mockChartData = {
                     categories: [seriesItem],
                     series: [categoryItem]
                 };
                 initialiseTranslationsServiceForLocale(FRENCH);
+            });
 
+            it('should translate the series and categories of the chartData', function () {
                 var translatedObjects = translationsService.translateChartData([mockChartData]);
                 expect(translatedObjects).toEqual([mockChartData]);
                 expect(seriesItem.name).toEqual('someFrenchNameA');
                 expect(categoryItem.name).toEqual('someFrenchNameB');
             });
+
+            describe('row or column is a period dimension', function () {
+                beforeEach(function () {
+                    rootScope.resourceBundle = {
+                        August: 'AugustInFrench'
+                    };
+                    seriesItem.id = 'somePeriodId';
+                    seriesItem.name = 'August 2016';
+                    seriesItem.periodDimension = true;
+                    mockChartData.monthlyChart = true;
+                });
+
+                it('should translate the month name if chart is a monthly chart', function () {
+                    translationsService.translateChartData([mockChartData]);
+                    expect(seriesItem.name).toEqual('AugustInFrench 2016');
+                });
+            });
+
         });
 
         describe('translate pivotTableData', function () {
@@ -225,14 +249,13 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                     rootScope.resourceBundle = {
                         August: 'AugustInFrench'
                     };
-                });
-
-                it('should translate the month name if pivotTable is a monthly report', function () {
                     rowItem.id = 'somePeriodId';
                     rowItem.name = 'August 2016';
                     rowItem.periodDimension = true;
                     mockPivotTableData.monthlyReport = true;
+                });
 
+                it('should translate the month name if pivotTable is a monthly report', function () {
                     translationsService.translatePivotTableData([mockPivotTableData]);
                     expect(rowItem.name).toEqual('AugustInFrench 2016');
                 });

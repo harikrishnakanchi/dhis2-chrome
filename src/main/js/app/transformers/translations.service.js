@@ -87,8 +87,13 @@ define(['lodash'], function(_){
             }
 
             return _.map(charts, function (chart) {
-                self.translate(chart.series);
-                self.translate(chart.categories);
+                var dimensions = _.flattenDeep([chart.series, chart.categories]),
+                    translatableDimensions = _.reject(dimensions, 'periodDimension'),
+                    periodDimensions = _.filter(dimensions, 'periodDimension');
+
+                self.translate(translatableDimensions);
+                if(chart.monthlyChart) translateMonthlyPeriods(periodDimensions);
+
                 return chart;
             });
         };
