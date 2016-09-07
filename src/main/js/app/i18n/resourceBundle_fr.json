@@ -148,7 +148,7 @@
     "reasonForInterventionValidation": "Veuillez saisir la Raison de l'Intervention",
     "itemsAwaitingDataSubmissionLabel": "Eléments en attente d'envoi",
     "itemsAwaitingApprovalAtUserLevelLabel": "Eléments en attente de votre validation",
-    "itemsAwaitingApprovalAtOtherLevelLabel": "Eléments en attente de validation à d'autres niveaux",
+    "itemsAwaitingApprovalAtOtherLevelLabel": "En attendant l'approbation à d'autres niveaux",
     "itemsAwaitingApprovalAtProjectLevel": "Niveau Projet",
     "itemsAwaitingApprovalAtCoordinationLevel": "Niveau Coordination",
     "itemsAwaitingApproval": "Eléments en attente de validation",
