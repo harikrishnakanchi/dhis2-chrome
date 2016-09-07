@@ -1,4 +1,4 @@
-<div ng-controller="opUnitController">
+<div ng-controller="opUnitController" class="op-unit-form">
     <div class="loading" ng-show="loading">
         <img src="img/ajax-loader.gif" class="spinner" />
     </div>
@@ -109,17 +109,19 @@
                             <td> {{origin.latitude}}</td>
                             <td> {{origin.longitude}}</td>
                             <td>
-                                <a title="edit" ng-if="!origin.isDisabled" class="edit" ng-click="editPatientOrigin(origin)">
-                                    <span class="glyphicon glyphicon-edit"></span>
+                                <a ng-if="!origin.isDisabled" class="edit" ng-click="editPatientOrigin(origin)">
+                                    <i class="fa fa-pencil"></i>
                                 </a>
-                                <span ng-if="origin.isDisabled" class="edit glyphicon glyphicon-ban-circle"></span>
+                                <a class="edit ban">
+                                    <i class="fa fa-ban" ng-if="origin.isDisabled"></i>
+                                </a>
                             </td>
                             <td>
                                 <a ng-if="!origin.isDisabled" href="" title="Disable" class="delete" ng-click="toggleOriginDisabledState(origin)">
-                                    <span class="glyphicon glyphicon-remove"></span>
+                                    <i class="fa fa-check-square-o"></i>
                                 </a>
                                 <a ng-if="origin.isDisabled" href="" title="Enable" class="delete" ng-click="toggleOriginDisabledState(origin)">
-                                    <span class="glyphicon glyphicon-ok glyphicon-green"></span>
+                                    <i class="fa fa-square-o"></i>
                                 </a>
                             </td>
                         </tr>

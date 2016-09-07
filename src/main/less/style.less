@@ -1444,3 +1444,16 @@ header .hamburger-menu {
 .viewRegistrationBookBtn {
     margin: -2px -7px 0;
 }
+
+.op-unit-form, .project-user-form {
+    .delete {
+        color: #000;
+    }
+    .edit {
+        &.ban {
+            cursor: not-allowed;
+            color: @brand-danger;
+        }
+        cursor: pointer;
+    }
+}
