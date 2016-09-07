@@ -19,8 +19,9 @@
                 <nav class="navbar">
                     <div class="{{layoutDirection.direction}}">
                         <div class="navbar-header" ng-class="{'navbar-right': layoutDirection.direction == 'rtl'}">
-                            <img src="img/logo.png" alt="" title="PRAXIS" id="logoImg" class="navbar-brand" tabindex="-1" ng-if="!showTestLogo()">
-                            <img src="img/logo-test.png" alt="" title="PRAXIS" id="logoImg" class="navbar-brand" tabindex="-1" ng-if="showTestLogo()">
+                            <img src="img/logo.png" alt="" title="PRAXIS" id="logoImg" class="navbar-brand logo" tabindex="-1" ng-if="!showTestLogo()">
+                            <img src="img/logo-test.png" alt="" title="PRAXIS" id="logoImg" class="navbar-brand logo" tabindex="-1" ng-if="showTestLogo()">
+                            <label class="version-number">{{ versionNumber() }}</label>
                         </div>
                         <div class="nav navbar-nav" ng-class="{'navbar-right': layoutDirection.direction != 'rtl'}" >
                             <p class="text-right login-message">

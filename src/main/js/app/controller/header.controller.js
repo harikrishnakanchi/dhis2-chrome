@@ -1,4 +1,4 @@
-define(["lodash"], function(_) {
+define(["lodash", "chromeUtils"], function(_, chromeUtils) {
     return function($q, $scope, $location, $rootScope, $hustle, $timeout, db, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor) {
         $scope.projects = [];
 
@@ -94,6 +94,12 @@ define(["lodash"], function(_) {
                 var currentLocation = $location.path();
                 $location.path("/productKeyPage").search({prev: currentLocation});
             }
+        };
+
+        $scope.versionNumber = function () {
+            var praxisVersion = chromeUtils.getPraxisVersion();
+            if (!praxisVersion) return '';
+            return praxisVersion;
         };
 
         var init = function() {

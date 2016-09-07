@@ -140,5 +140,25 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "chromeUti
                 systemSettingRepository.isKeyGeneratedFromProd.and.returnValue(false);
                 expect(scope.showTestLogo()).toBe(true);
             });
+
+            describe('Praxis Version', function () {
+                beforeEach(function () {
+                    spyOn(chromeUtils, 'getPraxisVersion').and.returnValue('7.0');
+                });
+
+                it('should get the correct Praxis Version', function () {
+                    scope.$apply();
+
+                    expect(scope.versionNumber()).toEqual('7.0');
+                });
+
+                it('should not show version number if praxisVersion is undefined', function () {
+                    chromeUtils.getPraxisVersion.and.returnValue(undefined);
+                    scope.$apply();
+
+                    expect(scope.versionNumber()).toEqual('');
+                });
+            });
+
         });
     });
