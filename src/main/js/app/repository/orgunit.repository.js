@@ -257,6 +257,18 @@ define(["moment", "lodashUtils"], function(moment, _) {
             });
         };
 
+        var enrichWithParent = function (orgUnit) {
+            var getAndStoreParent = function (orgUnit) {
+                if(!orgUnit.parent) return $q.when(orgUnit);
+
+                return get(orgUnit.parent.id).then(function (parent) {
+                    orgUnit.parent = parent;
+                    return orgUnit;
+                });
+            };
+            return _.isArray(orgUnit) ? $q.all(_.map(orgUnit, getAndStoreParent)) : getAndStoreParent(orgUnit);
+        };
+
         return {
             "upsert": upsert,
             "upsertDhisDownloadedData": upsertDhisDownloadedData,
@@ -272,7 +284,8 @@ define(["moment", "lodashUtils"], function(moment, _) {
             "getAllOriginsByName": getAllOriginsByName,
             "getAllOriginsInOrgUnits": getAllOriginsInOrgUnits,
             "getAllOrgUnitsUnderProject": getAllOrgUnitsUnderProject,
-            "getOrgUnitAndDescendants": getOrgUnitAndDescendants
+            "getOrgUnitAndDescendants": getOrgUnitAndDescendants,
+            "enrichWithParent": enrichWithParent
         };
     };
 });
