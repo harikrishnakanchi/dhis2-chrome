@@ -152,7 +152,6 @@
     "itemsAwaitingApprovalAtCoordinationLevel": "Coordination Level",
     "itemsAwaitingApproval": "Items awaiting approval",
     "awaitingApproval": "Awaiting Approval",
-    "awaitingApprovalAtOtherLevel": "Awaiting Approval at other levels",
     "noItemsAwaitingApproval": "There are no items for approval.",
     "awaitingApprovalAtLabel": "Awaiting Approval At",
     "selectProgramLabel": "Select Program",

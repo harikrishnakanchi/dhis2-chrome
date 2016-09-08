@@ -10,7 +10,7 @@
                     <div class="col-md-4 {{ layoutDirection.direction }} dashboardDataApproval" ng-repeat-start="(moduleName, weeks) in modules">
                         <ul class="list-unstyled">
                             <li>
-                                <div class="data-approval">{{ moduleName }}</div>
+                                <div class="data-approval"><strong>{{ moduleName }}</strong></div>
                             </li>
                             <li ng-repeat="week in weeks | orderBy: 'period'">
                                 <input type="checkbox" class="dashboard-form-checkbox" ng-model="week.selectedForApproval" />
@@ -40,7 +40,7 @@
             <tr class="title">
                 <th class="col-md-4">{{resourceBundle.moduleLabel|uppercase}}</th>
                 <th class="col-md-4">{{resourceBundle.itemsAwaitingDataSubmissionLabel|uppercase}}</th>
-                <th class="col-md-4">{{resourceBundle.awaitingApprovalAtOtherLevel|uppercase}}</th>
+                <th class="col-md-4">{{resourceBundle.awaitingApproval|uppercase}}</th>
             </tr>
             </thead>
 
