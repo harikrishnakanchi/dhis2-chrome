@@ -191,7 +191,9 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
         var loadOrgUnit = function() {
             var orgUnitId = $routeParams.orgUnit;
 
-            return orgUnitRepository.get(orgUnitId).then(function(orgUnit) {
+            return orgUnitRepository.get(orgUnitId)
+                .then(orgUnitRepository.enrichWithParent)
+                .then(function(orgUnit) {
                 orgUnit.displayName = orgUnit.parent.name + ' - ' + orgUnit.name;
                 orgUnit.lineListService = CustomAttributes.getBooleanAttributeValue(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
                 $scope.orgUnit = orgUnit;

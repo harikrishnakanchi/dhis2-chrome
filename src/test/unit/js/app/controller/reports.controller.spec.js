@@ -47,6 +47,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             spyOn(orgUnitRepository, 'get').and.returnValue(utils.getPromise(q, mockModule));
             spyOn(orgUnitRepository, 'getAllModulesInOrgUnits').and.returnValue(utils.getPromise(q, [mockModule]));
             spyOn(orgUnitRepository, 'findAllByParent').and.returnValue(utils.getPromise(q, []));
+            spyOn(orgUnitRepository, 'enrichWithParent').and.callFake(function(orgUnit){ return orgUnit; });
 
             changeLogRepository = new ChangeLogRepository();
             spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, {}));
