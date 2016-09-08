@@ -10,11 +10,15 @@ define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
         };
 
         var createForProject = function (projectId, periodRange) {
-            return orgUnitRepository.getAllModulesInOrgUnits(projectId).then(_.partial(createForModules, _, periodRange));
+            return orgUnitRepository.getAllModulesInOrgUnits(projectId)
+                .then(orgUnitRepository.enrichWithParent)
+                .then(_.partial(createForModules, _, periodRange));
         };
 
         var createForModule = function (moduleId, periodRange) {
-            return orgUnitRepository.findAll([moduleId]).then(_.partial(createForModules, _, periodRange));
+            return orgUnitRepository.findAll([moduleId])
+                .then(orgUnitRepository.enrichWithParent)
+                .then(_.partial(createForModules, _, periodRange));
         };
 
         var createForModules = function (moduleOrgUnits, periodRange) {
