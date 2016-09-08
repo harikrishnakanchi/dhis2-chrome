@@ -260,7 +260,6 @@ define(["moment", "lodashUtils"], function(moment, _) {
         return {
             "upsert": upsert,
             "upsertDhisDownloadedData": upsertDhisDownloadedData,
-            "getAll": getAll,
             "get": get,
             "findAll": findAll,
             "findAllByParent": findAllByParent,

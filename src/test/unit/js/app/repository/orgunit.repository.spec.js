@@ -279,19 +279,6 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
             expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedUpsertPayload);
         });
 
-        it("should get all org units", function() {
-            var actualOrgUnits;
-
-            orgUnitRepository.getAll().then(function(results) {
-                actualOrgUnits = results;
-            });
-
-            scope.$apply();
-
-            expect(mockOrgStore.getAll).toHaveBeenCalled();
-            expect(actualOrgUnits).toEqual(orgUnits);
-        });
-
         it("should get orgUnit by id", function() {
             var projectId = "proj1";
             var orgUnit = orgUnitRepository.get(projectId);
