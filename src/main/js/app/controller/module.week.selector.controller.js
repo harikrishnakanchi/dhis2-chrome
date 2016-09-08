@@ -56,7 +56,9 @@ define(["lodash", "moment", "interpolate"],
 
             var setAvailableModules = function() {
                 if ($rootScope.currentUser && $rootScope.currentUser.selectedProject) {
-                    return orgUnitRepository.getAllModulesInOrgUnits($rootScope.currentUser.selectedProject.id).then(function(modules) {
+                    return orgUnitRepository.getAllModulesInOrgUnits($rootScope.currentUser.selectedProject.id)
+                        .then(orgUnitRepository.enrichWithParent)
+                        .then(function(modules) {
                         $scope.modules = getFilteredModulesWithDisplayNames(modules);
                     });
                 } else {
