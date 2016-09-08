@@ -24,6 +24,7 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "chromeUti
 
                 spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
                 spyOn(orgUnitRepository, "getAllOpUnitsInOrgUnits").and.returnValue(utils.getPromise(q, []));
+                spyOn(orgUnitRepository, "enrichWithParent").and.callFake(function (orgUnit) { return orgUnit; });
 
                 spyOn(systemSettingRepository, "isProductKeySet").and.returnValue(utils.getPromise(q, true));
                 spyOn(systemSettingRepository, "isKeyGeneratedFromProd").and.returnValue(utils.getPromise(q, true));
