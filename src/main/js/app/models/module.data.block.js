@@ -1,9 +1,9 @@
 define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, CustomAttributes, moment, properties) {
-    var ModuleDataBlock = function (orgUnit, period, aggregateDataValues, lineListEvents, approvalData, failedToSyncData, parentOrgUnit) {
+    var ModuleDataBlock = function (orgUnit, period, aggregateDataValues, lineListEvents, approvalData, failedToSyncData) {
         this.moduleId = orgUnit.id;
         this.period = period;
         this.moduleName = orgUnit.name;
-        this.opUnitName = parentOrgUnit.name;
+        this.opUnitName = orgUnit.parent && orgUnit.parent.name;
         this.lineListService = CustomAttributes.getBooleanAttributeValue(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
         this.active = isActive(this.period, orgUnit.openingDate);
 

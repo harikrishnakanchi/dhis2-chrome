@@ -1,6 +1,6 @@
 define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(ModuleDataBlock, CustomAttributes, moment, timecop) {
     describe('ModuleDataBlock', function () {
-        var moduleDataBlock, orgUnit, parentOrgUnit, period, aggregateDataValues, lineListEvents, approvalData, someMomentInTime, isLineListService, failedToSyncData;
+        var moduleDataBlock, orgUnit, period, aggregateDataValues, lineListEvents, approvalData, someMomentInTime, isLineListService, failedToSyncData;
 
         beforeEach(function() {
             isLineListService = false;
@@ -8,10 +8,8 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                 return isLineListService;
             });
             orgUnit = {
-                id: 'someOrgUnitId'
-            };
-            parentOrgUnit = {
-                name: 'parentOrgUnitName'
+                id: 'someOrgUnitId',
+                name: 'someOrgUnitName'
             };
             period = 'somePeriod';
             aggregateDataValues = undefined;
@@ -22,7 +20,7 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
         });
 
         var createModuleDataBlock = function() {
-            return ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData, failedToSyncData, parentOrgUnit);
+            return ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData, failedToSyncData);
         };
 
         var createMockDataValue = function(options) {
@@ -46,21 +44,26 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             it('should return an instance with required properties', function () {
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.moduleId).toEqual(orgUnit.id);
+                expect(moduleDataBlock.moduleName).toEqual(orgUnit.name);
                 expect(moduleDataBlock.period).toEqual(period);
             });
         });
 
-        describe('moduleName', function () {
-            it('should concatenate the orgUnit parent name and orgUnit name', function () {
+        describe('opUnitName', function () {
+            it('should return the parent name', function () {
                 orgUnit = {
-                    name: 'orgUnitName',
                     parent: {
-                        name: 'parentName'
+                        name: 'parentOrgUnitName'
                     }
                 };
                 moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.moduleName).toEqual('orgUnitName');
-                expect(moduleDataBlock.opUnitName).toEqual('parentOrgUnitName');
+                expect(moduleDataBlock.opUnitName).toEqual(orgUnit.parent.name);
+            });
+
+            it('should return undefined if there is no parent', function () {
+                orgUnit = {};
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.opUnitName).toBeUndefined();
             });
         });
 
