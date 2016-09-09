@@ -79,6 +79,11 @@ define(["moment", "orgUnitMapper", "properties", "lodash"], function(moment, org
 
             var dhisProject = orgUnitMapper.mapToExistingProject(newOrgUnit, orgUnit);
 
+            dhisProject.attributeValues = _.filter(dhisProject.attributeValues, function (attributeValue) {
+                var falseyValues = [undefined, null, '', NaN];
+                return !_.includes(falseyValues, attributeValue.value);
+            });
+
             var getModulesInProject = function() {
                 return orgUnitRepository.getAllModulesInOrgUnits([dhisProject.id]);
             };
