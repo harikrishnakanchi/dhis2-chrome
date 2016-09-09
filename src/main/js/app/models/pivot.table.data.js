@@ -15,7 +15,7 @@ define(['analyticsData', 'lodash'], function(AnalyticsData, _) {
         this.rows = mapRows(analyticsData);
         this.columns = mapColumns(analyticsData, definition);
         this.columnConfigurations = getCartesianProductOfColumns(this.columns);
-        this.isTableDataAvailable = analyticsData.isDataAvailable;
+        this.isDataAvailable = analyticsData.isDataAvailable;
         this.getDataValue = analyticsData.getDataValue;
         this.getTotalOfDataValues = analyticsData.getTotalOfDataValues;
         this.getDisplayName = analyticsData.getDisplayName;

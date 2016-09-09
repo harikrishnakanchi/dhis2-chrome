@@ -47,7 +47,7 @@ define(['pivotTableData', 'analyticsData'], function(PivotTableData, AnalyticsDa
                 pivotTableData = PivotTableData.create(definition, data);
 
                 expect(pivotTableData.columns).toEqual(mockAnalyticsData.columns);
-                expect(pivotTableData.isTableDataAvailable).toEqual(mockAnalyticsData.isDataAvailable);
+                expect(pivotTableData.isDataAvailable).toEqual(mockAnalyticsData.isDataAvailable);
                 expect(pivotTableData.getDataValue).toEqual(mockAnalyticsData.getDataValue);
                 expect(pivotTableData.getTotalOfDataValues).toEqual(mockAnalyticsData.getTotalOfDataValues);
                 expect(pivotTableData.getDisplayName).toEqual(mockAnalyticsData.getDisplayName);

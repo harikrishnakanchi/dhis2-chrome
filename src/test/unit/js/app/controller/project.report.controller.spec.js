@@ -124,7 +124,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             pivotTableData = {
                 some: 'data',
                 title: 'someTitle',
-                isTableDataAvailable: true
+                isDataAvailable: true
             };
 
             orgUnitGroupSets = [{
@@ -303,7 +303,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
         });
 
         it('should filter out project report tables without data', function() {
-            pivotTableData.isTableDataAvailable = false;
+            pivotTableData.isDataAvailable = false;
             scope.$apply();
 
             expect(scope.pivotTables).toEqual([]);

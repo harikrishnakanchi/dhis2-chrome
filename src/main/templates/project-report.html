@@ -37,7 +37,7 @@
             <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
         </div>
         <div ng-if="!(pivotTables | isEmpty)" class="exp-coll-group">
-            <div ng-repeat="table in pivotTables" ng-show="table.isTableDataAvailable">
+            <div ng-repeat="table in pivotTables" ng-show="table.isDataAvailable">
                 <accordion>
                     <accordion-group is-open="status.open">
                         <accordion-heading>

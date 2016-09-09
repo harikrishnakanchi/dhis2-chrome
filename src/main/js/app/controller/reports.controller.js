@@ -206,7 +206,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             });
 
             return $q.all(promises).then(function (pivotTableData) {
-                return _.filter(pivotTableData, 'isTableDataAvailable');
+                return _.filter(pivotTableData, 'isDataAvailable');
             });
         };
 

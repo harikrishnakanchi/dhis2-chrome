@@ -144,7 +144,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                     dataSetCode: 'someOtherDataSetCode'
                 };
                 pivotTableData = {
-                    isTableDataAvailable: true
+                    isDataAvailable: true
                 };
 
                 pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [pivotTableA, pivotTableB]));
@@ -174,7 +174,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             });
 
             it('should filter out pivot tables without data', function () {
-                pivotTableData.isTableDataAvailable = false;
+                pivotTableData.isDataAvailable = false;
                 scope.$apply();
                 expect(scope.pivotTables).toEqual([]);
             });

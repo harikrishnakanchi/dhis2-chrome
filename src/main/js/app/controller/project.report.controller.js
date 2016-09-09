@@ -150,7 +150,7 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, date
             });
 
             return $q.all(promises).then(function (pivotTableData) {
-                return _.filter(pivotTableData, 'isTableDataAvailable');
+                return _.filter(pivotTableData, 'isDataAvailable');
             });
         };
 

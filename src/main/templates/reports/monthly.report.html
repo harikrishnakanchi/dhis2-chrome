@@ -35,7 +35,7 @@
                     <div ng-show="updatedForMonthlyPivotTable" class="text-info mb15">
                         <strong> Updated: {{ updatedForMonthlyPivotTable }} </strong>
                     </div>
-                    <div ng-repeat="table in pivotTables | filter: { monthlyReport: true, dataSetCode: selectedDataset.code, isTableDataAvailable: true } | orderBy: 'displayPosition'" class="exportCSV-container">
+                    <div ng-repeat="table in pivotTables | filter: { monthlyReport: true, dataSetCode: selectedDataset.code, isDataAvailable: true } | orderBy: 'displayPosition'" class="exportCSV-container">
                         <accordion close-others="false">
                             <accordion-group is-open="status.open">
                                 <accordion-heading>
