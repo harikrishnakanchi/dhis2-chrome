@@ -1,8 +1,9 @@
 <div>
+    <div ng-if="(charts | filter: { weeklyChart: true, dataSetCode: selectedDataset.code } | isEmpty) &&
+                (pivotTables | filter: { weeklyReport: true, dataSetCode: selectedDataset.code } | isEmpty)">
+        <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
+    </div>
     <div id="weeklyCharts">
-        <div ng-show="charts | filter: { weeklyChart: true, dataSetCode: selectedDataset.code } | isEmpty">
-            <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
-        </div>
         <div ng-if="!(charts | filter: { weeklyChart: true, dataSetCode: selectedDataset.code } | isEmpty)">
             <span ng-show="updatedForWeeklyChart" class="text-info">
                 <strong> Updated: {{ updatedForWeeklyChart }} </strong>
@@ -21,17 +22,14 @@
         </div>
     </div>
 
-    <div id="weeklyReports">
+    <div id="weeklyReports" ng-hide="pivotTables | filter: { weeklyReport: true, dataSetCode: selectedDataset.code } | isEmpty">
         <accordion close-others="false">
             <accordion-group is-open="true">
                 <accordion-heading>
                     <span>{{resourceBundle.tabularReports}}</span>
                     <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isReportOpen, 'glyphicon-chevron-right': !isReportOpen}"></i>
                 </accordion-heading>
-                <div ng-show="pivotTables | filter: { weeklyReport: true, dataSetCode: selectedDataset.code } | isEmpty">
-                    <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
-                </div>
-                <div ng-hide="pivotTables | filter: { weeklyReport: true, dataSetCode: selectedDataset.code } | isEmpty" class="exp-coll-group">
+                <div class="exp-coll-group">
                     <div class="text-info mb15" ng-show="updatedForWeeklyPivotTable">
                         <strong> Updated: {{ updatedForWeeklyPivotTable }} </strong>
                     </div>

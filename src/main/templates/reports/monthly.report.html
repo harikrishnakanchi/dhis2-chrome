@@ -1,8 +1,9 @@
 <div>
+    <div ng-show="(charts | filter: { monthlyChart: true, dataSetCode: selectedDataset.code } | isEmpty) &&
+                  (pivotTables | filter: { monthlyReport: true, dataSetCode: selectedDataset.code } | isEmpty)">
+        <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
+    </div>
     <div id="monthlyCharts">
-        <div ng-show="charts | filter: { monthlyChart: true, dataSetCode: selectedDataset.code } | isEmpty">
-            <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
-        </div>
         <div ng-if="!(charts | filter: { monthlyChart: true, dataSetCode: selectedDataset.code } | isEmpty)">
             <span ng-show="updatedForMonthlyChart" class="text-info">
                 <strong> Updated: {{ updatedForMonthlyChart }} </strong>
@@ -21,17 +22,14 @@
         </div>
     </div>
 
-    <div id="monthlyReports" class="margin-top">
+    <div id="monthlyReports" class="margin-top" ng-hide="pivotTables | filter: { monthlyReport: true, dataSetCode: selectedDataset.code } | isEmpty">
         <accordion close-others="false">
             <accordion-group is-open="true">
                 <accordion-heading>
                     <span>{{resourceBundle.tabularReports}}</span>
                     <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isReportOpen, 'glyphicon-chevron-right': !isReportOpen}"></i>
                 </accordion-heading>
-                <div ng-show="pivotTables | filter: { monthlyReport: true, dataSetCode: selectedDataset.code } | isEmpty">
-                    <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
-                </div>
-                <div ng-hide="pivotTables | filter: { monthlyReport: true, dataSetCode: selectedDataset.code } | isEmpty" class="exp-coll-group">
+                <div class="exp-coll-group">
                     <div ng-show="updatedForMonthlyPivotTable" class="text-info mb15">
                         <strong> Updated: {{ updatedForMonthlyPivotTable }} </strong>
                     </div>
