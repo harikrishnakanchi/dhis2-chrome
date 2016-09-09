@@ -24,7 +24,7 @@
         <td class="col-md-4">
             <ul class="list-unstyled">
                 <li ng-repeat="week in itemsAwaitingApprovalAtOtherLevels[opUnitName][moduleName] | orderBy: 'period'" ng-if="week.active">
-                    <a class="period" ng-class="{ 'error-label': week.failedToSync }" ng-href="{{getTemplateUrl(week)}}">{{formatPeriods(week.period)}}</a>
+                    <a class="period" ng-href="{{getTemplateUrl(week)}}">{{formatPeriods(week.period)}}</a>
                     <span ng-if="week.awaitingActionAtProjectLevelApprover">- {{ resourceBundle.itemsAwaitingApprovalAtProjectLevel }}</span>
                     <span ng-if="week.awaitingActionAtCoordinationLevelApprover">- {{ resourceBundle.itemsAwaitingApprovalAtCoordinationLevel }}</span>
                 </li>
