@@ -60,7 +60,8 @@
                 <td class="col-md-4">
                     <ul class="list-unstyled">
                         <li ng-repeat="week in itemsAwaitingApprovalAtOtherLevels[opUnitName][moduleName] | orderBy: 'period'" ng-if="week.active">
-                            <span class="period">{{formatPeriods(week.period)}}</span>
+                            <span ng-if="week.awaitingActionAtProjectLevelApprover" class="period">{{ formatPeriods(week.period) }}</span>
+                            <a ng-if="week.awaitingActionAtCoordinationLevelApprover" class="period" ng-href="{{ getTemplateUrl(week) }}">{{ formatPeriods(week.period) }}</a>
                             <span ng-if="week.awaitingActionAtProjectLevelApprover">- {{ resourceBundle.itemsAwaitingApprovalAtProjectLevel }}</span>
                             <span ng-if="week.awaitingActionAtCoordinationLevelApprover">- {{ resourceBundle.itemsAwaitingApprovalAtCoordinationLevel }}</span>
                         </li>
