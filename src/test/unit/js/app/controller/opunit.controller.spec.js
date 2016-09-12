@@ -180,6 +180,15 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     name: 'B1'
                 });
             });
+
+            it('should leave the type and hospitalUnitCode undefined if customAttributes are not present', function () {
+                scope.orgUnit.attributeValues = null;
+                scope.isNewMode = false;
+                scope.$apply();
+
+                expect(scope.opUnit.type).toBeUndefined();
+                expect(scope.opUnit.hospitalUnitCode).toBeUndefined();
+            });
         });
 
         it("should save operation unit with GIS coordinate information", function() {
