@@ -17,7 +17,18 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 level: 5,
                 parent: {
                     id: 'someParentId'
-                }
+                },
+                attributeValues: [{
+                    attribute: {
+                        code: 'opUnitType'
+                    },
+                    value: 'Hospital'
+                }, {
+                    attribute: {
+                        code: 'hospitalUnitCode'
+                    },
+                    value: 'B1'
+                }]
             };
             scope.isNewMode = true;
             scope.locale = 'en';
@@ -45,23 +56,13 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             };
 
             orgUnitGroupSets = [{
-                "name": "Hospital Unit Code",
-                "code": "hospital_unit_code",
-                "id": "a9ca3d1ed93",
-                "organisationUnitGroups": [{
-                    "id": "a9ab62b5ef3",
-                    "name": "Unit Code - C2"
+                code: 'hospital_unit_code',
+                organisationUnitGroups: [{
+                    id: 'orgUnitGroupC2Id',
+                    name: 'Unit Code - C2'
                 }, {
-                    "id": "aedbab45572",
-                    "name": "Unit Code - B1"
-                }]
-            }, {
-                "name": "Model Of Management",
-                "code": "model_of_management",
-                "id": "a2d4a1dee27",
-                "organisationUnitGroups": [{
-                    "id": "a11a7a5d55a",
-                    "name": "Collaboration"
+                    id: 'orgUnitGroupB1Id',
+                    name: 'Unit Code - B1'
                 }]
             }];
 
@@ -160,12 +161,25 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         it("should set hospitalUnitCodes on scope on init", function() {
             scope.$apply();
             expect(scope.hospitalUnitCodes).toEqual([{
-                "id": "aedbab45572",
-                "name": "B1"
+                id: 'orgUnitGroupB1Id',
+                name: 'B1'
             }, {
-                "id": "a9ab62b5ef3",
-                "name": "C2"
+                id: 'orgUnitGroupC2Id',
+                name: 'C2'
             }]);
+        });
+
+        describe('editing an existing opUnit', function () {
+            it('should set the type and hospitalUnitCode', function () {
+                scope.isNewMode = false;
+                scope.$apply();
+
+                expect(scope.opUnit.type).toEqual({ name: 'Hospital'});
+                expect(scope.opUnit.hospitalUnitCode).toEqual({
+                    id: 'orgUnitGroupB1Id',
+                    name: 'B1'
+                });
+            });
         });
 
         it("should save operation unit with GIS coordinate information", function() {
