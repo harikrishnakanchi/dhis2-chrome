@@ -81,7 +81,7 @@
     "noIncompleteEventsFound": "لم يتم العثور على حالات غير مكتملة",
     "noReadyToSubmitEventsFound": "لم يتم العثور على حالات جاهزة للتقديم",
     "syncScheduled": "تم بنجاح تنزيل جدول المعلومات",
-    "usernamePrefixValidation": "ينبغي أن يبدأ",
+    "usernamePrefixValidation": "ينبغي أن يبدأ {{username_prefix}}",
     "openingDateValidation": "مطلوب فتح التاريخ",
     "invalidDateError": "تاريخ غير متوفر",
     "nameValidation": "الاسم مطلوب",

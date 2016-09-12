@@ -102,13 +102,6 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
             expect(scope.saveFailure).toEqual(false);
         });
 
-        it("should determine username prefix and return validate username", function() {
-            var specifiedUserName = "prj_afdssd";
-
-            expect(scope.userNamePlaceHolder).toEqual("Username should begin with prj_");
-            expect(scope.userNameMatchExpr.test(specifiedUserName)).toEqual(true);
-        });
-
         it("should take the user to the view page of the project on clicking cancel", function() {
             scope.orgUnit = {
                 "id": "parent",

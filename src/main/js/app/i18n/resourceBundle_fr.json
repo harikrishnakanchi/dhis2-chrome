@@ -82,7 +82,7 @@
     "noIncompleteEventsFound": "Pas de Cas Incomplets trouves",
     "noReadyToSubmitEventsFound": "Pas de Cas prêts à être envoyés trouvés",
     "syncScheduled": "Téléchargement des données planifié avec succès.",
-    "usernamePrefixValidation": "L'identifiant doit commencer par",
+    "usernamePrefixValidation": "L'identifiant doit commencer par {{username_prefix}}",
     "openingDateValidation": "Veuillez saisir la Date d'Ouverture.",
     "invalidDateError": "Date non valide.",
     "nameValidation": "Veuillez saisir le nom.",

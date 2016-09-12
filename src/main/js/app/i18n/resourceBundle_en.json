@@ -81,7 +81,7 @@
     "noIncompleteEventsFound": "No Incomplete Cases Found",
     "noReadyToSubmitEventsFound": "No Ready To Submit Cases Found",
     "syncScheduled": "Data download scheduled successfully.",
-    "usernamePrefixValidation": "Should begin with",
+    "usernamePrefixValidation": "Should begin with {{username_prefix}}",
     "openingDateValidation": "Opening Date is required.",
     "invalidDateError": "Date is invalid.",
     "nameValidation": "Name is required.",
