@@ -19,6 +19,13 @@ define(["lodash", "moment", "properties", "interpolate"], function(_, moment, pr
             }
         };
 
+        $scope.canShowDataElement = function (optionSetId, dataElementId) {
+            var options = $scope.optionSetMapping[optionSetId];
+            return _.any(options, function (option) {
+                return $scope.getCount(dataElementId, false, false, option.id) > 0;
+            });
+        };
+
         $scope.getCount = function(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter) {
             var count;
 

@@ -55,7 +55,7 @@
                             <accordion close-others="false">
                                 <div ng-repeat="programStage in program.programStages" ng-class="'dataset-acc-wrapper'">
                                     <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
-                                        <div ng-repeat="psde in section.programStageDataElements">
+                                        <div ng-repeat="psde in section.programStageDataElements" ng-if="canShowDataElement(psde.dataElement.optionSet.id, psde.dataElement.id)">
                                             <div class="spacing-div-accordian" class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) && psde.dataElement.isIncluded">
                                                 <accordion-group is-open="status.open">
                                                     <accordion-heading>
@@ -128,7 +128,7 @@
                             <accordion close-others="false">
                                 <div ng-repeat="programStage in program.programStages">
                                     <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
-                                        <div ng-repeat="psde in section.programStageDataElements">
+                                        <div ng-repeat="psde in section.programStageDataElements" ng-if="canShowDataElement(psde.dataElement.optionSet.id, psde.dataElement.id)">
                                             <div class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) && psde.dataElement.isIncluded">
                                                 <accordion-group is-open="status.open">
                                                     <accordion-heading>
@@ -204,7 +204,7 @@
                             <accordion close-others="false">
                                 <div ng-repeat="programStage in program.programStages">
                                     <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
-                                        <div ng-repeat="psde in section.programStageDataElements">
+                                        <div ng-repeat="psde in section.programStageDataElements" ng-if="canShowDataElement(psde.dataElement.optionSet.id, psde.dataElement.id)">
                                             <div class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) && psde.dataElement.isIncluded">
                                                 <accordion-group is-open="status.open">
                                                     <accordion-heading>
@@ -285,7 +285,7 @@
                             <accordion close-others="false">
                                 <div ng-repeat="programStage in program.programStages">
                                     <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
-                                        <div ng-repeat="psde in section.programStageDataElements">
+                                        <div ng-repeat="psde in section.programStageDataElements" ng-if="canShowDataElement(psde.dataElement.optionSet.id, psde.dataElement.id)">
                                             <div class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) && psde.dataElement.isIncluded">
                                                 <accordion-group is-open="status.open">
                                                     <accordion-heading>
