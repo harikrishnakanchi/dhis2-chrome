@@ -6,7 +6,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadSystemSettingConsumer, uploadPatientOriginConsumer, uploadExcludedDataElementsConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
             uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer,
             uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadOrgUnitConsumer, downloadOrgUnitGroupConsumer, userPreferenceRepository, downloadModuleDataBlocksConsumer,
-            syncModuleDataBlockConsumer;
+            syncModuleDataBlockConsumer, downloadHistoricalDataConsumer;
 
         beforeEach(mocks.inject(function($q, $log, $rootScope) {
             uploadApprovalDataConsumer = {
@@ -107,6 +107,9 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             syncModuleDataBlockConsumer = {
                 'run': jasmine.createSpy("syncModuleDataBlockConsumer")
             };
+            downloadHistoricalDataConsumer = {
+                'run': jasmine.createSpy("downloadHistoricalDataConsumer")
+            };
 
             message = {};
             q = $q;
@@ -129,12 +132,13 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             userPreferenceRepository.getCurrentUsersUsername.and.returnValue(utils.getPromise(q, 'someUsername'));
             downloadModuleDataBlocksConsumer.run.and.returnValue(utils.getPromise(q, {}));
             syncModuleDataBlockConsumer.run.and.returnValue(utils.getPromise(q, {}));
+            downloadHistoricalDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
 
             dispatcher = new Dispatcher(q, log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, updateDatasetConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer, uploadEventDataConsumer,
                 deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer,
                 downloadChartDataConsumer, uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
-                downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer);
+                downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, downloadHistoricalDataConsumer);
         }));
 
         it("should call upload data consumer for uploading data values", function() {
@@ -180,6 +184,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
                 expect(downloadPivotTableDataConsumer.run).toHaveBeenCalledWith(message, {});
                 expect(downloadChartDataConsumer.run).toHaveBeenCalledWith(message, {});
                 expect(downloadPivotTablesConsumer.run).toHaveBeenCalledWith(message, {});
+                expect(downloadHistoricalDataConsumer.run).toHaveBeenCalledWith(message, {});
             });
 
             it('should only call project settings download consumer if current user is an admin', function() {

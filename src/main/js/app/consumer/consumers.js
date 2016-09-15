@@ -5,7 +5,7 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
         "metadataRepository", "uploadPatientOriginConsumer", "mergeBy", "downloadPivotTableDataConsumer", "downloadChartDataConsumer", "excludedDataElementsRepository", "uploadExcludedDataElementsConsumer", "uploadReferralLocationsConsumer",
         "referralLocationsRepository", "downloadProjectSettingsConsumer", "downloadChartsConsumer", "downloadPivotTablesConsumer", "downloadModuleDataBlocksConsumer", "moduleDataBlockMerger",
         "syncModuleDataBlockConsumer", "aggregateDataValuesMerger", "lineListEventsMerger", "removeOrgunitDatasetAssociationConsumer", "syncExcludedLinelistOptionsConsumer",
-        "excludedLinelistOptionsMerger"
+        "excludedLinelistOptionsMerger", "downloadHistoricalDataConsumer"
     ],
     function(uploadApprovalDataConsumer, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, updateDatasetConsumer, associateOrgunitToProgramConsumer, createUserConsumer,
         updateUserConsumer, dispatcher, consumerRegistry, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, orgUnitRepository, programRepository, uploadProgramConsumer,
@@ -13,7 +13,7 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
         downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, metadataService, metadataRepository, uploadPatientOriginConsumer, mergeBy, downloadPivotTableDataConsumer,
         downloadChartDataConsumer, excludedDataElementsRepository, uploadExcludedDataElementsConsumer, uploadReferralLocationsConsumer, referralLocationsRepository, downloadProjectSettingsConsumer,
         downloadChartsConsumer, downloadPivotTablesConsumer, downloadModuleDataBlocksConsumer, moduleDataBlockMerger, syncModuleDataBlockConsumer, aggregateDataValuesMerger, lineListEventsMerger,
-        removeOrgunitDatasetAssociationConsumer, syncExcludedLinelistOptionsConsumer, excludedLinelistOptionsMerger) {
+        removeOrgunitDatasetAssociationConsumer, syncExcludedLinelistOptionsConsumer, excludedLinelistOptionsMerger, downloadHistoricalDataConsumer) {
 
         var init = function(app) {
             app.service('mergeBy', ['$log', mergeBy]);
@@ -56,11 +56,13 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
                 "moduleDataBlockFactory", "moduleDataBlockMerger", "eventService", "$q", downloadModuleDataBlocksConsumer]);
             app.service("syncModuleDataBlockConsumer", ["moduleDataBlockFactory", "dataService", "eventService", "datasetRepository", "approvalService", "orgUnitRepository", "changeLogRepository", "moduleDataBlockMerger", "$q", syncModuleDataBlockConsumer]);
             app.service("syncExcludedLinelistOptionsConsumer", ["$q", "excludedLinelistOptionsMerger", syncExcludedLinelistOptionsConsumer]);
+            app.service("downloadHistoricalDataConsumer", ["$q", "dataService", "userPreferenceRepository", "orgUnitRepository", "datasetRepository", "changeLogRepository", "dataRepository", downloadHistoricalDataConsumer]);
             app.service("dispatcher", ["$q", "$log", "downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupConsumer", "downloadDatasetConsumer", "updateDatasetConsumer",
                 "createUserConsumer", "updateUserConsumer", "downloadDataConsumer", "uploadDataConsumer", "uploadCompletionDataConsumer", "uploadApprovalDataConsumer", "uploadProgramConsumer",
                 "downloadProgramConsumer", "uploadEventDataConsumer", "deleteEventConsumer", "downloadApprovalConsumer", "downloadMetadataConsumer",
                 "downloadOrgUnitGroupConsumer", "deleteApprovalConsumer", "downloadSystemSettingConsumer", "uploadPatientOriginConsumer", "downloadPivotTableDataConsumer", "downloadChartDataConsumer",
-                "uploadReferralLocationsConsumer", "downloadProjectSettingsConsumer", "uploadExcludedDataElementsConsumer", "downloadChartsConsumer", "downloadPivotTablesConsumer", "userPreferenceRepository", "downloadModuleDataBlocksConsumer", "syncModuleDataBlockConsumer", "removeOrgunitDatasetAssociationConsumer", "associateOrgunitToProgramConsumer", "syncExcludedLinelistOptionsConsumer", dispatcher
+                "uploadReferralLocationsConsumer", "downloadProjectSettingsConsumer", "uploadExcludedDataElementsConsumer", "downloadChartsConsumer", "downloadPivotTablesConsumer", "userPreferenceRepository",
+                "downloadModuleDataBlocksConsumer", "syncModuleDataBlockConsumer", "removeOrgunitDatasetAssociationConsumer", "associateOrgunitToProgramConsumer", "syncExcludedLinelistOptionsConsumer", "downloadHistoricalDataConsumer", dispatcher
             ]);
 
         };
