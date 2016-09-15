@@ -69,5 +69,15 @@ define(['dateUtils', 'moment', 'timecop'], function(dateUtils, moment, timecop) 
                 expect(dateUtils.getNumberOfISOWeeksInMonth(monthWith5Weeks)).toEqual(5);
             });
         });
+
+        describe('getPeriodRangeBetween', function () {
+            beforeEach(function() {
+                Timecop.freeze(new Date('2016-09-15T05:20:31.559Z'));
+            });
+
+            it('should return the period range between the specified number of weeks', function () {
+                expect(dateUtils.getPeriodRangeBetween(-5, -2)).toEqual(['2016W33', '2016W34', '2016W35']);
+            });
+        });
     });
 });
