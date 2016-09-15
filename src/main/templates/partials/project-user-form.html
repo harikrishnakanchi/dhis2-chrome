@@ -59,10 +59,10 @@
                         <td> {{user.userCredentials.username}}</td>
                         <td> {{user.roles}}</td>
                         <td>
-                            <a ng-if="!user.userCredentials.disabled" href="" title="Disable" class="delete" ng-if="user.roles != 'Projectadmin'" ng-click="toggleUserDisabledState(user)">
+                            <a ng-if="!user.userCredentials.disabled" href="" class="delete" ng-if="user.roles != 'Projectadmin'" ng-click="toggleUserDisabledState(user)">
                                 <i class="fa fa-check-square-o"></i>
                             </a>
-                            <a ng-if="user.userCredentials.disabled" href="" title="Enable" class="delete" ng-if="user.roles != 'Projectadmin'" ng-click="toggleUserDisabledState(user)">
+                            <a ng-if="user.userCredentials.disabled" href="" class="delete" ng-if="user.roles != 'Projectadmin'" ng-click="toggleUserDisabledState(user)">
                                 <i class="fa fa-square-o"></i>
                             </a>
                         </td>
