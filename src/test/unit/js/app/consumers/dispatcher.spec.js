@@ -6,7 +6,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadSystemSettingConsumer, uploadPatientOriginConsumer, uploadExcludedDataElementsConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
             uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer,
             uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadOrgUnitConsumer, downloadOrgUnitGroupConsumer, userPreferenceRepository, downloadModuleDataBlocksConsumer,
-            syncModuleDataBlockConsumer, downloadHistoricalDataConsumer;
+            syncModuleDataBlockConsumer, removeOrgunitDatasetAssociationConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer;
 
         beforeEach(mocks.inject(function($q, $log, $rootScope) {
             uploadApprovalDataConsumer = {
@@ -99,13 +99,17 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             userPreferenceRepository = {
                 'getCurrentUsersUsername': jasmine.createSpy("userPreferenceRepository")
             };
-
             downloadModuleDataBlocksConsumer = {
                 'run': jasmine.createSpy("downloadModuleDataBlocksConsumer")
             };
-
             syncModuleDataBlockConsumer = {
                 'run': jasmine.createSpy("syncModuleDataBlockConsumer")
+            };
+            removeOrgunitDatasetAssociationConsumer = {
+                'run': jasmine.createSpy("removeOrgunitDatasetAssociationConsumer")
+            };
+            syncExcludedLinelistOptionsConsumer = {
+                'run': jasmine.createSpy("syncExcludedLinelistOptionsConsumer")
             };
             downloadHistoricalDataConsumer = {
                 'run': jasmine.createSpy("downloadHistoricalDataConsumer")
@@ -132,13 +136,15 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             userPreferenceRepository.getCurrentUsersUsername.and.returnValue(utils.getPromise(q, 'someUsername'));
             downloadModuleDataBlocksConsumer.run.and.returnValue(utils.getPromise(q, {}));
             syncModuleDataBlockConsumer.run.and.returnValue(utils.getPromise(q, {}));
+            removeOrgunitDatasetAssociationConsumer.run.and.returnValue(utils.getPromise(q, {}));
+            syncExcludedLinelistOptionsConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadHistoricalDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
 
             dispatcher = new Dispatcher(q, log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, updateDatasetConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer, uploadEventDataConsumer,
                 deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer,
                 downloadChartDataConsumer, uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
-                downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, downloadHistoricalDataConsumer);
+                downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, removeOrgunitDatasetAssociationConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer);
         }));
 
         it("should call upload data consumer for uploading data values", function() {
@@ -439,6 +445,30 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             scope.$apply();
 
             expect(uploadExcludedDataElementsConsumer.run).toHaveBeenCalledWith(message);
+        });
+
+        it("should call upload excluded options", function() {
+            message.data = {
+                "data": {},
+                "type": "uploadExcludedOptions"
+            };
+
+            dispatcher.run(message);
+            scope.$apply();
+
+            expect(syncExcludedLinelistOptionsConsumer.run).toHaveBeenCalledWith(message);
+        });
+
+        it("should call remove org unit from dataset", function() {
+            message.data = {
+                "data": {},
+                "type": "removeOrgUnitFromDataset"
+            };
+
+            dispatcher.run(message);
+            scope.$apply();
+
+            expect(removeOrgunitDatasetAssociationConsumer.run).toHaveBeenCalledWith(message);
         });
     });
 });
