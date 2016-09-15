@@ -14,6 +14,9 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
         }, {
             label: $scope.resourceBundle.lastTwelveWeeks,
             value: 12
+        }, {
+            label: $scope.resourceBundle.lastFiftyTwoWeeks,
+            value: 52
         }];
 
         var createDataValuesMap = function () {
