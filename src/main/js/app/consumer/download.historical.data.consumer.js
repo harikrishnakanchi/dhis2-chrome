@@ -55,26 +55,24 @@ define(['lodash', 'moment', 'dateUtils', 'properties'], function (_, moment, dat
             var periodChunks = _.chunk(periodRange, CHUNK_SIZE);
 
             return _.reduce(modulesByProject, function (promise, modules, projectId) {
-                return promise.then(function () {
-                    return _.reduce(modules, function (modulePromise, module) {
-                        var downloadModuleDataValues = function () {
-                            return _.reduce(periodChunks, function (moduleChunkPromise, periodChunk) {
-                                return moduleChunkPromise.then(function () {
-                                    return dataService.downloadData(module.id, module.dataSetIds, periodChunk).then(dataRepository.saveDhisData);
-                                });
-                            }, modulePromise);
-                        };
+                return _.reduce(modules, function (modulePromise, module) {
+                    var downloadModuleDataValues = function () {
+                        return _.reduce(periodChunks, function (moduleChunkPromise, periodChunk) {
+                            return moduleChunkPromise.then(function () {
+                                return dataService.downloadData(module.id, module.dataSetIds, periodChunk).then(dataRepository.saveDhisData);
+                            });
+                        }, modulePromise);
+                    };
 
-                        var updateChangeLog = function () {
-                            return changeLogRepository.upsert([CHANGE_LOG_PREFIX, projectId, module.id].join(':'), moment().toISOString());
-                        };
+                    var updateChangeLog = function () {
+                        return changeLogRepository.upsert([CHANGE_LOG_PREFIX, projectId, module.id].join(':'), moment().toISOString());
+                    };
 
-                        return changeLogRepository.get([CHANGE_LOG_PREFIX, projectId, module.id].join(':')).then(function (lastUpdatedTime) {
-                            var areDataValuesAlreadyDownloaded = !!lastUpdatedTime;
-                            return areDataValuesAlreadyDownloaded ? modulePromise : downloadModuleDataValues().then(updateChangeLog);
-                        });
-                    }, promise);
-                });
+                    return changeLogRepository.get([CHANGE_LOG_PREFIX, projectId, module.id].join(':')).then(function (lastUpdatedTime) {
+                        var areDataValuesAlreadyDownloaded = !!lastUpdatedTime;
+                        return areDataValuesAlreadyDownloaded ? modulePromise : downloadModuleDataValues().then(updateChangeLog);
+                    });
+                }, promise);
             }, $q.when());
         };
 
