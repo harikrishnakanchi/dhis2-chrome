@@ -188,7 +188,7 @@
     "enterProductKeyLabel": "أدخل رقم المنتج",
     "productKeyPlaceholder": "مفتاح المنتج",
     "eventDateLabel": "تاريخ الحدث",
-    "openingDateInFutureError": "جمع البيانات لهذه الوحدة سيتم من أسبوع {{week}}",
+    "openingDateInFutureError": "جمع البيانات لهذه الوحدة سيتم من أسبوع {{week}}, {{year}}",
     "confirmExport": "نعم أريد تصدير التطبيق",
     "confirmExportTitle": "تأكيد التصدير",
     "confirmImport": "نعم، أريد أن استيراد نسخة التطبيق.",

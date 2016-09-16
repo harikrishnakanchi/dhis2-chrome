@@ -6,7 +6,10 @@ define(["lodash", "moment", "interpolate"],
                 $scope.errorMessage = undefined;
                 if ($scope.week && $scope.currentModule) {
                     if (isOpeningDateInFuture()) {
-                        $scope.errorMessage = interpolate($scope.resourceBundle.openingDateInFutureError, { week: moment($scope.currentModule.openingDate).isoWeek() });
+                        $scope.errorMessage = interpolate($scope.resourceBundle.openingDateInFutureError, {
+                            week: moment($scope.currentModule.openingDate).isoWeek(),
+                            year: moment($scope.currentModule.openingDate).year()
+                        });
                         $scope.$emit('errorInfo', $scope.errorMessage);
                         return;
                     }

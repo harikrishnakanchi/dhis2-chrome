@@ -188,7 +188,7 @@
     "enterProductKeyLabel": "Entrer la Clé Produit",
     "productKeyPlaceholder": "Clé Produit",
     "eventDateLabel": "Date du cas",
-    "openingDateInFutureError": "La collecte des données pour ce module commencera à partir de la semaine {{week}}",
+    "openingDateInFutureError": "La collecte des données pour ce module commencera à partir de la semaine {{week}}, {{year}}",
     "confirmExport": "OUI, je veux exporter l'application",
     "confirmExportTitle": "Confirmation de l'exportation",
     "confirmImport": "OUI, je veux importer une copie de l'application",
