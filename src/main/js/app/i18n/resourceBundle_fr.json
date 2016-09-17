@@ -152,7 +152,7 @@
     "itemsAwaitingApprovalAtProjectLevel": "Niveau Projet",
     "itemsAwaitingApprovalAtCoordinationLevel": "Niveau Coordination",
     "itemsAwaitingApproval": "Eléments en attente de validation",
-    "awaitingApproval": " En attente de validation",
+    "awaitingApproval": "En attente de validation",
     "noItemsAwaitingApproval": "Aucun élément à valider",
     "awaitingApprovalAtLabel": "En attente de validation",
     "selectProgramLabel": "Sélectionner un Programme",
