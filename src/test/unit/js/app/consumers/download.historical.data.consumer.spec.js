@@ -1,6 +1,6 @@
-define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'downloadHistoricalDataConsumer', 'dataService',
+define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties', 'moment', 'downloadHistoricalDataConsumer', 'dataService',
         'userPreferenceRepository', 'orgUnitRepository', 'datasetRepository', 'changeLogRepository', 'dataRepository', 'programEventRepository','eventService','customAttributes'],
-    function (utils, timecop, mocks, _, dateUtils, DownloadHistoricalDataConsumer, DataService, UserPreferenceRepository,
+    function (utils, timecop, mocks, _, dateUtils, properties, moment, DownloadHistoricalDataConsumer, DataService, UserPreferenceRepository,
               OrgUnitRepository, DatasetRepository, ChangeLogRepository, DataRepository, ProgramEventRepository, EventService, CustomAttributes) {
         describe('DownloadHistoricalDataConsumer', function () {
             var scope, q, downloadHistoricalDataConsumer, dataService, eventService, userPreferenceRepository, orgUnitRepository,
@@ -26,13 +26,16 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'downloadHist
                 mockDataSets = [{id: 'dataSetA'}, {id: 'dataSetB'}];
                 mockPayload = ['somePayload'];
 
-                mockPeriodRange = [
-                    '2016W21', '2016W22', '2016W23', '2016W24', '2016W25', '2016W26', '2016W27', '2016W28', '2016W29', '2016W30',
-                    '2016W31', '2016W32', '2016W33'
+                properties.projectDataSync.numWeeksToSync = 12;
+                Timecop.install();
+                Timecop.freeze(moment('2016-09-19'));
+
+                mockPeriodRange = ["2015W39", "2015W40", "2015W41", "2015W42", "2015W43", "2015W44", "2015W45", "2015W46", "2015W47", "2015W48",
+                    "2015W49", "2015W50", "2015W51", "2015W52", "2015W53", "2016W01", "2016W02", "2016W03", "2016W04", "2016W05", "2016W06",
+                    "2016W07", "2016W08", "2016W09", "2016W10", "2016W11", "2016W12", "2016W13", "2016W14", "2016W15", "2016W16",
+                    "2016W17", "2016W18", "2016W19", "2016W20", "2016W21", "2016W22", "2016W23", "2016W24", "2016W25", "2016W26"
                 ];
                 periodChunkSize = 10;
-
-                spyOn(dateUtils, 'getPeriodRangeBetween').and.returnValue(mockPeriodRange);
 
                 userPreferenceRepository = UserPreferenceRepository();
                 spyOn(userPreferenceRepository, 'getCurrentUsersProjectIds').and.returnValue(utils.getPromise(q, mockProjectIds));
@@ -74,6 +77,11 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'downloadHist
 
                 downloadHistoricalDataConsumer = new DownloadHistoricalDataConsumer(q, dataService, eventService, userPreferenceRepository, orgUnitRepository, datasetRepository, changeLogRepository, dataRepository, programEventRepository);
             }));
+
+            afterEach(function () {
+                Timecop.returnToPresent();
+                Timecop.uninstall();
+            });
 
             it('should get the current users project ids', function () {
                 downloadHistoricalDataConsumer.run();

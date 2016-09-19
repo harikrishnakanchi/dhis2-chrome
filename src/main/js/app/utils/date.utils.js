@@ -37,20 +37,12 @@ define(["moment", "lodash"], function(moment, _) {
         }, 0);
     };
 
-    var getPeriodRangeBetween = function (from, to) {
-        return _.difference(
-            getPeriodRange(-from),
-            getPeriodRange(-to)
-        );
-    };
-
     return {
         toDhisFormat: toDhisFormat,
         max: max,
         getFormattedPeriod: getFormattedPeriod,
         subtractWeeks: subtractWeeks,
         getPeriodRange: getPeriodRange,
-        getNumberOfISOWeeksInMonth: getNumberOfISOWeeksInMonth,
-        getPeriodRangeBetween: getPeriodRangeBetween
+        getNumberOfISOWeeksInMonth: getNumberOfISOWeeksInMonth
     };
 });

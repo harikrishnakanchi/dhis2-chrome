@@ -48,10 +48,8 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], func
 
         var downloadData = function (modulesByProject) {
 
-            var periodRange = dateUtils.getPeriodRangeBetween(
-                -properties.projectDataSync.numWeeksForHistoricalData,
-                -properties.projectDataSync.numWeeksToSync
-            );
+            var periodRange = _.difference(dateUtils.getPeriodRange(properties.projectDataSync.numWeeksForHistoricalData, {excludeCurrentWeek: true}),
+                dateUtils.getPeriodRange(properties.projectDataSync.numWeeksToSync));
 
             return _.reduce(modulesByProject, function (promise, modules, projectId) {
                 return _.reduce(modules, function (modulePromise, module) {
