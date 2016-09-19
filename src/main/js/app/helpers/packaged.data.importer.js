@@ -18,7 +18,7 @@ define(["lodash", "moment"], function(_, moment) {
             if (!_.isObject(metadata))
                 return;
 
-            var created = moment(metadata.created).toISOString();
+            var created = moment.utc(metadata.created).toISOString();
             var promises = [];
             promises.push(changeLogRepository.upsert("metaData", created));
             promises.push(changeLogRepository.upsert("orgUnits", created));

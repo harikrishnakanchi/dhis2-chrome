@@ -91,7 +91,7 @@ define(["moment", "lodash", "properties", "dateUtils", "customAttributes"], func
         };
 
         this.getEventsFromPeriod = function(startPeriod, orgUnitIds) {
-            var startDate = moment(startPeriod, 'GGGG[W]W').startOf('day').toISOString();
+            var startDate = moment.utc(startPeriod, 'GGGG[W]W').startOf('day').toISOString();
             var endDate = moment().endOf('day').toISOString();
 
             var store = db.objectStore('programEvents');
@@ -201,8 +201,8 @@ define(["moment", "lodash", "properties", "dateUtils", "customAttributes"], func
         };
 
         this.findEventsByDateRange = function(programId, orgUnitIds, fromDate, toDate) {
-            fromDate = moment(fromDate).startOf('day').toISOString();
-            toDate = moment(toDate).endOf('day').toISOString();
+            fromDate = moment.utc(fromDate).startOf('day').toISOString();
+            toDate = moment.utc(toDate).endOf('day').toISOString();
 
             orgUnitIds = _.flatten([orgUnitIds]);
 

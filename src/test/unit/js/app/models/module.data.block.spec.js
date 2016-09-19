@@ -16,7 +16,7 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             lineListEvents = undefined;
             approvalData = undefined;
             failedToSyncData = {};
-            someMomentInTime = moment('2016-05-18T00:00:00.000Z');
+            someMomentInTime = moment.utc('2016-05-18T00:00:00.000Z');
         });
 
         var createModuleDataBlock = function() {

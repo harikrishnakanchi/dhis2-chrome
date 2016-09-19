@@ -13,8 +13,8 @@ define(['moment'], function (moment) {
                     var lastUpdatedTimeOnLocal = localExcludedLineListOptions && localExcludedLineListOptions.clientLastUpdated;
                     var lastUpdatedTimeOnRemote = remoteExcludedLineListOptions && remoteExcludedLineListOptions.clientLastUpdated;
                     if (lastUpdatedTimeOnRemote && lastUpdatedTimeOnLocal) {
-                        lastUpdatedTimeOnRemote = moment(lastUpdatedTimeOnRemote);
-                        lastUpdatedTimeOnLocal = moment(lastUpdatedTimeOnLocal);
+                        lastUpdatedTimeOnRemote = moment.utc(lastUpdatedTimeOnRemote);
+                        lastUpdatedTimeOnLocal = moment.utc(lastUpdatedTimeOnLocal);
                         if (lastUpdatedTimeOnLocal.isAfter(lastUpdatedTimeOnRemote)) {
                             return upstreamSync ? dataStoreService.updateExcludedOptions(moduleId, localExcludedLineListOptions) : $q.when();
                         }
