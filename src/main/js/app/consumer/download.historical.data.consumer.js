@@ -78,9 +78,11 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], func
                         return changeLogRepository.upsert([CHANGE_LOG_PREFIX, projectId, module.id].join(':'), moment().toISOString());
                     };
 
-                    return changeLogRepository.get([CHANGE_LOG_PREFIX, projectId, module.id].join(':')).then(function (lastUpdatedTime) {
-                        var areDataValuesAlreadyDownloaded = !!lastUpdatedTime;
-                        return areDataValuesAlreadyDownloaded ? modulePromise : downloadModuleData().then(updateChangeLog);
+                    return modulePromise.then(function () {
+                        return changeLogRepository.get([CHANGE_LOG_PREFIX, projectId, module.id].join(':')).then(function (lastUpdatedTime) {
+                            var areDataValuesAlreadyDownloaded = !!lastUpdatedTime;
+                            return areDataValuesAlreadyDownloaded ? modulePromise : downloadModuleData().then(updateChangeLog);
+                        });
                     });
                 }, promise);
             }, $q.when());
