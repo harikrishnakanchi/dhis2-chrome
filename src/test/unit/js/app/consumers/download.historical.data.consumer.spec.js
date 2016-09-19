@@ -4,7 +4,7 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
               OrgUnitRepository, DatasetRepository, ChangeLogRepository, DataRepository, ProgramEventRepository, EventService, CustomAttributes) {
         describe('DownloadHistoricalDataConsumer', function () {
             var scope, q, downloadHistoricalDataConsumer, dataService, eventService, userPreferenceRepository, orgUnitRepository,
-                datasetRepository, dataRepository, changeLogRepository, programEventRepository, mockProjectIds, mockModulesForProjectA, mockModulesForProjectB, mockLineListModuleA, mockLineListModuleB,
+                datasetRepository, dataRepository, changeLogRepository, programEventRepository, mockProjectIds, mockModulesForProjectA, mockModulesForProjectB,
                 mockOrigins, mockDataSets, mockPeriodRange, periodChunkSize, mockPayload;
 
             beforeEach(mocks.inject(function ($q, $rootScope) {
@@ -13,15 +13,7 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
 
                 mockProjectIds = ['projectA', 'projectB'];
                 mockModulesForProjectA = [{id: 'moduleA', attributeValues: []}];
-                mockLineListModuleA = {
-                    id: 'linelistModuleA',
-                    attributeValues: []
-                };
-                mockLineListModuleB = {
-                    id: 'linelistModuleB',
-                    attributeValues: []
-                };
-                mockModulesForProjectB = [{id: 'moduleB', attributeValues: []}, {id: 'moduleC', attributeValues: []}, mockLineListModuleA, mockLineListModuleB];
+                mockModulesForProjectB = [{id: 'moduleB', attributeValues: []}, {id: 'moduleC', attributeValues: []}];
                 mockOrigins = [{id: 'originA'}, {id: 'originB'}];
                 mockDataSets = [{id: 'dataSetA'}, {id: 'dataSetB'}];
                 mockPayload = ['somePayload'];
@@ -62,9 +54,7 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                     var changeLogs = {
                         'yearlyDataValues:projectA:moduleA': utils.getPromise(q, undefined),
                         'yearlyDataValues:projectB:moduleB': utils.getPromise(q, 'someLastUpdatedTime'),
-                        'yearlyDataValues:projectB:moduleC': utils.getPromise(q, undefined),
-                        'yearlyDataValues:projectB:linelistModuleA': utils.getPromise(q, undefined),
-                        'yearlyDataValues:projectB:linelistModuleB': utils.getPromise(q, 'someLastUpdatedTime')
+                        'yearlyDataValues:projectB:moduleC': utils.getPromise(q, undefined)
                     };
                     return changeLogs[key];
                 });
@@ -167,15 +157,15 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                     });
 
                     it('should not download data values', function () {
-                        expect(dataService.downloadData).not.toHaveBeenCalledWith(mockLineListModuleA.id);
+                        expect(dataService.downloadData).not.toHaveBeenCalledWith(mockModulesForProjectA[0].id);
                     });
 
                     it('should download events', function () {
-                        expect(eventService.getEvents).toHaveBeenCalledWith(mockLineListModuleA.id, mockPeriodRange);
+                        expect(eventService.getEvents).toHaveBeenCalledWith(mockModulesForProjectA[0].id, mockPeriodRange);
                     });
 
                     it('should not download events if it were already downloaded', function() {
-                        expect(eventService.getEvents).not.toHaveBeenCalledWith(mockLineListModuleB.id);
+                        expect(eventService.getEvents).not.toHaveBeenCalledWith(mockModulesForProjectB[1].id);
                     });
 
                     it('should upsert the events into IndexedDB after downloading events', function () {
@@ -189,8 +179,6 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
 
                     expect(changeLogRepository.upsert).toHaveBeenCalledWith('yearlyDataValues:projectA:moduleA', jasmine.any(String));
                     expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('yearlyDataValues:projectB:moduleB', jasmine.any(String));
-                    expect(changeLogRepository.upsert).toHaveBeenCalledWith('yearlyDataValues:projectB:linelistModuleA', jasmine.any(String));
-                    expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('yearlyDataValues:projectB:linelistModuleB', jasmine.any(String));
                 });
             });
         });
