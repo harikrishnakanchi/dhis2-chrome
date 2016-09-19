@@ -63,7 +63,7 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], func
                                 return moduleChunkPromise.then(function () {
                                     return dataService.downloadData(module.id, module.dataSetIds, periodChunk).then(dataRepository.saveDhisData);
                                 });
-                            }, modulePromise);
+                            }, $q.when());
                         };
 
                         var downloadLineListEvents = function () {
@@ -81,7 +81,7 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], func
                     return modulePromise.then(function () {
                         return changeLogRepository.get([CHANGE_LOG_PREFIX, projectId, module.id].join(':')).then(function (lastUpdatedTime) {
                             var areDataValuesAlreadyDownloaded = !!lastUpdatedTime;
-                            return areDataValuesAlreadyDownloaded ? modulePromise : downloadModuleData().then(updateChangeLog);
+                            return areDataValuesAlreadyDownloaded ? $q.when() : downloadModuleData().then(updateChangeLog);
                         });
                     });
                 }, promise);
