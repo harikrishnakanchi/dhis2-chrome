@@ -600,9 +600,9 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
 
             it('should be false if period is before opening date or date12WeeksEarlier which ever is most recent', function() {
                 orgUnit = {
-                    openingDate: '2016-02-01'
+                    openingDate: '2015-02-01'
                 };
-                period = '2016W3';
+                period = '2015W50';
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.active).toEqual(false);
             });

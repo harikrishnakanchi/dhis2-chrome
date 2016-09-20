@@ -68,7 +68,7 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         var date12WeeksEarlier = moment().subtract(properties.weeksToDisplayStatusInDashboard, 'weeks');
         openingDate = moment(openingDate);
         var dateToCompare = date12WeeksEarlier.isAfter(openingDate) ? date12WeeksEarlier : openingDate;
-        return moment(period, "GGGG[W]W").isoWeek() >= dateToCompare.isoWeek();
+        return moment(period, "GGGG[W]W").startOf('isoweek') >= dateToCompare.startOf('isoweek');
     };
 
     var getAggregateDataValues = function(aggregateDataValues) {
