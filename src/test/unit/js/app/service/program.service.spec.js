@@ -1,5 +1,5 @@
 define(["programService", "angularMocks", "properties", "utils"], function(ProgramService, mocks, properties, utils) {
-    describe("program service", function() {
+    describe("programService", function() {
         var http, httpBackend, programService;
 
         beforeEach(mocks.inject(function($httpBackend, $http) {
@@ -70,6 +70,18 @@ define(["programService", "angularMocks", "properties", "utils"], function(Progr
             }];
 
             expect(actualResult).toEqual(expectedProgramData);
+        });
+
+        describe('assignOrgUnitToProgram', function () {
+            it('should assign the org unit to the program', function () {
+                var programId = 'someProgramId',
+                    orgUnitId = 'someOrgUnitId';
+
+                programService.assignOrgUnitToProgram(programId, orgUnitId);
+
+                httpBackend.expectPOST(properties.dhis.url + '/api/programs/' + programId + '/organisationUnits/' + orgUnitId).respond(204);
+                httpBackend.flush();
+            });
         });
     });
 });

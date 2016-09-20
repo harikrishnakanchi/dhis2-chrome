@@ -2,7 +2,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
     describe("dispatcher", function() {
         var uploadCompletionDataConsumer, uploadDataConsumer, downloadDataConsumer, uploadApprovalDataConsumer, dispatcher, message, q, log, scope,
             createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer, uploadEventDataConsumer,
-            deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer, downloadDatasetConsumer, updateDatasetConsumer,
+            deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer, downloadDatasetConsumer, updateDatasetConsumer, associateOrgunitToProgramConsumer,
             downloadSystemSettingConsumer, uploadPatientOriginConsumer, uploadExcludedDataElementsConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
             uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer,
             uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadOrgUnitConsumer, downloadOrgUnitGroupConsumer, userPreferenceRepository, downloadModuleDataBlocksConsumer,
@@ -38,6 +38,9 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             };
             updateDatasetConsumer = {
                 'run': jasmine.createSpy("updateDatasetConsumer")
+            };
+            associateOrgunitToProgramConsumer ={
+                'run': jasmine.createSpy("associateOrgunitToProgramConsumer")
             };
             createUserConsumer = {
                 'run': jasmine.createSpy("createUserConsumer")

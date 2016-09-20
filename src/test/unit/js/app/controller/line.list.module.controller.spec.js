@@ -1358,13 +1358,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     }]
                 };
 
-                var patientOrigins = {
-                    "origins": [{
-                        "id": "id",
-                        "name": "Unknown"
-                    }]
-                };
-
                 var originOrgUnit = [{
                     "name": "Unknown",
                     "shortName": "Unknown",
@@ -1384,6 +1377,11 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     }
                 }];
 
+                var messageData = {
+                    programIds: ['prog1'],
+                    orgUnitIds: ['UnknownModule2someId']
+                };
+
                 spyOn(dhisId, "get").and.callFake(function(name) {
                     return name;
                 });
@@ -1400,8 +1398,8 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 expect(programRepository.associateOrgUnits).toHaveBeenCalledWith(program, originOrgUnit);
                 expect(datasetRepository.associateOrgUnits).toHaveBeenCalledWith(["Ds1", "OrgDs1"], originOrgUnit);
                 expect(hustle.publish.calls.argsFor(3)).toEqual([{
-                    data: program,
-                    type: "uploadProgram",
+                    data: messageData,
+                    type: "associateOrgunitToProgramConsumer",
                     locale: "en",
                     desc: "associate selected program to Unknown"
                 }, "dataValues"]);

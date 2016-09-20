@@ -6,6 +6,10 @@ define(["dhisUrl", "lodash"], function(dhisUrl, _) {
             });
         };
 
+        this.assignOrgUnitToProgram = function (programId, orgUnitId) {
+            return $http.post(dhisUrl.programs + '/' + programId + '/organisationUnits/' + orgUnitId);
+        };
+
         this.getAll = function(lastUpdatedTime) {
             var url = dhisUrl.getProgramsAndStages;
             url = lastUpdatedTime ? url + "&filter=lastUpdated:gte:" + lastUpdatedTime : url;

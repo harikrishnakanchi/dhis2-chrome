@@ -325,7 +325,11 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
                 var associateToProgram = function(program, originOrgUnits) {
                     return programRepository.associateOrgUnits(program, originOrgUnits).then(function() {
-                        publishMessage(program, "uploadProgram", $scope.resourceBundle.uploadProgramDesc + _.pluck(originOrgUnits, "name"));
+                        var programIdsAndOrgunitIds = {
+                            programIds: [program.id],
+                            orgUnitIds: _.map(originOrgUnits, 'id')
+                        };
+                        return publishMessage(programIdsAndOrgunitIds, 'associateOrgunitToProgramConsumer', $scope.resourceBundle.uploadProgramDesc + _.pluck(originOrgUnits, "name"));
                     });
                 };
 
