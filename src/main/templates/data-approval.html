@@ -27,7 +27,7 @@
                     <div ng-if="!syncError">
                         <div ng-show="isApproved" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
                         <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
-                        <div class="alert alert-danger" ng-if="!isCompleted || !isSubmitted">{{resourceBundle.noDataForApproval}}</div>
+                        <div class="alert alert-danger" ng-if="(moduleDataBlock.active && !isCompleted) || !isSubmitted">{{resourceBundle.noDataForApproval}}</div>
                     </div>
                     <div ng-if="syncError && moduleDataBlock.awaitingActionAtCoordinationLevelApprover">
                         <div class="alert alert-danger">{{resourceBundle.dataApprovalSyncError}}</div>
@@ -187,7 +187,7 @@
                         <input ng-if="syncError && moduleDataBlock.awaitingActionAtProjectLevelApprover" type="button" class="btn btn-primary" ng-click="firstLevelApproval()" value="{{resourceBundle.reApproveBtnValue}}" />
                     </div>
                     <div ng-if="hasRoles(['Coordination Level Approver'])">
-                        <input ng-if="!syncError && !(moduleDataBlock.awaitingActionAtDataEntryLevel || moduleDataBlock.awaitingActionAtProjectLevelApprover)" type="button" class="btn btn-primary" ng-click="secondLevelApproval()" ng-disabled="isApproved" value="{{resourceBundle.approveBtnValue}}" />
+                        <input ng-if="!syncError && (isSubmitted && (!(moduleDataBlock.awaitingActionAtDataEntryLevel || moduleDataBlock.awaitingActionAtProjectLevelApprover) || !moduleDataBlock.active))" type="button" class="btn btn-primary" ng-click="secondLevelApproval()" ng-disabled="!moduleDataBlock.active || isApproved" value="{{resourceBundle.approveBtnValue}}" />
                         <input ng-if="syncError && moduleDataBlock.awaitingActionAtCoordinationLevelApprover" type="button" class="btn btn-primary" ng-click="secondLevelApproval()" value="{{resourceBundle.reApproveBtnValue}}" />
                     </div>
                 </form>

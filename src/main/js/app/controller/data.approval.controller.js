@@ -30,7 +30,8 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             } else if($rootScope.hasRoles(['Project Level Approver'])) {
                 return $scope.isSubmitted && !$scope.moduleDataBlock.awaitingActionAtDataEntryLevel;
             } else if($rootScope.hasRoles(['Coordination Level Approver'])) {
-                return $scope.isSubmitted && !($scope.moduleDataBlock.awaitingActionAtDataEntryLevel || $scope.moduleDataBlock.awaitingActionAtProjectLevelApprover);
+                var awaitingApprovalAtCoordinationLevel = !($scope.moduleDataBlock.awaitingActionAtDataEntryLevel || $scope.moduleDataBlock.awaitingActionAtProjectLevelApprover);
+                return $scope.isSubmitted && (awaitingApprovalAtCoordinationLevel || !$scope.moduleDataBlock.active);
             }
         };
 
