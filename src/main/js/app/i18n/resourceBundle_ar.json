@@ -329,6 +329,6 @@
     "infoLabel": "info",
     "aggregateDataNotAvailableMessage": "There is no data for this week.",
     "linelistDataNotAvailableMessage": "There is no summary data for this week.",
-    "praxisDownloadMessage": "One of the reasons might be because Praxis downloads only last 12 weeks of data. Any data collected before 12 weeks will not be available in data entry screen. However this data is available for use in the reports and chart sections.",
+    "praxisDownloadMessage": "One of the reasons might be because Praxis downloads only last 52 weeks of data. Any data collected before 52 weeks will not be available in data entry screen. However this data is available for use in the reports and chart sections.",
     "contactSupport": "Contact {{supportEmail}} for any questions."
 }
