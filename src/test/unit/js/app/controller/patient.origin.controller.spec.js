@@ -60,7 +60,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
 
             programRepository = new ProgramRepository();
             spyOn(programRepository, "getProgramForOrgUnit");
-            spyOn(programRepository, "associateOrgUnits");
+            spyOn(programRepository, "associateOrgUnits").and.returnValue(utils.getPromise(q, {}));
 
             origins = [{
                 "id": "origin1",
