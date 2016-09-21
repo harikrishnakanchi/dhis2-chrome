@@ -30,7 +30,7 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
             var createOrgUnitsAndGroups = function() {
                 var allOriginOrgUnits = [];
                 var associatedDatasetIdsAndOrgUnitIdsList = [];
-                var associatedPrograms = [];
+                var associatedOrgUnitsToProgramsList = [];
                 var orgUnitsForGroups = [];
 
                 var doAssociations = function(originOrgUnits, siblingOriginOrgUnit) {
@@ -44,8 +44,12 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                         associatedDatasetIdsAndOrgUnitIdsList.push(orgunitIdsAndDatasetIds);
                         return datasetRepository.associateOrgUnits(datasetIds, originOrgUnits).then(function() {
                             if (program) {
-                                associatedPrograms.push(program);
-                                programRepository.associateOrgUnits(program, originOrgUnits);
+                                var orgUnitAndProgramAssociations = {
+                                    "orgUnitIds": originOrgUnitIds,
+                                    "programIds": [program.id]
+                                };
+                                associatedOrgUnitsToProgramsList.push(orgUnitAndProgramAssociations);
+                                return programRepository.associateOrgUnits(program, originOrgUnits);
                             }
                         });
                     };
@@ -67,9 +71,11 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                             $scope.resourceBundle.associateOrgUnitToDatasetDesc + $scope.orgUnit.name);
                     });
 
-                    if (!_.isEmpty(associatedPrograms))
-                        publishMessage(associatedPrograms, "uploadProgram",
-                            $scope.resourceBundle.uploadProgramDesc + _.pluck(allOriginOrgUnits, "name"));
+                    if (!_.isEmpty(associatedOrgUnitsToProgramsList)) {
+                        return _.map(associatedOrgUnitsToProgramsList, function (orgUnitProgramAssociations) {
+                            return publishMessage(orgUnitProgramAssociations, 'associateOrgunitToProgramConsumer', $scope.resourceBundle.uploadProgramDesc + _.pluck(allOriginOrgUnits, "name"));
+                        });
+                    }
                 };
 
                 var getBooleanAttributeValue = function(attributeValues, attributeCode) {
