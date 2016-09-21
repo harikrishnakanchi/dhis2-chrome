@@ -8,7 +8,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
             $scope.isSubSectionExpanded = {};
             $scope.isDisabled = false;
             $scope.module = {};
-            $scope.allModules = [];
+            $scope.otherModules = [];
             $scope.selectedDataset = {};
             $scope.selectedTemplate = {};
 
@@ -100,7 +100,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
                 var getAllModules = function() {
                     return orgUnitRepository.getAllModulesInOrgUnits([$scope.module.parent.id]).then(function(modules) {
-                        $scope.allModules = _.pluck(modules, "name");
+                        $scope.otherModules = _.difference(_.pluck(modules, "name"),[$scope.module.name]);
                     });
                 };
 

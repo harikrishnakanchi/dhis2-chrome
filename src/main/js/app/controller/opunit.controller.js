@@ -366,7 +366,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper", "customAttributes"], func
 
                 var parentId = $scope.isNewMode ? $scope.orgUnit.id : $scope.orgUnit.parent.id;
                 orgUnitRepository.getChildOrgUnitNames(parentId).then(function(data) {
-                    $scope.allOpunitNames = data;
+                    $scope.otherOpUnitNames = _.difference(data, [$scope.opUnit.name]);
                 });
             });
 

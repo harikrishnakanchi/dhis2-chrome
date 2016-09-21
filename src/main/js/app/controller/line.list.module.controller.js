@@ -6,7 +6,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
             $scope.module = {};
             $scope.isExpanded = {};
             $scope.isDisabled = false;
-            $scope.allModules = [];
+            $scope.otherModules = [];
             $scope.collapseSection = {};
             $scope.excludedDataElements = [];
             $scope.allPrograms = [];
@@ -39,7 +39,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
                 var getAllModules = function() {
                     return orgUnitRepository.getAllModulesInOrgUnits([$scope.module.parent.id]).then(function(modules) {
-                        $scope.allModules = _.pluck(modules, "name");
+                        $scope.otherModules = _.difference(_.pluck(modules, "name"), [$scope.module.name]);
                     });
                 };
 
