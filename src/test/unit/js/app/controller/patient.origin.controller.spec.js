@@ -257,7 +257,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
 
             expect(hustle.publish.calls.argsFor(3)).toEqual([{
                 "data": {'programIds': [program.id], 'orgUnitIds': _.map(originOrgUnits, 'id')},
-                "type": "associateOrgunitToProgramConsumer",
+                "type": "associateOrgunitToProgram",
                 "locale": "en",
                 "desc": "upload program for origin org unit"
             }, "dataValues"]);

@@ -37,7 +37,7 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                             "programIds": [program.id]
                         };
                         return programRepository.associateOrgUnits(program, orgUnits).then(function () {
-                            return publishMessage(orgUnitAndProgramAssociations, 'associateOrgunitToProgramConsumer', $scope.resourceBundle.uploadProgramDesc + _.pluck(orgUnits, "name"));
+                            return publishMessage(orgUnitAndProgramAssociations, 'associateOrgunitToProgram', $scope.resourceBundle.uploadProgramDesc + _.pluck(orgUnits, "name"));
                         });
                     }
                     else {

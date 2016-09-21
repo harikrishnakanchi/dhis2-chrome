@@ -75,7 +75,7 @@ define(["lodash"], function(_) {
                 case "removeOrgUnitFromDataset":
                     return removeOrgunitDatasetAssociationConsumer.run(message);
                 
-                case "associateOrgunitToProgramConsumer":
+                case "associateOrgunitToProgram":
                     return associateOrgunitToProgramConsumer.run(message);
 
                 case "createUser":

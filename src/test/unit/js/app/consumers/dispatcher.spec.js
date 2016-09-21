@@ -474,7 +474,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
         it("should call associate org unit to program", function() {
             message.data = {
                 "data": {},
-                "type": "associateOrgunitToProgramConsumer"
+                "type": "associateOrgunitToProgram"
             };
 
             dispatcher.run(message);

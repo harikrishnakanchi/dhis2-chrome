@@ -1399,7 +1399,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 expect(datasetRepository.associateOrgUnits).toHaveBeenCalledWith(["Ds1", "OrgDs1"], originOrgUnit);
                 expect(hustle.publish.calls.argsFor(3)).toEqual([{
                     data: messageData,
-                    type: "associateOrgunitToProgramConsumer",
+                    type: "associateOrgunitToProgram",
                     locale: "en",
                     desc: "associate selected program to Unknown"
                 }, "dataValues"]);
