@@ -87,7 +87,7 @@ define(["uploadOrgUnitGroupConsumer", "orgUnitGroupService", "orgUnitGroupReposi
             };
 
             spyOn(orgUnitGroupRepository, "findAll").and.returnValue(utils.getPromise(q, [orgUnitGroupFromIDB]));
-            orgUnitGroupService.deleteOrgUnit.and.returnValue(utils.getRejectedPromise(q, {"status" : 404}));
+            orgUnitGroupService.deleteOrgUnit.and.returnValue(utils.getPromise(q, undefined));
 
             message = {
                 "data": {

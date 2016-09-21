@@ -5,7 +5,7 @@ define(["dataService", "metadataService", "approvalService", "orgUnitService", "
             app.service('approvalService', ['$http', '$indexedDB', '$q', approvalService]);
             app.service('metadataService', ['$http', metadataService]);
             app.service('orgUnitService', ['$http', '$indexedDB', orgUnitService]);
-            app.service('orgUnitGroupService', ['$http', orgUnitGroupService]);
+            app.service('orgUnitGroupService', ['$http', '$q', orgUnitGroupService]);
             app.service('datasetService', ['$http', datasetService]);
             app.service('userService', ['$http', '$indexedDB', userService]);
             app.service('systemSettingService', ['$http', systemSettingService]);

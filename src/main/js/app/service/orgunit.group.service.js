@@ -1,5 +1,5 @@
 define(["dhisUrl", "httpUtils", "lodash"], function(dhisUrl, httpUtils, _) {
-    return function($http) {
+    return function($http, $q) {
 
         this.get = function(orgUnitGroupIds) {
             orgUnitGroupIds = _.isArray(orgUnitGroupIds) ? orgUnitGroupIds : [orgUnitGroupIds];
@@ -21,8 +21,15 @@ define(["dhisUrl", "httpUtils", "lodash"], function(dhisUrl, httpUtils, _) {
             return $http.post(dhisUrl.orgUnitGroups + "/" + orgUnitGroupId + "/organisationUnits/" + orgUnitId);
         };
 
-        this.deleteOrgUnit = function(orgUnitGroupId, orgUnitId) {
-            return $http.delete(dhisUrl.orgUnitGroups + "/" + orgUnitGroupId + "/organisationUnits/" + orgUnitId);
+        this.deleteOrgUnit = function (orgUnitGroupId, orgUnitId) {
+            return $http.delete(dhisUrl.orgUnitGroups + "/" + orgUnitGroupId + "/organisationUnits/" + orgUnitId)
+                .catch(function (response) {
+                    if (response.status === 404) {
+                        return $q.when();
+                    } else {
+                        return $q.reject(response);
+                    }
+                });
         };
     };
 });
