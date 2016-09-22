@@ -3,7 +3,8 @@ define(['dhisUrl', 'properties', 'moment', 'lodash'], function(dhisUrl, properti
         var MAX_NUMBER_OF_EVENTS = properties.eventsSync.maximumNumberOfEventsToSync,
             EVENT_ID_PAGE_SIZE = properties.eventsSync.pageSize.eventIds,
             EVENT_DATA_PAGE_SIZE = properties.eventsSync.pageSize.eventData,
-            DEFAULT_PAGE_REQUESTS_MAX_LIMIT = 99;
+            DEFAULT_PAGE_REQUESTS_MAX_LIMIT = 99,
+            ISO_8601_DATE_FORMAT = 'YYYY-MM-DD';
 
         var recursivelyDownloadPagedEvents = function(queryParams, maximumPageRequests, eventsResponses) {
             queryParams.totalPages = true;
@@ -29,6 +30,13 @@ define(['dhisUrl', 'properties', 'moment', 'lodash'], function(dhisUrl, properti
         };
 
         this.getEvents = function(orgUnitId, periodRange, lastUpdated) {
+            var formatEventDates = function (events) {
+                return _.map(events, function(event) {
+                    event.eventDate = moment.utc(event.eventDate).format(ISO_8601_DATE_FORMAT);
+                    return event;
+                });
+            };
+
             var startDate = moment(_.first(periodRange), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
                 endDate = moment(_.last(periodRange), 'GGGG[W]WW').endOf('isoWeek').format('YYYY-MM-DD'),
                 maximumPageRequests = MAX_NUMBER_OF_EVENTS / EVENT_DATA_PAGE_SIZE;
@@ -41,7 +49,7 @@ define(['dhisUrl', 'properties', 'moment', 'lodash'], function(dhisUrl, properti
                 fields: ":all,dataValues[value,dataElement,providedElsewhere,storedBy]",
                 lastUpdated: lastUpdated,
                 pageSize: EVENT_DATA_PAGE_SIZE
-            }, maximumPageRequests);
+            }, maximumPageRequests).then(formatEventDates);
         };
 
         this.getEventIds = function(orgUnitId, periodRange) {

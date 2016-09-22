@@ -1,4 +1,4 @@
-define([], function() {
+define(['moment'], function(moment) {
     var create_data_store = function(stores, db) {
         _.each(stores, function(type) {
             db.createObjectStore(type, {
@@ -345,6 +345,19 @@ define([], function() {
         changeLogStore.delete("charts");
     };
 
+    var format_event_dates = function(db, tx) {
+        var programEventStore = tx.objectStore("programEvents");
+        programEventStore.openCursor().onsuccess = function(e) {
+            var cursor = e.target.result;
+            if (cursor) {
+                var event = cursor.value;
+                event.eventDate = moment.utc(event.eventDate).format('YYYY-MM-DD');
+                cursor.update(event);
+                cursor.continue();
+            }
+        };
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -391,6 +404,7 @@ define([], function() {
         delete_keys_chart_and_reports_from_changelog,
         force_pivot_tables_to_redownload,
         create_excluded_line_list_options_store,
-        force_charts_to_redownload
+        force_charts_to_redownload,
+        format_event_dates
     ];
 });
