@@ -1,17 +1,17 @@
 require.config({
     paths: {
         "Q": "lib/q/q",
-        "lodash": "lib/lodash/lodash",
-        "ng-i18n": "lib/ng-i18n/ng-i18n",
+        "lodash": "lib/lodash/lodash.min",
+        "ng-i18n": "lib/ng-i18n/ng-i18n-0.2.0.min",
         "properties": "app/conf/properties",
         "overrides": "app/conf/overrides",
         "indexedDBLogger": "app/utils/indexeddb.logger",
         "app": "app/bg.app",
         "hustle": "lib/hustle/hustle",
-        "moment": "lib/moment/moment-with-locales",
+        "moment": "lib/moment/moment-with-locales.min",
         "hustleModule": "lib/angularjs-hustle/hustle.module",
-        "angular": "lib/angular/angular",
-        "md5": "lib/js-md5/md5",
+        "md5": "lib/js-md5/md5.min",
+        "angular": "lib/angular/angular.min",
         "sjcl": "lib/sjcl/sjcl",
 
         //services

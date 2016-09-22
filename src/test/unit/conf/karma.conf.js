@@ -3,7 +3,7 @@ module.exports = function(config) {
     config.set({
         basePath: '../../../',
         files: [
-            'main/js/lib/angular/angular.js',
+            'main/js/lib/angular/angular.min.js',
             'test/unit/test.main.js', {
                 pattern: 'test/unit/test.config.js',
                 included: false

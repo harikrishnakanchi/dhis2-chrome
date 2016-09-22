@@ -1,27 +1,26 @@
 require.config({
     paths: {
-        "angular": "lib/angular/angular",
+        "angular": "lib/angular/angular.min",
         "Q": "lib/q/q",
-        "d3": "lib/d3/d3",
+        "d3": "lib/d3/d3.min",
         "d3-shim": "lib/custom/d3-shim/d3.shim",
-        "nvd3": "lib/nvd3/nv.d3",
-        "lodash": "lib/lodash/lodash",
-        "ng-i18n": "lib/ng-i18n/ng-i18n",
-        "angular-route": "lib/angular-route/angular-route",
-        "angular-resource": "lib/angular-resource/angular-resource",
+        "nvd3": "lib/nvd3/nv.d3.min",
+        "lodash": "lib/lodash/lodash.min",
+        "ng-i18n": "lib/ng-i18n/ng-i18n-0.2.0.min",
+        "angular-route": "lib/angular-route/angular-route.min",
         "migrations": "app/migrator/migrations",
         "migrator": "app/migrator/migrator",
         "properties": "app/conf/properties",
         "overrides": "app/conf/overrides",
-        "moment": "lib/moment/moment-with-locales",
+        "moment": "lib/moment/moment-with-locales.min",
         "timecop": "lib/timecop/timecop-0.1.1",
         "hustle": "lib/hustle/hustle",
         "hustleModule": "lib/angularjs-hustle/hustle.module",
         "indexedDBLogger": "app/utils/indexeddb.logger",
-        "JSZip": "lib/jszip/jszip",
+        "JSZip": "lib/jszip/jszip.min",
         "sjcl": "lib/sjcl/sjcl",
         "saveSvgAsPng": "lib/save-svg-as-png/saveSvgAsPng",
-        "angular-sanitize": "lib/angular-sanitize/angular-sanitize",
+        "angular-sanitize": "lib/angular-sanitize/angular-sanitize.min",
 
         //3rd party angular modules
         "angular-indexedDB": "lib/angular-indexedDB/indexeddb",
@@ -41,8 +40,8 @@ require.config({
         "angular-multiselect": "lib/angularjs-directives/src/multiselect/multiselect",
         "angular-filter": "lib/angular-filter/angular-filter.min",
         "angucomplete-alt": "lib/angularjs-directives/src/angucomplete-alt/angucomplete-alt",
-        "angular-nvd3": "lib/angular-nvd3/angular-nvd3",
-        "md5": "lib/js-md5/md5",
+        "angular-nvd3": "lib/angular-nvd3/angular-nvd3.min",
+        "md5": "lib/js-md5/md5.min",
 
         //Controllers
         "controllers": "app/controller/controllers",
@@ -200,9 +199,6 @@ require.config({
             deps: ["angular"]
         },
         'angular-indexedDB': {
-            deps: ["angular"]
-        },
-        'angular-resource': {
             deps: ["angular"]
         },
         'angular-ui-tabs': {
