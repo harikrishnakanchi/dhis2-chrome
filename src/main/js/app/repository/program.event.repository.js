@@ -1,7 +1,5 @@
 define(["moment", "lodash", "properties", "dateUtils", "customAttributes"], function(moment, _, properties, dateUtils, CustomAttributes) {
     return function(db, $q, dataElementRepository) {
-        var ISO_8601_DATE_FORMAT =  'YYYY-MM-DD';
-
         this.upsert = function(events) {
 
             var extractEventCode = function(events) {
@@ -203,14 +201,11 @@ define(["moment", "lodash", "properties", "dateUtils", "customAttributes"], func
         };
 
         this.findEventsByDateRange = function(programId, orgUnitIds, fromDate, toDate) {
-            fromDate = moment.utc(fromDate).format(ISO_8601_DATE_FORMAT);
-            toDate = moment.utc(toDate).format(ISO_8601_DATE_FORMAT);
-
             orgUnitIds = _.flatten([orgUnitIds]);
 
             var getEvents = function() {
                 var store = db.objectStore('programEvents');
-                var query = db.queryBuilder().$between(fromDate, toDate).$index("by_event_date").compile();
+                var query = db.queryBuilder().$between(dateUtils.toISODate(fromDate), dateUtils.toISODate(toDate)).$index('by_event_date').compile();
                 return store.each(query);
             };
 

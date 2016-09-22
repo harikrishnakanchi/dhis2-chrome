@@ -1,10 +1,9 @@
-define(['dhisUrl', 'properties', 'moment', 'lodash'], function(dhisUrl, properties, moment, _) {
+define(['dhisUrl', 'dateUtils', 'properties', 'moment', 'lodash'], function(dhisUrl, dateUtils, properties, moment, _) {
     return function($http, $q) {
         var MAX_NUMBER_OF_EVENTS = properties.eventsSync.maximumNumberOfEventsToSync,
             EVENT_ID_PAGE_SIZE = properties.eventsSync.pageSize.eventIds,
             EVENT_DATA_PAGE_SIZE = properties.eventsSync.pageSize.eventData,
-            DEFAULT_PAGE_REQUESTS_MAX_LIMIT = 99,
-            ISO_8601_DATE_FORMAT = 'YYYY-MM-DD';
+            DEFAULT_PAGE_REQUESTS_MAX_LIMIT = 99;
 
         var recursivelyDownloadPagedEvents = function(queryParams, maximumPageRequests, eventsResponses) {
             queryParams.totalPages = true;
@@ -32,7 +31,7 @@ define(['dhisUrl', 'properties', 'moment', 'lodash'], function(dhisUrl, properti
         this.getEvents = function(orgUnitId, periodRange, lastUpdated) {
             var formatEventDates = function (events) {
                 return _.map(events, function(event) {
-                    event.eventDate = moment.utc(event.eventDate).format(ISO_8601_DATE_FORMAT);
+                    event.eventDate = dateUtils.toISODate(event.eventDate);
                     return event;
                 });
             };

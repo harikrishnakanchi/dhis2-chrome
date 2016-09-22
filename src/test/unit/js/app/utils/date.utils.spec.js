@@ -18,6 +18,28 @@ define(['dateUtils', 'moment', 'timecop'], function(dateUtils, moment, timecop) 
             });
         });
 
+        describe('toISODate', function () {
+            it('should convert a moment object to ISO date format', function () {
+                var momentObject = moment('2016-07-31T00:00:00Z');
+                expect(dateUtils.toISODate(momentObject)).toEqual('2016-07-31');
+            });
+
+            it('should convert a datetime string to UTC in ISO date format', function () {
+                var dateTimeString = '2016-07-31T00:00:00+0100';
+                expect(dateUtils.toISODate(dateTimeString)).toEqual('2016-07-30');
+            });
+
+            it('should convert a datetime string without a timezone to ISO date format', function () {
+                var dateTimeString = '2016-07-31T00:00:00';
+                expect(dateUtils.toISODate(dateTimeString)).toEqual('2016-07-31');
+            });
+
+            it('should convert a date string to ISO date format', function () {
+                var dateString = '2016-07-31';
+                expect(dateUtils.toISODate(dateString)).toEqual('2016-07-31');
+            });
+        });
+
         describe('maxTime', function () {
             it('should return max time', function() {
                 var timeStrings = ['2014-05-30T12:43:54.972Z', '2014-05-30T18:43:54.972Z', '2014-04-30T12:43:54.972Z'];

@@ -1,4 +1,4 @@
-define(['moment'], function(moment) {
+define(['dateUtils'], function(dateUtils) {
     var create_data_store = function(stores, db) {
         _.each(stores, function(type) {
             db.createObjectStore(type, {
@@ -346,12 +346,12 @@ define(['moment'], function(moment) {
     };
 
     var format_event_dates = function(db, tx) {
-        var programEventStore = tx.objectStore("programEvents");
+        var programEventStore = tx.objectStore('programEvents');
         programEventStore.openCursor().onsuccess = function(e) {
             var cursor = e.target.result;
             if (cursor) {
                 var event = cursor.value;
-                event.eventDate = moment.utc(event.eventDate).format('YYYY-MM-DD');
+                event.eventDate = dateUtils.toISODate(event.eventDate);
                 cursor.update(event);
                 cursor.continue();
             }
