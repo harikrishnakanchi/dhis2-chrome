@@ -41,7 +41,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             scope.resourceBundle = {
                 "upsertOrgUnitDesc": "upsert org unit ",
-                "uploadApprovalDataDesc": "approve data at coordination level for ",
                 "uploadCompletionDataDesc": "approve data at project level for "
             };
 
