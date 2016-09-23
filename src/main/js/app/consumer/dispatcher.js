@@ -1,10 +1,10 @@
 define(["lodash"], function(_) {
-    return function($q, $log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, updateDatasetConsumer,
+    return function($q, $log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDataSetConsumer, updateDataSetConsumer,
         createUserConsumer, updateUserConsumer, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer,
         downloadProgramConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer,
         downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
         uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
-        downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, removeOrgunitDatasetAssociationConsumer, associateOrgunitToProgramConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer) {
+        downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, removeOrgunitDataSetAssociationConsumer, associateOrgunitToProgramConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer) {
 
         this.run = function(message) {
             $log.info("Processing message: " + message.data.type, message.data);
@@ -15,7 +15,7 @@ define(["lodash"], function(_) {
                         .then(_.partial(downloadOrgUnitConsumer.run, message))
                         .then(_.partial(downloadOrgUnitGroupConsumer.run, message))
                         .then(_.partial(downloadProgramConsumer.run, message))
-                        .then(_.partial(downloadDatasetConsumer.run, message))
+                        .then(_.partial(downloadDataSetConsumer.run, message))
                         .then(function() {
                             $log.info('Metadata sync complete');
                         });
@@ -70,10 +70,10 @@ define(["lodash"], function(_) {
                     return uploadOrgUnitGroupConsumer.run(message);
 
                 case "associateOrgUnitToDataset":
-                    return updateDatasetConsumer.run(message);
+                    return updateDataSetConsumer.run(message);
 
                 case "removeOrgUnitFromDataset":
-                    return removeOrgunitDatasetAssociationConsumer.run(message);
+                    return removeOrgunitDataSetAssociationConsumer.run(message);
                 
                 case "associateOrgunitToProgram":
                     return associateOrgunitToProgramConsumer.run(message);
