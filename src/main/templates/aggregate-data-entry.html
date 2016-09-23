@@ -30,7 +30,7 @@
                     <button class="btn btn-sm btn-primary printTallySheetBtn" ng-click="printWindow()" ng-show="selectedModule">{{resourceBundle.printTallySheetBtnValue}}</button>
                 </div>
                 <accordion close-others="false">
-                    <div ng-class="'dataset-acc-wrapper'">
+                    <div class="data-set-acc-wrapper">
                         <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: false, isPopulationDataset: false } | orderBy: 'name' track by dataSet.id" is-open="getDatasetState(dataSet.id, $first)[dataSet.id]">
                             <accordion-heading>
                                 <span>{{ dataSet.name }}</span>

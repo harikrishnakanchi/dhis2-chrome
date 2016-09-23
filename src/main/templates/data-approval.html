@@ -39,7 +39,7 @@
 
                 <form name="dataentryForm" id="dataentry" ng-if="showForm()">
                     <accordion close-others="false">
-                        <div class="dataset-acc-wrapper">
+                        <div class="data-set-acc-wrapper">
                             <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: false, isPopulationDataset: false }" is-open="getDatasetState(dataSet.id, $first)[dataSet.id]">
                                 <accordion-heading>
                                     <span>{{ dataSet.name}}</span>
@@ -114,7 +114,7 @@
                                 </div>
                             </accordion-group>
                         </div>
-                        <div class="dataset-acc-wrapper">
+                        <div class="data-set-acc-wrapper">
                             <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: true }" is-open="getDatasetState(dataSet.id, false)[dataSet.id]" class="originDataset">
                                 <accordion-heading>
                                     <span>{{ dataSet.name}}</span>
