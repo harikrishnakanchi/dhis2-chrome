@@ -198,7 +198,6 @@
     "notificationAbortRetryMessage": "Failed to {{job_description}} even after repeated retries. Please try again or contact admin.",
     "downloadDataDesc": "download data from DHIS",
     "syncModuleDataBlockDesc": "upload data and approvals for {{period}}",
-    "uploadCompletionDataDesc": "approve data at project level for ",
     "disableOrgUnitDesc": "disable organisation unit: {{orgUnit}}",
     "upsertOrgUnitDesc": "save organisation unit: ",
     "createUserDesc": "create user ",

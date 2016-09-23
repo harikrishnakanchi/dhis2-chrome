@@ -47,7 +47,6 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                     syncModuleDataBlockDesc: 'some description',
                     uploadProgramEventsDesc: 'submit cases for ',
                     deleteEventDesc: 'delete cases',
-                    uploadCompletionDataDesc: 'approve data at project level for ',
                     eventSubmitAndApproveSuccess: '{{number_of_events}} some success message',
                     eventSubmitSuccess: '{{number_of_events}} some other success message',
                     eventDateLabel: 'Event Date',

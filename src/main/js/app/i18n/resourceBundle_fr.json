@@ -198,7 +198,6 @@
     "notificationAbortRetryMessage": "a échoué à {{job_description}} malgré plusieurs tentatives. SVP ré-essayer à nouveau ou contacter l'administrateur.",
     "downloadDataDesc": "télécharger les données depuis DHIS",
     "syncModuleDataBlockDesc": "télécharger les données et les validations pour {{period}}",
-    "uploadCompletionDataDesc": "valider les données au niveau Coordination pour",
     "disableOrgUnitDesc": "Désactiver définivitement l'Unité Opérationnelle {{orgUnit}}",
     "upsertOrgUnitDesc": "sauvegarder l'unité organisationnelle",
     "createUserDesc": "créer un utilisateur",
