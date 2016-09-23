@@ -91,7 +91,7 @@ define(["moment", "lodash", "properties", "dateUtils", "customAttributes"], func
         };
 
         this.getEventsFromPeriod = function(startPeriod, orgUnitIds) {
-            var startDate = moment(startPeriod, 'GGGG[W]W').startOf('day').toISOString();
+            var startDate = moment.utc(startPeriod, 'GGGG[W]W').startOf('day').toISOString();
             var endDate = moment().endOf('day').toISOString();
 
             var store = db.objectStore('programEvents');
@@ -201,14 +201,11 @@ define(["moment", "lodash", "properties", "dateUtils", "customAttributes"], func
         };
 
         this.findEventsByDateRange = function(programId, orgUnitIds, fromDate, toDate) {
-            fromDate = moment(fromDate).startOf('day').toISOString();
-            toDate = moment(toDate).endOf('day').toISOString();
-
             orgUnitIds = _.flatten([orgUnitIds]);
 
             var getEvents = function() {
                 var store = db.objectStore('programEvents');
-                var query = db.queryBuilder().$between(fromDate, toDate).$index("by_event_date").compile();
+                var query = db.queryBuilder().$between(dateUtils.toISODate(fromDate), dateUtils.toISODate(toDate)).$index('by_event_date').compile();
                 return store.each(query);
             };
 
@@ -252,9 +249,11 @@ define(["moment", "lodash", "properties", "dateUtils", "customAttributes"], func
             };
 
             return getProgramDataElements(programId).then(function(programDataElements) {
-                return _.transform(events, function(acc, programEvent) {
-                    if (programEvent.localStatus === "DELETED")
-                        return false;
+                var isDeletedEvent = function (event) {
+                    return event.localStatus === "DELETED";
+                };
+
+                var mapEventAndDataElements = function(programEvent) {
                     var mappedEvent = _.omit(programEvent, "dataValues");
                     mappedEvent.dataValues = _.cloneDeep(programDataElements);
                     _.each(programEvent.dataValues, function(programEventDataValue) {
@@ -263,8 +262,10 @@ define(["moment", "lodash", "properties", "dateUtils", "customAttributes"], func
                         });
                         mappedEventDataValue.value = programEventDataValue.value;
                     });
-                    acc.push(mappedEvent);
-                }, []);
+                    return mappedEvent;
+                };
+
+                return _.chain(events).reject(isDeletedEvent).map(mapEventAndDataElements).value();
             });
         };
     };

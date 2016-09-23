@@ -1,4 +1,4 @@
-define(['chart', 'lodash'], function(Chart, _) {
+define(['chart', 'chartData', 'lodash'], function(Chart, ChartData, _) {
     return function(db, $q) {
         var CHART_STORE_NAME = 'chartDefinitions';
         var CHART_DATA_STORE_NAME = 'chartData';
@@ -45,6 +45,13 @@ define(['chart', 'lodash'], function(Chart, _) {
             var store = db.objectStore(CHART_DATA_STORE_NAME);
             return store.find([chartName, orgUnitId]).then(function (chartData) {
                 return !!chartData && chartData.data;
+            });
+        };
+
+        this.getChartData = function (chartDefinition, orgUnitId) {
+            var store = db.objectStore(CHART_DATA_STORE_NAME);
+            return store.find([chartDefinition.name, orgUnitId]).then(function (chartData) {
+                return chartData && ChartData.create(chartDefinition, chartData.data);
             });
         };
     };

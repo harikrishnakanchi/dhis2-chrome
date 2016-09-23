@@ -1,4 +1,4 @@
-define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], function(moment, properties, _, indexedDBLogger, zipUtils) {
+define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interpolate"], function(moment, properties, _, indexedDBLogger, zipUtils, interpolate) {
     return function($scope, $modal, $timeout, indexeddbUtils, filesystemService, sessionHelper, $location, $rootScope) {
         $scope.status = {
             isopen: false
@@ -14,7 +14,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
             var errorCallback = function(error) {
                 if(_.isObject(error)) {
                     var notificationMessages = {
-                        "notificationMessage": $scope.resourceBundle.dumpLogsErrorMessage + error.message,
+                        "notificationMessage": interpolate($scope.resourceBundle.dumpLogsErrorMessage, { error: error.message }),
                         "notificationTitle": $scope.resourceBundle.errorNotification
                     };
                     showNotification(notificationMessages);
@@ -23,7 +23,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
 
             var successCallback = function(directory) {
                 var notificationMessages = {
-                    "notificationMessage": $scope.resourceBundle.dumpLogsSuccessMessage + directory.name,
+                    "notificationMessage": interpolate($scope.resourceBundle.dumpLogsSuccessMessage, { directory: directory.name }),
                     "notificationTitle": $scope.resourceBundle.successNotification
                 };
                 showNotification(notificationMessages);
@@ -37,7 +37,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
             var errorCallback = function(error) {
                 if(_.isObject(error)) {
                     var notificationMessages = {
-                        "notificationMessage": $scope.resourceBundle.createCloneErrorMessage + error.message,
+                        "notificationMessage": interpolate($scope.resourceBundle.createCloneErrorMessage, { error: error.message }),
                         "notificationTitle": $scope.resourceBundle.errorNotification
                     };
                     showNotification(notificationMessages);
@@ -46,7 +46,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
 
             var successCallback = function(directory) {
                 var notificationMessages = {
-                    "notificationMessage": $scope.resourceBundle.createCloneSuccessMessage + directory.name,
+                    "notificationMessage": interpolate($scope.resourceBundle.createCloneSuccessMessage, { directory: directory.name }),
                     "notificationTitle": $scope.resourceBundle.successNotification
                 };
                 showNotification(notificationMessages);
@@ -66,7 +66,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
         $scope.loadClone = function() {
             var errorCallback = function(error) {
                 var notificationMessages = {
-                    "notificationMessage": $scope.resourceBundle.loadCloneErrorMessage + error,
+                    "notificationMessage": interpolate($scope.resourceBundle.loadCloneErrorMessage, { error: error.message }),
                     "notificationTitle": $scope.resourceBundle.errorNotification
                 };
                 showNotification(notificationMessages);

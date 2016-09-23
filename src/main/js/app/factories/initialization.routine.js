@@ -31,6 +31,7 @@ define(['lodash', 'chromeUtils'], function (_, chromeUtils) {
             systemSettingRepository.getLocale().then($rootScope.setLocale);
             packagedDataImporter.run();
             systemSettingRepository.loadProductKey().finally(redirectIfProductKeyNotSet);
+            chromeUtils.init();
         };
 
         return {

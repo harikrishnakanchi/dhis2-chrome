@@ -1,7 +1,7 @@
 define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository'], function (TranslationsService, mocks, utils, SystemSettingRepository) {
     describe('Translation Service', function () {
         var q, rootScope, translationsService, mockDB, scope, mockStore, i18nResourceBundle, systemSettingRepository, mockTranslations;
-        var ENGLISH = 'en', FRENCH = FRENCH;
+        var ENGLISH = 'en', FRENCH = 'fr';
 
         beforeEach(mocks.inject(function ($q, $rootScope) {
             q = $q;
@@ -19,55 +19,25 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
             spyOn(systemSettingRepository, 'upsertLocale').and.returnValue(utils.getPromise(q, {}));
 
             mockTranslations = [{
-                objectId: 'id1',
-                value: 'frenchName',
+                objectId: 'someIdA',
+                value: 'someFrenchNameA',
                 locale: FRENCH,
                 property: 'name'
             }, {
-                objectId: 'id2',
-                value: 'frenchSection',
+                objectId: 'someIdB',
+                value: 'someFrenchNameB',
                 locale: FRENCH,
                 property: 'name'
             }, {
-                objectId: 'id3',
-                value: 'frenchDataElement',
+                objectId: 'someIdC',
+                value: 'someFrenchNameC',
                 locale: FRENCH,
                 property: 'name'
             },{
-                objectId: 'id4',
-                value: 'french description',
+                objectId: 'someIdD',
+                value: 'someFrenchDescriptionD',
                 locale: FRENCH,
                 property: 'description'
-            },{
-                objectId: 'id4',
-                value: 'frenchReport',
-                locale: FRENCH,
-                property: 'shortName'
-            }, {
-                objectId: 'id4',
-                value: 'french name',
-                locale: FRENCH,
-                property: 'name'
-            }, {
-                objectId: 'id5',
-                value: 'frenchDataElementDescription',
-                locale: FRENCH,
-                property: 'description'
-            }, {
-                objectId: 'id6',
-                value: 'frenchHeader',
-                locale: FRENCH,
-                property: 'name'
-            }, {
-                objectId: 'someRowId',
-                value: 'frenchRowName',
-                locale: FRENCH,
-                property: 'name'
-            }, {
-                objectId: 'someColumnId',
-                value: 'frenchColumnName',
-                locale: FRENCH,
-                property: 'name'
             }];
             mockStore.each.and.returnValue(utils.getPromise(q, mockTranslations));
 
@@ -81,35 +51,33 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
 
         it('should return translation value of property for specified object', function() {
             initialiseTranslationsServiceForLocale(FRENCH);
-            expect(translationsService.getTranslationForProperty('id1', 'name')).toEqual('frenchName');
+            expect(translationsService.getTranslationForProperty('someIdA', 'name')).toEqual('someFrenchNameA');
         });
 
         it('should return default value if translation for specified property in specified object is not present', function() {
-            var defaultValue = "defaultValue";
-
             initialiseTranslationsServiceForLocale(FRENCH);
-            expect(translationsService.getTranslationForProperty('id1', 'formName', defaultValue)).toEqual(defaultValue);
+            expect(translationsService.getTranslationForProperty('someInvalidId', 'name', 'defaultValue')).toEqual('defaultValue');
         });
 
         it('should translate name to french if locale is french', function () {
             var object = {
-                id: 'id1',
-                name: 'testName'
+                id: 'someIdA',
+                name: 'someEnglishNameA'
             };
             initialiseTranslationsServiceForLocale(FRENCH);
-            expect(translationsService.translate(object).name).toEqual('frenchName');
+            expect(translationsService.translate(object).name).toEqual('someFrenchNameA');
         });
         
         it('should translate each element if object is an array', function () {
             var array = [{
-                id: 'id1',
-                name: 'testName'
+                id: 'someIdA',
+                name: 'someEnglishNameA'
             }, {
-                id: 'id2',
-                name: 'testName'
+                id: 'someIdB',
+                name: 'someEnglishNameB'
             }];
             initialiseTranslationsServiceForLocale(FRENCH);
-            expect(_.map(translationsService.translate(array), 'name')).toEqual(['frenchName', 'frenchSection']);
+            expect(_.map(translationsService.translate(array), 'name')).toEqual(['someFrenchNameA', 'someFrenchNameB']);
         });
 
         it('should return undefined if object to be translated is undefined', function() {
@@ -118,232 +86,125 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
 
         it('should not translate if locale is english', function () {
             var obj = {
-                id: 'id1',
-                name: 'testName'
+                id: 'someIdA',
+                name: 'someEnglishNameA'
             };
             initialiseTranslationsServiceForLocale(ENGLISH);
 
-            expect(translationsService.translate(obj).name).toEqual('testName');
+            expect(translationsService.translate(obj).name).toEqual('someEnglishNameA');
         });
 
-        it('should translate the name in the nested object structure if locale is anything other than english', function () {
+        it('should translate nested objects', function () {
             var obj = {
-                id: 'id1',
-                name: 'testName',
+                id: 'someIdA',
+                name: 'someEnglishNameA',
                 sections: [{
-                    id: 'id2',
-                    name: 'testSection',
-                    dataElements: {
-                        id: 'id3',
-                        name: 'testDataElement'
-                    }
+                    id: 'someIdB',
+                    name: 'someEnglishNameB'
                 }, {
-                    id: 'id4',
-                    name: 'testSection',
-                    dataElements: {
-                        id: 'id3',
-                        name: 'testDataElement'
-                    }
+                    id: 'someIdC',
+                    name: 'someEnglishNameC'
                 }]
             };
 
             initialiseTranslationsServiceForLocale(FRENCH);
 
             var translatedObject = translationsService.translate(obj);
-            expect(_.map(translatedObject.sections, 'name')).toEqual(['frenchSection', 'french name']);
+            expect(_.map(translatedObject.sections, 'name')).toEqual(['someFrenchNameB', 'someFrenchNameC']);
         });
 
-        it('should set the default english name if there was no translation with the selected locale', function () {
+        it('should keep the default name if there was no translation with the selected locale', function () {
             var object = {
-                id: 'someObjectIdWithoutTranslation',
-                name: 'testName'
+                id: 'someInvalidId',
+                name: 'someEnglishName'
             };
             initialiseTranslationsServiceForLocale(FRENCH);
 
-            expect(translationsService.translate(object).name).toEqual('testName');
+            expect(translationsService.translate(object).name).toEqual('someEnglishName');
         });
 
-        it('should translate description property in the object with the selected locale', function () {
+        it('should translate the description property in the object', function () {
             var obj = {
-                id: 'id4',
-                description: 'english description'
+                id: 'someIdD',
+                description: 'someEnglishDescriptionD'
             };
             initialiseTranslationsServiceForLocale(FRENCH);
 
-            expect(translationsService.translate(obj).description).toEqual('french description');
+            expect(translationsService.translate(obj).description).toEqual('someFrenchDescriptionD');
         });
 
-        it('should not translate dataElements for referral datasets if locale is anything other than english', function () {
+        it('should not translate dataElements for referral dataDets', function () {
             var obj = [{
-                id: 'id1',
-                name: 'testName',
+                id: 'someIdA',
+                name: 'someEnglishNameA',
                 sections: [{
-                    id: 'id2',
-                    name: 'testSection',
+                    id: 'someIdB',
+                    name: 'someEnglishNameB',
                     dataElements: {
-                        id: 'id3',
-                        name: 'testDataElement'
-                    }
-                }, {
-                    id: 'id4',
-                    name: 'testSection',
-                    dataElements: {
-                        id: 'id5',
-                        description: 'testDataElementDescription'
+                        id: 'someIdC',
+                        name: 'someEnglishNameC'
                     }
                 }]
             }];
             initialiseTranslationsServiceForLocale(FRENCH);
 
             expect(translationsService.translateReferralLocations(obj)).toEqual([{
-                id: 'id1',
-                name: 'frenchName',
+                id: 'someIdA',
+                name: 'someFrenchNameA',
                 sections: [{
-                    id: 'id2',
-                    name: 'frenchSection',
+                    id: 'someIdB',
+                    name: 'someFrenchNameB',
                     dataElements: {
-                        id: 'id3',
-                        name: 'testDataElement'
-                    }
-                }, {
-                    id: 'id4',
-                    name: 'french name',
-                    dataElements: {
-                        id: 'id5',
-                        description: 'testDataElementDescription'
+                        id: 'someIdC',
+                        name: 'someEnglishNameC'
                     }
                 }]
             }]);
         });
 
-        describe('translate reports', function () {
-            var mockReport, translatedReport;
+        describe('translateChartData', function () {
+            var seriesItem, categoryItem, mockChartData;
 
             beforeEach(function () {
-                mockReport = {
-                    definition: {
-                        rows: [{
-                            items: [{
-                                id: 'id4',
-                                name: 'someName'
-                            }]
-                        }]
-                    },
-                    data: {
-                        metaData: {
-                            names: {}
-                        }
-                    }
+                seriesItem = {
+                    id: 'someIdA',
+                    name: 'someEnglishNameA'
                 };
-
+                categoryItem = {
+                    id: 'someIdB',
+                    name: 'someEnglishNameB'
+                };
+                mockChartData = {
+                    categories: [seriesItem],
+                    series: [categoryItem]
+                };
                 initialiseTranslationsServiceForLocale(FRENCH);
             });
 
-            it('should translate the names for the rows in the reports', function () {
-                translatedReport = translationsService.translateReports([mockReport]);
-                expect(translatedReport[0].definition.rows[0].items[0].name).toEqual('frenchReport');
+            it('should translate the series and categories of the chartData', function () {
+                var translatedObjects = translationsService.translateChartData([mockChartData]);
+                expect(translatedObjects).toEqual([mockChartData]);
+                expect(seriesItem.name).toEqual('someFrenchNameA');
+                expect(categoryItem.name).toEqual('someFrenchNameB');
             });
 
-            it('should translate the description of the item if translation exists', function () {
-                mockReport.definition.rows[0].items[0].description = 'someDescription';
+            describe('row or column is a period dimension', function () {
+                beforeEach(function () {
+                    rootScope.resourceBundle = {
+                        August: 'AugustInFrench'
+                    };
+                    seriesItem.id = 'somePeriodId';
+                    seriesItem.name = 'August 2016';
+                    seriesItem.periodDimension = true;
+                    mockChartData.monthlyChart = true;
+                });
 
-                translatedReport = translationsService.translateReports([mockReport]);
-                expect(translatedReport[0].definition.rows[0].items[0].description).toEqual('french description');
-            });
-        });
-
-        describe('translateCharts', function () {
-            var chartData;
-
-            beforeEach(function () {
-                var categoryOptionCombos = [{
-                    name: '<23 months, Female',
-                    id: 'categoryOptionComboId1',
-                    categoryOptions: [
-                        {id: 'categoryOptionId1', name: 'Female'},
-                        {id: 'categoryOptionId2', name: '<23 months'}
-                    ]
-                }, {
-                    name: '5-14 years',
-                    id: 'categoryOptionComboId2',
-                    categoryOptions: [
-                        {id: 'categoryOptionId3', name: '5-14 years'}
-                    ]
-                }, {
-                    name: '24-59 months, Male',
-                    id: 'categoryOptionComboId3',
-                    categoryOptions: [
-                        {id: 'categoryOptionId4', name: 'Male'},
-                        {id: 'categoryOptionId5', name: '24-59 months'}
-                    ]
-                }];
-
-                var translations = [{
-                    objectId: 'dataElementId',
-                    value: 'french data element name',
-                    locale: FRENCH,
-                    property: 'shortName'
-                }, {
-                    objectId: 'indicatorId',
-                    value: 'french indicator name',
-                    locale: FRENCH,
-                    property: 'shortName'
-                }, {
-                    objectId: 'categoryOptionId1',
-                    value: 'Female fr',
-                    locale: FRENCH,
-                    property: 'shortName'
-                }, {
-                    objectId: 'categoryOptionId2',
-                    value: '<23 months fr',
-                    locale: FRENCH,
-                    property: 'shortName'
-                }, {
-                    objectId: 'categoryOptionId3',
-                    value: '5-14 years fr',
-                    locale: FRENCH,
-                    property: 'shortName'
-                }, {
-                    objectId: 'categoryOptionId4',
-                    value: 'Male fr',
-                    locale: FRENCH,
-                    property: 'shortName'
-                }];
-
-                mockStore.getAll.and.returnValue(utils.getPromise(q, categoryOptionCombos));
-                mockStore.each.and.returnValue(utils.getPromise(q, translations));
-
-                initialiseTranslationsServiceForLocale(FRENCH);
-
-                chartData = {
-                    metaData: {
-                        names: {
-                            "dataElementId": "Some data element",
-                            "indicatorId": "Some indicator",
-                            "categoryOptionComboId1": "some category option data 1",
-                            "categoryOptionComboId2": "some category option data 2",
-                            "categoryOptionComboId3": "some category option data 3"
-                        },
-                        dx: ["dataElementId", "indicatorId"],
-                        co: ["categoryOptionComboId1", "categoryOptionComboId2", "categoryOptionComboId3"]
-                    }
-                };
-                translationsService.translateCharts(chartData);
+                it('should translate the month name if chart is a monthly chart', function () {
+                    translationsService.translateChartData([mockChartData]);
+                    expect(seriesItem.name).toEqual('AugustInFrench 2016');
+                });
             });
 
-            it('should translate dataelement, indicator and category option combo names in chart data', function () {
-                expect(chartData.metaData.names.dataElementId).toEqual('french data element name');
-                expect(chartData.metaData.names.indicatorId).toEqual('french indicator name');
-            });
-
-            it('should translate category option combo names in chart data', function () {
-                expect(chartData.metaData.names.categoryOptionComboId1).toEqual('<23 months fr, Female fr');
-                expect(chartData.metaData.names.categoryOptionComboId2).toEqual('5-14 years fr');
-            });
-
-            it('should translate return english category option combo name in chart data if one of the option is missing translation', function () {
-                expect(chartData.metaData.names.categoryOptionComboId3).toEqual('some category option data 3');
-            });
         });
 
         describe('translate pivotTableData', function () {
@@ -351,16 +212,16 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
 
             beforeEach(function () {
                 rowItem = {
-                    id: 'someRowId',
-                    name: 'someRowName'
+                    id: 'someIdA',
+                    name: 'someEnglishNameA'
                 };
                 columnItem = {
-                    id: 'someColumnId',
-                    name: 'someColumnName'
+                    id: 'someIdB',
+                    name: 'someEnglishNameB'
                 };
                 columnConfigurationItem = {
-                    id: 'someColumnId',
-                    name: 'someColumnName'
+                    id: 'someIdC',
+                    name: 'someEnglishNameC'
                 };
                 mockPivotTableData = {
                     rows: [rowItem],
@@ -378,9 +239,9 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
             it('should translate the rows and columns of the pivotTableData', function () {
                 var translatedObject = translationsService.translatePivotTableData([mockPivotTableData]);
                 expect(translatedObject).toEqual([mockPivotTableData]);
-                expect(rowItem.name).toEqual('frenchRowName');
-                expect(columnItem.name).toEqual('frenchColumnName');
-                expect(columnConfigurationItem.name).toEqual('frenchColumnName');
+                expect(rowItem.name).toEqual('someFrenchNameA');
+                expect(columnItem.name).toEqual('someFrenchNameB');
+                expect(columnConfigurationItem.name).toEqual('someFrenchNameC');
             });
 
             describe('row or column is a period dimension', function () {
@@ -388,14 +249,13 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                     rootScope.resourceBundle = {
                         August: 'AugustInFrench'
                     };
-                });
-
-                it('should translate the month name if pivotTable is a monthly report', function () {
                     rowItem.id = 'somePeriodId';
                     rowItem.name = 'August 2016';
                     rowItem.periodDimension = true;
                     mockPivotTableData.monthlyReport = true;
+                });
 
+                it('should translate the month name if pivotTable is a monthly report', function () {
                     translationsService.translatePivotTableData([mockPivotTableData]);
                     expect(rowItem.name).toEqual('AugustInFrench 2016');
                 });

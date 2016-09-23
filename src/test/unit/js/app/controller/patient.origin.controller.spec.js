@@ -60,7 +60,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
 
             programRepository = new ProgramRepository();
             spyOn(programRepository, "getProgramForOrgUnit");
-            spyOn(programRepository, "associateOrgUnits");
+            spyOn(programRepository, "associateOrgUnits").and.returnValue(utils.getPromise(q, {}));
 
             origins = [{
                 "id": "origin1",
@@ -256,8 +256,8 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             }, "dataValues"]);
 
             expect(hustle.publish.calls.argsFor(3)).toEqual([{
-                "data": [program],
-                "type": "uploadProgram",
+                "data": {'programIds': [program.id], 'orgUnitIds': _.map(originOrgUnits, 'id')},
+                "type": "associateOrgunitToProgram",
                 "locale": "en",
                 "desc": "upload program for origin org unit"
             }, "dataValues"]);

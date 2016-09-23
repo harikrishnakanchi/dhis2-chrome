@@ -1,5 +1,5 @@
 define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], function(OrgUnitRepository, utils, mocks, timecop, _) {
-    describe("Org Unit Repository specs", function() {
+    describe('orgUnitRepository', function() {
         var mockOrgStore, mockDb, orgUnitRepository, q, orgUnits, scope, company, country, project, opUnit, originOU, opcenter, module1, module2;
         var getAttr = function(key, value) {
             return {
@@ -279,19 +279,6 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
             expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedUpsertPayload);
         });
 
-        it("should get all org units", function() {
-            var actualOrgUnits;
-
-            orgUnitRepository.getAll().then(function(results) {
-                actualOrgUnits = results;
-            });
-
-            scope.$apply();
-
-            expect(mockOrgStore.getAll).toHaveBeenCalled();
-            expect(actualOrgUnits).toEqual(orgUnits);
-        });
-
         it("should get orgUnit by id", function() {
             var projectId = "proj1";
             var orgUnit = orgUnitRepository.get(projectId);
@@ -512,6 +499,48 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
             scope.$apply();
 
             expect(origins).toEqual([originOU]);
+        });
+
+        describe('enrichWithParent', function () {
+            var orgUnit, parentOrgUnit;
+
+            beforeEach(function () {
+                orgUnit = {
+                    id: 'someId',
+                    parent: {
+                        id: 'parentId'
+                    }
+                };
+                parentOrgUnit = {
+                    id: 'parentId',
+                    name: 'parentName'
+                };
+                mockOrgStore.find.and.returnValue(utils.getPromise(q, parentOrgUnit));
+            });
+
+            it('should enrich the orgUnit with the parent orgUnit', function () {
+                orgUnitRepository.enrichWithParent(orgUnit).then(function (enrichedOrgUnits) {
+                    expect(enrichedOrgUnits.parent).toEqual(parentOrgUnit);
+                });
+                scope.$apply();
+            });
+
+            it('should enrich a collection of orgUnits', function () {
+                orgUnitRepository.enrichWithParent([orgUnit]).then(function (enrichedOrgUnits) {
+                    expect(_.map(enrichedOrgUnits, 'parent')).toEqual([parentOrgUnit]);
+                });
+                scope.$apply();
+            });
+
+            it('should return the original object if there is no parent', function () {
+                orgUnit = {
+                    id: 'someId'
+                };
+                orgUnitRepository.enrichWithParent([orgUnit]).then(function (enrichedOrgUnits) {
+                    expect(enrichedOrgUnits).toEqual([orgUnit]);
+                });
+                scope.$apply();
+            });
         });
     });
 });

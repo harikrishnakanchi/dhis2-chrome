@@ -81,6 +81,7 @@ define(["moduleWeekSelectorController", "testData", "angularMocks", "lodash", "u
                 }];
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modules));
+                spyOn(orgUnitRepository, "enrichWithParent").and.callFake(function (orgUnit) { return orgUnit; });
             }));
 
             it("should initialize modules if dataType is set to aggregate", function() {

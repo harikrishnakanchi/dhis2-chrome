@@ -64,6 +64,23 @@ define(['eventService', 'angularMocks', 'properties', 'moment', 'lodash'], funct
                 httpBackend.flush();
             });
 
+            it('should format the eventDate as an ISO8601 date', function () {
+                var mockDHISResponse = {
+                    events: [{
+                        id: 'someId',
+                        eventDate: '2016-09-09T00:00:00+0000'
+                    }]
+                };
+
+                httpBackend.expectGET(/.*/).respond(200, mockDHISResponse);
+                eventService.getEvents(orgUnitId, periodRange).then(function (response) {
+                    var event = _.first(response);
+                    expect(event.eventDate).toEqual('2016-09-09');
+                });
+
+                httpBackend.flush();
+            });
+
             it('should return an empty array if response is empty', function() {
                 httpBackend.expectGET(/.*/).respond(200, {});
 

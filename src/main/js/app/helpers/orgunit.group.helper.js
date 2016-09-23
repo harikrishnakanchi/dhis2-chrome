@@ -16,6 +16,7 @@ define([], function() {
                     };
 
                     return orgUnitRepository.getProjectAndOpUnitAttributes(orgUnits[0].id).then(function(attributeValues) {
+                        attributeValues = _.filter(attributeValues, 'value');
                         return _.transform(attributeValues, function(acc, attr) {
                             var group = findGroupByAttrValue(attr);
                             if (group) acc.push(group);

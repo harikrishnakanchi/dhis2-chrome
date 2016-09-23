@@ -1,4 +1,4 @@
-define(["lodash", "moment"], function(_, moment) {
+define(["lodash", "moment", "properties", "interpolate"], function(_, moment, properties, interpolate) {
     return function($scope, $q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, datasetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService) {
 
         $scope.isGenderFilterApplied = false;
@@ -7,6 +7,24 @@ define(["lodash", "moment"], function(_, moment) {
             'open': true
         };
         var groupedProcedureDataValues, groupedDataValues;
+
+        $scope.getTotalCount = function(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilters, ageFilter) {
+            var genderfilterIds = _.map(genderFilters, 'id');
+            if(_.isUndefined(genderFilters)) {
+                return $scope.getCount(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionId, undefined, ageFilter);
+            } else {
+                return _.reduce(genderfilterIds, function (totalCount, genderFilterId) {
+                    return totalCount + $scope.getCount(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter);
+                }, 0);
+            }
+        };
+
+        $scope.canShowDataElement = function (optionSetId, dataElementId) {
+            var options = $scope.optionSetMapping[optionSetId];
+            return _.any(options, function (option) {
+                return $scope.getCount(dataElementId, false, false, option.id) > 0;
+            });
+        };
 
         $scope.getCount = function(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter) {
             var count;
@@ -54,6 +72,17 @@ define(["lodash", "moment"], function(_, moment) {
             count = _.isEmpty(groupedDataValues[optionId][dataElementId]) ? 0 : groupedDataValues[optionId][dataElementId].length;
 
             return count;
+        };
+
+        $scope.getTotalProcedureCount = function (isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilters, ageFilter) {
+            var genderfilterIds = _.map(genderFilters, 'id');
+            if(_.isUndefined(genderFilters)) {
+                return $scope.getProcedureCount(isGenderFilterApplied, isAgeFilterApplied, optionId, undefined, ageFilter);
+            } else {
+                return _.reduce(genderfilterIds, function (totalCount, genderFilterId) {
+                    return totalCount + $scope.getProcedureCount(isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter);
+                }, 0);
+            }
         };
 
         $scope.getProcedureCount = function(isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter) {
@@ -144,7 +173,10 @@ define(["lodash", "moment"], function(_, moment) {
             return !_.isEmpty($scope.procedureDataValueIds);
         };
 
+        $scope.contactSupport = interpolate($scope.resourceBundle.contactSupport, { supportEmail:properties.support_email });
+
         var getPeriod = function() {
+            $scope.isValidWeek = moment($scope.week.startOfWeek).isAfter(moment().subtract(properties.projectDataSync.numWeeksForHistoricalData, 'week'));
             return moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
         };
 

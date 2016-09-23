@@ -1,4 +1,4 @@
-<div ng-controller="projectUserController">
+<div ng-controller="projectUserController" class="project-user-form">
     <div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorUser }}</div>
     <form name="form.userForm" class="form-horizontal" role="form" novalidate ng-if="isNewMode">
         <div class="panel panel-default">
@@ -51,7 +51,7 @@
                     <tr>
                         <th>{{ resourceBundle.usernameLabel }}</th>
                         <th>{{ resourceBundle.roleLabel }}</th>
-                        <th>{{ resourceBundle.enableDisableLabel }}</th>
+                        <th>{{ resourceBundle.enabledLabel }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -59,11 +59,11 @@
                         <td> {{user.userCredentials.username}}</td>
                         <td> {{user.roles}}</td>
                         <td>
-                            <a ng-if="!user.userCredentials.disabled" href="" title="Disable" class="delete" ng-if="user.roles != 'Projectadmin'" ng-click="toggleUserDisabledState(user)">
-                                <span class="glyphicon glyphicon-remove"></span>
+                            <a ng-if="!user.userCredentials.disabled" href="" class="delete" ng-if="user.roles != 'Projectadmin'" ng-click="toggleUserDisabledState(user)">
+                                <i class="fa fa-check-square-o"></i>
                             </a>
-                            <a ng-if="user.userCredentials.disabled" href="" title="Enable" class="delete" ng-if="user.roles != 'Projectadmin'" ng-click="toggleUserDisabledState(user)">
-                                <span class="glyphicon glyphicon-ok glyphicon-green"></span>
+                            <a ng-if="user.userCredentials.disabled" href="" class="delete" ng-if="user.roles != 'Projectadmin'" ng-click="toggleUserDisabledState(user)">
+                                <i class="fa fa-square-o"></i>
                             </a>
                         </td>
                     </tr>

@@ -72,26 +72,6 @@ define(['lodash'], function(_){
             });
         };
 
-        this.translateReports = function (reportsToTranslate) {
-            if(_locale == 'en') {
-                return reportsToTranslate;
-            }
-
-            return _.each(reportsToTranslate, function (report) {
-                var items = report.definition.rows[0].items;
-                var namesHash = report.data ? report.data.metaData.names : {};
-                return _.each(items, function (item) {
-                    var translationObject = translations[item.id];
-                    if(item.description) {
-                        var descriptionTranslation = _.find(translationObject, {property: "description"});
-                        item.description = descriptionTranslation ? descriptionTranslation.value : item.description;
-                    }
-                    var shortNameTranslation = _.find(translationObject, {property: "shortName"});
-                    item.name = shortNameTranslation ? shortNameTranslation.value : item.name;
-                });
-            });
-        };
-
         var getTranslation = function (objectId, property) {
             var translationObject = _.find(translations[objectId], { property: property });
             return translationObject && translationObject.value;
@@ -101,26 +81,21 @@ define(['lodash'], function(_){
             return getTranslation(objectId, property) || defaultValue;
         };
 
-        this.translateCharts = function (chartData) {
+        this.translateChartData = function (charts) {
             if(_locale == 'en') {
-                return chartData;
+                return charts;
             }
 
-            var translatablePropertyIds = _.keys(chartData.metaData.names);
-            _.each(translatablePropertyIds, function (id) {
-                var isCategoryOptionCombo = _.get(categoryOptionCombosAndOptions, id);
-                if (isCategoryOptionCombo) {
-                    var translatedOptions = _.map(categoryOptionCombosAndOptions[id], function (categoryOptionId) {
-                        return getTranslation(categoryOptionId, 'shortName');
-                    });
-                    if(translatedOptions.length == _.compact(translatedOptions).length)
-                        chartData.metaData.names[id] = translatedOptions.join(', ');
-                } else {
-                    chartData.metaData.names[id] = getTranslation(id, 'shortName') || chartData.metaData.names[id];
-                }
+            return _.map(charts, function (chart) {
+                var dimensions = _.flattenDeep([chart.series, chart.categories]),
+                    translatableDimensions = _.reject(dimensions, 'periodDimension'),
+                    periodDimensions = _.filter(dimensions, 'periodDimension');
 
+                self.translate(translatableDimensions);
+                if(chart.monthlyChart) translateMonthlyPeriods(periodDimensions);
+
+                return chart;
             });
-            return chartData;
         };
 
         this.translateReferralLocations = function(arrayOfObjectsToBeTranslated) {
@@ -175,9 +150,9 @@ define(['lodash'], function(_){
             var translationsForObject = translations[objectToBeTranslated.id] || [];
 
             _.each(TRANSLATABLE_PROPERTIES, function (property) {
-                if(objectToBeTranslated[property]) {
-                    var translationForProperty = _.find(translationsForObject, { property: property });
-                    objectToBeTranslated[property] = translationForProperty && translationForProperty.value || objectToBeTranslated[property];
+                var translationForProperty = _.find(translationsForObject, { property: property });
+                if(translationForProperty && translationForProperty.value) {
+                    objectToBeTranslated[property] = translationForProperty.value;
                 }
             });
 

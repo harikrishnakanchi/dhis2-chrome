@@ -1,11 +1,29 @@
 define(["lodash", "dateUtils", "moment"], function(_, dateUtils, moment) {
     return function($scope, $rootScope, translationsService, filesystemService, pivotTableCsvBuilder) {
+        var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
+        var REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY hh[.]mm A";
+
         $scope.resourceBundle = $rootScope.resourceBundle;
         $scope.showDownloadButton = $scope.disableDownload != 'true';
 
+        var DELIMITER = ',',
+            NEW_LINE = '\n',
+            EMPTY_CELL = '';
+
+        var escapeString = function (string) {
+            return '"' + string + '"';
+        };
+
+        var getLastUpdatedTimeContent = function () {
+            var formattedTime = moment($scope.updatedTime, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
+            return [escapeString('Updated'), escapeString(formattedTime)].join(DELIMITER);
+        };
+
         $scope.exportToCSV = function () {
-            var fileName = [$scope.table.dataSetCode, $scope.table.title, moment().format("DD-MMM-YYYY"), 'csv'].join('.'),
-                csvContent = pivotTableCsvBuilder.build($scope.table);
+            var formattedDate = moment($scope.updatedTime, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA),
+                updatedTimeDetails = $scope.updatedTime ? '[updated ' + formattedDate + ']' : moment().format("DD-MMM-YYYY"),
+                fileName = [$scope.table.dataSetCode, $scope.table.title, updatedTimeDetails, 'csv'].join('.'),
+                csvContent = [getLastUpdatedTimeContent(), EMPTY_CELL, pivotTableCsvBuilder.build($scope.table)].join(NEW_LINE);
 
             filesystemService.promptAndWriteFile(fileName, new Blob([csvContent], {type: 'text/csv'}), filesystemService.FILE_TYPE_OPTIONS.CSV);
         };

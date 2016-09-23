@@ -1,11 +1,12 @@
 define(["orgUnitGroupService", "angularMocks", "properties"], function(OrgUnitGroupService, mocks, properties) {
     describe("orgUnitGroupService", function() {
-        var http, httpBackend, orgUnitGroupService;
+        var http, httpBackend, orgUnitGroupService, q;
 
-        beforeEach(mocks.inject(function($httpBackend, $http) {
+        beforeEach(mocks.inject(function($httpBackend, $http, $q) {
             http = $http;
             httpBackend = $httpBackend;
-            orgUnitGroupService = new OrgUnitGroupService(http);
+            q = $q;
+            orgUnitGroupService = new OrgUnitGroupService(http, q);
         }));
 
         afterEach(function() {
@@ -60,6 +61,18 @@ define(["orgUnitGroupService", "angularMocks", "properties"], function(OrgUnitGr
             httpBackend
                 .expectDELETE(properties.dhis.url + "/api/organisationUnitGroups/" + orgUnitGroupId + "/organisationUnits/" + orgUnitId)
                 .respond(204, "ok");
+            httpBackend.flush();
+        });
+
+        it("should resolve promise if orgUnit is already removed from orgUnit group", function () {
+            var orgUnitGroupId = 'ougid1';
+            var orgUnitId = 'ouid1';
+
+            orgUnitGroupService.deleteOrgUnit(orgUnitGroupId, orgUnitId);
+
+            httpBackend
+                .expectDELETE(properties.dhis.url + "/api/organisationUnitGroups/" + orgUnitGroupId + "/organisationUnits/" + orgUnitId)
+                .respond(404, "ok");
             httpBackend.flush();
         });
     });

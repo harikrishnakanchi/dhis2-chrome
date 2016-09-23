@@ -28,6 +28,7 @@ require.config({
         "orgUnitGroupService": "app/service/orgunit.group.service",
         "patientOriginService": "app/service/patient.origin.service",
         "reportService": "app/service/report.service",
+        "dataStoreService": "app/service/datastore.service",
 
         //Repositories
         "repositories": "app/repository/bg.repositories",
@@ -49,6 +50,7 @@ require.config({
         "pivotTableRepository": "app/repository/pivot.table.repository",
         "dataSyncFailureRepository": "app/repository/data.sync.failure.repository",
         "dataElementRepository": "app/repository/data.element.repository",
+        "excludedLineListOptionsRepository": "app/repository/excluded.line.list.options.repository",
 
         //Models
         "chart": "app/models/chart",
@@ -56,6 +58,8 @@ require.config({
         "moduleDataBlock": "app/models/module.data.block",
         "customAttributes": "app/models/custom.attributes",
         "pivotTableData": "app/models/pivot.table.data",
+        "chartData": "app/models/chart.data",
+        "analyticsData": "app/models/analytics.data",
 
         //Factories
         "factories":"app/factories/factories",
@@ -87,6 +91,7 @@ require.config({
         "uploadOrgUnitGroupConsumer": "app/consumer/upload.orgunit.group.consumer",
         "downloadDatasetConsumer": "app/consumer/download.dataset.consumer",
         "updateDatasetConsumer": "app/consumer/update.dataset.consumer",
+        "removeOrgunitDatasetAssociationConsumer": "app/consumer/remove.orgunit.dataset.association.consumer",
         "createUserConsumer": "app/consumer/create.user.consumer",
         "updateUserConsumer": "app/consumer/update.user.consumer",
         "uploadProgramConsumer": "app/consumer/upload.program.consumer",
@@ -108,6 +113,9 @@ require.config({
         "uploadReferralLocationsConsumer": "app/consumer/upload.referral.locations.consumer",
         "downloadModuleDataBlocksConsumer": "app/consumer/download.module.data.blocks.consumer",
         "syncModuleDataBlockConsumer": "app/consumer/sync.module.data.block.consumer",
+        "syncExcludedLinelistOptionsConsumer": "app/consumer/sync.excluded.linelist.options.consumer",
+        "associateOrgunitToProgramConsumer": "app/consumer/associate.orgUnit.to.program.consumer",
+        "downloadHistoricalDataConsumer": "app/consumer/download.historical.data.consumer",
 
         //merge strategies
         "mergeBy": "app/consumer/mergestrategies/merge.by",
@@ -116,6 +124,7 @@ require.config({
         "moduleDataBlockMerger": "app/consumer/mergestrategies/module.data.block.merger",
         "aggregateDataValuesMerger": "app/consumer/mergestrategies/aggregate.data.values.merger",
         "lineListEventsMerger": "app/consumer/mergestrategies/line.list.events.merger",
+        "excludedLinelistOptionsMerger": "app/consumer/mergestrategies/excluded.linelist.options.merger",
 
         "angular-indexedDB": "lib/angular-indexedDB/indexeddb",
 
@@ -136,6 +145,7 @@ require.config({
         "cipherUtils": "app/utils/cipher.utils",
         "httpUtils": "app/utils/http.utils",
         "dhisUrl": "app/utils/dhis.url",
+        "interpolate": "app/utils/interpolate",
         "appSettingsUtils": "app/utils/app.settings.utils"
     },
     shim: {

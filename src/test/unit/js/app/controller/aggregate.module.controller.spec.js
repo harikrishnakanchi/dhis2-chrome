@@ -36,6 +36,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 spyOn(dataSetRepo, "getAll").and.returnValue(utils.getPromise(q, []));
                 spyOn(dataSetRepo, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
                 spyOn(dataSetRepo, "associateOrgUnits").and.returnValue(utils.getPromise(q, undefined));
+                spyOn(dataSetRepo, "removeOrgUnits").and.returnValue(utils.getPromise(q, undefined));
                 spyOn(dataSetRepo, "includeDataElements").and.returnValue(utils.getPromise(q, []));
 
                 systemSettingRepository = new SystemSettingRepository();
@@ -90,7 +91,8 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     "disableOrgUnitDesc": "disable organisation unit: ",
                     "upsertOrgUnitDesc": "save organisation unit: ",
                     "uploadSystemSettingDesc": "upload sys settings for ",
-                    "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit "
+                    "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit ",
+                    "removeOrgUnitFromDatasetDesc": "remove selected services from module "
                 };
 
                 scope.isNewMode = true;
@@ -136,7 +138,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     displayName: 'Project1 - Module1',
                     id: 'Module1someid',
                     level: NaN,
-                    openingDate: moment(new Date()).toDate(),
+                    openingDate: moment.utc(new Date()).format('YYYY-MM-DD'),
                     attributeValues: [{
                         created: moment().toISOString(),
                         lastUpdated: moment().toISOString(),
@@ -201,7 +203,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     "displayName": 'parent - mod1',
                     "id": 'mod1pid',
                     "level": 6,
-                    "openingDate": moment("2014-04-01").toDate(),
+                    "openingDate": moment.utc("2014-04-01").format('YYYY-MM-DD'),
                     "attributeValues": [{
                         "created": '2014-04-01T00:00:00.000Z',
                         "lastUpdated": '2014-04-01T00:00:00.000Z',
@@ -353,7 +355,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     "displayName": 'parent - mod1',
                     "id": 'mod1pid',
                     "level": 6,
-                    "openingDate": moment("2014-04-01").toDate(),
+                    "openingDate": moment.utc("2014-04-01").format('YYYY-MM-DD'),
                     "attributeValues": [{
                         "created": '2014-04-01T00:00:00.000Z',
                         "lastUpdated": '2014-04-01T00:00:00.000Z',
@@ -562,7 +564,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     displayName: 'Par1 - module NEW name',
                     id: oldid,
                     level: 6,
-                    openingDate: new Date(),
+                    openingDate: moment.utc().format('YYYY-MM-DD'),
                     attributeValues: [{
                         created: moment().toISOString(),
                         lastUpdated: moment().toISOString(),
@@ -603,11 +605,116 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 }, "dataValues");
             });
 
+            it('should update assoscaiated dataset when a new dataset is added to existing module', function () {
+                var datasetOne = {
+                    "id": "ds1",
+                    "organisationUnits": [{
+                        "id": "mod1"
+                    }],
+                    "isAggregateService": true,
+                    "sections": []
+                };
+                var datasetTwo = {
+                    "id": "ds2",
+                    "organisationUnits": [{
+                        "id": "mod2"
+                    }],
+                    "isAggregateService": true,
+                    "sections": []
+                };
+
+                var dataSets = [datasetOne, datasetTwo];
+
+                scope.orgUnit = {
+                    id: 'mod1',
+                    name: 'module name',
+                    parent: {
+                        id : "org1",
+                        name: 'parent'
+                    }
+                };
+
+                scope.isNewMode = false;
+
+                dataSetRepo.getAll.and.returnValue(utils.getPromise(q, dataSets));
+                dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, dataSets));
+                dataSetRepo.includeDataElements.and.returnValue(utils.getPromise(q, dataSets));
+                translationsService.translate.and.returnValue(dataSets);
+
+                initialiseController();
+                scope.$apply();
+
+                scope.associatedDatasets = [datasetOne, datasetTwo];
+
+                scope.update();
+                scope.$apply();
+
+                expect(hustle.publish.calls.argsFor(2)).toEqual([{
+                    data: {"orgUnitIds":["mod1"], "dataSetIds":["ds2"]},
+                    type: "associateOrgUnitToDataset",
+                    locale: "en",
+                    desc: "associate selected services to origins of Op Unit module name"
+                }, "dataValues"]);
+            });
+
+            // TODO: This test is skipped until we play orgUnit-Dataset association removal as part of story #2017
+            xit('should update assoscaiated datasets when a dataset is removed from existing module', function () {
+                var datasetOne = {
+                    "id": "ds1",
+                    "organisationUnits": [{
+                        "id": "mod1"
+                    }],
+                    "isAggregateService": true,
+                    "sections": []
+                };
+                var datasetTwo = {
+                    "id": "ds2",
+                    "organisationUnits": [{
+                        "id": "mod1"
+                    }],
+                    "isAggregateService": true,
+                    "sections": []
+                };
+
+                var dataSets = [datasetOne, datasetTwo];
+
+                scope.orgUnit = {
+                    id: 'mod1',
+                    name: 'moduleName',
+                    parent: {
+                        id: "org1",
+                        name: 'parent'
+                    }
+                };
+
+                scope.isNewMode = false;
+
+                dataSetRepo.getAll.and.returnValue(utils.getPromise(q, dataSets));
+                dataSetRepo.includeDataElements.and.returnValue(utils.getPromise(q, dataSets));
+                translationsService.translate.and.returnValue(dataSets);
+
+                initialiseController();
+                scope.$apply();
+
+                scope.associatedDatasets = [datasetOne];
+
+                scope.update();
+                scope.$apply();
+
+                expect(dataSetRepo.removeOrgUnits).toHaveBeenCalledWith(["ds2"], ["mod1"]);
+                expect(hustle.publish.calls.argsFor(3)).toEqual([{
+                    data: {"orgUnitIds": ["mod1"], "dataSetIds": ["ds2"]},
+                    type: "removeOrgUnitFromDataset",
+                    locale: "en",
+                    desc: "remove selected services from module moduleName"
+                }, "dataValues"]);
+            });
+
             it("should return false if datasets for modules are selected", function() {
                 scope.$apply();
                 scope.associatedDatasets = [{
                     'id': 'ds_11',
-                    'name': 'dataset11',
+                    'name': 'dataset11'
                 }, {
                     'id': 'ds_12',
                     'name': 'dataset12'
@@ -842,7 +949,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     displayName: 'Par1 - test1',
                     id: 'projectId',
                     level: 6,
-                    openingDate: moment(new Date()).toDate(),
+                    openingDate: moment.utc(new Date()).format('YYYY-MM-DD'),
                     attributeValues: [{
                         created: moment().toISOString(),
                         lastUpdated: moment().toISOString(),
@@ -938,7 +1045,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     displayName: 'parent - mod1',
                     id: 'mod1pid',
                     level: 6,
-                    openingDate: moment("2014-04-01").toDate(),
+                    openingDate: moment.utc("2014-04-01").format('YYYY-MM-DD'),
                     attributeValues: [{
                         created: moment().toISOString(),
                         lastUpdated: moment().toISOString(),

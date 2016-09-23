@@ -1,4 +1,4 @@
-<div ng-controller="opUnitController">
+<div ng-controller="opUnitController" class="op-unit-form">
     <div class="loading" ng-show="loading">
         <img src="img/ajax-loader.gif" class="spinner" />
     </div>
@@ -20,7 +20,7 @@
                         <li class="form-group">
                             <label for="opUnitName" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.nameOfTheUnitLabel }}</label>
                             <div class="col-sm-4">
-                                <input type="text" class="form-control" name="opUnitName{{$index}}" id="opUnitName{{$index}}" placeholder="{{ resourceBundle.operationUnitNameLabel }}" ng-model="opUnit.name" not-in="allOpunitNames" ng-disabled="isDisabled" required />
+                                <input type="text" class="form-control" name="opUnitName{{$index}}" id="opUnitName{{$index}}" placeholder="{{ resourceBundle.operationUnitNameLabel }}" ng-model="opUnit.name" not-in="otherOpUnitNames" ng-disabled="isDisabled" required />
                                 <div ng-show="form.opUnitName{{$index}}.$dirty &amp;&amp; form.opUnitName{{$index}}.$invalid">
                                     <span class="errortxt" ng-show="form.opUnitName{{$index}}.$error.required">{{resourceBundle.nameValidation}}</span>
                                     <span class="errortxt" ng-show="form.opUnitName{{$index}}.$error.isWithin">{{resourceBundle.alreadyExists}}</span>
@@ -100,7 +100,7 @@
                             <th>{{ resourceBundle.latitudeLabel }}</th>
                             <th>{{ resourceBundle.longitudeLabel }}</th>
                             <th>{{ resourceBundle.editLabel }}</th>
-                            <th>{{ resourceBundle.enableDisableLabel }}</th>
+                            <th>{{ resourceBundle.enabledLabel }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -109,17 +109,19 @@
                             <td> {{origin.latitude}}</td>
                             <td> {{origin.longitude}}</td>
                             <td>
-                                <a title="edit" ng-if="!origin.isDisabled" class="edit" ng-click="editPatientOrigin(origin)">
-                                    <span class="glyphicon glyphicon-edit"></span>
+                                <a ng-if="!origin.isDisabled" class="edit" ng-click="editPatientOrigin(origin)">
+                                    <i class="fa fa-pencil"></i>
                                 </a>
-                                <span ng-if="origin.isDisabled" class="edit glyphicon glyphicon-ban-circle"></span>
+                                <a class="edit ban">
+                                    <i class="fa fa-ban" ng-if="origin.isDisabled"></i>
+                                </a>
                             </td>
                             <td>
-                                <a ng-if="!origin.isDisabled" href="" title="Disable" class="delete" ng-click="toggleOriginDisabledState(origin)">
-                                    <span class="glyphicon glyphicon-remove"></span>
+                                <a ng-if="!origin.isDisabled" href="" class="delete" ng-click="toggleOriginDisabledState(origin)">
+                                    <i class="fa fa-check-square-o"></i>
                                 </a>
-                                <a ng-if="origin.isDisabled" href="" title="Enable" class="delete" ng-click="toggleOriginDisabledState(origin)">
-                                    <span class="glyphicon glyphicon-ok glyphicon-green"></span>
+                                <a ng-if="origin.isDisabled" href="" class="delete" ng-click="toggleOriginDisabledState(origin)">
+                                    <i class="fa fa-square-o"></i>
                                 </a>
                             </td>
                         </tr>

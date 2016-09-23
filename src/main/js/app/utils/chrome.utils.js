@@ -7,10 +7,6 @@ define(["lodash", "properties", "appSettingsUtils"], function(_, properties, app
         };
     };
 
-    var getPraxisVersion = function () {
-        return chrome.runtime.getManifest().version;
-    };
-
     var addListener = function(message, callback) {
         chrome.runtime.onMessage.addListener(registerMessageCallback(message, callback));
     };
@@ -53,12 +49,29 @@ define(["lodash", "properties", "appSettingsUtils"], function(_, properties, app
         });
     };
 
+    var getPraxisVersion = function () {
+        return chrome.runtime.getManifest().version;
+    };
+
+    var getOS = function () {
+        return os;
+    };
+
+    var os;
+    var init = function () {
+        chrome.runtime.getPlatformInfo(function (platformInfo) {
+            os = platformInfo.os;
+        });
+    };
+
     return {
-        "addListener": addListener,
-        "sendMessage": sendMessage,
-        "setAuthHeader": setAuthHeader,
-        "getAuthHeader": getAuthHeader,
-        "createNotification": createNotification,
-        "getPraxisVersion": getPraxisVersion
+        addListener: addListener,
+        sendMessage: sendMessage,
+        setAuthHeader: setAuthHeader,
+        getAuthHeader: getAuthHeader,
+        createNotification: createNotification,
+        getPraxisVersion: getPraxisVersion,
+        getOS: getOS,
+        init: _.once(init)
     };
 });

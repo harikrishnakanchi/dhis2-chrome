@@ -3,7 +3,7 @@
     <div ng-show="selectedModule &amp;&amp; week  &amp;&amp; !errorMessage">
         <section class="panel tab-panel {{ layoutDirection.direction }}" ng-if="week &amp;&amp; selectedModule">
 
-            <div ng-if="!(syncError && moduleDataBlock.awaitingActionAtDataEntryLevel)">
+            <div ng-if="moduleDataBlock.active && !(syncError && moduleDataBlock.awaitingActionAtDataEntryLevel)">
                 <div class="alert alert-success" ng-show="saveSuccess" >{{resourceBundle.dataSaveSuccess}}</div>
                 <div class="alert alert-success" ng-show="isSubmitted && (!isCompleted || moduleDataBlock.awaitingActionAtProjectLevelApprover) && !isApproved && !submitAndApprovalSuccess">{{resourceBundle.dataSubmittedForApproval}}</div>
                 <div class="alert alert-success" ng-show="isCompleted && (!isApproved || moduleDataBlock.awaitingActionAtCoordinationLevelApprover) && !moduleDataBlock.awaitingActionAtProjectLevelApprover">{{resourceBundle.firstLevelApproveSuccess}}</div>
@@ -14,9 +14,18 @@
             <div class="alert alert-danger" ng-show="saveError">{{resourceBundle.dataSaveFailure}}</div>
             <div class="alert alert-danger" ng-show="submitError">{{resourceBundle.dataSubmitFailure}}</div>
 
+            <div class="alert alert-danger" ng-if="!(isDataAvailable || isDataEntryAllowed)">{{ resourceBundle.aggregateDataNotAvailableMessage }}
+                <a href="" ng-click="messageExpanded=!messageExpanded">
+                    <span ng-if="!messageExpanded">{{ resourceBundle.moreLabel }}</span>
+                    <span ng-if="messageExpanded">{{ resourceBundle.lessLabel }}</span>
+                    {{ resourceBundle.infoLabel }}&hellip;</a>
+                <br>
+                <span ng-if="messageExpanded">{{ resourceBundle.praxisDownloadMessage }} <b>{{ contactSupport }}</b></span>
+            </div>
+
             <div class="alert alert-danger" ng-show="syncError && moduleDataBlock.awaitingActionAtDataEntryLevel && !submitError">{{resourceBundle.aggregateDataSyncError}}</div>
 
-            <form name="dataentryForm" id="dataentry" ng-if="hasRoles(['Data entry user', 'Observer'])">
+            <form name="dataentryForm" id="dataentry" ng-if="hasRoles(['Data entry user', 'Observer']) && (isDataAvailable || isDataEntryAllowed)">
                 <div ng-class="layoutDirection.direction == 'rtl' ? 'text-left' : 'text-right'">
                     <button class="btn btn-sm btn-primary printTallySheetBtn" ng-click="printWindow()" ng-show="selectedModule">{{resourceBundle.printTallySheetBtnValue}}</button>
                 </div>

@@ -7,14 +7,16 @@ define(["moment", "properties", "lodash", "chromeUtils"], function(moment, prope
             };
 
             var downloadMetadata = $hustle.publishOnce({
-                "type": "downloadMetadata",
-                "data": []
-            }, "dataValues");
+                type: 'downloadMetadata',
+                data: [],
+                locale: $scope.locale
+            }, 'dataValues');
 
             var downloadProjectData = $hustle.publishOnce({
-                "type": "downloadProjectData",
-                "data": []
-            }, "dataValues");
+                type: 'downloadProjectData',
+                data: [],
+                locale: $scope.locale
+            }, 'dataValues');
 
             return $q.all([
                     downloadMetadata,

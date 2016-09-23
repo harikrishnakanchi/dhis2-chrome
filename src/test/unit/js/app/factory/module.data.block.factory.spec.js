@@ -12,6 +12,9 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
                 spyOn(orgUnitRepository, 'getAllModulesInOrgUnits').and.returnValue(utils.getPromise(q, []));
                 spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, []));
                 spyOn(orgUnitRepository, "findAll").and.returnValue(utils.getPromise(q, []));
+                spyOn(orgUnitRepository, "enrichWithParent").and.callFake(function (orgUnits) {
+                    return $q.when(orgUnits);
+                });
 
                 dataRepository = new DataRepository();
                 spyOn(dataRepository, 'getDataValuesForOrgUnitsAndPeriods').and.returnValue(utils.getPromise(q, {}));

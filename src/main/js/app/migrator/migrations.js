@@ -1,4 +1,4 @@
-define([], function() {
+define(['dateUtils'], function(dateUtils) {
     var create_data_store = function(stores, db) {
         _.each(stores, function(type) {
             db.createObjectStore(type, {
@@ -331,9 +331,31 @@ define([], function() {
         });
     };
 
+    var create_excluded_line_list_options_store = function (db) {
+        create_store_with_key('excludedLineListOptions', 'moduleId', db);
+    };
+
     var force_pivot_tables_to_redownload = function (db, tx) {
         var changeLogStore = tx.objectStore("changeLog");
         changeLogStore.delete("pivotTables");
+    };
+
+    var force_charts_to_redownload = function (db, tx) {
+        var changeLogStore = tx.objectStore("changeLog");
+        changeLogStore.delete("charts");
+    };
+
+    var format_event_dates = function(db, tx) {
+        var programEventStore = tx.objectStore('programEvents');
+        programEventStore.openCursor().onsuccess = function(e) {
+            var cursor = e.target.result;
+            if (cursor) {
+                var event = cursor.value;
+                event.eventDate = dateUtils.toISODate(event.eventDate);
+                cursor.update(event);
+                cursor.continue();
+            }
+        };
     };
 
     return [add_object_stores,
@@ -380,6 +402,9 @@ define([], function() {
         migrate_and_delete_charts_store,
         migrate_and_delete_pivot_table_store,
         delete_keys_chart_and_reports_from_changelog,
-        force_pivot_tables_to_redownload
+        force_pivot_tables_to_redownload,
+        create_excluded_line_list_options_store,
+        force_charts_to_redownload,
+        format_event_dates
     ];
 });

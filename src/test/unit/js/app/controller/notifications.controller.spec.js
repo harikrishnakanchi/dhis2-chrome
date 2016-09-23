@@ -41,6 +41,7 @@
 
              orgUnitRepository = new OrgUnitRepository();
              spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, userModules));
+             spyOn(orgUnitRepository, "enrichWithParent").and.callFake(function (orgUnit) { return orgUnit; });
 
              chartRepository = new ChartRepository();
              spyOn(chartRepository, "getAllChartsForNotifications").and.returnValue(utils.getPromise(q, []));

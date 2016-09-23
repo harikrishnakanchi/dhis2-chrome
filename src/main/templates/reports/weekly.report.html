@@ -1,39 +1,39 @@
 <div>
+    <div ng-if="(charts | filter: { weeklyChart: true, dataSetCode: selectedDataset.code } | isEmpty) &&
+                (pivotTables | filter: { weeklyReport: true, dataSetCode: selectedDataset.code } | isEmpty)">
+        <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
+    </div>
     <div id="weeklyCharts">
-        <div ng-hide="selectedDataset.isWeeklyChartsAvailable">
-            <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
-        </div>
-        <div ng-repeat="chart in charts | filter: {definition: {dataSetCode: selectedDataset.code}} | orderBy: 'definition.displayPosition'" ng-show="chart.definition.weeklyChart && chart.data && chart.data.length > 0">
-            <div class="row chart-title">
-                <h3 class="col-md-6 col-md-offset-3 text-center">{{chart.definition.title}}</h3>
-                <a class="col-md-1 col-md-offset-2" href="" title="{{ resourceBundle.downloadChart }}" ng-click="downloadChartAsPng(chart.definition)">
-                    <span class="glyphicon glyphicon-download-alt"></span>
-                </a>
+        <div ng-if="!(charts | filter: { weeklyChart: true, dataSetCode: selectedDataset.code } | isEmpty)">
+            <span ng-show="updatedForWeeklyChart" class="text-info">
+                <strong> Updated: {{ updatedForWeeklyChart }} </strong>
+            </span>
+            <div ng-repeat="chart in charts | filter: { weeklyChart: true, dataSetCode: selectedDataset.code } | orderBy: 'displayPosition'">
+                <div class="row chart-title">
+                    <h3 class="col-md-6 col-md-offset-3 text-center">{{ chart.title }}</h3>
+                    <a class="col-md-1 col-md-offset-2" href="" title="{{ resourceBundle.downloadChart }}" ng-click="downloadChartAsPng(chart, updatedForWeeklyChart)">
+                        <span class="glyphicon glyphicon-download-alt"></span>
+                    </a>
+                </div>
+                <p ng-class="{ 'lineChart-container': chart.definition.type === 'LINE' }">
+                    <nvd3 options="chart.nvd3Options" data="chart.nvd3Data" id="{{ chart.id }}"></nvd3>
+                </p>
             </div>
-            <p ng-if="chart.definition.type === 'LINE'" class="lineChart-container">
-                <nvd3 options="weeklyLineChartOptions" data="chart.data" id="{{ chart.definition.id }}"></nvd3>
-            </p>
-            <p ng-if="chart.definition.type === 'COLUMN'">
-                <nvd3 options="weeklyBarChartOptions" data="chart.data" id="{{ chart.definition.id }}"></nvd3>
-            </p>
-            <p ng-if="chart.definition.type === 'STACKED_COLUMN'">
-                <nvd3 options="weeklyStackedBarChartOptions" data="chart.data" id="{{ chart.definition.id }}"></nvd3>
-            </p>
         </div>
     </div>
 
-    <div id="weeklyReports">
+    <div id="weeklyReports" ng-hide="pivotTables | filter: { weeklyReport: true, dataSetCode: selectedDataset.code } | isEmpty">
         <accordion close-others="false">
             <accordion-group is-open="true">
                 <accordion-heading>
                     <span>{{resourceBundle.tabularReports}}</span>
                     <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isReportOpen, 'glyphicon-chevron-right': !isReportOpen}"></i>
                 </accordion-heading>
-                <div ng-show="!selectedDataset.isWeeklyPivotTablesAvailable">
-                    <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
-                </div>
-                <div class="exp-coll-group" ng-if="selectedDataset.isWeeklyPivotTablesAvailable">
-                    <div ng-repeat="table in pivotTables | filter: { weeklyReport: true, dataSetCode: selectedDataset.code, isTableDataAvailable: true } | orderBy: 'displayPosition'" class="exportCSV-container">
+                <div class="exp-coll-group">
+                    <div class="text-info mb15" ng-show="updatedForWeeklyPivotTable">
+                        <strong> Updated: {{ updatedForWeeklyPivotTable }} </strong>
+                    </div>
+                    <div ng-repeat="table in pivotTables | filter: { weeklyReport: true, dataSetCode: selectedDataset.code } | orderBy: 'displayPosition'" class="exportCSV-container">
                         <accordion close-others="false">
                             <accordion-group is-open="status.open">
                                 <accordion-heading>
@@ -41,7 +41,7 @@
                                     <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                                 </accordion-heading>
                                 <div>
-                                    <pivot-table table="table" resource-bundle="resourceBundle"></pivot-table>
+                                    <pivot-table table="table" updated-time="{{ updatedForWeeklyPivotTable }}" resource-bundle="resourceBundle"></pivot-table>
                                 </div>
                             </accordion-group>
                         </accordion>

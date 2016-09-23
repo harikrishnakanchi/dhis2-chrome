@@ -14,14 +14,7 @@ define(["lodash"], function(_) {
                                     .then(_.partial(clearLocalStatus, orgUnitGroup.id, orgUnit.id));
                             else if (orgUnit.localStatus === "DELETED")
                                 return orgUnitGroupService.deleteOrgUnit(orgUnitGroup.id, orgUnit.id)
-                                    .then(_.partial(clearLocalStatus, orgUnitGroup.id, orgUnit.id))
-                                    .catch(function(response) {
-                                        if(response.status === 404) {
-                                            return clearLocalStatus(orgUnitGroup.id, orgUnit.id);
-                                        } else {
-                                            return $q.reject(response);
-                                        }
-                                    });
+                                    .then(_.partial(clearLocalStatus, orgUnitGroup.id, orgUnit.id));
                             else
                                 return eachPromise;
                         });

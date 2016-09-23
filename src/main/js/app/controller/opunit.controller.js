@@ -1,4 +1,4 @@
-define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, moment, orgUnitMapper) {
+define(["lodash", "dhisId", "moment", "orgUnitMapper", "customAttributes"], function(_, dhisId, moment, orgUnitMapper, CustomAttributes) {
     return function($scope, $q, $hustle, orgUnitRepository, orgUnitGroupHelper, db, $location, $modal, patientOriginRepository, orgUnitGroupSetRepository) {
         $scope.isDisabled = false;
         $scope.showOpUnitCode = false;
@@ -342,24 +342,15 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 if (!$scope.isNewMode) {
                     var coordinates = $scope.orgUnit.coordinates;
                     coordinates = coordinates ? coordinates.substr(1, coordinates.length - 2).split(",") : coordinates;
-                    var selectedHospitalUnitCode = _.find($scope.orgUnit.attributeValues, {
-                        "attribute": {
-                            "code": "hospitalUnitCode"
-                        }
-                    }).value;
-                    var selectedOpUnitType = _.find($scope.orgUnit.attributeValues, {
-                        "attribute": {
-                            "code": "opUnitType"
-                        }
-                    }).value;
+
                     $scope.opUnit = {
-                        'name': $scope.orgUnit.name,
-                        'openingDate': $scope.orgUnit.openingDate,
-                        'type': _.find($scope.opUnitTypes, {
-                            "name": selectedOpUnitType
+                        name: $scope.orgUnit.name,
+                        openingDate: $scope.orgUnit.openingDate,
+                        type: _.find($scope.opUnitTypes, {
+                            name: CustomAttributes.getAttributeValue($scope.orgUnit.attributeValues, CustomAttributes.OPERATION_UNIT_TYPE_CODE)
                         }),
-                        'hospitalUnitCode': _.find($scope.hospitalUnitCodes, {
-                            "name": selectedHospitalUnitCode
+                        hospitalUnitCode: _.find($scope.hospitalUnitCodes, {
+                            name: CustomAttributes.getAttributeValue($scope.orgUnit.attributeValues, CustomAttributes.HOSPITAL_UNIT_CODE)
                         })
                     };
 
@@ -368,19 +359,14 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                         $scope.opUnit.latitude = parseFloat(coordinates[1]);
                     }
 
-                    var isDisabled = _.find($scope.orgUnit.attributeValues, {
-                        "attribute": {
-                            "code": "isDisabled"
-                        }
-                    });
+                    $scope.isDisabled = CustomAttributes.getBooleanAttributeValue($scope.orgUnit.attributeValues, CustomAttributes.DISABLED_CODE);
 
-                    $scope.isDisabled = isDisabled && isDisabled.value === "true" ? true : false;
                     patientOriginRepository.get($scope.orgUnit.id).then(setOriginDetails);
                 }
 
                 var parentId = $scope.isNewMode ? $scope.orgUnit.id : $scope.orgUnit.parent.id;
                 orgUnitRepository.getChildOrgUnitNames(parentId).then(function(data) {
-                    $scope.allOpunitNames = data;
+                    $scope.otherOpUnitNames = _.difference(data, [$scope.opUnit.name]);
                 });
             });
 

@@ -1,48 +1,45 @@
-/*global Date:true*/
 define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "timecop", "moment", "dhisId", "orgUnitRepository", "patientOriginRepository", "orgUnitGroupSetRepository"], function(OpUnitController, mocks, utils, OrgUnitGroupHelper, timecop, moment, dhisId, OrgUnitRepository, PatientOriginRepository, OrgUnitGroupSetRepository) {
-    describe("op unit controller", function() {
+    describe('opUnitController', function() {
+        var scope, db, q, hustle, fakeModal,
+            opUnitController,
+            patientOriginRepository, orgUnitRepository, orgUnitGroupSetRepository, orgUnitGroupHelper,
+            orgUnitGroupSets;
 
-        var scope, opUnitController, db, q, location, _Date, hustle, orgUnitRepo, fakeModal, orgUnitGroupHelper, patientOriginRepository, orgUnitRepository, orgUnitGroupSets, orgUnitGroupSetRepository;
-
-        beforeEach(module("hustle"));
+        beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
             scope = $rootScope.$new();
-            scope.isNewMode = true;
             q = $q;
             hustle = $hustle;
-            location = $location;
 
-            orgUnitRepository = new OrgUnitRepository();
-            orgUnitGroupSetRepository = new OrgUnitGroupSetRepository();
-
-            spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
-            spyOn(orgUnitRepository, "getChildOrgUnitNames").and.returnValue(utils.getPromise(q, []));
-            spyOn(orgUnitRepository, "upsert").and.callFake(function(orgUnits) {
-                return utils.getPromise(q, [orgUnits]);
-            });
-            spyOn(orgUnitRepository, "getAllOriginsByName").and.returnValue(utils.getPromise(q, {}));
-
-            orgUnitGroupHelper = new OrgUnitGroupHelper();
             scope.orgUnit = {
-                "id": "blah",
-                "parent": {
-                    "id": "parent"
-                }
+                id: 'someOrgUnitId',
+                name: 'someOrgUnitName',
+                level: 5,
+                parent: {
+                    id: 'someParentId'
+                },
+                attributeValues: [{
+                    attribute: {
+                        code: 'opUnitType'
+                    },
+                    value: 'Hospital'
+                }, {
+                    attribute: {
+                        code: 'hospitalUnitCode'
+                    },
+                    value: 'B1'
+                }]
             };
-
-            patientOriginRepository = new PatientOriginRepository();
-            spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, {}));
-            spyOn(patientOriginRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
-
-            scope.locale = "en";
-
+            scope.isNewMode = true;
+            scope.locale = 'en';
             scope.resourceBundle = {
-                "uploadPatientOriginDetailsDesc": "create patient origin ",
-                "upsertOrgUnitDesc": "upsert org unit "
+                'uploadPatientOriginDetailsDesc': 'create patient origin ',
+                'upsertOrgUnitDesc': 'upsert org unit '
             };
+            scope.$parent.closeNewForm = jasmine.createSpy();
 
             Timecop.install();
-            Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
+            Timecop.freeze(new Date('2014-10-29T12:43:54.972Z'));
 
             fakeModal = {
                 close: function() {
@@ -51,33 +48,46 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 dismiss: function(type) {
                     this.result.cancelCallback(type);
                 },
-                open: function(object) {}
+                open: function() {
+                    return {
+                        result: utils.getPromise(q, {})
+                    };
+                }
             };
 
             orgUnitGroupSets = [{
-                "name": "Hospital Unit Code",
-                "code": "hospital_unit_code",
-                "id": "a9ca3d1ed93",
-                "organisationUnitGroups": [{
-                    "id": "a9ab62b5ef3",
-                    "name": "Unit Code - C2"
+                code: 'hospital_unit_code',
+                organisationUnitGroups: [{
+                    id: 'orgUnitGroupC2Id',
+                    name: 'Unit Code - C2'
                 }, {
-                    "id": "aedbab45572",
-                    "name": "Unit Code - B1"
-                }]
-            }, {
-                "name": "Model Of Management",
-                "code": "model_of_management",
-                "id": "a2d4a1dee27",
-                "organisationUnitGroups": [{
-                    "id": "a11a7a5d55a",
-                    "name": "Collaboration"
+                    id: 'orgUnitGroupB1Id',
+                    name: 'Unit Code - B1'
                 }]
             }];
 
-            spyOn(orgUnitGroupSetRepository, "getAll").and.returnValue(utils.getPromise(q, orgUnitGroupSets));
-            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepository, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository, orgUnitGroupSetRepository);
-            scope.$apply();
+            spyOn(dhisId, 'get').and.returnValue('someMd5Hash');
+            spyOn(hustle, 'publish').and.returnValue(utils.getPromise(q, {}));
+
+            patientOriginRepository = new PatientOriginRepository();
+            spyOn(patientOriginRepository, 'get').and.returnValue(utils.getPromise(q, {}));
+            spyOn(patientOriginRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
+
+
+            orgUnitRepository = new OrgUnitRepository();
+            spyOn(orgUnitRepository, 'getAllModulesInOrgUnits').and.returnValue(utils.getPromise(q, []));
+            spyOn(orgUnitRepository, 'getAllOriginsByName').and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitRepository, 'getChildOrgUnitNames').and.returnValue(utils.getPromise(q, []));
+            spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, []));
+            spyOn(orgUnitRepository, 'upsert').and.callFake(function(orgUnits) { return utils.getPromise(q, [orgUnits]); });
+
+            orgUnitGroupSetRepository = new OrgUnitGroupSetRepository();
+            spyOn(orgUnitGroupSetRepository, 'getAll').and.returnValue(utils.getPromise(q, orgUnitGroupSets));
+
+            orgUnitGroupHelper = new OrgUnitGroupHelper();
+            spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
+
+            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepository, orgUnitGroupHelper, db, $location, fakeModal, patientOriginRepository, orgUnitGroupSetRepository);
         }));
 
         afterEach(function() {
@@ -96,23 +106,15 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     "title": "Unit Code - A"
                 }
             };
-
-            scope.orgUnit = {
-                "level": "4",
-                "name": "Parent",
-                "id": "ParentId"
-            };
+            scope.orgUnit.level = 4;
 
             var expectedOpUnit = {
                 "name": "OpUnit1",
                 "openingDate": moment().format("YYYY-MM-DD"),
-                "id": "OpUnit1ParentId",
+                "id": "someMd5Hash",
                 "shortName": "OpUnit1",
                 "level": 5,
-                "parent": {
-                    "name": "Parent",
-                    "id": "ParentId"
-                },
+                "parent": _.pick(scope.orgUnit, ['id', 'name']),
                 "attributeValues": [{
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
@@ -144,16 +146,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 }]
             };
 
-            spyOn(location, "hash");
-            spyOn(dhisId, "get").and.callFake(function(name) {
-                return name;
-            });
-            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {
-                "data": {
-                    "data": []
-                }
-            }));
-
             scope.save(opUnit);
             scope.$apply();
 
@@ -167,13 +159,36 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         });
 
         it("should set hospitalUnitCodes on scope on init", function() {
+            scope.$apply();
             expect(scope.hospitalUnitCodes).toEqual([{
-                "id": "aedbab45572",
-                "name": "B1"
+                id: 'orgUnitGroupB1Id',
+                name: 'B1'
             }, {
-                "id": "a9ab62b5ef3",
-                "name": "C2"
+                id: 'orgUnitGroupC2Id',
+                name: 'C2'
             }]);
+        });
+
+        describe('editing an existing opUnit', function () {
+            it('should set the type and hospitalUnitCode', function () {
+                scope.isNewMode = false;
+                scope.$apply();
+
+                expect(scope.opUnit.type).toEqual({ name: 'Hospital'});
+                expect(scope.opUnit.hospitalUnitCode).toEqual({
+                    id: 'orgUnitGroupB1Id',
+                    name: 'B1'
+                });
+            });
+
+            it('should leave the type and hospitalUnitCode undefined if customAttributes are not present', function () {
+                scope.orgUnit.attributeValues = null;
+                scope.isNewMode = false;
+                scope.$apply();
+
+                expect(scope.opUnit.type).toBeUndefined();
+                expect(scope.opUnit.hospitalUnitCode).toBeUndefined();
+            });
         });
 
         it("should save operation unit with GIS coordinate information", function() {
@@ -189,23 +204,15 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "latitude": 50,
                 "longitude": 25
             };
-
-            scope.orgUnit = {
-                "level": "4",
-                "name": "Parent",
-                "id": "ParentId"
-            };
+            scope.orgUnit.level = 4;
 
             var expectedOpUnit = {
                 "name": "OpUnit1",
                 "openingDate": moment().format("YYYY-MM-DD"),
-                "id": "OpUnit1ParentId",
+                "id": "someMd5Hash",
                 "shortName": "OpUnit1",
                 "level": 5,
-                "parent": {
-                    "name": "Parent",
-                    "id": "ParentId"
-                },
+                "parent": _.pick(scope.orgUnit, ['id', 'name']),
                 "attributeValues": [{
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
@@ -239,16 +246,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "featureType": "POINT"
             };
 
-            spyOn(location, "hash");
-            spyOn(dhisId, "get").and.callFake(function(name) {
-                return name;
-            });
-            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {
-                "data": {
-                    "data": []
-                }
-            }));
-
             scope.save(opUnit);
             scope.$apply();
 
@@ -272,23 +269,15 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     "title": "Unit Code - A"
                 }
             };
-
-            scope.orgUnit = {
-                "level": "4",
-                "name": "Parent",
-                "id": "ParentId"
-            };
+            scope.orgUnit.level = 4;
 
             var expectedOpUnit = {
                 "name": "OpUnit1",
                 "openingDate": moment().format("YYYY-MM-DD"),
-                "id": "OpUnit1ParentId",
+                "id": "someMd5Hash",
                 "shortName": "OpUnit1",
                 "level": 5,
-                "parent": {
-                    "name": "Parent",
-                    "id": "ParentId"
-                },
+                "parent": _.pick(scope.orgUnit, ['id', 'name']),
                 "attributeValues": [{
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
@@ -319,16 +308,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     "value": 'true'
                 }]
             };
-
-            spyOn(location, "hash");
-            spyOn(dhisId, "get").and.callFake(function(name) {
-                return name;
-            });
-            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {
-                "data": {
-                    "data": []
-                }
-            }));
 
             scope.save(opUnit);
             scope.$apply();
@@ -387,13 +366,11 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 }]
             };
 
-            scope.isNewMode = false;
-
             patientOriginRepository.get.and.returnValue(utils.getPromise(q, patientOrigins));
 
-            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepository, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository, orgUnitGroupSetRepository);
-
+            scope.isNewMode = false;
             scope.$apply();
+
             expect(scope.opUnit.name).toEqual("opUnit1");
             expect(scope.opUnit.type.name).toEqual("Health Center");
             expect(scope.opUnit.longitude).toEqual(29);
@@ -427,15 +404,11 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             };
             scope.isNewMode = false;
 
-            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepository, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository, orgUnitGroupSetRepository);
-
             scope.$apply();
             expect(scope.isDisabled).toBeTruthy();
         });
 
         it("should disable opunit and all its modules", function() {
-            scope.$parent.closeNewForm = jasmine.createSpy();
-            scope.resourceBundle = {};
             var opunit = {
                 "name": "opunit1",
                 "id": "opunit1",
@@ -493,13 +466,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "data": expectedOrgUnits,
                 "type": "upsertOrgUnit",
                 "locale": "en",
-                "desc": "undefinedmod1"
+                "desc": scope.resourceBundle.upsertOrgUnitDesc + "mod1"
             };
             orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modulesUnderOpunit));
-            spyOn(hustle, "publish");
-            spyOn(fakeModal, "open").and.returnValue({
-                result: utils.getPromise(q, {})
-            });
 
             scope.disable(opunit);
             scope.$apply();
@@ -596,10 +565,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             }];
 
             orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modulesUnderOpunit));
-            spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, originOrgUnits));
-            spyOn(location, "hash");
-            spyOn(hustle, "publish");
-            spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
+            orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, originOrgUnits));
 
             scope.update(opUnit);
             scope.$apply();
@@ -628,28 +594,13 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "longitude": 25
             };
 
-            scope.orgUnit = {
-                "id": "opUnit1Id",
-                "name": "OpUnit1",
-                "type": "Health Center",
-                "level": 5,
-                "hospitalUnitCode": "Unit Code - B1",
-                "parent": {
-                    "name": "Parent",
-                    "id": "ParentId"
-                }
-            };
-
             var expectedOpUnit = {
                 "name": "OpUnit1",
-                "id": "opUnit1Id",
+                "id": scope.orgUnit.id,
                 "openingDate": moment().format("YYYY-MM-DD"),
                 "shortName": "OpUnit1",
                 "level": 5,
-                "parent": {
-                    "name": "Parent",
-                    "id": "ParentId"
-                },
+                "parent": scope.orgUnit.parent,
                 "attributeValues": [{
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
@@ -683,23 +634,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "featureType": "POINT"
             };
 
-            var orgunitsToAssociate = [{
-                "id": "child1",
-                "name": "child1"
-            }, {
-                "id": "child2",
-                "name": "child2"
-            }];
-
-            spyOn(location, "hash");
-
-            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {
-                "data": {
-                    "data": []
-                }
-            }));
-            spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
-
             scope.update(opUnit);
             scope.$apply();
 
@@ -713,19 +647,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         });
 
         it("should take the user to the view page of the parent project on clicking cancel", function() {
-            scope.orgUnit = {
-                "id": "parent",
-                "name": "parent"
-            };
-
-            scope.$parent = {
-                "closeNewForm": function() {}
-            };
-
-            spyOn(scope.$parent, "closeNewForm").and.callFake(function(parentOrgUnit) {
-                return;
-            });
-
             scope.closeForm();
 
             expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(scope.orgUnit);
@@ -741,37 +662,21 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             };
 
             var payload = {
-                "orgUnit": "OpUnit1ParentId",
+                "orgUnit": "someMd5Hash",
                 "origins": [{
                     "name": "Not Specified",
-                    "id": "OpUnit1ParentIdNot Specified",
+                    "id": "someMd5Hash",
                     "isDisabled": false,
                     "clientLastUpdated": "2014-10-29T12:43:54.972Z"
                 }]
             };
-
-            scope.orgUnit = {
-                "level": "4",
-                "name": "Parent",
-                "id": "ParentId"
-            };
-
-            spyOn(location, "hash");
-            spyOn(dhisId, "get").and.callFake(function(name) {
-                return name;
-            });
-            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {
-                "data": {
-                    "data": []
-                }
-            }));
 
             scope.save(opUnit);
             scope.$apply();
 
             expect(patientOriginRepository.upsert).toHaveBeenCalledWith(payload);
             expect(hustle.publish).toHaveBeenCalledWith({
-                "data": "OpUnit1ParentId",
+                "data": "someMd5Hash",
                 "type": "uploadPatientOriginDetails",
                 "locale": "en",
                 "desc": "create patient origin Not Specified"
@@ -784,18 +689,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "type": "Hospital",
                 "openingDate": moment().format("YYYY-MM-DD"),
                 "hospitalUnitCode": "Unit Code - A"
-            };
-
-            scope.orgUnit = {
-                "id": "opUnit1Id",
-                "name": "OpUnit1",
-                "type": "Health Center",
-                "level": 5,
-                "hospitalUnitCode": "Unit Code - B1",
-                "parent": {
-                    "name": "Parent",
-                    "id": "ParentId"
-                }
             };
 
             var modulesUnderOpunit = [{
@@ -819,14 +712,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             }];
 
             orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modulesUnderOpunit));
-            spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, originOrgUnits));
-
-            spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
-            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {
-                "data": {
-                    "data": []
-                }
-            }));
+            orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, originOrgUnits));
 
             scope.update(opUnit);
             scope.$apply();
@@ -845,11 +731,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         });
 
         it("should disable patient origin", function() {
-            scope.orgUnit = {
-                "id": "opUnit1Id",
-                "name": "OpUnit1"
-            };
-
             var originToEnableDisable = {
                 "id": "0",
                 "name": "origin1"
@@ -921,14 +802,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
 
             orgUnitRepository.getAllOriginsByName.and.returnValue(utils.getPromise(q, origins));
             patientOriginRepository.get.and.returnValue(utils.getPromise(q, patientOrigin));
-            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {
-                "data": {
-                    "data": []
-                }
-            }));
-            spyOn(fakeModal, "open").and.returnValue({
-                result: utils.getPromise(q, {})
-            });
 
             scope.toggleOriginDisabledState(originToEnableDisable);
             scope.$apply();
@@ -950,11 +823,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         });
 
         it("should enable patient origin", function() {
-            scope.orgUnit = {
-                "id": "opUnit1Id",
-                "name": "OpUnit1"
-            };
-
             var originToEnableDisable = {
                 "id": "0",
                 "name": "origin1"
@@ -1002,14 +870,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
 
             orgUnitRepository.getAllOriginsByName.and.returnValue(utils.getPromise(q, origins));
             patientOriginRepository.get.and.returnValue(utils.getPromise(q, patientOrigin));
-            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {
-                "data": {
-                    "data": []
-                }
-            }));
-            spyOn(fakeModal, "open").and.returnValue({
-                result: utils.getPromise(q, {})
-            });
 
             scope.toggleOriginDisabledState(originToEnableDisable);
             scope.$apply();

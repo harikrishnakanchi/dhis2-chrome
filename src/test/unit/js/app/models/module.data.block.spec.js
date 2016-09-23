@@ -8,14 +8,15 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                 return isLineListService;
             });
             orgUnit = {
-                id: 'someOrgUnitId'
+                id: 'someOrgUnitId',
+                name: 'someOrgUnitName'
             };
             period = 'somePeriod';
             aggregateDataValues = undefined;
             lineListEvents = undefined;
             approvalData = undefined;
             failedToSyncData = {};
-            someMomentInTime = moment('2016-05-18T00:00:00.000Z');
+            someMomentInTime = moment.utc('2016-05-18T00:00:00.000Z');
         });
 
         var createModuleDataBlock = function() {
@@ -43,28 +44,26 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             it('should return an instance with required properties', function () {
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.moduleId).toEqual(orgUnit.id);
+                expect(moduleDataBlock.moduleName).toEqual(orgUnit.name);
                 expect(moduleDataBlock.period).toEqual(period);
             });
         });
 
-        describe('moduleName', function () {
-            it('should concatenate the orgUnit parent name and orgUnit name', function () {
+        describe('opUnitName', function () {
+            it('should return the parent name', function () {
                 orgUnit = {
-                    name: 'orgUnitName',
                     parent: {
-                        name: 'parentName'
+                        name: 'parentOrgUnitName'
                     }
                 };
                 moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.moduleName).toEqual('parentName - orgUnitName');
+                expect(moduleDataBlock.opUnitName).toEqual(orgUnit.parent.name);
             });
 
-            it('should return just the orgUnit name if it has no parent', function () {
-                orgUnit = {
-                    name: 'orgUnitName'
-                };
+            it('should return undefined if there is no parent', function () {
+                orgUnit = {};
                 moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.moduleName).toEqual('orgUnitName');
+                expect(moduleDataBlock.opUnitName).toBeUndefined();
             });
         });
 
@@ -601,9 +600,9 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
 
             it('should be false if period is before opening date or date12WeeksEarlier which ever is most recent', function() {
                 orgUnit = {
-                    openingDate: '2016-02-01'
+                    openingDate: '2015-02-01'
                 };
-                period = '2016W3';
+                period = '2015W50';
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.active).toEqual(false);
             });

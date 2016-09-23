@@ -1,9 +1,8 @@
 define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], function(_, moment, properties, orgUnitMapper, interpolate) {
-    return function($scope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, programRepository, programEventRepository, excludedDataElementsRepository,
+    return function($scope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, historyService, programRepository, programEventRepository, excludedDataElementsRepository,
         orgUnitRepository, approvalDataRepository, referralLocationsRepository, dataSyncFailureRepository, translationsService, filesystemService) {
 
         $scope.filterParams = {};
-        $scope.currentUrl = $location.path();
         $scope.loadingResults = false;
         $scope.showOfflineSummaryForViewOnly = true;
         $scope.viewRegistrationBook = false;
@@ -57,14 +56,14 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
                 allEvents: []
             };
 
-            if ($scope.filterBy === "incomplete") {
+            if ($scope.filterParams.filterBy === "incomplete") {
                 $scope.eventListTitle = $scope.resourceBundle.incompleteEventsTitle;
                 $scope.noCasesMsg = $scope.resourceBundle.noIncompleteEventsFound;
 
                 return programEventRepository.getDraftEventsFor($scope.program.id, _.pluck($scope.originOrgUnits, "id"))
                     .then(translateAndFilterEventData);
             }
-            if ($scope.filterBy === "readyToSubmit") {
+            if ($scope.filterParams.filterBy === "readyToSubmit") {
                 $scope.eventListTitle = $scope.resourceBundle.readyToSubmitEventsTitle;
                 $scope.noCasesMsg = $scope.resourceBundle.noReadyToSubmitEventsFound;
                 return programEventRepository.getSubmitableEventsFor($scope.program.id, _.pluck($scope.originOrgUnits, "id")).then(function(events) {
@@ -77,18 +76,18 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
                     });
                 }).then(translateAndFilterEventData);
             }
-            if ($scope.filterBy === "dateRange") {
+            if ($scope.filterParams.filterBy === "dateRange") {
                 var startDate = $location.search().startDate;
                 var endDate = $location.search().endDate;
-                $scope.filterParams.startDate = moment(startDate).startOf('day').toDate();
-                $scope.filterParams.endDate = moment(endDate).endOf('day').toDate();
+                $scope.filterParams.startDate = $scope.filterParams.startDate || moment(startDate).startOf('day').toDate();
+                $scope.filterParams.endDate = $scope.filterParams.endDate || moment(endDate).endOf('day').toDate();
 
                 $scope.filterByDateRange();
             }
 
-            if ($scope.filterBy === "caseNumber") {
-                $scope.filterParams.caseNumber = "";
-                $scope.events = undefined;
+            if ($scope.filterParams.filterBy === "caseNumber") {
+                $scope.filterParams.caseNumber = $scope.filterParams.caseNumber || $location.search().caseNumber;
+                $scope.filterByCaseNumber();
             }
 
         };
@@ -343,6 +342,16 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
             init();
         });
 
+        $scope.pushToHistory = function () {
+            var currentSearchState = {
+                filterBy : $scope.filterParams.filterBy,
+                startDate: $scope.filterParams.startDate,
+                endDate: $scope.filterParams.endDate,
+                caseNumber: $scope.filterParams.caseNumber
+            };
+            historyService.pushState(currentSearchState);
+        };
+
         var init = function() {
 
             var loadModule = function() {
@@ -404,9 +413,9 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
 
             showResultMessage($location.search().messageType, $location.search().message);
 
-            $scope.filterBy = $routeParams.filterBy;
-            if (!$scope.filterBy)
-                $scope.filterBy = 'caseNumber';
+            $scope.filterParams.filterBy = $routeParams.filterBy;
+            if (!$scope.filterParams.filterBy)
+                $scope.filterParams.filterBy = 'caseNumber';
             $scope.eventListTitle = $scope.resourceBundle.eventListTitle;
             $scope.noCasesMsg = $scope.resourceBundle.noCasesFound;
             $scope.loading = true;

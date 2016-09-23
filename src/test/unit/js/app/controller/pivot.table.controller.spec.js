@@ -113,14 +113,26 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
                 };
             });
 
-            it('should prompt the user to download tabular data to CSV with suggested filename', function () {
+            it('should prompt the user to download tabular data to CSV with lastUpdated date in the filename', function () {
+                var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm";
+                scope.updatedTime = moment('2015-10-29').format(REPORTS_LAST_UPDATED_TIME_FORMAT);
+
                 scope.exportToCSV();
-                expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith([scope.table.dataSetCode, scope.table.title, currentTime.format('DD-MMM-YYYY'), 'csv'].join('.'), jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
+                expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith([scope.table.dataSetCode, scope.table.title, '[updated 29 October 2015 12.00 AM]', 'csv'].join('.'), jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
             });
 
             it('should contain results of csv builder', function () {
                 scope.exportToCSV();
                 expect(csvContent).toContain(mockPivotTableCsv);
+            });
+
+            it("should include lastUpdated time", function () {
+                var REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY hh[.]mm A";
+                scope.updatedTime = moment('2015-10-29').format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
+                var expected = '"Updated","' + scope.updatedTime + '"';
+
+                scope.exportToCSV();
+                expect(csvContent).toContain(expected);
             });
         });
 

@@ -11,7 +11,9 @@ define(['chart'], function(Chart) {
                     columns: 'someColumns',
                     filters: 'someFilters',
                     rows: 'someRows',
-                    type: 'someType'
+                    type: 'someType',
+                    categoryDimensions: 'categoryDimensionInfo',
+                    dataDimensionItems: 'dataDimensionItemInfo'
                 };
                 chart = Chart.create(config);
                 expect(chart.id).toEqual(config.id);
@@ -21,6 +23,8 @@ define(['chart'], function(Chart) {
                 expect(chart.filters).toEqual(config.filters);
                 expect(chart.rows).toEqual(config.rows);
                 expect(chart.type).toEqual(config.type);
+                expect(chart.categoryDimensions).toEqual(config.categoryDimensions);
+                expect(chart.dataDimensionItems).toEqual(config.dataDimensionItems);
             });
         });
 

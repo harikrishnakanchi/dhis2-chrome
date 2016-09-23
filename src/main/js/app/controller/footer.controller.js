@@ -1,14 +1,12 @@
-define(['chromeUtils', 'interpolate', 'lodash'], function(chromeUtils, interpolate, _) {
+define(['interpolate', 'lodash'], function(interpolate, _) {
     return function ($rootScope, $scope, systemSettingRepository) {
-        $scope.versionAndConnectionMessage = function () {
-            var versionAndConnectionMessage = _.get($scope.resourceBundle, 'versionAndConnectionMessage'),
-                praxisVersion = chromeUtils.getPraxisVersion(),
+        $scope.connectionMessage = function () {
+            var connectionMessage = _.get($scope.resourceBundle, 'connectionMessage'),
                 dhisUrl = systemSettingRepository.getDhisUrl();
 
-            if(!versionAndConnectionMessage || !praxisVersion || !dhisUrl) return;
+            if(!connectionMessage || !dhisUrl) return;
 
-            return interpolate(versionAndConnectionMessage, {
-                praxis_version: praxisVersion,
+            return interpolate(connectionMessage, {
                 dhis_url: dhisUrl
             });
         };

@@ -16,5 +16,9 @@ define(['interpolate'], function (interpolate) {
             string = 'I am {{foo}} years old.';
             expect(interpolate(string, { bar: 5 })).toEqual('I am {{foo}} years old.');
         });
+
+        it('returns null if string is null', function () {
+            expect(interpolate(null, {})).toBeNull();
+        });
     });
 });

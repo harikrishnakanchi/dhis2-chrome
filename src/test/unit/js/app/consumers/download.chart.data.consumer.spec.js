@@ -140,6 +140,23 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalledWith(someOtherChart, mockModule.id);
             });
 
+            it('should download chart data for origins for geographicOriginCharts', function() {
+                var geographicOriginChart = {
+                    id: 'mockChartId',
+                    dataSetCode: mockDataSet.code,
+                    geographicOriginChart: true
+                },  mockOrigin = {
+                    id: 'someOriginId'
+                };
+                chartRepository.getAll.and.returnValue(utils.getPromise(q, [geographicOriginChart]));
+                orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, [mockOrigin]));
+
+                downloadChartDataConsumer.run();
+                scope.$apply();
+
+                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(geographicOriginChart, [mockOrigin.id]);
+            });
+
             it('should continue download of charts even if one call fails', function() {
                 var usersModules = [{
                     id: 'Mod1'

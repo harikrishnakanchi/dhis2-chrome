@@ -12,7 +12,7 @@ define(["lodashUtils", "moment"], function(_, moment) {
 
         var isLocalDataStale = function(remoteItem, localItem) {
             if (!localItem) return true;
-            return moment(_.extract(remoteItem, remoteTimeField, epoc)).isAfter(moment(_.extract(localItem, localTimeField, epoc)));
+            return moment.utc(_.extract(remoteItem, remoteTimeField, epoc)).isAfter(moment.utc(_.extract(localItem, localTimeField, epoc)));
         };
 
         _.each(localList, function(localItem) {

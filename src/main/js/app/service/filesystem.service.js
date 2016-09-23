@@ -1,4 +1,4 @@
-define(['lodash'], function(_) {
+define(['lodash', 'chromeUtils'], function(_, chromeUtils) {
     return function($q) {
         var FILE_TYPE_OPTIONS = {
             CSV: {
@@ -19,7 +19,25 @@ define(['lodash'], function(_) {
             }
         };
 
+        var replaceSpecialCharsInFileName = function (fileName) {
+            var charMap = {
+                '<': String.fromCharCode(0x02C2),
+                '>': String.fromCharCode(0x02C3)
+            };
+
+            for(var symbol in charMap) {
+                var regex = new RegExp(symbol, 'g');
+                fileName = fileName.replace(regex, charMap[symbol]);
+            }
+
+            return fileName;
+        };
+
         var promptAndWriteFile = function(fileName, contents, options) {
+
+            if(chromeUtils.getOS() == 'win')
+                fileName = replaceSpecialCharsInFileName(fileName);
+
             var deferred = $q.defer(),
                 defaultOptions = {
                     type: 'saveFile',

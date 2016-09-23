@@ -703,6 +703,31 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.$apply();
             });
 
+            describe('isDataAvailable', function () {
+                it('should set it true when there is approval data for a module', function () {
+                    moduleDataBlockFactory.create.and.returnValue(utils.getPromise(q, {
+                        approvedAtAnyLevel: true
+                    }));
+                    scope.$apply();
+                    expect(scope.isDataAvailable).toBeTruthy();
+                });
+
+                it('should set it true when there is data values for a module', function () {
+                    moduleDataBlockFactory.create.and.returnValue(utils.getPromise(q, {
+                        approvedAtAnyLevel: false,
+                        submitted: true
+                    }));
+                    scope.$apply();
+                    expect(scope.isDataAvailable).toBeTruthy();
+                });
+
+                it('should set it false when there is no data values and approvals for a module', function () {
+                    moduleDataBlockFactory.create.and.returnValue(utils.getPromise(q, {}));
+                    scope.$apply();
+                    expect(scope.isDataAvailable).toBeFalsy();
+                });
+            });
+
             it("should expand the first dataset panel", function() {
                 var id = "first_panel_id";
                 var isDatasetOpen = scope.getDatasetState(id, true);

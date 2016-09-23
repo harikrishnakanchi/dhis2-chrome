@@ -1,5 +1,5 @@
-define(["properties", "moment", "dateUtils", "lodash"], function(properties, moment, dateUtils, _) {
-    return function($scope, $hustle, $q, $rootScope, $modal, $timeout, $location, approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility, dataSyncFailureRepository) {
+define(["properties", "moment", "dateUtils", "lodash", "interpolate"], function(properties, moment, dateUtils, _, interpolate) {
+    return function($scope, $hustle, $q, $rootScope, $modal, $timeout, $location, $anchorScroll, approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility, dataSyncFailureRepository) {
 
         $scope.formatPeriods = function(period) {
             m = moment(period, "GGGG[W]W");
@@ -23,18 +23,9 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
             return "#/aggregate-data-entry/" + item.moduleId + "/" + item.period;
         };
 
-        $scope.toggleSelectAll = function() {
-            var items = _.flatten(_.values($scope.itemsAwaitingApprovalAtUserLevel));
-
-            $scope.selectedAllItemsForApproval = !$scope.selectedAllItemsForApproval;
-            _.each(items, function(item) {
-                item.selectedForApproval = $scope.selectedAllItemsForApproval;
-            });
-        };
-
-        $scope.toggleWeek = function () {
-            var items = _.flatten(_.values($scope.itemsAwaitingApprovalAtUserLevel));
-            $scope.selectedAllItemsForApproval = _.all(items, 'selectedForApproval');
+        var scrollToTop = function() {
+            $location.hash();
+            $anchorScroll();
         };
 
         $scope.bulkApprove = function() {
@@ -63,7 +54,7 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
 
             var approve = function() {
                 var currentUsersUsername = $rootScope.currentUser.userCredentials.username,
-                    moduleDataBlocksToBeApproved = _.filter($scope.moduleDataBlocks, { selectedForApproval: true }),
+                    moduleDataBlocksToBeApproved = _.filter($scope.moduleDataBlocks, 'selectedForApproval'),
                     periodsAndOrgUnitsToBeApproved = _.map(moduleDataBlocksToBeApproved, function(moduleDataBlock) {
                         return {
                             "period": moduleDataBlock.period,
@@ -108,7 +99,7 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
             };
 
             showModal(function() {
-                approve().then(successPromise, errorPromise);
+                approve().then(successPromise, errorPromise).then(scrollToTop);
             }, modalMessages);
         };
 
@@ -125,6 +116,10 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
 
         $scope.itemsArePresent = function (object) {
             return !_.isEmpty(object);
+        };
+        
+        $scope.getModuleName = function (moduleName) {
+            return moduleName.split(' - ')[1];
         };
 
         var loadDashboard = function() {
@@ -152,14 +147,27 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                     itemsAwaitingApprovalAtOtherLevels = _.filter(moduleDataBlocks, { awaitingActionAtProjectLevelApprover: true });
                 }
 
-                $scope.itemsAwaitingSubmission = _.groupBy(itemsAwaitingSubmission, 'moduleName');
-                $scope.itemsAwaitingApprovalAtUserLevel = _.groupBy(itemsAwaitingApprovalAtUserLevel, 'moduleName');
-                $scope.itemsAwaitingApprovalAtOtherLevels = _.groupBy(itemsAwaitingApprovalAtOtherLevels, 'moduleName');
+                var moduleMap = _.groupBy(moduleDataBlocks, 'opUnitName');
+                $scope.moduleMap = _.each(moduleMap, function (modules, opUnitName) {
+                    moduleMap[opUnitName] = _.uniq(_.map(modules, 'moduleName'));
+                });
+
+                var groupItemsByOpUnitByModule = function (items) {
+                    var itemsByOpUnit = _.groupBy(items, 'opUnitName');
+                    return _.each(itemsByOpUnit, function (moduleDataBlocks, opUnit) {
+                        itemsByOpUnit[opUnit] = _.groupBy(moduleDataBlocks, 'moduleName');
+                    });
+                };
+
+                $scope.itemsAwaitingSubmission = groupItemsByOpUnitByModule(itemsAwaitingSubmission);
+                $scope.itemsAwaitingApprovalAtUserLevel = groupItemsByOpUnitByModule(itemsAwaitingApprovalAtUserLevel);
+                $scope.itemsAwaitingApprovalAtOtherLevels = groupItemsByOpUnitByModule(itemsAwaitingApprovalAtOtherLevels);
+
             });
         };
 
         var init = function() {
-            $scope.support_email = properties.support_email;
+            $scope.contactSupport = interpolate($scope.resourceBundle.contactSupport, {supportEmail: properties.support_email});
 
             $scope.compatibilityInfo = {};
             checkVersionCompatibility($scope.compatibilityInfo);

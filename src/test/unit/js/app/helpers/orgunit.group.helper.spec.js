@@ -132,5 +132,51 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                     "desc": "upsertOrgUnitGroupsDesc"
                 }, "dataValues"]);
             });
+
+            it('should not add modules to orgUnit groups for the unRecorded attributes', function () {
+                var modules = [{
+                    "id": "a72ec34b863"
+                }];
+
+                var projectAndOpunitAttributes = [{
+                    "attribute": {
+                        "name": "Hospital Unit Code",
+                        "id": "c6d3c8a7286",
+                        "code": "hospitalUnitCode"
+                    },
+                    "value": undefined
+                }, {
+                    "attribute": {
+                        "name": "Operation Unit Type",
+                        "id": "52ec8ccaf8f"
+                    },
+                    "value": "Hospital"
+                }];
+
+                var orgunitgroups = [{
+                    "name": "Hospital",
+                    "id": "a8b42a1c9b8",
+                    "organisationUnits": []
+                }];
+
+                spyOn(orgUnitGroupRepository, "getAll").and.returnValue(utils.getPromise(q, orgunitgroups));
+                spyOn(orgUnitGroupRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
+                spyOn(orgUnitRepository, "getProjectAndOpUnitAttributes").and.returnValue(utils.getPromise(q, projectAndOpunitAttributes));
+                orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepository, orgUnitGroupRepository);
+
+                orgUnitGroupHelper.createOrgUnitGroups(modules, true);
+                scope.$apply();
+
+                expect(hustle.publish.calls.argsFor(0)).toEqual([{
+                    "data": {
+                        "orgUnitGroupIds": ["a8b42a1c9b8"],
+                        "orgUnitIds": ["a72ec34b863"]
+                    },
+                    "type": "upsertOrgUnitGroups",
+                    "locale": "en",
+                    "desc": "upsertOrgUnitGroupsDesc"
+                }, "dataValues"]);
+
+            });
         });
     });

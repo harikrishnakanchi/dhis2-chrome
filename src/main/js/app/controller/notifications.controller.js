@@ -169,7 +169,11 @@ define(["lodash"], function(_) {
 
         var init = function() {
             $scope.loading = true;
-            return getAllCharts().then(getUserModules).then(getChartData).then(function () {
+            return getAllCharts()
+                .then(getUserModules)
+                .then(orgUnitRepository.enrichWithParent)
+                .then(getChartData)
+                .then(function () {
                 $scope.loading = false;
             });
         };

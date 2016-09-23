@@ -1,16 +1,16 @@
-<div class="product-key-form">
+<div class="product-key-form {{ layoutDirection.direction }}">
     <form name="productKeyForm" role="form" ng-submit="setAuthHeaderAndProceed()" class="form-horizontal">
         <ul class="form-horizontal">
             <p class='alert alert-danger' ng-show='isKeyInvalid' id="isKeyInvalid">{{resourceBundle.invalidKey}}</p>
             <li class="form-group">
                 <label for="productKey" class="col-sm-4 control-label">{{resourceBundle.enterProductKeyLabel}}</label>
-                <div class="col-sm-8">
+                <div class="col-sm-8 product-key-input">
                     <textarea rows="4" cols="50" class="form-control" id="productKey" ng-model="productKey" placeholder="{{ resourceBundle.productKeyPlaceholder }}" autofocus required>
                     </textarea>
                 </div>
             </li>
             <li class="form-group">
-                <div class=" col-sm-offset-4 col-md-offset-4 col-sm-8">
+                <div class="col-sm-offset-4 col-md-offset-4 col-sm-8 product-key-buttons">
                     <input type="submit" ng-disabled="productKeyForm.$invalid" value="{{ resourceBundle.submitBtnValue }}" class="btn btn-primary" id="submitButton">
                     <input type="button" value="{{ resourceBundle.backBtnValue }}" class="btn" ng-click="back()" ng-if="showBackButton">
                 </div>

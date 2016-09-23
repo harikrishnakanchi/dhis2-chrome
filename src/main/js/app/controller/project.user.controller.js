@@ -1,4 +1,4 @@
-define(["dhisId", "properties"], function(dhisId, properties) {
+define(["dhisId", "interpolate", "properties"], function(dhisId, interpolate, properties) {
     return function($scope, $hustle, $timeout, $modal, userRepository) {
 
         $scope.projectUser = {};
@@ -26,9 +26,9 @@ define(["dhisId", "properties"], function(dhisId, properties) {
             var orgUnitType = getAttributeValue($scope.orgUnit.attributeValues, 'Type');
             var userNamePrefix = _.isEmpty(projCode) ? projCode : projCode + "_";
             $scope.userNameMatchExpr = orgUnitType === "Country" ? new RegExp("[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+\\.[a-zA-Z]{2,4}$", "i") : new RegExp(userNamePrefix + "(.)+", "i");
-            $scope.patternValidationMessage = orgUnitType === "Country" ? $scope.resourceBundle.emailValidation : $scope.resourceBundle.usernamePrefixValidation + userNamePrefix;
+            $scope.patternValidationMessage = orgUnitType === "Country" ? $scope.resourceBundle.emailValidation :  interpolate($scope.resourceBundle.usernamePrefixValidation, { username_prefix: userNamePrefix });
 
-            $scope.userNamePlaceHolder = _.isEmpty(userNamePrefix) ? "" : $scope.resourceBundle.usernamePrefixValidation + " " + userNamePrefix;
+            $scope.userNamePlaceHolder = _.isEmpty(userNamePrefix) ? "" : interpolate($scope.resourceBundle.usernamePrefixValidation, { username_prefix: userNamePrefix });
 
             $scope.userRoles = allRoles[orgUnitType];
             $scope.form = {};
@@ -84,18 +84,18 @@ define(["dhisId", "properties"], function(dhisId, properties) {
         };
 
         $scope.toggleUserDisabledState = function(user) {
-            $scope.toggleStateUsername = user.userCredentials.username;
             $scope.isUserToBeDisabled = !user.userCredentials.disabled;
             $scope.userStateSuccessfullyToggled = false;
 
-            var confirmationMessage = $scope.isUserToBeDisabled === true ? $scope.resourceBundle.userDisableConfMessage : $scope.resourceBundle.userEnableConfMessage;
+            var confirmationMessageTemplate = $scope.isUserToBeDisabled ? $scope.resourceBundle.userDisableConfMessage : $scope.resourceBundle.userEnableConfMessage;
 
             $scope.modalMessages = {
-                "confirmationMessage": confirmationMessage
+                title: $scope.isUserToBeDisabled ? $scope.resourceBundle.disableUserLabel : $scope.resourceBundle.enableUserLabel,
+                confirmationMessage: interpolate(confirmationMessageTemplate, { username: user.userCredentials.username })
             };
 
             var modalInstance = $modal.open({
-                templateUrl: 'templates/toggle-disable-state-confirmation.html',
+                templateUrl: 'templates/confirm-dialog.html',
                 controller: 'confirmDialogController',
                 scope: $scope
             });

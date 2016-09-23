@@ -1,4 +1,4 @@
-define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], function(_, dataValuesMapper, orgUnitMapper, moment, properties) {
+define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "interpolate"], function(_, dataValuesMapper, orgUnitMapper, moment, properties, interpolate) {
     return function($scope, $routeParams, $q, $hustle, $anchorScroll, $location, $modal, $rootScope, $window, $timeout,
         dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository) {
 
@@ -21,6 +21,8 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             $scope.associatedProgramId = undefined;
             $scope.rowTotal = {};
         };
+
+        $scope.contactSupport = interpolate($scope.resourceBundle.contactSupport, { supportEmail:properties.support_email });
 
         $scope.printWindow = function() {
             $scope.printingTallySheet = true;
@@ -436,6 +438,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                         $scope.isSubmitted = moduleDataBlock.submitted;
                         $scope.isCompleted = moduleDataBlock.approvedAtProjectLevel;
                         $scope.isApproved = moduleDataBlock.approvedAtCoordinationLevel;
+                        $scope.isDataAvailable = moduleDataBlock.submitted || moduleDataBlock.approvedAtAnyLevel;
                     });
 
                 if ($scope.dataentryForm !== undefined)

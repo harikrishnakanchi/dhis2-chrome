@@ -1,5 +1,5 @@
 define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, moment, dhisId, dateUtils, properties) {
-    return function($scope, $rootScope, $routeParams, $location, $anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService) {
+    return function($scope, $rootScope, $routeParams, $location, $anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService) {
 
         var resetForm = function() {
             $scope.form = $scope.form || {};
@@ -29,40 +29,19 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 return '^[1-9][0-9]?$';
         };
 
-        //TODO remove this when all clients have moved to 2.21
-        var getType = function(obj) {
-            var type = obj.type || obj.valueType;
-            switch (type) {
-                case "int":
-                    return "NUMBER";
-                case "date":
-                    return "DATE";
-                case "bool":
-                    return "BOOLEAN";
-                case "datetime":
-                    return "DATETIME";
-                case "string":
-                    return "TEXT";
-                case "INTEGER_ZERO_OR_POSITIVE":
-                    return "NUMBER";
-                default:
-                    return type;
-            }
-        };
-
         var getDataValuesAndEventDate = function() {
             var programStage = $scope.program.programStages[0];
             var eventDate = null;
             var compulsoryFieldsPresent = true;
 
-            var formatValue = function(value, type) {
+            var formatValue = function(value, valueType) {
                 if (_.isObject(value) && value.originalObject)
                     return value.originalObject.code;
                 if (_.isObject(value) && value.code)
                     return value.code;
-                if (value && type === "DATE")
+                if (value && valueType === "DATE")
                     return moment.utc(new Date(value)).format("YYYY-MM-DD");
-                if (value && type === "DATETIME")
+                if (value && valueType === "DATETIME")
                     return moment.utc(new Date(value)).toISOString();
                 return value;
             };
@@ -70,14 +49,14 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             var dataValuesList = _.flatten(_.map(programStage.programStageSections, function(sections) {
 
                 return _.map(sections.programStageDataElements, function(psde) {
-                    var type = getType(psde.dataElement);
-                    var value = formatValue($scope.dataValues[psde.dataElement.id], type);
+                    var dataElementValueType = psde.dataElement.valueType;
+                    var value = formatValue($scope.dataValues[psde.dataElement.id], dataElementValueType);
 
                     if ($scope.isEventDateSubstitute(psde.dataElement)) {
                         eventDate = value;
                     }
                     if (psde.compulsory) {
-                        if (type === "NUMBER") {
+                        if (dataElementValueType == "NUMBER" || dataElementValueType == "INTEGER_ZERO_OR_POSITIVE") {
                             compulsoryFieldsPresent = isNaN(value) || value === null ? false : compulsoryFieldsPresent;
                         } else if (_.isEmpty(value))
                             compulsoryFieldsPresent = false;
@@ -106,7 +85,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
         };
 
         $scope.loadEventsView = function() {
-            $location.path($routeParams.returnTo);
+            historyService.back();
         };
 
         $scope.isEventDateSubstitute = function(dataElement) {
@@ -117,9 +96,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
         };
 
         $scope.isReferralLocationPresent = function(dataElement) {
-            if ($scope.loading === false && _.endsWith(dataElement.code, "_referralLocations") && _.isUndefined($scope.optionSetMapping[dataElement.optionSet.id]))
-                return false;
-            return true;
+            return !($scope.loading === false && _.eq(dataElement.offlineSummaryType, "referralLocations") && _.isEmpty($scope.dataElementOptions[dataElement.id]));
         };
 
         $scope.update = function() {
@@ -130,7 +107,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             $scope.event.dataValues = dataValuesAndEventDate.dataValues;
 
             programEventRepository.upsert($scope.event).then(function() {
-                $location.path($routeParams.returnTo).search({
+                historyService.back({
                     'messageType': 'success',
                     "message": $scope.resourceBundle.eventSaveSuccess
                 });
@@ -163,7 +140,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                     setEventMinAndMaxDate();
                     scrollToTop(eventId);
                 } else {
-                    $location.path($routeParams.returnTo).search({
+                    historyService.back({
                         'messageType': 'success',
                         "message": $scope.resourceBundle.eventSaveSuccess
                     });
@@ -211,13 +188,6 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 var getProgram = function(excludedDataElements) {
                     return programRepository.getProgramForOrgUnit($scope.originOrgUnits[0].id).then(function(program) {
                         return programRepository.get(program.id, excludedDataElements).then(function(program) {
-                            _.each(program.programStages, function(stage) {
-                                _.each(stage.programStageSections, function(section) {
-                                    _.each(section.programStageDataElements, function(sde) {
-                                        sde.dataElement.type = getType(sde.dataElement);
-                                    });
-                                });
-                            });
                             $scope.program = translationsService.translate(program);
                         });
                     });
@@ -234,8 +204,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             var loadOptionSets = function() {
                 var isNewCase = $routeParams.eventId ? false : true;
                 return optionSetRepository.getOptionSetMapping($scope.opUnitId, isNewCase).then(function(data) {
-                    var translatedOptionSetMap = translationsService.translateOptionSetMap(data.optionSetMap);
-                    $scope.optionSetMapping = translatedOptionSetMap;
+                    return translationsService.translateOptionSetMap(data.optionSetMap);
                 });
             };
 
@@ -243,27 +212,36 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 var formatValue = function(dv) {
 
                     var filterOptions = function() {
-                        $scope.optionSetMapping[de.optionSet.id] = _.filter($scope.optionSetMapping[de.optionSet.id], {
+                        $scope.dataElementOptions[de.id] = _.filter($scope.dataElementOptions[de.id], {
                             "isDisabled": false
                         });
                     };
 
                     var de = allDataElementsMap[dv.dataElement];
                     if (de && de.optionSet) {
-                        return _.find($scope.optionSetMapping[de.optionSet.id], function(optionSet) {
+                        var value =_.find($scope.dataElementOptions[de.id], function(option) {
                             if (_.endsWith(de.optionSet.code, "_referralLocations")) {
                                 filterOptions();
-                                if (!_.contains($scope.optionSetMapping[de.optionSet.id], optionSet))
-                                    $scope.optionSetMapping[de.optionSet.id].push(optionSet);
+                                if (!_.contains($scope.dataElementOptions[de.id], option) && option.code === dv.value)
+                                    $scope.dataElementOptions[de.id].push(option);
                             }
-                            return optionSet.code === dv.value;
+                            return option.code === dv.value;
                         });
+                        if(_.isUndefined(value)) {
+                            var selectedOption = _.find(dv.optionSet.options, { id: dv.value });
+                            if (selectedOption) {
+                                $scope.dataElementOptions[de.id].push(selectedOption);
+                            }
+                            return selectedOption;
+                        } else {
+                            return value;
+                        }
                     }
-                    //TODO remove date, datetime and int checks after DHIS 2.21
-                    if (dv.type === "date" || dv.valueType === "DATE" || dv.type === "datetime" || dv.valueType === "DATETIME")
+
+                    if (dv.valueType === "DATE" || dv.valueType === "DATETIME")
                         return new Date(dv.value);
 
-                    if (dv.type === "int" || dv.valueType === 'NUMBER')
+                    if (dv.valueType === 'NUMBER')
                         return parseFloat(dv.value);
 
                     return dv.value;
@@ -283,6 +261,28 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 }
             };
 
+            var loadExcludedOptions = function (translatedOptionSetMapping) {
+                var buildDataElementOptions = function (excludedLinelistOptions) {
+                    $scope.dataElementOptions = {};
+                    var dataElementsWithOptions = _.filter(allDataElementsMap, 'optionSet');
+                    var indexedExcludedLineListOptions = excludedLinelistOptions && _.indexBy(excludedLinelistOptions.dataElements, 'dataElementId');
+                    _.forEach(dataElementsWithOptions, function (dataElement) {
+                        var options = translatedOptionSetMapping[dataElement.optionSet.id] || [];
+                        if (!_.isUndefined(excludedLinelistOptions)) {
+                            var excludedOptionIds = indexedExcludedLineListOptions[dataElement.id] && indexedExcludedLineListOptions[dataElement.id].excludedOptionIds;
+                            options = _.reject(options, function (option) {
+                                return _.contains(excludedOptionIds, option.id);
+                            });
+                        }
+                        $scope.dataElementOptions[dataElement.id] = options;
+                    });
+                };
+
+               return excludedLineListOptionsRepository.get($scope.selectedModuleId).then(buildDataElementOptions);
+            };
+
+
+
             $scope.loading = true;
             resetForm();
             loadModule()
@@ -290,6 +290,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 .then(loadPrograms)
                 .then(loadAllDataElements)
                 .then(loadOptionSets)
+                .then(loadExcludedOptions)
                 .then(loadEvent)
                 .then(setEventMinAndMaxDate)
                 .finally(function() {

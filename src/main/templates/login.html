@@ -5,7 +5,7 @@
         <p class='alert alert-danger' ng-show='disabledCredentials' id="userDisabledMsg">{{ resourceBundle.disabledCredentials }}</p>
         <p class='alert alert-danger' ng-show='compatibilityInfo.incompatibleVersion'>
             {{ resourceBundle.incompatiblePraxisVersion }}<br>
-            {{ resourceBundle.contactSupport }} ({{ support_email }})
+            {{ contactSupport }}
         </p>
         <p class='alert alert-info' ng-show="compatibilityInfo.newerVersionAvailable">
             {{ resourceBundle.praxis + ' ' + compatibilityInfo.newerVersionNumber + ' ' + resourceBundle.newUpgradeAvailable }}

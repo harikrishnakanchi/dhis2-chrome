@@ -139,9 +139,11 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                 httpBackend.expectGET(/.*charts.json.*/).respond(200, chartIds);
 
                 var expectedQueryParams = encodeURI('fields=id,name,title,relativePeriods,type,' +
-                                                    'columns[dimension,items[id,name,description]],' +
+                                                    'categoryDimensions[dataElementCategory,categoryOptions[:identifiable]],' +
+                                                    'dataDimensionItems[dataElement[id,name,formName,description],indicator[id,name,shortName,description],programIndicator[id,name,shortName,description]],' +
+                                                    'columns[dimension,items[id,name]],' +
                                                     'rows[dimension,items[id,name]],' +
-                                                    'filters[dimension,items[id,name]]');
+                                                    'filters[dimension,items[id]]');
                 httpBackend.expectGET(properties.dhis.url + '/api/charts/chart1.json?' + expectedQueryParams).respond(200, {});
                 httpBackend.expectGET(properties.dhis.url + '/api/charts/chart2.json?' + expectedQueryParams).respond(200, {});
 

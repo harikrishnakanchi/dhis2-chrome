@@ -28,25 +28,38 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
             };
 
             var createOrgUnitsAndGroups = function() {
-                var allOriginOrgUnits = [];
-                var associatedDatasetIdsAndOrgUnitIdsList = [];
-                var associatedPrograms = [];
                 var orgUnitsForGroups = [];
+                
+                var associateOrgunitsToPrograms = function (program, orgUnits) {
+                    if (program) {
+                        var orgUnitAndProgramAssociations = {
+                            "orgUnitIds": _.map(orgUnits, 'id'),
+                            "programIds": [program.id]
+                        };
+                        return programRepository.associateOrgUnits(program, orgUnits).then(function () {
+                            return publishMessage(orgUnitAndProgramAssociations, 'associateOrgunitToProgram', $scope.resourceBundle.uploadProgramDesc + _.pluck(orgUnits, "name"));
+                        });
+                    }
+                    else {
+                        return $q.when();
+                    }
+                };
+
+                var associateOrgunitsToDatasets = function (datasets, orgUnits) {
+                    var dataSetIds = _.map(datasets, "id");
+                    var orgUnitAndDatasetAssociations = {
+                        "orgUnitIds": _.map(orgUnits, 'id'),
+                        "dataSetIds": dataSetIds
+                    };
+                    return datasetRepository.associateOrgUnits(dataSetIds, orgUnits).then(function () {
+                        return publishMessage(orgUnitAndDatasetAssociations, 'associateOrgUnitToDataset', $scope.resourceBundle.associateOrgUnitToDatasetDesc + $scope.orgUnit.name);
+                    });
+                };
 
                 var doAssociations = function(originOrgUnits, siblingOriginOrgUnit) {
                     var associate = function(datasets, program) {
-                        var datasetIds = _.pluck(datasets, "id");
-                        var originOrgUnitIds = _.pluck(originOrgUnits, "id");
-                        var orgunitIdsAndDatasetIds = {
-                            "orgUnitIds": originOrgUnitIds,
-                            "dataSetIds": datasetIds
-                        };
-                        associatedDatasetIdsAndOrgUnitIdsList.push(orgunitIdsAndDatasetIds);
-                        return datasetRepository.associateOrgUnits(datasetIds, originOrgUnits).then(function() {
-                            if (program) {
-                                associatedPrograms.push(program);
-                                programRepository.associateOrgUnits(program, originOrgUnits);
-                            }
+                        return associateOrgunitsToDatasets(datasets, originOrgUnits).then(function() {
+                            return associateOrgunitsToPrograms(program, originOrgUnits);
                         });
                     };
 
@@ -57,19 +70,6 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                     return getDatasetsAndProgram(siblingOriginOrgUnit.id).then(function(data) {
                         return associate(data[0], data[1]);
                     });
-                };
-
-                var publishMessages = function() {
-                    publishMessage(allOriginOrgUnits, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + _.uniq(_.pluck(allOriginOrgUnits, "name")));
-
-                    _.each(associatedDatasetIdsAndOrgUnitIdsList, function(associatedDatasetIdsAndOrgUnitIds){
-                        publishMessage(associatedDatasetIdsAndOrgUnitIds, "associateOrgUnitToDataset",
-                            $scope.resourceBundle.associateOrgUnitToDatasetDesc + $scope.orgUnit.name);
-                    });
-
-                    if (!_.isEmpty(associatedPrograms))
-                        publishMessage(associatedPrograms, "uploadProgram",
-                            $scope.resourceBundle.uploadProgramDesc + _.pluck(allOriginOrgUnits, "name"));
                 };
 
                 var getBooleanAttributeValue = function(attributeValues, attributeCode) {
@@ -94,9 +94,10 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                 var createOrgUnits = function(module) {
                     return orgUnitRepository.findAllByParent(module.id).then(function(siblingOriginOrgUnits) {
                         return originOrgunitCreator.create(module, $scope.patientOrigin).then(function(originOrgUnits) {
-                            allOriginOrgUnits = allOriginOrgUnits.concat(originOrgUnits);
                             orgUnitsForGroups = isLinelistService(module) ? orgUnitsForGroups.concat(originOrgUnits) : orgUnitsForGroups.concat(module);
-                            return doAssociations(originOrgUnits, siblingOriginOrgUnits[0]);
+                            return publishMessage(originOrgUnits, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + _.uniq(_.pluck(originOrgUnits, "name"))).then(function () {
+                                return doAssociations(originOrgUnits, siblingOriginOrgUnits[0]);
+                            });
                         });
                     });
                 };
@@ -108,7 +109,6 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                             });
                         }, $q.when({}));
                     })
-                    .then(publishMessages)
                     .then(createOrgUnitGroups);
             };
 

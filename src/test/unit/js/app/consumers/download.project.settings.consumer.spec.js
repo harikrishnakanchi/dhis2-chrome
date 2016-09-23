@@ -1,5 +1,5 @@
-define(["angularMocks", "utils", "systemSettingService", "userPreferenceRepository", "referralLocationsRepository", "patientOriginRepository", "excludedDataElementsRepository", "downloadProjectSettingsConsumer", "mergeBy"],
-    function(mocks, utils, SystemSettingService, UserPreferenceRepository, ReferralLocationsRepository, PatientOriginRepository, ExcludedDataElementsRepository, DownloadProjectSettingsConsumer, MergeBy) {
+define(["angularMocks", "utils", "systemSettingService", "userPreferenceRepository", "referralLocationsRepository", "patientOriginRepository", "excludedDataElementsRepository", "downloadProjectSettingsConsumer", "mergeBy", "excludedLinelistOptionsMerger"],
+    function(mocks, utils, SystemSettingService, UserPreferenceRepository, ReferralLocationsRepository, PatientOriginRepository, ExcludedDataElementsRepository, DownloadProjectSettingsConsumer, MergeBy, ExcludedLinelistOptionsMerger) {
         describe("downloadProjectSettingsConsumer", function() {
             var consumer,
                 systemSettingService,
@@ -10,7 +10,8 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 excludedDataElementsRepository,
                 q,
                 scope,
-                mergeBy;
+                mergeBy,
+                excludedLinelistOptionsMerger;
 
             beforeEach(mocks.inject(function($q, $rootScope, $log) {
 
@@ -34,9 +35,12 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 excludedDataElementsRepository = new ExcludedDataElementsRepository();
                 spyOn(excludedDataElementsRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
 
+                excludedLinelistOptionsMerger = new ExcludedLinelistOptionsMerger();
+                spyOn(excludedLinelistOptionsMerger, 'mergeAndSaveForProject').and.returnValue(utils.getPromise(q, undefined));
+
                 mergeBy = new MergeBy($log);
 
-                consumer = new DownloadProjectSettingsConsumer(q, systemSettingService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository, excludedDataElementsRepository, mergeBy);
+                consumer = new DownloadProjectSettingsConsumer(q, systemSettingService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository, excludedDataElementsRepository, mergeBy, excludedLinelistOptionsMerger);
             }));
 
             it("should download project settings for current user projects", function() {
@@ -335,6 +339,16 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 expect(referralLocationsRepository.upsert).not.toHaveBeenCalled();
                 expect(patientOriginRepository.upsert).not.toHaveBeenCalled();
                 expect(excludedDataElementsRepository.upsert).not.toHaveBeenCalled();
+            });
+
+            it('should download and merge excludedLineListOptions for users projects', function () {
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1', 'prj2']));
+
+                consumer.run();
+                scope.$apply();
+
+                expect(excludedLinelistOptionsMerger.mergeAndSaveForProject.calls.argsFor(0)).toContain('prj1');
+                expect(excludedLinelistOptionsMerger.mergeAndSaveForProject.calls.argsFor(1)).toContain('prj2');
             });
         });
     });

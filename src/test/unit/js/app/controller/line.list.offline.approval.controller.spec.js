@@ -1,5 +1,5 @@
-define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEventRepository", "orgUnitRepository", "programRepository", "optionSetRepository", "datasetRepository", "referralLocationsRepository", "excludedDataElementsRepository", "translationsService"],
-    function(LineListOfflineApprovalController, mocks, utils, ProgramEventRepository, OrgUnitRepository, ProgramRepository, OptionSetRepository, DatasetRepository, ReferralLocationsRepository, ExcludedDataElementsRepository, TranslationsService) {
+define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEventRepository", "orgUnitRepository", "programRepository", "optionSetRepository", "datasetRepository", "referralLocationsRepository", "excludedDataElementsRepository", "translationsService", "timecop"],
+    function(LineListOfflineApprovalController, mocks, utils, ProgramEventRepository, OrgUnitRepository, ProgramRepository, OptionSetRepository, DatasetRepository, ReferralLocationsRepository, ExcludedDataElementsRepository, TranslationsService, timecop) {
         describe("lineListOfflineApprovalController", function() {
             var lineListOfflineApprovalController, scope, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, q, origins, program, optionSetMapping, events, origin1, origin2, origin3, origin4, dataSetRepository, associatedDataSets, referralLocationsRepository, excludedDataElementsRepository, translationsService;
 
@@ -153,6 +153,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         }
                     }]
                 }];
+
+                scope.resourceBundle = {};
 
                 programEventRepository = new ProgramEventRepository();
                 spyOn(programEventRepository, "getEventsForPeriod").and.returnValue(utils.getPromise(q, events));
@@ -415,43 +417,43 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 expect(scope.shouldShowProceduresInOfflineSummary()).toEqual(false);
             });
 
-            it("should get count when no filters are applied", function() {
-                expect(scope.getCount("Triage Status", false, false, "Green")).toEqual(2);
-            });
-
             it("should get referral count", function() {
                 expect(scope.getReferralCount("ref 1")).toEqual(2);
             });
 
-            it("should get count when gender filter is applied", function() {
-                scope.isGenderFilterApplied = true;
-                scope.program = {
-                    "name": "er"
-                };
-                scope.$apply();
+            it("should get count when no filters are applied", function() {
+                expect(scope.getCount("Triage Status", false, false, "Green")).toEqual(2);
+            });
 
+            it("should get count when gender filter is applied", function() {
                 expect(scope.getCount("Triage Status", true, false, "Green", "Male_er")).toEqual(1);
             });
 
             it("should get count when age filter is applied", function() {
-                scope.isAgeFilterApplied = true;
-                scope.program = {
-                    "name": "er"
-                };
-                scope.$apply();
-
                 expect(scope.getCount("Triage Status", false, true, "Green", "Triage Status", [0, 5])).toEqual(1);
             });
 
             it("should get count when age and gender filter is applied", function() {
-                scope.isAgeFilterApplied = true;
-                scope.program = {
-                    "name": "er"
-                };
-                scope.$apply();
-
                 expect(scope.getCount("Triage Status", true, true, "Green", "Female_er", [0, 5])).toEqual(1);
                 expect(scope.getCount("Triage Status", true, true, "Green", "Male_er", [4, 15])).toEqual(1);
+            });
+
+            it("should get total count", function () {
+                spyOn(scope, 'getCount').and.returnValue(2);
+                var genderOptions = [{id: 'Female_er'}, {id: 'Male_er'}];
+                var total = scope.getTotalCount("Triage Status", true, true, "Green", genderOptions, [0, 9999]);
+
+                expect(scope.getCount).toHaveBeenCalledWith("Triage Status", true, true, "Green", "Female_er", [0, 9999]);
+                expect(scope.getCount).toHaveBeenCalledWith("Triage Status", true, true, "Green", "Male_er", [0, 9999]);
+                expect(total).toEqual(4);
+            });
+
+            it("should get total count when gender filter is undefined", function () {
+                spyOn(scope, 'getCount').and.returnValue(2);
+                var total = scope.getTotalCount("Triage Status", true, true, "Green", undefined, [0, 9999]);
+
+                expect(scope.getCount).toHaveBeenCalledWith("Triage Status", true, true, "Green", undefined, [0, 9999]);
+                expect(total).toEqual(2);
             });
 
             it("should get procedure count when no filters are applied", function() {
@@ -460,36 +462,36 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
             });
 
             it("should get procedure count when gender filter is applied", function() {
-                scope.isGenderFilterApplied = true;
-                scope.program = {
-                    "name": "er"
-                };
-                scope.$apply();
-
                 expect(scope.getProcedureCount(true, false, "procedure 1", "Male_er")).toEqual(2);
                 expect(scope.getProcedureCount(true, false, "procedure 1", "Female_er")).toEqual(1);
                 expect(scope.getProcedureCount(true, false, "procedure 2", "Female_er")).toEqual(1);
             });
 
             it("should get procedure count when age filter is applied", function() {
-                scope.isAgeFilterApplied = true;
-                scope.program = {
-                    "name": "er"
-                };
-                scope.$apply();
-
                 expect(scope.getProcedureCount(false, true, "procedure 1", "", [0, 5])).toEqual(1);
             });
 
             it("should get procedure count when age and gender filter is applied", function() {
-                scope.isAgeFilterApplied = true;
-                scope.program = {
-                    "name": "er"
-                };
-                scope.$apply();
-
                 expect(scope.getProcedureCount(true, true, "procedure 1", "Female_er", [0, 5])).toEqual(1);
                 expect(scope.getProcedureCount(true, true, "procedure 1", "Male_er", [4, 15])).toEqual(2);
+            });
+
+            it("should get total procedure count", function () {
+                spyOn(scope, 'getProcedureCount').and.returnValue(2);
+                var genderOptions = [{id: 'Female_er'}, {id: 'Male_er'}];
+                var total = scope.getTotalProcedureCount(true, true, "Green", genderOptions, [0, 9999]);
+
+                expect(scope.getProcedureCount).toHaveBeenCalledWith(true, true, "Green", "Female_er", [0, 9999]);
+                expect(scope.getProcedureCount).toHaveBeenCalledWith(true, true, "Green", "Male_er", [0, 9999]);
+                expect(total).toEqual(4);
+            });
+
+            it("should get total procedure count when gender filter is undefined", function () {
+                spyOn(scope, 'getProcedureCount').and.returnValue(2);
+                var total = scope.getTotalProcedureCount(true, true, "Green", undefined, [0, 9999]);
+
+                expect(scope.getProcedureCount).toHaveBeenCalledWith(true, true, "Green", undefined, [0, 9999]);
+                expect(total).toEqual(2);
             });
 
             it("should return true if it should be shown in offline summary else false", function() {
@@ -513,6 +515,29 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 }];
                 expect(scope.shouldShowInOfflineSummary("Triage Status", allDataElements)).toEqual(true);
                 expect(scope.shouldShowInOfflineSummary("Case Number", allDataElements)).toEqual(false);
+            });
+
+            describe('isValidWeek', function () {
+                beforeEach(function () {
+                    Timecop.install();
+                    Timecop.freeze('2016-09-06T05:52:49.027Z'); // week 36
+                });
+
+                afterEach(function() {
+                    Timecop.returnToPresent();
+                    Timecop.uninstall();
+                });
+
+                it('should set isValidWeek to true if current week within last 12 weeks', function () {
+                    scope.$apply();
+                    scope.week = {
+                        weekNumber: 20,
+                        weekYear: 2016,
+                        startOfWeek: "2016-05-16"
+                    };
+
+                    expect(scope.isValidWeek).toBeTruthy();
+                });
             });
         });
     });

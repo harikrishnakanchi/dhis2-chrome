@@ -1,6 +1,9 @@
 define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, dateUtils, _, orgUnitMapper) {
-    return function($rootScope, $q, $scope, orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository, filesystemService, pivotTableCsvBuilder) {
+    return function($rootScope, $q, $scope, orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService, pivotTableCsvBuilder) {
         $scope.selectedProject = $rootScope.currentUser.selectedProject;
+
+        var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
+        var REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY hh[.]mm A";
 
         var buildCsvContent = function () {
             var DELIMITER = ',',
@@ -9,6 +12,11 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, date
 
             var escapeString = function (string) {
                 return '"' + string + '"';
+            };
+
+            var getLastUpdatedTimeDetails = function () {
+                var formattedTime = moment($scope.lastUpdatedTimeForProjectReport, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
+                return [escapeString('Updated'), escapeString(formattedTime)].join(DELIMITER);
             };
 
             var getProjectBasicInfo = function() {
@@ -34,15 +42,29 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, date
                 }).join(NEW_LINE + NEW_LINE);
             };
 
-            return [
+            var csvContent = [
                 getProjectBasicInfo(),
                 EMPTY_CELL,
                 getPivotTableData()
-            ].join(NEW_LINE);
+            ];
+
+            if ($scope.lastUpdatedTimeForProjectReport) {
+                csvContent.unshift(getLastUpdatedTimeDetails(), EMPTY_CELL);
+            }
+
+            return csvContent.join(NEW_LINE);
         };
 
         $scope.exportToCSV = function () {
-            var filename = [$scope.selectedProject.name, 'ProjectReport', moment().format("DD-MMM-YYYY"), 'csv'].join('.');
+            var lastUpdatedTimeDetails;
+            if ($scope.lastUpdatedTimeForProjectReport) {
+                var formattedDate = moment($scope.lastUpdatedTimeForProjectReport, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
+                lastUpdatedTimeDetails = '[updated ' + formattedDate + ']';
+            }
+            else {
+                lastUpdatedTimeDetails = moment().format("DD-MMM-YYYY");
+            }
+            var filename = [$scope.selectedProject.name, 'ProjectReport', lastUpdatedTimeDetails, 'csv'].join('.');
             filesystemService.promptAndWriteFile(filename, new Blob([buildCsvContent()], {type: 'text/csv'}), filesystemService.FILE_TYPE_OPTIONS.CSV);
         };
 
@@ -122,10 +144,26 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, date
             return _.filter(tables, { 'projectReport': true });
         };
 
-        var getDataForPivotTables = function(tables) {
-            return $q.all(_.map(tables, function(tableDefinition) {
-                return pivotTableRepository.getPivotTableData(tableDefinition, $scope.selectedProject.id);
-            }));
+        var getDataForPivotTables = function(pivotTables) {
+            var promises = _.map(pivotTables, function(pivotTable) {
+                return pivotTableRepository.getPivotTableData(pivotTable, $scope.selectedProject.id);
+            });
+
+            return $q.all(promises).then(function (pivotTableData) {
+                return _.filter(pivotTableData, 'isDataAvailable');
+            });
+        };
+
+        var loadLastUpdatedTimeForProjectReport = function() {
+            var formatlastUpdatedTime = function (date) {
+                return date ? moment(date).format(REPORTS_LAST_UPDATED_TIME_FORMAT) : undefined;
+            };
+
+            return changeLogRepository.get('monthlyPivotTableData:' +  $scope.selectedProject.id)
+                .then(formatlastUpdatedTime)
+                .then(function(lastUpdated) {
+                $scope.lastUpdatedTimeForProjectReport = lastUpdated;
+            });
         };
 
         var loadPivotTables = function() {
@@ -134,14 +172,14 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, date
                 .then(getDataForPivotTables)
                 .then(translationsService.translatePivotTableData)
                 .then(function(pivotTables) {
-                    $scope.pivotTables = _.sortBy(_.filter(pivotTables, { isTableDataAvailable: true }), 'displayPosition');
+                    $scope.pivotTables = _.sortBy(pivotTables, 'displayPosition');
                 });
         };
 
         var init = function() {
             $scope.pivotTables= [];
             $scope.loading = true;
-            $q.all([loadProjectBasicInfo(), loadPivotTables()]).finally(function () {
+            $q.all([loadProjectBasicInfo(), loadPivotTables(), loadLastUpdatedTimeForProjectReport()]).finally(function () {
                 $scope.loading = false;
             });
         };

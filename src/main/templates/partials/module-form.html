@@ -13,7 +13,7 @@
                     <li class="form-group">
                         <label for="moduleName" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.moduleNameLabel }}</label>
                         <div class="col-sm-4">
-                            <input type="text" class="form-control" name="moduleName{{$index}}" id="moduleName{{$index}}" placeholder="{{ resourceBundle.moduleNameLabel }}" ng-model="module.name" not-in="allModules" ng-disabled="isDisabled==true" required>
+                            <input type="text" class="form-control" name="moduleName{{$index}}" id="moduleName{{$index}}" placeholder="{{ resourceBundle.moduleNameLabel }}" ng-model="module.name" not-in="otherModules" ng-disabled="isDisabled==true" required>
                             <div ng-show="form.moduleName{{$index}}.$dirty &amp;&amp; form.moduleName{{$index}}.$invalid">
                                 <span class="errortxt" ng-show="form.moduleName{{$index}}.$error.required">{{resourceBundle.nameValidation}}</span>
                                 <span class="errortxt" ng-show="form.moduleName{{$index}}.$error.isWithin">{{resourceBundle.alreadyExists}}</span>
@@ -23,7 +23,7 @@
                     <li class="form-group">
                         <label for="moduleOpeningDate" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.openingDateLabel }}</label>
                         <div class="col-sm-6 col-md-6">
-                            <input type="date" name="moduleOpeningDate" ng-model="module.openingDate" ng-disabled="isDisabled==true" max="9999-12-31" required>
+                            <input type="date" name="moduleOpeningDate" ng-model="module.openingDate" ng-disabled="isDisabled==true" max="9999-12-31" required ng-model-options="{timezone: 'UTC'}">
                             <div ng-show="form.moduleOpeningDate.$dirty &amp;&amp; form.moduleOpeningDate.$invalid">
                                 <span ng-show="form.moduleOpeningDate.$error.required" class="errortxt">{{resourceBundle.openingDateValidation}}</span>
                                 <span ng-show="form.moduleOpeningDate.$invalid" class="errortxt">{{resourceBundle.invalidDateError}}</span>
@@ -42,7 +42,8 @@
                                         <span class="glyphicon glyphicon-info-sign"></span>
                                         <span>{{resourceBundle.selectDatasets}}</span>
                                     </div>
-                                    <multiselect resource-bundle="resourceBundle" left-list="nonAssociatedDataSets" name="name" ng-model="associatedDatasets" disabled="!isNewMode" on-right-item-select="selectDataSet(item)" on-move-left="discardDataSet(module, items)" select-first-item="true"></multiselect>
+                                    <multiselect resource-bundle="resourceBundle" left-list="nonAssociatedDataSets" name="name" ng-model="associatedDatasets" on-right-item-select="selectDataSet(item)" on-move-left="discardDataSet(module, items)" disabled="!isNewMode"
+                                                 select-first-item="true"></multiselect>
                                 </div>
                                 <div class="details" ng-show="selectedDataset.sections.length > 0">
                                     <span ng-hide="areDataElementsSelectedForSection()">{{resourceBundle.selectDatasetSection}}</span>

@@ -1,0 +1,35 @@
+<table class="table dataentrytable" ng-if="itemsArePresent(itemsAwaitingSubmission) || itemsArePresent(itemsAwaitingApprovalAtOtherLevels)" locked-table-header>
+    <thead>
+        <tr class="title">
+            <th class="col-md-4">{{resourceBundle.moduleLabel|uppercase}}</th>
+            <th class="col-md-4">{{resourceBundle.itemsAwaitingDataSubmissionLabel|uppercase}}</th>
+            <th class="col-md-4">{{resourceBundle.awaitingApproval|uppercase}}</th>
+        </tr>
+    </thead>
+
+    <tbody ng-repeat="(opUnitName, modules) in moduleMap">
+    <tr class="header-with-opunit">
+        <th colspan="3" class="col-md-4">{{ opUnitName }}</th>
+    </tr>
+    <tr ng-repeat="moduleName in modules">
+        <td class="col-md-4"><strong>{{ moduleName }}</strong></td>
+        <td class="col-md-4">
+            <ul class="list-unstyled">
+                <li ng-repeat="week in itemsAwaitingSubmission[opUnitName][moduleName] | orderBy: 'period'" ng-if="week.active">
+                    <a ng-if="hasRoles(['Data entry user'])" class="period" ng-class="{ 'error-label': week.failedToSync }" ng-href="{{getTemplateUrl(week)}}">{{formatPeriods(week.period)}}</a>
+                    <span ng-if="!hasRoles(['Data entry user'])">{{formatPeriods(week.period)}}</span>
+                </li>
+            </ul>
+        </td>
+        <td class="col-md-4">
+            <ul class="list-unstyled">
+                <li ng-repeat="week in itemsAwaitingApprovalAtOtherLevels[opUnitName][moduleName] | orderBy: 'period'" ng-if="week.active">
+                    <a class="period" ng-href="{{getTemplateUrl(week)}}">{{formatPeriods(week.period)}}</a>
+                    <span ng-if="week.awaitingActionAtProjectLevelApprover">- {{ resourceBundle.itemsAwaitingApprovalAtProjectLevel }}</span>
+                    <span ng-if="week.awaitingActionAtCoordinationLevelApprover">- {{ resourceBundle.itemsAwaitingApprovalAtCoordinationLevel }}</span>
+                </li>
+            </ul>
+        </td>
+    </tr>
+    </tbody>
+</table>

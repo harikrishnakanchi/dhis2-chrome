@@ -13,7 +13,7 @@
                     <li class="form-group">
                         <label for="moduleName" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.moduleNameLabel }}</label>
                         <div class="col-sm-4">
-                            <input type="text" class="form-control" name="moduleName{{$index}}" id="moduleName{{$index}}" placeholder="{{ resourceBundle.moduleNameLabel }}" ng-model="module.name" not-in="allModules" ng-disabled="isDisabled==true" required>
+                            <input type="text" class="form-control" name="moduleName{{$index}}" id="moduleName{{$index}}" placeholder="{{ resourceBundle.moduleNameLabel }}" ng-model="module.name" not-in="otherModules" ng-disabled="isDisabled==true" required>
                             <div ng-show="form.moduleName{{$index}}.$dirty &amp;&amp; form.moduleName{{$index}}.$invalid">
                                 <span class="errortxt" ng-show="form.moduleName{{$index}}.$error.required">{{resourceBundle.nameValidation}}</span>
                                 <span class="errortxt" ng-show="form.moduleName{{$index}}.$error.isWithin">{{resourceBundle.alreadyExists}}</span>
@@ -23,7 +23,7 @@
                     <li class="form-group">
                         <label for="moduleOpeningDate" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.openingDateLabel }}</label>
                         <div class="col-sm-6 col-md-6">
-                            <input type="date" name="moduleOpeningDate" ng-model="module.openingDate" ng-disabled="isDisabled==true" max="9999-12-31" required>
+                            <input type="date" name="moduleOpeningDate" ng-model="module.openingDate" ng-disabled="isDisabled==true" max="9999-12-31" required ng-model-options="{timezone: 'UTC'}">
                             <div ng-show="form.moduleOpeningDate.$dirty &amp;&amp; form.moduleOpeningDate.$invalid">
                                 <span ng-show="form.moduleOpeningDate.$error.required" class="errortxt">{{resourceBundle.openingDateValidation}}</span>
                                 <span ng-show="form.moduleOpeningDate.$invalid" class="errortxt">{{resourceBundle.invalidDateError}}</span>
@@ -64,18 +64,59 @@
                                             <div class="collapse-head">
                                                 <h5 ng-click="changeCollapsed(section.id)">{{section.name}}</h5>
                                             </div>
-                                            <div collapse="getCollapsed(section.id)" class="collapse-body">
+                                            <div collapse="getCollapsed(section.id)" class="collapse-body data-element-with-options-header">
                                                 <ul>
-                                                    <li ng-repeat="de in section.programStageDataElements">
+                                                    <li ng-repeat="de in section.dataElementsWithOptions" ng-init="de.dataElement.isDataElementExpanded = false">
+                                                        <div class="collapse-head">
+                                                            <div class="data-element-with-options" ng-click="de.dataElement.isDataElementExpanded = !de.dataElement.isDataElementExpanded">
+                                                            <span class="glyphicon"
+                                                                  ng-class="{'glyphicon-chevron-right':!de.dataElement.isDataElementExpanded, 'glyphicon-chevron-down':de.dataElement.isDataElementExpanded}" aria-hidden="true"></span>  {{ de.dataElement.formName}}
+                                                                <span ng-class="{'required': de.compulsory}"></span>
+                                                                <a class="description-popup-icon grey"
+                                                                   description-popup
+                                                                   dp-title="{{ de.dataElement.formName }}"
+                                                                   dp-desc="{{ de.dataElement.description }}">
+                                                                    <i class="fa fa-info-circle"
+                                                                       tooltip-placement="top"></i>
+                                                                </a>
+                                                            <input type="checkbox"
+                                                                   ng-disabled="de.compulsory || isDisabled==true"
+                                                                   ng-model="de.dataElement.isIncluded"
+                                                                   ng-click="stopPropagation($event)" />
+                                                            </div>
+                                                        </div>
+                                                        <div collapse="!de.dataElement.isDataElementExpanded" class="collapse-body" ng-class="{'disabled': !de.dataElement.isIncluded}">
+                                                            <ul>
+                                                                <li ng-repeat="option in de.dataElement.optionSet.options" class="data-element-options">
+                                                                  <span>
+                                                                    <input type="checkbox" ng-model="option.isSelected"
+                                                                           ng-change="onOptionSelectionChange(de.dataElement.optionSet, option)">
+                                                                        {{ option.name}}
+                                                                  </span>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+
+                                                    </li>
+                                                    <li ng-repeat="de in section.dataElementsWithoutOptions">
+                                                        <div class = "description-popup">
                                                         <label>
-                                                            <input type="checkbox" ng-disabled="de.compulsory || isDisabled==true" ng-model="de.dataElement.isIncluded">
-                                                            <a class="changeColor"
+                                                            <input type="checkbox"
+                                                                   ng-disabled="de.compulsory || isDisabled==true"
+                                                                   ng-model="de.dataElement.isIncluded">
+                                                            <label ng-class="{'required': de.compulsory}" dp-title="{{ de.dataElement.formName }}">
+                                                                {{ de.dataElement.formName }}
+                                                            </label>
+                                                            <a class="description-popup-icon grey"
                                                                description-popup
                                                                dp-title="{{ de.dataElement.formName }}"
-                                                               dp-desc="{{ de.dataElement.description }}">
-                                                            {{de.dataElement.formName}}
+                                                               dp-desc="{{ de.dataElement.description }}"
+                                                            >
+                                                                <i class="fa fa-info-circle"
+                                                                   tooltip-placement="top"></i>
                                                             </a>
                                                         </label>
+                                                        </div>
                                                     </li>
                                                 </ul>
                                             </div>

@@ -1,12 +1,15 @@
-define(["lodash", "moment"],
-    function(_, moment) {
+define(["lodash", "moment", "interpolate"],
+    function(_, moment, interpolate) {
         return function($scope, $routeParams, $q, $location, $rootScope, orgUnitRepository) {
 
             var deregisterWeekModulerWatcher = $scope.$watchCollection('[week, currentModule, resourceBundle]', function() {
                 $scope.errorMessage = undefined;
                 if ($scope.week && $scope.currentModule) {
                     if (isOpeningDateInFuture()) {
-                        $scope.errorMessage = $scope.resourceBundle.openingDateInFutureError + moment($scope.currentModule.openingDate).isoWeek();
+                        $scope.errorMessage = interpolate($scope.resourceBundle.openingDateInFutureError, {
+                            week: moment($scope.currentModule.openingDate).isoWeek(),
+                            year: moment($scope.currentModule.openingDate).year()
+                        });
                         $scope.$emit('errorInfo', $scope.errorMessage);
                         return;
                     }
@@ -56,7 +59,9 @@ define(["lodash", "moment"],
 
             var setAvailableModules = function() {
                 if ($rootScope.currentUser && $rootScope.currentUser.selectedProject) {
-                    return orgUnitRepository.getAllModulesInOrgUnits($rootScope.currentUser.selectedProject.id).then(function(modules) {
+                    return orgUnitRepository.getAllModulesInOrgUnits($rootScope.currentUser.selectedProject.id)
+                        .then(orgUnitRepository.enrichWithParent)
+                        .then(function(modules) {
                         $scope.modules = getFilteredModulesWithDisplayNames(modules);
                     });
                 } else {

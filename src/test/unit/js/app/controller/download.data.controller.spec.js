@@ -13,6 +13,7 @@ define(["downloadDataController", "angularMocks", "utils", "lodash", "chromeUtil
                 timeout = $timeout;
 
                 scope.resourceBundle = {};
+                scope.locale = 'someLocale';
 
                 spyOn(hustle, "publishOnce").and.returnValue(utils.getPromise(q, {}));
                 spyOn(chromeUtils, "createNotification").and.returnValue(utils.getPromise(q, {}));
@@ -35,8 +36,9 @@ define(["downloadDataController", "angularMocks", "utils", "lodash", "chromeUtil
 
                 var getHustleMessage = function(type) {
                     return {
-                        "type": type,
-                        "data": []
+                        type: type,
+                        data: [],
+                        locale: scope.locale
                     };
                 };
 

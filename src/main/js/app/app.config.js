@@ -61,6 +61,7 @@ require.config({
         "loginController": "app/controller/login.controller",
         "countryController": "app/controller/country.controller",
         "confirmDialogController": "app/controller/confirm.dialog.controller",
+        "alertDialogController": "app/controller/alert.dialog.controller",
         "notificationDialogController": "app/controller/notification.dialog.controller",
         "projectUserController": "app/controller/project.user.controller",
         "indicatorController": "app/controller/indicator.controller",
@@ -92,6 +93,7 @@ require.config({
         "eventService": "app/service/event.service",
         "orgUnitGroupService": "app/service/orgunit.group.service",
         "filesystemService": "app/service/filesystem.service",
+        "historyService": "app/service/history.service",
 
         //Repositories
         "repositories": "app/repository/repositories",
@@ -117,6 +119,7 @@ require.config({
         "excludedDataElementsRepository": "app/repository/excluded.dataelements.repository",
         "pivotTableRepository": "app/repository/pivot.table.repository",
         "dataSyncFailureRepository": "app/repository/data.sync.failure.repository",
+        "excludedLineListOptionsRepository": "app/repository/excluded.line.list.options.repository",
 
         //Models
         "chart": "app/models/chart",
@@ -124,6 +127,8 @@ require.config({
         "moduleDataBlock": "app/models/module.data.block",
         "customAttributes": "app/models/custom.attributes",
         "pivotTableData": "app/models/pivot.table.data",
+        "chartData": "app/models/chart.data",
+        "analyticsData": "app/models/analytics.data",
 
         //Factories
         "factories": "app/factories/factories",

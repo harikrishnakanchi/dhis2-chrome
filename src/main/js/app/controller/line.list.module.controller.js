@@ -1,12 +1,12 @@
 define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
     function(_, orgUnitMapper, moment, systemSettingsTransformer) {
         return function($scope, $hustle, orgUnitRepository, excludedDataElementsRepository, $q, $modal,
-            programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService) {
+            programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService, excludedLineListOptionsRepository) {
 
             $scope.module = {};
             $scope.isExpanded = {};
             $scope.isDisabled = false;
-            $scope.allModules = [];
+            $scope.otherModules = [];
             $scope.collapseSection = {};
             $scope.excludedDataElements = [];
             $scope.allPrograms = [];
@@ -17,7 +17,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 var initModule = function() {
                     if ($scope.isNewMode) {
                         $scope.module = {
-                            'openingDate': moment().toDate(),
+                            'openingDate': moment.utc().toDate(),
                             'timestamp': new Date().getTime(),
                             "serviceType": "Linelist",
                             "dataModelType": "New",
@@ -27,7 +27,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                         $scope.module = {
                             'id': $scope.orgUnit.id,
                             'name': $scope.orgUnit.name,
-                            'openingDate': moment($scope.orgUnit.openingDate).toDate(),
+                            'openingDate': moment.utc($scope.orgUnit.openingDate).toDate(),
                             'serviceType': "Linelist",
                             "dataModelType": "New",
                             "parent": $scope.orgUnit.parent,
@@ -39,16 +39,28 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
                 var getAllModules = function() {
                     return orgUnitRepository.getAllModulesInOrgUnits([$scope.module.parent.id]).then(function(modules) {
-                        $scope.allModules = _.pluck(modules, "name");
+                        $scope.otherModules = _.difference(_.pluck(modules, "name"), [$scope.module.name]);
                     });
                 };
 
                 var getExcludedDataElements = function() {
-                    if (!$scope.module.id)
-                        return;
                     return excludedDataElementsRepository.get($scope.module.id).then(function(excludedDataElementsSetting) {
                         $scope.excludedDataElements = excludedDataElementsSetting ? _.pluck(excludedDataElementsSetting.dataElements, "id") : undefined;
                     });
+                };
+
+                var getExcludedLineListOptions = function () {
+                    return excludedLineListOptionsRepository.get($scope.module.id).then(function (excludedLineListOptions) {
+                        $scope.excludedLineListOptions = excludedLineListOptions;
+                    });
+                };
+
+                var getExcludedModuleData = function () {
+                    if (!$scope.module.id) {
+                        return;
+                    }
+                    return getExcludedDataElements()
+                        .then(getExcludedLineListOptions);
                 };
 
                 var getAssociatedProgram = function() {
@@ -76,8 +88,64 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 };
 
                 var getEnrichedProgram = function(progId) {
+                    var buildProgramDataElements = function () {
+                        var isDataElementWithOptions = function (programStageDataElement) {
+                            var dataElementHasOptions = !!programStageDataElement.dataElement.optionSet;
+                            var isReferralLocation = programStageDataElement.dataElement.offlineSummaryType == 'referralLocations';
+                            return dataElementHasOptions && !isReferralLocation;
+                        };
+
+                        _.forEach($scope.enrichedProgram.programStages, function (programStage) {
+                            _.forEach(programStage.programStageSections, function (programStageSection) {
+                                programStageSection.dataElementsWithOptions = _.filter(programStageSection.programStageDataElements, isDataElementWithOptions);
+                                programStageSection.dataElementsWithoutOptions = _.reject(programStageSection.programStageDataElements, isDataElementWithOptions);
+                            });
+                        });
+                    };
+
+                    var setDataElementOptionStatus = function () {
+
+                        var allDataElements = _.chain($scope.enrichedProgram.programStages)
+                            .map('programStageSections')
+                            .flatten()
+                            .map('dataElementsWithOptions')
+                            .flatten()
+                            .map('dataElement')
+                            .value();
+
+                        var markAllOptionsAsTrue = function (options) {
+                            _.each(options, function (option) {
+                                option.isSelected = true;
+                            });
+                        };
+
+                        var isModuleConfiguredWithExcludedLineListOptions = !!$scope.excludedLineListOptions;
+
+                        if (isModuleConfiguredWithExcludedLineListOptions) {
+                            var excludedOptionsByDataElement = _.indexBy($scope.excludedLineListOptions.dataElements, 'dataElementId');
+                            _.each(allDataElements, function (dataElement) {
+                                var dataElementExcludedOptions = excludedOptionsByDataElement[dataElement.id];
+                                var isAnyDataElementOptionsUnSelected = !!dataElementExcludedOptions;
+                                if(isAnyDataElementOptionsUnSelected) {
+                                    var dataElementOptions = dataElementExcludedOptions.excludedOptionIds;
+                                    _.each(dataElement.optionSet.options, function (option) {
+                                        option.isSelected = !_.contains(dataElementOptions, option.id);
+                                    });
+                                } else {
+                                    markAllOptionsAsTrue(dataElement.optionSet.options);
+                                }
+                            });
+                        } else {
+                            _.each(allDataElements, function (dataElement) {
+                                markAllOptionsAsTrue(dataElement.optionSet.options);
+                            });
+                        }
+                    };
+
                     return programRepository.get(progId, $scope.excludedDataElements).then(function(data) {
                         $scope.enrichedProgram = translationsService.translate(data);
+                        buildProgramDataElements();
+                        setDataElementOptionStatus();
                         resetCollapse();
                     });
                 };
@@ -117,11 +185,12 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     return $q.all([programRepository.getAll()]);
                 };
 
+
                 initModule().then(getPrograms)
                     .then(translatePrograms)
                     .then(setPrograms)
                     .then(getAllModules)
-                    .then(getExcludedDataElements)
+                    .then(getExcludedModuleData)
                     .then(getAssociatedProgram)
                     .then(setUpModule);
             };
@@ -138,14 +207,18 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 $scope.$parent.closeNewForm($scope.orgUnit);
             };
 
-            var publishMessage = function(data, action, desc) {
-                return $hustle.publish({
+            var publishJob = function(publishMethod, data, action, desc) {
+                return publishMethod({
                     "data": data,
                     "type": action,
                     "locale": $scope.locale,
                     "desc": desc
                 }, "dataValues");
             };
+
+            var publishMessage = _.partial(publishJob, $hustle.publish);
+
+            var publishMessageOnlyOnce = _.partial(publishJob, $hustle.publishOnce);
 
             var resetCollapse = function() {
                 $scope.collapseSection = {};
@@ -180,6 +253,15 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 modalInstance.result.then(okCallback);
             };
 
+            var showAlert = function(messages) {
+                $scope.modalMessages = messages;
+                $modal.open({
+                    templateUrl: 'templates/alert-dialog.html',
+                    controller: 'alertDialogController',
+                    scope: $scope
+                });
+            };
+
             $scope.disable = function(module) {
                 var modalMessages = {
                     "confirmationMessage": $scope.resourceBundle.disableOrgUnitConfirmationMessage
@@ -210,13 +292,44 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                         $scope.resourceBundle.uploadSystemSettingDesc + enrichedModule.name));
             };
 
-            $scope.save = function(module) {
+            var saveExcludedLineListOptions = function (enrichedModule) {
+                var dataElementsWithOptions = _.chain($scope.enrichedProgram.programStages)
+                    .map('programStageSections')
+                    .flatten()
+                    .map('dataElementsWithOptions')
+                    .flatten()
+                    .map('dataElement')
+                    .filter('isIncluded')
+                    .value();
+                var excludedLineListOptions = {};
+                excludedLineListOptions.moduleId = enrichedModule.id;
+                excludedLineListOptions.clientLastUpdated = moment().toISOString();
+                excludedLineListOptions.dataElements = _.transform(dataElementsWithOptions, function (dataElements, dataElement) {
+                    var excludedOptionIds = _.map(_.reject(dataElement.optionSet && dataElement.optionSet.options, 'isSelected'), 'id');
+                    if(excludedOptionIds.length) {
+                        dataElements.push({
+                            dataElementId: dataElement.id,
+                            optionSetId: dataElement.optionSet.id,
+                            excludedOptionIds: excludedOptionIds
+                        });
+                    }
+                });
+                return excludedLineListOptionsRepository.upsert(excludedLineListOptions).then(function () {
+                    return publishMessageOnlyOnce(enrichedModule.id, "uploadExcludedOptions", $scope.resourceBundle.uploadExcludedOptionsDesc + enrichedModule.name);
+                });
+            };
+
+            $scope.save = function() {
                 var enrichedModule = {};
                 var populationDatasetId, referralDatasetId;
 
                 var associateToProgram = function(program, originOrgUnits) {
                     return programRepository.associateOrgUnits(program, originOrgUnits).then(function() {
-                        publishMessage(program, "uploadProgram", $scope.resourceBundle.uploadProgramDesc + _.pluck(originOrgUnits, "name"));
+                        var programIdsAndOrgunitIds = {
+                            programIds: [program.id],
+                            orgUnitIds: _.map(originOrgUnits, 'id')
+                        };
+                        return publishMessage(programIdsAndOrgunitIds, 'associateOrgunitToProgram', $scope.resourceBundle.uploadProgramDesc + _.pluck(originOrgUnits, "name"));
                     });
                 };
 
@@ -287,6 +400,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     .then(_.partial(saveExcludedDataElements, enrichedModule))
                     .then(createOriginOrgUnitsAndGroups)
                     .then(associateMandatoryDatasetsToModule)
+                    .then(_.partial(saveExcludedLineListOptions, enrichedModule))
                     .then(_.partial(onSuccess, enrichedModule), onError)
                     .finally(function() {
                         $scope.loading = false;
@@ -297,10 +411,12 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 var enrichedModule = orgUnitMapper.mapToModule(module, module.id, 6);
 
                 $scope.loading = true;
-                return $q.all([saveExcludedDataElements(enrichedModule),
-                        orgUnitRepository.upsert(enrichedModule),
-                        publishMessage(enrichedModule, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + enrichedModule.name)
-                    ])
+                return $q.all([
+                    saveExcludedDataElements(enrichedModule),
+                    saveExcludedLineListOptions(enrichedModule),
+                    orgUnitRepository.upsert(enrichedModule),
+                    publishMessage(enrichedModule, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + enrichedModule.name)
+                ])
                     .then(_.partial(onSuccess, enrichedModule), onError)
                     .finally(function() {
                         $scope.loading = false;
@@ -309,6 +425,22 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
             $scope.shouldDisableSaveOrUpdateButton = function() {
                 return _.isEmpty($scope.program.name);
+            };
+
+            $scope.onOptionSelectionChange = function (optionSet, option) {
+                var areAtleastTwoOptionsSelected = _.filter(optionSet.options, {isSelected: true}).length >= 2;
+                if(!areAtleastTwoOptionsSelected) {
+                    option.isSelected = true;
+                    var modalMessages = {
+                        confirmationMessage: $scope.resourceBundle.atleastTwoOptionsMustBeSelected,
+                        ok: $scope.resourceBundle.okLabel
+                    };
+                    showAlert(modalMessages);
+                }
+            };
+
+            $scope.stopPropagation = function (event) {
+                event.stopPropagation();
             };
 
             init();

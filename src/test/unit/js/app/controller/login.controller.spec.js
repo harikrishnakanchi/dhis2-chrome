@@ -11,6 +11,9 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             hustle = $hustle;
             q = $q;
 
+            scope.resourceBundle = {};
+            scope.locale = 'someLocale';
+
             rootScope = {
                 "hasRoles": jasmine.createSpy("hasRoles").and.returnValue(false)
             };
@@ -280,9 +283,10 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             scope.$apply();
 
             expect(hustle.publishOnce).toHaveBeenCalledWith({
-                "type": "downloadProjectData",
-                "data": []
-            }, "dataValues");
+                type: 'downloadProjectData',
+                data: [],
+                locale: scope.locale
+            }, 'dataValues');
         });
 
         it("should start sync project data if the currentUser and previousUsers are admin and non-admin users", function () {
@@ -330,9 +334,10 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             scope.$apply();
 
             expect(hustle.publishOnce).toHaveBeenCalledWith({
-                "type": "downloadProjectData",
-                "data": []
-            }, "dataValues");
+                type: 'downloadProjectData',
+                data: [],
+                locale: scope.locale
+            }, 'dataValues');
         });
 
         it("should refresh translations after login", function () {

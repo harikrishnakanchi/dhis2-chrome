@@ -1,10 +1,16 @@
 define(["moment", "lodash"], function(moment, _) {
+    var ISO_8601_DATE_FORMAT = 'YYYY-MM-DD';
+
     var toDhisFormat = function(m) {
         return m.format("GGGG[W]WW");
     };
 
     var getFormattedPeriod = function(period) {
         return moment(period, "GGGG[W]W").format("GGGG[W]WW");
+    };
+
+    var toISODate = function (datetime) {
+        return moment.utc(datetime).format(ISO_8601_DATE_FORMAT);
     };
 
     var max = function(dateStrings) {
@@ -39,6 +45,7 @@ define(["moment", "lodash"], function(moment, _) {
 
     return {
         toDhisFormat: toDhisFormat,
+        toISODate: toISODate,
         max: max,
         getFormattedPeriod: getFormattedPeriod,
         subtractWeeks: subtractWeeks,
