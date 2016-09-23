@@ -1,7 +1,7 @@
 define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], function (_, moment, dateUtils, properties, customAttributes) {
     return function ($q, dataService, eventService, userPreferenceRepository, orgUnitRepository, datasetRepository, changeLogRepository, dataRepository, programEventRepository) {
         var CHANGE_LOG_PREFIX = 'yearlyDataValues',
-            CHUNK_SIZE = 10;
+            CHUNK_SIZE = 11;
 
         var getProjectIds = function () {
             return userPreferenceRepository.getCurrentUsersProjectIds();

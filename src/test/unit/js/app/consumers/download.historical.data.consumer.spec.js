@@ -27,7 +27,7 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                     "2016W07", "2016W08", "2016W09", "2016W10", "2016W11", "2016W12", "2016W13", "2016W14", "2016W15", "2016W16",
                     "2016W17", "2016W18", "2016W19", "2016W20", "2016W21", "2016W22", "2016W23", "2016W24", "2016W25", "2016W26"
                 ];
-                periodChunkSize = 10;
+                periodChunkSize = 11;
 
                 userPreferenceRepository = UserPreferenceRepository();
                 spyOn(userPreferenceRepository, 'getCurrentUsersProjectIds').and.returnValue(utils.getPromise(q, mockProjectIds));
