@@ -88,7 +88,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.locale = "en";
 
                 scope.resourceBundle = {
-                    "disableOrgUnitDesc": "disable organisation unit: ",
+                    "disableOrgUnitDesc": "disable organisation unit",
                     "upsertOrgUnitDesc": "save organisation unit: ",
                     "uploadSystemSettingDesc": "upload sys settings for ",
                     "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit ",
@@ -992,7 +992,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     data: expectedModule,
                     type: "upsertOrgUnit",
                     locale: "en",
-                    desc: "disable organisation unit: test1"
+                    desc: "disable organisation unit"
                 };
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})

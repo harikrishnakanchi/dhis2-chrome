@@ -1,5 +1,5 @@
-define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
-    function(_, orgUnitMapper, moment, systemSettingsTransformer) {
+define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransformer"],
+    function(_, orgUnitMapper, moment, interpolate, systemSettingsTransformer) {
         return function($scope, $hustle, orgUnitRepository, datasetRepository, systemSettingRepository, excludedDataElementsRepository, db, $location, $q, $modal,
             orgUnitGroupHelper, originOrgunitCreator, translationsService) {
 
@@ -216,7 +216,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 var enrichedModules = orgUnitMapper.mapToModule(module, module.id, 6);
                 var payload = orgUnitMapper.disable(enrichedModules);
                 $scope.isDisabled = true;
-                $q.all([orgUnitRepository.upsert(payload), publishMessage(payload, "upsertOrgUnit", $scope.resourceBundle.disableOrgUnitDesc + payload.name)])
+                $q.all([orgUnitRepository.upsert(payload), publishMessage(payload, "upsertOrgUnit", interpolate($scope.resourceBundle.disableOrgUnitDesc, { orgUnit: payload.name }))])
                     .then(function() {
                         if ($scope.$parent.closeNewForm) $scope.$parent.closeNewForm(module, "disabledModule");
                     });

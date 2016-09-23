@@ -115,7 +115,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 scope.locale = "en";
 
                 scope.resourceBundle = {
-                    "disableOrgUnitDesc": "disable organisation unit: ",
                     "upsertOrgUnitDesc": "save organisation unit: ",
                     "associateOrgUnitToDatasetDesc": "associate datasets for ",
                     "uploadSystemSettingDesc": "upload sys settings for ",
