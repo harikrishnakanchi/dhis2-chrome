@@ -1,4 +1,4 @@
-define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, moment, orgUnitMapper) {
+define(["lodash", "dhisId", "moment","interpolate", "orgUnitMapper"], function(_, dhisId, moment, interpolate, orgUnitMapper) {
     return function($scope, $hustle, orgUnitRepository, $q, $location, $timeout, $anchorScroll) {
         $scope.openOpeningDate = function($event) {
             $event.preventDefault();
@@ -47,7 +47,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                     "data": data,
                     "type": "upsertOrgUnit",
                     "locale": $scope.locale,
-                    "desc": $scope.resourceBundle.upsertOrgUnitDesc + data[0].name
+                    "desc": interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: data[0].name })
                 }, "dataValues").then(function() {
                     return data;
                 });

@@ -1,4 +1,4 @@
-define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhisId, orgUnitMapper) {
+define(["lodash", "moment", "dhisId","interpolate", "orgUnitMapper"], function(_, moment, dhisId, interpolate, orgUnitMapper) {
     return function($scope, $hustle, $q, patientOriginRepository, orgUnitRepository, datasetRepository, programRepository, originOrgunitCreator, orgUnitGroupHelper) {
         var patientOrigins = [];
         var oldName = "";
@@ -95,7 +95,7 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                     return orgUnitRepository.findAllByParent(module.id).then(function(siblingOriginOrgUnits) {
                         return originOrgunitCreator.create(module, $scope.patientOrigin).then(function(originOrgUnits) {
                             orgUnitsForGroups = isLinelistService(module) ? orgUnitsForGroups.concat(originOrgUnits) : orgUnitsForGroups.concat(module);
-                            return publishMessage(originOrgUnits, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + _.uniq(_.pluck(originOrgUnits, "name"))).then(function () {
+                            return publishMessage(originOrgUnits, "upsertOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: _.uniq(_.pluck(originOrgUnits, "name")) })).then(function () {
                                 return doAssociations(originOrgUnits, siblingOriginOrgUnits[0]);
                             });
                         });
@@ -185,7 +185,7 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                     publishMessage(updatedPatientOrigin.orgUnit, "uploadPatientOriginDetails", $scope.resourceBundle.uploadPatientOriginDetailsDesc + _.pluck(updatedPatientOrigin.origins, "name"));
                 });
                 orgUnitRepository.upsert(originsToUpsert).then(function() {
-                    publishMessage(originsToUpsert, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + _.uniq(_.pluck(originsToUpsert, "name")));
+                    publishMessage(originsToUpsert, "upsertOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: _.uniq(_.pluck(originsToUpsert, "name")) }));
                 });
             };
 

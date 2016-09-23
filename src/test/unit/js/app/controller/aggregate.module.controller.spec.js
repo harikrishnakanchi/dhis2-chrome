@@ -89,7 +89,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
 
                 scope.resourceBundle = {
                     "disableOrgUnitDesc": "disable organisation unit",
-                    "upsertOrgUnitDesc": "save organisation unit: ",
+                    "upsertOrgUnitDesc": "save organisation unit",
                     "uploadSystemSettingDesc": "upload sys settings for ",
                     "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit ",
                     "removeOrgUnitFromDatasetDesc": "remove selected services from module "
@@ -181,7 +181,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     data: enrichedAggregateModule,
                     type: "upsertOrgUnit",
                     locale: "en",
-                    desc: "save organisation unit: Module1"
+                    desc: "save organisation unit"
                 }, "dataValues");
             });
 
@@ -601,7 +601,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     data: expectedModule,
                     type: "upsertOrgUnit",
                     locale: "en",
-                    desc: "save organisation unit: module NEW name"
+                    desc: "save organisation unit"
                 }, "dataValues");
             });
 
@@ -1097,7 +1097,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     "data": originOrgUnit,
                     "type": "upsertOrgUnit",
                     "locale": "en",
-                    "desc": "save organisation unit: origin org unit"
+                    "desc": "save organisation unit"
                 }, "dataValues"]);
             });
 

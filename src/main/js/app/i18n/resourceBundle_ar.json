@@ -199,7 +199,7 @@
     "downloadDataDesc": "تحميل الملفات من نظام المعلومات الصحي",
     "syncModuleDataBlockDesc": "تحميل البيانات والموافقات ل {{period}}",
     "disableOrgUnitDesc": "تعطيل وحدة التنظيم {{orgUnit}}",
-    "upsertOrgUnitDesc": "حفظ وحدة التنظيم",
+    "upsertOrgUnitDesc": "حفظ وحدة التنظيم {{orgUnit}}",
     "createUserDesc": "أنشئ مستخدما",
     "updateUserDesc": "تحديث المستخدم",
     "upsertOrgUnitGroupsDesc": "تعيين وحدة المؤسسة إلى المجموعات المناسبة",

@@ -40,7 +40,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             };
 
             scope.resourceBundle = {
-                "upsertOrgUnitDesc": "upsert org unit "
+                "upsertOrgUnitDesc": "upsert org unit"
             };
 
             scope.locale = "en";
@@ -249,7 +249,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 data: [expectedNewOrgUnit],
                 type: "upsertOrgUnit",
                 locale: "en",
-                desc: "upsert org unit blah"
+                desc: "upsert org unit"
             }, "dataValues");
         });
 

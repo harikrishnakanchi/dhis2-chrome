@@ -199,7 +199,7 @@
     "downloadDataDesc": "download data from DHIS",
     "syncModuleDataBlockDesc": "upload data and approvals for {{period}}",
     "disableOrgUnitDesc": "disable organisation unit: {{orgUnit}}",
-    "upsertOrgUnitDesc": "save organisation unit: ",
+    "upsertOrgUnitDesc": "save organisation unit: {{orgUnit}}",
     "createUserDesc": "create user ",
     "updateUserDesc": "update user ",
     "upsertOrgUnitGroupsDesc": "assign organisation unit to appropriate groups",

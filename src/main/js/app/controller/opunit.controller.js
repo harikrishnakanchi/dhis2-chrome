@@ -1,4 +1,4 @@
-define(["lodash", "dhisId", "moment", "orgUnitMapper", "customAttributes"], function(_, dhisId, moment, orgUnitMapper, CustomAttributes) {
+define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAttributes"], function(_, dhisId, moment, interpolate, orgUnitMapper, CustomAttributes) {
     return function($scope, $q, $hustle, orgUnitRepository, orgUnitGroupHelper, db, $location, $modal, patientOriginRepository, orgUnitGroupSetRepository) {
         $scope.isDisabled = false;
         $scope.showOpUnitCode = false;
@@ -23,7 +23,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper", "customAttributes"], func
                 "data": data,
                 "type": "upsertOrgUnit",
                 "locale": $scope.locale,
-                "desc": $scope.resourceBundle.upsertOrgUnitDesc + data[0].name
+                "desc": interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: data[0].name })
             }, "dataValues");
         };
 
@@ -254,7 +254,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper", "customAttributes"], func
                     publishMessage(updatedPatientOrigin.orgUnit, "uploadPatientOriginDetails", $scope.resourceBundle.uploadPatientOriginDetailsDesc + _.pluck(updatedPatientOrigin.origins, "name"));
                 });
                 orgUnitRepository.upsert(originsToUpsert).then(function() {
-                    publishMessage(originsToUpsert, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + _.uniq(_.pluck(originsToUpsert, "name")));
+                    publishMessage(originsToUpsert, "upsertOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, {orgUnit : _.uniq(_.pluck(originsToUpsert, "name")) }));
                 });
             };
 

@@ -291,7 +291,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
 
                 var createModules = function() {
                     return $q.all([orgUnitRepository.upsert(enrichedModule),
-                        publishMessage(enrichedModule, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + enrichedModule.name)
+                        publishMessage(enrichedModule, "upsertOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: enrichedModule.name }))
                     ]);
                 };
 
@@ -301,7 +301,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
 
                 var createOriginOrgUnits = function() {
                     return originOrgunitCreator.create(enrichedModule).then(function(originOrgUnits) {
-                        return publishMessage(originOrgUnits, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + _.pluck(originOrgUnits, "name"))
+                        return publishMessage(originOrgUnits, "upsertOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: _.pluck(originOrgUnits, "name")}))
                             .then(_.partial(associateToDatasets, _.map($scope.originDatasets, 'id'), originOrgUnits));
                     });
                 };
@@ -333,7 +333,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
 
                 $scope.loading = true;
                 return $q.all([saveExcludedDataElements(enrichedModule), orgUnitRepository.upsert(enrichedModule),
-                        publishMessage(enrichedModule, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + enrichedModule.name)
+                        publishMessage(enrichedModule, "upsertOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: enrichedModule.name }))
                     ])
                     .then(updateOrgUnitDatasetAssociations)
                     .then(_.partial(onSuccess, enrichedModule), onError)

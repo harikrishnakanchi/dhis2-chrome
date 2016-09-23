@@ -28,7 +28,7 @@ define(["countryController", "angularMocks", "utils", "moment", "timecop", "dhis
             scope.locale = "en";
 
             scope.resourceBundle = {
-                "upsertOrgUnitDesc": "create organisation unit: ",
+                "upsertOrgUnitDesc": "create organisation unit"
             };
 
             Timecop.install();
@@ -117,7 +117,7 @@ define(["countryController", "angularMocks", "utils", "moment", "timecop", "dhis
                 "data": [expectedNewOrgUnit],
                 "type": "upsertOrgUnit",
                 "locale": "en",
-                "desc": "create organisation unit: Org1"
+                "desc": "create organisation unit"
             }, 'dataValues');
         });
 

@@ -366,7 +366,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
                 };
 
                 var createModule = function() {
-                    return $q.all([orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + enrichedModule.name)]);
+                    return $q.all([orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: enrichedModule.name }))]);
                 };
 
                 var createOriginOrgUnitsAndGroups = function() {
@@ -375,7 +375,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
                     };
 
                     return originOrgunitCreator.create(enrichedModule).then(function(patientOriginOUPayload) {
-                        return publishMessage(patientOriginOUPayload, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + _.pluck(patientOriginOUPayload, "name"))
+                        return publishMessage(patientOriginOUPayload, "upsertOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: _.pluck(patientOriginOUPayload, "name") }))
                             .then(_.partial(associateToProgram, $scope.program, patientOriginOUPayload))
                             .then(_.partial(associateToDatasets, patientOriginOUPayload))
                             .then(_.partial(createOrgUnitGroups, patientOriginOUPayload));
@@ -415,7 +415,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
                     saveExcludedDataElements(enrichedModule),
                     saveExcludedLineListOptions(enrichedModule),
                     orgUnitRepository.upsert(enrichedModule),
-                    publishMessage(enrichedModule, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + enrichedModule.name)
+                    publishMessage(enrichedModule, "upsertOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: enrichedModule.name }))
                 ])
                     .then(_.partial(onSuccess, enrichedModule), onError)
                     .finally(function() {
