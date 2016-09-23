@@ -194,7 +194,7 @@
     "confirmImport": "نعم، أريد أن استيراد نسخة التطبيق.",
     "confirmImportTitle": "تأكيد استيراد",
     "notificationTitle": "فشل المزامنة",
-    "notificationRetryMessage": "فشل {{job_description}} . ستتم إعادة المحاولة في {{retry_delay}} ساعات.",
+    "notificationRetryMessage": "فشل {{job_description}} . ستتم إعادة المحاولة في {{retry_delay}}.",
     "notificationAbortRetryMessage": "فشل {{job_description}} حتى بعد إعادة المحاولة المتكررة . يرجى المحاولة مرة أخرى أو الاتصال بمشرف.",
     "downloadDataDesc": "تحميل الملفات من نظام المعلومات الصحي",
     "syncModuleDataBlockDesc": "تحميل البيانات والموافقات ل {{period}}",

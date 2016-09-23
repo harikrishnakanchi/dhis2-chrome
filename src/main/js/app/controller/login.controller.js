@@ -109,9 +109,10 @@ define(["md5", "properties", "lodash", "interpolate"], function(md5, properties,
 
                 if (projectChanged || roleChanged) {
                     $hustle.publishOnce({
-                        "type": "downloadProjectData",
-                        "data": []
-                    }, "dataValues");
+                        type: 'downloadProjectData',
+                        data: [],
+                        locale: $scope.locale
+                    }, 'dataValues');
                 }
             });
 

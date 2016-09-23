@@ -8,15 +8,14 @@ define(["properties", "chromeUtils", "interpolate", "moment", "lodash"], functio
             });
         };
 
-        var getRetryDelayInHours = function(retryNumber) {
+        var getRetryDelay = function(retryNumber, locale) {
             var delayInMs = properties.queue.retryDelayConfig[retryNumber];
-            var delayinHrs = delayInMs / (1000 * 60 * 60);
-            return delayinHrs.toString();
+            return moment.duration(delayInMs).locale(locale || 'en').humanize();
         };
 
         var notifyUser = function(job, data) {
             var getCurrentDateTime = function() {
-                return moment().format("MM-DD-YYYY HH:mm") + "\n";
+                return moment().format("YYYY-MM-DD HH:mm") + "\n";
             };
 
             if (data && data.status === 401) {
@@ -27,21 +26,19 @@ define(["properties", "chromeUtils", "interpolate", "moment", "lodash"], functio
                     chromeUtils.sendMessage("productKeyExpired");
                 });
             } else if (job.releases === 2) {
-                getResourceBundle(job.data.locale).then(function(data) {
-                    var resourceBundle = data;
+                getResourceBundle(job.data.locale).then(function(resourceBundle) {
                     var notificationMessage = getCurrentDateTime();
                     notificationMessage += interpolate(resourceBundle.notificationRetryMessage, {
                         job_description: job.data.desc || resourceBundle.downloadDataDesc,
-                        retry_delay: getRetryDelayInHours(3)
+                        retry_delay: getRetryDelay(3, job.data.locale)
                     });
                     chromeUtils.createNotification(resourceBundle.notificationTitle, notificationMessage);
                 });
             } else if (job.releases === properties.queue.maxretries) {
-                getResourceBundle(job.data.locale).then(function(data) {
-                    var resourceBundle = data;
+                getResourceBundle(job.data.locale).then(function(resourceBundle) {
                     var notificationMessage = getCurrentDateTime();
                     notificationMessage += interpolate(resourceBundle.notificationAbortRetryMessage, {
-                        job_description: job.data.desc
+                        job_description: job.data.desc || resourceBundle.downloadDataDesc
                     });
                     chromeUtils.createNotification(resourceBundle.notificationTitle, notificationMessage);
                 });

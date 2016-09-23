@@ -194,7 +194,7 @@
     "confirmImport": "OUI, je veux importer une copie de l'application",
     "confirmImportTitle": "Confirmation de l'importation",
     "notificationTitle": "Echec de la synchronisation",
-    "notificationRetryMessage": "a échoué à {{job_description}}. Nouvelle tentative dans {{retry_delay}} heures.",
+    "notificationRetryMessage": "a échoué à {{job_description}}. Nouvelle tentative dans {{retry_delay}}.",
     "notificationAbortRetryMessage": "a échoué à {{job_description}} malgré plusieurs tentatives. SVP ré-essayer à nouveau ou contacter l'administrateur.",
     "downloadDataDesc": "télécharger les données depuis DHIS",
     "syncModuleDataBlockDesc": "télécharger les données et les validations pour {{period}}",
