@@ -1,6 +1,6 @@
-define(["dataSetRepository", "dataSetTransformer", "testData", "angularMocks", "utils"], function(DatasetRepository, datasetTransformer, testData, mocks, utils) {
-    describe("dataset repository", function() {
-        var mockStore, datasetRepository, q, scope;
+define(["dataSetRepository", "dataSetTransformer", "testData", "angularMocks", "utils"], function(DataSetRepository, dataSetTransformer, testData, mocks, utils) {
+    describe("dataSetRepository", function() {
+        var mockStore, dataSetRepository, q, scope;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
@@ -9,10 +9,10 @@ define(["dataSetRepository", "dataSetTransformer", "testData", "angularMocks", "
             var mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
 
-            datasetRepository = new DatasetRepository(mockDB.db, q);
+            dataSetRepository = new DataSetRepository(mockDB.db, q);
         }));
 
-        it("should transform and get all datasets after filtering out current datasets", function() {
+        it("should transform and get all dataSets after filtering out current dataSets", function() {
             var allDataSets = [{
                 "id": "ds1",
                 "attributeValues": [{
@@ -33,18 +33,18 @@ define(["dataSetRepository", "dataSetTransformer", "testData", "angularMocks", "
 
             mockStore.getAll.and.returnValue(utils.getPromise(q, allDataSets));
 
-            var actualDatasets, actualCatOptCombos;
-            datasetRepository.getAll().then(function(datasets) {
-                actualDatasets = datasets;
+            var actualDataSets, actualCatOptCombos;
+            dataSetRepository.getAll().then(function(dataSets) {
+                actualDataSets = dataSets;
             });
             scope.$apply();
 
-            expect(actualDatasets.length).toEqual(1);
-            expect(actualDatasets[0].id).toEqual("ds1");
-            expect(actualDatasets[0].attributeValues).toBeUndefined();
+            expect(actualDataSets.length).toEqual(1);
+            expect(actualDataSets[0].id).toEqual("ds1");
+            expect(actualDataSets[0].attributeValues).toBeUndefined();
         });
 
-        it("should get all unique datasets by orgUnitIds after filtering out current datasets", function() {
+        it("should get all unique dataSets by orgUnitIds after filtering out current dataSets", function() {
             var allDataSetsForOu1 = [{
                 "id": "ds1",
                 "organisationUnits": [{
@@ -99,20 +99,20 @@ define(["dataSetRepository", "dataSetTransformer", "testData", "angularMocks", "
 
             mockStore.each.and.returnValue(utils.getPromise(q, allDataSetsForOu1.concat(allDataSetsForOu2)));
 
-            var actualDatasets;
-            datasetRepository.findAllForOrgUnits(["ou1", "ou2"]).then(function(datasets) {
-                actualDatasets = datasets;
+            var actualDataSets;
+            dataSetRepository.findAllForOrgUnits(["ou1", "ou2"]).then(function(dataSets) {
+                actualDataSets = dataSets;
             });
             scope.$apply();
 
-            expect(actualDatasets.length).toEqual(2);
-            expect(actualDatasets[0].id).toEqual("ds1");
-            expect(actualDatasets[1].id).toEqual("ds2");
-            expect(actualDatasets[0].attributeValues).toBeUndefined();
-            expect(actualDatasets[1].attributeValues).toBeUndefined();
+            expect(actualDataSets.length).toEqual(2);
+            expect(actualDataSets[0].id).toEqual("ds1");
+            expect(actualDataSets[1].id).toEqual("ds2");
+            expect(actualDataSets[0].attributeValues).toBeUndefined();
+            expect(actualDataSets[1].attributeValues).toBeUndefined();
         });
 
-        it("should get datasets with sections and dataElements", function() {
+        it("should get dataSets with sections and dataElements", function() {
             var dataSets = [{
                 "name": "OPD",
                 "id": "DS_OPD",
@@ -133,31 +133,31 @@ define(["dataSetRepository", "dataSetTransformer", "testData", "angularMocks", "
                     return utils.getPromise(q, testData.get("dataElements"));
             });
 
-            var actualDatasets;
+            var actualDataSets;
 
-            datasetRepository.includeDataElements(dataSets, ["DE1"]).then(function(data) {
-                actualDatasets = data;
+            dataSetRepository.includeDataElements(dataSets, ["DE1"]).then(function(data) {
+                actualDataSets = data;
             });
 
             scope.$apply();
 
-            expect(actualDatasets.length).toBe(1);
-            expect(actualDatasets[0].id).toBe("DS_OPD");
-            expect(actualDatasets[0].sections.length).toBe(2);
-            expect(actualDatasets[0].sections[0].id).toBe("Sec1");
-            expect(actualDatasets[0].sections[0].isIncluded).toBe(true);
-            expect(actualDatasets[0].sections[1].id).toBe("Sec2");
-            expect(actualDatasets[0].sections[1].isIncluded).toBe(false);
-            expect(actualDatasets[0].sections[0].dataElements.length).toBe(3);
-            expect(actualDatasets[0].sections[0].dataElements[0].id).toBe("DE1");
-            expect(actualDatasets[0].sections[0].dataElements[0].isIncluded).toBe(false);
-            expect(actualDatasets[0].sections[0].dataElements[1].id).toBe("DE2");
-            expect(actualDatasets[0].sections[0].dataElements[1].isIncluded).toBe(true);
-            expect(actualDatasets[0].sections[0].dataElements[2].id).toBe("DE4");
-            expect(actualDatasets[0].sections[0].dataElements[2].isIncluded).toBe(true);
+            expect(actualDataSets.length).toBe(1);
+            expect(actualDataSets[0].id).toBe("DS_OPD");
+            expect(actualDataSets[0].sections.length).toBe(2);
+            expect(actualDataSets[0].sections[0].id).toBe("Sec1");
+            expect(actualDataSets[0].sections[0].isIncluded).toBe(true);
+            expect(actualDataSets[0].sections[1].id).toBe("Sec2");
+            expect(actualDataSets[0].sections[1].isIncluded).toBe(false);
+            expect(actualDataSets[0].sections[0].dataElements.length).toBe(3);
+            expect(actualDataSets[0].sections[0].dataElements[0].id).toBe("DE1");
+            expect(actualDataSets[0].sections[0].dataElements[0].isIncluded).toBe(false);
+            expect(actualDataSets[0].sections[0].dataElements[1].id).toBe("DE2");
+            expect(actualDataSets[0].sections[0].dataElements[1].isIncluded).toBe(true);
+            expect(actualDataSets[0].sections[0].dataElements[2].id).toBe("DE4");
+            expect(actualDataSets[0].sections[0].dataElements[2].isIncluded).toBe(true);
         });
 
-        it("should get datasets with sections headers", function() {
+        it("should get dataSets with sections headers", function() {
             var dataSets = [{
                 "id": "DS_OPD",
                 "sections": [{
@@ -180,10 +180,10 @@ define(["dataSetRepository", "dataSetTransformer", "testData", "angularMocks", "
                     return utils.getPromise(q, testData.get("categoryOptionCombos"));
             });
 
-            var actualDatasets;
+            var actualDataSets;
 
-            datasetRepository.includeCategoryOptionCombinations(dataSets).then(function(data) {
-                actualDatasets = data;
+            dataSetRepository.includeCategoryOptionCombinations(dataSets).then(function(data) {
+                actualDataSets = data;
             });
 
             scope.$apply();
@@ -210,13 +210,13 @@ define(["dataSetRepository", "dataSetTransformer", "testData", "angularMocks", "
                     "name": "GreaterThan5"
                 }]
             ];
-            expect(actualDatasets[0].sections[0].headers).toEqual(expectedSectionHeaders);
-            expect(actualDatasets[0].sections[0].categoryOptionComboIds).toEqual(['1', '2', '3', '4']);
-            expect(actualDatasets[0].sections[0].categoryOptionComboIdsForTotals).toEqual(['2', '3', '4']);
+            expect(actualDataSets[0].sections[0].headers).toEqual(expectedSectionHeaders);
+            expect(actualDataSets[0].sections[0].categoryOptionComboIds).toEqual(['1', '2', '3', '4']);
+            expect(actualDataSets[0].sections[0].categoryOptionComboIdsForTotals).toEqual(['2', '3', '4']);
         });
 
-        it("should upsert datasets downloaded from dhis", function() {
-            var datasets = [{
+        it("should upsert dataSets downloaded from dhis", function() {
+            var dataSets = [{
                 "id": "ds1",
                 "name": "NeoNat",
                 "organisationUnits": [{
@@ -224,10 +224,10 @@ define(["dataSetRepository", "dataSetTransformer", "testData", "angularMocks", "
                     "name": "ou1"
                 }]
             }];
-            datasetRepository.upsertDhisDownloadedData(datasets);
+            dataSetRepository.upsertDhisDownloadedData(dataSets);
             scope.$apply();
 
-            var expectedDatasetUpsert = [{
+            var expectedDataSetUpsert = [{
                 "id": "ds1",
                 "name": "NeoNat",
                 "organisationUnits": [{
@@ -236,11 +236,11 @@ define(["dataSetRepository", "dataSetTransformer", "testData", "angularMocks", "
                 }],
                 "orgUnitIds": ["ou1"]
             }];
-            expect(mockStore.upsert).toHaveBeenCalledWith(expectedDatasetUpsert);
+            expect(mockStore.upsert).toHaveBeenCalledWith(expectedDataSetUpsert);
         });
 
-        it("should upsert datasets downloaded from dhis with given sections", function() {
-            var datasets = [{
+        it("should upsert dataSets downloaded from dhis with given sections", function() {
+            var dataSets = [{
                 "id": "ds1",
                 "name": "NeoNat",
                 "organisationUnits": [{
@@ -257,10 +257,10 @@ define(["dataSetRepository", "dataSetTransformer", "testData", "angularMocks", "
                 }
             }];
 
-            datasetRepository.upsertDhisDownloadedData(datasets, sections);
+            dataSetRepository.upsertDhisDownloadedData(dataSets, sections);
             scope.$apply();
 
-            var expectedDatasetUpsert = [{
+            var expectedDataSetUpsert = [{
                 "id": "ds1",
                 "name": "NeoNat",
                 "organisationUnits": [{
@@ -273,11 +273,11 @@ define(["dataSetRepository", "dataSetTransformer", "testData", "angularMocks", "
                 }],
                 "orgUnitIds": ["ou1"]
             }];
-            expect(mockStore.upsert).toHaveBeenCalledWith(expectedDatasetUpsert);
+            expect(mockStore.upsert).toHaveBeenCalledWith(expectedDataSetUpsert);
         });
 
-        it("should associate org units to datasets", function() {
-            var datasets = [{
+        it("should associate org units to dataSets", function() {
+            var dataSets = [{
                 "id": "ds1",
                 "name": "NeoNat",
                 "organisationUnits": [{
@@ -294,7 +294,7 @@ define(["dataSetRepository", "dataSetTransformer", "testData", "angularMocks", "
                 "name": "ou2"
             }];
 
-            var expectedDatasetUpsert = [{
+            var expectedDataSetUpsert = [{
                 "id": "ds1",
                 "name": "NeoNat",
                 "organisationUnits": [{
@@ -307,15 +307,15 @@ define(["dataSetRepository", "dataSetTransformer", "testData", "angularMocks", "
                 "orgUnitIds": ["ou1", "ou2"]
             }];
 
-            mockStore.each.and.returnValue(utils.getPromise(q, datasets));
-            datasetRepository.associateOrgUnits(["ds1"], orgunits);
+            mockStore.each.and.returnValue(utils.getPromise(q, dataSets));
+            dataSetRepository.associateOrgUnits(["ds1"], orgunits);
             scope.$apply();
 
-            expect(mockStore.upsert).toHaveBeenCalledWith(expectedDatasetUpsert);
+            expect(mockStore.upsert).toHaveBeenCalledWith(expectedDataSetUpsert);
         });
 
-        it("should remove org units from datasets", function () {
-            var datasets = [{
+        it("should remove org units from dataSets", function () {
+            var dataSets = [{
                 "id": "ds1",
                 "name": "NeoNat",
                 "organisationUnits": [{
@@ -332,7 +332,7 @@ define(["dataSetRepository", "dataSetTransformer", "testData", "angularMocks", "
                 "name": "ou1"
             }];
 
-            var expectedDatasetUpsert = [{
+            var expectedDataSetUpsert = [{
                 "id": "ds1",
                 "name": "NeoNat",
                 "organisationUnits": [{
@@ -342,11 +342,11 @@ define(["dataSetRepository", "dataSetTransformer", "testData", "angularMocks", "
                 "orgUnitIds": ["ou2"]
             }];
 
-            mockStore.each.and.returnValue(utils.getPromise(q, datasets));
-            datasetRepository.removeOrgUnits(["ds1"], ["ou1"]);
+            mockStore.each.and.returnValue(utils.getPromise(q, dataSets));
+            dataSetRepository.removeOrgUnits(["ds1"], ["ou1"]);
             scope.$apply();
 
-            expect(mockStore.upsert).toHaveBeenCalledWith(expectedDatasetUpsert);
+            expect(mockStore.upsert).toHaveBeenCalledWith(expectedDataSetUpsert);
         });
     });
 });

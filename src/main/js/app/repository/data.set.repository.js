@@ -1,13 +1,13 @@
-define(["lodash", "dataSetTransformer", "moment"], function(_, datasetTransformer, moment) {
+define(["lodash", "dataSetTransformer", "moment"], function(_, dataSetTransformer, moment) {
     return function(db, $q) {
         var self = this;
 
         this.getAll = function() {
             var store = db.objectStore("dataSets");
             return store.getAll().then(function(dsFromDb) {
-                datasets = _.map(dsFromDb, datasetTransformer.mapDatasetForView);
-                datasets = _.filter(datasets, "isNewDataModel");
-                return datasets;
+                dataSets = _.map(dsFromDb, dataSetTransformer.mapDatasetForView);
+                dataSets = _.filter(dataSets, "isNewDataModel");
+                return dataSets;
             });
         };
         
@@ -15,10 +15,10 @@ define(["lodash", "dataSetTransformer", "moment"], function(_, datasetTransforme
             var store = db.objectStore("dataSets");
             var query = db.queryBuilder().$in(orgUnitIds).$index("by_organisationUnit").compile();
             return store.each(query).then(function(dsFromDb) {
-                datasets = _.map(dsFromDb, datasetTransformer.mapDatasetForView);
-                datasets = _.filter(datasets, "isNewDataModel");
-                datasets = _.uniq(_.sortBy(datasets, 'id'), true, 'id');
-                return datasets;
+                dataSets = _.map(dsFromDb, dataSetTransformer.mapDatasetForView);
+                dataSets = _.filter(dataSets, "isNewDataModel");
+                dataSets = _.uniq(_.sortBy(dataSets, 'id'), true, 'id');
+                return dataSets;
             });
         };
 
@@ -31,8 +31,8 @@ define(["lodash", "dataSetTransformer", "moment"], function(_, datasetTransforme
             });
         };
 
-        this.includeDataElements = function(datasets, excludedDataElements) {
-            var sectionIds = _.pluck(_.flatten(_.pluck(datasets, "sections")), "id");
+        this.includeDataElements = function(dataSets, excludedDataElements) {
+            var sectionIds = _.pluck(_.flatten(_.pluck(dataSets, "sections")), "id");
             var store = db.objectStore("sections");
             var query = db.queryBuilder().$in(sectionIds).compile();
             var setupSections = function(dataElementGroups, sections) {
@@ -40,7 +40,7 @@ define(["lodash", "dataSetTransformer", "moment"], function(_, datasetTransforme
                 var store = db.objectStore("dataElements");
                 var query = db.queryBuilder().$in(dataElementIds).compile();
                 return store.each(query).then(function(dataElements) {
-                    return datasetTransformer.enrichWithSectionsAndDataElements(datasets, sections, dataElements, excludedDataElements, dataElementGroups);
+                    return dataSetTransformer.enrichWithSectionsAndDataElements(dataSets, sections, dataElements, excludedDataElements, dataElementGroups);
                 });
             };
             return getDataElementGroups().then(function(dataElementGroups) {
@@ -49,7 +49,7 @@ define(["lodash", "dataSetTransformer", "moment"], function(_, datasetTransforme
 
         };
 
-        this.includeCategoryOptionCombinations = function(datasets) {
+        this.includeCategoryOptionCombinations = function(dataSets) {
             var getAll = function(storeName) {
                 var store = db.objectStore(storeName);
                 return store.getAll();
@@ -63,7 +63,7 @@ define(["lodash", "dataSetTransformer", "moment"], function(_, datasetTransforme
                 var allCategoryCombos = data[0];
                 var allCategories = data[1];
                 var allCategoryOptionCombos = data[2];
-                return datasetTransformer.enrichWithCategoryOptionCombinations(datasets, allCategoryCombos, allCategories, allCategoryOptionCombos);
+                return dataSetTransformer.enrichWithCategoryOptionCombinations(dataSets, allCategoryCombos, allCategories, allCategoryOptionCombos);
             });
         };
 
@@ -74,11 +74,11 @@ define(["lodash", "dataSetTransformer", "moment"], function(_, datasetTransforme
             });
         };
 
-        this.associateOrgUnits = function(datasetIds, orgUnits) {
-            return self.findAllDhisDatasets(datasetIds).then(function(datasets) {
-                var updatedDatasets = _.map(datasets, function(ds) {
+        this.associateOrgUnits = function(dataSetIds, orgUnits) {
+            return self.findAllDhisDatasets(dataSetIds).then(function(dataSets) {
+                var updatedDataSets = _.map(dataSets, function(ds) {
                     ds.organisationUnits = ds.organisationUnits || [];
-                    var orgUnitsForDataset = _.transform(orgUnits, function(results, orgUnit) {
+                    var orgUnitsForDataSet = _.transform(orgUnits, function(results, orgUnit) {
                         var orgUnitToAdd = {
                             "id": orgUnit.id,
                             "name": orgUnit.name
@@ -87,34 +87,34 @@ define(["lodash", "dataSetTransformer", "moment"], function(_, datasetTransforme
                             results.push(orgUnitToAdd);
                     });
 
-                    ds.organisationUnits = ds.organisationUnits.concat(orgUnitsForDataset);
+                    ds.organisationUnits = ds.organisationUnits.concat(orgUnitsForDataSet);
                     return ds;
                 });
 
-                return self.upsertDhisDownloadedData(updatedDatasets);
+                return self.upsertDhisDownloadedData(updatedDataSets);
             });
         };
 
-        this.removeOrgUnits = function (datasetIds, orgUnitIds) {
-            return self.findAllDhisDatasets(datasetIds).then(function(datasets) {
-                var updatedDatasets = _.map(datasets, function(ds) {
+        this.removeOrgUnits = function (dataSetIds, orgUnitIds) {
+            return self.findAllDhisDatasets(dataSetIds).then(function(dataSets) {
+                var updatedDataSets = _.map(dataSets, function(ds) {
                     ds.organisationUnits = ds.organisationUnits || [];
                     ds.organisationUnits = _.reject(ds.organisationUnits, function(orgUnit) {
                         return _.contains(orgUnitIds, orgUnit.id);
                     });
                     return ds;
                 });
-                return self.upsertDhisDownloadedData(updatedDatasets);
+                return self.upsertDhisDownloadedData(updatedDataSets);
             });
         };
 
-        this.findAllDhisDatasets = function(datasetIds) {
+        this.findAllDhisDatasets = function(dataSetIds) {
             var store = db.objectStore("dataSets");
-            var query = db.queryBuilder().$in(datasetIds).compile();
+            var query = db.queryBuilder().$in(dataSetIds).compile();
             return store.each(query);
         };
 
-        var associateSectionsToDatasets = function(dataSets, sections) {
+        var associateSectionsToDataSets = function(dataSets, sections) {
             var indexedSections = _.groupBy(sections, function(section) {
                 return section.dataSet.id;
             });
@@ -130,7 +130,7 @@ define(["lodash", "dataSetTransformer", "moment"], function(_, datasetTransforme
         this.upsertDhisDownloadedData = function(dataSets, sections) {
             dataSets = !_.isArray(dataSets) ? [dataSets] : dataSets;
             dataSets = extractOrgUnitIdsForIndexing(dataSets);
-            dataSets = sections ? associateSectionsToDatasets(dataSets, sections) : dataSets;
+            dataSets = sections ? associateSectionsToDataSets(dataSets, sections) : dataSets;
             var store = db.objectStore("dataSets");
             return store.upsert(dataSets).then(function() {
                 return dataSets;
