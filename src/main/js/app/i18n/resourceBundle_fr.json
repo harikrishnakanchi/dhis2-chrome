@@ -203,7 +203,6 @@
     "createUserDesc": "créer un utilisateur {{username}}",
     "updateUserDesc": "mettre à jour l'utilisateur {{username}}",
     "upsertOrgUnitGroupsDesc": "attribuer l'unité organisationnelle aux groupes appropriés",
-    "uploadProgramEventsDesc": "envoyer les cas pour",
     "deleteEventDesc": "effacer les cas",
     "uploadPatientOriginDetailsDesc": "créer une origine géographique patient",
     "associateOrgUnitToDatasetDesc": "Associer les services sélectionnés aux origines géographiques de l'Unité Opérationnelle",

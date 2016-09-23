@@ -203,7 +203,6 @@
     "createUserDesc": "create user {{username}}",
     "updateUserDesc": "update user {{username}}",
     "upsertOrgUnitGroupsDesc": "assign organisation unit to appropriate groups",
-    "uploadProgramEventsDesc": "submit cases for ",
     "deleteEventDesc": "delete cases",
     "uploadPatientOriginDetailsDesc": "create patient origin ",
     "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit ",

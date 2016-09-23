@@ -45,7 +45,6 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
 
                 scope.resourceBundle = {
                     syncModuleDataBlockDesc: 'some description',
-                    uploadProgramEventsDesc: 'submit cases for ',
                     deleteEventDesc: 'delete cases',
                     eventSubmitAndApproveSuccess: '{{number_of_events}} some success message',
                     eventSubmitSuccess: '{{number_of_events}} some other success message',

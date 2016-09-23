@@ -203,7 +203,6 @@
     "createUserDesc": "أنشئ مستخدما {{username}}",
     "updateUserDesc": "تحديث المستخدم {{username}}",
     "upsertOrgUnitGroupsDesc": "تعيين وحدة المؤسسة إلى المجموعات المناسبة",
-    "uploadProgramEventsDesc": "تقديم الحالة ل",
     "deleteEventDesc": "حذف الحالات",
     "uploadPatientOriginDetailsDesc": "انشاء مكان قدوم المريض",
     "associateOrgUnitToDatasetDesc": "ربط الخدمات المختارة الى الأصول في وحدة العملية",
