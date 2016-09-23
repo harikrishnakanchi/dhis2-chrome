@@ -31,7 +31,7 @@ define(["properties", "chromeUtils", "interpolate", "moment", "lodash"], functio
                     var resourceBundle = data;
                     var notificationMessage = getCurrentDateTime();
                     notificationMessage += interpolate(resourceBundle.notificationRetryMessage, {
-                        job_description: job.data.desc,
+                        job_description: job.data.desc || resourceBundle.downloadDataDesc,
                         retry_delay: getRetryDelayInHours(3)
                     });
                     chromeUtils.createNotification(resourceBundle.notificationTitle, notificationMessage);
