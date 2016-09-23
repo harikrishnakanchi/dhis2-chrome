@@ -1,4 +1,4 @@
-define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "datasetRepository", "mergeBy"],
+define(["downloadDataSetConsumer", "dataSetService", "utils", "angularMocks", "dataSetRepository", "mergeBy"],
     function(DownloadDatasetConsumer, DatasetService, utils, mocks, DatasetRepository, MergeBy) {
         describe("download dataset consumer", function() {
             var scope, q, datasetService, datasetRepository, downloadDatasetConsumer, changeLogRepository, mergeBy;

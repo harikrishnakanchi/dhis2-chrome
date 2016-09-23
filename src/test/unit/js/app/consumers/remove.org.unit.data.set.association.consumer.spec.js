@@ -1,4 +1,4 @@
-define(["removeOrgunitDatasetAssociationConsumer", "utils", "angularMocks", "datasetService"], function(RemoveOrgunitDatasetAssociationConsumer, utils, mocks, DatasetService) {
+define(["removeOrgUnitDataSetAssociationConsumer", "utils", "angularMocks", "dataSetService"], function(RemoveOrgunitDatasetAssociationConsumer, utils, mocks, DatasetService) {
     describe("removeOrgunitDatasetAssociationConsumer", function() {
         var removeOrgunitDatasetAssociationConsumer, message, datasetService, q, scope;
 

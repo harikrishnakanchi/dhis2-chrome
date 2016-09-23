@@ -1,4 +1,4 @@
-define(["dataService", "metadataService", "approvalService", "orgUnitService", "datasetService", "systemSettingService", "userService", "programService", "eventService", "orgUnitGroupService", 'patientOriginService', 'reportService', 'dataStoreService'],
+define(["dataService", "metadataService", "approvalService", "orgUnitService", "dataSetService", "systemSettingService", "userService", "programService", "eventService", "orgUnitGroupService", 'patientOriginService', 'reportService', 'dataStoreService'],
     function(dataService, metadataService, approvalService, orgUnitService, datasetService, systemSettingService, userService, programService, eventService, orgUnitGroupService, patientOriginService, reportService, dataStoreService) {
         var init = function(app) {
             app.service('dataService', ['$http', '$q', dataService]);

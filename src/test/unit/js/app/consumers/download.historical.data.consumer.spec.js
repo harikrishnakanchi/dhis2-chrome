@@ -1,5 +1,5 @@
 define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties', 'moment', 'downloadHistoricalDataConsumer', 'dataService',
-        'userPreferenceRepository', 'orgUnitRepository', 'datasetRepository', 'changeLogRepository', 'dataRepository', 'programEventRepository','eventService','customAttributes'],
+        'userPreferenceRepository', 'orgUnitRepository', 'dataSetRepository', 'changeLogRepository', 'dataRepository', 'programEventRepository','eventService','customAttributes'],
     function (utils, timecop, mocks, _, dateUtils, properties, moment, DownloadHistoricalDataConsumer, DataService, UserPreferenceRepository,
               OrgUnitRepository, DatasetRepository, ChangeLogRepository, DataRepository, ProgramEventRepository, EventService, CustomAttributes) {
         describe('DownloadHistoricalDataConsumer', function () {

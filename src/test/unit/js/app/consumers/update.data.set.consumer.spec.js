@@ -1,4 +1,4 @@
-define(["updateDatasetConsumer", "utils", "angularMocks", "datasetService"], function(UpdateDatasetConsumer, utils, mocks, DatasetService) {
+define(["updateDataSetConsumer", "utils", "angularMocks", "dataSetService"], function(UpdateDatasetConsumer, utils, mocks, DatasetService) {
     describe("updateDatasetConsumer", function() {
         var updateDatasetConsumer, message, datasetService, q, scope;
 

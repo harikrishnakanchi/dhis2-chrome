@@ -1,4 +1,4 @@
-define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransformer", "properties", "interpolate"], function(_, dataValuesMapper, orgUnitMapper, moment, datasetTransformer, properties, interpolate) {
+define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransformer", "properties", "interpolate"], function(_, dataValuesMapper, orgUnitMapper, moment, datasetTransformer, properties, interpolate) {
     return function($scope, $routeParams, $q, $hustle, dataRepository, excludedDataElementsRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
         $timeout, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository) {
 

@@ -1,4 +1,4 @@
-define(["referralLocationsRepository", "datasetRepository", "angularMocks", "utils"], function(ReferralLocationsRepository, DatasetRepository, mocks, utils) {
+define(["referralLocationsRepository", "dataSetRepository", "angularMocks", "utils"], function(ReferralLocationsRepository, DatasetRepository, mocks, utils) {
     describe("referralLocationsRepository", function() {
         var datasetRepository, referralLocationRepository, mockStore, q, scope;
 

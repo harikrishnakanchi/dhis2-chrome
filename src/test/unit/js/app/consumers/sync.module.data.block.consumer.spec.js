@@ -1,4 +1,4 @@
-define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', 'orgUnitRepository', 'moduleDataBlockFactory', 'dataService', 'eventService', 'moduleDataBlockMerger', 'changeLogRepository', 'utils', 'angularMocks', 'dateUtils', 'properties'],
+define(['syncModuleDataBlockConsumer', "dataSetRepository", 'approvalService', 'orgUnitRepository', 'moduleDataBlockFactory', 'dataService', 'eventService', 'moduleDataBlockMerger', 'changeLogRepository', 'utils', 'angularMocks', 'dateUtils', 'properties'],
     function (SyncModuleDataBlockConsumer, DataSetRepository, ApprovalService, OrgUnitRepository, ModuleDataBlockFactory, DataService, EventService, ModuleDataBlockMerger, ChangeLogRepository, utils, mocks, dateUtils, properties) {
         var syncModuleDataBlockConsumer, moduleDataBlockFactory, dataSetRepository, dataService, eventService, approvalService, orgUnitRepository, moduleDataBlockMerger, changeLogRepository,
             scope, q,

@@ -1,4 +1,4 @@
-define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataService", "dataRepository", "datasetRepository", "userPreferenceRepository", "moment", "timecop", "mergeBy", "changeLogRepository"],
+define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataService", "dataRepository", "dataSetRepository", "userPreferenceRepository", "moment", "timecop", "mergeBy", "changeLogRepository"],
     function(DownloadDataConsumer, mocks, properties, utils, DataService, DataRepository, DatasetRepository, UserPreferenceRepository, moment, timecop, MergeBy, ChangeLogRepository) {
         describe("download data consumer", function() {
 

@@ -1,4 +1,4 @@
-define(["datasetRepository", "datasetTransformer", "testData", "angularMocks", "utils"], function(DatasetRepository, datasetTransformer, testData, mocks, utils) {
+define(["dataSetRepository", "dataSetTransformer", "testData", "angularMocks", "utils"], function(DatasetRepository, datasetTransformer, testData, mocks, utils) {
     describe("dataset repository", function() {
         var mockStore, datasetRepository, q, scope;
 

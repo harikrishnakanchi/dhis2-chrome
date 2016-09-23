@@ -1,4 +1,4 @@
-define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "datasetRepository", "orgUnitRepository", "userPreferenceRepository", "approvalService", "moment"],
+define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "dataSetRepository", "orgUnitRepository", "userPreferenceRepository", "approvalService", "moment"],
     function(DownloadApprovalConsumer, mocks, properties, utils, DatasetRepository, OrgUnitRepository, UserPreferenceRepository, ApprovalService, moment) {
         describe("download approval consumer", function() {
 

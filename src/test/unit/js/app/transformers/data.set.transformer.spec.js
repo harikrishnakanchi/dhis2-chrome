@@ -1,4 +1,4 @@
-define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer, testData, _) {
+define(["dataSetTransformer", "testData", "lodash"], function(datasetTransformer, testData, _) {
     describe("datasetTransformer", function() {
 
         it("should map aggregate dataset for view", function() {

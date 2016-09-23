@@ -1,4 +1,4 @@
-define(["uploadApprovalDataConsumer", "angularMocks", "approvalService", "approvalDataRepository", "datasetRepository", "utils"],
+define(["uploadApprovalDataConsumer", "angularMocks", "approvalService", "approvalDataRepository", "dataSetRepository", "utils"],
     function(UploadApprovalDataConsumer, mocks, ApprovalService, ApprovalDataRepository, DatasetRepository, utils) {
         describe("upload data consumer", function() {
             var approvalDataRepository, uploadApprovalDataConsumer, datasetRepository, scope, q;

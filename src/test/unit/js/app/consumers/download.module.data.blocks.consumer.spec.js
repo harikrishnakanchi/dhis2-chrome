@@ -1,4 +1,4 @@
-define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'datasetRepository', 'userPreferenceRepository', 'changeLogRepository', 'orgUnitRepository', 'moduleDataBlockFactory',
+define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', "dataSetRepository", 'userPreferenceRepository', 'changeLogRepository', 'orgUnitRepository', 'moduleDataBlockFactory',
         'moduleDataBlockMerger', 'eventService', 'angularMocks', 'dateUtils', 'utils', 'timecop', 'moment'],
     function(DownloadModuleDataBlocksConsumer, DataService, ApprovalService, DataSetRepository, UserPreferenceRepository, ChangeLogRepository, OrgUnitRepository, ModuleDataBlockFactory,
              ModuleDataBlockMerger, EventService, mocks, dateUtils, utils, timecop, moment) {

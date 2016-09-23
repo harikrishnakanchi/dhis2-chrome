@@ -1,4 +1,4 @@
-define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransformer, moment) {
+define(["lodash", "dataSetTransformer", "moment"], function(_, datasetTransformer, moment) {
     return function(db, $q) {
         var self = this;
 

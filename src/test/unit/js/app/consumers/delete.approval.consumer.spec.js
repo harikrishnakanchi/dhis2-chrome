@@ -1,4 +1,4 @@
-define(["deleteApprovalConsumer", "angularMocks", "utils", "approvalService", "approvalDataRepository", "datasetRepository"], function(DeleteApprovalConsumer, mocks, utils, ApprovalService, ApprovalDataRepository, DatasetRepository) {
+define(["deleteApprovalConsumer", "angularMocks", "utils", "approvalService", "approvalDataRepository", "dataSetRepository"], function(DeleteApprovalConsumer, mocks, utils, ApprovalService, ApprovalDataRepository, DatasetRepository) {
     describe("deleteApprovalConsumer", function() {
         var deleteApprovalConsumer, message, approvalService, scope, q, completeDataSets, approvedDataSets, allDatasetIds;
 

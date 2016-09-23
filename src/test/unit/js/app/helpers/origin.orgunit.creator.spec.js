@@ -1,4 +1,4 @@
-define(["originOrgunitCreator", "angularMocks", "utils", "orgUnitRepository", "patientOriginRepository", "dhisId", "orgUnitGroupHelper", "datasetRepository"],
+define(["originOrgunitCreator", "angularMocks", "utils", "orgUnitRepository", "patientOriginRepository", "dhisId", "orgUnitGroupHelper", "dataSetRepository"],
     function(OriginOrgunitCreator, mocks, utils, OrgUnitRepository, PatientOriginRepository, dhisId, OrgUnitGroupHelper, DatasetRepository) {
         describe("origin orgunit creator", function() {
 

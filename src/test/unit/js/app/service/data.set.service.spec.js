@@ -1,4 +1,4 @@
-define(["datasetService", "angularMocks", "properties"], function(DatasetService, mocks, properties) {
+define(["dataSetService", "angularMocks", "properties"], function(DatasetService, mocks, properties) {
     describe("dataset service", function() {
         var http, httpBackend, datasetService, q;
 
