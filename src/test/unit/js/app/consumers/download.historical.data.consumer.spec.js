@@ -109,6 +109,20 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                 expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(orgUnitIds);
             });
 
+            it('should continue download of historical data even if one module fails', function() {
+                changeLogRepository.get.and.returnValue(utils.getPromise(q, undefined));
+                dataService.downloadData.and.callFake(function (moduleId) {
+                    return moduleId == mockModuleB.id ? utils.getRejectedPromise(q, {}) : utils.getPromise(q, {});
+                });
+
+                downloadHistoricalDataConsumer.run();
+                scope.$apply();
+
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('yearlyDataValues:projectA:moduleA', jasmine.any(String));
+                expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('yearlyDataValues:projectB:moduleB', jasmine.any(String));
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('yearlyDataValues:projectB:moduleC', jasmine.any(String));
+            });
+
             describe('Download Data', function () {
 
                 describe('Aggregate modules', function () {

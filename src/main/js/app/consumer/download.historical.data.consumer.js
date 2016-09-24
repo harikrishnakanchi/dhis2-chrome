@@ -63,13 +63,17 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], func
                     return isLinelistModule ? downloadLineListEvents() : downloadModuleDataValues();
                 };
 
-                var updateChangeLog = function () {
+                var onSuccess = function () {
                     return changeLogRepository.upsert(changeLogKey, moment().toISOString());
+                };
+
+                var onFailure = function () {
+                    return $q.when(); //continue with next module
                 };
 
                 return changeLogRepository.get(changeLogKey).then(function (lastUpdatedTime) {
                     var areDataValuesAlreadyDownloaded = !!lastUpdatedTime;
-                    return areDataValuesAlreadyDownloaded ? $q.when() : downloadModuleData().then(updateChangeLog);
+                    return areDataValuesAlreadyDownloaded ? $q.when() : downloadModuleData().then(onSuccess, onFailure);
                 });
             };
 
