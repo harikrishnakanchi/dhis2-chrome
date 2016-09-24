@@ -1,4 +1,4 @@
-define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
+define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, moment, CustomAttributes) {
     var buildProjectAttributeValues = function(orgUnit) {
         var attributeValues = [{
             "created": moment().toISOString(),
@@ -134,7 +134,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                 "value": moment(orgUnit.endDate).format("YYYY-MM-DD")
             });
 
-        return attributeValues;
+        return CustomAttributes.cleanAttributeValues(attributeValues);
     };
 
     this.disable = function(orgUnits) {

@@ -22,8 +22,13 @@ define(['lodash'], function(_) {
         return correspondingAttributeValue && correspondingAttributeValue.value;
     };
 
+    var cleanAttributeValues = function (attributeValues) {
+        return _.filter(attributeValues, 'value');
+    };
+
     return _.merge(ATTRIBUTE_CODES, {
         getBooleanAttributeValue: getBooleanAttributeValue,
-        getAttributeValue: getAttributeValue
+        getAttributeValue: getAttributeValue,
+        cleanAttributeValues: cleanAttributeValues
     });
 });
