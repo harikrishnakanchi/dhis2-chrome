@@ -41,7 +41,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper", "customAttributes"], func
             hospitalUnitCode = type === "Hospital" ? hospitalUnitCode : {
                 "name": ""
             };
-            return [{
+            var attributes = [{
                 "created": moment().toISOString(),
                 "lastUpdated": moment().toISOString(),
                 "attribute": {
@@ -70,6 +70,8 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper", "customAttributes"], func
                 },
                 "value": "true"
             }];
+
+            return CustomAttributes.cleanAttributeValues(attributes);
         };
 
         var publishMessage = function(data, action, desc) {
