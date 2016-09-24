@@ -94,9 +94,9 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                 scope.$apply();
 
                 expect(orgUnitRepository.findAllByParent.calls.count()).toEqual(mockModulesForProjectA.concat(mockModulesForProjectB).length);
-                expect(orgUnitRepository.findAllByParent.calls.argsFor(0)[0]).toEqual([mockModulesForProjectA[0].id]);
-                expect(orgUnitRepository.findAllByParent.calls.argsFor(1)[0]).toEqual([mockModulesForProjectB[0].id]);
-                expect(orgUnitRepository.findAllByParent.calls.argsFor(2)[0]).toEqual([mockModulesForProjectB[1].id]);
+                expect(orgUnitRepository.findAllByParent.calls.argsFor(0)[0]).toEqual(mockModulesForProjectA[0].id);
+                expect(orgUnitRepository.findAllByParent.calls.argsFor(1)[0]).toEqual(mockModulesForProjectB[0].id);
+                expect(orgUnitRepository.findAllByParent.calls.argsFor(2)[0]).toEqual(mockModulesForProjectB[1].id);
             });
 
             it('should get all the datasets for the given orgunits', function () {
