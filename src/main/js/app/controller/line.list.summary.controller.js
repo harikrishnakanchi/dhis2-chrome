@@ -337,6 +337,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
         };
 
         $scope.$on('moduleWeekInfo', function(event, data) {
+            $scope.errorMessage = undefined;
             $scope.selectedModule = data[0];
             $scope.week = data[1];
             init();
@@ -351,6 +352,10 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
             };
             historyService.pushState(currentSearchState);
         };
+
+        $scope.$on('errorInfo', function(event, errorMessage) {
+            $scope.errorMessage = errorMessage;
+        });
 
         var init = function() {
 
