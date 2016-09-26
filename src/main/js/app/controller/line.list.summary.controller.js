@@ -6,6 +6,7 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
         $scope.loadingResults = false;
         $scope.showOfflineSummaryForViewOnly = true;
         $scope.viewRegistrationBook = false;
+        $scope.excludedDataElementIds = [];
 
         var INITIAL_PAGE_LIMIT = 20;
         $scope.pageLimit = INITIAL_PAGE_LIMIT;
@@ -63,6 +64,14 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
         };
 
         var enhanceEvents = function (events) {
+            var translatedEvents = translationsService.translate(events);
+            $scope.eventsForExport = _.map(_.cloneDeep(translatedEvents), function (event) {
+                event.dataValues = _.reject(event.dataValues, function (dataValue) {
+                    return _.contains($scope.excludedDataElementIds, dataValue.dataElement);
+                });
+                return event;
+            });
+
             var filterEvent = function (event) {
                 event.dataValues = _.filter(event.dataValues, 'showInEventSummary');
                 return event;
@@ -345,7 +354,7 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
 
             var buildHeaders = function () {
                 var eventDateLabel = escapeString($scope.resourceBundle.eventDateLabel);
-                var formNames = _.map(_.map($scope.summaryDataElements, 'formName'), escapeString);
+                var formNames = _.chain($scope.dataElementsForExport).map('formName').map(escapeString).value();
                 return [eventDateLabel].concat(formNames).join(DELIMITER);
             };
 
@@ -355,7 +364,7 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
                 return [eventDate].concat(values).join(DELIMITER);
             };
 
-            var eventsToBeExported = _.chain($scope.events).filter($scope.filterSubmittedEvents).map(buildData).value();
+            var eventsToBeExported = _.chain($scope.eventsForExport).filter($scope.filterSubmittedEvents).map(buildData).value();
 
             var csvContent = _.flatten([buildHeaders(), eventsToBeExported]).join(NEW_LINE);
             var fileName = [$scope.selectedModuleName, 'summary', moment().format('DD-MMM-YYYY'), 'csv'].join('.');
@@ -413,9 +422,18 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
                     return _.filter(_.map(programStageDataElements, 'dataElement'), 'showInEventSummary');
                 };
 
+                var getDataElementsForExport = function (program) {
+                    var sections = _.flatten(_.map(program.programStages, 'programStageSections')),
+                        programStageDataElements = _.flatten(_.map(sections, 'programStageDataElements'));
+                    return _.reject(_.map(programStageDataElements, 'dataElement'), function (dataElement) {
+                        return _.contains($scope.excludedDataElementIds, _.get(dataElement, 'id'));
+                    });
+                };
+
                 var getExcludedDataElementsForModule = function() {
                     return excludedDataElementsRepository.get($scope.selectedModuleId).then(function(data) {
-                        return data ? _.pluck(data.dataElements, "id") : [];
+                        $scope.excludedDataElementIds = data ? _.pluck(data.dataElements, "id") : [];
+                        return $scope.excludedDataElementIds;
                     });
                 };
 
@@ -425,6 +443,7 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
                             $scope.program = translationsService.translate(program);
                             $scope.associatedProgramId = $scope.program.id;
                             $scope.summaryDataElements = getSummaryDataElementFromProgram($scope.program);
+                            $scope.dataElementsForExport = getDataElementsForExport($scope.program);
                         });
                     });
                 };
