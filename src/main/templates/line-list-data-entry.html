@@ -160,7 +160,9 @@
                                     <input type="button" class="btn btn-main" ng-disabled="eventDataEntryForm.$invalid" ng-if="isNewMode" value="{{ resourceBundle.saveCaseBtnValue }}" ng-click="save()" />
                                     <input type="button" class="btn btn-main" ng-disabled="eventDataEntryForm.$invalid" ng-if="isNewMode" value="{{ resourceBundle.saveAndAddAnotherBtnValue }}" ng-click="save(true)" />
                                     <input type="button" class="btn btn-main" ng-disabled="eventDataEntryForm.$invalid" ng-if="!isNewMode && !isHistoricalEvent" value="{{ resourceBundle.updateBtnValue }}" ng-click="update()" />
-                                    <input type="button" class="btn btn-main" value="{{ resourceBundle.cancelLabel }}" ng-click="loadEventsView()" />
+                                    <input type="button" class="btn btn-main" ng-if="!isHistoricalEvent" value="{{ resourceBundle.cancelLabel }}" ng-click="loadEventsView()" />
+                                    <input type="button" class="btn btn-main" ng-if="isHistoricalEvent" value="{{ resourceBundle.backBtnValue }}" ng-click="loadEventsView()" />
+
                                 </div>
                             </li>
                         </ul>
