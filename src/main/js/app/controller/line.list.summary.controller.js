@@ -1,4 +1,4 @@
-define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], function(_, moment, properties, orgUnitMapper, interpolate) {
+define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpolate"], function(_, moment, properties, dateUtils, orgUnitMapper, interpolate) {
     return function($scope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, historyService, programRepository, programEventRepository, excludedDataElementsRepository,
         orgUnitRepository, approvalDataRepository, referralLocationsRepository, dataSyncFailureRepository, translationsService, filesystemService) {
 
@@ -43,12 +43,20 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
             scrollToTop();
         };
 
-        var translateAndFilterEventData = function (events) {
-            var translatedEvents = translationsService.translate(events);
-            $scope.events = _.map(translatedEvents, function (event) {
+        var enhanceEvents = function (events) {
+            var filterEvent = function (event) {
                 event.dataValues = _.filter(event.dataValues, 'showInEventSummary');
                 return event;
-            });
+            };
+
+            var minEventDate = dateUtils.max([dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync), $scope.moduleOpeningDate]).startOf('day').toISOString();
+
+            var addHistoricalEventFlag = function (event) {
+                event.isHistorical = (moment(new Date(event.eventDate)).isBefore(minEventDate));
+                return event;
+            };
+
+            $scope.events = _.chain(translationsService.translate(events)).map(filterEvent).map(addHistoricalEventFlag).value();
         };
 
         var loadEventsView = function() {
@@ -61,7 +69,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
                 $scope.noCasesMsg = $scope.resourceBundle.noIncompleteEventsFound;
 
                 return programEventRepository.getDraftEventsFor($scope.program.id, _.pluck($scope.originOrgUnits, "id"))
-                    .then(translateAndFilterEventData);
+                    .then(enhanceEvents);
             }
             if ($scope.filterParams.filterBy === "readyToSubmit") {
                 $scope.eventListTitle = $scope.resourceBundle.readyToSubmitEventsTitle;
@@ -74,7 +82,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
                                                               moment().diff(moment(event.clientLastUpdated), 'days') > properties.eventsSync.numberOfDaysToAllowResubmit;
                         return eventIsADraft || eventIsSubmittedButHasNoTimestamp || eventIsSubmittedButHasNotSynced;
                     });
-                }).then(translateAndFilterEventData);
+                }).then(enhanceEvents);
             }
             if ($scope.filterParams.filterBy === "dateRange") {
                 var startDate = $location.search().startDate;
@@ -281,7 +289,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
         $scope.filterByCaseNumber = function() {
             $scope.loadingResults = true;
             programEventRepository.findEventsByCode($scope.program.id, _.pluck($scope.originOrgUnits, "id"), $scope.filterParams.caseNumber)
-                .then(translateAndFilterEventData)
+                .then(enhanceEvents)
                 .then(function() {
                     $scope.loadingResults = false;
                 });
@@ -293,7 +301,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
             var endDate = moment($scope.filterParams.endDate).format("YYYY-MM-DD");
 
             programEventRepository.findEventsByDateRange($scope.program.id, _.pluck($scope.originOrgUnits, "id"), startDate, endDate)
-                .then(translateAndFilterEventData)
+                .then(enhanceEvents)
                 .then(function() {
                     $scope.loadingResults = false;
                 });
@@ -364,6 +372,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
                     $scope.selectedModuleId = data.id;
                     $scope.selectedModuleName = data.name;
                     $scope.opUnitId = data.parent.id;
+                    $scope.moduleOpeningDate = data.openingDate;
                 });
             };
 

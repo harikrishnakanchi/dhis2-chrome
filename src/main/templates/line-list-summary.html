@@ -139,7 +139,8 @@
                                                 <a href title="{{resourceBundle.editLabel}}" ng-click="pushToHistory()" ng-href="#/line-list-data-entry/{{selectedModuleId}}/{{event.event}}" class="edit"><span class="glyphicon glyphicon-edit"></span></a>
                                             </td>
                                             <td>
-                                                <a href title="{{resourceBundle.deleteLabel}}" ng-click="deleteEvent(event)" title="Delete" class="delete"><span class="glyphicon glyphicon-trash"></span></a>
+                                                <a href title="{{resourceBundle.deleteLabel}}" ng-if="!event.isHistorical" ng-click="deleteEvent(event)" title="Delete" class="delete"><span class="glyphicon glyphicon-trash"></span></a>
+                                                <span ng-if="event.isHistorical" class="delete glyphicon glyphicon-trash disabled-button" ></span>
                                             </td>
                                         </tr>
                                     </tbody>
