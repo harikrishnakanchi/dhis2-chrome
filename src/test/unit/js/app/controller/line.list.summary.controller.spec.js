@@ -413,75 +413,124 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
             });
 
             describe('exportToCSV', function() {
-                var csvContent, mockDataValue, mockEventA, mockEventB, mockEventC, mockDataElement;
+                var csvContent, mockProgram, mockProgramStage, mockProgramStageSection,
+                    mockDataValueA, mockDataValueB,
+                    mockEventA, mockEventB, mockEventC,
+                    mockDataElementA, mockDataElementB;
 
                 beforeEach(function () {
-                    spyOn(scope, "getDisplayValue").and.callFake(function (data) {
-                        return data.value;
-                    });
+                    mockDataElementA = {
+                        id: 'someIdA',
+                        formName: 'someDataElementFormName'
+                    };
+                    mockDataElementB = {
+                        id: 'someIdB',
+                        formName: 'someOtherDataElementFormName'
+                    };
 
-                    spyOn(window, 'Blob').and.callFake(function (contentArray) {
-                        this.value = contentArray.join();
-                    });
+                    mockDataValueA = mockEventDataValue({ dataElement: mockDataElementA.id, formName: mockDataElementA.formName });
+                    mockDataValueB = mockEventDataValue({ dataElement: mockDataElementB.id, formName: mockDataElementB.formName });
 
-                    filesystemService.promptAndWriteFile.and.callFake(function (fileName, blob) {
-                        csvContent = blob.value;
-                    });
-
-                    mockDataValue = mockEventDataValue();
                     mockEventA = createMockEvent({
                         eventDate: moment('2016-07-31T12:00:00Z').toISOString(),
-                        dataValues: [mockDataValue]
+                        dataValues: [mockDataValueA, mockDataValueB]
                     });
                     mockEventB = createMockEvent({
                         eventDate: moment('2016-07-30T12:00:00Z').toISOString(),
-                        dataValues: [mockDataValue],
+                        dataValues: [mockDataValueA, mockDataValueB],
                         localStatus: 'NEW_DRAFT'
                     });
                     mockEventC = createMockEvent({
                         eventDate: moment('2016-07-29T12:00:00Z').toISOString(),
-                        dataValues: [mockDataValue],
+                        dataValues: [mockDataValueA, mockDataValueB],
                         localStatus: 'READY_FOR_DHIS'
                     });
 
-                    mockDataElement = {
-                        formName: 'someDataElementFormName'
+                    mockProgramStageSection = {
+                        id: 'someSectionId',
+                        programStageDataElements: [{ dataElement: mockDataElementA }, { dataElement: mockDataElementB }]
                     };
-                    scope.summaryDataElements = [mockDataElement];
-                    scope.events = [mockEventA, mockEventB, mockEventC];
-                    scope.selectedModuleName = 'someModuleName';
-                    scope.exportToCSV();
+
+                    mockProgramStage = {
+                        id: 'someProgramStageId',
+                        programStageSections: [mockProgramStageSection]
+                    };
+
+                    mockProgram = {
+                        id: 'someProgram',
+                        programStages: [mockProgramStage]
+                    };
                 });
 
-                var escapeString = function(string) {
-                    return '"' + string + '"';
-                };
+                it('should contain all the data values for the exported events',function () {
+                    programEventRepository.findEventsByDateRange.and.returnValue(utils.getPromise(q, [mockEventA]));
+                    excludedDataElementsRepository.get.and.returnValue(utils.getPromise(q, { dataElements: [{ id: mockDataValueB.dataElement }]}));
+                    scope.$apply();
 
-                it('should build headers for listed events while exporting to CSV', function () {
-                    var expectedCsvContent = [escapeString(scope.resourceBundle.eventDateLabel), escapeString(mockDataElement.formName)].join(',');
-                    expect(csvContent).toContain(expectedCsvContent);
+                    scope.filterByDateRange();
+                    scope.$apply();
+                    expect(scope.eventsForExport[0].dataValues).toEqual([mockDataValueA]);
                 });
 
-                it('should contain data for listed events while exporting data', function () {
-                    var expectedCsvContent = [moment(mockEventA.eventDate).toDate().toLocaleDateString(), escapeString(mockDataValue.value)].join(',');
-                    expect(csvContent).toContain(expectedCsvContent);
+                it('should contain all data elements for export except excluded data elements', function () {
+                    programRepository.get.and.returnValue(utils.getPromise(q, mockProgram));
+                    excludedDataElementsRepository.get.and.returnValue(utils.getPromise(q, { dataElements: [{ id: mockDataValueB.dataElement }]}));
+                    scope.$apply();
+
+                    expect(scope.dataElementsForExport).toEqual([mockDataElementA]);
                 });
 
-                it('should format data values in CSV', function () {
-                    expect(scope.getDisplayValue.calls.argsFor(0)).toContain(mockDataValue);
-                });
+                describe('export', function () {
+                    beforeEach(function () {
+                        spyOn(scope, "getDisplayValue").and.callFake(function (data) {
+                            return data.value;
+                        });
 
-                it('should prompt user to export data values into CSV', function () {
-                    var expectedFilename = scope.selectedModuleName + '.summary.' + currentTime.format('DD-MMM-YYYY') + '.csv';
-                    expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
-                });
+                        spyOn(window, 'Blob').and.callFake(function (contentArray) {
+                            this.value = contentArray.join();
+                        });
 
-                it('should save only submitted events to CSV', function () {
-                    var expectedCsvContentForEventB = [moment(mockEventB.eventDate).toDate().toLocaleDateString(), escapeString(mockDataValue.value)].join(',');
-                    var expectedCsvContentForEventC = [moment(mockEventC.eventDate).toDate().toLocaleDateString(), escapeString(mockDataValue.value)].join(',');
+                        filesystemService.promptAndWriteFile.and.callFake(function (fileName, blob) {
+                            csvContent = blob.value;
+                        });
 
-                    expect(csvContent).not.toContain(expectedCsvContentForEventB);
-                    expect(csvContent).toContain(expectedCsvContentForEventC);
+                        scope.eventsForExport = [mockEventA, mockEventB, mockEventC];
+                        scope.dataElementsForExport = [mockDataElementA];
+                        scope.selectedModuleName = 'someModuleName';
+
+                        scope.exportToCSV();
+                    });
+
+                    var escapeString = function(string) {
+                        return '"' + string + '"';
+                    };
+
+                    it('should build headers for listed events while exporting to CSV', function () {
+                        var expectedCsvContent = [escapeString(scope.resourceBundle.eventDateLabel), escapeString(mockDataElementA.formName)].join(',');
+                        expect(csvContent).toContain(expectedCsvContent);
+                    });
+
+                    it('should contain data for listed events while exporting data', function () {
+                        var expectedCsvContent = [moment(mockEventA.eventDate).toDate().toLocaleDateString(), escapeString(mockDataValueA.value), escapeString(mockDataValueB.value)].join(',');
+                        expect(csvContent).toContain(expectedCsvContent);
+                    });
+
+                    it('should format data values in CSV', function () {
+                        expect(scope.getDisplayValue.calls.argsFor(0)).toContain(mockDataValueA);
+                    });
+
+                    it('should prompt user to export data values into CSV', function () {
+                        var expectedFilename = scope.selectedModuleName + '.summary.' + currentTime.format('DD-MMM-YYYY') + '.csv';
+                        expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
+                    });
+
+                    it('should save only submitted events to CSV', function () {
+                        var expectedCsvContentForEventB = [moment(mockEventB.eventDate).toDate().toLocaleDateString(), escapeString(mockDataValueA.value)].join(',');
+                        var expectedCsvContentForEventC = [moment(mockEventC.eventDate).toDate().toLocaleDateString(), escapeString(mockDataValueA.value)].join(',');
+
+                        expect(csvContent).not.toContain(expectedCsvContentForEventB);
+                        expect(csvContent).toContain(expectedCsvContentForEventC);
+                    });
                 });
             });
         });
