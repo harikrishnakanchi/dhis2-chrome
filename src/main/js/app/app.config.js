@@ -22,6 +22,7 @@ require.config({
         "sjcl": "lib/sjcl/sjcl",
         "saveSvgAsPng": "lib/save-svg-as-png/saveSvgAsPng",
         "angular-sanitize": "lib/angular-sanitize/angular-sanitize",
+        "xlsx": "lib/js-xlsx/xlsx",
 
         //3rd party angular modules
         "angular-indexedDB": "lib/angular-indexedDB/indexeddb",
@@ -173,6 +174,8 @@ require.config({
         "authenticationUtils": "app/utils/authentication.utils",
         "dataURItoBlob": "app/utils/data.uri.to.blob",
         "interpolate": "app/utils/interpolate",
+        "xlsxLoader": "app/utils/xlsx.loader",
+        "excelBuilder": "app/utils/excel.builder",
 
         //Helpers
         "helpers": "app/helpers/helpers",
@@ -261,6 +264,10 @@ require.config({
         },
         'angular-sanitize': {
             deps: ["angular"]
+        },
+        'xlsx': {
+            exports: 'XLSX',
+            deps: ['xlsxLoader']
         }
     }
 });
