@@ -562,17 +562,17 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
 
                     it('should build headers for listed events while exporting to CSV', function () {
                         var expectedCsvContent = [
-                            escapeString(scope.resourceBundle.patientOriginLabel),
-                            escapeString(mockDataElementA.formName)
+                            escapeString(mockDataElementA.formName),
+                            escapeString(scope.resourceBundle.patientOriginLabel)
                         ].join(',');
                         expect(csvContent).toContain(expectedCsvContent);
                     });
 
                     it('should contain data for listed events while exporting data', function () {
                         var expectedCsvContent = [
-                            escapeString(mockEventA.orgUnitName),
                             escapeString(mockDataValueA.value),
-                            escapeString(mockDataValueB.value)
+                            escapeString(mockDataValueB.value),
+                            escapeString(mockEventA.orgUnitName)
                         ].join(',');
                         expect(csvContent).toContain(expectedCsvContent);
                     });
@@ -588,13 +588,13 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
 
                     it('should save only submitted events to CSV', function () {
                         var expectedCsvContentForEventB = [
-                            escapeString(mockEventB.orgUnitName),
-                            escapeString(mockDataValueA.value)
+                            escapeString(mockDataValueA.value),
+                            escapeString(mockEventB.orgUnitName)
                         ].join(',');
 
                         var expectedCsvContentForEventC = [
-                            escapeString(mockEventC.orgUnitName),
-                            escapeString(mockDataValueA.value)
+                            escapeString(mockDataValueA.value),
+                            escapeString(mockEventC.orgUnitName)
                         ].join(',');
 
                         expect(csvContent).not.toContain(expectedCsvContentForEventB);

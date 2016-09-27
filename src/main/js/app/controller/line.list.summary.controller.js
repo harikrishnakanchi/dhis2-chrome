@@ -373,13 +373,13 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
             var buildHeaders = function () {
                 var patientOriginLabel = escapeString($scope.resourceBundle.patientOriginLabel);
                 var formNames = _.chain($scope.dataElementsForExport).map('formName').map(escapeString).value();
-                return [patientOriginLabel].concat(formNames).join(DELIMITER);
+                return formNames.concat(patientOriginLabel).join(DELIMITER);
             };
 
             var buildData = function (event) {
                 var values = _.map(_.map(event.dataValues, $scope.getDisplayValue), escapeString);
                 var patientOrigin = escapeString(event.orgUnitName);
-                return [patientOrigin].concat(values).join(DELIMITER);
+                return values.concat(patientOrigin).join(DELIMITER);
             };
 
             var eventsToBeExported = _.chain($scope.eventsForExport).filter($scope.filterSubmittedEvents).map(buildData).value();
