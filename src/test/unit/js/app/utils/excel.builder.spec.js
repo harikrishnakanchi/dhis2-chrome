@@ -13,7 +13,7 @@ define(['excelBuilder', 'xlsx'], function (excelBuilder, XLSX) {
                 sheetA = {
                     name: 'someSheetName',
                     data: [
-                        ['headerA', 'headerB'],
+                        ['headerTitleA', 'headerTitleB'],
                         [123, 456],
                         [true, false],
                         [null]
@@ -39,7 +39,7 @@ define(['excelBuilder', 'xlsx'], function (excelBuilder, XLSX) {
 
             it('should set cell data for string values', function () {
                 excelBuilder.createWorkBook(mockData);
-                expect(workBookData.Sheets[sheetA.name].A1).toEqual({ v: 'headerA', t: 's' });
+                expect(workBookData.Sheets[sheetA.name].A1).toEqual({ v: 'headerTitleA', t: 's' });
             });
 
             it('should set cell data for number values', function () {
@@ -60,6 +60,11 @@ define(['excelBuilder', 'xlsx'], function (excelBuilder, XLSX) {
             it('should set the range for the sheet', function () {
                 excelBuilder.createWorkBook(mockData);
                 expect(workBookData.Sheets[sheetA.name]['!ref']).toEqual('A1:B4');
+            });
+
+            it('should set the column widths to the max number of characters in each column', function () {
+                excelBuilder.createWorkBook(mockData);
+                expect(workBookData.Sheets[sheetA.name]['!cols']).toEqual([{ wch: 12 }, { wch: 12 }]);
             });
         });
     });

@@ -7,6 +7,8 @@ define(['xlsx', 'lodash'], function (XLSX, _) {
         default: 's'
     };
 
+    var DEFAULT_COLUMN_WIDTH = 10;
+
     var stringToArrayBuffer = function (string) {
         var buffer = new ArrayBuffer(string.length);
         var view = new Uint8Array(buffer);
@@ -24,6 +26,7 @@ define(['xlsx', 'lodash'], function (XLSX, _) {
     var createSheetObject = function (sheetData) {
         var maxRowIndex = 0,
             maxColumnIndex = 0,
+            columnWidths = {},
             sheetObject = {};
 
         _.each(sheetData, function (row, rowIndex) {
@@ -32,10 +35,12 @@ define(['xlsx', 'lodash'], function (XLSX, _) {
                 var cellReference = XLSX.utils.encode_cell({ r: rowIndex, c: columnIndex });
                 sheetObject[cellReference] = createCellObject(cell);
                 maxColumnIndex = _.max([maxColumnIndex, columnIndex]);
+                columnWidths[columnIndex] = _.max([columnWidths[columnIndex], cell && cell.length, DEFAULT_COLUMN_WIDTH]);
             });
         });
 
         sheetObject['!ref'] = XLSX.utils.encode_range({ r: 0, c: 0 }, { r: maxRowIndex, c: maxColumnIndex });
+        sheetObject['!cols'] = _.map(columnWidths, function(width) { return { wch: width }; });
         return sheetObject;
     };
 
