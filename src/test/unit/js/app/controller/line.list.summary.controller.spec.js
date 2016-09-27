@@ -492,13 +492,13 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                         eventDate: moment('2016-07-30T12:00:00Z').toISOString(),
                         dataValues: [mockDataValueA, mockDataValueB],
                         localStatus: 'NEW_DRAFT',
-                        orgUnitName: 'originA'
+                        orgUnitName: 'originB'
                     });
                     mockEventC = createMockEvent({
                         eventDate: moment('2016-07-29T12:00:00Z').toISOString(),
                         dataValues: [mockDataValueA, mockDataValueB],
                         localStatus: 'READY_FOR_DHIS',
-                        orgUnitName: 'originB'
+                        orgUnitName: 'originC'
                     });
 
                     mockProgramStageSection = {
@@ -562,7 +562,6 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
 
                     it('should build headers for listed events while exporting to CSV', function () {
                         var expectedCsvContent = [
-                            escapeString(scope.resourceBundle.eventDateLabel),
                             escapeString(scope.resourceBundle.patientOriginLabel),
                             escapeString(mockDataElementA.formName)
                         ].join(',');
@@ -571,7 +570,6 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
 
                     it('should contain data for listed events while exporting data', function () {
                         var expectedCsvContent = [
-                            moment(mockEventA.eventDate).toDate().toLocaleDateString(),
                             escapeString(mockEventA.orgUnitName),
                             escapeString(mockDataValueA.value),
                             escapeString(mockDataValueB.value)
@@ -590,13 +588,11 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
 
                     it('should save only submitted events to CSV', function () {
                         var expectedCsvContentForEventB = [
-                            moment(mockEventB.eventDate).toDate().toLocaleDateString(),
                             escapeString(mockEventB.orgUnitName),
                             escapeString(mockDataValueA.value)
                         ].join(',');
 
                         var expectedCsvContentForEventC = [
-                            moment(mockEventC.eventDate).toDate().toLocaleDateString(),
                             escapeString(mockEventC.orgUnitName),
                             escapeString(mockDataValueA.value)
                         ].join(',');
