@@ -383,6 +383,29 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                     var actualValue = scope.getDisplayValue(dataValue);
                     expect(actualValue).toEqual("Male");
                 });
+
+                it('should get the referral location name if dataValue is of type referral location', function () {
+                    var dataValue = {
+                        id: 'dv1',
+                        optionSet: {
+                            options: [{
+                                id: 'option1',
+                                name: 'Referral1'
+                            }]
+                        },
+                        value: 'option1',
+                        code: 'dv1_referralLocations'
+                    };
+
+                    scope.referralLocations = {
+                        Referral1: {
+                            name: 'LocationName1'
+                        }
+                    };
+
+                    var actualValue = scope.getDisplayValue(dataValue);
+                    expect(actualValue).toEqual('LocationName1');
+                });
             });
 
             it("should filter events by case number", function() {

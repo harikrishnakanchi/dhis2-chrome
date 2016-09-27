@@ -135,8 +135,10 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
 
             if (!dataValue.value) return "";
 
-            if (_.endsWith(dataValue.code, "_referralLocations"))
-                return $scope.referralLocations[dataValue.value].name;
+            if (_.endsWith(dataValue.code, "_referralLocations")){
+                var referralLocationGenericName = _.chain(dataValue.optionSet.options).find({ id: dataValue.value }).get('name').value();
+                return $scope.referralLocations[referralLocationGenericName].name;
+            }
 
             if (dataValue.optionSet && dataValue.optionSet.options.length > 0) {
                 var option = _.find(dataValue.optionSet.options, function(o) {
