@@ -347,6 +347,29 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                 expect(programEventRepository.getSubmitableEventsFor).toHaveBeenCalled();
             });
 
+            it('should set the referralLocationGenericName on each option for referral location dataValues', function () {
+                var mockEventA, dataValue = {
+                    id: 'dv1',
+                    optionSet: {
+                        options: [{
+                            id: 'option1',
+                            name: 'Referral1'
+                        }]
+                    },
+                    value: 'option1',
+                    code: 'dv1_referralLocations',
+                    showInEventSummary: true
+                };
+                mockEventA = createMockEvent({ dataValues: [dataValue]});
+                programEventRepository.findEventsByDateRange.and.returnValue(utils.getPromise(q, [mockEventA]));
+                scope.$apply();
+
+                scope.filterByDateRange();
+                scope.$apply();
+
+                expect(mockEventA.dataValues[0].optionSet.options[0].referralLocationGenericName).toEqual('Referral1');
+            });
+
             describe('getDisplayValue', function() {
                 it("should get data value", function() {
                     var actualValue = scope.getDisplayValue({
@@ -395,7 +418,8 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                         optionSet: {
                             options: [{
                                 id: 'option1',
-                                name: 'Referral1'
+                                name: 'Referral1',
+                                referralLocationGenericName: 'Referral1'
                             }]
                         },
                         value: 'option1',
