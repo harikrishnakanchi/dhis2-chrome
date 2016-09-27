@@ -16,7 +16,7 @@
                     <select class="form-control" ng-model="selectedWeeksToExport" ng-options="weeksToExport.value as weeksToExport.label for weeksToExport in weeksToExportOptions"></select>
                 </span>
                 <span>
-                    <input type="button" value="{{ resourceBundle.exportRawDataToCSV }}" class="btn btn-primary" ng-click="exportToCSV()" ng-disabled="dataValuesMap | isEmpty"/>
+                    <input type="button" value="{{ resourceBundle.exportRawDataToExcel }}" class="btn btn-primary" ng-click="exportToExcel()" ng-disabled="dataValuesMap | isEmpty"/>
                 </span>
             </form>
 

@@ -1,4 +1,4 @@
-define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
+define(['moment', 'lodash', 'dateUtils', 'excelBuilder'], function (moment, _, dateUtils, excelBuilder) {
     return function($scope, $q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService) {
 
         $scope.weeksToExportOptions = [{
@@ -101,32 +101,26 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
                 });
         };
 
-        var buildCsvContent = function() {
-            var DELIMITER = ',',
-                NEW_LINE = '\n',
-                EMPTY_LINE = '';
-
-            var escapeString = function (string) {
-                return '"' + string + '"';
-            };
+        var buildSpreadSheetContent = function() {
+            var EMPTY_LINE = [];
 
             var buildHeader = function () {
                 var columnHeader = $scope.selectedDataset.isOriginDataset ? $scope.resourceBundle.originLabel : $scope.resourceBundle.dataElement;
-                return [columnHeader].concat($scope.weeks).join(DELIMITER);
+                return [columnHeader].concat($scope.weeks);
             };
 
             var buildDataElement = function (dataElement) {
-                return [
-                    escapeString(dataElement.formName),
+                return _.flatten([
+                    dataElement.formName,
                     _.map($scope.weeks, function(week) { return $scope.dataValuesMap[week] && $scope.dataValuesMap[week][dataElement.id]; })
-                ].join(DELIMITER);
+                ]);
             };
 
             var buildOriginData = function (originOrgUnit) {
-                return [
-                    escapeString(originOrgUnit.name),
+                return _.flatten([
+                    originOrgUnit.name,
                     _.map($scope.weeks, function(week) { return $scope.dataValuesMap[week] && $scope.dataValuesMap[week][originOrgUnit.id]; })
-                ].join(DELIMITER);
+                ]);
             };
 
             var buildSection = function (section) {
@@ -135,20 +129,22 @@ define(['moment', 'lodash', 'dateUtils'], function (moment, _, dateUtils) {
                 } else {
                     return [
                         EMPTY_LINE,
-                        escapeString(section.name),
-                        _.map(section.dataElements, buildDataElement)
-                    ];
+                        [section.name]
+                    ].concat(_.map(section.dataElements, buildDataElement));
                 }
             };
 
-            return _.flattenDeep([buildHeader(), _.map($scope.sections, buildSection)]).join(NEW_LINE);
+            return [buildHeader()].concat(_.flatten(_.map($scope.sections, buildSection)));
         };
 
-        $scope.exportToCSV = function () {
+        $scope.exportToExcel = function () {
             var fileName = [$scope.orgUnit.name, $scope.selectedDataset.name, 'export', moment().format('DD-MMM-YYYY')].join('.'),
-                csvContent = buildCsvContent();
+                spreadSheetContent = [{
+                    name: $scope.selectedDataset.name,
+                    data: buildSpreadSheetContent()
+                }];
 
-            return filesystemService.promptAndWriteFile(fileName, new Blob([csvContent], { type: 'text/csv' }), filesystemService.FILE_TYPE_OPTIONS.CSV);
+            return filesystemService.promptAndWriteFile(fileName, excelBuilder.createWorkBook(spreadSheetContent), filesystemService.FILE_TYPE_OPTIONS.XLSX);
         };
 
         $scope.$watchGroup(['orgUnit', 'selectedDataset', 'selectedWeeksToExport'], reloadView);

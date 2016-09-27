@@ -277,6 +277,7 @@
     "exportEventData": "Exporter les cas soumis",
     "weeksToExport": "Nombre de semaines à exporter",
     "exportRawDataToCSV": "Exporter les données en CSV",
+    "exportRawDataToExcel": "Exporter les données en Excel",
     "noRawDataAvailable": "Pas de données disponibles pour les semaines sélectionnées",
     "noExportRawDataForLineLists": "Vous pouvez exporter des données individuelles depuis la 'barre de recherche' d'un programme spécifique",
     "noExportRawDataForLineListsForApprovers": "Les données individuelles des données agrégées ne peuvent pas être exportés à partir de maintenant.",

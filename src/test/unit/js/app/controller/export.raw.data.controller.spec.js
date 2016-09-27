@@ -1,5 +1,5 @@
-define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'excludedDataElementsRepository', 'orgUnitRepository', 'referralLocationsRepository', 'moduleDataBlockFactory', 'filesystemService', 'translationsService', 'utils', 'dateUtils', 'timecop', 'moment', 'lodash'],
-    function (ExportRawDataController, mocks, DatasetRepository, ExcludedDataElementsRepository, OrgUnitRepository, ReferralLocationsRepository, ModuleDataBlockFactory, FilesystemService, TranslationsService, utils, dateUtils, timecop, moment, _) {
+define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'excludedDataElementsRepository', 'orgUnitRepository', 'referralLocationsRepository', 'moduleDataBlockFactory', 'filesystemService', 'translationsService', 'excelBuilder', 'utils', 'dateUtils', 'timecop', 'moment', 'lodash'],
+    function (ExportRawDataController, mocks, DatasetRepository, ExcludedDataElementsRepository, OrgUnitRepository, ReferralLocationsRepository, ModuleDataBlockFactory, FilesystemService, TranslationsService, excelBuilder, utils, dateUtils, timecop, moment, _) {
         describe('ExportRawDataController', function () {
             var controller, rootScope, scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService,
                 selectedOrgUnit, selectedDataSet, mockEnrichedDataSet, mockExcludedDataElements, mockDataBlocks;
@@ -100,6 +100,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
 
                 spyOn(dateUtils, 'getPeriodRange').and.returnValue(['2016W20']);
 
+                spyOn(excelBuilder, 'createWorkBook').and.returnValue(new Blob());
                 datasetRepository = new DatasetRepository();
                 spyOn(datasetRepository, 'includeDataElements').and.returnValue(utils.getPromise(q, [mockEnrichedDataSet]));
 
@@ -341,31 +342,27 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     expect(scope.dataValuesMap).toEqual(expectedDataValues);
                 });
 
-                describe('exportToCSV', function () {
-                    var csvContent;
+                describe('exportToExcel', function () {
+                    var spreadSheetContent;
 
                     beforeEach(function () {
                         scope.weeks = ['2016W01', '2016W02'];
 
-                        spyOn(window, 'Blob').and.callFake(function (contentArray) {
-                            this.value = contentArray.join();
+                        excelBuilder.createWorkBook.and.callFake(function (workBookContent) {
+                            spreadSheetContent = _.first(workBookContent);
                         });
 
-                        filesystemService.promptAndWriteFile.and.callFake(function (fileName, blob) {
-                            csvContent = blob.value;
-                        });
-
-                        scope.exportToCSV();
+                        scope.exportToExcel();
                     });
 
                     it('should contain the row headers', function () {
-                        var expectedHeader = [scope.resourceBundle.originLabel].concat(scope.weeks).join(',');
-                        expect(csvContent).toContain(expectedHeader);
+                        var expectedHeader = [scope.resourceBundle.originLabel].concat(scope.weeks);
+                        expect(spreadSheetContent.data).toContain(expectedHeader);
                     });
 
                     it('should contain the origin data', function () {
-                        expect(csvContent).toContain('"originNameA",1,3');
-                        expect(csvContent).toContain('"originNameB",2,');
+                        expect(spreadSheetContent.data).toContain(['originNameA', 1, 3]);
+                        expect(spreadSheetContent.data).toContain(['originNameB', 2, undefined]);
                     });
                 });
             });
@@ -433,7 +430,8 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                 });
 
             });
-            describe('exportToCSV', function () {
+
+            describe('exportToExcel', function () {
                 beforeEach(function () {
                     Timecop.install();
                 });
@@ -443,21 +441,20 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     Timecop.uninstall();
                 });
 
-                it('should prompt the user to save CSV file with suggested name', function () {
+                it('should prompt the user to save Excel file with suggested name', function () {
                     var currentTime = moment('2016-07-21T00:00:00.888Z');
                     Timecop.freeze(currentTime);
 
-                    scope.exportToCSV();
+                    scope.exportToExcel();
 
                     var expectedFilename = [selectedOrgUnit.name, selectedDataSet.name, 'export', currentTime.format('DD-MMM-YYYY')].join('.');
-                    expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
+                    expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.XLSX);
                 });
 
-                describe('contents of csv', function () {
-                    var csvContent, sectionA, sectionB;
+                describe('contents of Excel', function () {
+                    var spreadSheetContent, sectionA, sectionB;
 
                     beforeEach(function () {
-                        csvContent = null;
                         scope.weeks = ['2016W01', '2016W02'];
                         scope.dataValuesMap = {
                             '2016W01': {
@@ -485,30 +482,26 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                         };
                         scope.sections = [sectionA, sectionB];
 
-                        spyOn(window, 'Blob').and.callFake(function (contentArray) {
-                            this.value = contentArray.join();
+                        excelBuilder.createWorkBook.and.callFake(function (workBookContent) {
+                            spreadSheetContent = _.first(workBookContent);
                         });
 
-                        filesystemService.promptAndWriteFile.and.callFake(function (fileName, blob) {
-                            csvContent = blob.value;
-                        });
-
-                        scope.exportToCSV();
+                        scope.exportToExcel();
                     });
 
                     it('should contain the row headers', function () {
-                        var expectedHeader = [scope.resourceBundle.dataElement].concat(scope.weeks).join(',');
-                        expect(csvContent).toContain(expectedHeader);
+                        var expectedHeader = [scope.resourceBundle.dataElement].concat(scope.weeks);
+                        expect(spreadSheetContent.data).toContain(expectedHeader);
                     });
 
                     it('should contain the section names', function () {
-                        expect(csvContent).toContain(sectionA.name);
-                        expect(csvContent).toContain(sectionB.name);
+                        expect(spreadSheetContent.data).toContain([sectionA.name]);
+                        expect(spreadSheetContent.data).toContain([sectionB.name]);
                     });
 
                     it('should contain the data element data', function () {
-                        expect(csvContent).toContain('"dataElementNameA",5,12');
-                        expect(csvContent).toContain('"dataElementNameB",6,16');
+                        expect(spreadSheetContent.data).toContain(['dataElementNameA', 5, 12]);
+                        expect(spreadSheetContent.data).toContain(['dataElementNameB', 6, 16]);
                     });
                 });
             });

@@ -277,6 +277,7 @@
     "exportEventData": "Export Submitted Cases",
     "weeksToExport": "Number of weeks to export:",
     "exportRawDataToCSV": "Export data as CSV",
+    "exportRawDataToExcel": "Export data to Excel",
     "noRawDataAvailable": "No data available for selected weeks",
     "noExportRawDataForLineLists": "You can export linelist data from ‘Search Tab’ of a specific program.",
     "noExportRawDataForLineListsForApprovers": "Linelist aggregated data cannot be exported as of now.",
