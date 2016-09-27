@@ -45,6 +45,22 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
         };
 
         var translateAndFilterEventData = function (events) {
+            var setReferralLocationGenericNames = function (events) {
+                var referralLocationDataValues = _.compact(_.map(events, function (event) {
+                    return _.find(event.dataValues, function (dataValue) {
+                        return _.includes(dataValue.code, '_referralLocations');
+                    });
+                }));
+                _.each(referralLocationDataValues, function (dataValue) {
+                    _.each(dataValue.optionSet.options, function (option) {
+                        option.referralLocationGenericName = option.name;
+                    });
+                });
+                return events;
+            };
+
+            setReferralLocationGenericNames(events);
+
             var translatedEvents = translationsService.translate(events);
             $scope.eventsForExport = _.map(_.cloneDeep(translatedEvents), function (event) {
                 event.dataValues = _.reject(event.dataValues, function (dataValue) {
@@ -136,7 +152,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
             if (!dataValue.value) return "";
 
             if (_.endsWith(dataValue.code, "_referralLocations")){
-                var referralLocationGenericName = _.chain(dataValue.optionSet.options).find({ id: dataValue.value }).get('name').value();
+                var referralLocationGenericName = _.chain(dataValue.optionSet.options).find({ id: dataValue.value }).get('referralLocationGenericName').value();
                 return $scope.referralLocations[referralLocationGenericName].name;
             }
 
