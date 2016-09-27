@@ -7,6 +7,25 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
         $scope.showOfflineSummaryForViewOnly = true;
         $scope.viewRegistrationBook = false;
 
+        var INITIAL_PAGE_LIMIT = 20;
+        $scope.pageLimit = INITIAL_PAGE_LIMIT;
+
+        $scope.loadMoreEvents = function () {
+            $scope.pageLimit += 10;
+        };
+
+        var scrollReachedBottomOfPage = function () {
+            if (($window.innerHeight + $window.scrollY) >= document.body.scrollHeight - 200 /* 200px buffer space above the bottom of the window */) {
+                $scope.$apply($scope.loadMoreEvents);
+            }
+        };
+
+        $window.addEventListener('scroll', scrollReachedBottomOfPage);
+
+        $scope.$on('$destroy', function () {
+            $window.removeEventListener('scroll', scrollReachedBottomOfPage);
+        });
+
         var scrollToTop = function() {
             $location.hash();
             $anchorScroll();
@@ -57,6 +76,9 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
             };
 
             $scope.events = _.chain(translationsService.translate(events)).map(filterEvent).map(addHistoricalEventFlag).value();
+
+            //reset pageLimit
+            $scope.pageLimit = INITIAL_PAGE_LIMIT;
         };
 
         var loadEventsView = function() {
