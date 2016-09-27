@@ -323,14 +323,16 @@ define(["lodash", "moment", "properties", "orgUnitMapper", "interpolate"], funct
 
             var buildHeaders = function () {
                 var eventDateLabel = escapeString($scope.resourceBundle.eventDateLabel);
+                var patientOriginLabel = escapeString($scope.resourceBundle.patientOriginLabel);
                 var formNames = _.chain($scope.dataElementsForExport).map('formName').map(escapeString).value();
-                return [eventDateLabel].concat(formNames).join(DELIMITER);
+                return [eventDateLabel, patientOriginLabel].concat(formNames).join(DELIMITER);
             };
 
             var buildData = function (event) {
                 var values = _.map(_.map(event.dataValues, $scope.getDisplayValue), escapeString);
                 var eventDate = $scope.getFormattedDate(event.eventDate);
-                return [eventDate].concat(values).join(DELIMITER);
+                var patientOrigin = escapeString(event.orgUnitName);
+                return [eventDate, patientOrigin].concat(values).join(DELIMITER);
             };
 
             var eventsToBeExported = _.chain($scope.eventsForExport).filter($scope.filterSubmittedEvents).map(buildData).value();
