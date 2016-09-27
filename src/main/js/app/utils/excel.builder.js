@@ -1,42 +1,56 @@
-define(['xlsx'], function (XLSX) {
+define(['xlsx', 'lodash'], function (XLSX, _) {
 
-    var createWorkBook = function () {
+    var CELL_TYPES = {
+        boolean: 'b',
+        number: 'n',
+        string: 's',
+        default: 's'
+    };
 
-        function s2ab(s) {
-            var buf = new ArrayBuffer(s.length);
-            var view = new Uint8Array(buf);
-            for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
-            return buf;
-        }
+    var stringToArrayBuffer = function (string) {
+        var buffer = new ArrayBuffer(string.length);
+        var view = new Uint8Array(buffer);
+        for (var i=0; i!=string.length; ++i) view[i] = string.charCodeAt(i) & 0xFF;
+        return buffer;
+    };
 
-        var myWorkBook = {
-            SheetNames: ['FooBar'],
-            Sheets: {
-                FooBar: {
-                    A1: {
-                        v: 'foo',
-                        t: 's'
-                    },
-                    B1: {
-                        v: 'bar',
-                        t: 's'
-                    },
-                    A2: {
-                        v: 123,
-                        t: 'n'
-                    },
-                    B2: {
-                        v: 456,
-                        t: 'n'
-                    },
-                    '!ref': XLSX.utils.encode_range('A1', 'B2')
-                }
-            }
+    var createCellObject = function (cellValue) {
+        return {
+            v: cellValue,
+            t: CELL_TYPES[typeof cellValue] || CELL_TYPES.default
         };
+    };
 
-        var xlsxWorkBook = XLSX.write(myWorkBook, { bookType:'xlsx', bookSST:true, type: 'binary' });
+    var createSheetObject = function (sheetData) {
+        var maxRowIndex = 0,
+            maxColumnIndex = 0,
+            sheetObject = {};
 
-        return new Blob([s2ab(xlsxWorkBook)], { type: "application/octet-stream" });
+        _.each(sheetData, function (row, rowIndex) {
+            maxRowIndex = _.max([maxRowIndex, rowIndex]);
+            _.each(row, function (cell, columnIndex) {
+                var cellReference = XLSX.utils.encode_cell({ r: rowIndex, c: columnIndex });
+                sheetObject[cellReference] = createCellObject(cell);
+                maxColumnIndex = _.max([maxColumnIndex, columnIndex]);
+            });
+        });
+
+        sheetObject['!ref'] = XLSX.utils.encode_range({ r: 0, c: 0 }, { r: maxRowIndex, c: maxColumnIndex });
+        return sheetObject;
+    };
+
+    var createWorkBookObject = function (sheets) {
+        return {
+            SheetNames: _.map(sheets, 'name'),
+            Sheets: _.reduce(sheets, function (sheetsObject, sheet) {
+                return _.set(sheetsObject, sheet.name, createSheetObject(sheet.data));
+            }, {})
+        };
+    };
+
+    var createWorkBook = function (workBookData) {
+        var xlsxString = XLSX.write(createWorkBookObject(workBookData), { bookType: 'xlsx', bookSST: true, type: 'binary' });
+        return new Blob([stringToArrayBuffer(xlsxString)], { type: "application/octet-stream" });
     };
 
     return {
