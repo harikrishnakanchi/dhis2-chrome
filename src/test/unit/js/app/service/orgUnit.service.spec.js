@@ -143,7 +143,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
 
             orgUnitService.get(orgUnitId);
 
-            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?filter=id:eq:org1234&paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],!dataSets,!access,!href,!uuid').respond(200, "ok");
+            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?filter=id:eq:org1234&paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid').respond(200, "ok");
             httpBackend.flush();
         });
 
@@ -153,7 +153,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
             orgUnitService.get(orgUnitId);
 
             httpBackend.expectGET(properties.dhis.url +
-                '/api/organisationUnits.json?filter=id:eq:id1&filter=id:eq:id2&filter=id:eq:id3&paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],!dataSets,!access,!href,!uuid').respond(200, "ok");
+                '/api/organisationUnits.json?filter=id:eq:id1&filter=id:eq:id2&filter=id:eq:id3&paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid').respond(200, "ok");
             httpBackend.flush();
         });
 
@@ -162,14 +162,14 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
 
             orgUnitService.getAll(lastUpdatedTime);
 
-            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],!dataSets,!access,!href,!uuid&filter=lastUpdated:gte:2014-12-30T09:13:41.092Z').respond(200, "ok");
+            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid&filter=lastUpdated:gte:2014-12-30T09:13:41.092Z').respond(200, "ok");
             httpBackend.flush();
         });
 
         it("should get all org units", function() {
             orgUnitService.getAll();
 
-            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],!dataSets,!access,!href,!uuid').respond(200, "ok");
+            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid').respond(200, "ok");
             httpBackend.flush();
         });
 
