@@ -69,16 +69,6 @@ define(["dataSetService", "angularMocks", "properties"], function(DatasetService
             expect(actualResult).toEqual(expectedDataSets);
         });
 
-        it('should assign orgunit to dataset', function() {
-            var datasetId = 'datasetId';
-            var orgUnitId = 'orgUnitId';
-
-            datasetService.assignOrgUnitToDataset(datasetId, orgUnitId);
-
-            httpBackend.expectPOST(properties.dhis.url + '/api/dataSets/' + datasetId + '/organisationUnits/' + orgUnitId).respond(204);
-            httpBackend.flush();
-        });
-
         it('should remove orgunit from dataset', function() {
             var datasetId = 'datasetId';
             var orgUnitId = 'orgUnitId';
@@ -102,6 +92,5 @@ define(["dataSetService", "angularMocks", "properties"], function(DatasetService
             httpBackend.flush();
             expect(success).toBeTruthy();
         });
-
     });
 });

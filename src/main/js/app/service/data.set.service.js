@@ -1,10 +1,6 @@
 define(["dhisUrl"], function(dhisUrl) {
     return function($http, $q) {
 
-        this.assignOrgUnitToDataset = function(datasetId, orgUnitId) {
-            return $http.post(dhisUrl.dataSets + '/' + datasetId + '/organisationUnits/' + orgUnitId);
-        };
-
         this.removeOrgUnitFromDataset = function(datasetId, orgUnitId) {
             return $http.delete(dhisUrl.dataSets + '/' + datasetId + '/organisationUnits/' + orgUnitId)
                 .catch(function (response) {
