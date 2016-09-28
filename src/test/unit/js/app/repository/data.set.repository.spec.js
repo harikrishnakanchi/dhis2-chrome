@@ -1,47 +1,36 @@
 define(["dataSetRepository", "dataSetTransformer", "testData", "angularMocks", "utils"], function(DataSetRepository, dataSetTransformer, testData, mocks, utils) {
     describe("dataSetRepository", function() {
-        var mockStore, dataSetRepository, q, scope;
+        var mockDB, mockStore, dataSetRepository, q, scope, mockDataSets;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
             scope = $rootScope.$new();
 
-            var mockDB = utils.getMockDB($q);
+            mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
+
+            mockDataSets = [{
+                id: 'dataSetIdA',
+                isNewDataModel: true
+            }, {
+                id: 'dataSetIdB',
+                isNewDataModel: false
+            }];
+
+            spyOn(dataSetTransformer, 'mapDatasetForView').and.callFake(function (dataSet) { return dataSet; });
 
             dataSetRepository = new DataSetRepository(mockDB.db, q);
         }));
 
-        it("should transform and get all dataSets after filtering out current dataSets", function() {
-            var allDataSets = [{
-                "id": "ds1",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }]
-            }, {
-                "id": "ds2",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "false"
-                }]
-            }];
+        describe('getAll', function () {
+            it('should transform and get all dataSets after filtering out current dataSets', function() {
+                mockStore.getAll.and.returnValue(utils.getPromise(q, mockDataSets));
 
-            mockStore.getAll.and.returnValue(utils.getPromise(q, allDataSets));
-
-            var actualDataSets, actualCatOptCombos;
-            dataSetRepository.getAll().then(function(dataSets) {
-                actualDataSets = dataSets;
+                dataSetRepository.getAll().then(function(dataSets) {
+                    expect(_.map(dataSets, 'id')).toEqual(['dataSetIdA']);
+                });
+                scope.$apply();
             });
-            scope.$apply();
-
-            expect(actualDataSets.length).toEqual(1);
-            expect(actualDataSets[0].id).toEqual("ds1");
-            expect(actualDataSets[0].attributeValues).toBeUndefined();
         });
 
         describe('findAllForOrgUnits', function () {
@@ -54,29 +43,11 @@ define(["dataSetRepository", "dataSetTransformer", "testData", "angularMocks", "
                     dataSets: [{ id: 'dataSetIdA' }]
                 }];
 
-                var mockDataSets = [{
-                    id: 'dataSetIdA'
-                }, {
-                    id: 'dataSetIdB'
-                }];
-
-                var transformedDataSetA = {
-                    id: 'dataSetIdA',
-                    isNewDataModel: true
-                },  transformedDataSetB = {
-                    id: 'dataSetIdB',
-                    isNewDataModel: false
-                };
-                spyOn(dataSetTransformer, 'mapDatasetForView').and.callFake(function (dataSet) {
-                    return dataSet.id == 'dataSetIdA' ? transformedDataSetA : transformedDataSetB;
-                });
-
                 mockStore.each.and.returnValue(utils.getPromise(q, mockDataSets));
 
                 dataSetRepository.findAllForOrgUnits(orgUnits).then(function(dataSets) {
                     expect(_.map(dataSets, 'id')).toEqual(['dataSetIdA']);
                 });
-
                 scope.$apply();
             });
         });

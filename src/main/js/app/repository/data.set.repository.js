@@ -1,19 +1,20 @@
 define(["lodash", "dataSetTransformer", "moment"], function(_, dataSetTransformer, moment) {
     return function(db, $q) {
-        var self = this;
+        var self = this,
+            DATA_SETS_STORE_NAME = 'dataSets';
 
         this.getAll = function() {
-            var store = db.objectStore("dataSets");
-            return store.getAll().then(function(dsFromDb) {
-                dataSets = _.map(dsFromDb, dataSetTransformer.mapDatasetForView);
-                dataSets = _.filter(dataSets, "isNewDataModel");
-                return dataSets;
+            var store = db.objectStore(DATA_SETS_STORE_NAME);
+
+            return store.getAll().then(function(dataSets) {
+                var transformedDataSets = _.map(dataSets, dataSetTransformer.mapDatasetForView);
+                return _.filter(transformedDataSets, 'isNewDataModel');
             });
         };
 
         this.findAllForOrgUnits = function(orgUnits) {
-            var store = db.objectStore("dataSets"),
-                dataSetIds = _.uniq(_.map(orgUnits, 'dataSets.id')),
+            var store = db.objectStore(DATA_SETS_STORE_NAME),
+                dataSetIds = _.uniq(_.map(_.flatten(_.map(orgUnits, 'dataSets')), 'id')),
                 query = db.queryBuilder().$in(dataSetIds).compile();
 
             return store.each(query).then(function(dataSets) {
@@ -109,7 +110,7 @@ define(["lodash", "dataSetTransformer", "moment"], function(_, dataSetTransforme
         };
 
         this.findAllDhisDatasets = function(dataSetIds) {
-            var store = db.objectStore("dataSets");
+            var store = db.objectStore(DATA_SETS_STORE_NAME);
             var query = db.queryBuilder().$in(dataSetIds).compile();
             return store.each(query);
         };
@@ -131,7 +132,7 @@ define(["lodash", "dataSetTransformer", "moment"], function(_, dataSetTransforme
             dataSets = !_.isArray(dataSets) ? [dataSets] : dataSets;
             dataSets = extractOrgUnitIdsForIndexing(dataSets);
             dataSets = sections ? associateSectionsToDataSets(dataSets, sections) : dataSets;
-            var store = db.objectStore("dataSets");
+            var store = db.objectStore(DATA_SETS_STORE_NAME);
             return store.upsert(dataSets).then(function() {
                 return dataSets;
             });
