@@ -44,72 +44,41 @@ define(["dataSetRepository", "dataSetTransformer", "testData", "angularMocks", "
             expect(actualDataSets[0].attributeValues).toBeUndefined();
         });
 
-        it("should get all unique dataSets by orgUnitIds after filtering out current dataSets", function() {
-            var allDataSetsForOu1 = [{
-                "id": "ds1",
-                "organisationUnits": [{
-                    "id": "ou1"
-                }],
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }]
-            }, {
-                "id": "ds2",
-                "organisationUnits": [{
-                    "id": "ou1"
+        describe('findAllForOrgUnits', function () {
+            it('should get all unique and newDataModel dataSets for the specified orgUnits', function() {
+                var orgUnits = [{
+                    id: 'someOrgUnitA',
+                    dataSets: [{ id: 'dataSetIdA' }, { id: 'dataSetIdB' }]
                 }, {
-                    "id": "ou2"
-                }],
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }]
-            }];
+                    id: 'someOrgUnitB',
+                    dataSets: [{ id: 'dataSetIdA' }]
+                }];
 
-            var allDataSetsForOu2 = [{
-                "id": "ds2",
-                "organisationUnits": [{
-                    "id": "ou1"
+                var mockDataSets = [{
+                    id: 'dataSetIdA'
                 }, {
-                    "id": "ou2"
-                }],
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }]
-            }, {
-                "id": "ds3",
-                "organisationUnits": [{
-                    "id": "ou2"
-                }],
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "false"
-                }]
-            }];
+                    id: 'dataSetIdB'
+                }];
 
-            mockStore.each.and.returnValue(utils.getPromise(q, allDataSetsForOu1.concat(allDataSetsForOu2)));
+                var transformedDataSetA = {
+                    id: 'dataSetIdA',
+                    isNewDataModel: true
+                },  transformedDataSetB = {
+                    id: 'dataSetIdB',
+                    isNewDataModel: false
+                };
+                spyOn(dataSetTransformer, 'mapDatasetForView').and.callFake(function (dataSet) {
+                    return dataSet.id == 'dataSetIdA' ? transformedDataSetA : transformedDataSetB;
+                });
 
-            var actualDataSets;
-            dataSetRepository.findAllForOrgUnits(["ou1", "ou2"]).then(function(dataSets) {
-                actualDataSets = dataSets;
+                mockStore.each.and.returnValue(utils.getPromise(q, mockDataSets));
+
+                dataSetRepository.findAllForOrgUnits(orgUnits).then(function(dataSets) {
+                    expect(_.map(dataSets, 'id')).toEqual(['dataSetIdA']);
+                });
+
+                scope.$apply();
             });
-            scope.$apply();
-
-            expect(actualDataSets.length).toEqual(2);
-            expect(actualDataSets[0].id).toEqual("ds1");
-            expect(actualDataSets[1].id).toEqual("ds2");
-            expect(actualDataSets[0].attributeValues).toBeUndefined();
-            expect(actualDataSets[1].attributeValues).toBeUndefined();
         });
 
         it("should get dataSets with sections and dataElements", function() {

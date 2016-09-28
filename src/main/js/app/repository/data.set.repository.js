@@ -10,15 +10,15 @@ define(["lodash", "dataSetTransformer", "moment"], function(_, dataSetTransforme
                 return dataSets;
             });
         };
-        
-        this.findAllForOrgUnits = function(orgUnitIds) {
-            var store = db.objectStore("dataSets");
-            var query = db.queryBuilder().$in(orgUnitIds).$index("by_organisationUnit").compile();
-            return store.each(query).then(function(dsFromDb) {
-                dataSets = _.map(dsFromDb, dataSetTransformer.mapDatasetForView);
-                dataSets = _.filter(dataSets, "isNewDataModel");
-                dataSets = _.uniq(_.sortBy(dataSets, 'id'), true, 'id');
-                return dataSets;
+
+        this.findAllForOrgUnits = function(orgUnits) {
+            var store = db.objectStore("dataSets"),
+                dataSetIds = _.uniq(_.map(orgUnits, 'dataSets.id')),
+                query = db.queryBuilder().$in(dataSetIds).compile();
+
+            return store.each(query).then(function(dataSets) {
+                var transformedDataSets = _.map(dataSets, dataSetTransformer.mapDatasetForView);
+                return _.filter(transformedDataSets, 'isNewDataModel');
             });
         };
 
