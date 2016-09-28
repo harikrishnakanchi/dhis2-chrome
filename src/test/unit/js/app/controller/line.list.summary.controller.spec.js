@@ -197,7 +197,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                     },
                     type: 'syncModuleDataBlock',
                     locale: 'en',
-                    desc: scope.resourceBundle.syncModuleDataBlockDesc + period + ', ' + module.name
+                    desc: scope.resourceBundle.syncModuleDataBlockDesc
                 };
             };
 

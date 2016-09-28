@@ -199,7 +199,9 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
                     period: period
                 },
                 locale: $scope.locale,
-                desc: $scope.resourceBundle.syncModuleDataBlockDesc + period + ', ' + $scope.selectedModuleName
+                desc: interpolate($scope.resourceBundle.syncModuleDataBlockDesc, {
+                    period: period + ', ' + $scope.selectedModuleName
+                })
             }, 'dataValues');
         };
 

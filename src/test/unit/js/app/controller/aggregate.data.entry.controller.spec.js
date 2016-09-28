@@ -433,7 +433,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     },
                     type: 'syncModuleDataBlock',
                     locale: 'en',
-                    desc: scope.resourceBundle.syncModuleDataBlockDesc + selectedPeriod + ', ' + scope.selectedModule.name
+                    desc: scope.resourceBundle.syncModuleDataBlockDesc
                 }, 'dataValues');
 
                 expect(scope.submitSuccess).toBe(true);
@@ -786,7 +786,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     },
                     type: 'syncModuleDataBlock',
                     locale: 'en',
-                    desc: scope.resourceBundle.syncModuleDataBlockDesc + selectedPeriod + ', ' + scope.selectedModule.name
+                    desc: scope.resourceBundle.syncModuleDataBlockDesc
                 }, 'dataValues');
             });
 

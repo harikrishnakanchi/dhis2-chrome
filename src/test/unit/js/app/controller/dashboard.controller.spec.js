@@ -154,7 +154,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                         },
                         "type": "syncModuleDataBlock",
                         "locale": "en",
-                        "desc": scope.resourceBundle.syncModuleDataBlockDesc + " 2014W01"
+                        "desc": scope.resourceBundle.syncModuleDataBlockDesc
                     });
                     expect(hustle.publishOnce.calls.argsFor(1)[0]).toEqual({
                         "data": {
@@ -163,7 +163,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                         },
                         "type": "syncModuleDataBlock",
                         "locale": "en",
-                        "desc": scope.resourceBundle.syncModuleDataBlockDesc + " 2014W02"
+                        "desc": scope.resourceBundle.syncModuleDataBlockDesc
                     });
                     expect(hustle.publishOnce.calls.argsFor(2)[0]).toEqual({
                         "data": {
@@ -172,7 +172,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                         },
                         "type": "syncModuleDataBlock",
                         "locale": "en",
-                        "desc": scope.resourceBundle.syncModuleDataBlockDesc + " 2014W02"
+                        "desc": scope.resourceBundle.syncModuleDataBlockDesc
                     });
                 });
 
@@ -240,7 +240,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                         },
                         "type": "syncModuleDataBlock",
                         "locale": "en",
-                        "desc": scope.resourceBundle.syncModuleDataBlockDesc + " 2014W01"
+                        "desc": scope.resourceBundle.syncModuleDataBlockDesc
                     });
                     expect(hustle.publishOnce.calls.argsFor(1)[0]).toEqual({
                         "data": {
@@ -249,7 +249,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                         },
                         "type": "syncModuleDataBlock",
                         "locale": "en",
-                        "desc": scope.resourceBundle.syncModuleDataBlockDesc + " 2014W02"
+                        "desc": scope.resourceBundle.syncModuleDataBlockDesc
                     });
                     expect(hustle.publishOnce.calls.argsFor(2)[0]).toEqual({
                         "data": {
@@ -258,7 +258,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                         },
                         "type": "syncModuleDataBlock",
                         "locale": "en",
-                        "desc": scope.resourceBundle.syncModuleDataBlockDesc + " 2014W02"
+                        "desc": scope.resourceBundle.syncModuleDataBlockDesc
                     });
                 });
             });

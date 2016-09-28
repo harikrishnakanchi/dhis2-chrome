@@ -207,7 +207,9 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                     },
                     type: "syncModuleDataBlock",
                     locale: $scope.locale,
-                    desc: $scope.resourceBundle.syncModuleDataBlockDesc + currentPeriod + ", " + $scope.selectedModule.name
+                    desc: interpolate($scope.resourceBundle.syncModuleDataBlockDesc, {
+                        period: currentPeriod + ", " + $scope.selectedModule.name
+                    })
                 }, "dataValues");
             };
 

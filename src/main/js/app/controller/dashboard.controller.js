@@ -71,7 +71,9 @@ define(["properties", "moment", "dateUtils", "lodash", "interpolate"], function(
                             },
                             type: 'syncModuleDataBlock',
                             locale: $scope.locale,
-                            desc: $scope.resourceBundle.syncModuleDataBlockDesc + ' ' + moduleDataBlock.period
+                            desc: interpolate($scope.resourceBundle.syncModuleDataBlockDesc, {
+                                period: moduleDataBlock.period + ", " + moduleDataBlock.moduleName
+                            })
                         }, "dataValues");
                     });
                     return $q.all(publishPromises);
