@@ -80,19 +80,6 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
 
             setReferralLocationGenericNames(events);
 
-            var translatedEvents = translationsService.translate(events);
-            $scope.eventsForExport = _.map(_.cloneDeep(translatedEvents), function (event) {
-                event.dataValues = _.reject(event.dataValues, function (dataValue) {
-                    return _.contains($scope.excludedDataElementIds, dataValue.dataElement);
-                });
-                return event;
-            });
-
-            var filterEvent = function (event) {
-                event.dataValues = _.filter(event.dataValues, 'showInEventSummary');
-                return event;
-            };
-
             var minEventDate = dateUtils.max([dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync), $scope.moduleOpeningDate]).startOf('day').toISOString();
 
             var addHistoricalEventFlag = function (event) {
@@ -100,7 +87,7 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
                 return event;
             };
 
-            $scope.events = _.chain(translationsService.translate(events)).map(filterEvent).map(addHistoricalEventFlag).value();
+            $scope.events = _.chain(translationsService.translate(events)).map(addHistoricalEventFlag).value();
 
             //reset pageLimit
             $scope.pageLimit = INITIAL_PAGE_LIMIT;
@@ -377,12 +364,15 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
             };
 
             var buildData = function (event) {
-                var values = _.map(_.map(event.dataValues, $scope.getDisplayValue), escapeString);
+                var dataValues = _.reject(event.dataValues, function (dataValue) {
+                    return _.contains($scope.excludedDataElementIds, dataValue.dataElement);
+                });
+                var values = _.map(_.map(dataValues, $scope.getDisplayValue), escapeString);
                 var patientOrigin = escapeString(event.orgUnitName);
                 return values.concat(patientOrigin).join(DELIMITER);
             };
 
-            var eventsToBeExported = _.chain($scope.eventsForExport).filter($scope.filterSubmittedEvents).map(buildData).value();
+            var eventsToBeExported = _.chain($scope.events).filter($scope.filterSubmittedEvents).map(buildData).value();
 
             var csvContent = _.flatten([buildHeaders(), eventsToBeExported]).join(NEW_LINE);
             var fileName = [$scope.selectedModuleName, 'summary', moment().format('DD-MMM-YYYY'), 'csv'].join('.');

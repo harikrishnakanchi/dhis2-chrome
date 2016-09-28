@@ -524,7 +524,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
 
                     scope.filterByDateRange();
                     scope.$apply();
-                    expect(scope.eventsForExport[0].dataValues).toEqual([mockDataValueA]);
+                    expect(scope.events[0].dataValues).toEqual([mockDataValueA, mockDataValueB]);
                 });
 
                 it('should contain all data elements for export except excluded data elements', function () {
@@ -549,7 +549,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                             csvContent = blob.value;
                         });
 
-                        scope.eventsForExport = [mockEventA, mockEventB, mockEventC];
+                        scope.events = [mockEventA, mockEventB, mockEventC];
                         scope.dataElementsForExport = [mockDataElementA];
                         scope.selectedModuleName = 'someModuleName';
 
