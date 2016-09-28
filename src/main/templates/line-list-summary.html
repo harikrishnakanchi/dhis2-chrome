@@ -127,7 +127,7 @@
                                         <tr ng-repeat="event in events">
                                             <td>{{ getFormattedDate(event.eventDate) }}</td>
                                             <td ng-if="showPatientOriginInSummaryTable()">{{ getOriginName(event.orgUnit)}}</td>
-                                            <td ng-repeat="dataValue in event.dataValues">
+                                            <td ng-repeat="dataValue in event.dataValues | filter: { showInEventSummary: true }">
                                                 <span>{{ getDisplayValue(dataValue) }}</span>
                                             </td>
                                             <td>
