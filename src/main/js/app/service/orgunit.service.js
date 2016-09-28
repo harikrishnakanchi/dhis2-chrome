@@ -1,8 +1,22 @@
 define(["dhisUrl", "httpUtils", "lodash"], function(dhisUrl, httpUtils, _) {
     return function($http, db) {
+
+        this.assignDataSetToOrgUnit = function(orgUnitId, dataSetId) {
+            return $http.post(dhisUrl.orgUnits + '/' + orgUnitId + '/dataSets/' + dataSetId);
+        };
+
+        this.removeDataSetFromOrgUnit = function(orgUnitId, dataSetId) {
+            return $http.delete(dhisUrl.orgUnits + '/' + orgUnitId + '/dataSets/' + dataSetId)
+                .catch(function (response) {
+                    if (response.status != 404) {
+                        return $q.reject();
+                    }
+                });
+        };
+
         this.get = function(orgUnitIds) {
             orgUnitIds = _.isArray(orgUnitIds) ? orgUnitIds : [orgUnitIds];
-            var url = dhisUrl.orgUnits + '?' + httpUtils.getParamString('id', orgUnitIds) + '&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid';
+            var url = dhisUrl.orgUnits + '.json?' + httpUtils.getParamString('id', orgUnitIds) + '&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid';
             return $http.get(url).then(function(response) {
                 return response.data.organisationUnits;
             });
@@ -15,7 +29,7 @@ define(["dhisUrl", "httpUtils", "lodash"], function(dhisUrl, httpUtils, _) {
         };
 
         this.getAll = function(lastUpdatedTime) {
-            var url = dhisUrl.orgUnits + '?paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid';
+            var url = dhisUrl.orgUnits + '.json?paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid';
             url = lastUpdatedTime ? url + "&filter=lastUpdated:gte:" + lastUpdatedTime : url;
             return $http.get(url).then(function(response) {
                 return response.data.organisationUnits;
@@ -23,7 +37,7 @@ define(["dhisUrl", "httpUtils", "lodash"], function(dhisUrl, httpUtils, _) {
         };
 
         this.getIds = function(orgUnitIds) {
-            var url = dhisUrl.orgUnits + '?' + httpUtils.getParamString('id', orgUnitIds) + "&fields=id";
+            var url = dhisUrl.orgUnits + '.json?' + httpUtils.getParamString('id', orgUnitIds) + "&fields=id";
             return $http.get(url).then(function(response) {
                 return _.pluck(response.data.organisationUnits, "id");
             });
