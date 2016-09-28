@@ -1,5 +1,5 @@
 define(["lodash"], function(_) {
-    return function($q, $log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDataSetConsumer, updateDataSetConsumer,
+    return function($q, $log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDataSetConsumer, assignDataSetsToOrgUnitsConsumer,
         createUserConsumer, updateUserConsumer, uploadProgramConsumer,
         downloadProgramConsumer, downloadMetadataConsumer,
         downloadOrgUnitGroupConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
@@ -53,7 +53,7 @@ define(["lodash"], function(_) {
                     return uploadOrgUnitGroupConsumer.run(message);
 
                 case "associateOrgUnitToDataset":
-                    return updateDataSetConsumer.run(message);
+                    return assignDataSetsToOrgUnitsConsumer.run(message);
 
                 case "removeOrgUnitFromDataset":
                     return removeOrgunitDataSetAssociationConsumer.run(message);
