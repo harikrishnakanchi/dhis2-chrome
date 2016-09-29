@@ -327,11 +327,11 @@
         "period": "Période",
         "organisationUnit": "L'unité organisationnelle"
     },
-    "moreLabel": "More",
-    "lessLabel": "Less",
-    "infoLabel": "info",
-    "aggregateDataNotAvailableMessage": "There is no data for this week.",
-    "linelistDataNotAvailableMessage": "There is no summary data for this week.",
-    "praxisDownloadMessage": "One of the reasons might be because Praxis downloads only last 52 weeks of data. Any data collected before 52 weeks will not be available on this page. However this data is available for use in the reports and chart sections.",
-    "contactSupport": "Contact {{supportEmail}} for any questions."
+    "moreLabel": "plus",
+    "lessLabel": "moins",
+    "infoLabel": "d’informations",
+    "aggregateDataNotAvailableMessage": "Il n’y a pas de données pour cette semaine.",
+    "linelistDataNotAvailableMessage": "Il n’y a pas de synthèse des données pour cette semaine.",
+    "praxisDownloadMessage": "Une des raisons peut être que Praxis ne télécharge que les 52 dernières semaines de données. Toute donnée collectée avant ces 52 semaines ne sera pas disponible sur cette page. Cependant, ces données sont disponibles dans la section des rapports et graphiques.",
+    "contactSupport": "Contactez {{supportEmail}} pour toute question"
 }
