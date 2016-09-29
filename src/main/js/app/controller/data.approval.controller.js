@@ -231,7 +231,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
 
             var loadAssociatedOrgUnitsAndPrograms = function() {
                 return orgUnitRepository.findAllByParent([$scope.selectedModule.id]).then(function(originOrgUnits) {
-                    $scope.moduleAndOriginOrgUnitIds = _.pluck(_.flattenDeep([$scope.selectedModule, originOrgUnits]), "id");
+                    $scope.moduleAndOriginOrgUnits = [$scope.selectedModule].concat(originOrgUnits);
                     return programRepository.getProgramForOrgUnit(originOrgUnits[0].id).then(function(program) {
                         if (program) {
                             $scope.associatedProgramId = program.id;
@@ -263,7 +263,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
                 });
             };
 
-            var findallOrgUnits = function(orgUnits) {
+            var findAllOrgUnits = function(orgUnits) {
                 var orgUnitIds = _.pluck(orgUnits, "id");
                 return orgUnitRepository.findAll(orgUnitIds);
             };
@@ -272,12 +272,12 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
                 return;
             return $q.all([loadAssociatedOrgUnitsAndPrograms(), loadExcludedDataElements(), loadRefferalLocations()]).then(function() {
 
-                var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnitIds)
+                var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnits)
                     .then(_.curryRight(datasetRepository.includeDataElements)($scope.excludedDataElements))
                     .then(datasetRepository.includeCategoryOptionCombinations)
                     .then(function(datasets) {
                         var dataSetPromises = _.map(datasets, function (dataset) {
-                            return findallOrgUnits(dataset.organisationUnits).then(function (orgunits) {
+                            return findAllOrgUnits(dataset.organisationUnits).then(function (orgunits) {
                                 dataset.organisationUnits = orgunits;
                                 return dataset;
                             });

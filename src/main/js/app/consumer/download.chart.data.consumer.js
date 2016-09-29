@@ -9,7 +9,7 @@ define(["lodash", "moment"], function(_, moment) {
                 return $q.all(upsertPromises);
             };
 
-            var downloadRelevantChartData = function(charts, userModuleIds) {
+            var downloadRelevantChartData = function(charts, userModules) {
                 var allDownloadsWereSuccessful = true;
 
                 var recursivelyDownloadAndUpsertChartData = function(modulesAndCharts) {
@@ -33,34 +33,34 @@ define(["lodash", "moment"], function(_, moment) {
 
                 var getModuleInformation = function() {
                     var getOriginsForModule = function (data) {
-                        return orgUnitRepository.findAllByParent(data.moduleId).then(function (origins) {
+                        return orgUnitRepository.findAllByParent(data.module.id).then(function (origins) {
                             return _.merge({ origins: origins }, data);
                         });
                     };
 
                     var getDataSetsForModuleAndOrigins = function (data) {
-                        var orgUnitIds = _.isEmpty(data.origins) ? [data.moduleId] : [data.moduleId, _.first(data.origins).id];
-                        return datasetRepository.findAllForOrgUnits(orgUnitIds).then(function (dataSets) {
+                        var orgUnits = [data.module].concat(data.origins);
+                        return datasetRepository.findAllForOrgUnits(orgUnits).then(function (dataSets) {
                             return _.merge({ dataSets: dataSets}, data);
                         });
                     };
 
-                    var promises = _.transform(userModuleIds, function (promises, moduleId) {
-                        promises[moduleId] = getOriginsForModule({ moduleId: moduleId}).then(getDataSetsForModuleAndOrigins);
+                    var promises = _.transform(userModules, function (promises, module) {
+                        promises[module.id] = getOriginsForModule({ module: module }).then(getDataSetsForModuleAndOrigins);
                     }, {});
                     return $q.all(promises);
                 };
 
                 var filterChartsForModules = function(moduleInformation) {
                     var modulesAndCharts = [];
-                    _.forEach(userModuleIds, function(moduleId) {
-                        _.forEach(moduleInformation[moduleId].dataSets, function (dataSet) {
+                    _.forEach(userModules, function(module) {
+                        _.forEach(moduleInformation[module.id].dataSets, function (dataSet) {
                             var filteredCharts = _.filter(charts, { dataSetCode: dataSet.code });
                             _.forEach(filteredCharts, function (chart) {
                                 modulesAndCharts.push({
-                                    moduleId: moduleId,
+                                    moduleId: module.id,
                                     chart: chart,
-                                    orgUnitDataDimensionItems: chart.geographicOriginChart ? _.map(moduleInformation[moduleId].origins, 'id') : moduleId
+                                    orgUnitDataDimensionItems: chart.geographicOriginChart ? _.map(moduleInformation[module.id].origins, 'id') : module.id
                                 });
                             });
                         });
@@ -107,13 +107,11 @@ define(["lodash", "moment"], function(_, moment) {
                     modules: orgUnitRepository.getAllModulesInOrgUnits([projectId]),
                     charts: chartRepository.getAll()
                 }).then(function (data) {
-                    var moduleIds = _.pluck(data.modules, 'id');
-
                     return applyDownloadFrequencyStrategy(projectId, data.charts).then(function(strategyResult) {
                         var chartsToDownload = strategyResult.charts,
                             changeLogKeysToUpdate = strategyResult.changeLogKeys;
 
-                        return downloadRelevantChartData(chartsToDownload, moduleIds).then(function(allDownloadsWereSuccessful) {
+                        return downloadRelevantChartData(chartsToDownload, data.modules).then(function(allDownloadsWereSuccessful) {
                             if(allDownloadsWereSuccessful) {
                                 return updateChangeLogs(changeLogKeysToUpdate);
                             }

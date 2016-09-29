@@ -105,8 +105,7 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                 downloadHistoricalDataConsumer.run();
                 scope.$apply();
 
-                var orgUnitIds = [mockModuleA.id].concat(_.map(mockOrigins, 'id'));
-                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(orgUnitIds);
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModuleA].concat(mockOrigins));
             });
 
             it('should continue download of historical data even if one module fails', function() {

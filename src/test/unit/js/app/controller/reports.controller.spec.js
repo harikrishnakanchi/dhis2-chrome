@@ -81,7 +81,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
         it("should load dataSets", function() {
             scope.$apply();
 
-            expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModule.id]);
+            expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModule]);
             expect(_.map(scope.datasets, 'id')).toEqual([mockDataSet.id]);
         });
 

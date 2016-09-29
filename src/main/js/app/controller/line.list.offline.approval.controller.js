@@ -6,7 +6,7 @@ define(["lodash", "moment", "properties", "interpolate"], function(_, moment, pr
         $scope.origins = {
             'open': true
         };
-        var groupedProcedureDataValues, groupedDataValues;
+        var groupedProcedureDataValues, groupedDataValues, filteredEventIds;
 
         $scope.getTotalCount = function(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilters, ageFilter) {
             var genderfilterIds = _.map(genderFilters, 'id');
@@ -265,7 +265,7 @@ define(["lodash", "moment", "properties", "interpolate"], function(_, moment, pr
         };
 
         var getAssociatedDataSets = function() {
-            return datasetRepository.findAllForOrgUnits([$scope.originOrgUnits[0].id]).then(function(data) {
+            return datasetRepository.findAllForOrgUnits([$scope.originOrgUnits[0]]).then(function(data) {
                 $scope.associatedDataSets = translationsService.translate(data);
             });
         };

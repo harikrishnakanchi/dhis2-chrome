@@ -330,7 +330,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
 
             var loadAssociatedOrgUnitsAndPrograms = function() {
                 return orgUnitRepository.findAllByParent([$scope.selectedModule.id]).then(function(originOrgUnits) {
-                    $scope.moduleAndOriginOrgUnitIds = _.pluck(_.flattenDeep([$scope.selectedModule, originOrgUnits]), "id");
+                    $scope.moduleAndOriginOrgUnits = [$scope.selectedModule].concat(originOrgUnits);
                     return programRepository.getProgramForOrgUnit(originOrgUnits[0].id).then(function(program) {
                         if (program)
                             $scope.associatedProgramId = program.id;
@@ -375,7 +375,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             };
 
             return $q.all([loadAssociatedOrgUnitsAndPrograms(), loadExcludedDataElements(), loadRefferalLocations()]).then(function() {
-                var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnitIds)
+                var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnits)
                     .then(_.curryRight(datasetRepository.includeDataElements)($scope.excludedDataElements))
                     .then(datasetRepository.includeCategoryOptionCombinations)
                     .then(function(datasets) {

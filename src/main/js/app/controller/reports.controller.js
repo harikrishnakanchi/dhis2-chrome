@@ -166,7 +166,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
         var loadRelevantDatasets = function() {
 
             var loadDataSetsForModules = function(orgUnits) {
-                return datasetRepository.findAllForOrgUnits(_.pluck(orgUnits, "id")).then(function(dataSets) {
+                return datasetRepository.findAllForOrgUnits(orgUnits).then(function(dataSets) {
                     var filteredDataSets = _.reject(dataSets, function(ds) {
                         return ds.isPopulationDataset || ds.isReferralDataset;
                     });

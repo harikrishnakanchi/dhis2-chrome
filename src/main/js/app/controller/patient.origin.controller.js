@@ -63,11 +63,11 @@ define(["lodash", "moment", "dhisId","interpolate", "orgUnitMapper"], function(_
                         });
                     };
 
-                    var getDatasetsAndProgram = function(orgUnitId) {
-                        return $q.all([datasetRepository.findAllForOrgUnits([orgUnitId]), programRepository.getProgramForOrgUnit(orgUnitId)]);
+                    var getDatasetsAndProgram = function(orgUnit) {
+                        return $q.all([datasetRepository.findAllForOrgUnits([orgUnit]), programRepository.getProgramForOrgUnit(orgUnit.id)]);
                     };
 
-                    return getDatasetsAndProgram(siblingOriginOrgUnit.id).then(function(data) {
+                    return getDatasetsAndProgram(siblingOriginOrgUnit).then(function(data) {
                         return associate(data[0], data[1]);
                     });
                 };

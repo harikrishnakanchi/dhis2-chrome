@@ -2,7 +2,7 @@ define(["lodash", "moment"], function(_, moment) {
     return function(reportService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, $q) {
 
         this.run = function() {
-            var downloadPivotTableDataForProject = function(pivotTables, projectId, userModuleIds) {
+            var downloadPivotTableDataForProject = function(pivotTables, projectId, userModules) {
                 var allDownloadsWereSuccessful = true;
 
                 var recursivelyDownloadAndUpsertPivotTableData = function(orgUnitsAndTables) {
@@ -26,23 +26,19 @@ define(["lodash", "moment"], function(_, moment) {
 
                 var getModuleInformation = function() {
                     var getOriginsForModule = function (data) {
-                        return orgUnitRepository.findAllByParent(data.moduleId).then(function (origins) {
+                        return orgUnitRepository.findAllByParent(data.module.id).then(function (origins) {
                             return _.merge({ origins: origins }, data);
                         });
                     };
 
                     var getDataSetsForModuleAndOrigins = function (data) {
-                        var orgUnitIds = [data.moduleId];
-                        if(!_.isEmpty(data.origins)) {
-                            orgUnitIds.push(_.first(data.origins).id);
-                        }
-                        return datasetRepository.findAllForOrgUnits(orgUnitIds).then(function (dataSets) {
+                        return datasetRepository.findAllForOrgUnits([data.module].concat(data.origins)).then(function (dataSets) {
                             return _.merge({ dataSets: dataSets }, data);
                         });
                     };
 
-                    var moduleInfoPromises = _.transform(userModuleIds, function (promises, moduleId) {
-                        promises[moduleId] = getOriginsForModule({ moduleId: moduleId }).then(getDataSetsForModuleAndOrigins);
+                    var moduleInfoPromises = _.transform(userModules, function (promises, module) {
+                        promises[module.id] = getOriginsForModule({ module: module }).then(getDataSetsForModuleAndOrigins);
                     }, {});
 
                     return $q.all(moduleInfoPromises);
@@ -51,14 +47,14 @@ define(["lodash", "moment"], function(_, moment) {
                 var filterPivotTablesForEachModule = function(moduleInformation) {
                     var modulesAndPivotTables = [];
 
-                    _.forEach(userModuleIds, function(moduleId) {
-                        _.forEach(moduleInformation[moduleId].dataSets, function(dataSet) {
+                    _.forEach(userModules, function(module) {
+                        _.forEach(moduleInformation[module.id].dataSets, function(dataSet) {
                             var pivotTablesForDataSet = _.filter(pivotTables, { dataSetCode: dataSet.code });
                             _.forEach(pivotTablesForDataSet, function(pivotTable) {
                                 modulesAndPivotTables.push({
-                                    orgUnitId: moduleId,
+                                    orgUnitId: module.id,
                                     pivotTable: pivotTable,
-                                    orgUnitDimensionItems: pivotTable.geographicOriginReport ? _.map(moduleInformation[moduleId].origins, 'id') : moduleId
+                                    orgUnitDimensionItems: pivotTable.geographicOriginReport ? _.map(moduleInformation[module.id].origins, 'id') : module.id
                                 });
                             });
                         });
@@ -127,13 +123,11 @@ define(["lodash", "moment"], function(_, moment) {
                     modules: orgUnitRepository.getAllModulesInOrgUnits([projectId]),
                     pivotTables: pivotTableRepository.getAll()
                 }).then(function (data) {
-                    var moduleIds = _.pluck(data.modules, 'id');
-
                     return applyDownloadFrequencyStrategy(projectId, data.pivotTables).then(function(strategyResult) {
                         var pivotTablesToDownload = strategyResult.pivotTables,
                             changeLogKeysToUpdate = strategyResult.changeLogKeys;
 
-                        return downloadPivotTableDataForProject(pivotTablesToDownload, projectId, moduleIds).then(function(allDownloadsWereSuccessful) {
+                        return downloadPivotTableDataForProject(pivotTablesToDownload, projectId, data.modules).then(function(allDownloadsWereSuccessful) {
                             if(allDownloadsWereSuccessful) {
                                 return updateChangeLogs(changeLogKeysToUpdate);
                             }

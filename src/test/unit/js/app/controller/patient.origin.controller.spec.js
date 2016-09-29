@@ -1,6 +1,9 @@
-define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop", "orgUnitRepository", "patientOriginRepository", "dataSetRepository", "originOrgunitCreator", "programRepository", "orgUnitGroupHelper", "systemSettingRepository"], function(PatientOriginController, mocks, utils, dhisId, timecop, OrgUnitRepository, PatientOriginRepository, DatasetRepository, OriginOrgunitCreator, ProgramRepository, OrgUnitGroupHelper, SystemSettingRepository) {
+define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop", "orgUnitRepository", "patientOriginRepository", "dataSetRepository", "originOrgunitCreator", "programRepository", "orgUnitGroupHelper"], function(PatientOriginController, mocks, utils, dhisId, timecop, OrgUnitRepository, PatientOriginRepository, DatasetRepository, OriginOrgunitCreator, ProgramRepository, OrgUnitGroupHelper) {
     describe("patientOriginController", function() {
-        var scope, patientOriginController, q, patientOriginRepository, hustle, origins, orgUnitRepository, originOrgunitCreator, programRepository, orgUnitGroupHelper, systemSettingRepository;
+        var scope, q, hustle,
+            patientOriginController,
+            datasetRepository, patientOriginRepository, orgUnitRepository, programRepository, originOrgunitCreator,
+            orgUnitGroupHelper, origins;
 
         beforeEach(module("hustle"));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle) {

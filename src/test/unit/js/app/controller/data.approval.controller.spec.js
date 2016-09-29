@@ -2,9 +2,11 @@
 define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "excludedDataElementsRepository", "dataSetRepository", "programRepository", "referralLocationsRepository", "translationsService", "moduleDataBlockFactory", "dataSyncFailureRepository"],
     function(DataApprovalController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, ExcludedDataElementsRepository, DatasetRepository, ProgramRepository, ReferralLocationsRepository, TranslationsService, ModuleDataBlockFactory, DataSyncFailureRepository) {
         describe("dataApprovalController ", function() {
-            var scope, routeParams, q, location, anchorScroll, dataApprovalController, rootScope,
-                saveSuccessPromise, saveErrorPromise, parentProject, getDataValuesSpy, getLocalStatusSpy, selectedPeriod,
-                window, getOrgUnitSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository, excludedDataElementsRepository, origin1, origin2, translationsService, moduleDataBlockFactory, programRepository, dataSyncFailureRepository;
+            var rootScope, scope, routeParams, q, window, location, anchorScroll, hustle, timeout,
+                dataApprovalController,
+                saveSuccessPromise, saveErrorPromise, fakeModal, parentProject, selectedPeriod, origin1, origin2,
+                dataRepository, datasetRepository, approvalDataRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, dataSyncFailureRepository, referralLocationsRepository,
+                translationsService, moduleDataBlockFactory;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $anchorScroll, $location, $window, $timeout) {
@@ -114,19 +116,18 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 programRepository = new ProgramRepository();
                 spyOn(programRepository, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, undefined));
 
-                orgUnitRepository = new OrgUnitRepository();
                 parentProject = {
                     'id': 'parent',
                     'attributeValues': [{
                         'attribute': {
                             'code': 'Type',
-                            'name': 'Type',
+                            'name': 'Type'
                         },
                         'value': 'Project'
                     }]
                 };
-                getOrgUnitSpy = spyOn(orgUnitRepository, "getParentProject");
-                getOrgUnitSpy.and.returnValue(utils.getPromise(q, parentProject));
+                orgUnitRepository = new OrgUnitRepository();
+                spyOn(orgUnitRepository, 'getParentProject').and.returnValue(utils.getPromise(q, parentProject));
                 spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
                 spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, [origin1, origin2]));
 
@@ -138,10 +139,8 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, {}));
 
                 dataRepository = new DataRepository();
-                getDataValuesSpy = spyOn(dataRepository, "getDataValues");
-                getDataValuesSpy.and.returnValue(utils.getPromise(q, undefined));
-                getLocalStatusSpy = spyOn(dataRepository, "getLocalStatus");
-                getLocalStatusSpy.and.returnValue(utils.getPromise(q, undefined));
+                spyOn(dataRepository, 'getDataValues').and.returnValue(utils.getPromise(q, undefined));
+                spyOn(dataRepository, 'getLocalStatus').and.returnValue(utils.getPromise(q, undefined));
 
                 referralLocationsRepository = new ReferralLocationsRepository();
                 spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, []));
