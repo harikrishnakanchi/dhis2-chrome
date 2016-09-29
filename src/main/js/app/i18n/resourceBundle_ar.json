@@ -320,7 +320,7 @@
     "stacked": "مكدسة",
     "xAxisLabel": "فترة",
     "downloadChart": "تحميل الرسم البياني",
-    "atleastTwoOptionsMustBeSelected": "At least two options need to be selected. (Ar)",
+    "atleastTwoOptionsMustBeSelected": "At least two options need to be selected.",
     "label": {
         "category": "فئة",
         "dataDimension": "البيانات",

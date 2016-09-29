@@ -320,7 +320,7 @@
     "stacked": "Empilées",
     "xAxisLabel": "Période",
     "downloadChart": "Télécharger le graphique",
-    "atleastTwoOptionsMustBeSelected": "At least two options need to be selected. (Fr)",
+    "atleastTwoOptionsMustBeSelected": "Au moins deux options doivent être sélectionnées.",
     "label": {
         "category": "Catégorie",
         "dataDimension": "Données",
