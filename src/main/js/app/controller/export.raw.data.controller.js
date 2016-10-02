@@ -19,23 +19,6 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder'], function (moment, _, d
             value: 52
         }];
 
-        var createDataValuesMap = function () {
-            return moduleDataBlockFactory.createForModule($scope.orgUnit.id, $scope.weeks).then(function(moduleDataBlocks) {
-                var allDataValues = _.flatten(_.map(moduleDataBlocks, 'dataValues')),
-                    submittedDataValues = _.reject(allDataValues, 'isDraft'),
-                    selectedDataSetDataElementIds = _.map(_.flatten(_.map($scope.sections, 'dataElements')), 'id');
-
-                $scope.dataValuesMap = _.transform(submittedDataValues, function (map, dataValue) {
-                    if(_.contains(selectedDataSetDataElementIds, dataValue.dataElement)) {
-                        var dataDimension = $scope.selectedDataset.isOriginDataset ? dataValue.orgUnit : dataValue.dataElement;
-                        map[dataValue.period] = map[dataValue.period] || {};
-                        map[dataValue.period][dataDimension] = map[dataValue.period][dataDimension] || 0;
-                        map[dataValue.period][dataDimension] += parseInt(dataValue.value);
-                    }
-                }, {});
-            });
-        };
-
         var loadExcludedDataElementIds = function(module) {
             return excludedDataElementsRepository.get(module.id).then(function(excludedDataElements) {
                 return _.pluck(excludedDataElements && excludedDataElements.dataElements, 'id');
@@ -82,23 +65,21 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder'], function (moment, _, d
             });
         };
 
-        var reloadView = function () {
-            $scope.sections = null;
-            $scope.dataValuesMap = {};
+        var createDataValuesMap = function () {
+            return moduleDataBlockFactory.createForModule($scope.orgUnit.id, $scope.weeks).then(function(moduleDataBlocks) {
+                var allDataValues = _.flatten(_.map(moduleDataBlocks, 'dataValues')),
+                    submittedDataValues = _.reject(allDataValues, 'isDraft'),
+                    selectedDataSetDataElementIds = _.map(_.flatten(_.map($scope.sections, 'dataElements')), 'id');
 
-            if(!($scope.orgUnit && $scope.selectedDataset && $scope.selectedWeeksToExport)) return;
-
-            $scope.weeks = dateUtils.getPeriodRange($scope.selectedWeeksToExport, { excludeCurrentWeek: true });
-
-            $scope.loading = true;
-            loadExcludedDataElementIds($scope.orgUnit)
-                .then(createSections)
-                .then(filterDataElementsAndRetrieveOriginsForOriginDataSet)
-                .then(filterDataElementsAndRetrieveAliasesForReferralDataSet)
-                .then(createDataValuesMap)
-                .finally(function() {
-                    $scope.loading = false;
-                });
+                $scope.dataValuesMap = _.transform(submittedDataValues, function (map, dataValue) {
+                    if(_.contains(selectedDataSetDataElementIds, dataValue.dataElement)) {
+                        var dataDimension = $scope.selectedDataset.isOriginDataset ? dataValue.orgUnit : dataValue.dataElement;
+                        map[dataValue.period] = map[dataValue.period] || {};
+                        map[dataValue.period][dataDimension] = map[dataValue.period][dataDimension] || 0;
+                        map[dataValue.period][dataDimension] += parseInt(dataValue.value);
+                    }
+                }, {});
+            });
         };
 
         var buildSpreadSheetContent = function() {
@@ -147,8 +128,34 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder'], function (moment, _, d
             return filesystemService.promptAndWriteFile(fileName, excelBuilder.createWorkBook(spreadSheetContent), filesystemService.FILE_TYPE_OPTIONS.XLSX);
         };
 
+        var loadAggregateRawData = function () {
+            $scope.sections = null;
+            $scope.dataValuesMap = {};
+
+            return loadExcludedDataElementIds($scope.orgUnit)
+                .then(createSections)
+                .then(filterDataElementsAndRetrieveOriginsForOriginDataSet)
+                .then(filterDataElementsAndRetrieveAliasesForReferralDataSet)
+                .then(createDataValuesMap);
+        };
+
+        var reloadView = function () {
+            if(!($scope.orgUnit && $scope.selectedDataset && $scope.selectedWeeksToExport)) return;
+            $scope.weeks = dateUtils.getPeriodRange($scope.selectedWeeksToExport, { excludeCurrentWeek: true });
+
+            var loadRawData = function () {
+                return $scope.orgUnit.lineListService ? $q.when() : loadAggregateRawData();
+            };
+
+            $scope.loading = true;
+            return loadRawData().finally(function() {
+                $scope.loading = false;
+            });
+        };
+
         $scope.$watchGroup(['orgUnit', 'selectedDataset', 'selectedWeeksToExport'], reloadView);
         $scope.selectedWeeksToExport = _.find($scope.weeksToExportOptions, 'default').value;
+
         $scope.dataValuesMap = {};
     };
 });

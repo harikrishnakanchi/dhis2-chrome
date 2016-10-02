@@ -1,60 +1,65 @@
-<div class="alert alert-danger" ng-if="orgUnit.lineListService && hasRoles(['Data entry user'])">
-    {{ resourceBundle.noExportRawDataForLineLists }}
-</div>
-<div class="alert alert-danger" ng-if="orgUnit.lineListService && hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver'])">
-    {{ resourceBundle.noExportRawDataForLineListsForApprovers }}
-</div>
-<div ng-controller="exportRawDataController" ng-if="!orgUnit.lineListService">
+<div ng-controller="exportRawDataController">
     <div class="loading" ng-show="loading">
-        <img src="img/ajax-loader.gif" class="spinner" />
+        <img src="img/ajax-loader.gif" class="spinner"/>
     </div>
-    <div class="row form-inline">
+
+    <div class="row form-inline" ng-show="!orgUnit.lineListService">
         <div class="col-md-12">
             <form class="well">
                 <span>{{ resourceBundle.weeksToExport }}</span>
                 <span>
-                    <select class="form-control" ng-model="selectedWeeksToExport" ng-options="weeksToExport.value as weeksToExport.label for weeksToExport in weeksToExportOptions"></select>
+                    <select class="form-control" ng-model="selectedWeeksToExport"
+                            ng-options="weeksToExport.value as weeksToExport.label for weeksToExport in weeksToExportOptions">
+                    </select>
                 </span>
                 <span>
                     <input type="button" value="{{ resourceBundle.exportRawDataToExcel }}" class="btn btn-primary" ng-click="exportToExcel()" ng-disabled="dataValuesMap | isEmpty"/>
                 </span>
             </form>
+        </div>
+    </div>
 
-            <div class="alert alert-danger" ng-if="!loading && (dataValuesMap | isEmpty)">
-                {{ resourceBundle.noRawDataAvailable }}
-            </div>
-            <div class="table-responsive" ng-if="sections && !(dataValuesMap | isEmpty)">
-                <table class="table table-striped table-bordered" locked-table-header>
-                    <thead>
-                    <tr>
-                        <th>{{ selectedDataset.isOriginDataset ? resourceBundle.originLabel : resourceBundle.dataElement }}</th>
-                        <th ng-repeat="week in weeks">{{ week }}</th>
-                    </tr>
-                    </thead>
-                    <tbody ng-repeat="section in sections" ng-if="!selectedDataset.isOriginDataset">
-                    <tr>
-                        <td class="active" colspan="{{ weeks.length + 1 }}">
-                            <strong>{{ section.name }}</strong>
-                        </td>
-                    </tr>
-                    <tr ng-repeat="dataElement in section.dataElements">
-                        <td>{{ dataElement.formName }}</td>
-                        <td ng-repeat="week in weeks">
-                            {{ dataValuesMap[week][dataElement.id] }}
-                        </td>
-                    </tr>
-                    </tbody>
-                    <tbody ng-repeat="section in sections" ng-if="selectedDataset.isOriginDataset">
-                    <tr ng-repeat="originOrgUnit in originOrgUnits">
-                        <td>{{ originOrgUnit.name }}</td>
-                        <td ng-repeat="week in weeks">
-                            {{ dataValuesMap[week][originOrgUnit.id] }}
-                        </td>
-                    </tr>
-                    </tbody>
+    <div ng-if="orgUnit.lineListService">
+        <div class="alert alert-danger" ng-if="hasRoles(['Data entry user'])">
+            {{ resourceBundle.noExportRawDataForLineLists }}
+        </div>
+        <div class="alert alert-danger"
+             ng-if="hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver'])">
+            {{ resourceBundle.noExportRawDataForLineListsForApprovers }}
+        </div>
+    </div>
 
-                </table>
-            </div>
+    <div ng-if="!orgUnit.lineListService">
+        <div class="alert alert-danger" ng-if="!loading && (dataValuesMap | isEmpty)">
+            {{ resourceBundle.noRawDataAvailable }}
+        </div>
+
+        <div class="table-responsive" ng-if="sections && !(dataValuesMap | isEmpty)">
+            <table class="table table-striped table-bordered" locked-table-header>
+                <thead>
+                <tr>
+                    <th>{{ selectedDataset.isOriginDataset ? resourceBundle.originLabel : resourceBundle.dataElement }}</th>
+                    <th ng-repeat="week in weeks">{{ week }}</th>
+                </tr>
+                </thead>
+                <tbody ng-repeat="section in sections" ng-if="!selectedDataset.isOriginDataset">
+                <tr>
+                    <td class="active" colspan="{{ weeks.length + 1 }}">
+                        <strong>{{ section.name }}</strong>
+                    </td>
+                </tr>
+                <tr ng-repeat="dataElement in section.dataElements">
+                    <td>{{ dataElement.formName }}</td>
+                    <td ng-repeat="week in weeks">{{ dataValuesMap[week][dataElement.id] }}</td>
+                </tr>
+                </tbody>
+                <tbody ng-repeat="section in sections" ng-if="selectedDataset.isOriginDataset">
+                <tr ng-repeat="originOrgUnit in originOrgUnits">
+                    <td>{{ originOrgUnit.name }}</td>
+                    <td ng-repeat="week in weeks">{{ dataValuesMap[week][originOrgUnit.id] }}</td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
