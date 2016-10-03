@@ -1,5 +1,5 @@
 define(['moment', 'lodash', 'dateUtils', 'excelBuilder'], function (moment, _, dateUtils, excelBuilder) {
-    return function($scope, $q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService) {
+    return function($scope, $q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository) {
 
         $scope.weeksToExportOptions = [{
             label: $scope.resourceBundle.lastOneWeek,
@@ -21,7 +21,8 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder'], function (moment, _, d
 
         var loadExcludedDataElementIds = function(module) {
             return excludedDataElementsRepository.get(module.id).then(function(excludedDataElements) {
-                return _.pluck(excludedDataElements && excludedDataElements.dataElements, 'id');
+                $scope.excludedDataElementIds = _.pluck(excludedDataElements && excludedDataElements.dataElements, 'id');
+                return $scope.excludedDataElementIds;
             });
         };
 
@@ -139,12 +140,39 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder'], function (moment, _, d
                 .then(createDataValuesMap);
         };
 
+        var fetchOriginOrgUnitsForCurrentModule = function () {
+            return orgUnitRepository.findAllByParent($scope.orgUnit.id).then(function (originOrgUnits) {
+                $scope.originOrgUnits = originOrgUnits;
+            });
+        };
+
+        var getProgramForCurrentModule = function () {
+            return programRepository.getProgramForOrgUnit($scope.originOrgUnits[0].id).then(function (program) {
+                return programRepository.get(program.id, $scope.excludedDataElementIds);
+            });
+        };
+
+        var fetchEventsForProgram = function (program) {
+            var startDate = moment(_.first($scope.weeks), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
+                endDate = moment(_.last($scope.weeks), 'GGGG[W]W').endOf('isoWeek').format('YYYY-MM-DD');
+
+            return programEventRepository.findEventsByDateRange(program.id, _.map($scope.originOrgUnits, 'id'), startDate, endDate).then(function (events) {
+                $scope.events = events;
+            });
+        };
+
+        var loadLineListRawData = function () {
+            return $q.all([fetchOriginOrgUnitsForCurrentModule(), loadExcludedDataElementIds($scope.orgUnit)])
+                .then(getProgramForCurrentModule)
+                .then(fetchEventsForProgram);
+        };
+
         var reloadView = function () {
             if(!($scope.orgUnit && $scope.selectedDataset && $scope.selectedWeeksToExport)) return;
             $scope.weeks = dateUtils.getPeriodRange($scope.selectedWeeksToExport, { excludeCurrentWeek: true });
 
             var loadRawData = function () {
-                return $scope.orgUnit.lineListService ? $q.when() : loadAggregateRawData();
+                return $scope.orgUnit.lineListService ? loadLineListRawData() : loadAggregateRawData();
             };
 
             $scope.loading = true;

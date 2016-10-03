@@ -1,8 +1,8 @@
-define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'excludedDataElementsRepository', 'orgUnitRepository', 'referralLocationsRepository', 'moduleDataBlockFactory', 'filesystemService', 'translationsService', 'excelBuilder', 'utils', 'dateUtils', 'timecop', 'moment', 'lodash'],
-    function (ExportRawDataController, mocks, DatasetRepository, ExcludedDataElementsRepository, OrgUnitRepository, ReferralLocationsRepository, ModuleDataBlockFactory, FilesystemService, TranslationsService, excelBuilder, utils, dateUtils, timecop, moment, _) {
+define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'excludedDataElementsRepository', 'orgUnitRepository', 'referralLocationsRepository', 'moduleDataBlockFactory', 'filesystemService', 'translationsService', 'excelBuilder', 'programRepository', 'programEventRepository', 'utils', 'dateUtils', 'timecop', 'moment', 'lodash'],
+    function (ExportRawDataController, mocks, DatasetRepository, ExcludedDataElementsRepository, OrgUnitRepository, ReferralLocationsRepository, ModuleDataBlockFactory, FilesystemService, TranslationsService, excelBuilder, ProgramRepository, ProgramEventRepository, utils, dateUtils, timecop, moment, _) {
         describe('ExportRawDataController', function () {
-            var controller, rootScope, scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService,
-                selectedOrgUnit, selectedDataSet, mockEnrichedDataSet, mockExcludedDataElements, mockDataBlocks;
+            var controller, rootScope, scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository,
+                selectedOrgUnit, selectedDataSet, mockEnrichedDataSet, mockExcludedDataElements, mockDataBlocks, mockOriginOrgUnits, mockProgram, mockEvents;
 
             beforeEach(mocks.inject(function ($rootScope, $q) {
                 rootScope = $rootScope;
@@ -126,7 +126,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     moduleDataBlockFactory = ModuleDataBlockFactory();
                     spyOn(moduleDataBlockFactory, 'createForModule').and.returnValue(utils.getPromise(q, mockDataBlocks));
 
-                    controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService);
+                    controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository);
                 });
 
                 it('should fetch sections along with data elements', function () {
@@ -502,6 +502,76 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                             expect(spreadSheetContent.data).toContain(['dataElementNameB', 6, 16]);
                         });
                     });
+                });
+            });
+
+            describe('LineListEventsRawData', function () {
+                beforeEach(function () {
+                    selectedOrgUnit = {
+                        id: 'orgUnitId',
+                        name: 'someModuleName',
+                        parent: {
+                            id: 'parentOrgUnitId'
+                        },
+                        lineListService: true
+                    };
+
+                    selectedDataSet = {
+                        id: 'dataSetId',
+                        name: 'someDataSetName'
+                    };
+                    
+                    scope.orgUnit = selectedOrgUnit;
+                    scope.selectedDataset = selectedDataSet;
+
+                    mockOriginOrgUnits = [{id: 'originA'}, {id: 'originB'}];
+
+                    mockProgram = { id: 'someProgram' };
+
+                    mockExcludedDataElements = [{id: 'someExcludedDataElement'}];
+
+                    mockEvents = [];
+
+                    orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, mockOriginOrgUnits));
+
+                    excludedDataElementsRepository.get.and.returnValue(utils.getPromise(q, { dataElements: mockExcludedDataElements }));
+
+                    dateUtils.getPeriodRange.and.returnValue(['2016W36', '2016W37', '2016W38']);
+
+                    programRepository = new ProgramRepository();
+                    spyOn(programRepository, 'getProgramForOrgUnit').and.returnValue(utils.getPromise(q, mockProgram));
+                    spyOn(programRepository, 'get').and.returnValue(utils.getPromise(q, mockProgram));
+
+                    programEventRepository = new ProgramEventRepository();
+                    spyOn(programEventRepository, 'findEventsByDateRange').and.returnValue(utils.getPromise(q, mockEvents));
+
+                    controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository);
+                });
+
+                it('should fetch the origin org units under the selected module', function () {
+                    scope.$apply();
+
+                    expect(orgUnitRepository.findAllByParent).toHaveBeenCalledWith(selectedOrgUnit.id);
+                    expect(scope.originOrgUnits).toBe(mockOriginOrgUnits);
+                });
+
+                it('should fetch the excluded data elements for the selected module', function () {
+                    scope.$apply();
+
+                    expect(excludedDataElementsRepository.get).toHaveBeenCalledWith(selectedOrgUnit.id);
+                });
+
+                it('should fetch the associated program for the selected module', function () {
+                    scope.$apply();
+
+                    expect(programRepository.getProgramForOrgUnit).toHaveBeenCalledWith(mockOriginOrgUnits[0].id);
+                    expect(programRepository.get).toHaveBeenCalledWith(mockProgram.id, _.map(mockExcludedDataElements, 'id'));
+                });
+
+                it('should fetch all the events in the specified week range for the associated program in selected module', function () {
+                    scope.$apply();
+
+                    expect(programEventRepository.findEventsByDateRange).toHaveBeenCalledWith(mockProgram.id, _.map(scope.originOrgUnits, 'id'), '2016-09-05', '2016-09-25');
                 });
             });
         });
