@@ -28,6 +28,8 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 spyOn(orgUnitRepo, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "getProjectAndOpUnitAttributes").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "get").and.returnValue(utils.getPromise(q, {}));
+                spyOn(orgUnitRepo, "associateDataSetsToOrgUnits").and.returnValue(utils.getPromise(q, {}));
+                spyOn(orgUnitRepo, "removeDataSetsFromOrgUnits").and.returnValue(utils.getPromise(q, {}));
 
                 originOrgunitCreator = new OriginOrgunitCreator();
                 spyOn(originOrgunitCreator, "create").and.returnValue(utils.getPromise(q, {}));
@@ -35,8 +37,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 dataSetRepo = new DatasetRepository();
                 spyOn(dataSetRepo, "getAll").and.returnValue(utils.getPromise(q, []));
                 spyOn(dataSetRepo, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
-                spyOn(dataSetRepo, "associateOrgUnits").and.returnValue(utils.getPromise(q, undefined));
-                spyOn(dataSetRepo, "removeOrgUnits").and.returnValue(utils.getPromise(q, undefined));
                 spyOn(dataSetRepo, "includeDataElements").and.returnValue(utils.getPromise(q, []));
 
                 systemSettingRepository = new SystemSettingRepository();
@@ -248,7 +248,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.save();
                 scope.$apply();
 
-                expect(dataSetRepo.associateOrgUnits).toHaveBeenCalledWith(["ds1"], [enrichedModule]);
+                expect(orgUnitRepo.associateDataSetsToOrgUnits).toHaveBeenCalledWith(["ds1"], [enrichedModule]);
                 expect(hustle.publish.calls.argsFor(1)).toEqual([{
                     data: {"orgUnitIds":["mod1pid"], "dataSetIds":["ds1"]},
                     type: "associateOrgUnitToDataset",
@@ -1150,9 +1150,9 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.save();
                 scope.$apply();
 
-                expect(dataSetRepo.associateOrgUnits.calls.count()).toEqual(2);
-                expect(dataSetRepo.associateOrgUnits.calls.argsFor(1)[0]).toEqual(["originds1"]);
-                expect(dataSetRepo.associateOrgUnits.calls.argsFor(1)[1]).toEqual(originOrgUnit);
+                expect(orgUnitRepo.associateDataSetsToOrgUnits.calls.count()).toEqual(2);
+                expect(orgUnitRepo.associateDataSetsToOrgUnits.calls.argsFor(1)[0]).toEqual(["originds1"]);
+                expect(orgUnitRepo.associateDataSetsToOrgUnits.calls.argsFor(1)[1]).toEqual(originOrgUnit);
             });
 
             it("should apply module templates", function() {
@@ -1546,7 +1546,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.save();
                 scope.$apply();
 
-                expect(dataSetRepo.associateOrgUnits).toHaveBeenCalledWith(["ds1", "ds2", "ds4"], jasmine.any(Object));
+                expect(orgUnitRepo.associateDataSetsToOrgUnits).toHaveBeenCalledWith(["ds1", "ds2", "ds4"], jasmine.any(Object));
 
             });
 

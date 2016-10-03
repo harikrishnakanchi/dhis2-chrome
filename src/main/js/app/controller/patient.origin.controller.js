@@ -45,20 +45,20 @@ define(["lodash", "moment", "dhisId","interpolate", "orgUnitMapper"], function(_
                     }
                 };
 
-                var associateOrgunitsToDatasets = function (datasets, orgUnits) {
+                var associateDataSetsToOrgUnits = function (datasets, orgUnits) {
                     var dataSetIds = _.map(datasets, "id");
                     var orgUnitAndDatasetAssociations = {
                         "orgUnitIds": _.map(orgUnits, 'id'),
                         "dataSetIds": dataSetIds
                     };
-                    return datasetRepository.associateOrgUnits(dataSetIds, orgUnits).then(function () {
+                    return orgUnitRepository.associateDataSetsToOrgUnits(dataSetIds, orgUnits).then(function () {
                         return publishMessage(orgUnitAndDatasetAssociations, 'associateOrgUnitToDataset', $scope.resourceBundle.associateOrgUnitToDatasetDesc + $scope.orgUnit.name);
                     });
                 };
 
                 var doAssociations = function(originOrgUnits, siblingOriginOrgUnit) {
                     var associate = function(datasets, program) {
-                        return associateOrgunitsToDatasets(datasets, originOrgUnits).then(function() {
+                        return associateDataSetsToOrgUnits(datasets, originOrgUnits).then(function() {
                             return associateOrgunitsToPrograms(program, originOrgUnits);
                         });
                     };

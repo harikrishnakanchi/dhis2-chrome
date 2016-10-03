@@ -253,7 +253,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
             };
 
             var associateToDatasets = function(datasetIds, orgUnits) {
-                return datasetRepository.associateOrgUnits(datasetIds, orgUnits).then(function() {
+                return orgUnitRepository.associateDataSetsToOrgUnits(datasetIds, orgUnits).then(function() {
                     var orgunitIdsAndDatasetIds = {
                         "orgUnitIds": _.pluck(orgUnits, "id"),
                         "dataSetIds": datasetIds
@@ -265,7 +265,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
 
             // TODO: Use this method when we remove orgUnit-Dataset association as part of story #2017
             var removeOrgUnitsFromDataSets = function (datasetIds, orgUnitIds) {
-                return datasetRepository.removeOrgUnits(datasetIds, orgUnitIds).then(function () {
+                return orgUnitRepository.removeDataSetsFromOrgUnits(datasetIds, orgUnitIds).then(function () {
                     var orgunitIdsAndDatasetIds = {
                         "orgUnitIds": orgUnitIds,
                         "dataSetIds": datasetIds

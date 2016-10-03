@@ -51,6 +51,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, [{
                     "id": "originOrgUnit"
                 }]));
+                spyOn(orgUnitRepository, "associateDataSetsToOrgUnits").and.returnValue(utils.getPromise(q, {}));
 
                 translationsService = new TranslationsService();
                 spyOn(translationsService, "translate").and.returnValue([]);
@@ -70,7 +71,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 }];
 
                 datasetRepository = new DatasetRepository();
-                spyOn(datasetRepository, "associateOrgUnits").and.returnValue(utils.getPromise(q, {}));
                 spyOn(datasetRepository, "getAll").and.returnValue(utils.getPromise(q, allDatasets));
 
                 excludedLineListOptionsRepository = new ExcludedLineListOptionsRepository();
@@ -1395,7 +1395,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 scope.$apply();
 
                 expect(programRepository.associateOrgUnits).toHaveBeenCalledWith(program, originOrgUnit);
-                expect(datasetRepository.associateOrgUnits).toHaveBeenCalledWith(["Ds1", "OrgDs1"], originOrgUnit);
+                expect(orgUnitRepository.associateDataSetsToOrgUnits).toHaveBeenCalledWith(["Ds1", "OrgDs1"], originOrgUnit);
                 expect(hustle.publish.calls.argsFor(3)).toEqual([{
                     data: messageData,
                     type: "associateOrgunitToProgram",

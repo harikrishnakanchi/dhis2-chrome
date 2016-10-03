@@ -349,7 +349,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
 
                         var datasetIds = _.flattenDeep([summaryDatasetId, originDatasetIds]);
 
-                        return datasetRepository.associateOrgUnits(datasetIds, originOrgUnits).then(function() {
+                        return orgUnitRepository.associateDataSetsToOrgUnits(datasetIds, originOrgUnits).then(function() {
                             var orgunitIdsAndDatasetIds = {
                                 "orgUnitIds": _.pluck(originOrgUnits, "id"),
                                 "dataSetIds": datasetIds
@@ -384,7 +384,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
 
                 var associateMandatoryDatasetsToModule = function() {
                     var datasetIds = [populationDatasetId, referralDatasetId];
-                    return datasetRepository.associateOrgUnits(datasetIds, [enrichedModule]).then(function() {
+                    return orgUnitRepository.associateDataSetsToOrgUnits(datasetIds, [enrichedModule]).then(function() {
                         var orgunitIdsAndDatasetIds = {
                             "orgUnitIds": [enrichedModule.id],
                             "dataSetIds": datasetIds

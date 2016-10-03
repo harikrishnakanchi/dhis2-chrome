@@ -51,12 +51,12 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             spyOn(orgUnitRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modules));
             spyOn(orgUnitRepository, "getAllOriginsByName").and.returnValue(utils.getPromise(q, []));
+            spyOn(orgUnitRepository, "associateDataSetsToOrgUnits").and.returnValue(utils.getPromise(q, {}));
 
             spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, siblingOriginOrgUnits));
 
             datasetRepository = new DatasetRepository();
             spyOn(datasetRepository, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
-            spyOn(datasetRepository, "associateOrgUnits").and.returnValue(utils.getPromise(q, {}));
 
             originOrgunitCreator = new OriginOrgunitCreator();
             spyOn(originOrgunitCreator, "create").and.returnValue(utils.getPromise(q, []));
@@ -239,7 +239,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             scope.save();
             scope.$apply();
 
-            expect(datasetRepository.associateOrgUnits).toHaveBeenCalledWith([datasets[0].id], originOrgUnits);
+            expect(orgUnitRepository.associateDataSetsToOrgUnits).toHaveBeenCalledWith([datasets[0].id], originOrgUnits);
             expect(programRepository.associateOrgUnits).toHaveBeenCalledWith(program, originOrgUnits);
 
             expect(hustle.publish.calls.count()).toEqual(4);
