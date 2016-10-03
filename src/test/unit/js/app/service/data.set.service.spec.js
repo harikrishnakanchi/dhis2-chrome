@@ -29,7 +29,7 @@ define(["dataSetService", "angularMocks", "properties"], function(DatasetService
                 'dataSets': datasets
             };
 
-            httpBackend.expectGET(properties.dhis.url + "/api/dataSets.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]],organisationUnits[:identifiable]&paging=false").respond(200, responsePayload);
+            httpBackend.expectGET(properties.dhis.url + "/api/dataSets.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]]&paging=false").respond(200, responsePayload);
             httpBackend.flush();
 
             expect(actualDataSets).toEqual(responsePayload.dataSets);
@@ -43,7 +43,7 @@ define(["dataSetService", "angularMocks", "properties"], function(DatasetService
 
             datasetService.getAll(lastUpdatedTime);
 
-            httpBackend.expectGET(properties.dhis.url + "/api/dataSets.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]],organisationUnits[:identifiable]&paging=false&filter=lastUpdated:gte:" + lastUpdatedTime).respond(200, responsePayload);
+            httpBackend.expectGET(properties.dhis.url + "/api/dataSets.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]]&paging=false&filter=lastUpdated:gte:" + lastUpdatedTime).respond(200, responsePayload);
             httpBackend.flush();
         });
 
