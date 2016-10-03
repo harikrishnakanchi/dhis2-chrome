@@ -195,14 +195,15 @@ define(['moment', 'lodash'],
 
                 return datasetRepository.getAll().then(function (allDataSet) {
                     var dataSetIds = _.pluck(allDataSet, 'id');
+                    var dataSetIdsToApprove = _.pluck(_.uniq(allDataSet, 'workflow.id'), 'id');
 
-                    return deleteApproval(dataSetIds)
+                    return deleteApproval(dataSetIdsToApprove)
                         .then(_.partial(deleteCompletion, dataSetIds))
                         .then(uploadDataValues)
                         .then(uploadEventData)
                         .then(deleteEvents)
                         .then(_.partial(uploadCompletionData, dataSetIds))
-                        .then(_.partial(uploadApprovalData, dataSetIds));
+                        .then(_.partial(uploadApprovalData, dataSetIdsToApprove));
 
                 });
             };
