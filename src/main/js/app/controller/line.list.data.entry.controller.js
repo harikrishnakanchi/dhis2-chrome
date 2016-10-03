@@ -257,6 +257,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                         _.forEach($scope.event.dataValues, function(dv) {
                             $scope.dataValues[dv.dataElement] = formatValue(dv);
                         });
+                        $scope.isHistoricalEvent = $scope.event && $scope.event.eventDate ? moment($scope.event.eventDate).isBefore($scope.minEventDate): false;
                     });
                 }
             };
@@ -286,13 +287,13 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             $scope.loading = true;
             resetForm();
             loadModule()
+                .then(setEventMinAndMaxDate)
                 .then(loadOriginOrgUnits)
                 .then(loadPrograms)
                 .then(loadAllDataElements)
                 .then(loadOptionSets)
                 .then(loadExcludedOptions)
                 .then(loadEvent)
-                .then(setEventMinAndMaxDate)
                 .finally(function() {
                     $scope.loading = false;
                 });

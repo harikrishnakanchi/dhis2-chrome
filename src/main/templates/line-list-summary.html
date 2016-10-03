@@ -124,7 +124,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr ng-repeat="event in events">
+                                        <tr ng-repeat="event in events | limitTo:pageLimit track by event.event">
                                             <td>{{ getFormattedDate(event.eventDate) }}</td>
                                             <td ng-if="showPatientOriginInSummaryTable()">{{ getOriginName(event.orgUnit)}}</td>
                                             <td ng-repeat="dataValue in event.dataValues | filter: { showInEventSummary: true }">
@@ -136,10 +136,12 @@
                                                 <a href title="Complete" ng-if="event.localStatus==='NEW_DRAFT' || event.localStatus==='UPDATED_DRAFT'" class="submitted disabled-link"><span class="glyphicon glyphicon-star"></span></a>
                                             </td>
                                             <td>
-                                                <a href title="{{resourceBundle.editLabel}}" ng-click="pushToHistory()" ng-href="#/line-list-data-entry/{{selectedModuleId}}/{{event.event}}" class="edit"><span class="glyphicon glyphicon-edit"></span></a>
+                                                <a href title="{{resourceBundle.editLabel}}" ng-if="!event.isHistorical" ng-click="pushToHistory()" ng-href="#/line-list-data-entry/{{selectedModuleId}}/{{event.event}}" class="edit"><span class="glyphicon glyphicon-edit"></span></a>
+                                                <a href title="{{resourceBundle.viewLabel}}" ng-if="event.isHistorical" ng-click="pushToHistory()" ng-href="#/line-list-data-entry/{{selectedModuleId}}/{{event.event}}" class="edit"><span class="glyphicon glyphicon-eye-open"></span></a>
                                             </td>
                                             <td>
-                                                <a href title="{{resourceBundle.deleteLabel}}" ng-click="deleteEvent(event)" title="Delete" class="delete"><span class="glyphicon glyphicon-trash"></span></a>
+                                                <a href title="{{resourceBundle.deleteLabel}}" ng-if="!event.isHistorical" ng-click="deleteEvent(event)" title="Delete" class="delete"><span class="glyphicon glyphicon-trash"></span></a>
+                                                <span ng-if="event.isHistorical" class="delete glyphicon glyphicon-trash disabled-button" ></span>
                                             </td>
                                         </tr>
                                     </tbody>

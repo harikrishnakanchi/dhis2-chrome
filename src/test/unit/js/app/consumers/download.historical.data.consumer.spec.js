@@ -4,16 +4,18 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
               OrgUnitRepository, DatasetRepository, ChangeLogRepository, DataRepository, ProgramEventRepository, EventService, CustomAttributes) {
         describe('DownloadHistoricalDataConsumer', function () {
             var scope, q, downloadHistoricalDataConsumer, dataService, eventService, userPreferenceRepository, orgUnitRepository,
-                datasetRepository, dataRepository, changeLogRepository, programEventRepository, mockProjectIds, mockModulesForProjectA, mockModulesForProjectB,
-                mockOrigins, mockDataSets, mockPeriodRange, periodChunkSize, mockPayload;
+                datasetRepository, dataRepository, changeLogRepository, programEventRepository,
+                mockOrigins, mockDataSets, mockPeriodRange, periodChunkSize, mockPayload, mockProjectA, mockProjectB, mockModuleA, mockModuleB, mockModuleC;
 
             beforeEach(mocks.inject(function ($q, $rootScope) {
                 q = $q;
                 scope = $rootScope.$new();
 
-                mockProjectIds = ['projectA', 'projectB'];
-                mockModulesForProjectA = [{id: 'moduleA', attributeValues: []}];
-                mockModulesForProjectB = [{id: 'moduleB', attributeValues: []}, {id: 'moduleC', attributeValues: []}];
+                mockProjectA = { id: 'projectA' };
+                mockProjectB = { id: 'projectB' };
+                mockModuleA = { id: 'moduleA' };
+                mockModuleB = { id: 'moduleB' };
+                mockModuleC = { id: 'moduleC' };
                 mockOrigins = [{id: 'originA'}, {id: 'originB'}];
                 mockDataSets = [{id: 'dataSetA'}, {id: 'dataSetB'}];
                 mockPayload = ['somePayload'];
@@ -30,7 +32,7 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                 periodChunkSize = 11;
 
                 userPreferenceRepository = UserPreferenceRepository();
-                spyOn(userPreferenceRepository, 'getCurrentUsersProjectIds').and.returnValue(utils.getPromise(q, mockProjectIds));
+                spyOn(userPreferenceRepository, 'getCurrentUsersProjectIds').and.returnValue(utils.getPromise(q, [mockProjectA.id, mockProjectB.id]));
 
                 dataService = new DataService();
                 spyOn(dataService, 'downloadData').and.returnValue(utils.getPromise(q, {}));
@@ -40,8 +42,8 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
 
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, 'getAllModulesInOrgUnits').and.callFake(function (projectId) {
-                    if (projectId == mockProjectIds[0]) return utils.getPromise(q, mockModulesForProjectA);
-                    if (projectId == mockProjectIds[1]) return utils.getPromise(q, mockModulesForProjectB);
+                    if (projectId == mockProjectA.id) return utils.getPromise(q, [mockModuleA]);
+                    if (projectId == mockProjectB.id) return utils.getPromise(q, [mockModuleB, mockModuleC]);
                 });
                 spyOn(orgUnitRepository, 'findAllByParent').and.returnValue(utils.getPromise(q, mockOrigins));
 
@@ -84,29 +86,41 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                 downloadHistoricalDataConsumer.run();
                 scope.$apply();
 
-                expect(orgUnitRepository.getAllModulesInOrgUnits.calls.count()).toEqual(mockProjectIds.length);
-                expect(orgUnitRepository.getAllModulesInOrgUnits.calls.argsFor(0)[0]).toEqual(mockProjectIds[0]);
-                expect(orgUnitRepository.getAllModulesInOrgUnits.calls.argsFor(1)[0]).toEqual(mockProjectIds[1]);
+                expect(orgUnitRepository.getAllModulesInOrgUnits.calls.count()).toEqual(2);
+                expect(orgUnitRepository.getAllModulesInOrgUnits.calls.argsFor(0)[0]).toEqual(mockProjectA.id);
+                expect(orgUnitRepository.getAllModulesInOrgUnits.calls.argsFor(1)[0]).toEqual(mockProjectB.id);
             });
 
             it('should get all the origins under a module', function () {
                 downloadHistoricalDataConsumer.run();
                 scope.$apply();
 
-                expect(orgUnitRepository.findAllByParent.calls.count()).toEqual(mockModulesForProjectA.concat(mockModulesForProjectB).length);
-                expect(orgUnitRepository.findAllByParent.calls.argsFor(0)[0]).toEqual([mockModulesForProjectA[0].id]);
-                expect(orgUnitRepository.findAllByParent.calls.argsFor(1)[0]).toEqual([mockModulesForProjectB[0].id]);
-                expect(orgUnitRepository.findAllByParent.calls.argsFor(2)[0]).toEqual([mockModulesForProjectB[1].id]);
+                expect(orgUnitRepository.findAllByParent.calls.count()).toEqual(3);
+                expect(orgUnitRepository.findAllByParent.calls.argsFor(0)[0]).toEqual(mockModuleA.id);
+                expect(orgUnitRepository.findAllByParent.calls.argsFor(1)[0]).toEqual(mockModuleB.id);
+                expect(orgUnitRepository.findAllByParent.calls.argsFor(2)[0]).toEqual(mockModuleC.id);
             });
 
             it('should get all the datasets for the given orgunits', function () {
                 downloadHistoricalDataConsumer.run();
                 scope.$apply();
 
-                var originIds = _.map(mockOrigins, 'id');
-                var mockModulesForProjectAIds = _.map(mockModulesForProjectA, 'id');
-                var orgUnitIds = mockModulesForProjectAIds.concat(originIds);
+                var orgUnitIds = [mockModuleA.id].concat(_.map(mockOrigins, 'id'));
                 expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(orgUnitIds);
+            });
+
+            it('should continue download of historical data even if one module fails', function() {
+                changeLogRepository.get.and.returnValue(utils.getPromise(q, undefined));
+                dataService.downloadData.and.callFake(function (moduleId) {
+                    return moduleId == mockModuleB.id ? utils.getRejectedPromise(q, {}) : utils.getPromise(q, {});
+                });
+
+                downloadHistoricalDataConsumer.run();
+                scope.$apply();
+
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('yearlyDataValues:projectA:moduleA', jasmine.any(String));
+                expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('yearlyDataValues:projectB:moduleB', jasmine.any(String));
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('yearlyDataValues:projectB:moduleC', jasmine.any(String));
             });
 
             describe('Download Data', function () {
@@ -124,18 +138,18 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                     });
 
                     it('should download data values', function () {
-                        expect(dataService.downloadData).toHaveBeenCalledWith(mockModulesForProjectA[0].id, dataSetIds, jasmine.any(Array));
+                        expect(dataService.downloadData).toHaveBeenCalledWith(mockModuleA.id, dataSetIds, jasmine.any(Array));
                     });
 
                     it('should not download data values if it were already downloaded', function () {
-                        expect(dataService.downloadData).not.toHaveBeenCalledWith(mockModulesForProjectB[0].id, dataSetIds, jasmine.any(Array));
-                        expect(dataService.downloadData).toHaveBeenCalledWith(mockModulesForProjectB[1].id, dataSetIds, jasmine.any(Array));
+                        expect(dataService.downloadData).not.toHaveBeenCalledWith(mockModuleB.id, dataSetIds, jasmine.any(Array));
+                        expect(dataService.downloadData).toHaveBeenCalledWith(mockModuleC.id, dataSetIds, jasmine.any(Array));
                     });
 
                     it('should download the data in chunks of periods for each module', function () {
                         var periodChunks = _.chunk(mockPeriodRange, periodChunkSize);
-                        expect(dataService.downloadData).toHaveBeenCalledWith(mockModulesForProjectA[0].id, dataSetIds, periodChunks[0]);
-                        expect(dataService.downloadData).toHaveBeenCalledWith(mockModulesForProjectA[0].id, dataSetIds, periodChunks[1]);
+                        expect(dataService.downloadData).toHaveBeenCalledWith(mockModuleA.id, dataSetIds, periodChunks[0]);
+                        expect(dataService.downloadData).toHaveBeenCalledWith(mockModuleA.id, dataSetIds, periodChunks[1]);
                     });
 
                     it('should upsert the datavalues into IndexedDB after downloading data values', function () {
@@ -157,15 +171,15 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                     });
 
                     it('should not download data values', function () {
-                        expect(dataService.downloadData).not.toHaveBeenCalledWith(mockModulesForProjectA[0].id);
+                        expect(dataService.downloadData).not.toHaveBeenCalledWith(mockModuleA.id);
                     });
 
                     it('should download events', function () {
-                        expect(eventService.getEvents).toHaveBeenCalledWith(mockModulesForProjectA[0].id, mockPeriodRange);
+                        expect(eventService.getEvents).toHaveBeenCalledWith(mockModuleA.id, mockPeriodRange);
                     });
 
                     it('should not download events if it were already downloaded', function() {
-                        expect(eventService.getEvents).not.toHaveBeenCalledWith(mockModulesForProjectB[1].id);
+                        expect(eventService.getEvents).not.toHaveBeenCalledWith(mockModuleC.id);
                     });
 
                     it('should upsert the events into IndexedDB after downloading events', function () {

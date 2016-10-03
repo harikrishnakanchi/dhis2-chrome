@@ -1,5 +1,5 @@
 <div ng-controller="lineListOfflineApprovalController">
-    <section class="panel tab-panel {{ layoutDirection.direction }}">
+    <section ng-if="!errorMessage" class="panel tab-panel {{ layoutDirection.direction }}">
 
         <div class="alert alert-info" ng-if="!showFilters && isValidWeek">{{ resourceBundle.noCasesToSummarize }}</div>
         <div class="alert alert-danger" ng-if="!(showFilters || isValidWeek)">{{ resourceBundle.linelistDataNotAvailableMessage }}

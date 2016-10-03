@@ -8,83 +8,77 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], func
         };
 
         var getModulesForProjects = function (projectIds) {
-            var modulesByProject = {};
-            _.each(projectIds, function (projectId) {
-                modulesByProject[projectId] = orgUnitRepository.getAllModulesInOrgUnits(projectId);
-            });
-            return $q.all(modulesByProject);
-        };
-
-        var getAllOriginsOfModules = function (modulesByProject) {
-            var promises = [];
-            _.each(modulesByProject, function (modules) {
-                _.each(modules, function (module) {
-                    var promise = orgUnitRepository.findAllByParent([module.id]).then(function (origins) {
-                        module.originIds = _.map(origins, 'id');
+            var getModulesForProject = function (projectId) {
+                return orgUnitRepository.getAllModulesInOrgUnits(projectId).then(function (modules) {
+                    return _.map(modules, function (module) {
+                        return _.set(module, 'projectId', projectId);
                     });
-                    promises.push(promise);
                 });
-            });
-            return $q.all(promises).then(function () {
-                return modulesByProject;
-            });
+            };
+
+            return $q.all(_.map(projectIds, getModulesForProject)).then(_.flatten);
         };
 
-        var getAllDataSetsForAllOrgUnits = function (modulesByProject) {
-            var promises = [];
-            _.each(modulesByProject, function (modules) {
-                _.each(modules, function (module) {
-                    var moduleAndOriginIds = [module.id].concat(module.originIds);
-                    var promise = datasetRepository.findAllForOrgUnits(moduleAndOriginIds).then(function (dataSets) {
-                        module.dataSetIds = _.map(dataSets, 'id');
-                    });
-                    promises.push(promise);
+        var getAllOriginsOfModules = function (modules) {
+            return $q.all(_.map(modules, function (module) {
+                return orgUnitRepository.findAllByParent(module.id).then(function (origins) {
+                    return _.set(module, 'originIds', _.map(origins, 'id'));
                 });
-            });
-            return $q.all(promises).then(function () {
-                return modulesByProject;
-            });
+            }));
         };
 
-        var downloadData = function (modulesByProject) {
+        var getAllDataSetsForAllOrgUnits = function (modules) {
+            return $q.all(_.map(modules, function (module) {
+                var moduleAndOriginIds = [module.id].concat(module.originIds);
+                return datasetRepository.findAllForOrgUnits(moduleAndOriginIds).then(function (dataSets) {
+                    return _.set(module, 'dataSetIds', _.map(dataSets, 'id'));
+                });
+            }));
+        };
 
+        var downloadData = function (modules) {
             var periodRange = _.difference(dateUtils.getPeriodRange(properties.projectDataSync.numWeeksForHistoricalData, {excludeCurrentWeek: true}),
                 dateUtils.getPeriodRange(properties.projectDataSync.numWeeksToSync));
 
-            return _.reduce(modulesByProject, function (promise, modules, projectId) {
-                return _.reduce(modules, function (modulePromise, module) {
+            var downloadDataForModule = function (module) {
+                var changeLogKey = [CHANGE_LOG_PREFIX, module.projectId, module.id].join(':');
 
-                    var downloadModuleData = function () {
+                var downloadModuleData = function () {
 
-                        var downloadModuleDataValues = function () {
-                            var periodChunks = _.chunk(periodRange, CHUNK_SIZE);
+                    var downloadModuleDataValues = function () {
+                        var periodChunks = _.chunk(periodRange, CHUNK_SIZE);
 
-                            return _.reduce(periodChunks, function (moduleChunkPromise, periodChunk) {
-                                return moduleChunkPromise.then(function () {
-                                    return dataService.downloadData(module.id, module.dataSetIds, periodChunk).then(dataRepository.saveDhisData);
-                                });
-                            }, $q.when());
-                        };
-
-                        var downloadLineListEvents = function () {
-                            return eventService.getEvents(module.id, periodRange).then(programEventRepository.upsert);
-                        };
-
-                        var isLinelistModule = customAttributes.getBooleanAttributeValue(module.attributeValues, 'isLineListService');
-                        return isLinelistModule ? downloadLineListEvents() : downloadModuleDataValues();
+                        return _.reduce(periodChunks, function (moduleChunkPromise, periodChunk) {
+                            return moduleChunkPromise.then(function () {
+                                return dataService.downloadData(module.id, module.dataSetIds, periodChunk).then(dataRepository.saveDhisData);
+                            });
+                        }, $q.when());
                     };
 
-                    var updateChangeLog = function () {
-                        return changeLogRepository.upsert([CHANGE_LOG_PREFIX, projectId, module.id].join(':'), moment().toISOString());
+                    var downloadLineListEvents = function () {
+                        return eventService.getEvents(module.id, periodRange).then(programEventRepository.upsert);
                     };
 
-                    return modulePromise.then(function () {
-                        return changeLogRepository.get([CHANGE_LOG_PREFIX, projectId, module.id].join(':')).then(function (lastUpdatedTime) {
-                            var areDataValuesAlreadyDownloaded = !!lastUpdatedTime;
-                            return areDataValuesAlreadyDownloaded ? $q.when() : downloadModuleData().then(updateChangeLog);
-                        });
-                    });
-                }, promise);
+                    var isLinelistModule = customAttributes.getBooleanAttributeValue(module.attributeValues, 'isLineListService');
+                    return isLinelistModule ? downloadLineListEvents() : downloadModuleDataValues();
+                };
+
+                var onSuccess = function () {
+                    return changeLogRepository.upsert(changeLogKey, moment().toISOString());
+                };
+
+                var onFailure = function () {
+                    return $q.when(); //continue with next module
+                };
+
+                return changeLogRepository.get(changeLogKey).then(function (lastUpdatedTime) {
+                    var areDataValuesAlreadyDownloaded = !!lastUpdatedTime;
+                    return areDataValuesAlreadyDownloaded ? $q.when() : downloadModuleData().then(onSuccess, onFailure);
+                });
+            };
+
+            return _.reduce(modules, function (existingPromises, module) {
+                return existingPromises.then(_.partial(downloadDataForModule, module));
             }, $q.when());
         };
 

@@ -1,6 +1,7 @@
 define(['customAttributes'], function(CustomAttributes) {
     describe('CustomAttributes', function() {
         var attributeValues;
+
         var mockAttributeValue = function (attributeCode, value) {
             return {
                 attribute: {
@@ -38,6 +39,23 @@ define(['customAttributes'], function(CustomAttributes) {
             it('should return undefined if corresponding attribute value does not exist', function() {
                 attributeValues = [];
                 expect(CustomAttributes.getAttributeValue(attributeValues, 'attributeCode')).toBeUndefined();
+            });
+        });
+
+        describe('cleanAttributeValues', function () {
+            it('should clean attribute values whose value is invalid', function () {
+                attributeValues = [
+                    mockAttributeValue('attributeCode', undefined),
+                    mockAttributeValue('attributeCode', null),
+                    mockAttributeValue('attributeCode', NaN),
+                    mockAttributeValue('attributeCode', '')
+                ];
+                expect(CustomAttributes.cleanAttributeValues(attributeValues)).toEqual([]);
+            });
+
+            it('should keep attribute values whose value is valid', function () {
+                attributeValues = [mockAttributeValue('attributeCode', 'someValue')];
+                expect(CustomAttributes.cleanAttributeValues(attributeValues)).toEqual(attributeValues);
             });
         });
     });
