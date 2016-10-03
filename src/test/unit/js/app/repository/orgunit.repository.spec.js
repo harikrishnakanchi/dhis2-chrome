@@ -542,5 +542,48 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
                 scope.$apply();
             });
         });
+
+        describe('associateDataSetsToOrgUnit', function () {
+           it('should associate the dataSets with the orgUnit', function () {
+               var orgunit = {
+                   id: 'someOrgUnitId',
+                   name: 'someOrgUnitName',
+                   dataSets: [{id: 'someOtherDataSetId'}]
+               };
+               var expectedOrgUnitUpsert = {
+                   "id": "someOrgUnitId",
+                   "name": "someOrgUnitName",
+                   "dataSets": [{"id": "someOtherDataSetId"}, {"id": "someDataSetId"}]
+               };
+               mockOrgStore.each.and.returnValue(utils.getPromise(q, orgunit));
+
+               orgUnitRepository.associateDataSetsToOrgUnit(['someDataSetId'], orgunit);
+               scope.$apply();
+
+               expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedOrgUnitUpsert);
+           });
+        });
+
+        describe('removeDataSetsToOrgUnit', function () {
+            it('should remove the dataSets from the orgUnit', function () {
+                var orgunit = {
+                    id: 'someOrgUnitId',
+                    name: 'someOrgUnitName',
+                    dataSets: [{id: 'someDataSetId'}, {id: 'dataSetToBeRemoved'}]
+                };
+                var expectedOrgUnitUpsert = {
+                    "id": "someOrgUnitId",
+                    "name": "someOrgUnitName",
+                    "dataSets": [{"id": "someDataSetId"}]
+                };
+                mockOrgStore.each.and.returnValue(utils.getPromise(q, orgunit));
+
+                orgUnitRepository.removeDataSetsFromOrgUnit(['dataSetToBeRemoved'], orgunit);
+                scope.$apply();
+
+                expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedOrgUnitUpsert);
+            });
+        });
+
     });
 });

@@ -269,6 +269,24 @@ define(["moment", "lodashUtils"], function(moment, _) {
             return _.isArray(orgUnit) ? $q.all(_.map(orgUnit, getAndStoreParent)) : getAndStoreParent(orgUnit);
         };
 
+        var associateDataSetsToOrgUnit = function (dataSetIds, orgUnit) {
+            var store = db.objectStore("organisationUnits");
+            var payload = orgUnit;
+            payload.dataSets = payload.dataSets.concat(_.map(dataSetIds, function (id) {
+                return {id: id};
+            }));
+            return store.upsert(payload);
+        };
+
+        var removeDataSetsFromOrgUnit = function (dataSetIdsToRemoved, orgUnit) {
+            var store = db.objectStore('organisationUnits');
+            var payload = orgUnit;
+            payload.dataSets = _.reject(orgUnit.dataSets, function (dataSet) {
+               return _.contains(dataSetIdsToRemoved, dataSet.id);
+            });
+            return store.upsert(orgUnit);
+        };
+
         return {
             "upsert": upsert,
             "upsertDhisDownloadedData": upsertDhisDownloadedData,
@@ -285,7 +303,9 @@ define(["moment", "lodashUtils"], function(moment, _) {
             "getAllOriginsInOrgUnits": getAllOriginsInOrgUnits,
             "getAllOrgUnitsUnderProject": getAllOrgUnitsUnderProject,
             "getOrgUnitAndDescendants": getOrgUnitAndDescendants,
-            "enrichWithParent": enrichWithParent
+            "enrichWithParent": enrichWithParent,
+            "associateDataSetsToOrgUnit": associateDataSetsToOrgUnit,
+            "removeDataSetsFromOrgUnit": removeDataSetsFromOrgUnit
         };
     };
 });
