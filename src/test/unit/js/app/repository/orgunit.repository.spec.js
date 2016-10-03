@@ -543,45 +543,98 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
             });
         });
 
-        describe('associateDataSetsToOrgUnit', function () {
+        describe('associateDataSetsToOrgUnits', function () {
            it('should associate the dataSets with the orgUnit', function () {
-               var orgunit = {
+               var orgunits = [{
                    id: 'someOrgUnitId',
                    name: 'someOrgUnitName',
                    dataSets: [{id: 'someOtherDataSetId'}]
-               };
+               }, {
+                   id: 'someOtherOrgUnitId',
+                   name: 'someOrgUnitName',
+                   dataSets: [{id: 'someOtherDataSetId'}]
+               }];
                var expectedOrgUnitUpsert = {
                    "id": "someOrgUnitId",
                    "name": "someOrgUnitName",
                    "dataSets": [{"id": "someOtherDataSetId"}, {"id": "someDataSetId"}]
                };
-               mockOrgStore.each.and.returnValue(utils.getPromise(q, orgunit));
+               var expectedSomeOtherOrgUnitUpsert = {
+                   "id": "someOtherOrgUnitId",
+                   "name": "someOrgUnitName",
+                   "dataSets": [{"id": "someOtherDataSetId"}, {"id": "someDataSetId"}]
+               };
+               mockOrgStore.each.and.returnValue(utils.getPromise(q, orgunits));
 
-               orgUnitRepository.associateDataSetsToOrgUnit(['someDataSetId'], orgunit);
+               orgUnitRepository.associateDataSetsToOrgUnits(['someDataSetId'], orgunits);
                scope.$apply();
 
                expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedOrgUnitUpsert);
+               expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedSomeOtherOrgUnitUpsert);
            });
-        });
 
-        describe('removeDataSetsToOrgUnit', function () {
-            it('should remove the dataSets from the orgUnit', function () {
-                var orgunit = {
+            it('should not associate the already existing dataSet with orgUnit', function () {
+                var orgunits = [{
                     id: 'someOrgUnitId',
                     name: 'someOrgUnitName',
-                    dataSets: [{id: 'someDataSetId'}, {id: 'dataSetToBeRemoved'}]
+                    dataSets: [{id: 'someOtherDataSetId'}]
+                }, {
+                    id: 'someOtherOrgUnitId',
+                    name: 'someOrgUnitName',
+                    dataSets: [{id: 'someOtherDataSetId'}]
+                }];
+                var expectedOrgUnitUpsert = {
+                    "id": "someOrgUnitId",
+                    "name": "someOrgUnitName",
+                    "dataSets": [{"id": "someOtherDataSetId"}]
                 };
+                var expectedSomeOtherOrgUnitUpsert = {
+                    "id": "someOtherOrgUnitId",
+                    "name": "someOrgUnitName",
+                    "dataSets": [{"id": "someOtherDataSetId"}]
+                };
+                mockOrgStore.each.and.returnValue(utils.getPromise(q, orgunits));
+
+                orgUnitRepository.associateDataSetsToOrgUnits(['someOtherDataSetId'], orgunits);
+                scope.$apply();
+
+                expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedOrgUnitUpsert);
+                expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedSomeOtherOrgUnitUpsert);
+            });
+
+        });
+
+        describe('removeDataSetsToOrgUnits', function () {
+            it('should remove the dataSets from the orgUnits', function () {
+                var orgUnits = [{
+                    id: 'someOrgUnitId',
+                    name: 'someOrgUnitName',
+                    dataSets: [{id: 'someDataSetId'}, {
+                        id: 'dataSetToBeRemoved'
+                    }]
+                }, {
+                    id: 'someOtherOrgUnitId',
+                    name: 'someOtherOrgUnitName',
+                    dataSets: [{id: 'someDataSetId'}, {id: 'dataSetToBeRemoved'}]
+                }];
                 var expectedOrgUnitUpsert = {
                     "id": "someOrgUnitId",
                     "name": "someOrgUnitName",
                     "dataSets": [{"id": "someDataSetId"}]
                 };
-                mockOrgStore.each.and.returnValue(utils.getPromise(q, orgunit));
 
-                orgUnitRepository.removeDataSetsFromOrgUnit(['dataSetToBeRemoved'], orgunit);
+                var expectedSomeOtherOrgUnitUpsert = {
+                    "id": "someOtherOrgUnitId",
+                    "name": "someOtherOrgUnitName",
+                    "dataSets": [{"id": "someDataSetId"}]
+                };
+                mockOrgStore.each.and.returnValue(utils.getPromise(q, orgUnits));
+
+                orgUnitRepository.removeDataSetsFromOrgUnits(['dataSetToBeRemoved'], orgUnits);
                 scope.$apply();
 
                 expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedOrgUnitUpsert);
+                expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedSomeOtherOrgUnitUpsert);
             });
         });
 
