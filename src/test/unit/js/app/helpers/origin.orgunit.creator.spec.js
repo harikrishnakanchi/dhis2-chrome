@@ -17,7 +17,6 @@ define(["originOrgunitCreator", "angularMocks", "utils", "orgUnitRepository", "p
                 spyOn(orgUnitRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
 
                 spyOn(datasetRepository, "getAll").and.returnValue(utils.getPromise(q, {}));
-                spyOn(datasetRepository, "associateOrgUnits").and.returnValue(utils.getPromise(q, {}));
 
                 spyOn(patientOriginRepository, "get");
 

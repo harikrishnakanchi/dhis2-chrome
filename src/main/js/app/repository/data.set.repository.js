@@ -75,40 +75,6 @@ define(["lodash", "dataSetTransformer", "moment"], function(_, dataSetTransforme
             });
         };
 
-        this.associateOrgUnits = function(dataSetIds, orgUnits) {
-            return self.findAllDhisDatasets(dataSetIds).then(function(dataSets) {
-                var updatedDataSets = _.map(dataSets, function(ds) {
-                    ds.organisationUnits = ds.organisationUnits || [];
-                    var orgUnitsForDataSet = _.transform(orgUnits, function(results, orgUnit) {
-                        var orgUnitToAdd = {
-                            "id": orgUnit.id,
-                            "name": orgUnit.name
-                        };
-                        if (!_.some(ds.organisationUnits, orgUnitToAdd))
-                            results.push(orgUnitToAdd);
-                    });
-
-                    ds.organisationUnits = ds.organisationUnits.concat(orgUnitsForDataSet);
-                    return ds;
-                });
-
-                return self.upsertDhisDownloadedData(updatedDataSets);
-            });
-        };
-
-        this.removeOrgUnits = function (dataSetIds, orgUnitIds) {
-            return self.findAllDhisDatasets(dataSetIds).then(function(dataSets) {
-                var updatedDataSets = _.map(dataSets, function(ds) {
-                    ds.organisationUnits = ds.organisationUnits || [];
-                    ds.organisationUnits = _.reject(ds.organisationUnits, function(orgUnit) {
-                        return _.contains(orgUnitIds, orgUnit.id);
-                    });
-                    return ds;
-                });
-                return self.upsertDhisDownloadedData(updatedDataSets);
-            });
-        };
-
         this.findAllDhisDatasets = function(dataSetIds) {
             var store = db.objectStore(DATA_SETS_STORE_NAME);
             var query = db.queryBuilder().$in(dataSetIds).compile();
