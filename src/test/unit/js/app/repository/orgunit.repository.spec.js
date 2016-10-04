@@ -638,5 +638,22 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
             });
         });
 
+        describe('getAllDataSets',function () {
+            it('should return all the associatewd dataSets for the orgUnit id', function () {
+                var dataSets = [{
+                    id: 'someDataSetId'
+                }];
+                var mockOrgUnit = {
+                    id: 'mockOrgUnitId',
+                    dataSets: dataSets
+                };
+                spyOn(orgUnitRepository, 'get').and.returnValue(mockOrgUnit);
+                var expectedDataSets = dataSets;
+                orgUnitRepository.getAllDataSetsForOrgUnit(mockOrgUnit.id).then(function (dataSets) {
+                    expect(expectedDataSets).toEqual(dataSets);
+                });
+            });
+        });
+
     });
 });

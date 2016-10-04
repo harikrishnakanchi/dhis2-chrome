@@ -296,6 +296,12 @@ define(["moment", "lodashUtils"], function(moment, _) {
             }));
         };
 
+        var getAllDataSetsForOrgUnit = function (orgUnitId) {
+            return get(orgUnitId).then(function (orgUnit) {
+                return orgUnit.dataSets;
+            });
+        };
+
         return {
             "upsert": upsert,
             "upsertDhisDownloadedData": upsertDhisDownloadedData,
@@ -314,7 +320,8 @@ define(["moment", "lodashUtils"], function(moment, _) {
             "getOrgUnitAndDescendants": getOrgUnitAndDescendants,
             "enrichWithParent": enrichWithParent,
             "associateDataSetsToOrgUnits": associateDataSetsToOrgUnits,
-            "removeDataSetsFromOrgUnits": removeDataSetsFromOrgUnits
+            "removeDataSetsFromOrgUnits": removeDataSetsFromOrgUnits,
+            "getAllDataSetsForOrgUnit": getAllDataSetsForOrgUnit
         };
     };
 });
