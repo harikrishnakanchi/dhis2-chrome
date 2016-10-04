@@ -119,15 +119,6 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             return sum;
         };
 
-        $scope.showTotalLabelForOriginDatasetSection = function (dataSet) {
-            var count = 0;
-            _.each(dataSet.organisationUnits, function (orgUnit) {
-                if ($scope.moduleAndOriginOrgUnitIds.indexOf(orgUnit.id) >= 0)
-                    count++;
-            });
-            return count > 1;
-        };
-
         var getReferralDataElementIds = function(dataElements) {
             var dataElementsForReferral = _.filter(dataElements, function(de) {
                 return $scope.referralLocations[de.formName] !== undefined;
@@ -160,9 +151,9 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             }, 0);
         };
 
-        $scope.originSum = function(dataValues, dataSet, section) {
-            var sum = 0;
-            _.forEach(dataSet.organisationUnits, function(orgUnit) {
+        $scope.originSum = function(dataValues, section) {
+            var sum = 0, values;
+            _.forEach($scope.originOrgUnits, function(orgUnit) {
                 values = dataValues[orgUnit.id];
                 if (values && values[section.dataElements[0].id] && values[section.dataElements[0].id][section.categoryOptionComboIds[0]]) {
                     var value = values[section.dataElements[0].id][section.categoryOptionComboIds[0]].value || "0";
@@ -331,6 +322,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             var loadAssociatedOrgUnitsAndPrograms = function() {
                 return orgUnitRepository.findAllByParent([$scope.selectedModule.id]).then(function(originOrgUnits) {
                     $scope.moduleAndOriginOrgUnits = [$scope.selectedModule].concat(originOrgUnits);
+                    $scope.originOrgUnits = originOrgUnits;
                     return programRepository.getProgramForOrgUnit(originOrgUnits[0].id).then(function(program) {
                         if (program)
                             $scope.associatedProgramId = program.id;
@@ -379,13 +371,6 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                     .then(_.curryRight(datasetRepository.includeDataElements)($scope.excludedDataElements))
                     .then(datasetRepository.includeCategoryOptionCombinations)
                     .then(function(datasets) {
-                        var dataSetPromises = _.map(datasets, function(dataset) {
-                            return findallOrgUnits(dataset.organisationUnits).then(function(orgunits) {
-                                dataset.organisationUnits = orgunits;
-                                return dataset;
-                            });
-                        });
-
                         var translateDatasets = function (dataSets) {
                             var partitionDatasets = _.partition(dataSets, {
                                 "isReferralDataset": false
@@ -415,11 +400,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                             return $scope.dataSets;
                         };
 
-                        return $q.all(dataSetPromises)
-                            .then(filterDatasets)
-                            .then(translateDatasets)
-                            .then(setDatasets)
-                            .then(setTotalsDisplayPreferencesforDataSetSections);
+                       return setTotalsDisplayPreferencesforDataSetSections(setDatasets(translateDatasets(filterDatasets(datasets))));
                     });
 
                 var loadProjectPromise = orgUnitRepository.getParentProject($scope.selectedModule.id).then(function(orgUnit) {
