@@ -272,7 +272,7 @@ define(["moment", "lodashUtils"], function(moment, _) {
 
         var associateDataSetsToOrgUnits = function (dataSetIds, orgUnits) {
             var store = db.objectStore(ORGANISATION_UNITS_STORE_NAME);
-            return _.map(orgUnits, function (orgUnit) {
+            return $q.all(_.map(orgUnits, function (orgUnit) {
                 var payload = orgUnit;
                 var dataSetsToAdd = _.transform(dataSetIds, function (result, dataSetId) {
                     var dataSetToAdd = { id: dataSetId };
@@ -280,20 +280,20 @@ define(["moment", "lodashUtils"], function(moment, _) {
                         result.push({id: dataSetId});
                     }
                 });
-                payload.dataSets = payload.dataSets.concat(dataSetsToAdd);
+                payload.dataSets = payload.dataSets ? payload.dataSets.concat(dataSetsToAdd) : [].concat(dataSetsToAdd);
                 return store.upsert(payload);
-            });
+            }));
         };
 
         var removeDataSetsFromOrgUnits = function (dataSetIdsToRemoved, orgUnits) {
             var store = db.objectStore(ORGANISATION_UNITS_STORE_NAME);
-            return _.map(orgUnits, function (orgUnit) {
+            return $q.all(_.map(orgUnits, function (orgUnit) {
                 var payload = orgUnit;
                 payload.dataSets = _.reject(orgUnit.dataSets, function (dataSet) {
                     return _.contains(dataSetIdsToRemoved, dataSet.id);
                 });
                 return store.upsert(orgUnit);
-            });
+            }));
         };
 
         return {
