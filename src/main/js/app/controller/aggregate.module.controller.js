@@ -61,6 +61,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
 
             var init = function() {
                 var initModule = function() {
+
                     if ($scope.isNewMode) {
                         $scope.module = {
                             'openingDate': moment.utc().toDate(),
@@ -68,17 +69,20 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                             "serviceType": "",
                             "parent": $scope.orgUnit
                         };
+                        return $q.when([]);
                     } else {
-                        $scope.module = {
-                            'id': $scope.orgUnit.id,
-                            'name': $scope.orgUnit.name,
-                            'openingDate': moment.utc($scope.orgUnit.openingDate).toDate(),
-                            'serviceType': "Aggregate",
-                            'parent': $scope.orgUnit.parent,
-                            "attributeValues": $scope.orgUnit.attributeValues
-                        };
+                        return orgUnitRepository.getAllDataSetsForOrgUnit($scope.orgUnit.id).then(function (dataSets) {
+                            $scope.module = {
+                                'id': $scope.orgUnit.id,
+                                'name': $scope.orgUnit.name,
+                                'openingDate': moment.utc($scope.orgUnit.openingDate).toDate(),
+                                'serviceType': "Aggregate",
+                                'parent': $scope.orgUnit.parent,
+                                'attributeValues': $scope.orgUnit.attributeValues,
+                                'dataSets': dataSets
+                            };
+                        });
                     }
-                    return $q.when([]);
                 };
 
                 var isDataElementExcluded = function(dataElement) {
@@ -132,16 +136,19 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
 
                         var translatedDatasets = translationsService.translate(datasets);
 
-                        var partitionedDatasets = _.partition(translatedDatasets, function(ds) {
-                            if ($scope.module.id)
-                                return _.any(ds.organisationUnits, "id", $scope.module.id);
-                            return false;
+                        datasetRepository.findAllForOrgUnits([$scope.module]).then(function (dataSets) {
+                            var partitionedDatasets = _.partition(translatedDatasets, function(ds) {
+                                if ($scope.module.id)
+                                    return _.any(dataSets, "id", ds.id);
+                                return false;
+                            });
+
+                            $scope.associatedDatasets = partitionedDatasets[0];
+                            existingAssociatedDatasetIds = _.map(partitionedDatasets[0], 'id');
+                            $scope.nonAssociatedDataSets = partitionedDatasets[1];
+                            $scope.selectedDataset = $scope.associatedDatasets ? $scope.associatedDatasets[0] : [];
                         });
 
-                        $scope.associatedDatasets = partitionedDatasets[0];
-                        existingAssociatedDatasetIds = _.map(partitionedDatasets[0], 'id');
-                        $scope.nonAssociatedDataSets = partitionedDatasets[1];
-                        $scope.selectedDataset = $scope.associatedDatasets ? $scope.associatedDatasets[0] : [];
                     });
                 };
 
@@ -326,7 +333,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
 
                 var updateOrgUnitDatasetAssociations = function () {
                     var associatedDatasetIds = _.map($scope.associatedDatasets, 'id');
-                    var newlyAddedDatasetIds = _.difference(associatedDatasetIds ,existingAssociatedDatasetIds);
+                    var newlyAddedDatasetIds = _.difference(associatedDatasetIds, existingAssociatedDatasetIds);
                     var removedDatasetIds = _.difference(existingAssociatedDatasetIds, associatedDatasetIds);
                     return associateToDatasets(newlyAddedDatasetIds, [enrichedModule]);
                 };

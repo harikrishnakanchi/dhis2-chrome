@@ -30,6 +30,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 spyOn(orgUnitRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "associateDataSetsToOrgUnits").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "removeDataSetsFromOrgUnits").and.returnValue(utils.getPromise(q, {}));
+                spyOn(orgUnitRepo, "getAllDataSetsForOrgUnit").and.returnValue(utils.getPromise(q, {}));
 
                 originOrgunitCreator = new OriginOrgunitCreator();
                 spyOn(originOrgunitCreator, "create").and.returnValue(utils.getPromise(q, {}));
@@ -401,16 +402,10 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
             it("should set datasets associated with module for edit", function() {
                 var datasets = [{
                     "id": "ds1",
-                    "organisationUnits": [{
-                        "id": "mod1"
-                    }],
                     "isAggregateService": true,
                     "sections": []
                 }, {
                     "id": "ds2",
-                    "organisationUnits": [{
-                        "id": "mod2"
-                    }],
                     "isAggregateService": true,
                     "sections": []
                 }];
@@ -425,7 +420,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.isNewMode = false;
 
                 dataSetRepo.getAll.and.returnValue(utils.getPromise(q, datasets));
-                dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasets));
+                dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [datasets[1]]));
                 dataSetRepo.includeDataElements.and.returnValue(utils.getPromise(q, datasets));
                 translationsService.translate.and.returnValue(datasets);
 
@@ -608,17 +603,11 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
             it('should update assoscaiated dataset when a new dataset is added to existing module', function () {
                 var datasetOne = {
                     "id": "ds1",
-                    "organisationUnits": [{
-                        "id": "mod1"
-                    }],
                     "isAggregateService": true,
                     "sections": []
                 };
                 var datasetTwo = {
                     "id": "ds2",
-                    "organisationUnits": [{
-                        "id": "mod2"
-                    }],
                     "isAggregateService": true,
                     "sections": []
                 };
@@ -637,7 +626,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.isNewMode = false;
 
                 dataSetRepo.getAll.and.returnValue(utils.getPromise(q, dataSets));
-                dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, dataSets));
+                dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [datasetOne]));
                 dataSetRepo.includeDataElements.and.returnValue(utils.getPromise(q, dataSets));
                 translationsService.translate.and.returnValue(dataSets);
 
