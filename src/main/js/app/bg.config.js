@@ -108,6 +108,7 @@ require.config({
         "syncExcludedLinelistOptionsConsumer": "app/consumer/sync.excluded.linelist.options.consumer",
         "associateOrgunitToProgramConsumer": "app/consumer/associate.orgUnit.to.program.consumer",
         "downloadHistoricalDataConsumer": "app/consumer/download.historical.data.consumer",
+        "syncOrgUnitConsumer": "app/consumer/sync.orgunit.consumer",
 
         //merge strategies
         "mergeBy": "app/consumer/mergestrategies/merge.by",
