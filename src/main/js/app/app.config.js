@@ -147,6 +147,7 @@ require.config({
         "datasetTransformer": "app/transformers/dataset.transformer",
         "programTransformer": "app/transformers/program.transformer",
         "translationsService": "app/transformers/translations.service",
+        "eventsAggregator": "app/transformers/events.aggregator",
         "transformers": "app/transformers/transformers",
 
         //Database Utilities
