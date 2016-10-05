@@ -1,4 +1,4 @@
-define(['moment', 'lodash', 'dateUtils', 'excelBuilder'], function (moment, _, dateUtils, excelBuilder) {
+define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], function (moment, _, dateUtils, excelBuilder, eventsAggregator) {
     return function($scope, $q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository) {
 
         $scope.weeksToExportOptions = [{
@@ -155,16 +155,18 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder'], function (moment, _, d
         var fetchEventsForProgram = function (program) {
             var startDate = moment(_.first($scope.weeks), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
                 endDate = moment(_.last($scope.weeks), 'GGGG[W]W').endOf('isoWeek').format('YYYY-MM-DD');
-
-            return programEventRepository.findEventsByDateRange(program.id, _.map($scope.originOrgUnits, 'id'), startDate, endDate).then(function (events) {
-                $scope.events = events;
-            });
+            return programEventRepository.findEventsByDateRange(program.id, _.map($scope.originOrgUnits, 'id'), startDate, endDate);
         };
 
         var loadLineListRawData = function () {
             return $q.all([fetchOriginOrgUnitsForCurrentModule(), loadExcludedDataElementIds($scope.orgUnit)])
                 .then(getProgramForCurrentModule)
-                .then(fetchEventsForProgram);
+                .then(fetchEventsForProgram)
+                .then(function (events) {
+                    if ($scope.selectedDataset.isOriginDataset) {
+                        $scope.originSummary = eventsAggregator.nest(events, ['orgUnitName', 'period']);
+                    }
+                });
         };
 
         var reloadView = function () {

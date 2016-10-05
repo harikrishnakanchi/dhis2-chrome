@@ -506,6 +506,13 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
             });
 
             describe('LineListEventsRawData', function () {
+                var createMockEvent = function (options) {
+                    return _.merge({
+                        'period': '2016W13',
+                        'event': 'someEventId'
+                    }, options);
+                };
+
                 beforeEach(function () {
                     selectedOrgUnit = {
                         id: 'orgUnitId',
@@ -572,6 +579,32 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     scope.$apply();
 
                     expect(programEventRepository.findEventsByDateRange).toHaveBeenCalledWith(mockProgram.id, _.map(scope.originOrgUnits, 'id'), '2016-09-05', '2016-09-25');
+                });
+
+                it('should recursively group all the events by origin, by period', function () {
+                    scope.selectedDataset = {
+                        id: 'someId',
+                        isOriginDataset: true
+                    };
+
+                    var eventA = createMockEvent({orgUnitName: 'originA', period: '2016W13'}),
+                        eventB = createMockEvent({orgUnitName: 'originA', period: '2016W14'}),
+                        eventC = createMockEvent({orgUnitName: 'originB', period: '2016W14'});
+
+                    programEventRepository.findEventsByDateRange.and.returnValue(utils.getPromise(q, [eventA, eventB, eventC]));
+                    scope.$apply();
+
+                    var expectedValue = {
+                        originA: {
+                            '2016W13': [eventA],
+                            '2016W14': [eventB]
+                        },
+                        originB: {
+                            '2016W14': [eventC]
+                        }
+                    };
+
+                    expect(scope.originSummary).toEqual(expectedValue);
                 });
             });
         });
