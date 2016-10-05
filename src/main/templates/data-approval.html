@@ -150,7 +150,7 @@
                                                         </th>
                                                     </tr>
                                                 </thead>
-                                                <tbody ng-repeat="orgUnit in dataSet.organisationUnits | orderBy: 'name'" ng-if="moduleAndOriginOrgUnitIds.indexOf(orgUnit.id) &gt;= 0">
+                                                <tbody ng-repeat="orgUnit in originOrgUnits | orderBy: 'name'">
                                                     <tr ng-repeat="dataElement in section.dataElements" ng-if="dataElement.associatedProgramId === associatedProgramId" ng-form="dataElementForm">
                                                         <td>
                                                             <span>{{ orgUnit[dataElement.id] || orgUnit.name}}</span>
@@ -163,15 +163,15 @@
                                                         <td ng-if="section.categoryOptionComboIds.length > 1" class="last-column">{{sum(dataValues, orgUnit ,dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
                                                     </tr>
                                                 </tbody>
-                                                <tbody ng-if="showTotalLabelForOriginDatasetSection(dataSet)">
+                                                <tbody>
                                                     <tr>
                                                         <td>
                                                             <span> {{ resourceBundle.totalLabel }}</span>
                                                         </td>
                                                         <td>
-                                                            {{originSum(dataValues, dataSet, section)}}
+                                                            {{originSum(dataValues, section)}}
                                                         </td>
-                                                        <td class="last-column" ng-if="section.categoryOptionComboIds.length > 1"> {{originSum(dataValues, dataSet,section)}}
+                                                        <td class="last-column" ng-if="section.categoryOptionComboIds.length > 1"> {{originSum(dataValues,section)}}
                                                         </td>
                                                     </tr>
                                                 </tbody>
