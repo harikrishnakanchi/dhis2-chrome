@@ -1,9 +1,9 @@
-define(["moment", "orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "changeLogRepository", "translationsService", "timecop", "orgUnitGroupSetRepository", "filesystemService", "pivotTableCsvBuilder"],
-    function(moment, OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, ChangeLogRepository, TranslationsService, timecop, OrgUnitGroupSetRepository, FilesystemService, PivotTableCsvBuilder) {
+define(["moment", "orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "changeLogRepository", "translationsService", "timecop", "orgUnitGroupSetRepository", "filesystemService", "pivotTableExportBuilder"],
+    function(moment, OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, ChangeLogRepository, TranslationsService, timecop, OrgUnitGroupSetRepository, FilesystemService, PivotTableExportBuilder) {
     describe("projectReportController", function() {
         var scope, rootScope, q,
             projectReportController,
-            orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService, pivotTableCsvBuilder,
+            orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService, pivotTableExportBuilder,
             mockPivotTables, pivotTableData, mockProjectOrgUnit, orgUnitGroupSets, currentTime, lastUpdatedTime;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
@@ -236,10 +236,10 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             filesystemService = new FilesystemService();
             spyOn(filesystemService, 'promptAndWriteFile').and.returnValue(utils.getPromise(q, {}));
 
-            pivotTableCsvBuilder = new PivotTableCsvBuilder();
-            spyOn(pivotTableCsvBuilder, 'build');
+            pivotTableExportBuilder = new PivotTableExportBuilder();
+            spyOn(pivotTableExportBuilder, 'build');
 
-            projectReportController = new ProjectReportController(rootScope, q, scope, orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService, pivotTableCsvBuilder);
+            projectReportController = new ProjectReportController(rootScope, q, scope, orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService, pivotTableExportBuilder);
         }));
 
         afterEach(function () {
@@ -287,7 +287,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
 
             it('should contain the results of the csv builder', function () {
                 var mockPivotTableCsvData = 'someCSVData';
-                pivotTableCsvBuilder.build.and.returnValue(mockPivotTableCsvData);
+                pivotTableExportBuilder.build.and.returnValue(mockPivotTableCsvData);
                 scope.exportToCSV();
 
                 expect(csvContent).toContain(mockPivotTableCsvData);

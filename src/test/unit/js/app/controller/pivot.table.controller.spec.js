@@ -1,6 +1,6 @@
-define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableController", "timecop", "translationsService", "filesystemService", "pivotTableCsvBuilder"], function (mocks, dateUtils, utils, lodash, moment, PivotTableController, timecop, TranslationsService, FilesystemService, PivotTableCsvBuilder) {
+define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableController", "timecop", "translationsService", "filesystemService", "pivotTableExportBuilder"], function (mocks, dateUtils, utils, lodash, moment, PivotTableController, timecop, TranslationsService, FilesystemService, PivotTableExportBuilder) {
     describe("pivotTableController", function () {
-        var scope, rootScope, q, pivotTableController, translationsService, filesystemService, pivotTableCsvBuilder,
+        var scope, rootScope, q, pivotTableController, translationsService, filesystemService, pivotTableExportBuilder,
             currentTime;
 
         beforeEach(mocks.inject(function ($rootScope, $q) {
@@ -24,10 +24,10 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
             filesystemService = new FilesystemService();
             spyOn(filesystemService, 'promptAndWriteFile').and.returnValue(utils.getPromise(q, {}));
 
-            pivotTableCsvBuilder = new PivotTableCsvBuilder();
-            spyOn(pivotTableCsvBuilder, 'build');
+            pivotTableExportBuilder = new PivotTableExportBuilder();
+            spyOn(pivotTableExportBuilder, 'build');
 
-            pivotTableController = new PivotTableController(scope, rootScope, translationsService, filesystemService, pivotTableCsvBuilder);
+            pivotTableController = new PivotTableController(scope, rootScope, translationsService, filesystemService, pivotTableExportBuilder);
             scope.$apply();
         }));
 
@@ -105,7 +105,7 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
                 });
 
                 mockPivotTableCsv = 'mockCSVData';
-                pivotTableCsvBuilder.build.and.returnValue(mockPivotTableCsv);
+                pivotTableExportBuilder.build.and.returnValue(mockPivotTableCsv);
 
                 scope.table = {
                     title: 'A table named T. Able',

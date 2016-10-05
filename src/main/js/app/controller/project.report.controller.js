@@ -1,5 +1,5 @@
 define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, dateUtils, _, orgUnitMapper) {
-    return function($rootScope, $q, $scope, orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService, pivotTableCsvBuilder) {
+    return function($rootScope, $q, $scope, orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService, pivotTableExportBuilder) {
         $scope.selectedProject = $rootScope.currentUser.selectedProject;
 
         var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
@@ -37,7 +37,7 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, date
                 return _.map($scope.pivotTables, function (pivotTable) {
                     return [
                         escapeString(pivotTable.title),
-                        pivotTableCsvBuilder.build(pivotTable)
+                        pivotTableExportBuilder.build(pivotTable)
                     ].join(NEW_LINE);
                 }).join(NEW_LINE + NEW_LINE);
             };
