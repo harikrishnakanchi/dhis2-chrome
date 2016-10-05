@@ -83,7 +83,7 @@ define(['pivotTableExportBuilder', 'angularMocks', 'dateUtils'], function (Pivot
             it('should contain the main column headers', function () {
                 exportContent = exportBuilder.build(pivotTableData);
 
-                var expectedHeader = [escapeString(rootScope.resourceBundle.label.dataDimension), escapeString(rootScope.resourceBundle.label.category), escapeString(outerColumnA.name)].join(DELIMITER);
+                var expectedHeader = [rootScope.resourceBundle.label.dataDimension, rootScope.resourceBundle.label.category, outerColumnA.name];
                 expect(exportContent).toContain(expectedHeader);
             });
 
@@ -93,16 +93,16 @@ define(['pivotTableExportBuilder', 'angularMocks', 'dateUtils'], function (Pivot
                 pivotTableData.monthlyReport = true;
                 exportContent = exportBuilder.build(pivotTableData);
 
-                expect(exportContent).toContain(escapeString(outerColumnA.name + ' [4 '+ rootScope.resourceBundle.weeksLabel + ']'));
+                expect(_.first(exportContent)).toContain(outerColumnA.name + ' [4 '+ rootScope.resourceBundle.weeksLabel + ']');
             });
 
             it('should contain dataValues for rows', function () {
                 exportContent = exportBuilder.build(pivotTableData);
 
-                var expectedRowA1 = [escapeString(rowA.name), escapeString(innerColumnA1.name), mockValue].join(DELIMITER),
-                    expectedRowA2 = [escapeString(rowA.name), escapeString(innerColumnA2.name), mockValue].join(DELIMITER),
-                    expectedRowB1 = [escapeString(rowB.name), escapeString(innerColumnA1.name), mockValue].join(DELIMITER),
-                    expectedRowB2 = [escapeString(rowB.name), escapeString(innerColumnA2.name), mockValue].join(DELIMITER);
+                var expectedRowA1 = [rowA.name, innerColumnA1.name, mockValue],
+                    expectedRowA2 = [rowA.name, innerColumnA2.name, mockValue],
+                    expectedRowB1 = [rowB.name, innerColumnA1.name, mockValue],
+                    expectedRowB2 = [rowB.name, innerColumnA2.name, mockValue];
 
                 expect(exportContent).toContain(expectedRowA1);
                 expect(exportContent).toContain(expectedRowA2);

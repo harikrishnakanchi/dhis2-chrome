@@ -1,4 +1,4 @@
-define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableController", "timecop", "translationsService", "filesystemService", "pivotTableExportBuilder"], function (mocks, dateUtils, utils, lodash, moment, PivotTableController, timecop, TranslationsService, FilesystemService, PivotTableExportBuilder) {
+define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableController", "timecop", "translationsService", "filesystemService", "pivotTableExportBuilder", "excelBuilder"], function (mocks, dateUtils, utils, lodash, moment, PivotTableController, timecop, TranslationsService, FilesystemService, PivotTableExportBuilder, ExcelBuilder) {
     describe("pivotTableController", function () {
         var scope, rootScope, q, pivotTableController, translationsService, filesystemService, pivotTableExportBuilder,
             currentTime;
@@ -26,6 +26,8 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
 
             pivotTableExportBuilder = new PivotTableExportBuilder();
             spyOn(pivotTableExportBuilder, 'build');
+
+            spyOn(ExcelBuilder, 'createWorkBook').and.returnValue(new Blob());
 
             pivotTableController = new PivotTableController(scope, rootScope, translationsService, filesystemService, pivotTableExportBuilder);
             scope.$apply();
@@ -92,20 +94,17 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
             });
         });
 
-        describe("Export as csv", function () {
-            var csvContent, mockPivotTableCsv;
+        describe("Export as Excel", function () {
+            var spreadSheetContent, mockPivotTableExport;
 
             beforeEach(function () {
-                spyOn(window, 'Blob').and.callFake(function (contentArray) {
-                    this.value = contentArray.join();
+                ExcelBuilder.createWorkBook.and.callFake(function (workBookContent) {
+                    spreadSheetContent = _.first(workBookContent);
+                    return new Blob();
                 });
 
-                filesystemService.promptAndWriteFile.and.callFake(function (fileName, blob) {
-                    csvContent = blob.value;
-                });
-
-                mockPivotTableCsv = 'mockCSVData';
-                pivotTableExportBuilder.build.and.returnValue(mockPivotTableCsv);
+                mockPivotTableExport = ['mockPivotTableExport'];
+                pivotTableExportBuilder.build.and.returnValue([mockPivotTableExport]);
 
                 scope.table = {
                     title: 'A table named T. Able',
@@ -113,26 +112,26 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
                 };
             });
 
-            it('should prompt the user to download tabular data to CSV with lastUpdated date in the filename', function () {
+            it('should prompt the user to download tabular data as Excel with lastUpdated date in the filename', function () {
                 var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm";
                 scope.updatedTime = moment('2015-10-29').format(REPORTS_LAST_UPDATED_TIME_FORMAT);
 
-                scope.exportToCSV();
-                expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith([scope.table.dataSetCode, scope.table.title, '[updated 29 October 2015 12.00 AM]', 'csv'].join('.'), jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
+                scope.exportToExcel();
+                expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith([scope.table.dataSetCode, scope.table.title, '[updated 29 October 2015 12.00 AM]', 'xlsx'].join('.'), jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.XLSX);
             });
 
             it('should contain results of csv builder', function () {
-                scope.exportToCSV();
-                expect(csvContent).toContain(mockPivotTableCsv);
+                scope.exportToExcel();
+                expect(spreadSheetContent.data).toContain(mockPivotTableExport);
             });
 
             it("should include lastUpdated time", function () {
                 var REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY hh[.]mm A";
                 scope.updatedTime = moment('2015-10-29').format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
-                var expected = '"Updated","' + scope.updatedTime + '"';
+                var expected = ["Updated", scope.updatedTime];
 
-                scope.exportToCSV();
-                expect(csvContent).toContain(expected);
+                scope.exportToExcel();
+                expect(spreadSheetContent.data).toContain(expected);
             });
         });
 

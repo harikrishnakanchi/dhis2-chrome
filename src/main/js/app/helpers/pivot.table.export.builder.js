@@ -1,13 +1,6 @@
 define(['dateUtils', 'lodash'], function (dateUtils, _) {
     return function ($rootScope) {
 
-        var DELIMITER = ',',
-            NEW_LINE = '\n';
-
-        var escapeString = function (string) {
-            return '"' + string + '"';
-        };
-
         var getNumberOfWeeksLabel = function (month) {
             return '[' + dateUtils.getNumberOfISOWeeksInMonth(month) + ' ' + $rootScope.resourceBundle.weeksLabel + ']';
         };
@@ -28,24 +21,24 @@ define(['dateUtils', 'lodash'], function (dateUtils, _) {
 
             var buildHeaders = function() {
                 var cells = _.map([pivotTableData.rows].concat(subColumns), function(items) {
-                    return escapeString(getColumnHeader(items));
+                    return getColumnHeader(items);
                 });
 
                 _.each(mainColumns, function (column) {
                     if(pivotTableData.monthlyReport && column.periodDimension) {
-                        cells.push(escapeString(pivotTableData.getDisplayName(column) + ' ' + getNumberOfWeeksLabel(column.id)));
+                        cells.push(pivotTableData.getDisplayName(column) + ' ' + getNumberOfWeeksLabel(column.id));
                     } else {
-                        cells.push(escapeString(pivotTableData.getDisplayName(column)));
+                        cells.push(pivotTableData.getDisplayName(column));
                     }
                 });
-                return cells.join(DELIMITER);
+                return cells;
             };
 
             var buildRows = function () {
                 var buildRowsForSubColumns = function (subColumns, rowSpecifiers) {
                     if(_.isEmpty(subColumns)) {
                         var cells = _.map(rowSpecifiers, function (rowSpecifier) {
-                            return escapeString(pivotTableData.getDisplayName(rowSpecifier));
+                            return pivotTableData.getDisplayName(rowSpecifier);
                         });
 
                         _.each(mainColumns, function (column) {
@@ -53,7 +46,7 @@ define(['dateUtils', 'lodash'], function (dateUtils, _) {
                             var value = pivotTableData.getDataValue(combinedRow, column);
                             cells.push(value);
                         });
-                        return cells.join(DELIMITER);
+                        return cells;
                     } else {
                         var thisSubColumn = _.first(subColumns),
                             remainingSubColumns = _.slice(subColumns, 1);
@@ -64,15 +57,12 @@ define(['dateUtils', 'lodash'], function (dateUtils, _) {
                     }
                 };
 
-                return _.map(pivotTableData.rows, function (row) {
+                return _.flatten(_.map(pivotTableData.rows, function (row) {
                     return buildRowsForSubColumns(subColumns, [row]);
-                });
+                }));
             };
 
-            return _.flattenDeep([
-                buildHeaders(),
-                buildRows()
-            ]).join(NEW_LINE);
+            return [buildHeaders()].concat(buildRows());
         };
     };
 });
