@@ -3,7 +3,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
         dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository) {
 
         var currentPeriod, currentPeriodAndOrgUnit;
-        var removeReferral = false;
+        var noReferralLocationConfigured = false;
         $scope.rowTotal = {};
 
         var resetForm = function() {
@@ -342,11 +342,11 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                         data = _.omit(data, function(o) {
                             return o.isDisabled !== false;
                         });
-                        removeReferral = _.keys(data).length === 0 ? true : false;
+                        noReferralLocationConfigured = _.keys(data).length === 0 ? true : false;
                         $scope.referralLocations = data;
                         return;
                     }
-                    removeReferral = true;
+                    noReferralLocationConfigured = true;
                 });
             };
 
@@ -370,7 +370,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                 var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnits)
                     .then(_.curryRight(datasetRepository.includeDataElements)($scope.excludedDataElements))
                     .then(datasetRepository.includeCategoryOptionCombinations)
-                    .then(function(datasets) {
+                    .then(function(dataSets) {
                         var translateDatasets = function (dataSets) {
                             var partitionDatasets = _.partition(dataSets, {
                                 "isReferralDataset": false
@@ -381,26 +381,28 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                             return translatedOtherDatasets.concat(translatedReferralDatasets);
                         };
 
-                        var filterDatasets = function (datasets) {
-                            if (removeReferral)
-                                return _.filter(datasets, { "isReferralDataset": false });
-                            return datasets;
+                        var filterOutReferralLocations = function (dataSets) {
+                            return _.filter(dataSets, { isReferralDataset: false });
                         };
 
-                        var setTotalsDisplayPreferencesforDataSetSections = function (dataSets) {
-                            _.each(dataSets, function (dataSet) {
+                        var setTotalsDisplayPreferencesforDataSetSections = function () {
+                            _.each($scope.dataSets, function (dataSet) {
                                 _.each(dataSet.sections, function (dataSetSection) {
                                     dataSetSection.shouldDisplayRowTotals = dataSetSection.categoryOptionComboIds.length > 1;
                                     dataSetSection.shouldDisplayColumnTotals = (_.filter(dataSetSection.dataElements, {isIncluded: true}).length > 1 && !(dataSetSection.shouldHideTotals));
                                 });
                             });
                         };
-                        var setDatasets = function (datasets) {
-                            $scope.dataSets = datasets;
-                            return $scope.dataSets;
+                        var setDataSets = function (dataSets) {
+                            $scope.dataSets = dataSets;
                         };
 
-                       return setTotalsDisplayPreferencesforDataSetSections(setDatasets(translateDatasets(filterDatasets(datasets))));
+                        if (noReferralLocationConfigured) {
+                            dataSets = filterOutReferralLocations(dataSets);
+                        }
+                        dataSets = translateDatasets(dataSets);
+                        setDataSets(dataSets);
+                        setTotalsDisplayPreferencesforDataSetSections();
                     });
 
                 var loadProjectPromise = orgUnitRepository.getParentProject($scope.selectedModule.id).then(function(orgUnit) {
