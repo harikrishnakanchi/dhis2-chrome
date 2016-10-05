@@ -68,13 +68,6 @@ define(["lodash", "dataSetTransformer", "moment"], function(_, dataSetTransforme
             });
         };
 
-        var extractOrgUnitIdsForIndexing = function(dataSets) {
-            return _.map(dataSets, function(ds) {
-                ds.orgUnitIds = _.pluck(ds.organisationUnits, "id");
-                return ds;
-            });
-        };
-
         this.findAllDhisDatasets = function(dataSetIds) {
             var store = db.objectStore(DATA_SETS_STORE_NAME);
             var query = db.queryBuilder().$in(dataSetIds).compile();
@@ -96,7 +89,6 @@ define(["lodash", "dataSetTransformer", "moment"], function(_, dataSetTransforme
 
         this.upsertDhisDownloadedData = function(dataSets, sections) {
             dataSets = !_.isArray(dataSets) ? [dataSets] : dataSets;
-            dataSets = extractOrgUnitIdsForIndexing(dataSets);
             dataSets = sections ? associateSectionsToDataSets(dataSets, sections) : dataSets;
             var store = db.objectStore(DATA_SETS_STORE_NAME);
             return store.upsert(dataSets).then(function() {

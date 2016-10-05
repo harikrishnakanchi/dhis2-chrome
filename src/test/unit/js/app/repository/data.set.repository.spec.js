@@ -155,65 +155,48 @@ define(["dataSetRepository", "dataSetTransformer", "testData", "angularMocks", "
             expect(actualDataSets[0].sections[0].categoryOptionComboIdsForTotals).toEqual(['2', '3', '4']);
         });
 
-        it("should upsert dataSets downloaded from dhis", function() {
-            var dataSets = [{
-                "id": "ds1",
-                "name": "NeoNat",
-                "organisationUnits": [{
-                    "id": "ou1",
-                    "name": "ou1"
-                }]
-            }];
-            dataSetRepository.upsertDhisDownloadedData(dataSets);
-            scope.$apply();
+        describe('Upsert dataSets downloaded from dhis', function () {
+            var mockDataSets;
+            beforeEach(function () {
+                  mockDataSets = [{
+                    "id": "ds1",
+                    "name": "NeoNat"
+                }];
+            });
 
-            var expectedDataSetUpsert = [{
-                "id": "ds1",
-                "name": "NeoNat",
-                "organisationUnits": [{
-                    "id": "ou1",
-                    "name": "ou1"
-                }],
-                "orgUnitIds": ["ou1"]
-            }];
-            expect(mockStore.upsert).toHaveBeenCalledWith(expectedDataSetUpsert);
-        });
+            it("should upsert dataSets downloaded", function() {
+                dataSetRepository.upsertDhisDownloadedData(mockDataSets);
+                scope.$apply();
 
-        it("should upsert dataSets downloaded from dhis with given sections", function() {
-            var dataSets = [{
-                "id": "ds1",
-                "name": "NeoNat",
-                "organisationUnits": [{
-                    "id": "ou1",
-                    "name": "ou1"
-                }]
-            }];
+                var expectedDataSetUpsert = [{
+                    "id": "ds1",
+                    "name": "NeoNat"
+                }];
+                expect(mockStore.upsert).toHaveBeenCalledWith(expectedDataSetUpsert);
+            });
 
-            var sections = [{
-                "id": "s1",
-                "name": "section1",
-                "dataSet": {
-                    "id": "ds1"
-                }
-            }];
-
-            dataSetRepository.upsertDhisDownloadedData(dataSets, sections);
-            scope.$apply();
-
-            var expectedDataSetUpsert = [{
-                "id": "ds1",
-                "name": "NeoNat",
-                "organisationUnits": [{
-                    "id": "ou1",
-                    "name": "ou1"
-                }],
-                "sections": [{
+            it("should upsert dataSets downloaded with given sections", function() {
+                var sections = [{
                     "id": "s1",
-                    "name": "section1"
-                }],
-                "orgUnitIds": ["ou1"]
-            }];
-            expect(mockStore.upsert).toHaveBeenCalledWith(expectedDataSetUpsert);
+                    "name": "section1",
+                    "dataSet": {
+                        "id": "ds1"
+                    }
+                }];
+
+                dataSetRepository.upsertDhisDownloadedData(mockDataSets, sections);
+                scope.$apply();
+
+                var expectedDataSetUpsert = [{
+                    "id": "ds1",
+                    "name": "NeoNat",
+                    "sections": [{
+                        "id": "s1",
+                        "name": "section1"
+                    }]
+                }];
+                expect(mockStore.upsert).toHaveBeenCalledWith(expectedDataSetUpsert);
+            });
         });
     });
 });
