@@ -54,4 +54,78 @@ define(['eventsAggregator'], function (eventsAggregator) {
             expect(actual).toEqual(expected);
         });
     });
+
+    describe('eventsAggregator.transform', function () {
+        it('should transform events by specified groups recursively', function () {
+            var eventA = {
+                period: '2016W14',
+                dataValues: [{
+                    dataElement: 'de1',
+                    value: 'optionA'
+                }, {
+                    dataElement: 'de2',
+                    value: 'optionX'
+                }]
+            }, eventB = {
+                period: '2016W14',
+                dataValues: [{
+                    dataElement: 'de1',
+                    value: 'optionA'
+                }, {
+                    dataElement: 'de2',
+                    value: 'optionY'
+                }]
+            }, eventC = {
+                period: '2016W15',
+                dataValues: [{
+                    dataElement: 'de1',
+                    value: 'optionB'
+                }, {
+                    dataElement: 'de2',
+                    value: 'optionX'
+                }]
+            }, eventD = {
+                period: '2016W16',
+                dataValues: [{
+                    dataElement: 'de1',
+                    value: 'optionB'
+                }, {
+                    dataElement: 'de2',
+                    value: 'optionY'
+                }]
+            };
+            var events = [eventA, eventB, eventC, eventD];
+
+            var expectedTree = {
+                de1: {
+                    optionA: {
+                        count: 2,
+                        '2016W14': [eventA, eventB]
+                    },
+                    optionB: {
+                        count: 2,
+                        '2016W15': [eventC],
+                        '2016W16': [eventD]
+                    }
+                },
+                de2: {
+                    optionX: {
+                        count: 2,
+                        '2016W14': [eventA],
+                        '2016W15': [eventC]
+                    },
+                    optionY: {
+                        count: 2,
+                        '2016W14': [eventB],
+                        '2016W16': [eventD]
+                    }
+                }
+            };
+
+            var dataElementIds = ['de1', 'de2'];
+
+            var actualTree = eventsAggregator.transform(events, ['period'], dataElementIds);
+            expect(actualTree).toEqual(expectedTree);
+        });
+    });
 });
