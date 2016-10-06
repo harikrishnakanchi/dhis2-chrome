@@ -71,44 +71,30 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
         });
 
         it("should mark data as approved in dhis", function() {
+            var orgUnitA = "orgUnitA", orgUnitB = "orgUnitB", period = "2016W31";
 
-            var expectedPayload = [{
-                "ds": "170b8cd5e53",
-                "pe": "2014W01",
-                "ou": "17yugc",
-                "ab": "currentUserName",
-                "ad": "2014-01-01"
-            }, {
-                "ds": "wqeb8cd5e53",
-                "pe": "2014W01",
-                "ou": "17yugc",
-                "ab": "currentUserName",
-                "ad": "2014-01-01"
-            }, {
-                "ds": "170b8cd5e53",
-                "pe": "2014W02",
-                "ou": "17yugc",
-                "ab": "currentUserName",
-                "ad": "2014-01-01"
-            }, {
-                "ds": "wqeb8cd5e53",
-                "pe": "2014W02",
-                "ou": "17yugc",
-                "ab": "currentUserName",
-                "ad": "2014-01-01"
-            }];
+            var expectedPayload = {
+                "pe": [period],
+                "ds": dataSets,
+                "approvals": [{
+                    "ou": orgUnitA
+                },{
+                        "ou": orgUnitB
+                    }
+                ]
+            };
 
-            httpBackend.expectPOST(properties.dhis.url + "/api/dataApprovals/multiple", expectedPayload).respond(200, "ok");
+            httpBackend.expectPOST(properties.dhis.url + "/api/dataApprovals/approvals", expectedPayload).respond(200, "ok");
 
             var periodsAndOrgUnits = [{
-                "period": "2014W01",
-                "orgUnit": "17yugc"
+                "period": period,
+                "orgUnit": orgUnitA
             }, {
-                "period": "2014W02",
-                "orgUnit": "17yugc"
+                "period": period,
+                "orgUnit": orgUnitB
             }];
 
-            approvalService.markAsApproved(["170b8cd5e53", "wqeb8cd5e53"], periodsAndOrgUnits, "currentUserName", "2014-01-01");
+            approvalService.markAsApproved(dataSets, periodsAndOrgUnits);
 
             httpBackend.flush();
         });

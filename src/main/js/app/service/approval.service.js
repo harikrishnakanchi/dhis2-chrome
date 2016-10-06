@@ -30,19 +30,14 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                 .catch(isAnyDataSetIsLocked);
         };
 
-        this.markAsApproved = function(dataSets, periodsAndOrgUnits, approvedBy, approvalDate) {
-            var payload = [];
-            _.each(periodsAndOrgUnits, function(periodAndOrgUnit) {
-                _.each(dataSets, function(ds) {
-                    payload.push({
-                        "ds": ds,
-                        "pe": periodAndOrgUnit.period,
-                        "ou": periodAndOrgUnit.orgUnit,
-                        "ab": approvedBy,
-                        "ad": approvalDate
-                    });
-                });
-            });
+        this.markAsApproved = function(dataSets, periodsAndOrgUnits) {
+            var payload = {
+                "ds": dataSets,
+                "pe": _.uniq(_.map(periodsAndOrgUnits, 'period')),
+                "approvals": _.map(periodsAndOrgUnits, function (periodAndOrgUnit) {
+                    return {"ou": periodAndOrgUnit.orgUnit};
+                })
+            };
 
             return $http.post(dhisUrl.approvalMultipleL2, payload);
         };
