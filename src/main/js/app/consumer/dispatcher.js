@@ -4,7 +4,7 @@ define(["lodash"], function(_) {
         downloadProgramConsumer, downloadMetadataConsumer,
         downloadOrgUnitGroupConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
         uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
-        downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, removeOrgunitDataSetAssociationConsumer, associateOrgunitToProgramConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer) {
+        downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, removeOrgunitDataSetAssociationConsumer, associateOrgunitToProgramConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer, syncOrgUnitConsumer) {
 
         this.run = function(message) {
             $log.info("Processing message: " + message.data.type, message.data);
@@ -48,6 +48,9 @@ define(["lodash"], function(_) {
                 case "upsertOrgUnit":
                     return downloadOrgUnitConsumer.run(message)
                         .then(_.partial(uploadOrgUnitConsumer.run, message));
+
+                case "syncOrgUnit":
+                    return syncOrgUnitConsumer.run(message);
 
                 case "upsertOrgUnitGroups":
                     return uploadOrgUnitGroupConsumer.run(message);
