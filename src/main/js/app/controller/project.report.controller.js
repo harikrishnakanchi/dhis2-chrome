@@ -1,14 +1,12 @@
-define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, dateUtils, _, orgUnitMapper) {
+define(["moment", "dateUtils", "lodash", "orgUnitMapper", "excelBuilder"], function(moment, dateUtils, _, orgUnitMapper, excelBuilder) {
     return function($rootScope, $q, $scope, orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService, pivotTableExportBuilder) {
         $scope.selectedProject = $rootScope.currentUser.selectedProject;
 
         var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
         var REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY hh[.]mm A";
 
-        var buildCsvContent = function () {
-            var DELIMITER = ',',
-                NEW_LINE = '\n',
-                EMPTY_CELL = '';
+        var buildSpreadSheetContent = function () {
+            var EMPTY_ROW = [];
 
             var escapeString = function (string) {
                 return '"' + string + '"';
@@ -16,46 +14,40 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, date
 
             var getLastUpdatedTimeDetails = function () {
                 var formattedTime = moment($scope.lastUpdatedTimeForProjectReport, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
-                return [escapeString('Updated'), escapeString(formattedTime)].join(DELIMITER);
+                return ['Updated', formattedTime];
             };
 
             var getProjectBasicInfo = function() {
                 var buildProjectAttribute = function(projectAttribute) {
-                    return [
-                        escapeString(projectAttribute.name),
-                        escapeString(projectAttribute.value)
-                    ].join(DELIMITER);
+                    return [projectAttribute.name, projectAttribute.value];
                 };
 
-                return _.flatten([
-                    escapeString($scope.resourceBundle.projectInformationLabel),
-                    _.map($scope.projectAttributes, buildProjectAttribute)
-                ]).join(NEW_LINE);
+                return [
+                    [$scope.resourceBundle.projectInformationLabel]
+                ].concat(_.map($scope.projectAttributes, buildProjectAttribute));
             };
 
             var getPivotTableData = function () {
-                return _.map($scope.pivotTables, function (pivotTable) {
+                return _.flatten(_.map($scope.pivotTables, function (pivotTable) {
                     return [
-                        escapeString(pivotTable.title),
-                        pivotTableExportBuilder.build(pivotTable)
-                    ].join(NEW_LINE);
-                }).join(NEW_LINE + NEW_LINE);
+                        [pivotTable.title]
+                    ].concat(pivotTableExportBuilder.build(pivotTable)).concat([EMPTY_ROW, EMPTY_ROW]);
+                }));
             };
 
-            var csvContent = [
-                getProjectBasicInfo(),
-                EMPTY_CELL,
-                getPivotTableData()
-            ];
-
+            var spreadSheetContent = getProjectBasicInfo().concat([EMPTY_ROW]).concat(getPivotTableData());
+            console.log(spreadSheetContent);
             if ($scope.lastUpdatedTimeForProjectReport) {
-                csvContent.unshift(getLastUpdatedTimeDetails(), EMPTY_CELL);
+                spreadSheetContent.unshift(getLastUpdatedTimeDetails(), EMPTY_ROW);
             }
 
-            return csvContent.join(NEW_LINE);
+            return [{
+                name: $scope.selectedProject.name,
+                data: spreadSheetContent
+            }];
         };
 
-        $scope.exportToCSV = function () {
+        $scope.exportToExcel = function () {
             var lastUpdatedTimeDetails;
             if ($scope.lastUpdatedTimeForProjectReport) {
                 var formattedDate = moment($scope.lastUpdatedTimeForProjectReport, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
@@ -64,8 +56,8 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper"], function(moment, date
             else {
                 lastUpdatedTimeDetails = moment().format("DD-MMM-YYYY");
             }
-            var filename = [$scope.selectedProject.name, 'ProjectReport', lastUpdatedTimeDetails, 'csv'].join('.');
-            filesystemService.promptAndWriteFile(filename, new Blob([buildCsvContent()], {type: 'text/csv'}), filesystemService.FILE_TYPE_OPTIONS.CSV);
+            var filename = [$scope.selectedProject.name, 'ProjectReport', lastUpdatedTimeDetails, 'xlsx'].join('.');
+            filesystemService.promptAndWriteFile(filename, excelBuilder.createWorkBook(buildSpreadSheetContent()), filesystemService.FILE_TYPE_OPTIONS.XLSX);
         };
 
         var parseProjectAttributes = function(dhisProject) {

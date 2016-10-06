@@ -1,5 +1,5 @@
-define(["moment", "orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "changeLogRepository", "translationsService", "timecop", "orgUnitGroupSetRepository", "filesystemService", "pivotTableExportBuilder"],
-    function(moment, OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, ChangeLogRepository, TranslationsService, timecop, OrgUnitGroupSetRepository, FilesystemService, PivotTableExportBuilder) {
+define(["moment", "orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "changeLogRepository", "translationsService", "timecop", "orgUnitGroupSetRepository", "filesystemService", "pivotTableExportBuilder", "excelBuilder"],
+    function(moment, OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, ChangeLogRepository, TranslationsService, timecop, OrgUnitGroupSetRepository, FilesystemService, PivotTableExportBuilder, ExcelBuilder) {
     describe("projectReportController", function() {
         var scope, rootScope, q,
             projectReportController,
@@ -239,6 +239,8 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             pivotTableExportBuilder = new PivotTableExportBuilder();
             spyOn(pivotTableExportBuilder, 'build');
 
+            spyOn(ExcelBuilder, 'createWorkBook').and.returnValue(new Blob());
+
             projectReportController = new ProjectReportController(rootScope, q, scope, orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService, pivotTableExportBuilder);
         }));
 
@@ -247,50 +249,48 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             Timecop.uninstall();
         });
 
-        describe('CSV Export', function () {
-            var csvContent;
+        describe('Excel Export', function () {
+            var spreadSheetContent;
 
             beforeEach(function () {
                 scope.$apply();
 
-                spyOn(window, 'Blob').and.callFake(function (contentArray) {
-                    this.value = contentArray.join();
-                });
-
-                filesystemService.promptAndWriteFile.and.callFake(function (fileName, blob) {
-                    csvContent = blob.value;
+                spreadSheetContent = undefined;
+                ExcelBuilder.createWorkBook.and.callFake(function (workBookContent) {
+                    spreadSheetContent = _.first(workBookContent);
+                    return new Blob();
                 });
             });
             
-            it('should prompt the user to save the CSV file with suggested filename', function () {
-                scope.exportToCSV();
+            it('should prompt the user to save the Excel file with suggested filename', function () {
+                scope.exportToExcel();
 
-                var expectedFilename = 'Aweil - SS153.ProjectReport.[updated 28 October 2015 06.13 PM].csv';
-                expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
+                var expectedFilename = 'Aweil - SS153.ProjectReport.[updated 28 October 2015 06.13 PM].xlsx';
+                expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.XLSX);
             });
 
             it('should contain project basic information', function () {
-                scope.exportToCSV();
-                expect(csvContent).toContain('"Project Information"\n"Country","SOUDAN Sud"');
+                scope.exportToExcel();
+                expect(spreadSheetContent.data).toContain(['Project Information']);
+                expect(spreadSheetContent.data).toContain(['Country', 'SOUDAN Sud']);
             });
 
             it('should contain project last downloaded time information', function () {
-                var expectedContent = '"Updated","28 October 2015 06.13 PM"';
-                expect(csvContent).toContain(expectedContent);
+                scope.exportToExcel();
+                expect(spreadSheetContent.data).toContain(['Updated', '28 October 2015 06.13 PM']);
             });
 
             it('should contain the title of each table', function () {
-                scope.exportToCSV();
-
-                expect(csvContent).toContain(pivotTableData.title);
+                scope.exportToExcel();
+                expect(spreadSheetContent.data).toContain([pivotTableData.title]);
             });
 
-            it('should contain the results of the csv builder', function () {
-                var mockPivotTableCsvData = 'someCSVData';
-                pivotTableExportBuilder.build.and.returnValue(mockPivotTableCsvData);
-                scope.exportToCSV();
+            it('should contain the results of the pivot table export builder', function () {
+                var mockPivotTableExport = ['mockPivotTableExport'];
+                pivotTableExportBuilder.build.and.returnValue([mockPivotTableExport]);
 
-                expect(csvContent).toContain(mockPivotTableCsvData);
+                scope.exportToExcel();
+                expect(spreadSheetContent.data).toContain(mockPivotTableExport);
             });
         });
 
