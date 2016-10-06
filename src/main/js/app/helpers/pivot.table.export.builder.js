@@ -46,14 +46,14 @@ define(['dateUtils', 'lodash'], function (dateUtils, _) {
                             var value = pivotTableData.getDataValue(combinedRow, column);
                             cells.push(value);
                         });
-                        return cells;
+                        return [cells];
                     } else {
                         var thisSubColumn = _.first(subColumns),
                             remainingSubColumns = _.slice(subColumns, 1);
 
-                        return _.map(thisSubColumn, function(columnItem) {
+                        return _.flatten(_.map(thisSubColumn, function(columnItem) {
                             return buildRowsForSubColumns(remainingSubColumns, rowSpecifiers.concat(columnItem));
-                        });
+                        }));
                     }
                 };
 

@@ -109,6 +109,21 @@ define(['pivotTableExportBuilder', 'angularMocks', 'dateUtils'], function (Pivot
                 expect(exportContent).toContain(expectedRowB1);
                 expect(exportContent).toContain(expectedRowB2);
             });
+
+            describe('pivot table with only one column configuration', function () {
+                it('should contain dataValues for rows', function () {
+                    pivotTableData.columns = [
+                        [outerColumnA]
+                    ];
+                    exportContent = exportBuilder.build(pivotTableData);
+
+                    var expectedRowA = [rowA.name, mockValue],
+                        expectedRowB = [rowB.name, mockValue];
+
+                    expect(exportContent).toContain(expectedRowA);
+                    expect(exportContent).toContain(expectedRowB);
+                });
+            });
         });
    });
 });
