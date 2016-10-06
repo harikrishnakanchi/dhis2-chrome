@@ -153,8 +153,13 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
                         .map('programStageSections').flatten()
                         .map('programStageDataElements').flatten()
                         .map('dataElement').filter('isIncluded').value();
+
+                    var referralLocationOptions = _.get(_.find($scope.allDataElements, { offlineSummaryType: 'referralLocations' }), 'optionSet.options');
+                    _.each(referralLocationOptions, function (option) {
+                        option.genericName = option.name;
+                    });
                     
-                    $scope.program = program;
+                    $scope.program = translationsService.translate(program);
                     return program;
                 });
             });

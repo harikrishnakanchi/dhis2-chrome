@@ -634,6 +634,11 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     scope.$apply();
                     expect(referralLocationsRepository.get).toHaveBeenCalledWith(scope.orgUnit.parent.id);
                 });
+
+                it('should translate program', function () {
+                    scope.$apply();
+                    expect(translationsService.translate).toHaveBeenCalledWith(mockProgram);
+                });
             });
         });
     });

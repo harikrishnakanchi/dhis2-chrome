@@ -55,7 +55,7 @@
 
                     <tbody ng-repeat="dataElement in referralLocationDataElement">
                     <tr ng-repeat="option in dataElement.optionSet.options" ng-if="eventSummary[dataElement.id][option.id].count > 0">
-                        <td>{{ referralLocations[option.name].name }}</td>
+                        <td>{{ referralLocations[option.genericName].name }}</td>
                         <td ng-repeat="week in weeks">
                             {{ eventSummary[dataElement.id][option.id][week].length }}
                         </td>
