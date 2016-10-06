@@ -148,8 +148,34 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
 
         var getProgramForCurrentModule = function () {
             return programRepository.getProgramForOrgUnit($scope.originOrgUnits[0].id).then(function (program) {
-                return programRepository.get(program.id, $scope.excludedDataElementIds);
+                return programRepository.get(program.id, $scope.excludedDataElementIds).then(function (program) {
+                    $scope.program = program;
+                    $scope.allDataElements = _.chain(program.programStages)
+                        .map('programStageSections').flatten()
+                        .map('programStageDataElements').flatten()
+                        .map('dataElement').filter('isIncluded').value();
+
+                    $scope.summaryDataElements = _.filter($scope.allDataElements, { offlineSummaryType: 'showInOfflineSummary' });
+                    $scope.procedureDataElements = _.filter($scope.allDataElements, { offlineSummaryType: 'procedures' });
+                    return program;
+                });
             });
+        };
+
+        $scope.getProcedureCountForOptionForAllWeeks = function (optionId) {
+            var count = _.sum($scope.procedureDataElements, function (dataElement) {
+                return _.chain($scope.eventSummary).get(dataElement.id).get(optionId).get('count').value() || 0;
+            });
+
+            return count !== 0 ? count : undefined;
+        };
+        
+        $scope.getProcedureCountForOptionForWeek = function (optionId, week) {
+            var count = _.sum($scope.procedureDataElements, function (dataElement) {
+                return _.chain($scope.eventSummary).get(dataElement.id).get(optionId).get(week).get('length').value() || 0;
+            });
+            
+            return count !== 0 ? count : undefined;
         };
 
         var fetchEventsForProgram = function (program) {
@@ -159,12 +185,20 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
         };
 
         var loadLineListRawData = function () {
+            $scope.events = [];
+            
             return $q.all([fetchOriginOrgUnitsForCurrentModule(), loadExcludedDataElementIds($scope.orgUnit)])
                 .then(getProgramForCurrentModule)
                 .then(fetchEventsForProgram)
                 .then(function (events) {
+                    $scope.events = events;
+                    
                     if ($scope.selectedDataset.isOriginDataset) {
                         $scope.originSummary = eventsAggregator.nest(events, ['orgUnitName', 'period']);
+                    } else {
+                        var byPeriod = 'period';
+                        var dataElementIds = _.map($scope.allDataElements, 'id');
+                        $scope.eventSummary = eventsAggregator.transform(events, [byPeriod], dataElementIds);
                     }
                 });
         };
@@ -187,5 +221,6 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
         $scope.selectedWeeksToExport = _.find($scope.weeksToExportOptions, 'default').value;
 
         $scope.dataValuesMap = {};
+        $scope.events = [];
     };
 });
