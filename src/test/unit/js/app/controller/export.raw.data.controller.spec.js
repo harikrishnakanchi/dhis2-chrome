@@ -1,8 +1,8 @@
-define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'excludedDataElementsRepository', 'orgUnitRepository', 'referralLocationsRepository', 'moduleDataBlockFactory', 'filesystemService', 'translationsService', 'excelBuilder', 'programRepository', 'programEventRepository', 'utils', 'dateUtils', 'timecop', 'moment', 'lodash'],
-    function (ExportRawDataController, mocks, DatasetRepository, ExcludedDataElementsRepository, OrgUnitRepository, ReferralLocationsRepository, ModuleDataBlockFactory, FilesystemService, TranslationsService, excelBuilder, ProgramRepository, ProgramEventRepository, utils, dateUtils, timecop, moment, _) {
+define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'excludedDataElementsRepository', 'orgUnitRepository', 'referralLocationsRepository', 'moduleDataBlockFactory', 'filesystemService', 'translationsService', 'excelBuilder', 'programRepository', 'programEventRepository', 'eventsAggregator', 'utils', 'dateUtils', 'timecop', 'moment', 'lodash'],
+    function (ExportRawDataController, mocks, DatasetRepository, ExcludedDataElementsRepository, OrgUnitRepository, ReferralLocationsRepository, ModuleDataBlockFactory, FilesystemService, TranslationsService, excelBuilder, ProgramRepository, ProgramEventRepository, eventsAggregator, utils, dateUtils, timecop, moment, _) {
         describe('ExportRawDataController', function () {
             var controller, rootScope, scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository,
-                selectedOrgUnit, selectedDataSet, mockEnrichedDataSet, mockExcludedDataElements, mockDataBlocks, mockOriginOrgUnits, mockProgram, mockEvents;
+                selectedOrgUnit, selectedDataSet, mockEnrichedDataSet, mockExcludedDataElements, mockDataBlocks, mockOriginOrgUnits, mockProgram, mockEvents, mockDataElement;
 
             beforeEach(mocks.inject(function ($rootScope, $q) {
                 rootScope = $rootScope;
@@ -17,7 +17,6 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     lastEightWeeks: 'Last 8 weeks',
                     lastTwelveWeeks: 'Last 12 weeks'
                 };
-                scope.selectedWeeksToExport = 1;
 
                 mockExcludedDataElements = {
                     dataElements: [
@@ -25,6 +24,23 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                         { id: 'dataElementId2' }
                     ]
                 };
+
+                selectedOrgUnit = {
+                    id: 'orgUnitId',
+                    name: 'someModuleName',
+                    parent: {
+                        id: 'parentOrgUnitId'
+                    }
+                };
+
+                selectedDataSet = {
+                    id: 'dataSetId',
+                    name: 'someDataSetName'
+                };
+
+                scope.selectedWeeksToExport = 1;
+                scope.orgUnit = selectedOrgUnit;
+                scope.selectedDataset = selectedDataSet;
 
                 spyOn(dateUtils, 'getPeriodRange').and.returnValue(['2016W20']);
 
@@ -47,22 +63,6 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
 
             describe('AggregateRawData', function () {
                 beforeEach(function () {
-                    selectedOrgUnit = {
-                        id: 'orgUnitId',
-                        name: 'someModuleName',
-                        parent: {
-                            id: 'parentOrgUnitId'
-                        }
-                    };
-
-                    selectedDataSet = {
-                        id: 'dataSetId',
-                        name: 'someDataSetName'
-                    };
-
-                    scope.orgUnit = selectedOrgUnit;
-                    scope.selectedDataset = selectedDataSet;
-
                     mockEnrichedDataSet = {
                         name: 'someDataSetName',
                         sections: [{
@@ -533,11 +533,22 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
 
                     mockOriginOrgUnits = [{id: 'originA'}, {id: 'originB'}];
 
-                    mockProgram = { id: 'someProgram' };
+                    mockDataElement = { id: 'someId', isIncluded: true };
+
+                    mockProgram = {
+                        id: 'someProgram',
+                        programStages: [{
+                            programStageSections: [{
+                                programStageDataElements: [{
+                                    dataElement: mockDataElement
+                                }]
+                            }]
+                        }]
+                    };
 
                     mockExcludedDataElements = [{id: 'someExcludedDataElement'}];
 
-                    mockEvents = [];
+                    mockEvents = [createMockEvent()];
 
                     orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, mockOriginOrgUnits));
 
@@ -551,6 +562,10 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
 
                     programEventRepository = new ProgramEventRepository();
                     spyOn(programEventRepository, 'findEventsByDateRange').and.returnValue(utils.getPromise(q, mockEvents));
+                    
+                    spyOn(referralLocationsRepository, 'get').and.returnValue(utils.getPromise(q, {}));
+
+                    spyOn(eventsAggregator, 'transform');
 
                     controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository);
                 });
@@ -605,6 +620,19 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     };
 
                     expect(scope.originSummary).toEqual(expectedValue);
+                });
+
+                it('should call the events aggregator to transform events', function () {
+                    scope.$apply();
+                    expect(eventsAggregator.transform).toHaveBeenCalledWith(mockEvents, ['period'], [mockDataElement.id]);
+                });
+
+                it('should get referral locations for the given opUnit', function () {
+                    scope.selectedDataset = {
+                        isReferralDataset: true
+                    };
+                    scope.$apply();
+                    expect(referralLocationsRepository.get).toHaveBeenCalledWith(scope.orgUnit.parent.id);
                 });
             });
         });

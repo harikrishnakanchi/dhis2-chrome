@@ -149,14 +149,12 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
         var getProgramForCurrentModule = function () {
             return programRepository.getProgramForOrgUnit($scope.originOrgUnits[0].id).then(function (program) {
                 return programRepository.get(program.id, $scope.excludedDataElementIds).then(function (program) {
-                    $scope.program = program;
                     $scope.allDataElements = _.chain(program.programStages)
                         .map('programStageSections').flatten()
                         .map('programStageDataElements').flatten()
                         .map('dataElement').filter('isIncluded').value();
-
-                    $scope.summaryDataElements = _.filter($scope.allDataElements, { offlineSummaryType: 'showInOfflineSummary' });
-                    $scope.procedureDataElements = _.filter($scope.allDataElements, { offlineSummaryType: 'procedures' });
+                    
+                    $scope.program = program;
                     return program;
                 });
             });
@@ -184,23 +182,36 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
             return programEventRepository.findEventsByDateRange(program.id, _.map($scope.originOrgUnits, 'id'), startDate, endDate);
         };
 
+        var generateViewModel = function (events) {
+            $scope.events = events;
+
+            if ($scope.selectedDataset.isOriginDataset) {
+                $scope.originSummary = eventsAggregator.nest(events, ['orgUnitName', 'period']);
+            } else {
+                var byPeriod = 'period';
+                var dataElementIds = _.map($scope.allDataElements, 'id');
+                $scope.eventSummary = eventsAggregator.transform(events, [byPeriod], dataElementIds);
+                
+                $scope.procedureDataElements = _.filter($scope.allDataElements, { offlineSummaryType: 'procedures' });
+                $scope.summaryDataElements = _.filter($scope.allDataElements, { offlineSummaryType: 'showInOfflineSummary' });
+                
+                if($scope.selectedDataset.isReferralDataset) {
+                    $scope.referralLocationDataElement = _.filter($scope.allDataElements, { offlineSummaryType: 'referralLocations'});
+
+                    referralLocationsRepository.get($scope.orgUnit.parent.id).then(function (referralLocations) {
+                        $scope.referralLocations = referralLocations;
+                    });
+                }
+            }
+        };
+        
         var loadLineListRawData = function () {
             $scope.events = [];
             
             return $q.all([fetchOriginOrgUnitsForCurrentModule(), loadExcludedDataElementIds($scope.orgUnit)])
                 .then(getProgramForCurrentModule)
                 .then(fetchEventsForProgram)
-                .then(function (events) {
-                    $scope.events = events;
-                    
-                    if ($scope.selectedDataset.isOriginDataset) {
-                        $scope.originSummary = eventsAggregator.nest(events, ['orgUnitName', 'period']);
-                    } else {
-                        var byPeriod = 'period';
-                        var dataElementIds = _.map($scope.allDataElements, 'id');
-                        $scope.eventSummary = eventsAggregator.transform(events, [byPeriod], dataElementIds);
-                    }
-                });
+                .then(generateViewModel);
         };
 
         var reloadView = function () {
