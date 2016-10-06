@@ -1,6 +1,6 @@
-define(['utils', 'angularMocks', 'syncOrgUnitConsumer', 'orgUnitService', 'orgUnitRepository'], function (utils, mocks, SyncOrgUnitConsumer, OrgUnitService, OrgUnitRepository) {
-    var syncOrgUnitConsumer, orgUnitService, orgUnitRepository, q, mockOrgUnit, message, scope;
-    fdescribe('syncOrgUnitConsumer', function () {
+define(['utils', 'angularMocks', 'lodash', 'syncOrgUnitConsumer', 'orgUnitService', 'orgUnitRepository'], function (utils, mocks, _, SyncOrgUnitConsumer, OrgUnitService, OrgUnitRepository) {
+    var syncOrgUnitConsumer, orgUnitService, orgUnitRepository, q, message, scope, mockOrgUnitId;
+    describe('syncOrgUnitConsumer', function () {
 
         var createSyncOrgUnitConsumer = function () {
             syncOrgUnitConsumer = new SyncOrgUnitConsumer(q, orgUnitService, orgUnitRepository);
@@ -8,45 +8,52 @@ define(['utils', 'angularMocks', 'syncOrgUnitConsumer', 'orgUnitService', 'orgUn
             scope.$apply();
         };
 
+        var createMockOrgUnit = function (options) {
+          return _.merge({
+              id: mockOrgUnitId
+          }, options);
+        };
+
+
         beforeEach(mocks.inject(function ($q, $rootScope) {
-            mockOrgUnit = {
-                id: 'mockOrgUnitId',
-                dataSets: []
-            };
+            mockOrgUnitId = 'mockOrgUnitId';
             q = $q;
             scope = $rootScope;
             orgUnitService = new OrgUnitService();
             spyOn(orgUnitService, 'get').and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitService, 'upsert').and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitService, 'assignDataSetToOrgUnit').and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitService, 'removeDataSetFromOrgUnit').and.returnValue(utils.getPromise(q, {}));
 
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, 'get').and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
             message = {
                 data: {
-                    data: mockOrgUnit,
+                    data: {
+                        orgUnitId: mockOrgUnitId
+                    },
                     type: 'syncOrgUnit'
                 }
             };
         }));
 
-        it('should download orgUnits from DHIS', function () {
+        it('should download orgUnit from DHIS', function () {
+            var mockOrgUnit = createMockOrgUnit();
             createSyncOrgUnitConsumer();
             expect(orgUnitService.get).toHaveBeenCalledWith(mockOrgUnit.id);
         });
 
-
         describe('when Praxis orgUnit is more recent', function () {
-            it('should upsert to DHIS when praxis orgUnit is more recent', function () {
-                var mockRemoteOrgUnit = {
-                    id: 'mockOrgUnitId',
-                    lastUpdated: '2016-08-23'
-                };
-                var mockLocalOrgUnit = {
-                    id: 'mockOrgUnitId',
-                    clientLastUpdated: '2016-08-24'
-                };
+            var mockRemoteOrgUnit, mockLocalOrgUnit;
+
+            beforeEach(function () {
+                mockRemoteOrgUnit = createMockOrgUnit({ lastUpdated: '2016-08-23' });
+            });
+
+            it('should upsert to DHIS', function () {
+                mockLocalOrgUnit = createMockOrgUnit({ clientLastUpdated: '2016-08-24' });
+
                 orgUnitService.get.and.returnValue(utils.getPromise(q, mockRemoteOrgUnit));
                 orgUnitRepository.get.and.returnValue(utils.getPromise(q, mockLocalOrgUnit));
 
@@ -55,28 +62,60 @@ define(['utils', 'angularMocks', 'syncOrgUnitConsumer', 'orgUnitService', 'orgUn
                 expect(orgUnitService.upsert).toHaveBeenCalledWith(mockLocalOrgUnit);
             });
 
-            fit('should associate the dataSets to orgUnit', function () {
-                var mockLocalOrgUnit = {
-                    id: 'mockOrgUnitId',
-                    dataSets: [{
-                        id: 'someDataSetId'
-                    }, {
-                        id: 'someOtherDataSetId'
-                    }]
-                };
+            it('should associate only newly added dataSets to orgUnit', function () {
+                var mockLocalDataSets = [{
+                    id: 'someDataSetId'
+                }, {
+                    id: 'SomeDataSetToBeAssociated'
+                }, {
+                    id: 'someOtherDataSetToBeAssociated'
+                }];
+
+                var mockRemoteDataSets = [{
+                    id: 'someDataSetId'
+                }];
+                mockRemoteOrgUnit = createMockOrgUnit({ lastUpdated: '2016-08-23' , dataSets: mockRemoteDataSets });
+                mockLocalOrgUnit = createMockOrgUnit({ clientLastUpdated: '2016-08-24', dataSets: mockLocalDataSets});
+
+                orgUnitService.get.and.returnValue(utils.getPromise(q, mockRemoteOrgUnit));
                 orgUnitRepository.get.and.returnValue(utils.getPromise(q, mockLocalOrgUnit));
+
                 createSyncOrgUnitConsumer();
 
-                expect(orgUnitService.assignDataSetToOrgUnit).toHaveBeenCalledWith(mockLocalOrgUnit.id, mockLocalOrgUnit.dataSets[0].id);
+                expect(orgUnitService.assignDataSetToOrgUnit).not.toHaveBeenCalledWith(mockLocalOrgUnit.id, mockLocalOrgUnit.dataSets[0].id);
                 expect(orgUnitService.assignDataSetToOrgUnit).toHaveBeenCalledWith(mockLocalOrgUnit.id, mockLocalOrgUnit.dataSets[1].id);
+                expect(orgUnitService.assignDataSetToOrgUnit).toHaveBeenCalledWith(mockLocalOrgUnit.id, mockLocalOrgUnit.dataSets[2].id);
+            });
+
+            it('should unassociate the dataSets which are removed', function () {
+                var mockLocalDataSets = [{
+                    id: 'someDataSetId'
+                }];
+
+                var mockRemoteDataSets = [{
+                    id: 'someDataSetId'
+                }, {
+                    id: 'dataSetToBeUnassociated'
+                }, {
+                    id: 'someOtherDataSetToBeUnassociated'
+                }];
+
+                mockRemoteOrgUnit = createMockOrgUnit({ lastUpdated: '2016-08-23' , dataSets: mockRemoteDataSets });
+                mockLocalOrgUnit = createMockOrgUnit({ clientLastUpdated: '2016-08-24', dataSets: mockLocalDataSets});
+
+                orgUnitService.get.and.returnValue(utils.getPromise(q, mockRemoteOrgUnit));
+                orgUnitRepository.get.and.returnValue(utils.getPromise(q, mockLocalOrgUnit));
+
+                createSyncOrgUnitConsumer();
+
+                expect(orgUnitService.removeDataSetFromOrgUnit).toHaveBeenCalledWith(mockLocalOrgUnit.id, mockRemoteDataSets[1].id);
+                expect(orgUnitService.removeDataSetFromOrgUnit).toHaveBeenCalledWith(mockLocalOrgUnit.id, mockRemoteDataSets[2].id);
             });
         });
 
         it('should upsert to DHIS if it is a newly created org unit', function () {
-            var mockLocalOrgUnit = {
-                id: 'mockOrgUnitId',
-                clientLastUpdated: '2016-08-24'
-            };
+            var mockLocalOrgUnit = createMockOrgUnit({ clientLastUpdated: '2016-08-24' });
+
             orgUnitService.get.and.returnValue(utils.getPromise(q, undefined));
             orgUnitRepository.get.and.returnValue(utils.getPromise(q, mockLocalOrgUnit));
 
@@ -89,25 +128,34 @@ define(['utils', 'angularMocks', 'syncOrgUnitConsumer', 'orgUnitService', 'orgUn
             var mockRemoteOrgUnit, mockLocalOrgUnit;
 
             beforeEach(function () {
-                mockRemoteOrgUnit = {
-                    id: 'mockOrgUnitId',
-                    lastUpdated: '2016-08-23'
-                };
-                mockLocalOrgUnit = {
-                    id: 'mockOrgUnitId',
-                    clientLastUpdated: '2016-08-22'
-                };
+                mockRemoteOrgUnit = createMockOrgUnit({ lastUpdated: '2016-08-23' });
+                mockLocalOrgUnit = createMockOrgUnit({ clientLastUpdated: '2016-08-22'});
                 orgUnitService.get.and.returnValue(utils.getPromise(q, mockRemoteOrgUnit));
                 orgUnitRepository.get.and.returnValue(utils.getPromise(q, mockLocalOrgUnit));
 
                 createSyncOrgUnitConsumer();
             });
-            it('should not upsert to DHIS ', function () {
+            it('should not upsert to DHIS', function () {
                 expect(orgUnitService.upsert).not.toHaveBeenCalled();
             });
 
             it('should replace locally modified orgUnit', function () {
                 expect(orgUnitRepository.upsert).toHaveBeenCalledWith(mockRemoteOrgUnit);
+            });
+
+            it('should not associate the dataSets to orgUnit', function () {
+                var dataSets = [{
+                    id: 'someDataSetId'
+                }, {
+                    id: 'someOtherDataSetId'
+                }];
+
+                var mockLocalOrgUnit = createMockOrgUnit({ clientLastUpdated: '2016-08-22', dataSets: dataSets});
+                orgUnitRepository.get.and.returnValue(utils.getPromise(q, mockLocalOrgUnit));
+
+                createSyncOrgUnitConsumer();
+
+                expect(orgUnitService.assignDataSetToOrgUnit).not.toHaveBeenCalled();
             });
         });
     });

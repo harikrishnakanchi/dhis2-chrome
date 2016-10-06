@@ -1,7 +1,7 @@
-define(['moment'], function (moment) {
+define(['moment', 'lodash'], function (moment, _) {
     return function ($q, orgUnitService, orgUnitRepository) {
         this.run = function (message) {
-            var orgUnitId = message.data.data.id;
+            var orgUnitId = message.data.data.orgUnitId;
 
             var downloadFromDHIS = function () {
                 return orgUnitService.get(orgUnitId).then(function (orgUnitFromDHIS) {
@@ -15,37 +15,63 @@ define(['moment'], function (moment) {
                 });
             };
 
-            var upsertToDHIS = function (data) {
+            var checkIsDHISMoreRecent = function (data) {
                 var isPraxisOrgUnitMoreRecentThanDHIS = function (orgUnitFromPraxis, orgUnitFromDHIS) {
                     return moment(orgUnitFromDHIS.lastUpdated).isBefore(moment(orgUnitFromPraxis.clientLastUpdated));
                 };
                 var isOrgUnitNewlyCreatedOnPraxis = !data.orgUnitFromDHIS;
-                if (isOrgUnitNewlyCreatedOnPraxis || isPraxisOrgUnitMoreRecentThanDHIS(data.orgUnitFromPraxis, data.orgUnitFromDHIS)) {
-                    return orgUnitService.upsert(data.orgUnitFromPraxis).then(function () {
-                        return data;
-                    });
-                } else {
-                    return orgUnitRepository.upsert(data.orgUnitFromDHIS).then(function () {
-                        return data;
-                    });
-                }
+                data.isDataMoreRecentOnDHIS = !(isOrgUnitNewlyCreatedOnPraxis || isPraxisOrgUnitMoreRecentThanDHIS(data.orgUnitFromPraxis, data.orgUnitFromDHIS));
+                return data;
             };
 
-            var associateDataSets = function (data) {
-                var dataSets = data.orgUnitFromPraxis.dataSets;
-                var orgUnitId = data.orgUnitFromPraxis.id;
-                return _.reduce(dataSets, function (promises, dataSet) {
-                    return promises.then(function () {
-                        return orgUnitService.assignDataSetToOrgUnit(orgUnitId, dataSet.id);
-                    });
-                }, $q.when());
+            var upsertToDHIS = function (data) {
+                var dhisDataSetIds = data.orgUnitFromDHIS ? _.map(data.orgUnitFromDHIS.dataSets, 'id') : [];
+                var praxisDataSetIds = _.map(data.orgUnitFromPraxis.dataSets, 'id');
+                var dataSetIdsToBeAssociated = _.difference(praxisDataSetIds, dhisDataSetIds);
+                var dataSetIdsToBeUnassociated = _.difference(dhisDataSetIds, praxisDataSetIds);
+
+                var orgUnitUpsert = function () {
+                    return orgUnitService.upsert(data.orgUnitFromPraxis);
+                };
+
+                var associateDataSets = function () {
+                    return _.reduce(dataSetIdsToBeAssociated, function (promises, dataSetId) {
+                        return promises.then(function () {
+                            return orgUnitService.assignDataSetToOrgUnit(data.orgUnitFromPraxis.id, dataSetId);
+                        });
+                    }, $q.when());
+                };
+
+                var unassociateDataSets = function () {
+                    return _.reduce(dataSetIdsToBeUnassociated, function (promises, dataSetId) {
+                        return promises.then(function () {
+                            return orgUnitService.removeDataSetFromOrgUnit(data.orgUnitFromPraxis.id, dataSetId);
+                        });
+                    }, $q.when());
+                };
+
+                return orgUnitUpsert()
+                    .then(associateDataSets)
+                    .then(unassociateDataSets);
+            };
+
+            var updatePraxis = function (data) {
+                return orgUnitRepository.upsert(data.orgUnitFromDHIS);
+            };
+
+            var syncData = function (data) {
+                if (data.isDataMoreRecentOnDHIS) {
+                    return updatePraxis(data);
+                } else {
+                    return upsertToDHIS(data);
+                }
             };
 
             return $q.all({
                 orgUnitFromDHIS: downloadFromDHIS(),
                 orgUnitFromPraxis: getFromPraxis()
-            }).then(upsertToDHIS)
-                .then(associateDataSets);
+            }).then(checkIsDHISMoreRecent)
+                .then(syncData);
         };
     };
 });
