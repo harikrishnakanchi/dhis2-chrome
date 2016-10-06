@@ -1,16 +1,16 @@
-define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupConsumer", "downloadDataSetConsumer", "updateDataSetConsumer",
-        "associateOrgunitToProgramConsumer", "createUserConsumer", "updateUserConsumer", "dispatcher", "consumerRegistry", "downloadDataConsumer", "uploadDataConsumer", "uploadCompletionDataConsumer",
+define(["downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupConsumer", "downloadDataSetConsumer", "updateDataSetConsumer",
+        "associateOrgunitToProgramConsumer", "createUserConsumer", "updateUserConsumer", "dispatcher", "consumerRegistry",
         "orgUnitRepository", "programRepository", "uploadProgramConsumer", "downloadProgramConsumer", "deleteEventConsumer", "eventService", "programEventRepository",
-        "uploadEventDataConsumer", "downloadApprovalConsumer", "downloadMetadataConsumer", "downloadOrgUnitGroupConsumer", "deleteApprovalConsumer", "downloadSystemSettingConsumer", "metadataService",
+        "uploadEventDataConsumer", "downloadMetadataConsumer", "downloadOrgUnitGroupConsumer", "downloadSystemSettingConsumer", "metadataService",
         "metadataRepository", "uploadPatientOriginConsumer", "mergeBy", "downloadPivotTableDataConsumer", "downloadChartDataConsumer", "excludedDataElementsRepository", "uploadExcludedDataElementsConsumer", "uploadReferralLocationsConsumer",
         "referralLocationsRepository", "downloadProjectSettingsConsumer", "downloadChartsConsumer", "downloadPivotTablesConsumer", "downloadModuleDataBlocksConsumer", "moduleDataBlockMerger",
         "syncModuleDataBlockConsumer", "aggregateDataValuesMerger", "lineListEventsMerger", "removeOrgUnitDataSetAssociationConsumer", "syncExcludedLinelistOptionsConsumer",
         "excludedLinelistOptionsMerger", "downloadHistoricalDataConsumer"
     ],
-    function(uploadApprovalDataConsumer, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDataSetConsumer, updateDataSetConsumer, associateOrgunitToProgramConsumer, createUserConsumer,
-        updateUserConsumer, dispatcher, consumerRegistry, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, orgUnitRepository, programRepository, uploadProgramConsumer,
-        downloadProgramConsumer, deleteEventConsumer, eventService, programEventRepository, uploadEventDataConsumer, downloadApprovalConsumer, downloadMetadataConsumer,
-        downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, metadataService, metadataRepository, uploadPatientOriginConsumer, mergeBy, downloadPivotTableDataConsumer,
+    function (downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDataSetConsumer, updateDataSetConsumer, associateOrgunitToProgramConsumer, createUserConsumer,
+        updateUserConsumer, dispatcher, consumerRegistry, orgUnitRepository, programRepository, uploadProgramConsumer,
+        downloadProgramConsumer, deleteEventConsumer, eventService, programEventRepository, uploadEventDataConsumer, downloadMetadataConsumer,
+        downloadOrgUnitGroupConsumer, downloadSystemSettingConsumer, metadataService, metadataRepository, uploadPatientOriginConsumer, mergeBy, downloadPivotTableDataConsumer,
         downloadChartDataConsumer, excludedDataElementsRepository, uploadExcludedDataElementsConsumer, uploadReferralLocationsConsumer, referralLocationsRepository, downloadProjectSettingsConsumer,
         downloadChartsConsumer, downloadPivotTablesConsumer, downloadModuleDataBlocksConsumer, moduleDataBlockMerger, syncModuleDataBlockConsumer, aggregateDataValuesMerger, lineListEventsMerger,
         removeOrgunitDataSetAssociationConsumer, syncExcludedLinelistOptionsConsumer, excludedLinelistOptionsMerger, downloadHistoricalDataConsumer) {
@@ -21,11 +21,6 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
             app.service('lineListEventsMerger', [lineListEventsMerger]);
             app.service('moduleDataBlockMerger', ["dataRepository", "approvalDataRepository", "dataService", "$q", "dataSetRepository", "approvalService", "dataSyncFailureRepository", "programEventRepository", "eventService", "aggregateDataValuesMerger", "lineListEventsMerger", moduleDataBlockMerger]);
             app.service('excludedLinelistOptionsMerger', ['$q', 'excludedLineListOptionsRepository', 'dataStoreService', 'orgUnitRepository', excludedLinelistOptionsMerger]);
-            app.service("downloadDataConsumer", ["dataService", "dataRepository", "dataSetRepository", "userPreferenceRepository", "$q", "approvalDataRepository", "mergeBy", "changeLogRepository", downloadDataConsumer]);
-            app.service("downloadApprovalConsumer", ["dataSetRepository", "userPreferenceRepository", "orgUnitRepository", "$q", "approvalService", "approvalDataRepository", downloadApprovalConsumer]);
-            app.service("uploadDataConsumer", ["dataService", "dataRepository", uploadDataConsumer]);
-            app.service("uploadCompletionDataConsumer", ["approvalService", "approvalDataRepository", "dataSetRepository", "$q", uploadCompletionDataConsumer]);
-            app.service("uploadApprovalDataConsumer", ["approvalService", "approvalDataRepository", "dataSetRepository", "$q", uploadApprovalDataConsumer]);
             app.service("downloadOrgUnitConsumer", ["orgUnitService", "orgUnitRepository", "changeLogRepository", "$q", "mergeBy", downloadOrgUnitConsumer]);
             app.service("uploadOrgUnitConsumer", ["orgUnitService", "orgUnitRepository", "$q", uploadOrgUnitConsumer]);
             app.service("downloadOrgUnitGroupConsumer", ["orgUnitGroupService", "orgUnitGroupRepository", "changeLogRepository", downloadOrgUnitGroupConsumer]);
@@ -44,7 +39,6 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
             app.service("uploadEventDataConsumer", ["eventService", "programEventRepository", "$q", uploadEventDataConsumer]);
             app.service("deleteEventConsumer", ["eventService", "programEventRepository", "$q", deleteEventConsumer]);
             app.service("downloadMetadataConsumer", ["metadataService", "metadataRepository", "changeLogRepository", downloadMetadataConsumer]);
-            app.service("deleteApprovalConsumer", ["approvalService", "approvalDataRepository", "dataSetRepository", "$q", deleteApprovalConsumer]);
             app.service("uploadPatientOriginConsumer", ["$q", "systemSettingService", "patientOriginRepository", "orgUnitRepository", uploadPatientOriginConsumer]);
             app.service("downloadPivotTablesConsumer", ["reportService", "pivotTableRepository", "changeLogRepository", downloadPivotTablesConsumer]);
             app.service("downloadPivotTableDataConsumer", ["reportService", "pivotTableRepository", "userPreferenceRepository", "dataSetRepository", "changeLogRepository", "orgUnitRepository", "$q", downloadPivotTableDataConsumer]);
@@ -58,9 +52,9 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
             app.service("syncExcludedLinelistOptionsConsumer", ["$q", "excludedLinelistOptionsMerger", syncExcludedLinelistOptionsConsumer]);
             app.service("downloadHistoricalDataConsumer", ["$q", "dataService", "eventService", "userPreferenceRepository", "orgUnitRepository", "dataSetRepository", "changeLogRepository", "dataRepository", "programEventRepository", downloadHistoricalDataConsumer]);
             app.service("dispatcher", ["$q", "$log", "downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupConsumer", "downloadDataSetConsumer", "updateDataSetConsumer",
-                "createUserConsumer", "updateUserConsumer", "downloadDataConsumer", "uploadDataConsumer", "uploadCompletionDataConsumer", "uploadApprovalDataConsumer", "uploadProgramConsumer",
-                "downloadProgramConsumer", "uploadEventDataConsumer", "deleteEventConsumer", "downloadApprovalConsumer", "downloadMetadataConsumer",
-                "downloadOrgUnitGroupConsumer", "deleteApprovalConsumer", "downloadSystemSettingConsumer", "uploadPatientOriginConsumer", "downloadPivotTableDataConsumer", "downloadChartDataConsumer",
+                "createUserConsumer", "updateUserConsumer", "uploadProgramConsumer",
+                "downloadProgramConsumer", "uploadEventDataConsumer", "deleteEventConsumer", "downloadMetadataConsumer",
+                "downloadOrgUnitGroupConsumer", "downloadSystemSettingConsumer", "uploadPatientOriginConsumer", "downloadPivotTableDataConsumer", "downloadChartDataConsumer",
                 "uploadReferralLocationsConsumer", "downloadProjectSettingsConsumer", "uploadExcludedDataElementsConsumer", "downloadChartsConsumer", "downloadPivotTablesConsumer", "userPreferenceRepository",
                 "downloadModuleDataBlocksConsumer", "syncModuleDataBlockConsumer", "removeOrgunitDataSetAssociationConsumer", "associateOrgunitToProgramConsumer", "syncExcludedLinelistOptionsConsumer", "downloadHistoricalDataConsumer", dispatcher
             ]);

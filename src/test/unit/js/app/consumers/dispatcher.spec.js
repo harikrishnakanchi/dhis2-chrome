@@ -1,6 +1,6 @@
 define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, utils) {
     describe("dispatcher", function() {
-        var uploadCompletionDataConsumer, uploadDataConsumer, downloadDataConsumer, uploadApprovalDataConsumer, dispatcher, message, q, log, scope,
+        var downloadDataConsumer, dispatcher, message, q, log, scope,
             createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer, uploadEventDataConsumer,
             deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer, downloadDataSetConsumer, updateDataSetConsumer, associateOrgunitToProgramConsumer,
             downloadSystemSettingConsumer, uploadPatientOriginConsumer, uploadExcludedDataElementsConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
@@ -9,18 +9,6 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             syncModuleDataBlockConsumer, removeOrgunitDataSetAssociationConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer;
 
         beforeEach(mocks.inject(function($q, $log, $rootScope) {
-            uploadApprovalDataConsumer = {
-                'run': jasmine.createSpy("uploadApprovalDataConsumer")
-            };
-            uploadCompletionDataConsumer = {
-                'run': jasmine.createSpy("uploadCompletionDataConsumer")
-            };
-            uploadDataConsumer = {
-                'run': jasmine.createSpy("uploadDataConsumer")
-            };
-            downloadDataConsumer = {
-                'run': jasmine.createSpy("downloadDataConsumer")
-            };
             downloadOrgUnitConsumer = {
                 'run': jasmine.createSpy("downloadOrgUnitConsumer")
             };
@@ -59,12 +47,6 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             };
             deleteEventConsumer = {
                 'run': jasmine.createSpy("deleteEventConsumer")
-            };
-            downloadApprovalConsumer = {
-                'run': jasmine.createSpy("downloadApprovalConsumer")
-            };
-            deleteApprovalConsumer = {
-                'run': jasmine.createSpy("deleteApprovalConsumer")
             };
             downloadMetadataConsumer = {
                 'run': jasmine.createSpy("downloadMetadataConsumer")
@@ -121,8 +103,6 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             scope = $rootScope.$new();
 
             downloadMetadataConsumer.run.and.returnValue(utils.getPromise(q, {}));
-            downloadDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
-            downloadApprovalConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadOrgUnitConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadOrgUnitGroupConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadProgramConsumer.run.and.returnValue(utils.getPromise(q, {}));
@@ -140,25 +120,13 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             syncExcludedLinelistOptionsConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadHistoricalDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
 
-            dispatcher = new Dispatcher(q, log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDataSetConsumer, updateDataSetConsumer, createUserConsumer, updateUserConsumer,
-                downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer, uploadEventDataConsumer,
-                deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer,
-                downloadChartDataConsumer, uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
+            dispatcher = new Dispatcher(q, log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDataSetConsumer, updateDataSetConsumer,
+                createUserConsumer, updateUserConsumer, uploadProgramConsumer,
+                downloadProgramConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadMetadataConsumer,
+                downloadOrgUnitGroupConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
+                uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
                 downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, removeOrgunitDataSetAssociationConsumer, associateOrgunitToProgramConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer);
         }));
-
-        it("should call upload data consumer for uploading data values", function() {
-            message.data = {
-                "data": {},
-                "type": "uploadDataValues"
-            };
-
-            dispatcher.run(message);
-            scope.$apply();
-
-            expect(downloadDataConsumer.run).toHaveBeenCalledWith(message);
-            expect(uploadDataConsumer.run).toHaveBeenCalledWith(message, {});
-        });
 
         it("should call syncModuleDataBlock consumer for syncing moduleDataBlock", function() {
             message.data = {
@@ -200,7 +168,6 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
                 scope.$apply();
 
                 expect(downloadProjectSettingsConsumer.run).toHaveBeenCalledWith(message);
-                expect(downloadDataConsumer.run).not.toHaveBeenCalled();
             });
 
             it('should only call project settings download consumer if no user has ever logged in', function() {
@@ -210,37 +177,8 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
                 scope.$apply();
 
                 expect(downloadProjectSettingsConsumer.run).toHaveBeenCalledWith(message);
-                expect(downloadDataConsumer.run).not.toHaveBeenCalled();
             });
 
-        });
-
-        it("should call completion data consumer for uploading completion data", function() {
-            message.data = {
-                "data": {},
-                "type": "uploadCompletionData"
-            };
-
-            dispatcher.run(message);
-            scope.$apply();
-
-            expect(downloadDataConsumer.run).toHaveBeenCalledWith(message);
-            expect(downloadApprovalConsumer.run).toHaveBeenCalledWith(message, {});
-            expect(uploadCompletionDataConsumer.run).toHaveBeenCalledWith(message, {});
-        });
-
-        it("should call approval data consumer for uploading approval data", function() {
-            message.data = {
-                "data": {},
-                "type": "uploadApprovalData"
-            };
-
-            dispatcher.run(message);
-            scope.$apply();
-
-            expect(downloadDataConsumer.run).toHaveBeenCalledWith(message);
-            expect(downloadApprovalConsumer.run).toHaveBeenCalledWith(message, {});
-            expect(uploadApprovalDataConsumer.run).toHaveBeenCalledWith(message, {});
         });
 
         it("should call upload org units consumer", function() {
@@ -386,17 +324,6 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             scope.$apply();
 
             expect(downloadOrgUnitGroupConsumer.run).toHaveBeenCalledWith(message, jasmine.any(Object));
-        });
-
-        it("should call delete approval consumer", function() {
-            message.data = {
-                "data": {},
-                "type": "deleteApprovals"
-            };
-
-            dispatcher.run(message);
-
-            expect(deleteApprovalConsumer.run).toHaveBeenCalledWith(message);
         });
 
         it("should download system setting consumer", function() {
