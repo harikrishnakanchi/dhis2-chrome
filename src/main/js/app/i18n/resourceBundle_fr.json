@@ -266,7 +266,7 @@
     "selectProjectLabel": "Sélectionner un Projet",
     "changeProject": "Changer de Projet",
     "tabularReports": "Rapports Tabulaires",
-    "exportAsCsv": "Télécharger rapport",
+    "downloadReport": "Télécharger rapport",
     "invalidAccess": "L'utilisateur n'a pas de droit d'accès à cette version de Praxis",
     "connectionMessage": "Connecté à {{dhis_url}}",
     "selectServiceNameLabel": "Sélectionner un service",

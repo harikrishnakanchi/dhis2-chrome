@@ -1,6 +1,6 @@
 <div>
     <button ng-if="showDownloadButton" class="col-md-2 exportCSV-btn btn btn-xs btn-primary" ng-click="exportToExcel()">
-        {{resourceBundle.exportAsCsv}}
+        {{resourceBundle.downloadReport}}
     </button>
     <div ng-class="{ 'm-top-30' : showDownloadButton }">
         <div ng-if="table.sortable" ng-include="'templates/pivot-table/_sortable.html'"></div>

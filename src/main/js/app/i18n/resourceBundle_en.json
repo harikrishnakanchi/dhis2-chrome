@@ -266,7 +266,7 @@
     "selectProjectLabel": "Select Project",
     "changeProject": "Change project",
     "tabularReports": "Tabular Reports",
-    "exportAsCsv": "Download report",
+    "downloadReport": "Download report",
     "invalidAccess": "User does not have access to this Praxis instance.",
     "connectionMessage": "Connected to {{dhis_url}}",
     "selectServiceNameLabel": "Select service",

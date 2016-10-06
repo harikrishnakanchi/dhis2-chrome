@@ -266,7 +266,7 @@
     "selectProjectLabel": "حدد مشروع",
     "changeProject": "تغيير المشروع",
     "tabularReports": "تقارير مجدولة",
-    "exportAsCsv": "تقرير تحميل",
+    "downloadReport": "تقرير تحميل",
     "invalidAccess": "المستخدم ليس لديه دخول الى نموذج ال Praxis هذا",
     "connectionMessage": "متصلا {{dhis_url}}",
     "selectServiceNameLabel": "اختر الخدمة",
