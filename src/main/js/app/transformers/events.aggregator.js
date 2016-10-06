@@ -2,7 +2,7 @@ define(['lodash'], function (_) {
     var nest = function (collection, predicates, options) {
         if (!predicates.length) return collection;
 
-        var obj = _.get(options, 'includeCount') ? _.merge(_.groupBy(collection, _.head(predicates)), {count: collection.length}) : _.groupBy(collection, _.head(predicates));
+        var obj = _.get(options, 'includeCount') ? _.assign(_.groupBy(collection, _.head(predicates)), {count: collection.length}) : _.groupBy(collection, _.head(predicates));
 
         return _.mapValues(obj, function (value) {
             return typeof value == 'number' ? value : nest(value, _.tail(predicates), options);
