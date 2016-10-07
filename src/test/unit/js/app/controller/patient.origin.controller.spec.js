@@ -207,11 +207,9 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             expect(originOrgunitCreator.create).toHaveBeenCalledWith(modules[0], patientOrigin);
         });
 
-        it("should associate datasets and programs to the newly created origin org units", function() {
+        it("should associate datasets and programs to the newly created origin org units for line list module", function() {
             scope.patientOrigin = {
-                "name": "Origin1",
-                "longitude": 100,
-                "latitude": 80
+                "name": "Origin1"
             };
 
             var originOrgUnits = [{
@@ -229,6 +227,19 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 "name": "Program1"
             };
 
+            var lineListModule = {
+                id: 'someLineListModule',
+                attributeValues: [
+                    {
+                        attribute: {
+                            code: 'isLineListService'
+                        },
+                        value: 'true'
+                    }
+                ]
+            };
+
+            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [lineListModule]));
             originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnits));
             datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasets));
             programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, program));
@@ -265,6 +276,48 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 "desc": "upload program for origin org unit"
             }, "dataValues"]);
         });
+
+        it("should associate datasets  to the newly created origin org units for aggregate module", function() {
+            scope.patientOrigin = {
+                "name": "Origin1"
+            };
+
+            var originOrgUnits = [{
+                "id": "ou1",
+                "name": "origin org unit"
+            }];
+
+            var aggregateModule = {
+                id: 'someAggregateModule',
+                attributeValues: [
+                    {
+                        attribute: {
+                            code: 'isLineListService'
+                        },
+                        value: 'false'
+                    }
+                ]
+            };
+
+            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [aggregateModule]));
+            originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnits));
+
+            patientOriginController = new PatientOriginController(scope, hustle, q, patientOriginRepository, orgUnitRepository, datasetRepository, programRepository, originOrgunitCreator, orgUnitGroupHelper);
+            scope.$apply();
+
+            scope.save();
+            scope.$apply();
+
+            expect(hustle.publish.calls.count()).toEqual(2);
+
+            expect(hustle.publish.calls.argsFor(1)).toEqual([{
+                "data": { orgUnitId: originOrgUnits[0].id },
+                "type": "syncOrgUnit",
+                "locale": "en",
+                "desc": "upsert"
+            }, "dataValues"]);
+        });
+
 
         it("should take the user to the view page of the parent opUnit on clicking cancel", function() {
             scope.orgUnit = {
