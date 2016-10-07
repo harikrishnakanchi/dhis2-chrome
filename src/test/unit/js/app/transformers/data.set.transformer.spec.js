@@ -23,8 +23,7 @@ define(["dataSetTransformer", "testData", "lodash"], function(datasetTransformer
                         "code": "isLineListService"
                     },
                     "value": "false"
-                }],
-                "workflow": { id: 'workflowId1' }
+                }]
             };
 
             var aggregateDatasetForView = datasetTransformer.mapDatasetForView(aggregateDataset);
@@ -40,8 +39,7 @@ define(["dataSetTransformer", "testData", "lodash"], function(datasetTransformer
                 "isOriginDataset": false,
                 "isNewDataModel": true,
                 "isReferralDataset": false,
-                "isPopulationDataset": false,
-                "workflow": { id: 'workflowId1' }
+                "isPopulationDataset": false
             };
 
             expect(aggregateDatasetForView).toEqual(expectedDataset);
@@ -69,8 +67,7 @@ define(["dataSetTransformer", "testData", "lodash"], function(datasetTransformer
                         "code": "isLineListService"
                     },
                     "value": "true"
-                }],
-                "workflow": { id: 'workflowId1' }
+                }]
             };
 
             var linelistDatasetForView = datasetTransformer.mapDatasetForView(linelistDataset);
@@ -86,8 +83,7 @@ define(["dataSetTransformer", "testData", "lodash"], function(datasetTransformer
                 "isOriginDataset": false,
                 "isNewDataModel": true,
                 "isReferralDataset": false,
-                "isPopulationDataset": false,
-                "workflow": { id: 'workflowId1' }
+                "isPopulationDataset": false
             };
 
             expect(linelistDatasetForView).toEqual(expectedDataset);
@@ -117,8 +113,7 @@ define(["dataSetTransformer", "testData", "lodash"], function(datasetTransformer
                         "code": "isLineListService"
                     },
                     "value": "false"
-                }],
-                "workflow": { id: 'workflowId1' }
+                }]
             };
 
             var originDatasetForView = datasetTransformer.mapDatasetForView(originDataset);
@@ -136,8 +131,7 @@ define(["dataSetTransformer", "testData", "lodash"], function(datasetTransformer
                 "isOriginDataset": true,
                 "isNewDataModel": true,
                 "isReferralDataset": false,
-                "isPopulationDataset": false,
-                "workflow": { id: 'workflowId1' }
+                "isPopulationDataset": false
             };
 
             expect(originDatasetForView).toEqual(expectedDataset);
