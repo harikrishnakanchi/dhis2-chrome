@@ -259,6 +259,10 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                     $scope.resourceBundle.uploadSystemSettingDesc + enrichedModule.name));
             };
 
+            var getDatasetsToAssociate = function() {
+                return _.compact([].concat($scope.associatedDatasets).concat(referralDataset).concat(populationDataset));
+            };
+
             $scope.save = function() {
 
                 var enrichedModule = {};
@@ -269,10 +273,6 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                 };
 
                 var enrichNewModuleWithDataSets = function () {
-                    var getDatasetsToAssociate = function() {
-                        return _.compact([].concat($scope.associatedDatasets).concat(referralDataset).concat(populationDataset));
-                    };
-
                     var dataSetsToAssociate = getDatasetsToAssociate();
                     enrichedModule.dataSets = _.map(dataSetsToAssociate, function (dataSet) {
                         return {id: dataSet.id};
@@ -313,8 +313,10 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
             $scope.update = function() {
                 var enrichedModule = orgUnitMapper.mapToModule($scope.module, $scope.module.id, 6);
 
+                var dataSetsToAssociate = getDatasetsToAssociate();
+
                 var enrichExistingModuleWithDataSets = function () {
-                    enrichedModule.dataSets = _.map($scope.associatedDatasets, function (dataSet) {
+                    enrichedModule.dataSets = _.map(dataSetsToAssociate, function (dataSet) {
                         return {id: dataSet.id};
                     });
                 };

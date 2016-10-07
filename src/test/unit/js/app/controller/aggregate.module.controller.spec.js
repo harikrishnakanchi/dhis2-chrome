@@ -637,7 +637,17 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     "sections": []
                 };
 
-                var dataSets = [datasetOne, datasetTwo];
+                var referralDataSet = {
+                    id: 'referralDataSetId',
+                    isReferralDataset: true
+                };
+
+                var populationDataSet = {
+                    id: 'populationDataSetId',
+                    isPopulationDataset: true
+                };
+
+                var dataSets = [datasetOne, datasetTwo, referralDataSet, populationDataSet];
 
                 scope.orgUnit = {
                     id: 'mod1',
@@ -652,7 +662,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
 
 
                 dataSetRepo.getAll.and.returnValue(utils.getPromise(q, dataSets));
-                dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [datasetOne]));
+                dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [datasetOne, referralDataSet, populationDataSet]));
                 dataSetRepo.includeDataElements.and.returnValue(utils.getPromise(q, dataSets));
                 translationsService.translate.and.returnValue(dataSets);
                 var mockOrgUnit = {id: 'someOrgUnitId'};
@@ -672,6 +682,10 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                         id: datasetOne.id
                     }, {
                         id: datasetTwo.id
+                    }, {
+                        id: referralDataSet.id
+                    }, {
+                        id: populationDataSet.id
                     }]
                 };
                 expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOrgUnit);
