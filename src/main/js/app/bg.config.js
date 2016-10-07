@@ -91,8 +91,6 @@ require.config({
         "updateUserConsumer": "app/consumer/update.user.consumer",
         "uploadProgramConsumer": "app/consumer/upload.program.consumer",
         "downloadProgramConsumer": "app/consumer/download.program.consumer",
-        "uploadEventDataConsumer": "app/consumer/upload.event.data.consumer",
-        "deleteEventConsumer": "app/consumer/delete.event.consumer",
         "dispatcher": "app/consumer/dispatcher",
         "downloadMetadataConsumer": "app/consumer/download.metadata.consumer",
         "downloadSystemSettingConsumer": "app/consumer/download.system.setting.consumer",

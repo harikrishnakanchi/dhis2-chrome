@@ -1,8 +1,8 @@
 define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, utils) {
     describe("dispatcher", function() {
         var dispatcher, message, q, log, scope,
-            createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer, uploadEventDataConsumer,
-            deleteEventConsumer, downloadMetadataConsumer, downloadDataSetConsumer, updateDataSetConsumer, associateOrgunitToProgramConsumer,
+            createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer,
+            downloadMetadataConsumer, downloadDataSetConsumer, updateDataSetConsumer, associateOrgunitToProgramConsumer,
             downloadSystemSettingConsumer, uploadPatientOriginConsumer, uploadExcludedDataElementsConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
             uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer,
             uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadOrgUnitConsumer, downloadOrgUnitGroupConsumer, userPreferenceRepository, downloadModuleDataBlocksConsumer,
@@ -41,12 +41,6 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             };
             uploadProgramConsumer = {
                 'run': jasmine.createSpy("uploadProgramConsumer")
-            };
-            uploadEventDataConsumer = {
-                'run': jasmine.createSpy("uploadEventDataConsumer")
-            };
-            deleteEventConsumer = {
-                'run': jasmine.createSpy("deleteEventConsumer")
             };
             downloadMetadataConsumer = {
                 'run': jasmine.createSpy("downloadMetadataConsumer")
@@ -122,7 +116,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
 
             dispatcher = new Dispatcher(q, log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDataSetConsumer, updateDataSetConsumer,
                 createUserConsumer, updateUserConsumer, uploadProgramConsumer,
-                downloadProgramConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadMetadataConsumer,
+                downloadProgramConsumer, downloadMetadataConsumer,
                 downloadOrgUnitGroupConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
                 uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
                 downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, removeOrgunitDataSetAssociationConsumer, associateOrgunitToProgramConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer);
@@ -264,30 +258,6 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             dispatcher.run(message);
             scope.$apply();
             expect(downloadProgramConsumer.run).toHaveBeenCalledWith(message, jasmine.any(Object));
-        });
-
-        it("should call event download and upload consumer", function() {
-            message.data = {
-                "data": {},
-                "type": "uploadProgramEvents"
-            };
-
-            dispatcher.run(message);
-            scope.$apply();
-
-            expect(uploadEventDataConsumer.run).toHaveBeenCalledWith(message);
-        });
-
-        it("should call delete event consumer", function() {
-            message.data = {
-                "data": {},
-                "type": "deleteEvent"
-            };
-
-            dispatcher.run(message);
-            scope.$apply();
-
-            expect(deleteEventConsumer.run).toHaveBeenCalledWith(message);
         });
 
         it("should call download metadata consumer", function() {

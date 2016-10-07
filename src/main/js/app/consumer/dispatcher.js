@@ -1,7 +1,7 @@
 define(["lodash"], function(_) {
     return function($q, $log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDataSetConsumer, updateDataSetConsumer,
         createUserConsumer, updateUserConsumer, uploadProgramConsumer,
-        downloadProgramConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadMetadataConsumer,
+        downloadProgramConsumer, downloadMetadataConsumer,
         downloadOrgUnitGroupConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
         uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
         downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, removeOrgunitDataSetAssociationConsumer, associateOrgunitToProgramConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer) {
@@ -70,12 +70,6 @@ define(["lodash"], function(_) {
                 case "uploadProgram":
                     return downloadProgramConsumer.run(message)
                         .then(_.partial(uploadProgramConsumer.run, message));
-
-                case "uploadProgramEvents":
-                    return uploadEventDataConsumer.run(message);
-
-                case "deleteEvent":
-                    return deleteEventConsumer.run(message);
 
                 case "uploadPatientOriginDetails":
                     return uploadPatientOriginConsumer.run(message);
