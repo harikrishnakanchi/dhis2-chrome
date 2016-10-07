@@ -21,7 +21,8 @@ define(['utils', 'angularMocks', 'lodash', 'syncOrgUnitConsumer', 'orgUnitServic
             scope = $rootScope;
             orgUnitService = new OrgUnitService();
             spyOn(orgUnitService, 'get').and.returnValue(utils.getPromise(q, {}));
-            spyOn(orgUnitService, 'upsert').and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitService, 'create').and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitService, 'update').and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitService, 'assignDataSetToOrgUnit').and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitService, 'removeDataSetFromOrgUnit').and.returnValue(utils.getPromise(q, {}));
 
@@ -51,7 +52,7 @@ define(['utils', 'angularMocks', 'lodash', 'syncOrgUnitConsumer', 'orgUnitServic
                 mockRemoteOrgUnit = createMockOrgUnit({ lastUpdated: '2016-08-23' });
             });
 
-            it('should upsert to DHIS', function () {
+            it('should update orgUnit when it is already existing', function () {
                 mockLocalOrgUnit = createMockOrgUnit({ clientLastUpdated: '2016-08-24' });
 
                 orgUnitService.get.and.returnValue(utils.getPromise(q, mockRemoteOrgUnit));
@@ -59,7 +60,7 @@ define(['utils', 'angularMocks', 'lodash', 'syncOrgUnitConsumer', 'orgUnitServic
 
                 createSyncOrgUnitConsumer();
 
-                expect(orgUnitService.upsert).toHaveBeenCalledWith(mockLocalOrgUnit);
+                expect(orgUnitService.update).toHaveBeenCalledWith(mockLocalOrgUnit.id, mockLocalOrgUnit);
             });
 
             it('should associate only newly added dataSets to orgUnit', function () {
@@ -113,7 +114,7 @@ define(['utils', 'angularMocks', 'lodash', 'syncOrgUnitConsumer', 'orgUnitServic
             });
         });
 
-        it('should upsert to DHIS if it is a newly created org unit', function () {
+        it('should create orgUnit when it is newly created', function () {
             var mockLocalOrgUnit = createMockOrgUnit({ clientLastUpdated: '2016-08-24' });
 
             orgUnitService.get.and.returnValue(utils.getPromise(q, undefined));
@@ -121,7 +122,7 @@ define(['utils', 'angularMocks', 'lodash', 'syncOrgUnitConsumer', 'orgUnitServic
 
             createSyncOrgUnitConsumer();
 
-            expect(orgUnitService.upsert).toHaveBeenCalledWith(mockLocalOrgUnit);
+            expect(orgUnitService.create).toHaveBeenCalledWith(mockLocalOrgUnit);
         });
 
         describe('when DHIS orgUnit is more recent', function () {
@@ -136,7 +137,7 @@ define(['utils', 'angularMocks', 'lodash', 'syncOrgUnitConsumer', 'orgUnitServic
                 createSyncOrgUnitConsumer();
             });
             it('should not upsert to DHIS', function () {
-                expect(orgUnitService.upsert).not.toHaveBeenCalled();
+                expect(orgUnitService.update).not.toHaveBeenCalled();
             });
 
             it('should replace locally modified orgUnit', function () {

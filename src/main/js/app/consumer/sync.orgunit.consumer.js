@@ -19,8 +19,8 @@ define(['moment', 'lodash'], function (moment, _) {
                 var isPraxisOrgUnitMoreRecentThanDHIS = function (orgUnitFromPraxis, orgUnitFromDHIS) {
                     return moment(orgUnitFromDHIS.lastUpdated).isBefore(moment(orgUnitFromPraxis.clientLastUpdated));
                 };
-                var isOrgUnitNewlyCreatedOnPraxis = !data.orgUnitFromDHIS;
-                data.isDataMoreRecentOnDHIS = !(isOrgUnitNewlyCreatedOnPraxis || isPraxisOrgUnitMoreRecentThanDHIS(data.orgUnitFromPraxis, data.orgUnitFromDHIS));
+                data.isOrgUnitNewlyCreatedOnPraxis = !data.orgUnitFromDHIS;
+                data.isDataMoreRecentOnDHIS = !(data.isOrgUnitNewlyCreatedOnPraxis || isPraxisOrgUnitMoreRecentThanDHIS(data.orgUnitFromPraxis, data.orgUnitFromDHIS));
                 return data;
             };
 
@@ -31,7 +31,11 @@ define(['moment', 'lodash'], function (moment, _) {
                 var dataSetIdsToBeUnassociated = _.difference(dhisDataSetIds, praxisDataSetIds);
 
                 var orgUnitUpsert = function () {
-                    return orgUnitService.upsert(data.orgUnitFromPraxis);
+                    if (data.isOrgUnitNewlyCreatedOnPraxis) {
+                        return orgUnitService.create(data.orgUnitFromPraxis);
+                    } else {
+                        return orgUnitService.update(data.orgUnitFromPraxis.id, data.orgUnitFromPraxis);
+                    }
                 };
 
                 var associateDataSets = function () {
