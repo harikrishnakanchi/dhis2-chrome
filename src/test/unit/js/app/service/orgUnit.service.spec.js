@@ -213,5 +213,37 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
             httpBackend.expectDELETE(properties.dhis.url + '/api/organisationUnits/' + orgUnitId + '/dataSets/' + dataSetId).respond(204);
             httpBackend.flush();
         });
+
+        it('should save organization unit to DHIS using the orgUnit API', function () {
+            var newMockOrgUnit = {
+                id: 'mockOrgUnitId',
+                dataSets: [{
+                    id: 'someDataSetId'
+                }, {
+                    id: 'someOtherDataSetId'
+                }]
+            };
+
+            orgUnitService.create(newMockOrgUnit);
+
+            httpBackend.expectPOST(properties.dhis.url + "/api/organisationUnits", newMockOrgUnit).respond(200, 'ok');
+            httpBackend.flush();
+        });
+
+        it('should update organization unit to DHIS using the orgUnit API', function () {
+            var existingMockOrgUnit = {
+                id: 'mockOrgUnitId',
+                dataSets: [{
+                    id: 'someDataSetId'
+                }, {
+                    id: 'someOtherDataSetId'
+                }]
+            };
+
+            orgUnitService.update(existingMockOrgUnit);
+
+            httpBackend.expectPUT(properties.dhis.url + "/api/organisationUnits/" + existingMockOrgUnit.id, existingMockOrgUnit).respond(200, 'ok');
+            httpBackend.flush();
+        });
     });
 });

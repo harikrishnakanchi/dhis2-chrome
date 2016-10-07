@@ -42,5 +42,13 @@ define(["dhisUrl", "httpUtils", "lodash"], function(dhisUrl, httpUtils, _) {
                 return _.pluck(response.data.organisationUnits, "id");
             });
         };
+
+        this.create = function (orgUnit) {
+            return $http.post(dhisUrl.orgUnits, orgUnit);
+        };
+
+        this.update = function (orgUnitToBeUpdated) {
+            return $http.put(dhisUrl.orgUnits + '/' + orgUnitToBeUpdated.id, orgUnitToBeUpdated);
+        };
     };
 });
