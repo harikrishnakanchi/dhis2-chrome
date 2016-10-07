@@ -74,23 +74,24 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
             };
 
             var doDelete = function(periodAndOrgUnit, responseFromGET) {
-                var mayUnapprovePermissions = _.map(responseFromGET.data.dataApprovalStateResponses, function(status) {
+                var filterApprovedDataSets = function(status) {
                     return status.permissions.mayUnapprove;
-                });
+                };
 
-                if (!_.isEmpty(responseFromGET.data.dataApprovalStateResponses) && _.any(mayUnapprovePermissions)) {
-                    return $http.delete(dhisUrl.approvalL2, {
-                        params: {
-                            "ds": dataSets,
-                            "pe": periodAndOrgUnit.period,
-                            "ou": periodAndOrgUnit.orgUnit
+                var filteredDataSets = _.chain(responseFromGET.data.dataApprovalStateResponses).filter(filterApprovedDataSets).map('dataSet').map("id").value();
+
+                if (!_.isEmpty(responseFromGET.data.dataApprovalStateResponses) && !_.isEmpty(filteredDataSets)) {
+                    return $http.post(dhisUrl.unApprovals, {
+                            "ds": filteredDataSets,
+                            "pe": [periodAndOrgUnit.period],
+                            "approvals": [{"ou": periodAndOrgUnit.orgUnit}]
                         }
-                    });
+                    );
                 }
             };
 
             var markAsUnapprovedPromises = _.map(periodsAndOrgUnits, function(periodAndOrgUnit) {
-                return doGet(periodAndOrgUnit).then(_.curry(doDelete)(periodAndOrgUnit));
+                return doGet(periodAndOrgUnit).then(_.partial(doDelete, periodAndOrgUnit));
             });
 
             return $q.all(markAsUnapprovedPromises);

@@ -1,4 +1,4 @@
-define(["approvalService", "angularMocks", "properties", "utils", "moment", "lodash"], function(ApprovalService, mocks, properties, utils, moment, _) {
+define(["approvalService", "angularMocks", "utils", "moment", "lodash", "properties", "dhisUrl"], function(ApprovalService, mocks, utils, moment, _, properties, dhisUrl) {
     describe("approval service", function() {
         var http, httpBackend, db, q, mockStore, dataSets, orgUnits, approvalService;
 
@@ -388,31 +388,79 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             httpBackend.flush();
         });
 
-        it("should mark data as unapproved in dhis if mayUnapprove permission exists else should not make a call to delete approval", function() {
-            var approvalStatusForOrgUnit1 = {
-                "dataApprovalStateResponses": [{
+        describe('markAsUnapproved', function () {
+            var approvalStatusForOrgUnitAForDataSetA, approvalStatusForOrgUnitAForDataSetB, approvalStatusForOrgUnitBForDataSetA, periodAndOrgUnitA, periodAndOrgUnitB;
+            var mockDataApprovalStateResponse = function (mayUnApprove, dataSetId) {
+                return {
+                    "dataSet": {id: dataSetId},
                     "permissions": {
-                        "mayUnapprove": true
+                        "mayUnapprove": mayUnApprove
                     }
-                }]
-            };
-            var approvalStatusForOrgUnit2 = {
-                "dataApprovalStateResponses": [{
-                    "permissions": {
-                        "mayUnapprove": false
-                    }
-                }]
+                };
             };
 
-            httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?ds=170b8cd5e53&endDate=2014-01-05&ou=orgUnit1&pe=Weekly&startDate=2013-12-30")
-                .respond(200, approvalStatusForOrgUnit1);
-            httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?ds=170b8cd5e53&endDate=2014-01-12&ou=orgUnit2&pe=Weekly&startDate=2014-01-06")
-                .respond(200, approvalStatusForOrgUnit2);
-            httpBackend.expectDELETE(properties.dhis.url + "/api/dataApprovals?ds=170b8cd5e53&ou=orgUnit1&pe=2014W01").respond(200, "ok");
+            beforeEach(function () {
+                approvalStatusForOrgUnitAForDataSetA = mockDataApprovalStateResponse(true, "dataSetIdA");
+                periodAndOrgUnitA = {"period": "2014W01", "orgUnit": "orgUnitA"};
+                periodAndOrgUnitB = {"period": "2014W02", "orgUnit": "orgUnitB"};
+            });
 
-            approvalService.markAsUnapproved(["170b8cd5e53"], [{"period": "2014W01", "orgUnit": "orgUnit1"},{"period": "2014W02", "orgUnit": "orgUnit2"}]);
+            it("should mark data as unapproved in dhis if mayUnapprove permission exists", function() {
+                approvalStatusForOrgUnitAForDataSetB = mockDataApprovalStateResponse(true, "dataSetIdB");
+                var dataApprovalStateResponsesForOrgUnitA = {
+                    dataApprovalStateResponses: [approvalStatusForOrgUnitAForDataSetA, approvalStatusForOrgUnitAForDataSetB]
+                };
 
-            httpBackend.flush();
+                var expectedPayloadForOrgUnitA = {
+                    "ds": ['dataSetIdA', 'dataSetIdB'],
+                    "pe": ['2014W01'],
+                    "approvals": [{"ou": "orgUnitA"}]
+                };
+
+                var expectedPayloadForOrgUnitB = {
+                    "ds": ['dataSetIdA'],
+                    "pe": ['2014W02'],
+                    "approvals": [{"ou": "orgUnitB"}]
+                };
+
+                approvalStatusForOrgUnitBForDataSetA = mockDataApprovalStateResponse(true, 'dataSetIdA');
+                var dataApprovalStateResponsesForOrgUnitB = {
+                    dataApprovalStateResponses: [approvalStatusForOrgUnitBForDataSetA]
+                };
+
+                httpBackend.expectGET(dhisUrl.approvalStatus + "?ds=dataSetIdA&ds=dataSetIdB&endDate=2014-01-05&ou=orgUnitA&pe=Weekly&startDate=2013-12-30")
+                    .respond(200, dataApprovalStateResponsesForOrgUnitA);
+                httpBackend.expectGET(dhisUrl.approvalStatus + "?ds=dataSetIdA&ds=dataSetIdB&endDate=2014-01-12&ou=orgUnitB&pe=Weekly&startDate=2014-01-06")
+                    .respond(200, dataApprovalStateResponsesForOrgUnitB);
+                httpBackend.expectPOST(dhisUrl.unApprovals, expectedPayloadForOrgUnitA).respond(200, "ok");
+                httpBackend.expectPOST(dhisUrl.unApprovals, expectedPayloadForOrgUnitB).respond(200, "ok");
+
+                approvalService.markAsUnapproved(["dataSetIdA", "dataSetIdB"], [periodAndOrgUnitA, periodAndOrgUnitB]);
+
+                httpBackend.flush();
+            });
+
+            it('should not include datasetIds that are not approved at DHIS in payload', function () {
+                approvalStatusForOrgUnitAForDataSetB = mockDataApprovalStateResponse(false, "dataSetIdB");
+                var dataApprovalStateResponsesForOrgUnitA = {
+                    dataApprovalStateResponses: [approvalStatusForOrgUnitAForDataSetA, approvalStatusForOrgUnitAForDataSetB]
+                };
+
+                var expectedPayloadForOrgUnitA = {
+                    "ds": ['dataSetIdA'],
+                    "pe": ['2014W01'],
+                    "approvals": [{"ou": "orgUnitA"}]
+                };
+
+                httpBackend.expectGET(dhisUrl.approvalStatus + "?ds=dataSetIdA&ds=dataSetIdB&endDate=2014-01-05&ou=orgUnitA&pe=Weekly&startDate=2013-12-30")
+                    .respond(200, dataApprovalStateResponsesForOrgUnitA);
+                httpBackend.expectPOST(dhisUrl.unApprovals, expectedPayloadForOrgUnitA).respond(200, "ok");
+
+                approvalService.markAsUnapproved(["dataSetIdA", "dataSetIdB"], [periodAndOrgUnitA]);
+
+                httpBackend.flush();
+            });
+
         });
     });
 });

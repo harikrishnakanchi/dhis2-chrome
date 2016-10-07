@@ -7,7 +7,7 @@ define(["properties"], function(properties) {
         "approvalMultipleL1": with_host("/api/completeDataSetRegistrations/multiple"),
         "approvalMultipleL2": with_host("/api/dataApprovals/approvals"),
         "approvalL1": with_host("/api/completeDataSetRegistrations"),
-        "approvalL2": with_host("/api/dataApprovals"),
+        "unApprovals": with_host("/api/dataApprovals/unapprovals"),
         "approvalStatus": with_host("/api/dataApprovals/status"),
         "dataValueSets": with_host("/api/dataValueSets"),
         "metadata": with_host("/api/metadata"),
