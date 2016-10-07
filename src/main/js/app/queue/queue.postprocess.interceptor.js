@@ -71,10 +71,6 @@ define(["properties", "chromeUtils", "interpolate", "moment", "lodash"], functio
                 }
 
                 $log.warn("Buried job", job);
-                //CAN BE REMOVED AFTER V6.0 HAS BEEN RELEASED
-                if(job.data.type == 'uploadDataValues') {
-                    dataRepository.setLocalStatus(job.data.data, "FAILED_TO_SYNC");
-                }
                 if(job.data.type == 'syncModuleDataBlock') {
                     var jobParameters = job.data.data;
 

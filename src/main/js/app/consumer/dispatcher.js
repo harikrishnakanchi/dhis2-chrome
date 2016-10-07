@@ -45,23 +45,6 @@ define(["lodash"], function(_) {
                 case "syncModuleDataBlock":
                     return syncModuleDataBlockConsumer.run(message);
 
-                case "uploadDataValues":
-                    return downloadDataConsumer.run(message)
-                        .then(_.partial(uploadDataConsumer.run, message));
-
-                case "uploadCompletionData":
-                    return downloadDataConsumer.run(message)
-                        .then(_.partial(downloadApprovalConsumer.run, message))
-                        .then(_.partial(uploadCompletionDataConsumer.run, message));
-
-                case "deleteApprovals":
-                    return deleteApprovalConsumer.run(message);
-
-                case "uploadApprovalData":
-                    return downloadDataConsumer.run(message)
-                        .then(_.partial(downloadApprovalConsumer.run, message))
-                        .then(_.partial(uploadApprovalDataConsumer.run, message));
-
                 case "upsertOrgUnit":
                     return downloadOrgUnitConsumer.run(message)
                         .then(_.partial(uploadOrgUnitConsumer.run, message));
