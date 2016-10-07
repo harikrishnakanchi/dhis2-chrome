@@ -154,7 +154,8 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
                         .map('programStageDataElements').flatten()
                         .map('dataElement').filter('isIncluded').value();
 
-                    var referralLocationOptions = _.get(_.find($scope.allDataElements, { offlineSummaryType: 'referralLocations' }), 'optionSet.options');
+                    $scope.referralLocationDataElement = _.find($scope.allDataElements, { offlineSummaryType: 'referralLocations' });
+                    var referralLocationOptions = _.get($scope.referralLocationDataElement, 'optionSet.options');
                     _.each(referralLocationOptions, function (option) {
                         option.genericName = option.name;
                     });
@@ -181,6 +182,10 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
             return count !== 0 ? count : undefined;
         };
 
+        $scope.isReferralDataAvailable = function () {
+            return !_.isEmpty($scope.events) && $scope.eventSummary[$scope.referralLocationDataElement.id].noValue.count !== $scope.events.length;
+        };
+        
         var fetchEventsForProgram = function (program) {
             var startDate = moment(_.first($scope.weeks), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
                 endDate = moment(_.last($scope.weeks), 'GGGG[W]W').endOf('isoWeek').format('YYYY-MM-DD');
@@ -201,8 +206,6 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
                 $scope.summaryDataElements = _.filter($scope.allDataElements, { offlineSummaryType: 'showInOfflineSummary' });
                 
                 if($scope.selectedDataset.isReferralDataset) {
-                    $scope.referralLocationDataElement = _.filter($scope.allDataElements, { offlineSummaryType: 'referralLocations'});
-
                     referralLocationsRepository.get($scope.orgUnit.parent.id).then(function (referralLocations) {
                         $scope.referralLocations = referralLocations;
                     });

@@ -20,7 +20,7 @@
     </div>
 
     <div ng-if="orgUnit.lineListService">
-        <div class="alert alert-danger" ng-if="!loading && (events | isEmpty)">
+        <div class="alert alert-danger" ng-if="!loading && (events | isEmpty) || (selectedDataset.isReferralDataset && !isReferralDataAvailable())">
             {{ resourceBundle.noRawDataAvailable }}
         </div>
 
@@ -43,7 +43,7 @@
             </div>
         </div>
 
-        <div ng-if="selectedDataset.isReferralDataset && !(events | isEmpty)">
+        <div ng-if="selectedDataset.isReferralDataset && isReferralDataAvailable()">
             <div class="table-responsive">
                 <table class="table table-striped table-bordered" locked-table-header>
                     <thead>
@@ -53,11 +53,11 @@
                     </tr>
                     </thead>
 
-                    <tbody ng-repeat="dataElement in referralLocationDataElement">
-                    <tr ng-repeat="option in dataElement.optionSet.options" ng-if="eventSummary[dataElement.id][option.id].count > 0">
+                    <tbody>
+                    <tr ng-repeat="option in referralLocationDataElement.optionSet.options" ng-if="eventSummary[referralLocationDataElement.id][option.id].count > 0">
                         <td>{{ referralLocations[option.genericName].name }}</td>
                         <td ng-repeat="week in weeks">
-                            {{ eventSummary[dataElement.id][option.id][week].length }}
+                            {{ eventSummary[referralLocationDataElement.id][option.id][week].length }}
                         </td>
                     </tr>
                     </tbody>
