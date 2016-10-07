@@ -20,15 +20,9 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', "da
                 spyOn(approvalRepository, 'clearFailedToSync').and.returnValue(utils.getPromise(q, {}));
 
                 dataSets = [{
-                    id: 'dataSetid1',
-                    workflow: {
-                        id: 'someWorkflowId'
-                    }
+                    id: 'dataSetid1'
                 }, {
-                    id: 'dataSetid2',
-                    workflow: {
-                        id: 'someWorkflowId'
-                    }
+                    id: 'dataSetid2'
                 }];
                 dataSetIds = _.pluck(dataSets, "id");
                 datasetRepository = new DatasetRepository();
@@ -518,10 +512,9 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', "da
 
                     it('should delete approval data from DHIS if it is present before uploading data values to DHIS', function() {
                         dhisApproval = createMockApproval();
-                        var dataSetIdsToBeUnApproved = [_.first(dataSetIds)];
 
                         performUpload();
-                        expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(dataSetIdsToBeUnApproved, [periodAndOrgUnit]);
+                        expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(dataSetIds, [periodAndOrgUnit]);
                     });
 
                     it('should not upload events to DHIS', function () {
@@ -578,10 +571,9 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', "da
 
                     it('should delete approval data from DHIS if it is present before uploading events to DHIS', function() {
                         dhisApproval = createMockApproval();
-                        var dataSetIdsToBeUnApproved = [_.first(dataSetIds)];
 
                         performUpload();
-                        expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(dataSetIdsToBeUnApproved, [periodAndOrgUnit]);
+                        expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(dataSetIds, [periodAndOrgUnit]);
                     });
 
                     it('should not upload data values to DHIS', function () {
@@ -636,10 +628,9 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', "da
 
                     it('should delete approval data from DHIS if it is present before deleting events from DHIS', function() {
                         dhisApproval = createMockApproval();
-                        var dataSetIdsToBeUnApproved = [_.first(dataSetIds)];
 
                         performUpload();
-                        expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(dataSetIdsToBeUnApproved, [periodAndOrgUnit]);
+                        expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(dataSetIds, [periodAndOrgUnit]);
                     });
                 });
 
@@ -681,9 +672,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', "da
                         });
 
                         performUpload();
-                        var dataSetIdsToBeApproved = [_.first(dataSetIds)];
-
-                        expect(approvalService.markAsApproved).toHaveBeenCalledWith(dataSetIdsToBeApproved,
+                        expect(approvalService.markAsApproved).toHaveBeenCalledWith(dataSetIds,
                             [moduleDataBlock.period], [moduleDataBlock.moduleId]
                         );
                     });
