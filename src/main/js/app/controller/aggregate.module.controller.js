@@ -259,25 +259,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                     $scope.resourceBundle.uploadSystemSettingDesc + enrichedModule.name));
             };
 
-            var associateToDatasets = function (datasetIds, orgUnits) {
-                return orgUnitRepository.associateDataSetsToOrgUnits(datasetIds, orgUnits);
-            };
-
-            // TODO: Use this method when we remove orgUnit-Dataset association as part of story #2017
-            var removeOrgUnitsFromDataSets = function (datasetIds, orgUnitIds) {
-                return orgUnitRepository.removeDataSetsFromOrgUnits(datasetIds, orgUnitIds).then(function () {
-                    var orgunitIdsAndDatasetIds = {
-                        "orgUnitIds": orgUnitIds,
-                        "dataSetIds": datasetIds
-                    };
-                });
-            };
-
             $scope.save = function() {
-
-                var getDatasetsToAssociate = function() {
-                    return _.compact([].concat($scope.associatedDatasets).concat(referralDataset).concat(populationDataset));
-                };
 
                 var enrichedModule = {};
 
@@ -286,17 +268,22 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                     return $q.when(enrichedModule);
                 };
 
-                var enrichModuleWithDataSets = function () {
-                    enrichedModule.dataSets = _.map($scope.associatedDatasets, function (dataSet) {
+                var enrichNewModuleWithDataSets = function () {
+                    var getDatasetsToAssociate = function() {
+                        return _.compact([].concat($scope.associatedDatasets).concat(referralDataset).concat(populationDataset));
+                    };
+
+                    var dataSetsToAssociate = getDatasetsToAssociate();
+                    enrichedModule.dataSets = _.map(dataSetsToAssociate, function (dataSet) {
                         return {id: dataSet.id};
                     });
                 };
 
                 var createModules = function () {
-                    enrichModuleWithDataSets();
-                    return associateToDatasets(datasetIdsToAssociate, [enrichedModule]).then($q.all([orgUnitRepository.upsert(enrichedModule),
+                    enrichNewModuleWithDataSets();
+                    return $q.all([orgUnitRepository.upsert(enrichedModule),
                         publishMessage({orgUnitId: enrichedModule.id}, "syncOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, {orgUnit: enrichedModule.name}))
-                    ]));
+                    ]);
                 };
 
                 var createOrgUnitGroups = function() {
@@ -306,13 +293,10 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                 var createOriginOrgUnits = function() {
                     return originOrgunitCreator.create(enrichedModule).then(function(originOrgUnits) {
                         return _.map(originOrgUnits, function (originOrgUnit) {
-                            return publishMessage({orgUnitId: originOrgUnit.id}, "syncOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: _.pluck(originOrgUnits, "name")}))
-                                .then(_.partial(associateToDatasets, _.map($scope.originDatasets, 'id'), originOrgUnits));
+                            return publishMessage({orgUnitId: originOrgUnit.id}, "syncOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: _.pluck(originOrgUnits, "name")}));
                         });
                     });
                 };
-
-                var datasetIdsToAssociate = _.map(getDatasetsToAssociate(), 'id');
 
                 $scope.loading = true;
                 return getEnrichedModule($scope.module)
@@ -329,14 +313,14 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
             $scope.update = function() {
                 var enrichedModule = orgUnitMapper.mapToModule($scope.module, $scope.module.id, 6);
 
-                var enrichModuleWithDataSets = function () {
+                var enrichExistingModuleWithDataSets = function () {
                     enrichedModule.dataSets = _.map($scope.associatedDatasets, function (dataSet) {
                         return {id: dataSet.id};
                     });
                 };
 
                 $scope.loading = true;
-                enrichModuleWithDataSets();
+                enrichExistingModuleWithDataSets();
                 return $q.all([saveExcludedDataElements(enrichedModule), orgUnitRepository.upsert(enrichedModule),
                         publishMessage({orgUnitId: enrichedModule.id}, "syncOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: enrichedModule.name }))
                     ])
