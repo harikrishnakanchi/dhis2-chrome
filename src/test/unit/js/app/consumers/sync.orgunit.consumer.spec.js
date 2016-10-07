@@ -20,7 +20,7 @@ define(['utils', 'angularMocks', 'lodash', 'syncOrgUnitConsumer', 'orgUnitServic
             q = $q;
             scope = $rootScope;
             orgUnitService = new OrgUnitService();
-            spyOn(orgUnitService, 'get').and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitService, 'get').and.returnValue(utils.getPromise(q, []));
             spyOn(orgUnitService, 'create').and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitService, 'update').and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitService, 'assignDataSetToOrgUnit').and.returnValue(utils.getPromise(q, {}));
@@ -55,12 +55,12 @@ define(['utils', 'angularMocks', 'lodash', 'syncOrgUnitConsumer', 'orgUnitServic
             it('should update orgUnit when it is already existing', function () {
                 mockLocalOrgUnit = createMockOrgUnit({ clientLastUpdated: '2016-08-24' });
 
-                orgUnitService.get.and.returnValue(utils.getPromise(q, mockRemoteOrgUnit));
+                orgUnitService.get.and.returnValue(utils.getPromise(q, [mockRemoteOrgUnit]));
                 orgUnitRepository.get.and.returnValue(utils.getPromise(q, mockLocalOrgUnit));
 
                 createSyncOrgUnitConsumer();
 
-                expect(orgUnitService.update).toHaveBeenCalledWith(mockLocalOrgUnit.id, mockLocalOrgUnit);
+                expect(orgUnitService.update).toHaveBeenCalledWith(mockLocalOrgUnit);
             });
 
             it('should associate only newly added dataSets to orgUnit', function () {
@@ -78,7 +78,7 @@ define(['utils', 'angularMocks', 'lodash', 'syncOrgUnitConsumer', 'orgUnitServic
                 mockRemoteOrgUnit = createMockOrgUnit({ lastUpdated: '2016-08-23' , dataSets: mockRemoteDataSets });
                 mockLocalOrgUnit = createMockOrgUnit({ clientLastUpdated: '2016-08-24', dataSets: mockLocalDataSets});
 
-                orgUnitService.get.and.returnValue(utils.getPromise(q, mockRemoteOrgUnit));
+                orgUnitService.get.and.returnValue(utils.getPromise(q, [mockRemoteOrgUnit]));
                 orgUnitRepository.get.and.returnValue(utils.getPromise(q, mockLocalOrgUnit));
 
                 createSyncOrgUnitConsumer();
@@ -104,7 +104,7 @@ define(['utils', 'angularMocks', 'lodash', 'syncOrgUnitConsumer', 'orgUnitServic
                 mockRemoteOrgUnit = createMockOrgUnit({ lastUpdated: '2016-08-23' , dataSets: mockRemoteDataSets });
                 mockLocalOrgUnit = createMockOrgUnit({ clientLastUpdated: '2016-08-24', dataSets: mockLocalDataSets});
 
-                orgUnitService.get.and.returnValue(utils.getPromise(q, mockRemoteOrgUnit));
+                orgUnitService.get.and.returnValue(utils.getPromise(q, [mockRemoteOrgUnit]));
                 orgUnitRepository.get.and.returnValue(utils.getPromise(q, mockLocalOrgUnit));
 
                 createSyncOrgUnitConsumer();
@@ -117,7 +117,7 @@ define(['utils', 'angularMocks', 'lodash', 'syncOrgUnitConsumer', 'orgUnitServic
         it('should create orgUnit when it is newly created', function () {
             var mockLocalOrgUnit = createMockOrgUnit({ clientLastUpdated: '2016-08-24' });
 
-            orgUnitService.get.and.returnValue(utils.getPromise(q, undefined));
+            orgUnitService.get.and.returnValue(utils.getPromise(q, []));
             orgUnitRepository.get.and.returnValue(utils.getPromise(q, mockLocalOrgUnit));
 
             createSyncOrgUnitConsumer();
@@ -131,7 +131,7 @@ define(['utils', 'angularMocks', 'lodash', 'syncOrgUnitConsumer', 'orgUnitServic
             beforeEach(function () {
                 mockRemoteOrgUnit = createMockOrgUnit({ lastUpdated: '2016-08-23' });
                 mockLocalOrgUnit = createMockOrgUnit({ clientLastUpdated: '2016-08-22'});
-                orgUnitService.get.and.returnValue(utils.getPromise(q, mockRemoteOrgUnit));
+                orgUnitService.get.and.returnValue(utils.getPromise(q, [mockRemoteOrgUnit]));
                 orgUnitRepository.get.and.returnValue(utils.getPromise(q, mockLocalOrgUnit));
 
                 createSyncOrgUnitConsumer();

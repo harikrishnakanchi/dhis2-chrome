@@ -5,7 +5,7 @@ define(['moment', 'lodash'], function (moment, _) {
 
             var downloadFromDHIS = function () {
                 return orgUnitService.get(orgUnitId).then(function (orgUnitFromDHIS) {
-                    return orgUnitFromDHIS;
+                    return (orgUnitFromDHIS && orgUnitFromDHIS.length > 0) ? _.first(orgUnitFromDHIS) : undefined;
                 });
             };
 
@@ -33,8 +33,8 @@ define(['moment', 'lodash'], function (moment, _) {
                 var orgUnitUpsert = function () {
                     if (data.isOrgUnitNewlyCreatedOnPraxis) {
                         return orgUnitService.create(data.orgUnitFromPraxis);
-                    } else {
-                        return orgUnitService.update(data.orgUnitFromPraxis.id, data.orgUnitFromPraxis);
+                    }else {
+                        return orgUnitService.update(data.orgUnitFromPraxis);
                     }
                 };
 
