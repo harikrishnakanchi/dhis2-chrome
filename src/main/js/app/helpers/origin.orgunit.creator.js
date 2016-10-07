@@ -21,11 +21,24 @@ define(["lodash", "orgUnitMapper"], function(_, orgUnitMapper) {
                 });
             };
 
-            return getOriginOUPayload().then(function(originOUPayload) {
-                return datasetRepository.getAll().then(function(allDatasets) {
-                    var originDatasetIds = _.pluck(_.filter(allDatasets, "isOriginDataset"), "id");
+            return getOriginOUPayload().then(function (originOUPayload) {
+                return datasetRepository.getAll().then(function (allDatasets) {
+
+                    var getOriginDataSets = function () {
+                        var originDataSets = _.filter(allDatasets, "isOriginDataset");
+                        return _.map(originDataSets, function (dataSet) {
+                            return {id: dataSet.id};
+                        });
+                    };
+
+                    var originDataSets = getOriginDataSets();
+
+                    _.map(originOUPayload, function (origin) {
+                        origin.dataSets = originDataSets;
+                    });
+
                     return orgUnitRepository.upsert(originOUPayload)
-                        .then(function() {
+                        .then(function () {
                             return originOUPayload;
                         });
                 });
