@@ -70,31 +70,23 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             httpBackend.flush();
         });
 
-        it("should mark data as approved in dhis", function() {
-            var orgUnitA = "orgUnitA", orgUnitB = "orgUnitB", period = "2016W31";
+        it('should mark data as approved in dhis', function () {
+            var orgUnitIdA = 'orgUnitA', orgUnitIdB = 'orgUnitB', periods = ['2016W31'];
 
             var expectedPayload = {
-                "pe": [period],
-                "ds": dataSets,
-                "approvals": [{
-                    "ou": orgUnitA
-                },{
-                        "ou": orgUnitB
-                    }
+                pe: periods,
+                ds: dataSets,
+                approvals: [{
+                    ou: orgUnitIdA
+                }, {
+                    ou: orgUnitIdB
+                }
                 ]
             };
 
-            httpBackend.expectPOST(properties.dhis.url + "/api/dataApprovals/approvals", expectedPayload).respond(200, "ok");
+            httpBackend.expectPOST(properties.dhis.url + '/api/dataApprovals/approvals', expectedPayload).respond(200, 'ok');
 
-            var periodsAndOrgUnits = [{
-                "period": period,
-                "orgUnit": orgUnitA
-            }, {
-                "period": period,
-                "orgUnit": orgUnitB
-            }];
-
-            approvalService.markAsApproved(dataSets, periodsAndOrgUnits);
+            approvalService.markAsApproved(dataSets, periods, [orgUnitIdA, orgUnitIdB]);
 
             httpBackend.flush();
         });

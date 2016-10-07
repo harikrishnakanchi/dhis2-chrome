@@ -30,12 +30,12 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                 .catch(isAnyDataSetIsLocked);
         };
 
-        this.markAsApproved = function(dataSets, periodsAndOrgUnits) {
+        this.markAsApproved = function(dataSets, periods, orgUnits) {
             var payload = {
-                "ds": dataSets,
-                "pe": _.uniq(_.map(periodsAndOrgUnits, 'period')),
-                "approvals": _.map(periodsAndOrgUnits, function (periodAndOrgUnit) {
-                    return {"ou": periodAndOrgUnit.orgUnit};
+                ds: dataSets,
+                pe: periods,
+                approvals: _.map(orgUnits, function (orgUnit) {
+                    return { ou : orgUnit };
                 })
             };
 

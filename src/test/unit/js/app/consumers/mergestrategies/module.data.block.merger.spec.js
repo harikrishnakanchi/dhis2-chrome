@@ -677,7 +677,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', "da
                             moduleDataBlock.approvedAtProjectLevelAt.toISOString());
                     });
 
-                    it('should upload approval data from Praxis to DHIS', function() {
+                    it('should upload approval data from Praxis to DHIS', function () {
                         moduleDataBlock = createMockModuleDataBlock({
                             approvedAtCoordinationLevel: true,
                             approvedAtCoordinationLevelBy: 'Kuala',
@@ -688,9 +688,8 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', "da
                         var dataSetIdsToBeApproved = [_.first(dataSetIds)];
 
                         expect(approvalService.markAsApproved).toHaveBeenCalledWith(dataSetIdsToBeApproved,
-                            [periodAndOrgUnit],
-                            moduleDataBlock.approvedAtCoordinationLevelBy,
-                            moduleDataBlock.approvedAtCoordinationLevelAt.toISOString());
+                            [moduleDataBlock.period], [moduleDataBlock.moduleId]
+                        );
                     });
 
                     it('should not re-upload completion and approval data to DHIS', function() {
