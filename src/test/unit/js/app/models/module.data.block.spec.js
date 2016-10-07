@@ -323,47 +323,6 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
         });
 
-        describe('approvedAtCoordinationLevelBy', function() {
-            it('should be null if there is no approval data', function() {
-                approvalData = undefined;
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.approvedAtCoordinationLevelBy).toBeNull();
-            });
-
-
-            it('should return completedBy if there is approval data', function() {
-                approvalData = { approvedBy: 'Kuala', isApproved: true };
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.approvedAtCoordinationLevelBy).toEqual('Kuala');
-            });
-
-            it('should return null if approval status is false', function() {
-                approvalData = { approvedBy: 'Kuala', isApproved: false };
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.approvedAtCoordinationLevelBy).toBeNull();
-            });
-        });
-
-        describe('approvedAtCoordinationLevelAt', function() {
-            it('should be null if there is no approval data', function() {
-                approvalData = undefined;
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.approvedAtCoordinationLevelAt).toBeNull();
-            });
-
-            it('should return approvedOn if there is approval data', function() {
-                approvalData = { approvedOn: someMomentInTime.toISOString(), isApproved: true };
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.approvedAtCoordinationLevelAt).toEqual(someMomentInTime);
-            });
-
-            it('should return null if completed status is false', function() {
-                approvalData = { approvedOn: someMomentInTime.toISOString(), isApproved: false };
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.approvedAtCoordinationLevelAt).toBeNull();
-            });
-        });
-
         describe('approvedAtAnyLevel', function() {
             it('should be false if approvalData is not present', function() {
                 approvalData = undefined;

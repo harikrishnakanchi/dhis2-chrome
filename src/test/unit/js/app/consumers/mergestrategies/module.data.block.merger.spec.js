@@ -135,8 +135,6 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', "da
                     approvedAtProjectLevelBy: null,
                     approvedAtProjectLevelAt: null,
                     approvedAtCoordinationLevel: false,
-                    approvedAtCoordinationLevelBy: null,
-                    approvedAtCoordinationLevelAt: null,
                     approvedAtAnyLevel: false
                 }, options);
             };
@@ -679,9 +677,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', "da
 
                     it('should upload approval data from Praxis to DHIS', function () {
                         moduleDataBlock = createMockModuleDataBlock({
-                            approvedAtCoordinationLevel: true,
-                            approvedAtCoordinationLevelBy: 'Kuala',
-                            approvedAtCoordinationLevelAt: someMomentInTime
+                            approvedAtCoordinationLevel: true
                         });
 
                         performUpload();
@@ -699,9 +695,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', "da
                             approvedAtProjectLevel: true,
                             approvedAtProjectLevelBy: 'Kuala',
                             approvedAtProjectLevelAt: someMomentInTime,
-                            approvedAtCoordinationLevel: true,
-                            approvedAtCoordinationLevelBy: 'Kuala',
-                            approvedAtCoordinationLevelAt: someMomentInTime
+                            approvedAtCoordinationLevel: true
                         });
 
                         performUpload();
@@ -718,9 +712,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', "da
                             approvedAtProjectLevel: true,
                             approvedAtProjectLevelBy: 'Kuala',
                             approvedAtProjectLevelAt: someMomentInTime,
-                            approvedAtCoordinationLevel: true,
-                            approvedAtCoordinationLevelBy: 'Kuala',
-                            approvedAtCoordinationLevelAt: someMomentInTime
+                            approvedAtCoordinationLevel: true
                         });
 
                         performUpload();
