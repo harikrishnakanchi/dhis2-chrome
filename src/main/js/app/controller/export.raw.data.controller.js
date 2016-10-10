@@ -183,7 +183,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
         };
 
         $scope.isReferralDataAvailable = function () {
-            return !_.isEmpty($scope.events) && $scope.eventSummary[$scope.referralLocationDataElement.id].noValue.count !== $scope.events.length;
+            return !_.isEmpty($scope.events) && !!$scope.eventSummary[$scope.referralLocationDataElement.id];
         };
         
         var fetchEventsForProgram = function (program) {

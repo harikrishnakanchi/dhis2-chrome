@@ -57,48 +57,55 @@ define(['eventsAggregator'], function (eventsAggregator) {
         });
 
         describe('buildEventsTree', function () {
-            it('should transform events by specified groups recursively', function () {
-                var eventA = {
+            var events, eventA, eventB, eventC, eventD;
+
+            beforeEach(function () {
+                eventA = {
                     period: '2016W14',
                     dataValues: [{
-                        dataElement: 'de1',
+                        dataElement: 'dataElementId1',
                         value: 'optionA'
                     }, {
-                        dataElement: 'de2',
+                        dataElement: 'dataElementId2',
                         value: 'optionX'
                     }]
-                }, eventB = {
+                };
+                eventB = {
                     period: '2016W14',
                     dataValues: [{
-                        dataElement: 'de1',
+                        dataElement: 'dataElementId1',
                         value: 'optionA'
                     }, {
-                        dataElement: 'de2',
-                        value: 'optionY'
-                    }]
-                }, eventC = {
-                    period: '2016W15',
-                    dataValues: [{
-                        dataElement: 'de1',
-                        value: 'optionB'
-                    }, {
-                        dataElement: 'de2',
-                        value: 'optionX'
-                    }]
-                }, eventD = {
-                    period: '2016W16',
-                    dataValues: [{
-                        dataElement: 'de1',
-                        value: 'optionB'
-                    }, {
-                        dataElement: 'de2',
+                        dataElement: 'dataElementId2',
                         value: 'optionY'
                     }]
                 };
-                var events = [eventA, eventB, eventC, eventD];
+                eventC = {
+                    period: '2016W15',
+                    dataValues: [{
+                        dataElement: 'dataElementId1',
+                        value: 'optionB'
+                    }, {
+                        dataElement: 'dataElementId2',
+                        value: 'optionX'
+                    }]
+                };
+                eventD = {
+                    period: '2016W16',
+                    dataValues: [{
+                        dataElement: 'dataElementId1',
+                        value: 'optionB'
+                    }, {
+                        dataElement: 'dataElementId2',
+                        value: 'optionY'
+                    }]
+                };
+                events = [eventA, eventB, eventC, eventD];
+            });
 
+            it('should transform events by specified groups recursively', function () {
                 var expectedTree = {
-                    de1: {
+                    dataElementId1: {
                         optionA: {
                             count: 2,
                             '2016W14': [eventA, eventB]
@@ -109,7 +116,7 @@ define(['eventsAggregator'], function (eventsAggregator) {
                             '2016W16': [eventD]
                         }
                     },
-                    de2: {
+                    dataElementId2: {
                         optionX: {
                             count: 2,
                             '2016W14': [eventA],
@@ -123,10 +130,15 @@ define(['eventsAggregator'], function (eventsAggregator) {
                     }
                 };
 
-                var dataElementIds = ['de1', 'de2'];
+                var dataElementIds = ['dataElementId1', 'dataElementId2'];
 
                 var actualTree = eventsAggregator.buildEventsTree(events, ['period'], dataElementIds);
                 expect(actualTree).toEqual(expectedTree);
+            });
+
+            it('should not include data elements for which no data values exist', function () {
+                var eventsTree = eventsAggregator.buildEventsTree(events, ['period'], ['someDataElementId']);
+                expect(eventsTree.someDataElementId).toBeUndefined();
             });
         });
     });

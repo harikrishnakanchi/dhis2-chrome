@@ -1,4 +1,6 @@
 define(['lodash'], function (_) {
+    var NO_VALUE = 'noValue';
+
     var nest = function (collection, predicates, options) {
         if (!predicates.length) return collection;
 
@@ -19,10 +21,11 @@ define(['lodash'], function (_) {
 
         return _.reduce(dataElementIdsForSummary, function (tree, dataElementId) {
             var eventsGroupedByOptions = _.groupBy(events, function (event) {
-                return event.dataValues[dataElementId] || 'noValue';
+                return event.dataValues[dataElementId] || NO_VALUE;
             });
 
-            return _.set(tree, dataElementId, _.mapValues(eventsGroupedByOptions, _.partial(nest, _, groupingCriteria, {includeCount: true})));
+            var noDataValuesExistForDataElement = _.isEqual(_.keys(eventsGroupedByOptions), [NO_VALUE]);
+            return noDataValuesExistForDataElement ? tree : _.set(tree, dataElementId, _.mapValues(eventsGroupedByOptions, _.partial(nest, _, groupingCriteria, {includeCount: true})));
         }, {});
     };
 
