@@ -166,6 +166,12 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
             });
         };
 
+        $scope.getProcedureCountForAllOptions = function () {
+            return _.any($scope.procedureDataElements, function (dataElement) {
+                return $scope.eventSummary[dataElement.id];
+            });
+        };
+
         $scope.getProcedureCountForOptionForAllWeeks = function (optionId) {
             var count = _.sum($scope.procedureDataElements, function (dataElement) {
                 return _.chain($scope.eventSummary).get(dataElement.id).get(optionId).get('count').value() || 0;

@@ -89,7 +89,7 @@
                     </tr>
                     </tbody>
 
-                    <tbody>
+                    <tbody ng-if="getProcedureCountForAllOptions()">
                     <tr>
                         <td class="active" colspan="{{ weeks.length + 1 }}">
                             <strong>{{ resourceBundle.proceduresPerformed }}</strong>
