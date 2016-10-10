@@ -508,7 +508,6 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                 beforeEach(function () {
                     selectedOrgUnit = {
                         id: 'orgUnitId',
-                        name: 'someModuleName',
                         parent: {
                             id: 'parentOrgUnitId'
                         },
@@ -516,8 +515,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     };
 
                     selectedDataSet = {
-                        id: 'dataSetId',
-                        name: 'someDataSetName'
+                        id: 'dataSetId'
                     };
                     
                     scope.orgUnit = selectedOrgUnit;
@@ -635,7 +633,6 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                                     }]
                                 }
                             };
-
                             scope.eventSummary = {
                                 someDataElementId: {
                                     referralLocationOptionIdA: {
