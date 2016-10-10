@@ -11,7 +11,7 @@ define(["dhisUrl"], function(dhisUrl) {
         };
 
         this.getAll = function(lastUpdatedTime) {
-            var url = dhisUrl.dataSets + '.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]]&paging=false';
+            var url = dhisUrl.dataSets + '.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]],!organisationUnits&paging=false';
             url = lastUpdatedTime ? url + "&filter=lastUpdated:gte:" + lastUpdatedTime : url;
             return $http.get(url).then(function(response) {
                 return response.data.dataSets;
