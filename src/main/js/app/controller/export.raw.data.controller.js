@@ -200,7 +200,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
             } else {
                 var byPeriod = 'period';
                 var dataElementIds = _.map($scope.allDataElements, 'id');
-                $scope.eventSummary = eventsAggregator.transform(events, [byPeriod], dataElementIds);
+                $scope.eventSummary = eventsAggregator.buildEventsTree(events, [byPeriod], dataElementIds);
                 
                 $scope.procedureDataElements = _.filter($scope.allDataElements, { offlineSummaryType: 'procedures' });
                 $scope.summaryDataElements = _.filter($scope.allDataElements, { offlineSummaryType: 'showInOfflineSummary' });

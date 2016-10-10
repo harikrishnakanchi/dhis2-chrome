@@ -56,7 +56,7 @@ define(['eventsAggregator'], function (eventsAggregator) {
             });
         });
 
-        describe('eventsAggregator.transform', function () {
+        describe('buildEventsTree', function () {
             it('should transform events by specified groups recursively', function () {
                 var eventA = {
                     period: '2016W14',
@@ -125,7 +125,7 @@ define(['eventsAggregator'], function (eventsAggregator) {
 
                 var dataElementIds = ['de1', 'de2'];
 
-                var actualTree = eventsAggregator.transform(events, ['period'], dataElementIds);
+                var actualTree = eventsAggregator.buildEventsTree(events, ['period'], dataElementIds);
                 expect(actualTree).toEqual(expectedTree);
             });
         });

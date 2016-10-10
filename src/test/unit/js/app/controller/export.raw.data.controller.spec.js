@@ -565,7 +565,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     
                     spyOn(referralLocationsRepository, 'get').and.returnValue(utils.getPromise(q, {}));
 
-                    spyOn(eventsAggregator, 'transform');
+                    spyOn(eventsAggregator, 'buildEventsTree');
 
                     controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository);
                 });
@@ -622,9 +622,9 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     expect(scope.originSummary).toEqual(expectedValue);
                 });
 
-                it('should call the events aggregator to transform events', function () {
+                it('should call the events aggregator to build events tree', function () {
                     scope.$apply();
-                    expect(eventsAggregator.transform).toHaveBeenCalledWith(mockEvents, ['period'], [mockDataElement.id]);
+                    expect(eventsAggregator.buildEventsTree).toHaveBeenCalledWith(mockEvents, ['period'], [mockDataElement.id]);
                 });
 
                 it('should get referral locations for the given opUnit', function () {

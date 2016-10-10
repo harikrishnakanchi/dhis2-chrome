@@ -28,6 +28,6 @@ define(['lodash'], function (_) {
 
     return {
         nest: nest,
-        transform: buildEventsTree
+        buildEventsTree: buildEventsTree
     };
 });
