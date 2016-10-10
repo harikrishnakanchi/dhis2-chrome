@@ -110,13 +110,13 @@ gulp.task('watch', function() {
 });
 
 gulp.task('download-metadata', function() {
-    return download(baseIntUrl + "/api/metadata.json?assumeTrue=false&categories=true&categoryCombos=true&categoryOptionCombos=true&categoryOptions=true&dataElementGroups=true&dataElements=true&optionSets=true&organisationUnitGroupSets=true&sections=true&translations=true&users=true&organisationUnits=true&organisationUnitGroups=true", auth)
+    return download(baseIntUrl + "/api/metadata.json?assumeTrue=false&categories=true&categoryCombos=true&categoryOptionCombos=true&categoryOptions=true&dataElementGroups=true&dataElements=true&optionSets=true&organisationUnitGroupSets=true&sections=true&translations=true&users=true&organisationUnitGroups=true", auth)
         .pipe(rename("metadata.json"))
         .pipe(gulp.dest(path.dirname("src/main/data/metadata.json")));
 });
 
 gulp.task('download-datasets', function() {
-    return download(baseIntUrl + "/api/dataSets.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]],organisationUnits[:identifiable]&paging=false", auth)
+    return download(baseIntUrl + "/api/dataSets.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]],!organisationUnits&paging=false", auth)
         .pipe(rename("dataSets.json"))
         .pipe(gulp.dest(path.dirname("src/main/data/dataSets.json")));
 });
@@ -133,7 +133,14 @@ gulp.task('download-fieldapp-settings', function() {
         .pipe(gulp.dest(path.dirname("src/main/data/systemSettings.json")));
 });
 
-gulp.task('pack', ['less', 'config', 'download-metadata', 'download-datasets', 'download-programs', 'download-fieldapp-settings'], function() {
+gulp.task('download-organisationunits', function() {
+    return download(baseIntUrl + "/api/organisationUnits.json?fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid&paging=false", auth)
+        .pipe(rename("organisationUnits.json"))
+        .pipe(gulp.dest(path.dirname("src/main/data/organisationUnits.json")));
+});
+
+
+gulp.task('pack', ['less', 'config', 'download-metadata', 'download-datasets', 'download-programs', 'download-fieldapp-settings', 'download-organisationunits'], function() {
     var stream = shell(["./scripts/crxmake.sh ./src/main key.pem " + "praxis_" + (argv.env || "dev")]);
     stream.write(process.stdout);
     return stream;

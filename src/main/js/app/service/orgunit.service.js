@@ -1,5 +1,5 @@
 define(["dhisUrl", "httpUtils", "lodash"], function(dhisUrl, httpUtils, _) {
-    return function($http, db) {
+    return function($http) {
 
         this.assignDataSetToOrgUnit = function(orgUnitId, dataSetId) {
             return $http.post(dhisUrl.orgUnits + '/' + orgUnitId + '/dataSets/' + dataSetId);
@@ -49,6 +49,12 @@ define(["dhisUrl", "httpUtils", "lodash"], function(dhisUrl, httpUtils, _) {
 
         this.update = function (orgUnitToBeUpdated) {
             return $http.put(dhisUrl.orgUnits + '/' + orgUnitToBeUpdated.id, orgUnitToBeUpdated);
+        };
+
+        this.loadFromFile = function () {
+            return $http.get('/data/organisationUnits.json').then(function (response) {
+              return response.data.organisationUnits;
+            });
         };
     };
 });

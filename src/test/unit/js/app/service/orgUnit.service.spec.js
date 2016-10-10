@@ -245,5 +245,27 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
             httpBackend.expectPUT(properties.dhis.url + "/api/organisationUnits/" + existingMockOrgUnit.id, existingMockOrgUnit).respond(200, 'ok');
             httpBackend.flush();
         });
+
+        it("should load pre-packaged organisationUnits data", function() {
+            var orgUnitsFromFile = {
+                "organisationUnits": [{
+                    "id": "someOrgUnit"
+                }]
+            };
+
+            httpBackend.expectGET("/data/organisationUnits.json").respond(200, orgUnitsFromFile);
+
+            var actualResult;
+            orgUnitService.loadFromFile().then(function(result) {
+                actualResult = result;
+            });
+            httpBackend.flush();
+
+            var expectedOrgUnits = [{
+                "id": "someOrgUnit"
+            }];
+
+            expect(actualResult).toEqual(expectedOrgUnits);
+        });
     });
 });
