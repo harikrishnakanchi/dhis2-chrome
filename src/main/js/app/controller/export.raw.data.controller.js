@@ -138,9 +138,30 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
                 ].concat(_.map(optionsWithData, _.partial(buildOption, dataElement)));
             };
 
+            var buildProceduresPerformedOption = function (option) {
+                return _.flatten([
+                    option.name,
+                    _.map($scope.weeks, function(week) { return $scope.getProcedureCountForOptionForWeek(option.id, week); })
+                ]);
+            };
+
+            var buildProceduresPerformedSection = function () {
+                var proceduresPerformedOptions = _.first($scope.procedureDataElements).optionSet.options,
+                    optionsWithData = _.filter(proceduresPerformedOptions, function(option) { return $scope.getProcedureCountForOptionForAllWeeks(option.id); });
+
+                if($scope.getProcedureCountForAllOptions()) {
+                    return [
+                        EMPTY_LINE,
+                        [$scope.resourceBundle.proceduresPerformed]
+                    ].concat(_.map(optionsWithData, buildProceduresPerformedOption));
+                } else {
+                    return [];
+                }
+            };
+
             var summaryDataElementWithData = _.filter($scope.summaryDataElements, function (dataElement) { return $scope.eventSummary[dataElement.id]; });
 
-            return [buildHeaders()].concat(_.flatten(_.map(summaryDataElementWithData, buildDataElementSection)));
+            return [buildHeaders()].concat(_.flatten(_.map(summaryDataElementWithData, buildDataElementSection))).concat(buildProceduresPerformedSection());
         };
 
         $scope.exportToExcel = function () {

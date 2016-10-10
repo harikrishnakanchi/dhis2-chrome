@@ -12,6 +12,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                 scope.resourceBundle = {
                     dataElement: 'Data Element',
                     optionName: 'Option Name',
+                    proceduresPerformed: 'Procedures Performed',
                     originLabel: 'Origin',
                     lastOneWeek: 'Last week',
                     lastFourWeeks: 'Last 4 weeks',
@@ -642,7 +643,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                 });
 
                 describe('contents of Excel', function () {
-                    var spreadSheetContent, dataElementA, dataElementB, optionA, optionB;
+                    var spreadSheetContent, dataElementA, dataElementB, dataElementC, optionA, optionB, optionC;
 
                     beforeEach(function () {
                         scope.weeks = ['2016W01', '2016W02'];
@@ -655,6 +656,10 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                             id: 'optionIdB',
                             name: 'optionNameB'
                         };
+                        optionC = {
+                            id: 'optionIdC',
+                            name: 'optionNameC'
+                        };
                         dataElementA = {
                             id: 'dataElementIdA',
                             name: 'dataElementNameA',
@@ -666,11 +671,26 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                             id: 'dataElementIdB',
                             name: 'dataElementNameB'
                         };
+                        dataElementC = {
+                            id: 'dataElementIdC',
+                            name: 'dataElementNameC',
+                            optionSet: {
+                                options: [optionC]
+                            }
+                        };
                         scope.summaryDataElements = [dataElementA, dataElementB];
+                        scope.procedureDataElements = [dataElementC];
                         scope.eventSummary = {
                             dataElementIdA: {
                                 optionIdA: {
+                                    count: 1,
                                     '2016W01': ['eventA']
+                                }
+                            },
+                            dataElementIdC: {
+                                optionIdC: {
+                                    count: 1,
+                                    '2016W01': ['eventC']
                                 }
                             }
                         };
@@ -701,6 +721,11 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
 
                     it('should ignore options for which no data values exist', function () {
                         expect(spreadSheetContent.data).not.toContain([optionB.name, undefined, undefined]);
+                    });
+
+                    it('should contain the data for procedures performed', function () {
+                        expect(spreadSheetContent.data).toContain([scope.resourceBundle.proceduresPerformed]);
+                        expect(spreadSheetContent.data).toContain([optionC.name, 1, undefined]);
                     });
                 });
             });
