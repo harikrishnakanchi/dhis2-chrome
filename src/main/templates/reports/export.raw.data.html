@@ -54,7 +54,8 @@
                     </thead>
 
                     <tbody>
-                    <tr ng-repeat="option in referralLocationDataElement.optionSet.options" ng-if="eventSummary[referralLocationDataElement.id][option.id].count > 0">
+                    <tr ng-repeat="option in referralLocationDataElement.optionSet.options"
+                        ng-if="referralLocations[option.genericName] && (!referralLocations[option.genericName].isDisabled || eventSummary[referralLocationDataElement.id][option.id])">
                         <td>{{ referralLocations[option.genericName].name }}</td>
                         <td ng-repeat="week in weeks">
                             {{ eventSummary[referralLocationDataElement.id][option.id][week].length }}

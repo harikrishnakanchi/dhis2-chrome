@@ -120,7 +120,10 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
 
         var buildLineListSpreadSheetContent = function () {
             var buildHeaders = function () {
-                var rowHeader = $scope.selectedDataset.isOriginDataset ? $scope.resourceBundle.originLabel : $scope.resourceBundle.optionName;
+                var rowHeader = $scope.selectedDataset.isOriginDataset && $scope.resourceBundle.originLabel ||
+                                $scope.selectedDataset.isReferralDataset && $scope.resourceBundle.referralLocationLabel ||
+                                $scope.resourceBundle.optionName;
+
                 return [rowHeader].concat($scope.weeks);
             };
 
@@ -169,11 +172,27 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
                 });
             };
 
+            var buildReferralLocationData = function () {
+                var referralLocationOptionsForModule = _.filter($scope.referralLocationDataElement.optionSet.options, function (option) {
+                     return $scope.referralLocations[option.genericName] &&
+                         (!$scope.referralLocations[option.genericName].isDisabled || $scope.eventSummary[$scope.referralLocationDataElement.id][option.id]);
+                });
+
+                return _.map(referralLocationOptionsForModule, function (referralLocationOption) {
+                    return _.flatten([
+                        $scope.referralLocations[referralLocationOption.genericName].name,
+                        _.map($scope.weeks, function(week) { return _.chain($scope.eventSummary).get($scope.referralLocationDataElement.id).get(referralLocationOption.id).get(week).get('length').value(); })
+                    ]);
+                });
+            };
+
             var summaryDataElementWithData = _.filter($scope.summaryDataElements, function (dataElement) { return $scope.eventSummary[dataElement.id]; });
 
             var spreadSheetContent = [buildHeaders()];
             if($scope.selectedDataset.isOriginDataset) {
                 return spreadSheetContent.concat(buildOriginData());
+            } else if($scope.selectedDataset.isReferralDataset) {
+                return spreadSheetContent.concat(buildReferralLocationData());
             } else {
                 return spreadSheetContent.concat(_.flatten(_.map(summaryDataElementWithData, buildDataElementSection))).concat(buildProceduresPerformedSection());
             }

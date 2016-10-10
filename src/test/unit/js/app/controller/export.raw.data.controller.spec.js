@@ -1,8 +1,10 @@
 define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'excludedDataElementsRepository', 'orgUnitRepository', 'referralLocationsRepository', 'moduleDataBlockFactory', 'filesystemService', 'translationsService', 'excelBuilder', 'programRepository', 'programEventRepository', 'eventsAggregator', 'utils', 'dateUtils', 'timecop', 'moment', 'lodash'],
     function (ExportRawDataController, mocks, DatasetRepository, ExcludedDataElementsRepository, OrgUnitRepository, ReferralLocationsRepository, ModuleDataBlockFactory, FilesystemService, TranslationsService, excelBuilder, ProgramRepository, ProgramEventRepository, eventsAggregator, utils, dateUtils, timecop, moment, _) {
         describe('ExportRawDataController', function () {
-            var controller, rootScope, scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository,
-                selectedOrgUnit, selectedDataSet, mockEnrichedDataSet, mockExcludedDataElements, mockDataBlocks, mockOriginOrgUnits, mockProgram, mockEvents, mockDataElement;
+            var controller, rootScope, scope, q,
+                datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, programRepository, programEventRepository,
+                moduleDataBlockFactory, filesystemService, translationsService,
+                selectedOrgUnit, selectedDataSet, mockEnrichedDataSet, mockExcludedDataElements, mockDataBlocks, mockOriginOrgUnits, mockProgram, mockEvents, mockDataElement, spreadSheetContent;
 
             beforeEach(mocks.inject(function ($rootScope, $q) {
                 rootScope = $rootScope;
@@ -14,6 +16,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     optionName: 'Option Name',
                     proceduresPerformed: 'Procedures Performed',
                     originLabel: 'Origin',
+                    referralLocationLabel: 'Referral Location',
                     lastOneWeek: 'Last week',
                     lastFourWeeks: 'Last 4 weeks',
                     lastEightWeeks: 'Last 8 weeks',
@@ -46,7 +49,12 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
 
                 spyOn(dateUtils, 'getPeriodRange').and.returnValue(['2016W20']);
 
-                spyOn(excelBuilder, 'createWorkBook').and.returnValue(new Blob());
+                spreadSheetContent = undefined;
+                spyOn(excelBuilder, 'createWorkBook').and.callFake(function (workBookContent) {
+                    spreadSheetContent = _.first(workBookContent);
+                    return new Blob();
+                });
+
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, 'findAllByParent').and.returnValue(utils.getPromise(q, {}));
 
@@ -349,15 +357,8 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     });
 
                     describe('exportToExcel', function () {
-                        var spreadSheetContent;
-
                         beforeEach(function () {
                             scope.weeks = ['2016W01', '2016W02'];
-
-                            excelBuilder.createWorkBook.and.callFake(function (workBookContent) {
-                                spreadSheetContent = _.first(workBookContent);
-                            });
-
                             scope.exportToExcel();
                         });
 
@@ -452,7 +453,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     });
 
                     describe('contents of Excel', function () {
-                        var spreadSheetContent, sectionA, sectionB;
+                        var sectionA, sectionB;
 
                         beforeEach(function () {
                             scope.weeks = ['2016W01', '2016W02'];
@@ -481,10 +482,6 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                                 }]
                             };
                             scope.sections = [sectionA, sectionB];
-
-                            excelBuilder.createWorkBook.and.callFake(function (workBookContent) {
-                                spreadSheetContent = _.first(workBookContent);
-                            });
 
                             scope.exportToExcel();
                         });
@@ -600,17 +597,64 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     expect(eventsAggregator.buildEventsTree).toHaveBeenCalledWith(mockEvents, ['period'], [mockDataElement.id]);
                 });
 
-                it('should get referral locations for the given opUnit', function () {
-                    scope.selectedDataset = {
-                        isReferralDataset: true
-                    };
-                    scope.$apply();
-                    expect(referralLocationsRepository.get).toHaveBeenCalledWith(scope.orgUnit.parent.id);
-                });
-
                 it('should translate program', function () {
                     scope.$apply();
                     expect(translationsService.translate).toHaveBeenCalledWith(mockProgram);
+                });
+
+                describe('selected dataset is a referral dataSet', function () {
+                    beforeEach(function () {
+                        scope.selectedDataset = {
+                            isReferralDataset: true
+                        };
+                    });
+
+                    it('should get referral locations for the given opUnit', function () {
+                        scope.$apply();
+                        expect(referralLocationsRepository.get).toHaveBeenCalledWith(scope.orgUnit.parent.id);
+                    });
+
+                    describe('exportToExcel', function () {
+                        beforeEach(function () {
+                            scope.weeks = ['2016W01', '2016W02'];
+
+                            scope.referralLocations = {
+                               someGenericNameA: {
+                                   name: 'someReferralLocationName'
+                               }
+                            };
+                            scope.referralLocationDataElement = {
+                                id: 'someDataElementId',
+                                optionSet: {
+                                    options: [{
+                                        id: 'referralLocationOptionIdA',
+                                        genericName: 'someGenericNameA'
+                                    }, {
+                                        id: 'referralLocationOptionIdB',
+                                        genericName: 'someGenericNameB'
+                                    }]
+                                }
+                            };
+
+                            scope.eventSummary = {
+                                someDataElementId: {
+                                    referralLocationOptionIdA: {
+                                        '2016W01': ['someEvent']
+                                    }
+                                }
+                            };
+                            scope.exportToExcel();
+                        });
+
+                        it('should contain the row headers', function () {
+                            var expectedHeader = [scope.resourceBundle.referralLocationLabel].concat(scope.weeks);
+                            expect(spreadSheetContent.data).toContain(expectedHeader);
+                        });
+
+                        it('should contain the data for each referral location', function () {
+                            expect(spreadSheetContent.data).toContain(['someReferralLocationName', 1, undefined]);
+                        });
+                    });
                 });
 
                 describe('selected dataset is an origin dataSet', function () {
@@ -635,8 +679,6 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     });
 
                     describe('exportToExcel', function () {
-                        var spreadSheetContent;
-
                         beforeEach(function () {
                             scope.weeks = ['2016W01', '2016W02'];
                             scope.originSummary = {
@@ -651,11 +693,6 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                             }];
 
                             scope.weeks = ['2016W01', '2016W02'];
-
-                            excelBuilder.createWorkBook.and.callFake(function (workBookContent) {
-                                spreadSheetContent = _.first(workBookContent);
-                            });
-
                             scope.exportToExcel();
                         });
 
@@ -672,7 +709,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                 });
 
                 describe('contents of Excel', function () {
-                    var spreadSheetContent, dataElementA, dataElementB, dataElementC, optionA, optionB, optionC;
+                    var dataElementA, dataElementB, dataElementC, optionA, optionB, optionC;
 
                     beforeEach(function () {
                         scope.weeks = ['2016W01', '2016W02'];
@@ -723,10 +760,6 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                                 }
                             }
                         };
-
-                        excelBuilder.createWorkBook.and.callFake(function (workBookContent) {
-                            spreadSheetContent = _.first(workBookContent);
-                        });
 
                         scope.exportToExcel();
                     });
