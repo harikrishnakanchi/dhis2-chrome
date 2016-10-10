@@ -280,7 +280,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
                         };
 
                         var filterOutReferralLocations = function(dataSets) {
-                            return _.filter(dataSets, { isReferralLocation: false });
+                            return _.reject(dataSets, 'isReferralDataset');
                         };
 
                         var setDatasets = function (translatedDatasets) {
