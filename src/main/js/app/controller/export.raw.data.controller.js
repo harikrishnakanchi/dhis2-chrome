@@ -1,5 +1,6 @@
 define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], function (moment, _, dateUtils, excelBuilder, eventsAggregator) {
     return function($scope, $q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository) {
+        var EMPTY_LINE = [];
 
         $scope.weeksToExportOptions = [{
             label: $scope.resourceBundle.lastOneWeek,
@@ -83,9 +84,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
             });
         };
 
-        var buildSpreadSheetContent = function() {
-            var EMPTY_LINE = [];
-
+        var buildAggregateSpreadSheetContent = function() {
             var buildHeader = function () {
                 var columnHeader = $scope.selectedDataset.isOriginDataset ? $scope.resourceBundle.originLabel : $scope.resourceBundle.dataElement;
                 return [columnHeader].concat($scope.weeks);
@@ -119,11 +118,36 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
             return [buildHeader()].concat(_.flatten(_.map($scope.sections, buildSection)));
         };
 
+        var buildLineListSpreadSheetContent = function () {
+            var buildHeaders = function () {
+                return [$scope.resourceBundle.optionName].concat($scope.weeks);
+            };
+
+            var buildOption = function (dataElement, option) {
+              return _.flatten([
+                  option.name,
+                  _.map($scope.weeks, function(week) { return _.chain($scope.eventSummary).get(dataElement.id).get(option.id).get(week).get('length').value(); })
+              ]);
+            };
+
+            var buildDataElementSection = function (dataElement) {
+                var optionsWithData = _.filter(dataElement.optionSet.options, function (option) { return $scope.eventSummary[dataElement.id][option.id]; });
+                return [
+                    EMPTY_LINE,
+                    [dataElement.name]
+                ].concat(_.map(optionsWithData, _.partial(buildOption, dataElement)));
+            };
+
+            var summaryDataElementWithData = _.filter($scope.summaryDataElements, function (dataElement) { return $scope.eventSummary[dataElement.id]; });
+
+            return [buildHeaders()].concat(_.flatten(_.map(summaryDataElementWithData, buildDataElementSection)));
+        };
+
         $scope.exportToExcel = function () {
             var fileName = [$scope.orgUnit.name, $scope.selectedDataset.name, 'export', moment().format('DD-MMM-YYYY')].join('.'),
                 spreadSheetContent = [{
                     name: $scope.selectedDataset.name,
-                    data: buildSpreadSheetContent()
+                    data: $scope.orgUnit.lineListService ? buildLineListSpreadSheetContent() : buildAggregateSpreadSheetContent()
                 }];
 
             return filesystemService.promptAndWriteFile(fileName, excelBuilder.createWorkBook(spreadSheetContent), filesystemService.FILE_TYPE_OPTIONS.XLSX);

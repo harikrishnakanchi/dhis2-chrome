@@ -11,6 +11,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
 
                 scope.resourceBundle = {
                     dataElement: 'Data Element',
+                    optionName: 'Option Name',
                     originLabel: 'Origin',
                     lastOneWeek: 'Last week',
                     lastFourWeeks: 'Last 4 weeks',
@@ -638,6 +639,69 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                 it('should translate program', function () {
                     scope.$apply();
                     expect(translationsService.translate).toHaveBeenCalledWith(mockProgram);
+                });
+
+                describe('contents of Excel', function () {
+                    var spreadSheetContent, dataElementA, dataElementB, optionA, optionB;
+
+                    beforeEach(function () {
+                        scope.weeks = ['2016W01', '2016W02'];
+
+                        optionA = {
+                            id: 'optionIdA',
+                            name: 'optionNameA'
+                        };
+                        optionB = {
+                            id: 'optionIdB',
+                            name: 'optionNameB'
+                        };
+                        dataElementA = {
+                            id: 'dataElementIdA',
+                            name: 'dataElementNameA',
+                            optionSet: {
+                                options: [optionA, optionB]
+                            }
+                        };
+                        dataElementB = {
+                            id: 'dataElementIdB',
+                            name: 'dataElementNameB'
+                        };
+                        scope.summaryDataElements = [dataElementA, dataElementB];
+                        scope.eventSummary = {
+                            dataElementIdA: {
+                                optionIdA: {
+                                    '2016W01': ['eventA']
+                                }
+                            }
+                        };
+
+                        excelBuilder.createWorkBook.and.callFake(function (workBookContent) {
+                            spreadSheetContent = _.first(workBookContent);
+                        });
+
+                        scope.exportToExcel();
+                    });
+
+                    it('should contain the row headers', function () {
+                        var expectedHeader = [scope.resourceBundle.optionName].concat(scope.weeks);
+                        expect(spreadSheetContent.data).toContain(expectedHeader);
+                    });
+
+                    it('should contain the data element names', function () {
+                        expect(spreadSheetContent.data).toContain([dataElementA.name]);
+                    });
+
+                    it('should contain the data for each option', function () {
+                        expect(spreadSheetContent.data).toContain([optionA.name, 1, undefined]);
+                    });
+
+                    it('should ignore data elements for which no data values exist', function () {
+                        expect(spreadSheetContent.data).not.toContain([dataElementB.name]);
+                    });
+
+                    it('should ignore options for which no data values exist', function () {
+                        expect(spreadSheetContent.data).not.toContain([optionB.name, undefined, undefined]);
+                    });
                 });
             });
         });

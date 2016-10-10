@@ -13,7 +13,7 @@
                     </select>
                 </span>
                 <span>
-                    <input type="button" value="{{ resourceBundle.exportRawDataToExcel }}" class="btn btn-primary" ng-click="exportToExcel()" ng-disabled="dataValuesMap | isEmpty"/>
+                    <input type="button" value="{{ resourceBundle.exportRawDataToExcel }}" class="btn btn-primary" ng-click="exportToExcel()" ng-disabled="(dataValuesMap | isEmpty) && (events | isEmpty)"/>
                 </span>
             </form>
         </div>
