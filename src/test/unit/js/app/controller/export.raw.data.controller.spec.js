@@ -371,7 +371,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                             expect(spreadSheetContent.data).toContain(['originNameB', 2, undefined]);
                         });
                     });
-            });
+                });
 
                 describe('selected dataset is a referral location', function () {
                     var mockReferralLocations, mockDataSet, dataElements, dataSetSection;
@@ -508,13 +508,6 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
             });
 
             describe('LineListEventsRawData', function () {
-                var createMockEvent = function (options) {
-                    return _.merge({
-                        'period': '2016W13',
-                        'event': 'someEventId'
-                    }, options);
-                };
-
                 beforeEach(function () {
                     selectedOrgUnit = {
                         id: 'orgUnitId',
@@ -550,7 +543,10 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
 
                     mockExcludedDataElements = [{id: 'someExcludedDataElement'}];
 
-                    mockEvents = [createMockEvent()];
+                    mockEvents = [{
+                        period: '2016W13',
+                        event: 'someEventId'
+                    }];
 
                     orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, mockOriginOrgUnits));
 
@@ -568,6 +564,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     spyOn(referralLocationsRepository, 'get').and.returnValue(utils.getPromise(q, {}));
 
                     spyOn(eventsAggregator, 'buildEventsTree');
+                    spyOn(eventsAggregator, 'nest');
 
                     controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository);
                 });
@@ -598,32 +595,6 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     expect(programEventRepository.findEventsByDateRange).toHaveBeenCalledWith(mockProgram.id, _.map(scope.originOrgUnits, 'id'), '2016-09-05', '2016-09-25');
                 });
 
-                it('should recursively group all the events by origin, by period', function () {
-                    scope.selectedDataset = {
-                        id: 'someId',
-                        isOriginDataset: true
-                    };
-
-                    var eventA = createMockEvent({orgUnitName: 'originA', period: '2016W13'}),
-                        eventB = createMockEvent({orgUnitName: 'originA', period: '2016W14'}),
-                        eventC = createMockEvent({orgUnitName: 'originB', period: '2016W14'});
-
-                    programEventRepository.findEventsByDateRange.and.returnValue(utils.getPromise(q, [eventA, eventB, eventC]));
-                    scope.$apply();
-
-                    var expectedValue = {
-                        originA: {
-                            '2016W13': [eventA],
-                            '2016W14': [eventB]
-                        },
-                        originB: {
-                            '2016W14': [eventC]
-                        }
-                    };
-
-                    expect(scope.originSummary).toEqual(expectedValue);
-                });
-
                 it('should call the events aggregator to build events tree', function () {
                     scope.$apply();
                     expect(eventsAggregator.buildEventsTree).toHaveBeenCalledWith(mockEvents, ['period'], [mockDataElement.id]);
@@ -640,6 +611,64 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                 it('should translate program', function () {
                     scope.$apply();
                     expect(translationsService.translate).toHaveBeenCalledWith(mockProgram);
+                });
+
+                describe('selected dataset is an origin dataSet', function () {
+                    beforeEach(function () {
+                        scope.selectedDataset = {
+                            id: 'someId',
+                            isOriginDataset: true
+                        };
+                    });
+
+                    it('should call the events aggregator to build origin summary', function () {
+                        var mockOriginSummary = {
+                            originName: {
+                                somePeriod: ['someEvent']
+                            }
+                        };
+                        eventsAggregator.nest.and.returnValue(mockOriginSummary);
+                        scope.$apply();
+
+                        expect(eventsAggregator.nest).toHaveBeenCalledWith(mockEvents, ['orgUnit', 'period']);
+                        expect(scope.originSummary).toEqual(mockOriginSummary);
+                    });
+
+                    describe('exportToExcel', function () {
+                        var spreadSheetContent;
+
+                        beforeEach(function () {
+                            scope.weeks = ['2016W01', '2016W02'];
+                            scope.originSummary = {
+                                originIdA: {
+                                    '2016W01': ['eventA']
+                                }
+                            };
+
+                            scope.originOrgUnits = [{
+                                id: 'originIdA',
+                                name: 'originNameA'
+                            }];
+
+                            scope.weeks = ['2016W01', '2016W02'];
+
+                            excelBuilder.createWorkBook.and.callFake(function (workBookContent) {
+                                spreadSheetContent = _.first(workBookContent);
+                            });
+
+                            scope.exportToExcel();
+                        });
+
+                        it('should contain the row headers', function () {
+                            var expectedHeader = [scope.resourceBundle.originLabel].concat(scope.weeks);
+                            expect(spreadSheetContent.data).toContain(expectedHeader);
+                        });
+
+                        it('should contain the data for each option', function () {
+                            expect(spreadSheetContent.data).toContain(['originNameA', 1, undefined]);
+                        });
+                    });
+
                 });
 
                 describe('contents of Excel', function () {

@@ -34,9 +34,9 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr ng-repeat="(originName, events) in originSummary">
-                        <td>{{ originName }}</td>
-                        <td ng-repeat="week in weeks">{{ events[week].length }}</td>
+                    <tr ng-repeat="origin in originOrgUnits">
+                        <td>{{ origin.name }}</td>
+                        <td ng-repeat="week in weeks">{{ originSummary[origin.id][week].length }}</td>
                     </tr>
                     </tbody>
                 </table>

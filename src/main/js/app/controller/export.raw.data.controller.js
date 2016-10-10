@@ -120,7 +120,8 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
 
         var buildLineListSpreadSheetContent = function () {
             var buildHeaders = function () {
-                return [$scope.resourceBundle.optionName].concat($scope.weeks);
+                var rowHeader = $scope.selectedDataset.isOriginDataset ? $scope.resourceBundle.originLabel : $scope.resourceBundle.optionName;
+                return [rowHeader].concat($scope.weeks);
             };
 
             var buildOption = function (dataElement, option) {
@@ -159,9 +160,23 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
                 }
             };
 
+            var buildOriginData = function () {
+                return _.map($scope.originOrgUnits, function (origin) {
+                    return _.flatten([
+                        origin.name,
+                        _.map($scope.weeks, function(week) { return _.chain($scope.originSummary).get(origin.id).get(week).get('length').value(); })
+                    ]);
+                });
+            };
+
             var summaryDataElementWithData = _.filter($scope.summaryDataElements, function (dataElement) { return $scope.eventSummary[dataElement.id]; });
 
-            return [buildHeaders()].concat(_.flatten(_.map(summaryDataElementWithData, buildDataElementSection))).concat(buildProceduresPerformedSection());
+            var spreadSheetContent = [buildHeaders()];
+            if($scope.selectedDataset.isOriginDataset) {
+                return spreadSheetContent.concat(buildOriginData());
+            } else {
+                return spreadSheetContent.concat(_.flatten(_.map(summaryDataElementWithData, buildDataElementSection))).concat(buildProceduresPerformedSection());
+            }
         };
 
         $scope.exportToExcel = function () {
@@ -247,7 +262,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
             $scope.events = events;
 
             if ($scope.selectedDataset.isOriginDataset) {
-                $scope.originSummary = eventsAggregator.nest(events, ['orgUnitName', 'period']);
+                $scope.originSummary = eventsAggregator.nest(events, ['orgUnit', 'period']);
             } else {
                 var byPeriod = 'period';
                 var dataElementIds = _.map($scope.allDataElements, 'id');
