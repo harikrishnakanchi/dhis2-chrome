@@ -358,6 +358,43 @@ define(['dateUtils'], function(dateUtils) {
         };
     };
 
+    var migrate_organisation_unit_data_set_association = function (db, tx) {
+        var dataSetsStore = tx.objectStore("dataSets");
+        var dataSets = {};
+        var orgUnits = {};
+
+        dataSetsStore.openCursor().onsuccess = function(e) {
+            var cursor = e.target.result;
+            if (cursor) {
+                var dataSet = cursor.value;
+                dataSets[dataSet.id] =  dataSet.orgUnitIds;
+                delete dataSet.orgUnitIds;
+                delete dataSet.organisationUnits;
+                cursor.update(dataSet);
+                cursor.continue();
+            } else {
+                // On DataSet Cursor completion
+                _.each(dataSets, function (orgUnitIds, dataSetId) {
+                    _.each(orgUnitIds, function (orgUnitId) {
+                        orgUnits[orgUnitId] = orgUnits[orgUnitId] || [];
+                        orgUnits[orgUnitId].push({
+                            id: dataSetId
+                        });
+                    });
+                });
+                var orgUnitStore = tx.objectStore('organisationUnits');
+                orgUnitStore.getAll().onsuccess = function (e) {
+                    var orgUnitsFromDB = e.target.result;
+                    _.each(orgUnitsFromDB, function (orgUnitFromDB) {
+                        orgUnitFromDB.dataSets = orgUnits[orgUnitFromDB.id] || [];
+                        orgUnitStore.put(orgUnitFromDB);
+                    });
+                };
+            }
+        };
+        dataSetsStore.deleteIndex('by_organisationUnit');
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -405,6 +442,7 @@ define(['dateUtils'], function(dateUtils) {
         force_pivot_tables_to_redownload,
         create_excluded_line_list_options_store,
         force_charts_to_redownload,
-        format_event_dates
+        format_event_dates,
+        migrate_organisation_unit_data_set_association
     ];
 });
