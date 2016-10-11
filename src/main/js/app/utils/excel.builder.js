@@ -32,6 +32,8 @@ define(['xlsx', 'lodash'], function (XLSX, _) {
         _.each(sheetData, function (row, rowIndex) {
             maxRowIndex = _.max([maxRowIndex, rowIndex]);
             _.each(row, function (cell, columnIndex) {
+                if(_.isNull(cell) || _.isUndefined(cell)) return;
+
                 var cellReference = XLSX.utils.encode_cell({ r: rowIndex, c: columnIndex });
                 sheetObject[cellReference] = createCellObject(cell);
                 maxColumnIndex = _.max([maxColumnIndex, columnIndex]);

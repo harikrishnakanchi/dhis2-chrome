@@ -1,7 +1,7 @@
 define(['excelBuilder', 'xlsx'], function (excelBuilder, XLSX) {
     describe('excelBuilder', function () {
         describe('createWorkBook', function () {
-            var workBookData, mockData, sheetA;
+            var workBookData, mockData, sheetA, someMomentInTime;
 
             beforeEach(function () {
                 workBookData = undefined;
@@ -10,13 +10,15 @@ define(['excelBuilder', 'xlsx'], function (excelBuilder, XLSX) {
                     return 'mockXLSX';
                 });
 
+                someMomentInTime = new Date('2016-8-28');
                 sheetA = {
                     name: 'someSheetName',
                     data: [
                         ['headerTitleA', 'headerTitleB'],
                         [123, 456],
                         [true, false],
-                        [null]
+                        [someMomentInTime],
+                        [null, undefined]
                     ]
                 };
                 mockData = [sheetA];
@@ -50,16 +52,23 @@ define(['excelBuilder', 'xlsx'], function (excelBuilder, XLSX) {
             it('should set cell data for boolean values', function () {
                 excelBuilder.createWorkBook(mockData);
                 expect(workBookData.Sheets[sheetA.name].A3).toEqual({ v: true, t: 'b' });
+                expect(workBookData.Sheets[sheetA.name].B3).toEqual({ v: false, t: 'b' });
             });
 
             it('should set cell data for other types of values', function () {
                 excelBuilder.createWorkBook(mockData);
-                expect(workBookData.Sheets[sheetA.name].A4).toEqual({ v: null, t: 's' });
+                expect(workBookData.Sheets[sheetA.name].A4).toEqual({ v: someMomentInTime, t: 's' });
+            });
+
+            it('should ignore null and undefined values', function () {
+                excelBuilder.createWorkBook(mockData);
+                expect(workBookData.Sheets[sheetA.name].A5).toBeUndefined();
+                expect(workBookData.Sheets[sheetA.name].B5).toBeUndefined();
             });
 
             it('should set the range for the sheet', function () {
                 excelBuilder.createWorkBook(mockData);
-                expect(workBookData.Sheets[sheetA.name]['!ref']).toEqual('A1:B4');
+                expect(workBookData.Sheets[sheetA.name]['!ref']).toEqual('A1:B5');
             });
 
             it('should set the column widths to the max number of characters in each column', function () {
