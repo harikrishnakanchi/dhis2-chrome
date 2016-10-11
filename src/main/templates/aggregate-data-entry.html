@@ -179,7 +179,7 @@
                 </accordion>
                 <div>
                     <input type="submit" class="btn btn-main" id="dataEntrySave" ng-click="saveAsDraft()" ng-disabled="dataentryForm.$invalid" ng-if="hasRoles(['Data entry user'])" ng-hide="isSubmitted" value="{{resourceBundle.saveBtnValue}}" />
-                    <input type="submit" class="btn btn-main" id="dataEntrySubmit" ng-click="submit()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid || !isDataEntryAllowed" ng-if="hasRoles(['Data entry user']) &amp;&amp; !projectIsAutoApproved" value="{{ (syncError && moduleDataBlock.awaitingActionAtDataEntryLevel) ? resourceBundle.resubmitButton : resourceBundle.submitBtnValue }}" />
+                    <input type="submit" class="btn btn-main" id="dataEntrySubmit" ng-click="submit()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$pristine || dataentryForm.$invalid || !isDataEntryAllowed" ng-if="hasRoles(['Data entry user']) &amp;&amp; !projectIsAutoApproved" value="{{ (syncError && moduleDataBlock.awaitingActionAtDataEntryLevel) ? resourceBundle.resubmitButton : resourceBundle.submitBtnValue }}" />
                     <input type="submit" class="btn btn-main" id="dataEntrySubmitAndApprove" ng-click="submitAndApprove()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid || !isDataEntryAllowed" ng-if="hasRoles(['Data entry user']) &amp;&amp; projectIsAutoApproved" value="{{ syncError ? resourceBundle.resubmitButton : resourceBundle.submitBtnValue }}" />
                 </div>
             </form>
