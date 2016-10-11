@@ -88,17 +88,17 @@
                                         </td>
                                         <td ng-repeat="option in section.categoryOptionComboIds">
                                             <ng-form name="datavalueForm">
-                                                <input type="text" class="input-sm" name="datavalue" id="datafield_{{$index}}" ng-value="getValue(dataValues, dataElement.id, option, dataSet.organisationUnits)" ng-disabled="true" />
+                                                <input type="text" class="input-sm" name="datavalue" id="datafield_{{$index}}" ng-value="getValue(dataValues, dataElement.id, option, selectedModule)" ng-disabled="true" />
                                             </ng-form>
                                         </td>
-                                        <td ng-if="section.shouldDisplayRowTotals" class="last-column">{{sum(dataValues, dataSet.organisationUnits, dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
+                                        <td ng-if="section.shouldDisplayRowTotals" class="last-column">{{sum(dataValues, selectedModule, dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
                                     </tr>
                                     <tr ng-if="(section.shouldDisplayColumnTotals)">
                                         <td>
                                             <span> {{ resourceBundle.totalLabel }}</span>
                                         </td>
                                         <td ng-repeat="option in section.categoryOptionComboIds track by $id(option)">
-                                            {{columnSum(dataValues, dataSet.organisationUnits, section.dataElements, option, dataSet.isReferralDataset)}}
+                                            {{columnSum(dataValues, selectedModule, section.dataElements, option, dataSet.isReferralDataset)}}
                                         </td>
                                         <td ng-if="section.shouldDisplayRowTotals" class="last-column"> {{totalSum(dataValues, section.dataElements)}}
                                         </td>
