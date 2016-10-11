@@ -1,4 +1,4 @@
-define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], function (moment, _, dateUtils, excelBuilder, eventsAggregator) {
+define(['moment', 'lodash', 'dateUtils', 'stringUtils', 'excelBuilder', 'eventsAggregator'], function (moment, _, dateUtils, stringUtils, excelBuilder, eventsAggregator) {
     return function($scope, $q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository) {
         var EMPTY_LINE = [];
 
@@ -201,7 +201,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
         $scope.exportToExcel = function () {
             var fileName = [$scope.orgUnit.name, $scope.selectedDataset.name, 'export', moment().format('DD-MMM-YYYY')].join('.'),
                 spreadSheetContent = [{
-                    name: $scope.selectedDataset.name,
+                    name: stringUtils.replaceSpecialCharacters($scope.selectedDataset.name),
                     data: $scope.orgUnit.lineListService ? buildLineListSpreadSheetContent() : buildAggregateSpreadSheetContent()
                 }];
 
