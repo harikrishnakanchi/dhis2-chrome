@@ -231,7 +231,7 @@ define(['moment', 'lodash', 'dateUtils', 'stringUtils', 'excelBuilder', 'eventsA
                     $scope.allDataElements = _.chain(program.programStages)
                         .map('programStageSections').flatten()
                         .map('programStageDataElements').flatten()
-                        .map('dataElement').filter('isIncluded').value();
+                        .map('dataElement').value();
 
                     $scope.referralLocationDataElement = _.find($scope.allDataElements, { offlineSummaryType: 'referralLocations' });
                     var referralLocationOptions = _.get($scope.referralLocationDataElement, 'optionSet.options');
