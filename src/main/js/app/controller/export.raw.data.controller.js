@@ -274,18 +274,22 @@ define(['moment', 'lodash', 'dateUtils', 'stringUtils', 'excelBuilder', 'eventsA
         var fetchEventsForProgram = function (program) {
             var startDate = moment(_.first($scope.weeks), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
                 endDate = moment(_.last($scope.weeks), 'GGGG[W]W').endOf('isoWeek').format('YYYY-MM-DD');
-            return programEventRepository.findEventsByDateRange(program.id, _.map($scope.originOrgUnits, 'id'), startDate, endDate);
+            return programEventRepository.findEventsByDateRange(program.id, _.map($scope.originOrgUnits, 'id'), startDate, endDate).then(function (events) {
+                return _.filter(events, function (event) {
+                    return !event.localStatus || event.localStatus == 'READY_FOR_DHIS';
+                });
+            });
         };
 
         var generateViewModel = function (events) {
             $scope.events = events;
 
             if ($scope.selectedDataset.isOriginDataset) {
-                $scope.originSummary = eventsAggregator.nest(events, ['orgUnit', 'period']);
+                $scope.originSummary = eventsAggregator.nest($scope.events, ['orgUnit', 'period']);
             } else {
                 var byPeriod = 'period';
                 var dataElementIds = _.map($scope.allDataElements, 'id');
-                $scope.eventSummary = eventsAggregator.buildEventsTree(events, [byPeriod], dataElementIds);
+                $scope.eventSummary = eventsAggregator.buildEventsTree($scope.events, [byPeriod], dataElementIds);
                 
                 $scope.procedureDataElements = _.filter($scope.allDataElements, { offlineSummaryType: 'procedures' });
                 $scope.summaryDataElements = _.filter($scope.allDataElements, { offlineSummaryType: 'showInOfflineSummary' });

@@ -505,6 +505,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
             });
 
             describe('LineListEventsRawData', function () {
+                var mockEventA, mockEventB, mockEventC;
                 beforeEach(function () {
                     selectedOrgUnit = {
                         id: 'orgUnitId',
@@ -538,10 +539,11 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
 
                     mockExcludedDataElements = [{id: 'someExcludedDataElement'}];
 
-                    mockEvents = [{
-                        period: '2016W13',
-                        event: 'someEventId'
-                    }];
+                    mockEventA = { event: 'eventAId', localStatus: 'UPDATED_DRAFT' };
+                    mockEventB = { event: 'eventBId', localStatus: 'READY_FOR_DHIS' };
+                    mockEventC = { event: 'eventCId' };
+
+                    mockEvents = [mockEventA, mockEventB, mockEventC];
 
                     orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, mockOriginOrgUnits));
 
@@ -590,9 +592,15 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     expect(programEventRepository.findEventsByDateRange).toHaveBeenCalledWith(mockProgram.id, _.map(scope.originOrgUnits, 'id'), '2016-09-05', '2016-09-25');
                 });
 
+                it('should filter the submitted events', function () {
+                    scope.$apply();
+
+                    expect(scope.events).toEqual([mockEventB, mockEventC]);
+                });
+
                 it('should call the events aggregator to build events tree', function () {
                     scope.$apply();
-                    expect(eventsAggregator.buildEventsTree).toHaveBeenCalledWith(mockEvents, ['period'], [mockDataElement.id]);
+                    expect(eventsAggregator.buildEventsTree).toHaveBeenCalledWith(scope.events, ['period'], [mockDataElement.id]);
                 });
 
                 it('should translate program', function () {
@@ -671,7 +679,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                         eventsAggregator.nest.and.returnValue(mockOriginSummary);
                         scope.$apply();
 
-                        expect(eventsAggregator.nest).toHaveBeenCalledWith(mockEvents, ['orgUnit', 'period']);
+                        expect(eventsAggregator.nest).toHaveBeenCalledWith(scope.events, ['orgUnit', 'period']);
                         expect(scope.originSummary).toEqual(mockOriginSummary);
                     });
 
