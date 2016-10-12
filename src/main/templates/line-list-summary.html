@@ -96,7 +96,7 @@
                                     <span>
                                         <button class="btn btn-primary" ng-class="layoutDirection.direction != 'rtl' ? 'pull-right' : 'pull-left'"
                                             ng-if="filterParams.filterBy === 'caseNumber' || filterParams.filterBy === 'dateRange'"
-                                            type="button" ng-click="exportToCSV()" ng-disabled="!(events | filter:filterSubmittedEvents).length"> {{ resourceBundle.exportEventData }}</button>
+                                            type="button" ng-click="exportToExcel()" ng-disabled="!(events | filter:filterSubmittedEvents).length"> {{ resourceBundle.exportEventData }}</button>
                                     </span>
                                     <div class="errortxt" ng-if="filterParams.filterBy === 'dateRange' && dateRangeError">{{resourceBundle.dateRangeError}}</div>
                                 </form>

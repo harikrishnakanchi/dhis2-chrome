@@ -1,4 +1,4 @@
-define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpolate"], function(_, moment, properties, dateUtils, orgUnitMapper, interpolate) {
+define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpolate", "excelBuilder"], function(_, moment, properties, dateUtils, orgUnitMapper, interpolate, excelBuilder) {
     return function($scope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, historyService, programRepository, programEventRepository, excludedDataElementsRepository,
         orgUnitRepository, approvalDataRepository, referralLocationsRepository, dataSyncFailureRepository, translationsService, filesystemService) {
 
@@ -349,34 +349,34 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
             return !event.localStatus || event.localStatus==='READY_FOR_DHIS';
         };
 
-        $scope.exportToCSV = function () {
-            var NEW_LINE = '\n',
-                DELIMITER = ',';
+        $scope.exportToExcel = function () {
+            var DELIMITER = ',';
 
             var escapeString = function (string) {
                 return '"' + string + '"';
             };
 
             var buildHeaders = function () {
-                var patientOriginLabel = escapeString($scope.resourceBundle.patientOriginLabel);
-                var formNames = _.chain($scope.dataElementsForExport).map('formName').map(escapeString).value();
-                return formNames.concat(patientOriginLabel).join(DELIMITER);
+                var formNames = _.map($scope.dataElementsForExport, 'formName');
+                return formNames.concat($scope.resourceBundle.patientOriginLabel);
             };
 
             var buildData = function (event) {
                 var dataValues = _.reject(event.dataValues, function (dataValue) {
                     return _.contains($scope.excludedDataElementIds, dataValue.dataElement);
                 });
-                var values = _.map(_.map(dataValues, $scope.getDisplayValue), escapeString);
-                var patientOrigin = escapeString(event.orgUnitName);
-                return values.concat(patientOrigin).join(DELIMITER);
+                var values = _.map(dataValues, $scope.getDisplayValue);
+                return values.concat(event.orgUnitName);
             };
 
             var eventsToBeExported = _.chain($scope.events).filter($scope.filterSubmittedEvents).map(buildData).value();
 
-            var csvContent = _.flatten([buildHeaders(), eventsToBeExported]).join(NEW_LINE);
-            var fileName = [$scope.selectedModuleName, 'summary', moment().format('DD-MMM-YYYY'), 'csv'].join('.');
-            return filesystemService.promptAndWriteFile(fileName, new Blob([csvContent], { type: 'text/csv' }), filesystemService.FILE_TYPE_OPTIONS.CSV);
+            var workBookContent = [{
+                name: $scope.selectedModuleName,
+                data: [buildHeaders()].concat(eventsToBeExported)
+            }];
+            var fileName = [$scope.selectedModuleName, 'summary', moment().format('DD-MMM-YYYY'), 'xlsx'].join('.');
+            return filesystemService.promptAndWriteFile(fileName, excelBuilder.createWorkBook(workBookContent), filesystemService.FILE_TYPE_OPTIONS.XLSX);
         };
 
         $scope.getOriginName = function(orgUnitId) {
