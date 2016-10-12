@@ -1,5 +1,5 @@
 define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransformer, moment) {
-    return function(db, $q) {
+    return function(db, $q, categoryRepository) {
         var self = this;
 
         this.getAll = function() {
@@ -50,14 +50,9 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
         };
 
         this.includeCategoryOptionCombinations = function(datasets) {
-            var getAll = function(storeName) {
-                var store = db.objectStore(storeName);
-                return store.getAll();
-            };
-
-            var categoryCombosPromise = getAll("categoryCombos");
-            var categoriesPromise = getAll("categories");
-            var categoryOptionCombosPromise = getAll("categoryOptionCombos");
+            var categoryCombosPromise = categoryRepository.getAllCategoryCombos();
+            var categoriesPromise = categoryRepository.getAllCategories();
+            var categoryOptionCombosPromise = categoryRepository.getAllCategoryOptionCombos();
 
             return $q.all([categoryCombosPromise, categoriesPromise, categoryOptionCombosPromise]).then(function(data) {
                 var allCategoryCombos = data[0];

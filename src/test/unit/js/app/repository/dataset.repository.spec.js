@@ -1,6 +1,6 @@
-define(["datasetRepository", "datasetTransformer", "testData", "angularMocks", "utils"], function(DatasetRepository, datasetTransformer, testData, mocks, utils) {
+define(["datasetRepository", "categoryRepository", "datasetTransformer", "testData", "angularMocks", "utils"], function(DatasetRepository, CategoryRepository, datasetTransformer, testData, mocks, utils) {
     describe("dataset repository", function() {
-        var mockStore, datasetRepository, q, scope;
+        var mockStore, datasetRepository, categoryRepository, q, scope;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
@@ -9,7 +9,12 @@ define(["datasetRepository", "datasetTransformer", "testData", "angularMocks", "
             var mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
 
-            datasetRepository = new DatasetRepository(mockDB.db, q);
+            categoryRepository = new CategoryRepository();
+            spyOn(categoryRepository, 'getAllCategoryCombos').and.returnValue(utils.getPromise(q, testData.get('categoryCombos')));
+            spyOn(categoryRepository, 'getAllCategories').and.returnValue(utils.getPromise(q, testData.get('categories')));
+            spyOn(categoryRepository, 'getAllCategoryOptionCombos').and.returnValue(utils.getPromise(q, testData.get('categoryOptionCombos')));
+
+            datasetRepository = new DatasetRepository(mockDB.db, q, categoryRepository);
         }));
 
         it("should transform and get all datasets after filtering out current datasets", function() {
@@ -170,15 +175,6 @@ define(["datasetRepository", "datasetTransformer", "testData", "angularMocks", "
                     }]
                 }]
             }];
-
-            mockStore.getAll.and.callFake(function(query) {
-                if (mockStore.storeName === "categoryCombos")
-                    return utils.getPromise(q, testData.get("categoryCombos"));
-                if (mockStore.storeName === "categories")
-                    return utils.getPromise(q, testData.get("categories"));
-                if (mockStore.storeName === "categoryOptionCombos")
-                    return utils.getPromise(q, testData.get("categoryOptionCombos"));
-            });
 
             var actualDatasets;
 

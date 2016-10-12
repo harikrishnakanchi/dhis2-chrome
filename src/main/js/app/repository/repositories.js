@@ -10,7 +10,7 @@ define(["dataRepository", "datasetRepository", "userPreferenceRepository", "orgU
         var init = function(app) {
             app.service('dataRepository', ['$q', '$indexedDB', dataRepository]);
             app.service('approvalDataRepository', ['$indexedDB', '$q', approvalDataRepository]);
-            app.service('datasetRepository', ['$indexedDB', '$q', datasetRepository]);
+            app.service('datasetRepository', ['$indexedDB', '$q', 'categoryRepository', datasetRepository]);
             app.service('systemSettingRepository', ['$indexedDB', '$q', '$rootScope', systemSettingRepository]);
             app.service('patientOriginRepository', ['$indexedDB', '$q', patientOriginRepository]);
             app.service('orgUnitRepository', ['$indexedDB', '$q', orgUnitRepository]);
