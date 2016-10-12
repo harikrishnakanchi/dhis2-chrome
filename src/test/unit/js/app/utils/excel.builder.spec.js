@@ -75,6 +75,18 @@ define(['excelBuilder', 'xlsx'], function (excelBuilder, XLSX) {
                 excelBuilder.createWorkBook(mockData);
                 expect(workBookData.Sheets[sheetA.name]['!cols']).toEqual([{ wch: 12 }, { wch: 12 }]);
             });
+
+            it('should replace special characters in sheet names', function () {
+                sheetA.name = '2>1 & \' < "';
+                excelBuilder.createWorkBook(mockData);
+                expect(workBookData.SheetNames).toEqual(['2&gt;1 &amp; &apos; &lt; &quot;']);
+            });
+
+            it('should truncate sheet names to 32 characters', function () {
+                sheetA.name = '5____10___15___20___25___30___&';
+                excelBuilder.createWorkBook(mockData);
+                expect(workBookData.SheetNames).toEqual(['5____10___15___20___25___30___']);
+            });
         });
     });
 });

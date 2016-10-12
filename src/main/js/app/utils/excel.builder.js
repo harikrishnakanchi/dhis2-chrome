@@ -7,13 +7,52 @@ define(['xlsx', 'lodash'], function (XLSX, _) {
         default: 's'
     };
 
-    var DEFAULT_COLUMN_WIDTH = 10;
+    var ESCAPED_CHARACTERS = {
+        '&': '&amp;',
+        '"': '&quot;',
+        '\'': '&apos;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '[': '',
+        ']': '',
+        '*': '',
+        '?': '',
+        ':': '',
+        '/': '',
+        '\\': ''
+    };
+
+    var DEFAULT_COLUMN_WIDTH = 10,
+        SHEET_NAME_CHARACTER_LIMIT = 32;
 
     var stringToArrayBuffer = function (string) {
         var buffer = new ArrayBuffer(string.length);
         var view = new Uint8Array(buffer);
         for (var i=0; i!=string.length; ++i) view[i] = string.charCodeAt(i) & 0xFF;
         return buffer;
+    };
+
+    var escapeXmlSpecialCharacters = function (string) {
+        return _.reduce(ESCAPED_CHARACTERS, function (string, replacement_character, character) {
+            return string.replace(character, replacement_character);
+        }, string);
+    };
+
+    var escapeAndTruncateString = function (string) {
+        var escapedString = escapeXmlSpecialCharacters(string);
+
+        if (escapedString.length > SHEET_NAME_CHARACTER_LIMIT) {
+            var truncatedString = string.substring(0, _.min([SHEET_NAME_CHARACTER_LIMIT, string.length - 1]));
+            return escapeAndTruncateString(truncatedString);
+        } else {
+            return escapedString;
+        }
+    };
+
+    var escapeAndTruncateSheetNames = function (sheets) {
+        return _.each(sheets, function (sheet) {
+            sheet.name = escapeAndTruncateString(sheet.name);
+        });
     };
 
     var createCellObject = function (cellValue) {
@@ -47,6 +86,8 @@ define(['xlsx', 'lodash'], function (XLSX, _) {
     };
 
     var createWorkBookObject = function (sheets) {
+        escapeAndTruncateSheetNames(sheets);
+
         return {
             SheetNames: _.map(sheets, 'name'),
             Sheets: _.reduce(sheets, function (sheetsObject, sheet) {
