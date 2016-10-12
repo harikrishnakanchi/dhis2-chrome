@@ -279,8 +279,6 @@
     "exportRawDataToCSV": "تصدير البيانات بصيغة CSV",
     "exportRawDataToExcel": "تصدير البيانات في تنسيق Excel",
     "noRawDataAvailable": "لا توجد بيانات متاحة للأسابيع المحددة",
-    "noExportRawDataForLineLists": "يمكنك تصدير البيانات التفصيلية من خيار البحث لبرنامج معين",
-    "noExportRawDataForLineListsForApprovers": "البيانات الفردية تجميع البيانات لا يمكن أن تصدر من هنا.",
     "lastOneWeek": "الاسبوع الماضى",
     "lastFourWeeks": "آخر 4 أسابيع",
     "lastEightWeeks": "آخر 8 أسابيع",
