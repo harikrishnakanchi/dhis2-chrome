@@ -9,8 +9,8 @@ define(['lodash'], function (_) {
             var indexedCategoryOptions = _.indexBy(categoryOptions, 'id');
 
             return _.each(collection, function (item) {
-                _.each(item.categoryOptions, function (categoryOption) {
-                    categoryOption.name = _.get(indexedCategoryOptions[categoryOption.id], 'name');
+                item.categoryOptions = _.map(item.categoryOptions, function (categoryOption) {
+                    return indexedCategoryOptions[categoryOption.id];
                 });
             });
         };

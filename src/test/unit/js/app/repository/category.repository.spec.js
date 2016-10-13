@@ -33,7 +33,8 @@ define(['categoryRepository', 'angularMocks', 'utils'], function (CategoryReposi
             beforeEach(function () {
                 mockCategoryOptions = [{
                     id: 'someCategoryOptionId',
-                    name: 'updatedCategoryName'
+                    name: 'updatedCategoryName',
+                    shortName: 'shortName'
                 }];
 
                 mockCategories = [{
@@ -82,7 +83,8 @@ define(['categoryRepository', 'angularMocks', 'utils'], function (CategoryReposi
             beforeEach(function () {
                 mockCategoryOptions = [{
                     id: 'someCategoryOptionId',
-                    name: 'updatedCategoryName'
+                    name: 'updatedCategoryName',
+                    shortName: 'shortName'
                 }];
 
                 mockCategoryOptionCombos = [{
