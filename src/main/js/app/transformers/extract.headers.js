@@ -1,13 +1,7 @@
-define(["findCategoryComboOption"], function(findCategoryComboOption) {
+define(["lodash", "findCategoryComboOption"], function(_, findCategoryComboOption) {
     return function(categories, categoryCombo, categoryOptionCombos) {
-        var prod;
-        var headers = [];
 
-        var categoryOptions = _.map(categories, function(category) {
-            return category.categoryOptions;
-        });
-
-        var cartesianProductOf = function(arr) {
+        var cartesianProductOf = function(twoDimensionalArray) {
             var multiply = function(arrA, arrB) {
                 return _.flatten(_.map(arrA, function(a) {
                     return _.map(arrB, function(b) {
@@ -18,29 +12,25 @@ define(["findCategoryComboOption"], function(findCategoryComboOption) {
                 }));
             };
 
-            if (arr.length === 1) {
-                return _.map(arr[0], function(a) {
-                    return [a];
-                });
-            }
-
-            return _.reduce(arr, function(result, a) {
-                headers.push(result);
-                return multiply(result, a);
-            });
+            return twoDimensionalArray.length === 1 ?
+                _.map(_.first(twoDimensionalArray), function(a) { return [a]; }) :
+                _.reduce(twoDimensionalArray, function(result, a) { return multiply(result, a); });
         };
 
-        prod = cartesianProductOf(categoryOptions);
-        headers.push(prod);
+        var arrayOfCategoryOptions = _.map(categories, 'categoryOptions');
 
-        var headerLabels = _.map(headers, function(a) {
-            return _.map(a, function(b) {
-                return _.isArray(b) ? _.last(b) : b;
+        var headerLabels = _.reduce(arrayOfCategoryOptions, function (result, categoryOptions) {
+            var previousItemLength = _.get(_.last(result), 'length', 1);
+            var headers = [];
+            _.times(previousItemLength, function () {
+                headers.push(categoryOptions);
             });
-        });
+            result.push(_.flatten(headers));
+            return result;
+        }, []);
 
-        var comboIds = _.map(prod, function(a) {
-            var combo = findCategoryComboOption(categoryOptionCombos, categoryCombo, _.pluck(a, "name"));
+        var comboIds = _.map(cartesianProductOf(arrayOfCategoryOptions), function(categoryOptions) {
+            var combo = findCategoryComboOption(categoryOptionCombos, categoryCombo, _.map(categoryOptions, "name"));
             return combo.id;
         });
 
