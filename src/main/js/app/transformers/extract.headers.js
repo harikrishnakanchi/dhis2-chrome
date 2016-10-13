@@ -30,7 +30,7 @@ define(["lodash", "findCategoryComboOption"], function(_, findCategoryComboOptio
         }, []);
 
         var comboIds = _.map(cartesianProductOf(arrayOfCategoryOptions), function(categoryOptions) {
-            var combo = findCategoryComboOption(categoryOptionCombos, categoryCombo, _.map(categoryOptions, "name"));
+            var combo = findCategoryComboOption(categoryOptionCombos, categoryCombo, _.map(categoryOptions, "id"));
             return combo.id;
         });
 

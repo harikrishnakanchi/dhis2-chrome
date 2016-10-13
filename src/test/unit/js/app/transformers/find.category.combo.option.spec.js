@@ -97,7 +97,7 @@ define(["findCategoryComboOption", "lodash"], function(findCategoryComboOption, 
         });
 
         it("should find category combo option id", function() {
-            expect(findCategoryComboOption(simpleCategoryOptionCombo, categoryCombo, ["Migrant"]).id).toBe(2);
+            expect(findCategoryComboOption(simpleCategoryOptionCombo, categoryCombo, ["op2"]).id).toBe(2);
             expect(findCategoryComboOption(simpleCategoryOptionCombo, categoryCombo, ["Junk"])).toBe(undefined);
         });
 
