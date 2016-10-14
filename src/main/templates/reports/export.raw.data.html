@@ -79,7 +79,7 @@
                     <tbody ng-repeat="dataElement in summaryDataElements" ng-if="eventSummary[dataElement.id]">
                     <tr>
                         <td class="active" colspan="{{ weeks.length + 1 }}">
-                            <strong>{{ dataElement.name }}</strong>
+                            <strong>{{ dataElement.formName }}</strong>
                         </td>
                     </tr>
                     <tr ng-repeat="option in dataElement.optionSet.options" ng-if="eventSummary[dataElement.id][option.id]">

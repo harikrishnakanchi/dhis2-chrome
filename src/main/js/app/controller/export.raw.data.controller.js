@@ -138,7 +138,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
                 var optionsWithData = _.filter(dataElement.optionSet.options, function (option) { return $scope.eventSummary[dataElement.id][option.id]; });
                 return [
                     EMPTY_LINE,
-                    [dataElement.name]
+                    [dataElement.formName]
                 ].concat(_.map(optionsWithData, _.partial(buildOption, dataElement)));
             };
 

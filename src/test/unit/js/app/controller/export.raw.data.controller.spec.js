@@ -733,18 +733,18 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                         };
                         dataElementA = {
                             id: 'dataElementIdA',
-                            name: 'dataElementNameA',
+                            formName: 'dataElementNameA',
                             optionSet: {
                                 options: [optionA, optionB]
                             }
                         };
                         dataElementB = {
                             id: 'dataElementIdB',
-                            name: 'dataElementNameB'
+                            formName: 'dataElementNameB'
                         };
                         dataElementC = {
                             id: 'dataElementIdC',
-                            name: 'dataElementNameC',
+                            formName: 'dataElementNameC',
                             optionSet: {
                                 options: [optionC]
                             }
@@ -775,7 +775,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     });
 
                     it('should contain the data element names', function () {
-                        expect(spreadSheetContent.data).toContain([dataElementA.name]);
+                        expect(spreadSheetContent.data).toContain([dataElementA.formName]);
                     });
 
                     it('should contain the data for each option', function () {
@@ -783,7 +783,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     });
 
                     it('should ignore data elements for which no data values exist', function () {
-                        expect(spreadSheetContent.data).not.toContain([dataElementB.name]);
+                        expect(spreadSheetContent.data).not.toContain([dataElementB.formName]);
                     });
 
                     it('should ignore options for which no data values exist', function () {
