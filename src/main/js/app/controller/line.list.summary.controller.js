@@ -63,11 +63,16 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
             scrollToTop();
         };
 
+        var isReferralLocationDataValue = function (dataValue) {
+            var dataElement = _.find($scope.dataElementsForExport, {id: dataValue.dataElement});
+            return (dataElement && dataElement.offlineSummaryType == 'referralLocations') ? true : false;
+        };
+
         var enhanceEvents = function (events) {
             var setReferralLocationGenericNames = function (events) {
                 var referralLocationDataValues = _.compact(_.map(events, function (event) {
                     return _.find(event.dataValues, function (dataValue) {
-                        return _.includes(dataValue.code, '_referralLocations');
+                        return isReferralLocationDataValue(dataValue);
                     });
                 }));
                 _.each(referralLocationDataValues, function (dataValue) {
@@ -169,7 +174,7 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
 
             if (!dataValue.value) return "";
 
-            if (_.endsWith(dataValue.code, "_referralLocations")){
+            if (isReferralLocationDataValue(dataValue)){
                 var referralLocationGenericName = _.chain(dataValue.optionSet.options).find({ id: dataValue.value }).get('referralLocationGenericName').value();
                 return $scope.referralLocations[referralLocationGenericName].name;
             }

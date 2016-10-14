@@ -357,13 +357,15 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                     optionSet: {
                         options: [{
                             id: 'option1',
-                            name: 'Referral1'
+                            name: 'Referral1',
+                            referralLocationGenericName: 'Referral1'
                         }]
                     },
                     value: 'option1',
-                    code: 'dv1_referralLocations',
-                    showInEventSummary: true
+                    showInEventSummary: true,
+                    dataElement: 'referralDataElement'
                 };
+
                 mockEventA = createMockEvent({ dataValues: [dataValue]});
                 programEventRepository.findEventsByDateRange.and.returnValue(utils.getPromise(q, [mockEventA]));
                 scope.$apply();
@@ -427,8 +429,10 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                             }]
                         },
                         value: 'option1',
-                        code: 'dv1_referralLocations'
+                        dataElement: 'referralLocationDataElement'
                     };
+
+                    scope.dataElementsForExport = [{id: 'referralLocationDataElement', offlineSummaryType: 'referralLocations'}];
 
                     scope.referralLocations = {
                         Referral1: {
