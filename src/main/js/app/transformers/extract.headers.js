@@ -1,5 +1,6 @@
 define(["lodash"], function(_) {
     return function(categories, categoryCombo, categoryOptionCombos) {
+        var categoryOptionCombosForGivenCategoryCombo = _.filter(categoryOptionCombos, { categoryCombo: { id: categoryCombo.id } });
 
         var cartesianProductOf = function(twoDimensionalArray) {
             var multiply = function(arrA, arrB) {
@@ -28,28 +29,18 @@ define(["lodash"], function(_) {
             result.push(_.flatten(headers));
             return result;
         }, []);
-        
-        var findCategoryComboOption = function(categoryOptionCombos, categoryCombo, optionIds) {
-            var filteredCategoryOptionCombos = _.filter(categoryOptionCombos, function(catOptCombo) {
-                return catOptCombo.categoryCombo.id === categoryCombo.id;
-            });
-            return _.find(filteredCategoryOptionCombos, function(combo) {
-                return _.every(optionIds, function(optionId) {
-                    return _.any(combo.categoryOptions, {
-                        'id': optionId
-                    });
-                });
-            });
-        };
 
         var comboIds = _.map(cartesianProductOf(arrayOfCategoryOptions), function(categoryOptions) {
-            var combo = findCategoryComboOption(categoryOptionCombos, categoryCombo, _.map(categoryOptions, "id"));
-            return combo.id;
+            var requiredCategoryOptionIds = _.map(categoryOptions, 'id').sort();
+
+            return _.find(categoryOptionCombosForGivenCategoryCombo, function(categoryOptionCombo) {
+                return _.isEqual(requiredCategoryOptionIds, _.map(categoryOptionCombo.categoryOptions, 'id').sort());
+            }).id;
         });
 
         return {
-            "headers": headerLabels,
-            "categoryOptionComboIds": comboIds
+            headers: headerLabels,
+            categoryOptionComboIds: comboIds
         };
     };
 });
