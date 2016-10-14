@@ -71,7 +71,6 @@ require.config({
         //Transformers
         "datasetTransformer": "app/transformers/dataset.transformer",
         "extractHeaders": "app/transformers/extract.headers",
-        "findCategoryComboOption": "app/transformers/find.category.combo.option",
 
         //Monitors
         "dhisMonitor": "app/monitors/dhis.monitor",

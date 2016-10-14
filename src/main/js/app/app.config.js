@@ -141,7 +141,6 @@ require.config({
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",
         "dataValuesMapper": "app/transformers/datavalues.mapper",
-        "findCategoryComboOption": "app/transformers/find.category.combo.option",
         "orgUnitMapper": "app/transformers/orgunit.mapper",
         "toTree": "app/transformers/to.tree",
         "systemSettingsTransformer": "app/transformers/system.settings.transformer",
