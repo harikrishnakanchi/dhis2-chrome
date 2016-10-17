@@ -197,9 +197,9 @@ define(['analyticsData'], function (AnalyticsData) {
                     expect(analyticsData.getDisplayName(item)).toEqual(item.formName);
                 });
         
-                it('should split the shortName by hyphen if formName is not available', function () {
+                it('should use the shortName if formName is not available', function () {
                     item = {
-                        shortName: 'someShortName - someOtherName - yetAnotherName',
+                        shortName: 'someShortName',
                         dataDimension: true
                     };
                     expect(analyticsData.getDisplayName(item)).toEqual('someShortName');

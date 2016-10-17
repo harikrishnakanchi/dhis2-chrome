@@ -28,11 +28,8 @@ define([], function () {
 
         this.getDisplayName = function (item) {
             if(item.dataDimension) {
-                //TODO: Remove this formatting of names after we complete transition to using formName for dataElement and shortName for indicators
-                var itemName = item.name && _.first(item.name.split(DATA_DIMENSION_NAME_SEPARATOR)),
-                    itemShortName = item.shortName && _.first(item.shortName.split(DATA_DIMENSION_NAME_SEPARATOR));
-
-                return item.formName || itemShortName || itemName;
+                var itemName = item.name && _.first(item.name.split(DATA_DIMENSION_NAME_SEPARATOR));
+                return item.formName || item.shortName || itemName;
             } else {
                 return item.name;
             }
