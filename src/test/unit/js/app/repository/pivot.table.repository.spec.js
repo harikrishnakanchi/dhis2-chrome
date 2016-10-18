@@ -1,6 +1,6 @@
-define(["pivotTableRepository", "pivotTable", "pivotTableData", "angularMocks", "utils", "lodash"], function(PivotTableRepository, PivotTable, PivotTableData, mocks, utils, _) {
+define(["pivotTableRepository", "pivotTable", "pivotTableData", "categoryRepository", "angularMocks", "utils", "lodash"], function(PivotTableRepository, PivotTable, PivotTableData, CategoryRepository, mocks, utils, _) {
     describe('Pivot Table Repository', function() {
-        var mockStore, pivotTableRepository, q, mockDB;
+        var mockStore, pivotTableRepository, categoryRepository, q, mockDB;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             mockDB = utils.getMockDB($q);
@@ -8,9 +8,12 @@ define(["pivotTableRepository", "pivotTable", "pivotTableData", "angularMocks", 
             scope = $rootScope.$new();
             mockStore = mockDB.objectStore;
 
+            categoryRepository = new CategoryRepository();
+            spyOn(categoryRepository, 'getAllCategoryOptions').and.returnValue(utils.getPromise(q, []));
+
             spyOn(PivotTableData, 'create').and.returnValue({});
 
-            pivotTableRepository = new PivotTableRepository(mockDB.db, q);
+            pivotTableRepository = new PivotTableRepository(mockDB.db, q, categoryRepository);
         }));
 
         it('should upsert the pivot tables', function() {
@@ -60,12 +63,32 @@ define(["pivotTableRepository", "pivotTable", "pivotTableData", "angularMocks", 
                 mockStore.getAll.and.returnValue(utils.getPromise(q, allPivotTables));
 
                 pivotTableRepository.getAll().then(function (pivotTablesFromRepository) {
-                    expect(_.pluck(pivotTablesFromRepository, 'id')).toEqual(['pivotTable1', 'pivotTable2']);
+                    expect(_.map(pivotTablesFromRepository, 'id')).toEqual(['pivotTable1', 'pivotTable2']);
                     expect(pivotTablesFromRepository).toEqual([jasmine.any(PivotTable), jasmine.any(PivotTable)]);
                 });
                 scope.$apply();
 
                 expect(mockStore.getAll).toHaveBeenCalled();
+            });
+
+            it('should enrich pivot table definitions with the updated category options', function () {
+                var allPivotTables = [{
+                    id: 'pivotTable1',
+                    categoryDimensions: [{
+                        categoryOptions: [{id: 'categoryOptionId', name: 'oldName'}]
+                    }]
+                }];
+                mockStore.getAll.and.returnValue(utils.getPromise(q, allPivotTables));
+
+                var mockCategoryOptions = [{id: 'categoryOptionId', name: 'newName'}];
+                categoryRepository.getAllCategoryOptions.and.returnValue(utils.getPromise(q, mockCategoryOptions));
+
+                pivotTableRepository.getAll().then(function (pivotTables) {
+                    var categoryOptions = _.first(_.first(pivotTables).categoryDimensions).categoryOptions;
+                    expect(_.first(categoryOptions)).toEqual(_.first(mockCategoryOptions));
+                });
+                scope.$apply();
+                expect(categoryRepository.getAllCategoryOptions).toHaveBeenCalled();
             });
         });
 
