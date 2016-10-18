@@ -20,7 +20,7 @@ define(["dataRepository", "datasetRepository", "userPreferenceRepository", "appr
             app.service('patientOriginRepository', ['$indexedDB', '$q', patientOriginRepository]);
             app.service('excludedDataElementsRepository', ['$indexedDB', '$q', excludedDataElementsRepository]);
             app.service('metadataRepository', ['$indexedDB', "$q", metadataRepository]);
-            app.service('chartRepository', ['$indexedDB', '$q', chartRepository]);
+            app.service('chartRepository', ['$indexedDB', '$q', 'categoryRepository', chartRepository]);
             app.service('referralLocationsRepository', ['$indexedDB', '$q', 'datasetRepository', referralLocationsRepository]);
             app.service('pivotTableRepository', ['$indexedDB', '$q', 'categoryRepository', pivotTableRepository]);
             app.service('dataSyncFailureRepository', ['$indexedDB', dataSyncFailureRepository]);

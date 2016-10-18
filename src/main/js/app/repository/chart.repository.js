@@ -1,5 +1,5 @@
 define(['chart', 'chartData', 'lodash'], function(Chart, ChartData, _) {
-    return function(db, $q) {
+    return function(db, $q, categoryRepository) {
         var CHART_STORE_NAME = 'chartDefinitions';
         var CHART_DATA_STORE_NAME = 'chartData';
 
@@ -34,10 +34,23 @@ define(['chart', 'chartData', 'lodash'], function(Chart, ChartData, _) {
             }));
         };
 
+        var enrichChartDefinitionWithCategoryOptions = function (chartDefinition, categoryOptions) {
+            chartDefinition.categoryDimensions = _.map(chartDefinition.categoryDimensions, function (categoryDimension) {
+                categoryDimension.categoryOptions = _.map(categoryDimension.categoryOptions, function (categoryOption) {
+                    return categoryOptions[categoryOption.id] || categoryOption;
+                });
+                return categoryDimension;
+            });
+            return chartDefinition;
+        };
+
         this.getAll = function() {
             var store = db.objectStore(CHART_STORE_NAME);
-            return store.getAll().then(function(allCharts) {
-                return _.map(allCharts, Chart.create);
+            return $q.all([store.getAll(), categoryRepository.getAllCategoryOptions()]).then(function (data) {
+                var chartDefinitions = _.first(data);
+                var allCategoryOptions = _.indexBy(_.last(data), 'id');
+                var enrichChartDefinitions = _.flowRight(Chart.create, _.partial(enrichChartDefinitionWithCategoryOptions, _, allCategoryOptions));
+                return _.map(chartDefinitions, enrichChartDefinitions);
             });
         };
 
