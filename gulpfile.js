@@ -16,6 +16,7 @@ var preprocess = require("gulp-preprocess");
 var zip = require('gulp-zip');
 var exportTranslations = require('./tasks/export.translations');
 var importTranslations = require('./tasks/import.translations');
+var template = require('gulp-template');
 
 var baseUrl = argv.url || "http://localhost:8080";
 var baseIntUrl = argv.int_url || baseUrl;
@@ -151,6 +152,30 @@ gulp.task('zip', ['less', 'config', 'download-metadata'], function() {
         .pipe(zip("praxis_" + (argv.env || "dev") + ".zip"))
         .pipe(gulp.dest(''));
 });
+
+gulp.task('distForChromeApp', function () {
+    return gulp.src(['./src/main/**', '!./src/main/**/pwa.*'])
+        .pipe(gulp.dest('dist/chromeApp'));
+});
+
+gulp.task('distForPwa', function () {
+    return gulp.src('./src/main/**')
+        .pipe(gulp.dest('dist/pwa'));
+});
+
+gulp.task("chromeApp", ['distForChromeApp'], function () {
+    gulp.src('src/main/index.html')
+        .pipe(template({bootstrapFile: 'bootstrap'}))
+        .pipe(gulp.dest('dist/chromeApp'))
+});
+
+gulp.task("pwa", ['distForPwa'], function () {
+    gulp.src('src/main/index.html')
+        .pipe(template({bootstrapFile: 'pwa.bootstrap'}))
+        .pipe(gulp.dest('dist/pwa'))
+});
+
+
 
 gulp.task('export-translations', exportTranslations);
 gulp.task('import-translations', importTranslations);
