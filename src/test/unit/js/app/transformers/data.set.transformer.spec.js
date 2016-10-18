@@ -1,283 +1,61 @@
 define(["dataSetTransformer", "testData", "lodash"], function(datasetTransformer, testData, _) {
     describe("datasetTransformer", function() {
-
-        it("should map aggregate dataset for view", function() {
-            var aggregateDataset = {
-                "id": "ds1",
-                "name": "Aggregate Dataset",
-                "organisationUnits": [{
-                    "id": "ou1"
-                }],
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }, {
-                    "attribute": {
-                        "code": "isOriginDataset"
-                    },
-                    "value": "false"
-                }, {
-                    "attribute": {
-                        "code": "isLineListService"
-                    },
-                    "value": "false"
-                }]
+        describe('mapDatasetForView', function () {
+            var createMockDataset = function (attributeValue) {
+                return {
+                    id: 'someDatasetId',
+                    attributeValues: [attributeValue]
+                };
+            }, createMockAttribute = function (mockCode, mockValue) {
+                return {
+                    value: mockValue,
+                    attribute: {
+                        code: mockCode
+                    }
+                };
             };
 
-            var aggregateDatasetForView = datasetTransformer.mapDatasetForView(aggregateDataset);
+            it("should set isAggregateService for aggregate dataset", function() {
+                var linelistAttribute = createMockDataset('isLineListService', 'true');
 
-            var expectedDataset = {
-                "id": "ds1",
-                "name": "Aggregate Dataset",
-                "organisationUnits": [{
-                    "id": "ou1"
-                }],
-                "isAggregateService": true,
-                "isLineListService": false,
-                "isOriginDataset": false,
-                "isNewDataModel": true,
-                "isReferralDataset": false,
-                "isPopulationDataset": false
-            };
+                var aggregateDatasetForView = datasetTransformer.mapDatasetForView(createMockDataset(linelistAttribute));
+                expect(aggregateDatasetForView.isAggregateService).toBeTruthy();
+            });
 
-            expect(aggregateDatasetForView).toEqual(expectedDataset);
-        });
+            it("should set isLinelistService for linelist dataset", function() {
+                var linelistAttribute = createMockAttribute('isLineListService', 'true');
 
-        it("should map linelist dataset for view", function() {
-            var linelistDataset = {
-                "id": "ds1",
-                "name": "Line List Dataset",
-                "organisationUnits": [{
-                    "id": "ou1"
-                }],
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }, {
-                    "attribute": {
-                        "code": "isOriginDataset"
-                    },
-                    "value": "false"
-                }, {
-                    "attribute": {
-                        "code": "isLineListService"
-                    },
-                    "value": "true"
-                }]
-            };
+                var linelistDatasetForView = datasetTransformer.mapDatasetForView(createMockDataset(linelistAttribute));
+                expect(linelistDatasetForView.isLineListService).toBeTruthy();
+            });
 
-            var linelistDatasetForView = datasetTransformer.mapDatasetForView(linelistDataset);
+            it("should set isOriginDataSet on dataset", function() {
+                var originAttribute = createMockAttribute('isOriginDataset', 'true');
 
-            var expectedDataset = {
-                "id": "ds1",
-                "name": "Line List Dataset",
-                "organisationUnits": [{
-                    "id": "ou1"
-                }],
-                "isAggregateService": false,
-                "isLineListService": true,
-                "isOriginDataset": false,
-                "isNewDataModel": true,
-                "isReferralDataset": false,
-                "isPopulationDataset": false
-            };
+                var originDatasetForView = datasetTransformer.mapDatasetForView(createMockDataset(originAttribute));
+                expect(originDatasetForView.isOriginDataset).toBeTruthy();
+            });
 
-            expect(linelistDatasetForView).toEqual(expectedDataset);
-        });
+            it("should set isNewDataModel as false for dataset", function() {
+                var newDataModelAttribute = createMockAttribute('isNewDataModel', 'false');
 
-        it("should map origin dataset for view", function() {
-            var originDataset = {
-                "id": "ds1",
-                "name": "Origin Dataset",
-                "organisationUnits": [{
-                    "id": "ou1"
-                }, {
-                    "id": "ou2"
-                }],
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }, {
-                    "attribute": {
-                        "code": "isOriginDataset"
-                    },
-                    "value": "true"
-                }, {
-                    "attribute": {
-                        "code": "isLineListService"
-                    },
-                    "value": "false"
-                }]
-            };
+                var currentDatasetForView = datasetTransformer.mapDatasetForView(createMockDataset(newDataModelAttribute));
+                expect(currentDatasetForView.isNewDataModel).toBeFalsy();
+            });
 
-            var originDatasetForView = datasetTransformer.mapDatasetForView(originDataset);
+            it("should set isReferralDataset ", function() {
+                var referralAttribute = createMockAttribute('isReferralDataset', 'true');
 
-            var expectedDataset = {
-                "id": "ds1",
-                "name": "Origin Dataset",
-                "organisationUnits": [{
-                    "id": "ou1"
-                }, {
-                    "id": "ou2"
-                }],
-                "isAggregateService": false,
-                "isLineListService": false,
-                "isOriginDataset": true,
-                "isNewDataModel": true,
-                "isReferralDataset": false,
-                "isPopulationDataset": false
-            };
+                var referralDatasetForView = datasetTransformer.mapDatasetForView(createMockDataset(referralAttribute));
+                expect(referralDatasetForView.isReferralDataset).toBeTruthy();
+            });
 
-            expect(originDatasetForView).toEqual(expectedDataset);
-        });
+            it("should map population dataset for view", function () {
+                var populationAttribute = createMockAttribute('isPopulationDataset', 'true');
 
-        it("should map current dataset for view", function() {
-
-            var currentDataset = {
-                "id": "ds1",
-                "name": "V1 Dataset",
-                "organisationUnits": [{
-                    "id": "ou1"
-                }],
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "false"
-                }, {
-                    "attribute": {
-                        "code": "isOriginDataset"
-                    },
-                    "value": "false"
-                }, {
-                    "attribute": {
-                        "code": "isLineListService"
-                    },
-                    "value": "false"
-                }]
-            };
-
-            var currentDatasetForView = datasetTransformer.mapDatasetForView(currentDataset);
-
-            var expectedDataset = {
-                "id": "ds1",
-                "name": "V1 Dataset",
-                "organisationUnits": [{
-                    "id": "ou1"
-                }],
-                "isAggregateService": true,
-                "isLineListService": false,
-                "isOriginDataset": false,
-                "isNewDataModel": false,
-                "isReferralDataset": false,
-                "isPopulationDataset": false
-            };
-
-            expect(currentDatasetForView).toEqual(expectedDataset);
-        });
-
-        it("should map referral locations dataset for view", function() {
-            var populationDataDataset = {
-                "id": "ds1",
-                "name": "Referral Locations Dataset",
-                "organisationUnits": [{
-                    "id": "ou1"
-                }],
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }, {
-                    "attribute": {
-                        "code": "isOriginDataset"
-                    },
-                    "value": "false"
-                }, {
-                    "attribute": {
-                        "code": "isLineListService"
-                    },
-                    "value": "false"
-                }, {
-                    "attribute": {
-                        "code": "isReferralDataset"
-                    },
-                    "value": "true"
-                }]
-            };
-
-            var populationDatasetForView = datasetTransformer.mapDatasetForView(populationDataDataset);
-
-            var expectedDataset = {
-                "id": "ds1",
-                "name": "Referral Locations Dataset",
-                "organisationUnits": [{
-                    "id": "ou1"
-                }],
-                "isAggregateService": false,
-                "isLineListService": false,
-                "isOriginDataset": false,
-                "isNewDataModel": true,
-                "isReferralDataset": true,
-                "isPopulationDataset": false
-            };
-
-            expect(populationDatasetForView).toEqual(expectedDataset);
-        });
-
-        it("should map population dataset for view", function() {
-            var referralLocationsDataset = {
-                "id": "ds1",
-                "name": "Population Data Dataset",
-                "organisationUnits": [{
-                    "id": "ou1"
-                }],
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }, {
-                    "attribute": {
-                        "code": "isOriginDataset"
-                    },
-                    "value": "false"
-                }, {
-                    "attribute": {
-                        "code": "isLineListService"
-                    },
-                    "value": "false"
-                }, {
-                    "attribute": {
-                        "code": "isPopulationDataset"
-                    },
-                    "value": "true"
-                }]
-            };
-
-            var referralDatasetForView = datasetTransformer.mapDatasetForView(referralLocationsDataset);
-
-            var expectedDataset = {
-                "id": "ds1",
-                "name": "Population Data Dataset",
-                "organisationUnits": [{
-                    "id": "ou1"
-                }],
-                "isAggregateService": false,
-                "isLineListService": false,
-                "isOriginDataset": false,
-                "isNewDataModel": true,
-                "isReferralDataset": false,
-                "isPopulationDataset": true
-            };
-
-            expect(referralDatasetForView).toEqual(expectedDataset);
+                var populationDatasetForView = datasetTransformer.mapDatasetForView(createMockDataset(populationAttribute));
+                expect(populationDatasetForView.isPopulationDataset).toBeTruthy();
+            });
         });
 
         it("should enrich datasets with sections and dataelements", function() {
@@ -394,27 +172,11 @@ define(["dataSetTransformer", "testData", "lodash"], function(datasetTransformer
         it("should set associated program ids on data elements where available", function() {
             var originDataset = {
                 "id": "ds1",
-                "name": "Origin Dataset",
-                "organisationUnits": [{
-                    "id": "ou1"
-                }, {
-                    "id": "ou2"
-                }],
                 "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }, {
                     "attribute": {
                         "code": "isOriginDataset"
                     },
                     "value": "true"
-                }, {
-                    "attribute": {
-                        "code": "isLineListService"
-                    },
-                    "value": "false"
                 }],
                 "sections": [{
                     "id": "Sec1"
@@ -423,49 +185,25 @@ define(["dataSetTransformer", "testData", "lodash"], function(datasetTransformer
 
             var sections = [{
                 "id": "Sec1",
-                "name": "Origin",
-                "sortOrder": 0,
-                "dataSet": _.pick(originDataset, ['name', 'id']),
                 "dataElements": [{
-                    "id": "DE1",
-                    "name": "Number of Patients - Origin - Origin Dataset"
-                }, {
-                    "id": "DE2",
-                    "name": "Number of Patients (Burn Unit) - Origin - Origin Dataset"
+                    "id": "DE1"
+                }, {"id": "DE2"
                 }]
             }];
 
             var dataElements = [{
                 "id": "DE1",
-                "code": "DE1_code",
-                "name": "Number of Patients - Origin - Origin Dataset",
-                "shortName": "NumPatients",
-                "formName": "Number of Patients",
-                "categoryCombo": {
-                    "id": "default"
-                },
                 "attributeValues": [{
                     "attribute": {
-                        "code": "associatedProgram",
-                        "id": "uDpmgVfegeR",
-                        "name": "Associated Program"
+                        "code": "associatedProgram"
                     },
                     "value": ""
                 }]
             }, {
                 "id": "DE2",
-                "code": "DE2_code",
-                "name": "Number of Patients (Burn Unit) - Origin - Origin Dataset",
-                "shortName": "NumPatients",
-                "formName": "Number of Patients (Burn Unit)",
-                "categoryCombo": {
-                    "id": "default"
-                },
                 "attributeValues": [{
                     "attribute": {
-                        "code": "associatedProgram",
-                        "id": "uDpmgVfegeR",
-                        "name": "Associated Program"
+                        "code": "associatedProgram"
                     },
                     "value": "a0a11378e0e"
                 }]
