@@ -1,37 +1,15 @@
 define(["extractHeaders", "lodash", "customAttributes"], function(extractHeaders, _, CustomAttributes) {
-
-    var getBooleanAttributeValue = function(attributes, attributeCode) {
-        var attr = _.find(attributes, {
-            "attribute": {
-                "code": attributeCode
-            }
-        });
-        return !_.isUndefined(attr) && attr.value === "true";
-    };
-
-    var getAttributeValue = function(attributes, attributeCode) {
-        var attr = _.find(attributes, {
-            "attribute": {
-                "code": attributeCode
-            }
-        });
-        if (attr && attr.value)
-            return attr.value;
-        else
-            return undefined;
-    };
-
     this.mapDatasetForView = function(dataset) {
         var resultDataset = _.pick(dataset, ["id", "name", "shortName", "code", "organisationUnits", "sections"]);
-        resultDataset.isAggregateService = !getBooleanAttributeValue(dataset.attributeValues, "isLineListService") &&
-            !getBooleanAttributeValue(dataset.attributeValues, "isOriginDataset") &&
-            !getBooleanAttributeValue(dataset.attributeValues, "isReferralDataset") &&
-            !getBooleanAttributeValue(dataset.attributeValues, "isPopulationDataset");
-        resultDataset.isLineListService = getBooleanAttributeValue(dataset.attributeValues, "isLineListService");
-        resultDataset.isOriginDataset = getBooleanAttributeValue(dataset.attributeValues, "isOriginDataset");
-        resultDataset.isNewDataModel = getBooleanAttributeValue(dataset.attributeValues, "isNewDataModel");
-        resultDataset.isReferralDataset = getBooleanAttributeValue(dataset.attributeValues, "isReferralDataset");
-        resultDataset.isPopulationDataset = getBooleanAttributeValue(dataset.attributeValues, "isPopulationDataset");
+        resultDataset.isAggregateService = !CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, "isLineListService") &&
+            !CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, "isOriginDataset") &&
+            !CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, "isReferralDataset") &&
+            !CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, "isPopulationDataset");
+        resultDataset.isLineListService = CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, "isLineListService");
+        resultDataset.isOriginDataset = CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, "isOriginDataset");
+        resultDataset.isNewDataModel = CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, "isNewDataModel");
+        resultDataset.isReferralDataset = CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, "isReferralDataset");
+        resultDataset.isPopulationDataset = CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, "isPopulationDataset");
         return resultDataset;
     };
 
@@ -64,15 +42,15 @@ define(["extractHeaders", "lodash", "customAttributes"], function(extractHeaders
         var enrichDataElements = function(dataElements) {
             return _.map(dataElements, function(dataElement) {
                 var enrichedDataElement = _.pick(indexedDataElements[dataElement.id], "id", "name", "formName", "categoryCombo", "description", "code");
-                var associatedProgram = getAttributeValue(indexedDataElements[dataElement.id].attributeValues, "associatedProgram");
+                var associatedProgram = CustomAttributes.getAttributeValue(indexedDataElements[dataElement.id].attributeValues, "associatedProgram");
                 if (!_.isEmpty(associatedProgram))
                     enrichedDataElement.associatedProgramId = associatedProgram;
                 enrichedDataElement.isIncluded = _.isEmpty(excludedDataElements) ? true : !_.contains(excludedDataElements, dataElement.id);
-                enrichedDataElement.isMandatory = getBooleanAttributeValue(indexedDataElements[dataElement.id].attributeValues, "mandatory");
+                enrichedDataElement.isMandatory = CustomAttributes.getBooleanAttributeValue(indexedDataElements[dataElement.id].attributeValues, "mandatory");
                 var subSection = getSubSection(enrichedDataElement)[0] || {
                     "name": "Default"
                 };
-                enrichedDataElement.shouldHideTotals = getBooleanAttributeValue(indexedDataElements[dataElement.id].attributeValues, "hideAggregateDataSetSectionTotals");
+                enrichedDataElement.shouldHideTotals = CustomAttributes.getBooleanAttributeValue(indexedDataElements[dataElement.id].attributeValues, "hideAggregateDataSetSectionTotals");
                 enrichedDataElement.subSection = subSection.name;
 
                 var populationDataElementCode = CustomAttributes.getAttributeValue(indexedDataElements[dataElement.id].attributeValues, 'praxisPopulationDataElements');
