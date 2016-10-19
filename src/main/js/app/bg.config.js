@@ -6,7 +6,6 @@ require.config({
         "properties": "app/conf/properties",
         "overrides": "app/conf/overrides",
         "indexedDBLogger": "app/utils/indexeddb.logger",
-        "app": "app/bg.app",
         "hustle": "lib/hustle/hustle",
         "moment": "lib/moment/moment-with-locales.min",
         "hustleModule": "lib/angularjs-hustle/hustle.module",

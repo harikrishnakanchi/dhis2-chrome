@@ -3,7 +3,7 @@ require.config({
 });
 
 require(["app/bg.config"], function(config) {
-    require(["app"], function(app) {
+    require(["app/bg.app"], function(app) {
         require(["properties"], function(properties) {
             var bootstrapData;
             var onDbReady = function(request, sender, sendResponse) {
