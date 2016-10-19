@@ -58,162 +58,121 @@ define(["dataSetTransformer", "testData", "lodash"], function(datasetTransformer
             });
         });
 
-        it("should enrich datasets with sections and dataelements", function() {
-
-            var datasets, sections, dataelements;
-            var allDataSetsFromTestData = testData.get("dataSets");
-            datasets = [allDataSetsFromTestData[0], allDataSetsFromTestData[1]];
-            sections = testData.get("sections");
-            dataelements = testData.get("dataElements");
-
-            var expectedSectionsForOpd = [{
-                "id": "Sec1",
-                "name": "Section 1",
-                "sortOrder": 0,
-                "shouldHideTotals" : true,
-                "isIncluded": true,
-                "dataElements": [{
-                    "id": "DE1",
-                    "code": "DE1_code",
-                    "name": "DE1 - ITFC",
-                    "subSection": "Default",
-                    "isIncluded": true,
-                    "formName": "DE1",
-                    "shouldHideTotals" : true,
-                    "isMandatory": true,
-                    "description": "some desc1",
-                    "categoryCombo": {
-                        "id": "CC1",
-                        "name": "CatCombo1"
+        describe('enrichWithSectionsAndDataElements', function () {
+            var createMockAttribute = function(attributeCode, attributeValue) {
+                return {
+                    value: attributeValue,
+                    attribute: {
+                        code: attributeCode
                     }
-                }, {
-                    "id": "DE2",
-                    "code": "DE2_code",
-                    "name": "DE2 - ITFC",
-                    "isIncluded": true,
-                    "subSection": "Default",
-                    "formName": "DE2",
-                    "isMandatory": false,
-                    "shouldHideTotals" : false,
-                    "description": "some desc2",
-                    "categoryCombo": {
-                        "id": "CC2",
-                        "name": "CatCombo2"
-                    }
-                }, {
-                    "id": "DE4",
-                    "code": "DE4_code",
-                    "name": "DE4 - ITFC",
-                    "isIncluded": true,
-                    "subSection": "Default",
-                    "isMandatory": false,
-                    "shouldHideTotals" : false,
-                    "formName": "DE4",
-                    "categoryCombo": {
-                        "id": "CC2",
-                        "name": "CatCombo2"
-                    }
-                }]
-            }, {
-                "id": "Sec2",
-                "name": "Section 2",
-                "sortOrder": 1,
-                "isIncluded": true,
-                "shouldHideTotals" : true,
-                "dataElements": [{
-                    "id": "DE1",
-                    "code": "DE1_code",
-                    "name": "DE1 - ITFC",
-                    "subSection": "Default",
-                    "isIncluded": true,
-                    "shouldHideTotals" : true,
-                    "isMandatory": true,
-                    "formName": "DE1",
-                    "description": "some desc1",
-                    "categoryCombo": {
-                        "id": "CC1",
-                        "name": "CatCombo1"
-                    }
-                }]
-            }];
-
-            var expectedSectionsForVacc = [{
-                "id": "Sec3",
-                "name": "Section 3",
-                "sortOrder": 0,
-                "isIncluded": false,
-                "shouldHideTotals" : false,
-                "dataElements": [{
-                    "id": "DE3",
-                    "code": "DE3_code",
-                    "subSection": "Default",
-                    "isMandatory": false,
-                    "name": "DE3 - ITFC",
-                    "shouldHideTotals" : false,
-                    "isIncluded": false,
-                    "formName": "DE3",
-                    "description": "some desc3",
-                    "categoryCombo": {
-                        "id": "CC2",
-                        "name": "CatCombo2"
-                    }
-                }]
-            }];
-
-            var actualEnrichedDatasets = datasetTransformer.enrichWithSectionsAndDataElements(datasets, sections, dataelements, ['DE3']);
-            expect(actualEnrichedDatasets.length).toBe(2);
-            expect(actualEnrichedDatasets[0].sections.length).toBe(2);
-            expect(actualEnrichedDatasets[0].sections).toContain(expectedSectionsForOpd[0]);
-            expect(actualEnrichedDatasets[0].sections).toContain(expectedSectionsForOpd[1]);
-            expect(actualEnrichedDatasets[1].sections.length).toBe(1);
-            expect(actualEnrichedDatasets[1].sections).toContain(expectedSectionsForVacc[0]);
-        });
-
-        it("should set associated program ids on data elements where available", function() {
-            var originDataset = {
-                "id": "ds1",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isOriginDataset"
-                    },
-                    "value": "true"
-                }],
-                "sections": [{
-                    "id": "Sec1"
-                }]
+                };
             };
 
-            var sections = [{
-                "id": "Sec1",
-                "dataElements": [{
-                    "id": "DE1"
-                }, {"id": "DE2"
-                }]
-            }];
+            var createMockDataset = function (options) {
+                return _.merge({
+                    id: 'someDatasetId',
+                    sections: [{
+                        id: 'someSectionId'
+                    }]
+                }, options);
+            };
 
-            var dataElements = [{
-                "id": "DE1",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "associatedProgram"
-                    },
-                    "value": ""
-                }]
-            }, {
-                "id": "DE2",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "associatedProgram"
-                    },
-                    "value": "a0a11378e0e"
-                }]
-            }];
+            it("should enrich datasets with sections and dataelements", function() {
 
+                var datasets = [createMockDataset()],
+                sections = [{
+                    id: 'someSectionId',
+                    name: 'someName',
+                    sortOrder: 'someSortOrder',
+                    dataElements: [{
+                        id: 'someDataElementId'
+                    }]
+                }],
+                dataelements = [{
+                    id: 'someDataElementId',
+                    name: 'someName',
+                    formName: 'someFormName',
+                    categoryCombo: 'someComboId',
+                    description: 'someDescription',
+                    code: 'someCode'
+                }];
 
-            var actualEnrichedDatasets = datasetTransformer.enrichWithSectionsAndDataElements([originDataset], sections, dataElements);
+                var actualEnrichedDatasets = datasetTransformer.enrichWithSectionsAndDataElements(datasets, sections, dataelements);
+                expect(actualEnrichedDatasets[0].sections[0].id).toEqual('someSectionId');
+                expect(actualEnrichedDatasets[0].sections[0].sortOrder).toEqual('someSortOrder');
+                expect(actualEnrichedDatasets[0].sections[0].dataElements[0].name).toEqual('someName');
+                expect(actualEnrichedDatasets[0].sections[0].dataElements[0].formName).toEqual('someFormName');
+                expect(actualEnrichedDatasets[0].sections[0].dataElements[0].categoryCombo).toEqual('someComboId');
+                expect(actualEnrichedDatasets[0].sections[0].dataElements[0].description).toEqual('someDescription');
+                expect(actualEnrichedDatasets[0].sections[0].dataElements[0].code).toEqual('someCode');
+            });
 
-            expect(actualEnrichedDatasets[0].sections[0].dataElements[0].associatedProgramId).toBeUndefined();
-            expect(actualEnrichedDatasets[0].sections[0].dataElements[1].associatedProgramId).toEqual("a0a11378e0e");
+            it("should set associated program ids on data elements where available", function() {
+                var originDataset = createMockDataset({ "attributeValues": [createMockAttribute('isOriginDataset', 'true')] }),
+                    sections = [{
+                    "id": "someSectionId",
+                    "dataElements": [{
+                        "id": "DE1"
+                    }]
+                }],
+                    dataElements = [{
+                    "id": "DE1",
+                    "attributeValues": [createMockAttribute('associatedProgram' , 'someProgramId')]
+                }];
+
+                var actualEnrichedDatasets = datasetTransformer.enrichWithSectionsAndDataElements([originDataset], sections, dataElements);
+                expect(actualEnrichedDatasets[0].sections[0].dataElements[0].associatedProgramId).toEqual("someProgramId");
+            });
+
+            it('should set isIncluded on the dataelement and dataset', function () {
+                var dataset = [createMockDataset()],
+                    sections = [{ id: 'someSectionId', dataElements: [{ id: 'someDataElementId'}, {id: 'someOtherDataElementId'}]}],
+                    dataelements = [{ id: 'someDataElementId'}, {id: 'someOtherDataElementId'}],
+                    excludedDataElements = ['someOtherDataElementId'];
+                
+                var enrichedDatasets = datasetTransformer.enrichWithSectionsAndDataElements(dataset, sections, dataelements, excludedDataElements);
+
+                expect(enrichedDatasets[0].sections[0].isIncluded).toBeTruthy();
+                expect(enrichedDatasets[0].sections[0].dataElements[0].isIncluded).toBeTruthy();
+                expect(enrichedDatasets[0].sections[0].dataElements[1].isIncluded).toBeFalsy();
+            });
+            
+            it('should set shouldHideTotals for dataElements and datasets', function () {
+                var dataset = [createMockDataset()],
+                    sections = [{ id: 'someSectionId', dataElements: [{ id: 'someDataElementId'}] }],
+                    dataelements = [{ id: 'someDataElementId', attributeValues: [createMockAttribute('hideAggregateDataSetSectionTotals', 'true')] }];
+
+                var enrichedDatasets = datasetTransformer.enrichWithSectionsAndDataElements(dataset, sections, dataelements);
+
+                expect(enrichedDatasets[0].sections[0].shouldHideTotals).toBeTruthy();
+                expect(enrichedDatasets[0].sections[0].dataElements[0].shouldHideTotals).toBeTruthy();
+            });
+
+            it('should set the subsection to a data elements', function () {
+                var dataset = [createMockDataset()],
+                    sections = [{ id: 'someSectionId', dataElements: [{ id: 'someDataElementId'} , { id: 'someOtherDataElementId'}] }],
+                    dataelements = [{ id: 'someDataElementId' }, {id: 'someOtherDataElementId'}],
+                    dataElementGroups = [{
+                        id: 'someDataElementGroupId',
+                        name: 'someDataElementGroupName',
+                        dataElements: [{
+                            id: 'someDataElementId'
+                        }]
+                    }];
+
+                var enrichedDatasets = datasetTransformer.enrichWithSectionsAndDataElements(dataset, sections, dataelements, [], dataElementGroups);
+                expect(enrichedDatasets[0].sections[0].dataElements[0].subSection).toEqual('someDataElementGroupName');
+                expect(enrichedDatasets[0].sections[0].dataElements[1].subSection).toEqual('Default');
+            });
+
+            it('should set population data element codes to data elements', function () {
+                var dataset = [createMockDataset()],
+                    sections = [{ id: 'someSectionId', dataElements: [{ id: 'someDataElementId'} ] }],
+                    dataelements = [{ id: 'someDataElementId' , attributeValues: [createMockAttribute('praxisPopulationDataElements', 'someElementType')]}];
+
+                var enrichedDatasets = datasetTransformer.enrichWithSectionsAndDataElements(dataset, sections, dataelements);
+                expect(enrichedDatasets[0].sections[0].dataElements[0].populationDataElementCode).toEqual('someElementType');
+            });
         });
 
         it("should enrich datasets with category option combinations", function() {

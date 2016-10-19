@@ -1,4 +1,4 @@
-define(["extractHeaders", "lodash"], function(extractHeaders, _) {
+define(["extractHeaders", "lodash", "customAttributes"], function(extractHeaders, _, CustomAttributes) {
 
     var getBooleanAttributeValue = function(attributes, attributeCode) {
         var attr = _.find(attributes, {
@@ -73,7 +73,11 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
                     "name": "Default"
                 };
                 enrichedDataElement.shouldHideTotals = getBooleanAttributeValue(indexedDataElements[dataElement.id].attributeValues, "hideAggregateDataSetSectionTotals");
-                enrichedDataElement.subSection = subSection.name.replace("module_creation", "").trim();
+                enrichedDataElement.subSection = subSection.name;
+
+                var populationDataElementCode = CustomAttributes.getAttributeValue(indexedDataElements[dataElement.id].attributeValues, 'praxisPopulationDataElements');
+                if(populationDataElementCode)
+                    enrichedDataElement.populationDataElementCode = populationDataElementCode;
                 return enrichedDataElement;
             });
         };
