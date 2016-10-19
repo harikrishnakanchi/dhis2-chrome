@@ -1,7 +1,6 @@
-define(["lodash", "dataSetTransformer", "moment"], function(_, dataSetTransformer, moment) {
+define(["lodash", "dataSetTransformer", "customAttributes"], function(_, dataSetTransformer, CustomAttributes) {
     return function(db, $q) {
-        var self = this,
-            DATA_SETS_STORE_NAME = 'dataSets';
+        var DATA_SETS_STORE_NAME = 'dataSets';
 
         this.getAll = function() {
             var store = db.objectStore(DATA_SETS_STORE_NAME);
@@ -27,7 +26,8 @@ define(["lodash", "dataSetTransformer", "moment"], function(_, dataSetTransforme
             var groupStore = db.objectStore("dataElementGroups");
             return groupStore.getAll().then(function(dataElementGroups) {
                 return _.filter(dataElementGroups, function(group) {
-                    return _.endsWith(group.code, "module_creation");
+                    // TODO: Remove this backward compatible code once we are sure that all the fields are upgraded to 9.0
+                    return CustomAttributes.getBooleanAttributeValue(group.attributeValues, 'praxisShowInModuleCreation') || _.endsWith(group.code, "module_creation");
                 });
             });
         };

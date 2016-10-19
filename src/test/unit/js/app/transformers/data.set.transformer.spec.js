@@ -228,80 +228,9 @@ define(["dataSetTransformer", "testData", "lodash"], function(datasetTransformer
             sections = testData.get("sections");
             dataelements = testData.get("dataElements");
             var dataElementGroups = [{
-                'name': 'Group 1 module_creation',
+                'name': 'Group 1',
                 'dataElements': [{
                     'id': "DE1"
-                }]
-            }];
-            var expectedSectionsForOpd = [{
-                "id": "Sec1",
-                "name": "Section 1",
-                "sortOrder": 0,
-                "isIncluded": true,
-                "dataElements": [{
-                    "id": "DE1",
-                    "code": "DE1_code",
-                    "name": "DE1 - ITFC",
-                    "isIncluded": true,
-                    "formName": "DE1",
-                    "categoryCombo": {
-                        "id": "CC1",
-                        "name": "CatCombo1"
-                    }
-                }, {
-                    "id": "DE2",
-                    "code": "DE2_code",
-                    "name": "DE2 - ITFC",
-                    "isIncluded": true,
-                    "formName": "DE2",
-                    "categoryCombo": {
-                        "id": "CC2",
-                        "name": "CatCombo2"
-                    }
-                }, {
-                    "id": "DE4",
-                    "code": "DE4_code",
-                    "name": "DE4 - ITFC",
-                    "isIncluded": true,
-                    "formName": "DE4",
-                    "categoryCombo": {
-                        "id": "CC2",
-                        "name": "CatCombo2"
-                    }
-                }]
-            }, {
-                "id": "Sec2",
-                "name": "Section 2",
-                "sortOrder": 1,
-                "isIncluded": true,
-                "dataElements": [{
-                    "id": "DE1",
-                    "code": "DE1_code",
-                    "name": "DE1 - ITFC",
-                    "isIncluded": true,
-                    "formName": "DE1",
-                    "categoryCombo": {
-                        "id": "CC1",
-                        "name": "CatCombo1"
-                    }
-                }]
-            }];
-
-            var expectedSectionsForVacc = [{
-                "id": "Sec3",
-                "name": "Section 3",
-                "sortOrder": 0,
-                "isIncluded": false,
-                "dataElements": [{
-                    "id": "DE3",
-                    "code": "DE3_code",
-                    "name": "DE3 - ITFC",
-                    "isIncluded": false,
-                    "formName": "DE3",
-                    "categoryCombo": {
-                        "id": "CC2",
-                        "name": "CatCombo2"
-                    }
                 }]
             }];
 
