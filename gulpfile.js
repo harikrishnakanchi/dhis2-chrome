@@ -153,24 +153,9 @@ gulp.task('zip', ['less', 'config', 'download-metadata'], function() {
         .pipe(gulp.dest(''));
 });
 
-gulp.task('distForChromeApp', function () {
-    return gulp.src(['./src/main/**', '!./src/main/js/app/**/*.js'])
-        .pipe(gulp.dest('dist/chromeApp'));
-});
+gulp.task("chromeApp", ['bundleForeground', 'bundleBackground', 'distForChromeApp'], function () {});
 
-gulp.task('distForPwa', function () {
-    return gulp.src(['./src/main/**', '!./src/main/js/app/**/*.js'])
-        .pipe(gulp.dest('dist/pwa'));
-});
-
-gulp.task("chromeApp", ['optimize', 'bgOptimize'], function () {
-});
-
-gulp.task("pwa", ['pwaOptimize'], function () {
-
-});
-
-gulp.task('optimize', ['distForChromeApp'], function () {
+gulp.task('bundleForeground', function () {
     var config = {
         mainConfigFile: './src/main/js/app/app.config.js',
         baseUrl: './src/main/js/',
@@ -184,21 +169,7 @@ gulp.task('optimize', ['distForChromeApp'], function () {
     return requirejs.optimize(config);
 });
 
-gulp.task('pwaOptimize', ['distForPwa'], function () {
-    var config = {
-        mainConfigFile: './src/main/js/app/pwa.config.js',
-        baseUrl: './src/main/js/',
-        name: './lib/almond/almond',
-        include: ['./app/pwa.bootstrap'],
-        findNestedDependencies: true,
-        optimize: "none",
-        out: "./dist/pwa/mainBundled.js"
-    };
-
-    return requirejs.optimize(config);
-});
-
-gulp.task('bgOptimize', ['distForChromeApp'],function () {
+gulp.task('bundleBackground', function () {
     var config = {
         mainConfigFile: './src/main/js/app/bg.config.js',
         baseUrl: './src/main/js/',
@@ -212,6 +183,31 @@ gulp.task('bgOptimize', ['distForChromeApp'],function () {
     return requirejs.optimize(config);
 });
 
+gulp.task('distForChromeApp', function () {
+    return gulp.src(['./src/main/**', '!./src/main/js/**/*.js'])
+        .pipe(gulp.dest('dist/chromeApp'));
+});
+
+gulp.task("pwa", ['bundlePwa', 'distForPwa'], function () {});
+
+gulp.task('bundlePwa', function () {
+    var config = {
+        mainConfigFile: './src/main/js/app/pwa.config.js',
+        baseUrl: './src/main/js/',
+        name: './lib/almond/almond',
+        include: ['./app/pwa.bootstrap'],
+        findNestedDependencies: true,
+        optimize: "none",
+        out: "./dist/pwa/mainBundled.js"
+    };
+
+    return requirejs.optimize(config);
+});
+
+gulp.task('distForPwa', function () {
+    return gulp.src(['./src/main/**', '!./src/main/js/**/*.js'])
+        .pipe(gulp.dest('dist/pwa'));
+});
 
 gulp.task('export-translations', exportTranslations);
 gulp.task('import-translations', importTranslations);
