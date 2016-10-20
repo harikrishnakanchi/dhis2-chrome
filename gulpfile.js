@@ -16,7 +16,6 @@ var preprocess = require("gulp-preprocess");
 var zip = require('gulp-zip');
 var exportTranslations = require('./tasks/export.translations');
 var importTranslations = require('./tasks/import.translations');
-var template = require('gulp-template');
 var requirejs = require('requirejs');
 
 var baseUrl = argv.url || "http://localhost:8080";
@@ -165,19 +164,10 @@ gulp.task('distForPwa', function () {
 });
 
 gulp.task("chromeApp", ['optimize', 'bgOptimize'], function () {
-    gulp.src('src/main/index.html')
-        .pipe(template({bundledFile: 'mainBundled'}))
-        .pipe(gulp.dest('dist/chromeApp'));
-
-    gulp.src('src/main/background.html')
-        .pipe(template({bundledFile: 'bgBundled'}))
-        .pipe(gulp.dest('dist/chromeApp'));
 });
 
 gulp.task("pwa", ['pwaOptimize'], function () {
-    gulp.src('src/main/index.html')
-        .pipe(template({bundledFile: 'pwaBundled'}))
-        .pipe(gulp.dest('dist/pwa'))
+
 });
 
 gulp.task('optimize', ['distForChromeApp'], function () {
@@ -202,7 +192,7 @@ gulp.task('pwaOptimize', ['distForPwa'], function () {
         include: ['./app/pwa.bootstrap'],
         findNestedDependencies: true,
         optimize: "none",
-        out: "./dist/pwa/pwaBundled.js"
+        out: "./dist/pwa/mainBundled.js"
     };
 
     return requirejs.optimize(config);
