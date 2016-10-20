@@ -1,10 +1,10 @@
-define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'excludedDataElementsRepository', 'orgUnitRepository', 'referralLocationsRepository', 'moduleDataBlockFactory', 'filesystemService', 'translationsService', 'excelBuilder', 'programRepository', 'programEventRepository', 'eventsAggregator', 'utils', 'dateUtils', 'timecop', 'moment', 'lodash'],
-    function (ExportRawDataController, mocks, DatasetRepository, ExcludedDataElementsRepository, OrgUnitRepository, ReferralLocationsRepository, ModuleDataBlockFactory, FilesystemService, TranslationsService, excelBuilder, ProgramRepository, ProgramEventRepository, eventsAggregator, utils, dateUtils, timecop, moment, _) {
+define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'excludedDataElementsRepository', 'orgUnitRepository', 'referralLocationsRepository', 'moduleDataBlockFactory', 'filesystemService', 'translationsService', 'excelBuilder', 'programRepository', 'programEventRepository','excludedLineListOptionsRepository', 'eventsAggregator', 'utils', 'dateUtils', 'timecop', 'moment', 'lodash'],
+    function (ExportRawDataController, mocks, DatasetRepository, ExcludedDataElementsRepository, OrgUnitRepository, ReferralLocationsRepository, ModuleDataBlockFactory, FilesystemService, TranslationsService, excelBuilder, ProgramRepository, ProgramEventRepository, ExcludedLineListOptionsRepository, eventsAggregator, utils, dateUtils, timecop, moment, _) {
         describe('ExportRawDataController', function () {
             var controller, rootScope, scope, q,
-                datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, programRepository, programEventRepository,
+                datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, programRepository, programEventRepository, excludedLineListOptionsRepository,
                 moduleDataBlockFactory, filesystemService, translationsService,
-                selectedOrgUnit, selectedDataSet, mockEnrichedDataSet, mockExcludedDataElements, mockDataBlocks, mockOriginOrgUnits, mockProgram, mockEvents, mockDataElement, spreadSheetContent;
+                selectedOrgUnit, selectedDataSet, mockEnrichedDataSet, mockExcludedDataElements, mockExcludedLineListOptions, mockDataBlocks, mockOriginOrgUnits, mockProgram, mockEvents, mockDataElement, spreadSheetContent;
 
             beforeEach(mocks.inject(function ($rootScope, $q) {
                 rootScope = $rootScope;
@@ -69,6 +69,9 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
 
                 excludedDataElementsRepository = new ExcludedDataElementsRepository();
                 spyOn(excludedDataElementsRepository, 'get').and.returnValue(utils.getPromise(q, mockExcludedDataElements));
+
+                excludedLineListOptionsRepository = new ExcludedLineListOptionsRepository();
+                spyOn(excludedLineListOptionsRepository, 'get').and.returnValue(utils.getPromise(q, {}));
             }));
 
             describe('AggregateRawData', function () {
@@ -136,7 +139,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     moduleDataBlockFactory = ModuleDataBlockFactory();
                     spyOn(moduleDataBlockFactory, 'createForModule').and.returnValue(utils.getPromise(q, mockDataBlocks));
 
-                    controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository);
+                    controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository, excludedLineListOptionsRepository);
                 });
 
                 it('should fetch sections along with data elements', function () {
@@ -563,7 +566,7 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     spyOn(eventsAggregator, 'buildEventsTree');
                     spyOn(eventsAggregator, 'nest');
 
-                    controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository);
+                    controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository, excludedLineListOptionsRepository);
                 });
 
                 it('should fetch the origin org units under the selected module', function () {
@@ -577,6 +580,12 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                     scope.$apply();
 
                     expect(excludedDataElementsRepository.get).toHaveBeenCalledWith(selectedOrgUnit.id);
+                });
+
+                it('should fetch excluded linelist options for the selected module', function () {
+                    scope.$apply();
+
+                    expect(excludedLineListOptionsRepository.get).toHaveBeenCalledWith(selectedOrgUnit.id);
                 });
 
                 it('should fetch the associated program for the selected module', function () {
@@ -782,12 +791,12 @@ define(['exportRawDataController', 'angularMocks', 'datasetRepository', 'exclude
                         expect(spreadSheetContent.data).toContain([optionA.name, 1, undefined]);
                     });
 
-                    it('should ignore data elements for which no data values exist', function () {
-                        expect(spreadSheetContent.data).not.toContain([dataElementB.formName]);
+                    it('should not ignore data elements for which no data values exist', function () {
+                        expect(spreadSheetContent.data).toContain([dataElementB.formName]);
                     });
 
-                    it('should ignore options for which no data values exist', function () {
-                        expect(spreadSheetContent.data).not.toContain([optionB.name, undefined, undefined]);
+                    it('should not ignore options for which no data values exist', function () {
+                        expect(spreadSheetContent.data).toContain([optionB.name, undefined, undefined]);
                     });
 
                     it('should contain the data for procedures performed', function () {

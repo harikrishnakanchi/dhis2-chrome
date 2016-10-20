@@ -1,5 +1,5 @@
 define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], function (moment, _, dateUtils, excelBuilder, eventsAggregator) {
-    return function($scope, $q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository) {
+    return function($scope, $q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository, excludedLineListOptionsRepository) {
         var EMPTY_LINE = [];
 
         $scope.weeksToExportOptions = [{
@@ -142,16 +142,15 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
             var buildOption = function (dataElement, option) {
               return _.flatten([
                   option.name,
-                  _.map($scope.weeks, function(week) { return _.chain($scope.eventSummary).get(dataElement.id).get(option.id).get(week).get('length').value(); })
+                  _.map($scope.weeks, function(week) { return _.isUndefined($scope.eventSummary[dataElement.id]) ? undefined : _.chain($scope.eventSummary).get(dataElement.id).get(option.id).get(week).get('length').value(); })
               ]);
             };
 
             var buildDataElementSection = function (dataElement) {
-                var optionsWithData = _.filter(dataElement.optionSet.options, function (option) { return $scope.eventSummary[dataElement.id][option.id]; });
                 return [
                     EMPTY_LINE,
                     [dataElement.formName]
-                ].concat(_.map(optionsWithData, _.partial(buildOption, dataElement)));
+                ].concat(_.map(_.get(dataElement.optionSet, 'options'), _.partial(buildOption, dataElement)));
             };
 
             var buildProceduresPerformedOption = function (option) {
@@ -162,14 +161,13 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
             };
 
             var buildProceduresPerformedSection = function () {
-                var proceduresPerformedOptions = _.first($scope.procedureDataElements).optionSet.options,
-                    optionsWithData = _.filter(proceduresPerformedOptions, function(option) { return $scope.getProcedureCountForOptionForAllWeeks(option.id); });
+                var proceduresPerformedOptions = _.first($scope.procedureDataElements).optionSet.options;
 
                 if($scope.getProcedureCountForAllOptions()) {
                     return [
                         EMPTY_LINE,
                         [$scope.resourceBundle.proceduresPerformed]
-                    ].concat(_.map(optionsWithData, buildProceduresPerformedOption));
+                    ].concat(_.map(proceduresPerformedOptions, buildProceduresPerformedOption));
                 } else {
                     return [];
                 }
@@ -198,15 +196,13 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
                 });
             };
 
-            var summaryDataElementWithData = _.filter($scope.summaryDataElements, function (dataElement) { return $scope.eventSummary[dataElement.id]; });
-
             var spreadSheetContent = [buildHeaders()];
             if($scope.selectedDataset.isOriginDataset) {
                 return spreadSheetContent.concat(buildOriginData());
             } else if($scope.selectedDataset.isReferralDataset) {
                 return spreadSheetContent.concat(buildReferralLocationData());
             } else {
-                return spreadSheetContent.concat(_.flatten(_.map(summaryDataElementWithData, buildDataElementSection))).concat(buildProceduresPerformedSection());
+                return spreadSheetContent.concat(_.flatten(_.map($scope.summaryDataElements, buildDataElementSection))).concat(buildProceduresPerformedSection());
             }
         };
 
@@ -243,7 +239,8 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
                     $scope.allDataElements = _.chain(program.programStages)
                         .map('programStageSections').flatten()
                         .map('programStageDataElements').flatten()
-                        .map('dataElement').value();
+                        .map('dataElement')
+                        .filter('isIncluded').value();
 
                     $scope.referralLocationDataElement = _.find($scope.allDataElements, { offlineSummaryType: 'referralLocations' });
                     var referralLocationOptions = _.get($scope.referralLocationDataElement, 'optionSet.options');
@@ -293,8 +290,23 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
             });
         };
 
+        var getExcludedLineListOptions = function () {
+            return excludedLineListOptionsRepository.get($scope.orgUnit.id).then(function (excludedLineListOptions) {
+                $scope.indexedExcludedLineListOptions = _.indexBy(excludedLineListOptions.dataElements, 'dataElementId');
+            });
+        };
+
         var generateViewModel = function (events) {
             $scope.events = events;
+
+            var excludeLineListDataElementsOptions = function () {
+                return _.map($scope.summaryDataElements, function (dataElement) {
+                    dataElement.optionSet.options = _.reject(dataElement.optionSet.options, function (option) {
+                        return _.contains(_.get($scope.indexedExcludedLineListOptions[dataElement.id], 'excludedOptionIds'), option.id);
+                    });
+                    return dataElement;
+                });
+            };
 
             if ($scope.selectedDataset.isOriginDataset) {
                 $scope.originSummary = eventsAggregator.nest($scope.events, ['orgUnit', 'period']);
@@ -305,7 +317,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
                 
                 $scope.procedureDataElements = _.filter($scope.allDataElements, { offlineSummaryType: 'procedures' });
                 $scope.summaryDataElements = _.filter($scope.allDataElements, { offlineSummaryType: 'showInOfflineSummary' });
-                
+                $scope.summaryDataElements = excludeLineListDataElementsOptions();
                 if($scope.selectedDataset.isReferralDataset) {
                     referralLocationsRepository.get($scope.orgUnit.parent.id).then(function (referralLocations) {
                         $scope.referralLocations = referralLocations;
@@ -317,7 +329,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
         var loadLineListRawData = function () {
             $scope.events = [];
             
-            return $q.all([fetchOriginOrgUnitsForCurrentModule(), loadExcludedDataElementIds($scope.orgUnit)])
+            return $q.all([fetchOriginOrgUnitsForCurrentModule(), loadExcludedDataElementIds($scope.orgUnit), getExcludedLineListOptions()])
                 .then(getProgramForCurrentModule)
                 .then(fetchEventsForProgram)
                 .then(generateViewModel);
