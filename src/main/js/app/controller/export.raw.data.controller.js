@@ -84,6 +84,18 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
             });
         };
 
+        $scope.isDataAvailableForDataElement = function (dataElement) {
+            var weeksWithoutData = _.filter($scope.weeks, function (week) {
+                return $scope.dataValuesMap[week] && $scope.dataValuesMap[week][dataElement.id];
+            });
+            return !_.isEmpty(weeksWithoutData);
+        };
+        
+        $scope.isDataAvailableForDataSetSection = function (section) {
+            var dataElementsWithoutData = _.filter(section.dataElements, $scope.isDataAvailableForDataElement);
+            return !_.isEmpty(dataElementsWithoutData);
+        };
+
         var buildAggregateSpreadSheetContent = function() {
             var buildHeader = function () {
                 var columnHeader = $scope.selectedDataset.isOriginDataset ? $scope.resourceBundle.originLabel : $scope.resourceBundle.dataElement;
