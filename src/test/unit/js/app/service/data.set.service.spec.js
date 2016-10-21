@@ -54,7 +54,7 @@ define(["dataSetService", "angularMocks", "properties"], function(DatasetService
                 }]
             };
 
-            httpBackend.expectGET("/data/dataSets.json").respond(200, dataSetsFromFile);
+            httpBackend.expectGET("data/dataSets.json").respond(200, dataSetsFromFile);
 
             var actualResult;
             datasetService.loadFromFile().then(function(result) {

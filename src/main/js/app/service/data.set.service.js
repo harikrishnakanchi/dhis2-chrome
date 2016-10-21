@@ -19,7 +19,7 @@ define(["dhisUrl"], function(dhisUrl) {
         };
 
         this.loadFromFile = function() {
-            return $http.get("/data/dataSets.json").then(function(response) {
+            return $http.get("data/dataSets.json").then(function(response) {
                 return response.data.dataSets;
             });
         };

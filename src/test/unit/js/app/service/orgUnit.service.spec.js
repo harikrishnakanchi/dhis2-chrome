@@ -253,7 +253,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
                 }]
             };
 
-            httpBackend.expectGET("/data/organisationUnits.json").respond(200, orgUnitsFromFile);
+            httpBackend.expectGET("data/organisationUnits.json").respond(200, orgUnitsFromFile);
 
             var actualResult;
             orgUnitService.loadFromFile().then(function(result) {

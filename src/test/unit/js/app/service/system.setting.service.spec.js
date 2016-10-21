@@ -64,7 +64,7 @@ define(["systemSettingService", "angularMocks", "utils", "dhisUrl"], function(Sy
                 }
             };
 
-            httpBackend.expectGET("/data/systemSettings.json").respond(200, systemSettingsFromFile);
+            httpBackend.expectGET("data/systemSettings.json").respond(200, systemSettingsFromFile);
 
             var actualResult;
             service.loadFromFile().then(function(result) {

@@ -140,8 +140,9 @@ gulp.task('download-organisationunits', function() {
         .pipe(gulp.dest(path.dirname("src/main/data/organisationUnits.json")));
 });
 
+gulp.task('data', ['download-metadata', 'download-datasets', 'download-programs', 'download-fieldapp-settings', 'download-organisationunits'], function () {});
 
-gulp.task('pack', ['less', 'config', 'download-metadata', 'download-datasets', 'download-programs', 'download-fieldapp-settings', 'download-organisationunits'], function() {
+gulp.task('pack', ['less', 'config', 'data'], function() {
     var stream = shell(["./scripts/crxmake.sh ./src/main key.pem " + "praxis_" + (argv.env || "dev")]);
     stream.write(process.stdout);
     return stream;
@@ -183,7 +184,7 @@ gulp.task('bundleBackground', function () {
     return requirejs.optimize(config);
 });
 
-gulp.task('distForChromeApp', function () {
+gulp.task('distForChromeApp', ['data', 'less'], function () {
     return gulp.src(['./src/main/**', '!./src/main/js/**/*.js'])
         .pipe(gulp.dest('dist/chromeApp'));
 });
@@ -204,7 +205,7 @@ gulp.task('bundlePwa', function () {
     return requirejs.optimize(config);
 });
 
-gulp.task('distForPwa', function () {
+gulp.task('distForPwa', ['data', 'less'], function () {
     return gulp.src(['./src/main/**', '!./src/main/js/**/*.js'])
         .pipe(gulp.dest('dist/pwa'));
 });

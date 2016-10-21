@@ -57,7 +57,7 @@ define(["programService", "angularMocks", "properties", "utils"], function(Progr
                 }]
             };
 
-            httpBackend.expectGET("/data/programs.json").respond(200, programDataFromFile);
+            httpBackend.expectGET("data/programs.json").respond(200, programDataFromFile);
 
             var actualResult;
             programService.loadFromFile().then(function(result) {
