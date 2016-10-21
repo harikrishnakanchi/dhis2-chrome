@@ -1,5 +1,5 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function(reportService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, $q) {
+    return function(reportService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository, $q) {
 
         this.run = function() {
             var downloadPivotTableDataForProject = function(pivotTables, projectId, userModules) {
@@ -37,8 +37,15 @@ define(["lodash", "moment"], function(_, moment) {
                         });
                     };
 
+                    var getProgramForModule = function (data) {
+                        var origin = _.first(data.origins);
+                        return programRepository.getProgramForOrgUnit(_.get(origin, 'id')).then(function (program) {
+                            return _.merge({ program: program }, data);
+                        });
+                    };
+
                     var moduleInfoPromises = _.transform(userModules, function (promises, module) {
-                        promises[module.id] = getOriginsForModule({ module: module }).then(getDataSetsForModuleAndOrigins);
+                        promises[module.id] = getOriginsForModule({ module: module }).then(getDataSetsForModuleAndOrigins).then(getProgramForModule);
                     }, {});
 
                     return $q.all(moduleInfoPromises);
@@ -58,6 +65,16 @@ define(["lodash", "moment"], function(_, moment) {
                                 });
                             });
                         });
+
+                        var pivotTablesForProgram = _.filter(pivotTables, {dataSetCode: _.get(moduleInformation[module.id].program, 'shortName')});
+                        _.each(pivotTablesForProgram, function (pivotTable) {
+                            modulesAndPivotTables.push({
+                                orgUnitId: module.id,
+                                pivotTable: pivotTable,
+                                orgUnitDimensionItems: module.id
+                            });
+                        });
+
                     });
                     return $q.when(modulesAndPivotTables);
                 };
