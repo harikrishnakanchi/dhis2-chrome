@@ -1,9 +1,9 @@
-define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment', 'reportService', 'chartRepository', 'userPreferenceRepository', "dataSetRepository", 'changeLogRepository', 'orgUnitRepository'],
-    function(DownloadChartDataConsumer, mocks, utils, timecop, moment, ReportService, ChartRepository, UserPreferenceRepository, DatasetRepository, ChangeLogRepository, OrgUnitRepository) {
+define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment', 'reportService', 'chartRepository', 'userPreferenceRepository', "dataSetRepository", 'changeLogRepository', 'orgUnitRepository', 'programRepository'],
+    function(DownloadChartDataConsumer, mocks, utils, timecop, moment, ReportService, ChartRepository, UserPreferenceRepository, DatasetRepository, ChangeLogRepository, OrgUnitRepository, ProgramRepository) {
 
         describe('Download Chart Data Consumer', function() {
             var downloadChartDataConsumer,
-                reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository,
+                reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository,
                 scope, q, currentTime, mockProjectId, mockModule, mockDataSet, mockChart;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
@@ -44,11 +44,14 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, null));
                 spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
 
+                programRepository = new ProgramRepository();
+                spyOn(programRepository, 'getProgramForOrgUnit').and.returnValue(utils.getPromise(q, {}));
+
                 currentTime = moment('2014-10-01T12:00:00.000Z');
                 Timecop.install();
                 Timecop.freeze(currentTime.toISOString());
 
-                downloadChartDataConsumer = new DownloadChartDataConsumer(reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, $q);
+                downloadChartDataConsumer = new DownloadChartDataConsumer(reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository, $q);
             }));
 
             afterEach(function() {
@@ -110,6 +113,16 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModule, mockOrigin]);
             });
 
+            it('should retrieve programs for each module', function () {
+                var mockOrigin = { id: 'someMockOrigin' };
+
+                orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, [mockOrigin]));
+
+                downloadChartDataConsumer.run();
+                scope.$apply();
+                expect(programRepository.getProgramForOrgUnit).toHaveBeenCalledWith(mockOrigin.id);
+            });
+
             it('should save chart data to the database', function() {
                 var mockChartData = {
                     some: 'data'
@@ -138,6 +151,30 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
 
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(chartRelevantToDataSet, mockModule.id);
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalledWith(someOtherChart, mockModule.id);
+            });
+
+            it('should download chart data for relevant program associated to module', function () {
+                var chartForAssosciatedProgram = {
+                    id: 'mockChartId',
+                    dataSetCode: 'someProgramName'
+                }, someOtherChartTable = {
+                    id: 'someOtherChartId',
+                    dataSetCode: 'someOtherDataSetCode'
+                };
+
+                var mockProgram = {
+                    id: 'someProgramId',
+                    shortName: 'someProgramName'
+                };
+
+                programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, mockProgram));
+                chartRepository.getAll.and.returnValue(utils.getPromise(q, [chartForAssosciatedProgram, someOtherChartTable]));
+
+                downloadChartDataConsumer.run();
+                scope.$apply();
+
+                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(chartForAssosciatedProgram, mockModule.id);
+                expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalledWith(someOtherChartTable, mockModule.id);
             });
 
             it('should download chart data for origins for geographicOriginCharts', function() {

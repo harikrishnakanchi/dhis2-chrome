@@ -1,5 +1,5 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function(reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, $q) {
+    return function(reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository, $q) {
 
         this.run = function() {
             var updateChangeLogs = function(changeLogKeys) {
@@ -45,8 +45,15 @@ define(["lodash", "moment"], function(_, moment) {
                         });
                     };
 
+                    var getProgramForModule = function (data) {
+                        var origin = _.first(data.origins);
+                        return programRepository.getProgramForOrgUnit(_.get(origin, 'id')).then(function (program) {
+                            return _.merge({ program: program }, data);
+                        });
+                    };
+
                     var promises = _.transform(userModules, function (promises, module) {
-                        promises[module.id] = getOriginsForModule({ module: module }).then(getDataSetsForModuleAndOrigins);
+                        promises[module.id] = getOriginsForModule({ module: module }).then(getDataSetsForModuleAndOrigins).then(getProgramForModule);
                     }, {});
                     return $q.all(promises);
                 };
@@ -62,6 +69,14 @@ define(["lodash", "moment"], function(_, moment) {
                                     chart: chart,
                                     orgUnitDataDimensionItems: chart.geographicOriginChart ? _.map(moduleInformation[module.id].origins, 'id') : module.id
                                 });
+                            });
+                        });
+                        var chartsForProgram = _.filter(charts, {dataSetCode: _.get(moduleInformation[module.id].program, 'shortName')});
+                        _.each(chartsForProgram, function (chart) {
+                            modulesAndCharts.push({
+                                moduleId: module.id,
+                                chart: chart,
+                                orgUnitDataDimensionItems: module.id
                             });
                         });
                     });
