@@ -18,6 +18,7 @@ var importTranslations = require('./tasks/import.translations');
 var requirejs = require('requirejs');
 var runSequence = require('run-sequence');
 var template = require('gulp-template');
+var browserSync = require('browser-sync').create();
 
 var baseUrl = argv.url || "http://localhost:8080";
 var baseIntUrl = argv.int_url || baseUrl;
@@ -110,8 +111,14 @@ gulp.task('less', function() {
         .pipe(gulp.dest('./src/main/css'));
 });
 
-gulp.task('watch', function() {
-    return gulp.watch('./src/main/less/main.less', ['less']);
+gulp.task('watch', ['watchPack'], function() {
+    browserSync.init({
+        server: {
+            baseDir: pwaDistPath
+        }
+    });
+    var watcher = gulp.watch(['./src/main/**/*.js', './src/main/**/*.json', './src/main/**/*.less'], ['watchPack']);
+    return watcher;
 });
 
 gulp.task('download-metadata', function () {
@@ -155,25 +162,34 @@ gulp.task('pack', ['pwa', 'chromeApp'], function(callBack) {
     runSequence(['config', 'download-packaged-data'], 'makeCRX', callBack);
 });
 
+gulp.task('watchPack', ['pwa', 'chromeApp'], function(callBack) {
+    runSequence('config', function () {
+        browserSync.reload();
+        callBack();
+    });
+});
+
 gulp.task('zip', ['less', 'config', 'download-metadata'], function() {
     return gulp.src('./src/main/**')
         .pipe(zip("praxis_" + (argv.env || "dev") + ".zip"))
         .pipe(gulp.dest(''));
 });
 
-gulp.task("chromeApp", ['distForChromeApp'], function () {
+gulp.task("chromeApp", ['generateDist'], function () {
     gulp.src('src/main/index.html')
         .pipe(template({bootstrapFile: 'bootstrap'}))
         .pipe(gulp.dest(chromeAppDistPath));
 
-    gulp.src('src/main/background.html')
+    return gulp.src('src/main/background.html')
         .pipe(template({bootstrapFile: 'bg.bootstrap'}))
         .pipe(gulp.dest(chromeAppDistPath));
 });
 
-gulp.task('distForChromeApp', ['less'], function () {
-    return gulp.src(['./src/main/**'])
-        .pipe(gulp.dest(chromeAppDistPath));
+gulp.task('generateDist', ['less'], function () {
+    var stream = gulp.src(['./src/main/**']);
+    stream.pipe(gulp.dest(chromeAppDistPath));
+    stream.pipe(gulp.dest(pwaDistPath));
+    return stream;
 });
 
 gulp.task('makeCRX', function () {
@@ -182,14 +198,9 @@ gulp.task('makeCRX', function () {
     return stream;
 });
 
-gulp.task("pwa", ['distForPwa'], function () {
-    gulp.src('src/main/index.html')
+gulp.task("pwa", ['generateDist'], function () {
+    return gulp.src('src/main/index.html')
         .pipe(template({bootstrapFile: 'pwa.bootstrap'}))
-        .pipe(gulp.dest(pwaDistPath));
-});
-
-gulp.task('distForPwa', ['less'], function () {
-    return gulp.src(['./src/main/**'])
         .pipe(gulp.dest(pwaDistPath));
 });
 
