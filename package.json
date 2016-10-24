@@ -12,7 +12,6 @@
     "gulp-if": "^2.0.0",
     "gulp-jshint": "^2.0.0",
     "gulp-less": "^3.0.0",
-    "gulp-preprocess": "^2.0.0",
     "gulp-protractor": "2.0.0",
     "gulp-rename": "1.2.2",
     "gulp-requirejs-optimize": "^0.3.0",

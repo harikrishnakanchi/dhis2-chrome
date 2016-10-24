@@ -12,7 +12,6 @@ var karmaConf = __dirname + '/src/test/unit/conf/karma.conf.js';
 var webserver;
 var rename = require('gulp-rename');
 var path = require('path');
-var preprocess = require("gulp-preprocess");
 var zip = require('gulp-zip');
 var exportTranslations = require('./tasks/export.translations');
 var importTranslations = require('./tasks/import.translations');
@@ -32,6 +31,7 @@ var ts = argv.ts || 64;
 var supportEmail = argv.supportEmail || "";
 var chromeAppDistPath = "./dist/chromeApp/";
 var pwaDistPath = "./dist/pwa/";
+var devMode = argv.devMode || false;
 
 gulp.task('test', function(onDone) {
     new karmaServer({
@@ -85,20 +85,20 @@ gulp.task('lint', function() {
         .pipe(jshint.reporter('fail'));
 });
 
-gulp.task('config', function() {
+gulp.task('config', function () {
     return gulp.src('./conf/overrides.js')
-        .pipe(preprocess({
-            context: {
+        .pipe(template({
                 DHIS_URL: baseUrl,
                 METADATA_SYNC_INTERVAL: metadata_sync_interval,
                 PASSPHRASE: passphrase,
                 ITER: iter,
                 KS: ks,
                 TS: ts,
-                SUPPORT_EMAIL: supportEmail
-            }
-        }))
-        .pipe(gulp.dest('./src/main/js/app/conf'));
+                SUPPORT_EMAIL: supportEmail,
+                DEV_MODE: devMode
+            }))
+        .pipe(gulp.dest(chromeAppDistPath + 'js/app/conf'))
+        .pipe(gulp.dest(pwaDistPath + 'js/app/conf'));
 });
 
 gulp.task('less', function() {
@@ -152,7 +152,7 @@ gulp.task('download-organisationunits', function() {
 gulp.task('download-packaged-data', ['download-metadata', 'download-datasets', 'download-programs', 'download-fieldapp-settings', 'download-organisationunits'], function () {});
 
 gulp.task('pack', ['pwa', 'chromeApp'], function(callBack) {
-    runSequence('download-packaged-data', 'makeCRX', callBack);
+    runSequence(['config', 'download-packaged-data'], 'makeCRX', callBack);
 });
 
 gulp.task('zip', ['less', 'config', 'download-metadata'], function() {
@@ -171,7 +171,7 @@ gulp.task("chromeApp", ['distForChromeApp'], function () {
         .pipe(gulp.dest(chromeAppDistPath));
 });
 
-gulp.task('distForChromeApp', ['less', 'config'], function () {
+gulp.task('distForChromeApp', ['less'], function () {
     return gulp.src(['./src/main/**'])
         .pipe(gulp.dest(chromeAppDistPath));
 });
@@ -188,7 +188,7 @@ gulp.task("pwa", ['distForPwa'], function () {
         .pipe(gulp.dest(pwaDistPath));
 });
 
-gulp.task('distForPwa', ['less', 'config'], function () {
+gulp.task('distForPwa', ['less'], function () {
     return gulp.src(['./src/main/**'])
         .pipe(gulp.dest(pwaDistPath));
 });
