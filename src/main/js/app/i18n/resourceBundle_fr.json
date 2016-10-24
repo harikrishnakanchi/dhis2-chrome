@@ -272,7 +272,6 @@
     "exportRawData": "Exporter des données",
     "exportEventData": "Exporter les cas soumis",
     "weeksToExport": "Nombre de semaines à exporter",
-    "exportRawDataToCSV": "Exporter les données en CSV",
     "exportRawDataToExcel": "Exporter les données en Excel",
     "noRawDataAvailable": "Pas de données disponibles pour la plage de semaines sélectionnées",
     "lastOneWeek": "Dernière semaine",

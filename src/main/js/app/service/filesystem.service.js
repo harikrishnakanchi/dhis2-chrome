@@ -1,14 +1,6 @@
 define(['lodash', 'chromeUtils'], function(_, chromeUtils) {
     return function($q) {
         var FILE_TYPE_OPTIONS = {
-            CSV: {
-                accepts: [{
-                    description: 'Text CSV (.csv)',
-                    mimeTypes: ['text/csv'],
-                    extensions: ['csv']
-                }],
-                acceptsAllTypes: false
-            },
             XLSX: {
                 accepts: [{
                     description: 'Microsoft Excel 2007-2013 XML (.xlsx)',
