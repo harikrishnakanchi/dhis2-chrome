@@ -51,6 +51,7 @@ require.config({
         "dataSyncFailureRepository": "app/repository/data.sync.failure.repository",
         "dataElementRepository": "app/repository/data.element.repository",
         "excludedLineListOptionsRepository": "app/repository/excluded.line.list.options.repository",
+        "categoryRepository": "app/repository/category.repository",
 
         //Models
         "chart": "app/models/chart",
@@ -70,7 +71,6 @@ require.config({
         //Transformers
         "dataSetTransformer": "app/transformers/data.set.transformer",
         "extractHeaders": "app/transformers/extract.headers",
-        "findCategoryComboOption": "app/transformers/find.category.combo.option",
 
         //Monitors
         "dhisMonitor": "app/monitors/dhis.monitor",

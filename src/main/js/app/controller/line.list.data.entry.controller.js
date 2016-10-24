@@ -129,6 +129,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 "program": $scope.program.id,
                 "programStage": $scope.program.programStages[0].id,
                 "orgUnit": $scope.patientOrigin.selected.id,
+                "orgUnitName": $scope.patientOrigin.selected.name,
                 "eventDate": dataValuesAndEventDate.eventDate,
                 "localStatus": dataValuesAndEventDate.compulsoryFieldsPresent ? "NEW_DRAFT" : "NEW_INCOMPLETE_DRAFT",
                 "dataValues": dataValuesAndEventDate.dataValues

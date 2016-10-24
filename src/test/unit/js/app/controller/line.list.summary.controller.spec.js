@@ -1,7 +1,9 @@
 define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment", "interpolate", "programRepository", "programEventRepository", "excludedDataElementsRepository",
-        "orgUnitRepository", "approvalDataRepository", "referralLocationsRepository", "dataSyncFailureRepository", "translationsService", "filesystemService", "historyService"
-    ],
-    function(LineListSummaryController, mocks, utils, timecop, moment, interpolate, ProgramRepository, ProgramEventRepository, ExcludedDataElementsRepository, OrgUnitRepository, ApprovalDataRepository, ReferralLocationsRepository, DataSyncFailureRepository, TranslationsService, FilesystemService, HistoryService) {
+        "orgUnitRepository", "approvalDataRepository", "referralLocationsRepository", "dataSyncFailureRepository", "translationsService", "filesystemService", "historyService",
+        "excelBuilder"],
+    function(LineListSummaryController, mocks, utils, timecop, moment, interpolate, ProgramRepository, ProgramEventRepository, ExcludedDataElementsRepository,
+             OrgUnitRepository, ApprovalDataRepository, ReferralLocationsRepository, DataSyncFailureRepository, TranslationsService, FilesystemService, HistoryService,
+             excelBuilder) {
         describe("lineListSummaryController ", function() {
             var scope, q, hustle, timeout, fakeModal, anchorScroll, location, routeParams, window, currentTime,
                 lineListSummaryController,
@@ -164,6 +166,8 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                 spyOn(translationsService, "translate").and.callFake(function(object){
                     return object;
                 });
+
+                spyOn(excelBuilder, 'createWorkBook').and.returnValue(new Blob());
 
                 createLineListSummary();
             }));
@@ -349,13 +353,15 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                     optionSet: {
                         options: [{
                             id: 'option1',
-                            name: 'Referral1'
+                            name: 'Referral1',
+                            referralLocationGenericName: 'Referral1'
                         }]
                     },
                     value: 'option1',
-                    code: 'dv1_referralLocations',
-                    showInEventSummary: true
+                    showInEventSummary: true,
+                    dataElement: 'referralDataElement'
                 };
+
                 mockEventA = createMockEvent({ dataValues: [dataValue]});
                 programEventRepository.findEventsByDateRange.and.returnValue(utils.getPromise(q, [mockEventA]));
                 scope.$apply();
@@ -419,9 +425,10 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                             }]
                         },
                         value: 'option1',
-                        code: 'dv1_referralLocations'
+                        dataElement: 'referralLocationDataElement'
                     };
 
+                    scope.dataElementsForExport = [{id: 'referralLocationDataElement', offlineSummaryType: 'referralLocations'}];
                     scope.referralLocations = {
                         Referral1: {
                             name: 'LocationName1'
@@ -460,8 +467,8 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                 expect(scope.events).toEqual([mockEvent]);
             });
 
-            describe('exportToCSV', function() {
-                var csvContent, mockProgram, mockProgramStage, mockProgramStageSection,
+            describe('exportToExcel', function() {
+                var spreadSheetContent, mockProgram, mockProgramStage, mockProgramStageSection,
                     mockDataValueA, mockDataValueB,
                     mockEventA, mockEventB, mockEventC,
                     mockDataElementA, mockDataElementB;
@@ -537,64 +544,59 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                             return data.value;
                         });
 
-                        spyOn(window, 'Blob').and.callFake(function (contentArray) {
-                            this.value = contentArray.join();
-                        });
-
-                        filesystemService.promptAndWriteFile.and.callFake(function (fileName, blob) {
-                            csvContent = blob.value;
+                        excelBuilder.createWorkBook.and.callFake(function (workBookData) {
+                            spreadSheetContent = _.first(workBookData);
+                            return new Blob();
                         });
 
                         scope.events = [mockEventA, mockEventB, mockEventC];
                         scope.dataElementsForExport = [mockDataElementA];
                         scope.selectedModuleName = 'someModuleName';
 
-                        scope.exportToCSV();
+                        scope.exportToExcel();
                     });
 
-                    var escapeString = function(string) {
-                        return '"' + string + '"';
-                    };
-
-                    it('should build headers for listed events while exporting to CSV', function () {
-                        var expectedCsvContent = [
-                            escapeString(mockDataElementA.formName),
-                            escapeString(scope.resourceBundle.patientOriginLabel)
-                        ].join(',');
-                        expect(csvContent).toContain(expectedCsvContent);
+                    it('should build headers for listed events while exporting to Excel', function () {
+                        var expectedHeaderContent = [
+                            mockDataElementA.formName,
+                            scope.resourceBundle.patientOriginLabel
+                        ];
+                        expect(spreadSheetContent.data).toContain(expectedHeaderContent);
                     });
 
                     it('should contain data for listed events while exporting data', function () {
-                        var expectedCsvContent = [
-                            escapeString(mockDataValueA.value),
-                            escapeString(mockDataValueB.value),
-                            escapeString(mockEventA.orgUnitName)
-                        ].join(',');
-                        expect(csvContent).toContain(expectedCsvContent);
+                        var expectedEventContent = [
+                            mockDataValueA.value,
+                            mockDataValueB.value,
+                            mockEventA.orgUnitName
+                        ];
+                        expect(spreadSheetContent.data).toContain(expectedEventContent);
                     });
 
-                    it('should format data values in CSV', function () {
+                    it('should format data values in Excel', function () {
                         expect(scope.getDisplayValue.calls.argsFor(0)).toContain(mockDataValueA);
                     });
 
-                    it('should prompt user to export data values into CSV', function () {
-                        var expectedFilename = scope.selectedModuleName + '.summary.' + currentTime.format('DD-MMM-YYYY') + '.csv';
-                        expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.CSV);
+                    it('should prompt user to export data values into Excel', function () {
+                        var expectedFilename = scope.selectedModuleName + '.summary.' + currentTime.format('DD-MMM-YYYY') + '.xlsx';
+                        expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.XLSX);
                     });
 
-                    it('should save only submitted events to CSV', function () {
-                        var expectedCsvContentForEventB = [
-                            escapeString(mockDataValueA.value),
-                            escapeString(mockEventB.orgUnitName)
-                        ].join(',');
+                    it('should save only submitted events to Excel', function () {
+                        var expectedExcelContentForEventB = [
+                            mockDataValueA.value,
+                            mockDataValueB.value,
+                            mockEventB.orgUnitName
+                        ];
 
-                        var expectedCsvContentForEventC = [
-                            escapeString(mockDataValueA.value),
-                            escapeString(mockEventC.orgUnitName)
-                        ].join(',');
+                        var expectedExcelContentForEventC = [
+                            mockDataValueA.value,
+                            mockDataValueB.value,
+                            mockEventC.orgUnitName
+                        ];
 
-                        expect(csvContent).not.toContain(expectedCsvContentForEventB);
-                        expect(csvContent).toContain(expectedCsvContentForEventC);
+                        expect(spreadSheetContent.data).not.toContain(expectedExcelContentForEventB);
+                        expect(spreadSheetContent.data).toContain(expectedExcelContentForEventC);
                     });
                 });
             });

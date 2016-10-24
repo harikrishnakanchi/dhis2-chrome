@@ -1,5 +1,5 @@
 define(["lodash", "dataSetTransformer", "customAttributes"], function(_, dataSetTransformer, CustomAttributes) {
-    return function(db, $q) {
+    return function(db, $q, categoryRepository) {
         var DATA_SETS_STORE_NAME = 'dataSets';
 
         this.getAll = function() {
@@ -51,14 +51,9 @@ define(["lodash", "dataSetTransformer", "customAttributes"], function(_, dataSet
         };
 
         this.includeCategoryOptionCombinations = function(dataSets) {
-            var getAll = function(storeName) {
-                var store = db.objectStore(storeName);
-                return store.getAll();
-            };
-
-            var categoryCombosPromise = getAll("categoryCombos");
-            var categoriesPromise = getAll("categories");
-            var categoryOptionCombosPromise = getAll("categoryOptionCombos");
+            var categoryCombosPromise = categoryRepository.getAllCategoryCombos();
+            var categoriesPromise = categoryRepository.getAllCategories();
+            var categoryOptionCombosPromise = categoryRepository.getAllCategoryOptionCombos();
 
             return $q.all([categoryCombosPromise, categoriesPromise, categoryOptionCombosPromise]).then(function(data) {
                 var allCategoryCombos = data[0];

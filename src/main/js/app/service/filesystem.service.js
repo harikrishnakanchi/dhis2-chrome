@@ -9,6 +9,13 @@ define(['lodash', 'chromeUtils'], function(_, chromeUtils) {
                 }],
                 acceptsAllTypes: false
             },
+            XLSX: {
+                accepts: [{
+                    description: 'Microsoft Excel 2007-2013 XML (.xlsx)',
+                    extensions: ['xlsx']
+                }],
+                acceptsAllTypes: false
+            },
             PNG: {
                 accepts: [{
                     description: 'PNG File (.png)',

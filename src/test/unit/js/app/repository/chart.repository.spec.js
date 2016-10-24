@@ -1,6 +1,6 @@
-define(["chartRepository", "chart", "chartData", "angularMocks", "utils", "lodash"], function(ChartRepository, Chart, ChartData, mocks, utils, _) {
+define(["chartRepository", "chart", "chartData", "categoryRepository", "angularMocks", "utils", "lodash"], function(ChartRepository, Chart, ChartData, CategoryRepository, mocks, utils, _) {
     describe('Chart Repository', function() {
-        var mockStore, chartRepository, q, mockDB, scope;
+        var mockStore, chartRepository, q, mockDB, scope, categoryRepository;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             mockDB = utils.getMockDB($q);
@@ -9,7 +9,11 @@ define(["chartRepository", "chart", "chartData", "angularMocks", "utils", "lodas
             mockStore = mockDB.objectStore;
             spyOn(ChartData, 'create').and.returnValue({});
 
-            chartRepository = new ChartRepository(mockDB.db, q);
+            categoryRepository = new CategoryRepository();
+            spyOn(categoryRepository, 'getAllCategoryOptions').and.returnValue(utils.getPromise(q, []));
+
+
+            chartRepository = new ChartRepository(mockDB.db, q, categoryRepository);
         }));
 
         describe('getAll', function() {
@@ -36,6 +40,27 @@ define(["chartRepository", "chart", "chartData", "angularMocks", "utils", "lodas
                     expect(_.first(chartsFromRepository)).toEqual(jasmine.any(Chart));
                 });
                 scope.$apply();
+            });
+
+            it('should enrich chart definition with updated categoryOption', function() {
+                var allChartDefinitions = [{
+                    id: 'chartId',
+                    categoryDimensions: [{
+                        categoryOptions: [{id: 'categoryOptionId', name: 'oldName'}]
+                    }]
+                }];
+
+                mockStore.getAll.and.returnValue(utils.getPromise(q, allChartDefinitions));
+
+                var mockCategoryOptions = [{id: 'categoryOptionId', name: 'newName'}];
+                categoryRepository.getAllCategoryOptions.and.returnValue(utils.getPromise(q, mockCategoryOptions));
+
+                chartRepository.getAll().then(function (charts) {
+                    var categoryOptions = _.first(_.first(charts).categoryDimensions).categoryOptions;
+                    expect(_.first(categoryOptions)).toEqual(_.first(mockCategoryOptions));
+                });
+                scope.$apply();
+                expect(categoryRepository.getAllCategoryOptions).toHaveBeenCalled();
             });
         });
 

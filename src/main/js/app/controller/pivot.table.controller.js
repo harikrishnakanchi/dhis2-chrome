@@ -1,14 +1,12 @@
-define(["lodash", "dateUtils", "moment"], function(_, dateUtils, moment) {
-    return function($scope, $rootScope, translationsService, filesystemService, pivotTableCsvBuilder) {
+define(["lodash", "dateUtils", "moment", "excelBuilder"], function(_, dateUtils, moment, excelBuilder) {
+    return function($scope, $rootScope, translationsService, filesystemService, pivotTableExportBuilder) {
         var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
         var REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY hh[.]mm A";
 
         $scope.resourceBundle = $rootScope.resourceBundle;
         $scope.showDownloadButton = $scope.disableDownload != 'true';
 
-        var DELIMITER = ',',
-            NEW_LINE = '\n',
-            EMPTY_CELL = '';
+        var EMPTY_ROW = [];
 
         var escapeString = function (string) {
             return '"' + string + '"';
@@ -16,16 +14,23 @@ define(["lodash", "dateUtils", "moment"], function(_, dateUtils, moment) {
 
         var getLastUpdatedTimeContent = function () {
             var formattedTime = moment($scope.updatedTime, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
-            return [escapeString('Updated'), escapeString(formattedTime)].join(DELIMITER);
+            return ['Updated', formattedTime];
         };
 
-        $scope.exportToCSV = function () {
+        $scope.exportToExcel = function () {
             var formattedDate = moment($scope.updatedTime, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA),
                 updatedTimeDetails = $scope.updatedTime ? '[updated ' + formattedDate + ']' : moment().format("DD-MMM-YYYY"),
-                fileName = [$scope.table.dataSetCode, $scope.table.title, updatedTimeDetails, 'csv'].join('.'),
-                csvContent = [getLastUpdatedTimeContent(), EMPTY_CELL, pivotTableCsvBuilder.build($scope.table)].join(NEW_LINE);
+                fileName = [$scope.table.dataSetCode, $scope.table.title, updatedTimeDetails, 'xlsx'].join('.');
 
-            filesystemService.promptAndWriteFile(fileName, new Blob([csvContent], {type: 'text/csv'}), filesystemService.FILE_TYPE_OPTIONS.CSV);
+            var spreadSheetContent = [{
+                name: $scope.table.title,
+                data: [
+                    getLastUpdatedTimeContent(),
+                    EMPTY_ROW
+                ].concat(pivotTableExportBuilder.build($scope.table))
+            }];
+
+            filesystemService.promptAndWriteFile(fileName, excelBuilder.createWorkBook(spreadSheetContent), filesystemService.FILE_TYPE_OPTIONS.XLSX);
         };
 
         $scope.sortByColumn = function (column) {

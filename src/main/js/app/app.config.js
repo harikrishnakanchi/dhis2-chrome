@@ -21,6 +21,7 @@ require.config({
         "sjcl": "lib/sjcl/sjcl",
         "saveSvgAsPng": "lib/save-svg-as-png/saveSvgAsPng",
         "angular-sanitize": "lib/angular-sanitize/angular-sanitize.min",
+        "xlsx": "lib/js-xlsx/xlsx",
 
         //3rd party angular modules
         "angular-indexedDB": "lib/angular-indexedDB/indexeddb",
@@ -119,6 +120,7 @@ require.config({
         "pivotTableRepository": "app/repository/pivot.table.repository",
         "dataSyncFailureRepository": "app/repository/data.sync.failure.repository",
         "excludedLineListOptionsRepository": "app/repository/excluded.line.list.options.repository",
+        "categoryRepository": "app/repository/category.repository",
 
         //Models
         "chart": "app/models/chart",
@@ -138,13 +140,13 @@ require.config({
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",
         "dataValuesMapper": "app/transformers/datavalues.mapper",
-        "findCategoryComboOption": "app/transformers/find.category.combo.option",
         "orgUnitMapper": "app/transformers/orgunit.mapper",
         "toTree": "app/transformers/to.tree",
         "systemSettingsTransformer": "app/transformers/system.settings.transformer",
         "dataSetTransformer": "app/transformers/data.set.transformer",
         "programTransformer": "app/transformers/program.transformer",
         "translationsService": "app/transformers/translations.service",
+        "eventsAggregator": "app/transformers/events.aggregator",
         "transformers": "app/transformers/transformers",
 
         //Database Utilities
@@ -172,6 +174,8 @@ require.config({
         "authenticationUtils": "app/utils/authentication.utils",
         "dataURItoBlob": "app/utils/data.uri.to.blob",
         "interpolate": "app/utils/interpolate",
+        "xlsxLoader": "app/utils/xlsx.loader",
+        "excelBuilder": "app/utils/excel.builder",
 
         //Helpers
         "helpers": "app/helpers/helpers",
@@ -179,7 +183,7 @@ require.config({
         "packagedDataImporter": "app/helpers/packaged.data.importer",
         "sessionHelper": "app/helpers/session.helper",
         "originOrgunitCreator": "app/helpers/origin.orgunit.creator",
-        "pivotTableCsvBuilder": "app/helpers/pivot.table.csv.builder",
+        "pivotTableExportBuilder": "app/helpers/pivot.table.export.builder",
 
         //Directives
         "directives": "app/directives/directives",
@@ -257,6 +261,10 @@ require.config({
         },
         'angular-sanitize': {
             deps: ["angular"]
+        },
+        'xlsx': {
+            exports: 'XLSX',
+            deps: ['xlsxLoader']
         }
     }
 });
