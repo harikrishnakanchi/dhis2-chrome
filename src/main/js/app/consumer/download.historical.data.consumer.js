@@ -59,7 +59,7 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], func
                         return eventService.getEvents(module.id, periodRange).then(programEventRepository.upsert);
                     };
 
-                    var isLinelistModule = customAttributes.getBooleanAttributeValue(module.attributeValues, 'isLineListService');
+                    var isLinelistModule = customAttributes.getBooleanAttributeValue(module.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE);
                     return isLinelistModule ? downloadLineListEvents() : downloadModuleDataValues();
                 };
 

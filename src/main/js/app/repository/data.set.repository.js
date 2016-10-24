@@ -27,7 +27,7 @@ define(["lodash", "dataSetTransformer", "customAttributes"], function(_, dataSet
             return groupStore.getAll().then(function(dataElementGroups) {
                 return _.filter(dataElementGroups, function(group) {
                     // TODO: Remove this backward compatible code once we are sure that all the fields are upgraded to 9.0
-                    return CustomAttributes.getBooleanAttributeValue(group.attributeValues, 'praxisShowInModuleCreation') || _.endsWith(group.code, "module_creation");
+                    return CustomAttributes.getBooleanAttributeValue(group.attributeValues, CustomAttributes.PRAXIS_SHOW_IN_MODULE_CREATION_CODE) || _.endsWith(group.code, "module_creation");
                 });
             });
         };
