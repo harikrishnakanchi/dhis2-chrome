@@ -87,7 +87,7 @@ angular.module('ui.bootstrap.tabs', [])
             type: '@'
         },
         controller: 'TabsetController',
-        templateUrl: '/js/lib/custom/angular-ui-tabs/tabset.html',
+        templateUrl: 'js/lib/custom/angular-ui-tabs/tabset.html',
         link: function(scope, element, attrs) {
             scope.vertical = angular.isDefined(attrs.vertical) ? scope.$parent.$eval(attrs.vertical) : false;
             scope.justified = angular.isDefined(attrs.justified) ? scope.$parent.$eval(attrs.justified) : false;
@@ -181,7 +181,7 @@ angular.module('ui.bootstrap.tabs', [])
             require: '^tabset',
             restrict: 'EA',
             replace: true,
-            templateUrl: '/js/lib/custom/angular-ui-tabs/tab.html',
+            templateUrl: 'js/lib/custom/angular-ui-tabs/tab.html',
             transclude: true,
             scope: {
                 active: '=?',
