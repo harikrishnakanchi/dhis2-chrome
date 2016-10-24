@@ -18,6 +18,7 @@ var exportTranslations = require('./tasks/export.translations');
 var importTranslations = require('./tasks/import.translations');
 var requirejs = require('requirejs');
 var runSequence = require('run-sequence');
+var template = require('gulp-template');
 
 var baseUrl = argv.url || "http://localhost:8080";
 var baseIntUrl = argv.int_url || baseUrl;
@@ -117,36 +118,41 @@ gulp.task('download-metadata', function () {
     var stream = download(baseIntUrl + "/api/metadata.json?assumeTrue=false&categories=true&categoryCombos=true&categoryOptionCombos=true&categoryOptions=true&dataElementGroups=true&dataElements=true&optionSets=true&organisationUnitGroupSets=true&sections=true&translations=true&users=true&organisationUnitGroups=true", auth);
     stream.pipe(rename("metadata.json")).pipe(gulp.dest(path.dirname(chromeAppDistPath + "data/metadata.json")));
     stream.pipe(rename("metadata.json")).pipe(gulp.dest(path.dirname(pwaDistPath + "data/metadata.json")));
+    return stream;
 });
 
 gulp.task('download-datasets', function () {
     var stream = download(baseIntUrl + "/api/dataSets.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]],!organisationUnits&paging=false", auth);
     stream.pipe(rename("dataSets.json")).pipe(gulp.dest(path.dirname(chromeAppDistPath + "data/dataSets.json")));
     stream.pipe(rename("dataSets.json")).pipe(gulp.dest(path.dirname(pwaDistPath + "data/dataSets.json")));
+    return stream;
 });
 
 gulp.task('download-programs', function () {
     var stream = download(baseIntUrl + "/api/programs.json?fields=id,name,displayName,organisationUnits,attributeValues[:identifiable,value,attribute[:identifiable]],programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false", auth);
     stream.pipe(rename("programs.json")).pipe(gulp.dest(path.dirname(chromeAppDistPath + "data/programs.json")));
     stream.pipe(rename("programs.json")).pipe(gulp.dest(path.dirname(pwaDistPath + "data/programs.json")));
+    return stream;
 });
 
 gulp.task('download-fieldapp-settings', function() {
     var stream = download(baseIntUrl + "/api/systemSettings.json?key=fieldAppSettings,versionCompatibilityInfo", auth);
     stream.pipe(rename("systemSettings.json")).pipe(gulp.dest(path.dirname(chromeAppDistPath + "data/systemSettings.json")));
     stream.pipe(rename("systemSettings.json")).pipe(gulp.dest(path.dirname(pwaDistPath + "data/systemSettings.json")));
+    return stream;
 });
 
 gulp.task('download-organisationunits', function() {
     var stream = download(baseIntUrl + "/api/organisationUnits.json?fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid&paging=false", auth);
     stream.pipe(rename("organisationUnits.json")).pipe(gulp.dest(path.dirname(chromeAppDistPath + "data/organisationUnits.json")));
     stream.pipe(rename("organisationUnits.json")).pipe(gulp.dest(path.dirname(pwaDistPath + "data/organisationUnits.json")));
+    return stream;
 });
 
-gulp.task('data', ['download-metadata', 'download-datasets', 'download-programs', 'download-fieldapp-settings', 'download-organisationunits'], function () {});
+gulp.task('download-packaged-data', ['download-metadata', 'download-datasets', 'download-programs', 'download-fieldapp-settings', 'download-organisationunits'], function () {});
 
 gulp.task('pack', ['pwa', 'chromeApp'], function(callBack) {
-    runSequence('data', 'makeCRX', callBack);
+    runSequence('download-packaged-data', 'makeCRX', callBack);
 });
 
 gulp.task('zip', ['less', 'config', 'download-metadata'], function() {
@@ -155,38 +161,18 @@ gulp.task('zip', ['less', 'config', 'download-metadata'], function() {
         .pipe(gulp.dest(''));
 });
 
-gulp.task("chromeApp", ['bundleForeground', 'bundleBackground', 'distForChromeApp'], function () {});
+gulp.task("chromeApp", ['distForChromeApp'], function () {
+    gulp.src('src/main/index.html')
+        .pipe(template({bootstrapFile: 'bootstrap'}))
+        .pipe(gulp.dest(chromeAppDistPath));
 
-gulp.task('bundleForeground', ['config'], function () {
-    var config = {
-        mainConfigFile: './src/main/js/app/app.config.js',
-        baseUrl: './src/main/js/',
-        name: './lib/almond/almond',
-        include: ['./app/bootstrap'],
-        findNestedDependencies: true,
-        optimize: "none",
-        out: "./dist/chromeApp/mainBundled.js"
-    };
-
-    return requirejs.optimize(config);
+    gulp.src('src/main/background.html')
+        .pipe(template({bootstrapFile: 'bg.bootstrap'}))
+        .pipe(gulp.dest(chromeAppDistPath));
 });
 
-gulp.task('bundleBackground', ['config'], function () {
-    var config = {
-        mainConfigFile: './src/main/js/app/bg.config.js',
-        baseUrl: './src/main/js/',
-        name: './lib/almond/almond',
-        include: ['./app/bg.bootstrap'],
-        findNestedDependencies: true,
-        optimize: "none",
-        out: "./dist/chromeApp/bgBundled.js"
-    };
-
-    return requirejs.optimize(config);
-});
-
-gulp.task('distForChromeApp', ['less'], function () {
-    return gulp.src(['./src/main/**', '!./src/main/js/**/*.js'])
+gulp.task('distForChromeApp', ['less', 'config'], function () {
+    return gulp.src(['./src/main/**'])
         .pipe(gulp.dest(chromeAppDistPath));
 });
 
@@ -196,24 +182,14 @@ gulp.task('makeCRX', function () {
     return stream;
 });
 
-gulp.task("pwa", ['bundlePwa', 'distForPwa'], function () {});
-
-gulp.task('bundlePwa', ['config'], function ()  {
-    var config = {
-        mainConfigFile: './src/main/js/app/pwa.config.js',
-        baseUrl: './src/main/js/',
-        name: './lib/almond/almond',
-        include: ['./app/pwa.bootstrap'],
-        findNestedDependencies: true,
-        optimize: "none",
-        out: "./dist/pwa/mainBundled.js"
-    };
-
-    return requirejs.optimize(config);
+gulp.task("pwa", ['distForPwa'], function () {
+    gulp.src('src/main/index.html')
+        .pipe(template({bootstrapFile: 'pwa.bootstrap'}))
+        .pipe(gulp.dest(pwaDistPath));
 });
 
-gulp.task('distForPwa', ['less'], function () {
-    return gulp.src(['./src/main/**', '!./src/main/js/**/*.js'])
+gulp.task('distForPwa', ['less', 'config'], function () {
+    return gulp.src(['./src/main/**'])
         .pipe(gulp.dest(pwaDistPath));
 });
 
