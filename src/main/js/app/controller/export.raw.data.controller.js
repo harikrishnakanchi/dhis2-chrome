@@ -292,7 +292,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
 
         var getExcludedLineListOptions = function () {
             return excludedLineListOptionsRepository.get($scope.orgUnit.id).then(function (excludedLineListOptions) {
-                $scope.indexedExcludedLineListOptions = _.indexBy(excludedLineListOptions.dataElements, 'dataElementId');
+                $scope.indexedExcludedLineListOptions = _.indexBy(_.get(excludedLineListOptions, 'dataElements'), 'dataElementId');
             });
         };
 

@@ -23,7 +23,7 @@ define(['lodash'], function(_){
                     var categoryOptions = categoryOptionCombo.name.split(", ");
                     result[categoryOptionCombo.id] = _.map(categoryOptions, function (categoryOption) {
                         var originalCategoryOption = _.find(categoryOptionCombo.categoryOptions, { name: categoryOption});
-                        return originalCategoryOption.id;
+                        return _.get(originalCategoryOption, 'id');
                     });
                     return result;
                 }, {});
