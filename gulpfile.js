@@ -163,6 +163,7 @@ gulp.task('pack', ['pwa', 'chromeApp'], function(callBack) {
 });
 
 gulp.task('watchPack', ['pwa', 'chromeApp'], function(callBack) {
+    devMode = true;
     runSequence('config', function () {
         browserSync.reload();
         callBack();
