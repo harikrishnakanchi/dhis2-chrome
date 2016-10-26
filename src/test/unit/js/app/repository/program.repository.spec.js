@@ -1,103 +1,50 @@
-define(["programRepository", "dataElementRepository", "angularMocks", "utils", "customAttributes", "timecop"], function(ProgramRepository, DataElementRepository, mocks, utils, CustomAttributes, timecop) {
+define(["programRepository", "dataElementRepository", "angularMocks", "utils", "customAttributes", "timecop", "moment", "lodash"], function(ProgramRepository, DataElementRepository, mocks, utils, CustomAttributes, timecop, moment, _) {
     describe("programRepository", function() {
-        var scope, q, programRepository, programData, attributeValues, dataElementRepository;
+        var scope, q,
+            programRepository, dataElementRepository, mockStore,
+            mockProgram, mockDataElementA, someMomentInTime;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
             scope = $rootScope;
 
             spyOn(CustomAttributes, 'getAttributeValue');
-            spyOn(CustomAttributes, 'getBooleanAttributeValue').and.callThrough();
+            spyOn(CustomAttributes, 'getBooleanAttributeValue').and.returnValue(true);
 
             var mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
-            dataElementRepository = new DataElementRepository(mockDB.db);
-            spyOn(dataElementRepository, "get");
-            programRepository = new ProgramRepository(mockDB.db, q, dataElementRepository);
 
-            programData = {
-                'id': 'p1',
-                'name': 'ER - Presenting Line List',
-                'displayName': 'ER - Presenting Line List',
-                'shortName': 'ER - Presenting Line List',
-                'programType': 'WITHOUT_REGISTRATION',
-                'programStages': [{
-                    'id': 'p1s1',
-                    'name': 'ER - Presenting Line List Stage 1',
-                    'programStageSections': [{
-                        'id': 'st1',
-                        'name': 'Arrival',
-                        'programStageDataElements': [{
-                            'dataElement': {
-                                'id': 'd1',
-                                'name': 'Date'
-                            }
-                        }, {
-                            'dataElement': {
-                                'id': 'd2',
-                                'name': 'Mode of Arrival'
-                            }
-                        }]
-                    }, {
-                        'id': 'st2',
-                        'name': 'Discharge',
-                        'programStageDataElements': [{
-                            'dataElement': {
-                                'id': 'd1',
-                                'name': 'Date'
-                            }
-                        }, {
-                            'dataElement': {
-                                'id': 'd3',
-                                'name': 'Mode of Discharge'
-                            }
-                        }]
+            mockStore.getAll.and.returnValue(utils.getPromise(q, []));
+            mockStore.each.and.returnValue(utils.getPromise(q, []));
+            mockStore.find.and.returnValue(utils.getPromise(q, undefined));
+
+            dataElementRepository = new DataElementRepository(mockDB.db);
+            spyOn(dataElementRepository, 'get');
+
+            mockDataElementA = {
+                id: 'dataElementIdA',
+                name: 'mockDataElementNameA'
+            };
+
+            mockProgram = {
+                id: 'someProgramId',
+                name: 'mockProgramName',
+                organisationUnits: [{
+                    id: 'someOrgUnitId'
+                }],
+                programStages: [{
+                    programStageSections: [{
+                        programStageDataElements: [{
+                            dataElement: { id: mockDataElementA.id}}]
                     }]
                 }]
             };
 
-            var dataElement1Data = {
-                'id': 'd1',
-                'name': 'Date',
-                'type': 'date',
-                'offlineSummaryType': 'showInOfflineSummary'
-            };
-
-            var dataElement2Data = {
-                'id': 'd2',
-                'name': 'Mode of Arrival',
-                'type': 'string',
-                'offlineSummaryType': undefined
-            };
-
-            var dataElement3Data = {
-                'id': 'd3',
-                'name': 'Mode of Discharge',
-                'type': 'string',
-                'offlineSummaryType': undefined
-            };
-
-            mockStore.getAll.and.returnValue(utils.getPromise(q, []));
-            mockStore.each.and.returnValue(utils.getPromise(q, []));
-
-            mockStore.find.and.callFake(function(id) {
-                if (id === "p1")
-                    return utils.getPromise(q, programData);
-                return utils.getPromise(q, undefined);
-            });
-
-            dataElementRepository.get.and.callFake(function(id) {
-                if (id === "d1")
-                    return utils.getPromise(q, dataElement1Data);
-                if (id === "d2")
-                    return utils.getPromise(q, dataElement2Data);
-                if (id === "d3")
-                    return utils.getPromise(q, dataElement3Data);
-                return utils.getPromise(q, undefined);
-            });
-
+            someMomentInTime = moment('2014-05-30T12:43:54.972Z');
             Timecop.install();
-            Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
+            Timecop.freeze(someMomentInTime);
+
+            programRepository = new ProgramRepository(mockDB.db, q, dataElementRepository);
         }));
 
         afterEach(function() {
@@ -105,289 +52,91 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
             Timecop.uninstall();
         });
 
-        it("should get Programs for OrgUnit", function() {
-            var programDataForOrgUnit = {
-                'id': 'p1'
-            };
-            mockStore.find.and.returnValue(utils.getPromise(q, programDataForOrgUnit));
-
-            var actualValues;
-            programRepository.getProgramForOrgUnit("ou1").then(function(programData) {
-                actualValues = programData;
+        describe('getProgramForOrgUnit', function () {
+            beforeEach(function () {
+                mockStore.find.and.returnValue(utils.getPromise(q, mockProgram));
+                CustomAttributes.getAttributeValue.and.returnValue('someServiceCode');
             });
 
-            scope.$apply();
+            it("should get Programs for OrgUnit", function() {
+                programRepository.getProgramForOrgUnit('someOrgUnitId').then(function(program) {
+                    expect(program.id).toEqual(mockProgram.id);
+                });
 
-            expect(actualValues).toEqual(programDataForOrgUnit);
-        });
-
-        it("should find all propgrams", function() {
-            var programIds = ["p1", "p2"];
-            programRepository.findAll(programIds);
-            scope.$apply();
-
-            expect(mockStore.each).toHaveBeenCalled();
-            expect(mockStore.each.calls.argsFor(0)[0].inList).toEqual(programIds);
-        });
-
-        it("should save programs", function() {
-            var programs = [{
-                "id": "prg1",
-                "name": "program1",
-                "organisationUnits": [{
-                    "id": "orgUnit1",
-                    "name": "orgUnit1"
-                }]
-            }];
-
-            var expectedUpsertedPrograms = [{
-                "id": "prg1",
-                "name": "program1",
-                "orgUnitIds": ["orgUnit1"],
-                "clientLastUpdated": "2014-05-30T12:43:54.972Z",
-                "organisationUnits": [{
-                    "id": "orgUnit1",
-                    "name": "orgUnit1"
-                }]
-            }];
-
-            var actualUpsertResult;
-            programRepository.upsert(programs).then(function(data) {
-                actualUpsertResult = data;
-            });
-            scope.$apply();
-
-            expect(mockStore.upsert).toHaveBeenCalledWith(expectedUpsertedPrograms);
-            expect(actualUpsertResult).toEqual(expectedUpsertedPrograms);
-        });
-
-        it("should get program", function() {
-            var actualValues;
-            programRepository.get("p1").then(function(programdata) {
-                actualValues = programdata;
+                scope.$apply();
             });
 
-            scope.$apply();
+            it('should parse the service code of the program', function () {
+                programRepository.getProgramForOrgUnit('someOrgUnitId').then(function(program) {
+                    expect(program.serviceCode).toEqual('someServiceCode');
+                });
 
-            expect(actualValues).toEqual({
-                'id': 'p1',
-                'name': 'ER - Presenting Line List',
-                'displayName': 'ER - Presenting Line List',
-                'shortName': 'ER - Presenting Line List',
-                'programType': 'WITHOUT_REGISTRATION',
-                'serviceCode': undefined,
-                'programStages': [{
-                    'id': 'p1s1',
-                    'name': 'ER - Presenting Line List Stage 1',
-                    'programStageSections': [{
-                        'id': 'st1',
-                        'name': 'Arrival',
-                        'programStageDataElements': [{
-                            'dataElement': {
-                                'id': 'd1',
-                                'name': 'Date',
-                                'type': 'date',
-                                'isIncluded': true,
-                                'offlineSummaryType': "showInOfflineSummary"
-                            }
-                        }, {
-                            'dataElement': {
-                                'id': 'd2',
-                                'name': 'Mode of Arrival',
-                                'type': 'string',
-                                'isIncluded': true,
-                                'offlineSummaryType': undefined
-                            }
-                        }]
-                    }, {
-                        'id': 'st2',
-                        'name': 'Discharge',
-                        'programStageDataElements': [{
-                            'dataElement': {
-                                'id': 'd1',
-                                'name': 'Date',
-                                'type': 'date',
-                                'isIncluded': true,
-                                'offlineSummaryType': "showInOfflineSummary"
-                            }
-                        }, {
-                            'dataElement': {
-                                'id': 'd3',
-                                'name': 'Mode of Discharge',
-                                'type': 'string',
-                                'isIncluded': true,
-                                'offlineSummaryType': undefined
-                            }
-                        }]
-                    }]
-
-                }]
+                scope.$apply();
             });
         });
 
-        it("should get program with excluded data elements", function() {
+        describe('upsert', function () {
+            it('should save programs with clientLastUpdated and orgUnitIds for indexing', function() {
+                var expectedProgramForUpsert = _.merge({
+                    orgUnitIds: _.map(mockProgram.organisationUnits, 'id'),
+                    clientLastUpdated: someMomentInTime.toISOString()
+                }, mockProgram);
 
-            var excludedDataElementIds = ['d2'];
+                programRepository.upsert(mockProgram);
+                scope.$apply();
 
-            var actualValues;
-            programRepository.get("p1", excludedDataElementIds).then(function(programData) {
-                actualValues = programData;
+                expect(mockStore.upsert).toHaveBeenCalledWith([expectedProgramForUpsert]);
             });
-
-            scope.$apply();
-
-            expect(actualValues).toEqual({
-                'id': 'p1',
-                'name': 'ER - Presenting Line List',
-                'displayName': 'ER - Presenting Line List',
-                'shortName': 'ER - Presenting Line List',
-                'programType': 'WITHOUT_REGISTRATION',
-                "serviceCode": undefined,
-                'programStages': [{
-                    'id': 'p1s1',
-                    'name': 'ER - Presenting Line List Stage 1',
-                    'programStageSections': [{
-                        'id': 'st1',
-                        'name': 'Arrival',
-                        'programStageDataElements': [{
-                            'dataElement': {
-                                'id': 'd1',
-                                'name': 'Date',
-                                'type': 'date',
-                                'isIncluded': true,
-                                'offlineSummaryType': "showInOfflineSummary",
-                            }
-                        }, {
-                            'dataElement': {
-                                'id': 'd2',
-                                'name': 'Mode of Arrival',
-                                'type': 'string',
-                                'isIncluded': false,
-                                'offlineSummaryType': undefined
-                            }
-                        }]
-                    }, {
-                        'id': 'st2',
-                        'name': 'Discharge',
-                        'programStageDataElements': [{
-                            'dataElement': {
-                                'id': 'd1',
-                                'name': 'Date',
-                                'type': 'date',
-                                'isIncluded': true,
-                                'offlineSummaryType': "showInOfflineSummary",
-                            }
-                        }, {
-                            'dataElement': {
-                                'id': 'd3',
-                                'name': 'Mode of Discharge',
-                                'type': 'string',
-                                'isIncluded': true,
-                                'offlineSummaryType': undefined
-                            }
-                        }]
-                    }]
-
-                }]
-            });
-        });
-
-        it("should get all new data model programs", function() {
-            var allPrograms = [{
-                "id": "p1",
-                "name": "Program1",
-                "attributeValues": [{
-                    "value": "true",
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    }
-                }],
-                "serviceCode": undefined
-            }, {
-                "id": "p2",
-                "name": "Program2",
-                "attributeValues": [{
-                    "value": "false",
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    }
-                }]
-            }];
-
-            mockStore.getAll.and.returnValue(utils.getPromise(q, allPrograms));
-
-            var expectedPrograms = [allPrograms[0]];
-            var actualPrograms;
-
-            programRepository.getAll().then(function(data) {
-                actualPrograms = data;
-            });
-
-            scope.$apply();
-            expect(actualPrograms).toEqual(expectedPrograms);
-        });
-
-        it("should associate org units to programs", function() {
-            var program = {
-                "id": "Prg",
-                "name": "Program"
-            };
-
-            var orgUnits = [{
-                "id": "ou1",
-                "name": "ou1"
-            }];
-
-            var expectedProgramsUpsert = [{
-                "id": "Prg",
-                "name": "Program",
-                "organisationUnits": orgUnits,
-                "clientLastUpdated": "2014-05-30T12:43:54.972Z",
-                "orgUnitIds": ["ou1"]
-            }];
-
-            programRepository.associateOrgUnits(program, orgUnits);
-
-            expect(mockStore.upsert).toHaveBeenCalledWith(expectedProgramsUpsert);
-
-        });
-
-        it("should add missing mandatory fields to programs", function() {
-            var program = {
-                "id": "Prg",
-                "name": "Program"
-            };
-
-            var expectedProgram = {
-                "id": "Prg",
-                "name": "Program",
-                "shortName": "Program",
-                "programType": "WITHOUT_REGISTRATION",
-                "serviceCode": undefined
-            };
-            mockStore.find.and.returnValue(utils.getPromise(q, program));
-
-            var actualValue;
-            programRepository.get("Prg").then(function (data) {
-                actualValue = data;
-            });
-
-            scope.$apply();
-
-            expect(actualValue).toEqual(expectedProgram);
         });
 
         describe('get', function () {
-            it('should parse the service code of the program', function () {
+            beforeEach(function () {
                 CustomAttributes.getAttributeValue.and.returnValue('someServiceCode');
+                mockStore.find.and.returnValue(utils.getPromise(q, mockProgram));
+                dataElementRepository.get.and.returnValue(utils.getPromise(q, mockDataElementA));
+            });
 
+            it("should get program", function() {
+                programRepository.get(mockProgram.id).then(function(program) {
+                    var programStageDataElements = _.first(_.first(program.programStages).programStageSections).programStageDataElements;
+                    expect(programStageDataElements).toEqual([{
+                        dataElement: _.merge({ isIncluded: true }, mockDataElementA)
+                    }]);
+                });
+
+                scope.$apply();
+            });
+
+            it('should parse the service code of the program', function () {
                 var mockProgram = {
                     id: 'someProgramId'
                 };
-                mockStore.find.and.returnValue(utils.getPromise(q, mockProgram));
 
                 programRepository.get(mockProgram.id).then(function (program) {
                     expect(program.serviceCode).toEqual('someServiceCode');
+                });
+
+                scope.$apply();
+            });
+
+            it("should get program with excluded data elements", function() {
+                var excludedDataElementIds = ['mockExcludedDataElementId'];
+
+                programRepository.get(mockProgram.id, excludedDataElementIds).then(function(program) {
+                    var programStageDataElements = _.first(_.first(program.programStages).programStageSections).programStageDataElements;
+                    expect(_.first(programStageDataElements).isIncluded).toBeFalsy();
+                });
+
+                scope.$apply();
+            });
+
+            it("should add missing mandatory fields to programs", function() {
+                mockStore.find.and.returnValue(utils.getPromise(q, mockProgram));
+
+                programRepository.get(mockProgram.id).then(function (program) {
+                    expect(program.shortName).toBeDefined();
+                    expect(program.shortName).toEqual(program.name);
+                    expect(program.programType).toBeDefined();
                 });
 
                 scope.$apply();
@@ -410,21 +159,53 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
 
                 scope.$apply();
             });
+
+            it('should filter out old data model programs', function() {
+                CustomAttributes.getBooleanAttributeValue.and.returnValue(false);
+                mockStore.getAll.and.returnValue(utils.getPromise(q, [mockProgram]));
+
+                programRepository.getAll().then(function(programs) {
+                    expect(programs).toEqual([]);
+                });
+
+                scope.$apply();
+            });
+
         });
 
         describe('findAll', function () {
-            it('should parse the service code of the programs', function () {
+            beforeEach(function () {
+                mockStore.each.and.returnValue(utils.getPromise(q, [mockProgram]));
+
                 CustomAttributes.getAttributeValue.and.returnValue('someServiceCode');
+            });
 
-                var allPrograms = [{
-                    id: 'someProgramId'
-                }];
-                mockStore.each.and.returnValue(utils.getPromise(q, allPrograms));
+            it('should find all programs', function() {
+                programRepository.findAll(['someProgramId']).then(function (programs) {
+                    expect(_.map(programs, 'id')).toEqual([mockProgram.id]);
+                });
+                scope.$apply();
+            });
 
+            it('should parse the service code of the programs', function () {
                 programRepository.findAll(['someProgramId']).then(function(programs) {
                     expect(_.first(programs).serviceCode).toEqual('someServiceCode');
                 });
 
+                scope.$apply();
+            });
+        });
+
+        describe('associateOrgUnits', function () {
+            it("should associate org units to programs", function() {
+                var orgUnitsToAssociate = [{
+                    id: 'orgUnitIdA',
+                    name: 'orgUnitNameA'
+                }];
+
+                programRepository.associateOrgUnits(mockProgram, orgUnitsToAssociate).then(function (programs) {
+                    expect(_.first(programs).orgUnitIds).toEqual(['someOrgUnitId', 'orgUnitIdA']);
+                });
                 scope.$apply();
             });
         });

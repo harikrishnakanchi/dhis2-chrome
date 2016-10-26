@@ -11,7 +11,7 @@ define(["lodash", "moment", "customAttributes"], function(_, moment, CustomAttri
 
         this.getProgramForOrgUnit = function(orgUnitId) {
             var store = db.objectStore("programs");
-            return store.find("by_organisationUnit", orgUnitId);
+            return store.find("by_organisationUnit", orgUnitId).then(addServiceCode);
         };
 
         this.getAll = function() {
