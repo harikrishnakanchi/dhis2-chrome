@@ -9,4 +9,3 @@ npm-debug.log
 .idea
 *.iml
 !src/main/js/lib/custom
-dist/
