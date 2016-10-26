@@ -4,7 +4,7 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
             var controller, rootScope, scope, q,
                 datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, programRepository, programEventRepository, excludedLineListOptionsRepository,
                 moduleDataBlockFactory, filesystemService, translationsService,
-                selectedOrgUnit, selectedDataSet, mockEnrichedDataSet, mockExcludedDataElements, mockExcludedLineListOptions, mockDataBlocks, mockOriginOrgUnits, mockProgram, mockEvents, mockDataElement, spreadSheetContent;
+                selectedOrgUnit, selectedService, mockEnrichedDataSet, mockExcludedDataElements, mockExcludedLineListOptions, mockDataBlocks, mockOriginOrgUnits, mockProgram, mockEvents, mockDataElement, spreadSheetContent;
 
             beforeEach(mocks.inject(function ($rootScope, $q) {
                 rootScope = $rootScope;
@@ -38,14 +38,14 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
                     }
                 };
 
-                selectedDataSet = {
+                selectedService = {
                     id: 'dataSetId',
                     name: 'someDataSetName'
                 };
 
                 scope.selectedWeeksToExport = 1;
                 scope.orgUnit = selectedOrgUnit;
-                scope.selectedDataset = selectedDataSet;
+                scope.selectedService = selectedService;
 
                 spyOn(dateUtils, 'getPeriodRange').and.returnValue(['2016W20']);
 
@@ -144,7 +144,7 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
 
                 it('should fetch sections along with data elements', function () {
                     scope.$apply();
-                    expect(datasetRepository.includeDataElements).toHaveBeenCalledWith([selectedDataSet], _.map(mockExcludedDataElements.dataElements, 'id'));
+                    expect(datasetRepository.includeDataElements).toHaveBeenCalledWith([selectedService], _.map(mockExcludedDataElements.dataElements, 'id'));
                 });
 
                 it('should filter out excluded dataSetSections', function () {
@@ -330,7 +330,7 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
                             name: 'originNameB'
                         }];
 
-                        scope.selectedDataset = mockDataSet;
+                        scope.selectedService = mockDataSet;
                         datasetRepository.includeDataElements.and.returnValue(utils.getPromise(q, [mockDataSet]));
                         moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, mockDataBlocks));
                         orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, mockOriginOrgUnits));
@@ -415,7 +415,7 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
                             }]
                         };
 
-                        scope.selectedDataset = mockDataSet;
+                        scope.selectedService = mockDataSet;
                         datasetRepository.includeDataElements.and.returnValue(utils.getPromise(q, [mockDataSet]));
                         referralLocationsRepository.getWithId.and.returnValue(utils.getPromise(q, mockReferralLocations));
                     });
@@ -451,7 +451,7 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
 
                         scope.exportToExcel();
 
-                        var expectedFilename = [selectedOrgUnit.name, selectedDataSet.name, 'export', currentTime.format('DD-MMM-YYYY')].join('.');
+                        var expectedFilename = [selectedOrgUnit.name, selectedService.name, 'export', currentTime.format('DD-MMM-YYYY')].join('.');
                         expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.XLSX);
                     });
 
@@ -518,12 +518,12 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
                         lineListService: true
                     };
 
-                    selectedDataSet = {
+                    selectedService = {
                         id: 'dataSetId'
                     };
                     
                     scope.orgUnit = selectedOrgUnit;
-                    scope.selectedDataset = selectedDataSet;
+                    scope.selectedService = selectedService;
 
                     mockOriginOrgUnits = [{id: 'originA'}, {id: 'originB'}];
 
@@ -619,7 +619,7 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
 
                 describe('selected dataset is a referral dataSet', function () {
                     beforeEach(function () {
-                        scope.selectedDataset = {
+                        scope.selectedService = {
                             isReferralDataset: true
                         };
                     });
@@ -673,7 +673,7 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
 
                 describe('selected dataset is an origin dataSet', function () {
                     beforeEach(function () {
-                        scope.selectedDataset = {
+                        scope.selectedService = {
                             id: 'someId',
                             isOriginDataset: true
                         };
