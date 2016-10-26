@@ -73,6 +73,16 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
 
                 scope.$apply();
             });
+
+            it('should return undefined if orgUnit has no programs', function () {
+                mockStore.find.and.returnValue(utils.getPromise(q, undefined));
+
+                programRepository.getProgramForOrgUnit('someOrgUnitId').then(function(program) {
+                    expect(program).toBeUndefined();
+                });
+
+                scope.$apply();
+            });
         });
 
         describe('upsert', function () {
