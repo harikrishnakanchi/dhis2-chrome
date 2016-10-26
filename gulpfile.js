@@ -13,7 +13,6 @@ var webserver;
 var rename = require('gulp-rename');
 var path = require('path');
 var zip = require('gulp-zip');
-var requirejs = require('requirejs');
 var template = require('gulp-template');
 
 var baseUrl = argv.url || "http://localhost:8080";
