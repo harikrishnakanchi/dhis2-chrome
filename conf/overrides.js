@@ -6,7 +6,6 @@ define([], function() {
     var ks = parseInt('<%= KS %>');
     var ts = parseInt('<%= TS %>');
     var supportEmail = '<%= SUPPORT_EMAIL %>';
-    var devMode = '<%= DEV_MODE %>';
 
     return {
         dhisPing: {
@@ -35,7 +34,7 @@ define([], function() {
             ks: ks,
             ts: ts
         },
-        devMode: (devMode === 'true'),
+        devMode: false,
         support_email: supportEmail
     };
 });

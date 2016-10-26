@@ -17,7 +17,7 @@ require(["app/bg.config"], function(config) {
 
             chrome.runtime.onMessage.addListener(onDbReady);
             chrome.app.runtime.onLaunched.addListener(function(launchData) {
-                chrome.app.window.create('../../index.html', {
+                chrome.app.window.create('../../chrome.app.html', {
                     id: 'PRAXIS',
                     state: 'maximized'
                 });
