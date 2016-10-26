@@ -1,6 +1,6 @@
 define(["extractHeaders", "lodash", "customAttributes"], function(extractHeaders, _, CustomAttributes) {
     this.mapDatasetForView = function(dataset) {
-        var resultDataset = _.pick(dataset, ["id", "name", "shortName", "code", "organisationUnits", "sections"]);
+        var resultDataset = _.pick(dataset, ["id", "name", "shortName", "code", "sections"]);
         resultDataset.isAggregateService = !CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE) &&
             !CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, CustomAttributes.ORIGIN_DATA_SET_CODE) &&
             !CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, CustomAttributes.REFERRAL_DATA_SET_CODE) &&
