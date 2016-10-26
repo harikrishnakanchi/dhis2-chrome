@@ -19,7 +19,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             };
             mockDataSet = {
                 id: 'someDataSetId',
-                code: 'someDataSetCode'
+                serviceCode: 'someDataSetServiceCode'
             };
             mockProject = {
                 id: 'someProjectId'
@@ -82,7 +82,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             scope.$apply();
 
             expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModule]);
-            expect(_.map(scope.datasets, 'id')).toEqual([mockDataSet.id]);
+            expect(_.map(scope.services, 'id')).toEqual([mockDataSet.id]);
         });
 
         describe('loading of charts', function () {
@@ -90,10 +90,10 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
 
             beforeEach(function () {
                 chartA = {
-                    dataSetCode: 'someDataSetCode'
+                    serviceCode: 'someDataSetServiceCode'
                 };
                 chartB = {
-                    dataSetCode: 'someOtherDataSetCode'
+                    serviceCode: 'someOtherDataSetServiceCode'
                 };
                 chartData = {
                     isDataAvailable: true,
@@ -138,10 +138,10 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
 
             beforeEach(function () {
                 pivotTableA = {
-                    dataSetCode: 'someDataSetCode'
+                    serviceCode: 'someDataSetServiceCode'
                 };
                 pivotTableB = {
-                    dataSetCode: 'someOtherDataSetCode'
+                    serviceCode: 'someOtherDataSetServiceCode'
                 };
                 pivotTableData = {
                     isDataAvailable: true
@@ -201,7 +201,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                 spyOn(document, 'getElementById').and.returnValue(mockElement);
 
                 mockChart = {
-                    dataSetCode: 'ServiceName',
+                    serviceCode: 'ServiceName',
                     title: 'ChartName'
                 };
                 scope.downloadChartAsPng(mockChart);
@@ -217,7 +217,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             });
 
             it('should prompt user to save chart as PNG with suggested name', function () {
-                var expectedFileName = [mockChart.dataSetCode, mockChart.title, currentTime.format(DATETIME_FORMAT), 'png'].join('.');
+                var expectedFileName = [mockChart.serviceCode, mockChart.title, currentTime.format(DATETIME_FORMAT), 'png'].join('.');
                 expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFileName, dataURItoBlob(mockDataUri), filesystemService.FILE_TYPE_OPTIONS.PNG);
             });
         });

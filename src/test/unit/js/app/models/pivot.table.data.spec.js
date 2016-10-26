@@ -5,7 +5,7 @@ define(['pivotTableData', 'analyticsData'], function(PivotTableData, AnalyticsDa
         beforeEach(function () {
             definition = {
                 title: 'someTitle',
-                dataSetCode: 'someDataSetCode',
+                serviceCode: 'someDataSetServiceCode',
                 displayPosition: 'someDisplayPosition',
                 weeklyReport: 'someBooleanValue',
                 monthlyReport: 'anotherBooleanValue',
@@ -32,7 +32,7 @@ define(['pivotTableData', 'analyticsData'], function(PivotTableData, AnalyticsDa
                 pivotTableData = PivotTableData.create(definition, data);
 
                 expect(pivotTableData.title).toEqual(definition.title);
-                expect(pivotTableData.dataSetCode).toEqual(definition.dataSetCode);
+                expect(pivotTableData.serviceCode).toEqual(definition.serviceCode);
                 expect(pivotTableData.displayPosition).toEqual(definition.displayPosition);
                 expect(pivotTableData.weeklyReport).toEqual(definition.weeklyReport);
                 expect(pivotTableData.monthlyReport).toEqual(definition.monthlyReport);

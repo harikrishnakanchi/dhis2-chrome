@@ -1,5 +1,5 @@
 define(['lodash'], function (_) {
-    var FIELD_APP_DATASET_CODE_REGEX = /\[FieldApp - (.*)]/;
+    var FIELD_APP_SERVICE_CODE_REGEX = /\[FieldApp - (.*)]/;
     var FIELD_APP_TITLE_REGEX = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]([0-9\s]*)([a-zA-Z0-9-\s)><(&\/\\=%\+']+)/;
 
     var PivotTable = function (config) {
@@ -15,9 +15,9 @@ define(['lodash'], function (_) {
         this.sortDescending = config.sortOrder == 2;
         this.sortable = this.sortAscending || this.sortDescending;
 
-        this.dataSetCode = parseDatasetCode(this.name);
-        this.projectReport = this.dataSetCode == 'ProjectReport';
-        this.geographicOriginReport = this.dataSetCode == 'GeographicOrigin';
+        this.serviceCode = parseServiceCode(this.name);
+        this.projectReport = this.serviceCode == 'ProjectReport';
+        this.geographicOriginReport = this.serviceCode == 'GeographicOrigin';
         this.monthlyReport = isMonthlyReport(config.relativePeriods);
         this.weeklyReport = !this.monthlyReport;
 
@@ -40,8 +40,8 @@ define(['lodash'], function (_) {
         return _.contains(selectedPeriod, "Month");
     };
 
-    var parseDatasetCode = function (pivotTableName) {
-        var matches = FIELD_APP_DATASET_CODE_REGEX.exec(pivotTableName);
+    var parseServiceCode = function (pivotTableName) {
+        var matches = FIELD_APP_SERVICE_CODE_REGEX.exec(pivotTableName);
         return matches && matches[1];
     };
 

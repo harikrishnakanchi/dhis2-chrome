@@ -89,7 +89,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 else {
                     lastUpdatedTimeDetails = moment().format("DD-MMM-YYYY");
                 }
-                return [chart.dataSetCode, chart.title, lastUpdatedTimeDetails, 'png'].join('.');
+                return [chart.serviceCode, chart.title, lastUpdatedTimeDetails, 'png'].join('.');
             };
 
             SVGUtils.svgAsPngUri(svgElement, {}, function(uri) {
@@ -99,9 +99,9 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
         };
 
         var filterReportsForCurrentModule = function (allReports) {
-            var dataSetCodes = _.map($scope.datasets, 'code');
+            var serviceCodes = _.map($scope.services, 'serviceCode');
             return _.filter(allReports, function(report) {
-                return _.contains(dataSetCodes, report.dataSetCode);
+                return _.contains(serviceCodes, report.serviceCode);
             });
         };
 
@@ -172,7 +172,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                     });
                     
                     var translatedDataSets = translationsService.translate(filteredDataSets);
-                    $scope.datasets = _.sortByOrder(translatedDataSets, 'name');
+                    $scope.services = _.sortByOrder(translatedDataSets, 'name');
                 });
             };
 
@@ -242,7 +242,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             $scope.loading = true;
 
             $scope.currentTab = 'weeklyReport';
-            $scope.selectedDataset = null;
+            $scope.selectedService = null;
 
             loadOrgUnit()
                 .then(loadRelevantDatasets)
@@ -250,7 +250,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 .then(loadPivotTablesWithData)
                 .then(loadLastUpdatedForChartsAndReports)
                 .finally(function() {
-                    $scope.selectedDataset = _.find($scope.datasets, { isOriginDataset: false });
+                    $scope.selectedService = _.find($scope.services, { isOriginDataset: false });
                     $scope.loading = false;
                 });
         };

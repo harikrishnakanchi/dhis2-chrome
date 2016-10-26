@@ -65,7 +65,7 @@ define(["lodash", "moment"], function(_, moment) {
                             allServiceCodes = _.compact(_.map(allServices, 'serviceCode'));
 
                         _.forEach(allServiceCodes, function (serviceCode) {
-                            var filteredCharts = _.filter(charts, { dataSetCode: serviceCode });
+                            var filteredCharts = _.filter(charts, { serviceCode: serviceCode });
                             _.forEach(filteredCharts, function (chart) {
                                 modulesAndCharts.push({
                                     moduleId: module.id,

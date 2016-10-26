@@ -59,7 +59,7 @@ define(["lodash", "moment"], function(_, moment) {
                             allServiceCodes = _.compact(_.map(allServices, 'serviceCode'));
 
                         _.forEach(allServiceCodes, function(serviceCode) {
-                            var pivotTablesForService = _.filter(pivotTables, { dataSetCode: serviceCode });
+                            var pivotTablesForService = _.filter(pivotTables, { serviceCode: serviceCode });
                             _.forEach(pivotTablesForService, function(pivotTable) {
                                 modulesAndPivotTables.push({
                                     orgUnitId: module.id,

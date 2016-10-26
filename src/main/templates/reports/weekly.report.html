@@ -1,14 +1,14 @@
 <div>
-    <div ng-if="(charts | filter: { weeklyChart: true, dataSetCode: selectedDataset.code } | isEmpty) &&
-                (pivotTables | filter: { weeklyReport: true, dataSetCode: selectedDataset.code } | isEmpty)">
+    <div ng-if="(charts | filter: { weeklyChart: true, serviceCode: selectedService.serviceCode } | isEmpty) &&
+                (pivotTables | filter: { weeklyReport: true, serviceCode: selectedService.serviceCode } | isEmpty)">
         <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
     </div>
     <div id="weeklyCharts">
-        <div ng-if="!(charts | filter: { weeklyChart: true, dataSetCode: selectedDataset.code } | isEmpty)">
+        <div ng-if="!(charts | filter: { weeklyChart: true, serviceCode: selectedService.serviceCode } | isEmpty)">
             <span ng-show="updatedForWeeklyChart" class="text-info">
                 <strong> Updated: {{ updatedForWeeklyChart }} </strong>
             </span>
-            <div ng-repeat="chart in charts | filter: { weeklyChart: true, dataSetCode: selectedDataset.code } | orderBy: 'displayPosition'">
+            <div ng-repeat="chart in charts | filter: { weeklyChart: true, serviceCode: selectedService.serviceCode } | orderBy: 'displayPosition'">
                 <div class="row chart-title">
                     <h3 class="col-md-6 col-md-offset-3 text-center">{{ chart.title }}</h3>
                     <a class="col-md-1 col-md-offset-2" href="" title="{{ resourceBundle.downloadChart }}" ng-click="downloadChartAsPng(chart, updatedForWeeklyChart)">
@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <div id="weeklyReports" ng-hide="pivotTables | filter: { weeklyReport: true, dataSetCode: selectedDataset.code } | isEmpty">
+    <div id="weeklyReports" ng-hide="pivotTables | filter: { weeklyReport: true, serviceCode: selectedService.serviceCode } | isEmpty">
         <accordion close-others="false">
             <accordion-group is-open="true">
                 <accordion-heading>
@@ -33,7 +33,7 @@
                     <div class="text-info mb15" ng-show="updatedForWeeklyPivotTable">
                         <strong> Updated: {{ updatedForWeeklyPivotTable }} </strong>
                     </div>
-                    <div ng-repeat="table in pivotTables | filter: { weeklyReport: true, dataSetCode: selectedDataset.code } | orderBy: 'displayPosition'" class="exportCSV-container">
+                    <div ng-repeat="table in pivotTables | filter: { weeklyReport: true, serviceCode: selectedService.serviceCode } | orderBy: 'displayPosition'" class="exportCSV-container">
                         <accordion close-others="false">
                             <accordion-group is-open="status.open">
                                 <accordion-heading>

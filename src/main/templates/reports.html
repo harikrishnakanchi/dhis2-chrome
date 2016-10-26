@@ -12,7 +12,7 @@
         <div class="row form-inline">
             <div class="col-md-4 form-group">
                 {{ resourceBundle.selectServiceNameLabel }}&nbsp;
-                <select id="selectDataset" class="form-control" ng-model="selectedDataset" ng-options="dataset as dataset.name for dataset in datasets"></select>
+                <select id="selectService" class="form-control" ng-model="selectedService" ng-options="service as service.name for service in services"></select>
             </div>
         </div>
 
@@ -22,9 +22,9 @@
             <li ng-class="{ 'active': currentTab == 'exportRawData'}"><a ng-click="currentTab = 'exportRawData'">{{ resourceBundle.exportRawData }}</a></li>
         </ul>
 
-        <div ng-if="selectedDataset && currentTab == 'weeklyReport'" ng-include="'templates/reports/weekly.report.html'"></div>
-        <div ng-if="selectedDataset && currentTab == 'monthlyReport'" ng-include="'templates/reports/monthly.report.html'"></div>
-        <div ng-if="selectedDataset && currentTab == 'exportRawData'" ng-include="'templates/reports/export.raw.data.html'"></div>
+        <div ng-if="selectedService && currentTab == 'weeklyReport'" ng-include="'templates/reports/weekly.report.html'"></div>
+        <div ng-if="selectedService && currentTab == 'monthlyReport'" ng-include="'templates/reports/monthly.report.html'"></div>
+        <div ng-if="selectedService && currentTab == 'exportRawData'" ng-include="'templates/reports/export.raw.data.html'"></div>
 
     </section>
 </div>

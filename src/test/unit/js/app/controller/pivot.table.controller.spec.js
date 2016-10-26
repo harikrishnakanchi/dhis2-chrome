@@ -108,7 +108,7 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
 
                 scope.table = {
                     title: 'A table named T. Able',
-                    dataSetCode: 'someDataSetCode'
+                    serviceCode: 'someDataSetServiceCode'
                 };
             });
 
@@ -117,7 +117,7 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
                 scope.updatedTime = moment('2015-10-29').format(REPORTS_LAST_UPDATED_TIME_FORMAT);
 
                 scope.exportToExcel();
-                expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith([scope.table.dataSetCode, scope.table.title, '[updated 29 October 2015 12.00 AM]', 'xlsx'].join('.'), jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.XLSX);
+                expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith([scope.table.serviceCode, scope.table.title, '[updated 29 October 2015 12.00 AM]', 'xlsx'].join('.'), jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.XLSX);
             });
 
             it('should contain results of csv builder', function () {

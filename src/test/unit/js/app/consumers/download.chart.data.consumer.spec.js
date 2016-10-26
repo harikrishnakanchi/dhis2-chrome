@@ -16,7 +16,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 };
                 mockDataSet = {
                     id: 'someDataSetId',
-                    serviceCode: 'someDataSetCode'
+                    serviceCode: 'someDataSetServiceCode'
                 };
                 mockProgram = {
                     id: 'someProgramId',
@@ -24,7 +24,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 };
                 mockChart = {
                     id: 'someChartId',
-                    dataSetCode: mockDataSet.serviceCode
+                    serviceCode: mockDataSet.serviceCode
                 };
 
                 datasetRepository = new DatasetRepository();
@@ -143,10 +143,10 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
             it('should download chart data for relevant modules and datasets', function() {
                 var chartRelevantToDataSet = {
                     id: 'mockChartId',
-                    dataSetCode: mockDataSet.serviceCode
+                    serviceCode: mockDataSet.serviceCode
                 }, someOtherChart = {
                     id: 'mockChartId',
-                    dataSetCode: 'someOtherDataSetCode'
+                    serviceCode: 'someOtherDataSetServiceCode'
                 };
                 chartRepository.getAll.and.returnValue(utils.getPromise(q, [chartRelevantToDataSet, someOtherChart]));
 
@@ -160,10 +160,10 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
             it('should download chart data for relevant program associated to module', function () {
                 var chartForAssosciatedProgram = {
                     id: 'mockChartId',
-                    dataSetCode: mockProgram.serviceCode
+                    serviceCode: mockProgram.serviceCode
                 }, someOtherChartTable = {
                     id: 'someOtherChartId',
-                    dataSetCode: 'someOtherDataSetCode'
+                    serviceCode: 'someOtherDataSetServiceCode'
                 };
 
                 chartRepository.getAll.and.returnValue(utils.getPromise(q, [chartForAssosciatedProgram, someOtherChartTable]));
@@ -178,7 +178,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
             it('should download chart data for origins for geographicOriginCharts', function() {
                 var geographicOriginChart = {
                     id: 'mockChartId',
-                    dataSetCode: mockDataSet.serviceCode,
+                    serviceCode: mockDataSet.serviceCode,
                     geographicOriginChart: true
                 },  mockOrigin = {
                     id: 'someOriginId'
@@ -267,7 +267,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 var mockMonthlyChart = {
                     id: 'someChartId',
                     monthlyChart: true,
-                    dataSetCode: 'someDataSetCode'
+                    serviceCode: 'someDataSetServiceCode'
                 };
 
                 var lastDownloadedTime = moment('2014-10-01T12:00:00.000Z').toISOString();

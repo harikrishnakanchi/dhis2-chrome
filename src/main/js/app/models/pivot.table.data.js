@@ -2,7 +2,7 @@ define(['analyticsData', 'lodash'], function(AnalyticsData, _) {
 
     var PivotTableData = function(definition, data) {
         this.title = definition.title;
-        this.dataSetCode = definition.dataSetCode;
+        this.serviceCode = definition.serviceCode;
         this.displayPosition = definition.displayPosition;
         this.weeklyReport = definition.weeklyReport;
         this.monthlyReport = definition.monthlyReport;

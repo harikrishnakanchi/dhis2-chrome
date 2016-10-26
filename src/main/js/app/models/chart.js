@@ -12,15 +12,15 @@ define([], function() {
         this.categoryDimensions = config.categoryDimensions;
         this.dataDimensionItems = config.dataDimensionItems;
 
-        this.dataSetCode = parseDataSetCode(this.name);
+        this.serviceCode = parseServiceCode(this.name);
         this.displayPosition = parseDisplayPosition(this.name);
 
-        this.geographicOriginChart = this.dataSetCode == 'GeographicOrigin';
+        this.geographicOriginChart = this.serviceCode == 'GeographicOrigin';
         this.monthlyChart = isMonthlyChart(config.relativePeriods);
         this.weeklyChart = !this.monthlyChart;
     };
 
-    var parseDataSetCode = function(chartName) {
+    var parseServiceCode = function(chartName) {
         var matches = FIELD_APP_NAME_REGEX.exec(chartName);
         return matches && matches[1];
     };
