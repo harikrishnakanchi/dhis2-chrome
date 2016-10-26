@@ -4,7 +4,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
         describe('Download Chart Data Consumer', function() {
             var downloadChartDataConsumer,
                 reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository,
-                scope, q, currentTime, mockProjectId, mockModule, mockDataSet, mockChart;
+                scope, q, currentTime, mockProjectId, mockModule, mockProgram, mockDataSet, mockChart;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
                 scope = $rootScope;
@@ -16,11 +16,15 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 };
                 mockDataSet = {
                     id: 'someDataSetId',
-                    code: 'someDataSetCode'
+                    serviceCode: 'someDataSetCode'
+                };
+                mockProgram = {
+                    id: 'someProgramId',
+                    serviceCode: 'someProgramServiceCode'
                 };
                 mockChart = {
                     id: 'someChartId',
-                    dataSetCode: 'someDataSetCode'
+                    dataSetCode: mockDataSet.serviceCode
                 };
 
                 datasetRepository = new DatasetRepository();
@@ -45,7 +49,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
 
                 programRepository = new ProgramRepository();
-                spyOn(programRepository, 'getProgramForOrgUnit').and.returnValue(utils.getPromise(q, {}));
+                spyOn(programRepository, 'getProgramForOrgUnit').and.returnValue(utils.getPromise(q, mockProgram));
 
                 currentTime = moment('2014-10-01T12:00:00.000Z');
                 Timecop.install();
@@ -139,7 +143,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
             it('should download chart data for relevant modules and datasets', function() {
                 var chartRelevantToDataSet = {
                     id: 'mockChartId',
-                    dataSetCode: mockDataSet.code
+                    dataSetCode: mockDataSet.serviceCode
                 }, someOtherChart = {
                     id: 'mockChartId',
                     dataSetCode: 'someOtherDataSetCode'
@@ -156,18 +160,12 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
             it('should download chart data for relevant program associated to module', function () {
                 var chartForAssosciatedProgram = {
                     id: 'mockChartId',
-                    dataSetCode: 'someProgramName'
+                    dataSetCode: mockProgram.serviceCode
                 }, someOtherChartTable = {
                     id: 'someOtherChartId',
                     dataSetCode: 'someOtherDataSetCode'
                 };
 
-                var mockProgram = {
-                    id: 'someProgramId',
-                    shortName: 'someProgramName'
-                };
-
-                programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, mockProgram));
                 chartRepository.getAll.and.returnValue(utils.getPromise(q, [chartForAssosciatedProgram, someOtherChartTable]));
 
                 downloadChartDataConsumer.run();
@@ -180,7 +178,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
             it('should download chart data for origins for geographicOriginCharts', function() {
                 var geographicOriginChart = {
                     id: 'mockChartId',
-                    dataSetCode: mockDataSet.code,
+                    dataSetCode: mockDataSet.serviceCode,
                     geographicOriginChart: true
                 },  mockOrigin = {
                     id: 'someOriginId'

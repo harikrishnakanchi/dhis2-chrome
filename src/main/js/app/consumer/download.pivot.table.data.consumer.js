@@ -55,9 +55,12 @@ define(["lodash", "moment"], function(_, moment) {
                     var modulesAndPivotTables = [];
 
                     _.forEach(userModules, function(module) {
-                        _.forEach(moduleInformation[module.id].dataSets, function(dataSet) {
-                            var pivotTablesForDataSet = _.filter(pivotTables, { dataSetCode: dataSet.code });
-                            _.forEach(pivotTablesForDataSet, function(pivotTable) {
+                        var allServices = moduleInformation[module.id].dataSets.concat([moduleInformation[module.id].program]),
+                            allServiceCodes = _.compact(_.map(allServices, 'serviceCode'));
+
+                        _.forEach(allServiceCodes, function(serviceCode) {
+                            var pivotTablesForService = _.filter(pivotTables, { dataSetCode: serviceCode });
+                            _.forEach(pivotTablesForService, function(pivotTable) {
                                 modulesAndPivotTables.push({
                                     orgUnitId: module.id,
                                     pivotTable: pivotTable,
@@ -65,16 +68,6 @@ define(["lodash", "moment"], function(_, moment) {
                                 });
                             });
                         });
-
-                        var pivotTablesForProgram = _.filter(pivotTables, {dataSetCode: _.get(moduleInformation[module.id].program, 'shortName')});
-                        _.each(pivotTablesForProgram, function (pivotTable) {
-                            modulesAndPivotTables.push({
-                                orgUnitId: module.id,
-                                pivotTable: pivotTable,
-                                orgUnitDimensionItems: module.id
-                            });
-                        });
-
                     });
                     return $q.when(modulesAndPivotTables);
                 };

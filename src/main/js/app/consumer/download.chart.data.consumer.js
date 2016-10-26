@@ -61,22 +61,17 @@ define(["lodash", "moment"], function(_, moment) {
                 var filterChartsForModules = function(moduleInformation) {
                     var modulesAndCharts = [];
                     _.forEach(userModules, function(module) {
-                        _.forEach(moduleInformation[module.id].dataSets, function (dataSet) {
-                            var filteredCharts = _.filter(charts, { dataSetCode: dataSet.code });
+                        var allServices = moduleInformation[module.id].dataSets.concat([moduleInformation[module.id].program]),
+                            allServiceCodes = _.compact(_.map(allServices, 'serviceCode'));
+
+                        _.forEach(allServiceCodes, function (serviceCode) {
+                            var filteredCharts = _.filter(charts, { dataSetCode: serviceCode });
                             _.forEach(filteredCharts, function (chart) {
                                 modulesAndCharts.push({
                                     moduleId: module.id,
                                     chart: chart,
                                     orgUnitDataDimensionItems: chart.geographicOriginChart ? _.map(moduleInformation[module.id].origins, 'id') : module.id
                                 });
-                            });
-                        });
-                        var chartsForProgram = _.filter(charts, {dataSetCode: _.get(moduleInformation[module.id].program, 'shortName')});
-                        _.each(chartsForProgram, function (chart) {
-                            modulesAndCharts.push({
-                                moduleId: module.id,
-                                chart: chart,
-                                orgUnitDataDimensionItems: module.id
                             });
                         });
                     });
