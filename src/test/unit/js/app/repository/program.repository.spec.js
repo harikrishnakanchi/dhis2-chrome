@@ -1,10 +1,13 @@
-define(["programRepository", "dataElementRepository", "angularMocks", "utils", "timecop"], function(ProgramRepository, DataElementRepository, mocks, utils, timecop) {
+define(["programRepository", "dataElementRepository", "angularMocks", "utils", "customAttributes", "timecop"], function(ProgramRepository, DataElementRepository, mocks, utils, CustomAttributes, timecop) {
     describe("programRepository", function() {
         var scope, q, programRepository, programData, attributeValues, dataElementRepository;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
             scope = $rootScope;
+
+            spyOn(CustomAttributes, 'getAttributeValue');
+            spyOn(CustomAttributes, 'getBooleanAttributeValue').and.callThrough();
 
             var mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
@@ -75,6 +78,7 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
             };
 
             mockStore.getAll.and.returnValue(utils.getPromise(q, []));
+            mockStore.each.and.returnValue(utils.getPromise(q, []));
 
             mockStore.find.and.callFake(function(id) {
                 if (id === "p1")
@@ -171,6 +175,7 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
                 'displayName': 'ER - Presenting Line List',
                 'shortName': 'ER - Presenting Line List',
                 'programType': 'WITHOUT_REGISTRATION',
+                'serviceCode': undefined,
                 'programStages': [{
                     'id': 'p1s1',
                     'name': 'ER - Presenting Line List Stage 1',
@@ -237,6 +242,7 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
                 'displayName': 'ER - Presenting Line List',
                 'shortName': 'ER - Presenting Line List',
                 'programType': 'WITHOUT_REGISTRATION',
+                "serviceCode": undefined,
                 'programStages': [{
                     'id': 'p1s1',
                     'name': 'ER - Presenting Line List Stage 1',
@@ -295,7 +301,8 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
                     "attribute": {
                         "code": "isNewDataModel"
                     }
-                }]
+                }],
+                "serviceCode": undefined
             }, {
                 "id": "p2",
                 "name": "Program2",
@@ -355,7 +362,8 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
                 "id": "Prg",
                 "name": "Program",
                 "shortName": "Program",
-                "programType": "WITHOUT_REGISTRATION"
+                "programType": "WITHOUT_REGISTRATION",
+                "serviceCode": undefined
             };
             mockStore.find.and.returnValue(utils.getPromise(q, program));
 
@@ -367,7 +375,58 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
             scope.$apply();
 
             expect(actualValue).toEqual(expectedProgram);
+        });
 
+        describe('get', function () {
+            it('should parse the service code of the program', function () {
+                CustomAttributes.getAttributeValue.and.returnValue('someServiceCode');
+
+                var mockProgram = {
+                    id: 'someProgramId'
+                };
+                mockStore.find.and.returnValue(utils.getPromise(q, mockProgram));
+
+                programRepository.get(mockProgram.id).then(function (program) {
+                    expect(program.serviceCode).toEqual('someServiceCode');
+                });
+
+                scope.$apply();
+            });
+        });
+
+        describe('getAll', function () {
+            it('should parse the service code of the programs', function () {
+                CustomAttributes.getAttributeValue.and.returnValue('someServiceCode');
+                CustomAttributes.getBooleanAttributeValue.and.returnValue(true);
+
+                var allPrograms = [{
+                    id: 'someProgramId'
+                }];
+                mockStore.getAll.and.returnValue(utils.getPromise(q, allPrograms));
+
+                programRepository.getAll().then(function(programs) {
+                    expect(_.first(programs).serviceCode).toEqual('someServiceCode');
+                });
+
+                scope.$apply();
+            });
+        });
+
+        describe('findAll', function () {
+            it('should parse the service code of the programs', function () {
+                CustomAttributes.getAttributeValue.and.returnValue('someServiceCode');
+
+                var allPrograms = [{
+                    id: 'someProgramId'
+                }];
+                mockStore.each.and.returnValue(utils.getPromise(q, allPrograms));
+
+                programRepository.findAll(['someProgramId']).then(function(programs) {
+                    expect(_.first(programs).serviceCode).toEqual('someServiceCode');
+                });
+
+                scope.$apply();
+            });
         });
     });
 });

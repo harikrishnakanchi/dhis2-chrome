@@ -1,13 +1,12 @@
 define(["lodash", "moment", "customAttributes"], function(_, moment, CustomAttributes) {
     return function(db, $q, dataElementRepository) {
-        var getBooleanAttributeValue = function(attributeValues, attributeCode) {
-            var attr = _.find(attributeValues, {
-                "attribute": {
-                    "code": attributeCode
-                }
-            });
-
-            return attr && attr.value === 'true';
+        var addServiceCode = function (program) {
+            if (_.isArray(program)) {
+                return _.map(program, addServiceCode);
+            } else {
+                program.serviceCode = CustomAttributes.getAttributeValue(CustomAttributes.SERVICE_CODE);
+                return program;
+            }
         };
 
         this.getProgramForOrgUnit = function(orgUnitId) {
@@ -17,9 +16,11 @@ define(["lodash", "moment", "customAttributes"], function(_, moment, CustomAttri
 
         this.getAll = function() {
             var store = db.objectStore("programs");
-            return store.getAll().then(function(programs) {
+            return store.getAll()
+                .then(addServiceCode)
+                .then(function(programs) {
                 return _.filter(programs, function(p) {
-                    return getBooleanAttributeValue(p.attributeValues, "isNewDataModel");
+                    return CustomAttributes.getBooleanAttributeValue(p.attributeValues, CustomAttributes.NEW_DATA_MODEL_CODE);
                 });
             });
         };
@@ -60,7 +61,7 @@ define(["lodash", "moment", "customAttributes"], function(_, moment, CustomAttri
             var store = db.objectStore("programs");
 
             var query = db.queryBuilder().$in(programIds).compile();
-            return store.each(query);
+            return store.each(query).then(addServiceCode);
         };
 
         this.get = function(programId, excludedDataElements) {
@@ -96,6 +97,7 @@ define(["lodash", "moment", "customAttributes"], function(_, moment, CustomAttri
             };
 
             return getProgram(programId)
+                .then(addServiceCode)
                 .then(enrichDataElements)
                 .then(addMandatoryFields);
         };

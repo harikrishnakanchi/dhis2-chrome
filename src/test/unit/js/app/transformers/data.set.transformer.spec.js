@@ -56,6 +56,13 @@ define(["dataSetTransformer", "testData", "lodash"], function(datasetTransformer
                 var populationDatasetForView = datasetTransformer.mapDatasetForView(createMockDataset(populationAttribute));
                 expect(populationDatasetForView.isPopulationDataset).toBeTruthy();
             });
+
+            it('should set the serviceCode for view', function () {
+                var serviceCodeAttribute = createMockAttribute('praxisServiceCode', 'someServiceCode');
+
+                var reportServiceForView = datasetTransformer.mapDatasetForView(createMockDataset(serviceCodeAttribute));
+                expect(reportServiceForView.serviceCode).toEqual('someServiceCode');
+            });
         });
 
         describe('enrichWithSectionsAndDataElements', function () {

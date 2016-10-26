@@ -10,6 +10,7 @@ define(["extractHeaders", "lodash", "customAttributes"], function(extractHeaders
         resultDataset.isNewDataModel = CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, CustomAttributes.NEW_DATA_MODEL_CODE);
         resultDataset.isReferralDataset = CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, CustomAttributes.REFERRAL_DATA_SET_CODE);
         resultDataset.isPopulationDataset = CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, CustomAttributes.POPULATION_DATA_SET_CODE);
+        resultDataset.serviceCode = CustomAttributes.getAttributeValue(dataset.attributeValues, CustomAttributes.SERVICE_CODE);
         return resultDataset;
     };
 

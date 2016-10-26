@@ -14,7 +14,8 @@ define(['lodash'], function(_) {
         MANDATORY_CODE: 'mandatory',
         HIDE_AGGREGATE_DATA_SET_SECTION_TOTALS: 'hideAggregateDataSetSectionTotals',
         PRAXIS_POPULATION_DATA_ELEMENTS: 'praxisPopulationDataElements',
-        ASSOCIATED_PROGRAM_CODE: 'associatedProgram'
+        ASSOCIATED_PROGRAM_CODE: 'associatedProgram',
+        SERVICE_CODE: 'praxisServiceCode'
     };
 
     var getBooleanAttributeValue = function(attributeValues, attributeCode) {
