@@ -171,7 +171,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
 
                 return datasetRepository.findAllForOrgUnits(modulesAndOrigins).then(function(dataSets) {
                     var filteredDataSets = _.reject(dataSets, function(ds) {
-                        return ds.isPopulationDataset || ds.isReferralDataset;
+                        return ds.isPopulationDataset || ds.isReferralDataset || ds.isLineListService;
                     });
                     
                     var translatedDataSets = translationsService.translate(filteredDataSets);
@@ -272,7 +272,9 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 .then(loadPivotTablesWithData)
                 .then(loadLastUpdatedForChartsAndReports)
                 .finally(function() {
-                    $scope.selectedService = _.find($scope.services, { isOriginDataset: false });
+                    $scope.selectedService = _.find($scope.services, function (service) {
+                        return !service.isOriginDataset;
+                    });
                     $scope.loading = false;
                 });
         };

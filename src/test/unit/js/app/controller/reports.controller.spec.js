@@ -113,6 +113,23 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
 
                 expect(_.map(scope.services, 'serviceCode')).toEqual(['noServiceCode']);
             });
+
+            it('should filter out population, referral and linelist data sets', function () {
+                var excludedDataSets = [{
+                    id: 'populationDataSet',
+                    isPopulationDataset: true
+                }, {
+                    id: 'referralDataSet',
+                    isReferralDataset: true
+                }, {
+                    id: 'lineListDataSet',
+                    isLineListService: true
+                }];
+                datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, excludedDataSets));
+
+                scope.$apply();
+                expect(scope.services).toEqual([]);
+            });
         });
 
         describe('loading of charts', function () {
