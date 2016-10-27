@@ -1,8 +1,9 @@
-define(["angularMocks", "utils", "moment", "timecop", "reportsController", "dataSetRepository", "orgUnitRepository", "chartRepository", "pivotTableRepository", "translationsService", "changeLogRepository", "customAttributes", "filesystemService", "saveSvgAsPng", "dataURItoBlob"], function(mocks, utils, moment, timecop, ReportsController, DatasetRepository, OrgUnitRepository, ChartRepository, PivotTableRepository, TranslationsService, ChangeLogRepository, CustomAttributes, FilesystemService, SVGUtils, dataURItoBlob) {
+define(["angularMocks", "utils", "moment", "timecop", "reportsController", "dataSetRepository", "programRepository", "orgUnitRepository", "chartRepository", "pivotTableRepository", "translationsService", "changeLogRepository", "customAttributes", "filesystemService", "saveSvgAsPng", "dataURItoBlob", "lodash"],
+    function(mocks, utils, moment, timecop, ReportsController, DatasetRepository, ProgramRepository, OrgUnitRepository, ChartRepository, PivotTableRepository, TranslationsService, ChangeLogRepository, CustomAttributes, FilesystemService, SVGUtils, dataURItoBlob, _) {
     describe("reportsController", function() {
         var scope, q, rootScope, routeParams,
-            mockModule, mockDataSet, mockProject,
-            reportsController, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, changeLogRepository, filesystemService;
+            mockModule, mockDataSet, mockProgram, mockProject, mockOrigin,
+            reportsController, datasetRepository, programRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, changeLogRepository, filesystemService;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             rootScope = $rootScope;
@@ -17,9 +18,16 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                     name: 'Some Parent Name'
                 }
             };
+            mockOrigin = {
+                id: 'mockOriginId'
+            };
             mockDataSet = {
                 id: 'someDataSetId',
                 serviceCode: 'someDataSetServiceCode'
+            };
+            mockProgram = {
+                id: 'someProgramId',
+                serviceCode: 'someProgramServiceCode'
             };
             mockProject = {
                 id: 'someProjectId'
@@ -35,6 +43,9 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             datasetRepository = new DatasetRepository();
             spyOn(datasetRepository, 'findAllForOrgUnits').and.returnValue(utils.getPromise(q, [mockDataSet]));
 
+            programRepository = new ProgramRepository();
+            spyOn(programRepository, 'getProgramForOrgUnit').and.returnValue(utils.getPromise(q, [mockProgram]));
+
             chartRepository = new ChartRepository();
             spyOn(chartRepository, 'getAll').and.returnValue(utils.getPromise(q, []));
             spyOn(chartRepository, 'getChartData').and.returnValue(utils.getPromise(q, {}));
@@ -46,7 +57,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, 'get').and.returnValue(utils.getPromise(q, mockModule));
             spyOn(orgUnitRepository, 'getAllModulesInOrgUnits').and.returnValue(utils.getPromise(q, [mockModule]));
-            spyOn(orgUnitRepository, 'findAllByParent').and.returnValue(utils.getPromise(q, []));
+            spyOn(orgUnitRepository, 'findAllByParent').and.returnValue(utils.getPromise(q, [mockOrigin]));
             spyOn(orgUnitRepository, 'enrichWithParent').and.callFake(function(orgUnit){ return orgUnit; });
 
             changeLogRepository = new ChangeLogRepository();
@@ -62,7 +73,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             spyOn(translationsService, 'translatePivotTableData').and.callFake(function (object) { return object; });
             spyOn(translationsService, 'translateChartData').and.callFake(function (object) { return object; });
 
-            reportsController = new ReportsController(rootScope, scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService, changeLogRepository);
+            reportsController = new ReportsController(rootScope, scope, q, routeParams, datasetRepository, programRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService, changeLogRepository);
         }));
 
         it('should set the orgunit display name for modules', function() {
@@ -78,11 +89,30 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             expect(scope.orgUnit.lineListService).toEqual('someBooleanValue');
         });
 
-        it("should load dataSets", function() {
-            scope.$apply();
+        describe('loading of services', function () {
+            beforeEach(function () {
+                programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, undefined));
+            });
+            it('should load dataSets', function() {
+                scope.$apply();
 
-            expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModule]);
-            expect(_.map(scope.services, 'id')).toEqual([mockDataSet.id]);
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModule, mockOrigin]);
+                expect(_.map(scope.services, 'id')).toEqual([mockDataSet.id]);
+            });
+
+            it('should load program', function () {
+                scope.$apply();
+
+                expect(programRepository.getProgramForOrgUnit).toHaveBeenCalledWith(mockOrigin.id);
+            });
+
+            it('should set the default service code if dataSet has no service code', function () {
+                mockDataSet.serviceCode = undefined;
+
+                scope.$apply();
+
+                expect(_.map(scope.services, 'serviceCode')).toEqual(['noServiceCode']);
+            });
         });
 
         describe('loading of charts', function () {

@@ -1,8 +1,9 @@
 define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURItoBlob"], function(d3, _, moment, CustomAttributes, SVGUtils, dataURItoBlob) {
-    return function($rootScope, $scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService, changeLogRepository) {
+    return function($rootScope, $scope, $q, $routeParams, datasetRepository, programRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService, changeLogRepository) {
 
         var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
         var REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY hh[.]mm A";
+        var DEFAULT_SERVICE_CODE = 'noServiceCode';
 
         var NVD3_CHART_OPTIONS = {
             DEFAULT: {
@@ -165,27 +166,48 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
 
         var loadRelevantDatasets = function() {
 
-            var loadDataSetsForModules = function(orgUnits) {
-                return datasetRepository.findAllForOrgUnits(orgUnits).then(function(dataSets) {
+            var loadDataSetsForModules = function(data) {
+                var modulesAndOrigins = data.modules.concat(data.origins);
+
+                return datasetRepository.findAllForOrgUnits(modulesAndOrigins).then(function(dataSets) {
                     var filteredDataSets = _.reject(dataSets, function(ds) {
                         return ds.isPopulationDataset || ds.isReferralDataset;
                     });
                     
                     var translatedDataSets = translationsService.translate(filteredDataSets);
-                    $scope.services = _.sortByOrder(translatedDataSets, 'name');
+                    return _.merge({ dataSets: translatedDataSets }, data);
                 });
             };
 
             var getOrigins = function(modules) {
-                var moduleIds = _.pluck(modules, "id");
+                var moduleIds = _.map(modules, 'id');
                 return orgUnitRepository.findAllByParent(moduleIds, true).then(function(origins) {
-                    return modules.concat(origins);
+                    return {
+                        modules: modules,
+                        origins: origins
+                    };
+                });
+            };
+
+            var loadProgramForOrigins = function (data) {
+                var oneOriginId = _.get(_.first(data.origins), 'id');
+                return programRepository.getProgramForOrgUnit(oneOriginId).then(function (program) {
+                    var translatedProgram = translationsService.translate(program);
+                    $scope.services = _.compact(data.dataSets.concat([translatedProgram]));
+                });
+            };
+
+            var setDefaultServiceCode = function () {
+                return _.map($scope.services, function (service) {
+                    return service.serviceCode ? service : _.set(service, 'serviceCode', DEFAULT_SERVICE_CODE);
                 });
             };
 
             return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id)
                 .then(getOrigins)
-                .then(loadDataSetsForModules);
+                .then(loadDataSetsForModules)
+                .then(loadProgramForOrigins)
+                .then(setDefaultServiceCode);
         };
 
         var loadOrgUnit = function() {

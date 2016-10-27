@@ -11,7 +11,7 @@ define(['reportsController', 'moduleWeekSelectorController', 'headerController',
         referralLocationsController, notificationsController, selectProjectPreferenceController, projectReportController, footerController, exportRawDataController, alertDialogController) {
 
         var init = function(app) {
-            app.controller('reportsController', ['$rootScope', '$scope', '$q', '$routeParams', 'dataSetRepository', 'orgUnitRepository', 'chartRepository', 'pivotTableRepository', 'translationsService', 'filesystemService','changeLogRepository', reportsController]);
+            app.controller('reportsController', ['$rootScope', '$scope', '$q', '$routeParams', 'dataSetRepository', 'programRepository', 'orgUnitRepository', 'chartRepository', 'pivotTableRepository', 'translationsService', 'filesystemService','changeLogRepository', reportsController]);
             app.controller('dashboardController', ['$scope', '$hustle', '$q', '$rootScope', '$modal', '$timeout', '$location', '$anchorScroll', 'approvalDataRepository', 'moduleDataBlockFactory', 'checkVersionCompatibility', 'dataSyncFailureRepository', dashboardController]);
             app.controller('moduleWeekSelectorController', ['$scope', '$routeParams', '$q', '$location', '$rootScope', 'orgUnitRepository', moduleWeekSelectorController]);
             app.controller('aggregateDataEntryController', ['$scope', '$routeParams', '$q', '$hustle', '$anchorScroll', '$location', '$modal', '$rootScope', '$window', '$timeout', 'dataRepository', 'excludedDataElementsRepository', 'approvalDataRepository', 'orgUnitRepository', 'dataSetRepository', 'programRepository', 'referralLocationsRepository', 'translationsService', 'moduleDataBlockFactory', 'dataSyncFailureRepository', aggregateDataEntryController]);

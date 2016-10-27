@@ -4,7 +4,7 @@ define(["lodash", "moment", "customAttributes"], function(_, moment, CustomAttri
             if (_.isArray(program)) {
                 return _.map(program, addServiceCode);
             } else {
-                return _.set(program, 'serviceCode', CustomAttributes.getAttributeValue(CustomAttributes.SERVICE_CODE));
+                return _.set(program, 'serviceCode', CustomAttributes.getAttributeValue(_.get(program, 'attributeValues'), CustomAttributes.SERVICE_CODE));
             }
         };
 
