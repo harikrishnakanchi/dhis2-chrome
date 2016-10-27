@@ -18,10 +18,11 @@
                     <li class="form-group">
                         <label for="newOrgUnitName" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.nameLabel }}</label>
                         <div class="col-sm-6 col-md-6">
-                            <input type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-model="newOrgUnit.name" not-in="peerProjects" required/>
+                            <input type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-maxlength="50" ng-model="newOrgUnit.name" not-in="peerProjects" required/>
                             <div ng-show="createForm.newOrgUnitName.$dirty &amp;&amp; createForm.newOrgUnitName.$invalid">
                                 <span ng-show="createForm.newOrgUnitName.$error.required" class="errortxt">{{resourceBundle.nameValidation}}</span>
                                 <span ng-show="createForm.newOrgUnitName.$error.isWithin" class="errortxt">{{resourceBundle.projectExists}}</span>
+                                <span ng-show="createForm.newOrgUnitName.$error.maxlength" class="errortxt">{{resourceBundle.nameLengthValidation}}</span>
                             </div>
                         </div>
                     </li>

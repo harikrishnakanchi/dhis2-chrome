@@ -85,6 +85,7 @@
     "openingDateValidation": "Opening Date is required.",
     "invalidDateError": "Date is invalid.",
     "nameValidation": "Name is required.",
+    "nameLengthValidation": "Length shouldn't be greater than 50 characters",
     "hospitalUnitCodeValidation": "Hospital Unit Code is required.",
     "loginFailed": "Invalid Credentials.",
     "savedCountry": "Country saved successfully.",

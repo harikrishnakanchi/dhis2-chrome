@@ -13,10 +13,11 @@
                     <li class="form-group">
                         <label for="moduleName" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.moduleNameLabel }}</label>
                         <div class="col-sm-4">
-                            <input type="text" class="form-control" name="moduleName{{$index}}" id="moduleName{{$index}}" placeholder="{{ resourceBundle.moduleNameLabel }}" ng-model="module.name" not-in="otherModules" ng-disabled="isDisabled==true" required>
+                            <input type="text" class="form-control" name="moduleName{{$index}}" id="moduleName{{$index}}" placeholder="{{ resourceBundle.moduleNameLabel }}" ng-maxlength="50" ng-model="module.name" not-in="otherModules" ng-disabled="isDisabled==true" required>
                             <div ng-show="form.moduleName{{$index}}.$dirty &amp;&amp; form.moduleName{{$index}}.$invalid">
                                 <span class="errortxt" ng-show="form.moduleName{{$index}}.$error.required">{{resourceBundle.nameValidation}}</span>
                                 <span class="errortxt" ng-show="form.moduleName{{$index}}.$error.isWithin">{{resourceBundle.moduleNameAlreadyExists}}</span>
+                                <span class="errortxt" ng-show="form.moduleName{{$index}}.$error.maxlength">{{resourceBundle.nameLengthValidation}}</span>
                             </div>
                         </div>
                     </li>

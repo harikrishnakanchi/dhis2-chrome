@@ -20,10 +20,11 @@
                         <li class="form-group">
                             <label for="opUnitName" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.nameOfTheUnitLabel }}</label>
                             <div class="col-sm-4">
-                                <input type="text" class="form-control" name="opUnitName{{$index}}" id="opUnitName{{$index}}" placeholder="{{ resourceBundle.operationUnitNameLabel }}" ng-model="opUnit.name" not-in="otherOpUnitNames" ng-disabled="isDisabled" required />
+                                <input type="text" class="form-control" name="opUnitName{{$index}}" id="opUnitName{{$index}}" placeholder="{{ resourceBundle.operationUnitNameLabel }}" ng-maxlength="50" ng-model="opUnit.name" not-in="otherOpUnitNames" ng-disabled="isDisabled" required />
                                 <div ng-show="form.opUnitName{{$index}}.$dirty &amp;&amp; form.opUnitName{{$index}}.$invalid">
                                     <span class="errortxt" ng-show="form.opUnitName{{$index}}.$error.required">{{resourceBundle.nameValidation}}</span>
                                     <span class="errortxt" ng-show="form.opUnitName{{$index}}.$error.isWithin">{{resourceBundle.opUnitNameAlreadyExists}}</span>
+                                    <span class="errortxt" ng-show="form.opUnitName{{$index}}.$error.maxlength">{{resourceBundle.nameLengthValidation}}</span>
                                 </div>
                             </div>
                         </li>

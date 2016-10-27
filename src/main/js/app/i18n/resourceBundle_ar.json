@@ -85,6 +85,7 @@
     "openingDateValidation": "مطلوب فتح التاريخ",
     "invalidDateError": "تاريخ غير متوفر",
     "nameValidation": "الاسم مطلوب",
+    "nameLengthValidation": "Length shouldn't be greater than 50 characters",
     "hospitalUnitCodeValidation": "مطلوب كود وحدة الشفى",
     "loginFailed": "بيانات الاعتماد غير صالحة.",
     "savedCountry": "تم حفظ البلد بنجاح",
