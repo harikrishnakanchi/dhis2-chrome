@@ -353,7 +353,6 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             };
 
             var extractPopulationDetails = function(orgUnitAttrs, populationDataCodes) {
-                console.log(orgUnitAttrs, populationDataCodes);
                 var populationDetails = {};
                 _.forEach(orgUnitAttrs, function(attr) {
                     if (_.includes(populationDataCodes, attr.attribute.code)) {
