@@ -1,9 +1,9 @@
-define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "excludedDataElementsRepository", "dataSetRepository", "programRepository", "referralLocationsRepository", "translationsService", "moduleDataBlockFactory", "dataSyncFailureRepository"],
-    function(AggregateDataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, ExcludedDataElementsRepository, DatasetRepository, ProgramRepository, ReferralLocationsRepository, TranslationsService, ModuleDataBlockFactory, DataSyncFailureRepository) {
+define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "excludedDataElementsRepository", "dataSetRepository", "programRepository", "referralLocationsRepository", "translationsService", "moduleDataBlockFactory", "dataSyncFailureRepository", "optionSetRepository", "customAttributes"],
+    function(AggregateDataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, ExcludedDataElementsRepository, DatasetRepository, ProgramRepository, ReferralLocationsRepository, TranslationsService, ModuleDataBlockFactory, DataSyncFailureRepository, OptionSetRepository, CustomAttributes) {
         describe("aggregateDataEntryController ", function() {
             var scope, routeParams, q, location, anchorScroll, aggregateDataEntryController, rootScope, parentProject, fakeModal,
                 window, hustle, timeout, origin1, origin2, mockModuleDataBlock, selectedPeriod,
-                dataRepository, approvalDataRepository, programRepository, orgUnitRepository, datasetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository;
+                dataRepository, approvalDataRepository, programRepository, orgUnitRepository, datasetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository, optionSetRepository;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $anchorScroll, $location, $window, $timeout) {
@@ -95,6 +95,10 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.dataentryForm = { $setPristine: function() {} };
                 spyOn(scope.dataentryForm, '$setPristine');
 
+                var mockOptionSet = {
+                    code: 'praxisPopulationDataElements',
+                    options: [{code: 'estimatedTargetPopulation'}, {code: 'estPopulationLessThan1Year'}, {code: 'estPopulationBetween1And5Years'}, {code: 'estPopulationOfWomenOfChildBearingAge'}]
+                };
 
                 spyOn(location, "hash");
 
@@ -141,7 +145,10 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 dataSyncFailureRepository = new DataSyncFailureRepository();
                 spyOn(dataSyncFailureRepository, "delete").and.returnValue(utils.getPromise(q, undefined));
 
-                aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, anchorScroll, location, fakeModal, rootScope, window, timeout, dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository);
+                optionSetRepository = new OptionSetRepository();
+                spyOn(optionSetRepository, 'getOptionSetByCode').and.returnValue(utils.getPromise(q, mockOptionSet));
+
+                aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, anchorScroll, location, fakeModal, rootScope, window, timeout, dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository, optionSetRepository);
 
                 scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
             }));
@@ -616,32 +623,33 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     "attributeValues": [{
                         'attribute': {
                             'code': 'estimatedTargetPopulation',
-                            'name': 'Population',
-                            'id': 'p1'
+                            'name': 'Population'
                         },
                         'value': '1000'
                     }, {
                         'attribute': {
                             'code': 'estPopulationLessThan1Year',
-                            'name': 'Proportion of children < 1 year old',
+                            'name': 'Proportion of children < 1 year old'
                         },
                         'value': '12'
                     }, {
                         'attribute': {
                             'code': 'estPopulationBetween1And5Years',
-                            'name': 'Proportion of children < 5 years old',
+                            'name': 'Proportion of children < 5 years old'
                         },
                         'value': '20'
                     }, {
                         'attribute': {
                             'code': 'estPopulationOfWomenOfChildBearingAge',
-                            'name': 'Proportion of women of child bearing age',
+                            'name': 'Proportion of women of child bearing age'
                         },
                         'value': '30'
                     }]
                 }));
 
                 scope.$apply();
+
+                expect(optionSetRepository.getOptionSetByCode).toHaveBeenCalledWith(CustomAttributes.PRAXIS_POPULATION_DATA_ELEMENTS);
 
                 expect(scope.projectPopulationDetails).toEqual({
                     "estimatedTargetPopulation": '1000',

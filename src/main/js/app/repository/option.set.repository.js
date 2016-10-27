@@ -62,5 +62,8 @@ define(['lodash'], function(_) {
             });
         };
 
+        this.getOptionSetByCode = function (optionSetCode) {
+            return this.getAll().then(_.partial(_.find, _, {code: optionSetCode}));
+        };
     };
 });

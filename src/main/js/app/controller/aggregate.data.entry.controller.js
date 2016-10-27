@@ -1,6 +1,6 @@
-define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "interpolate"], function(_, dataValuesMapper, orgUnitMapper, moment, properties, interpolate) {
+define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "interpolate", "customAttributes"], function(_, dataValuesMapper, orgUnitMapper, moment, properties, interpolate, CustomAttributes) {
     return function($scope, $routeParams, $q, $hustle, $anchorScroll, $location, $modal, $rootScope, $window, $timeout,
-        dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository) {
+        dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository, optionSetRepository) {
 
         var currentPeriod, currentPeriodAndOrgUnit;
         var noReferralLocationConfigured = false;
@@ -344,7 +344,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                         data = _.omit(data, function(o) {
                             return o.isDisabled !== false;
                         });
-                        noReferralLocationConfigured = _.keys(data).length === 0 ? true : false;
+                        noReferralLocationConfigured = _.keys(data).length === 0;
                         $scope.referralLocations = data;
                         return;
                     }
@@ -352,13 +352,8 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                 });
             };
 
-            var findallOrgUnits = function(orgUnits) {
-                var orgUnitIds = _.pluck(orgUnits, "id");
-                return orgUnitRepository.findAll(orgUnitIds);
-            };
-
-            var extractPopulationDetails = function(orgUnitAttrs) {
-                var populationDataCodes = ["estimatedTargetPopulation", "estPopulationLessThan1Year", "estPopulationBetween1And5Years", "estPopulationOfWomenOfChildBearingAge"];
+            var extractPopulationDetails = function(orgUnitAttrs, populationDataCodes) {
+                console.log(orgUnitAttrs, populationDataCodes);
                 var populationDetails = {};
                 _.forEach(orgUnitAttrs, function(attr) {
                     if (_.includes(populationDataCodes, attr.attribute.code)) {
@@ -367,8 +362,14 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                 });
                 return populationDetails;
             };
+            
+            var loadPopulationOptionSet = function () {
+                optionSetRepository.getOptionSetByCode(CustomAttributes.PRAXIS_POPULATION_DATA_ELEMENTS).then(function (populationOptionSet) {
+                    $scope.populationDataCodes = _.map(populationOptionSet.options, 'code');
+                });
+            };
 
-            return $q.all([loadAssociatedOrgUnitsAndPrograms(), loadExcludedDataElements(), loadRefferalLocations()]).then(function() {
+            return $q.all([loadAssociatedOrgUnitsAndPrograms(), loadExcludedDataElements(), loadRefferalLocations(), loadPopulationOptionSet()]).then(function() {
                 var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnits)
                     .then(_.curryRight(datasetRepository.includeDataElements)($scope.excludedDataElements))
                     .then(datasetRepository.includeCategoryOptionCombinations)
@@ -414,7 +415,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                         },
                         "value": "true"
                     });
-                    $scope.projectPopulationDetails = extractPopulationDetails(orgUnit.attributeValues);
+                    $scope.projectPopulationDetails = extractPopulationDetails(orgUnit.attributeValues, $scope.populationDataCodes);
                 });
 
                 var loadModuleDataBlock = moduleDataBlockFactory.create($scope.selectedModule.id, currentPeriod)
