@@ -154,7 +154,7 @@ gulp.task('generate-service-worker', function (callback) {
             rootDir + '/templates/**/*',
             rootDir + '/*.html'
         ],
-        stripPrefix: rootDir
+        stripPrefix: rootDir + '/'
     }, callback);
 });
 
