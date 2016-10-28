@@ -60,7 +60,7 @@ gulp.task('serve', ['download-packaged-data'], function() {
         ecstatic({
             root: __dirname + '/src/main',
             gzip: true,
-            cache: -1,
+            cache: 'max-age=0, must-revalidate',
             showDir: true
         })
     );
