@@ -59,7 +59,9 @@ gulp.task('serve', ['download-packaged-data'], function() {
     webserver = http.createServer(
         ecstatic({
             root: __dirname + '/src/main',
-            gzip: true
+            gzip: true,
+            cache: -1,
+            showDir: true
         })
     );
     webserver.listen(8081);
@@ -137,6 +139,24 @@ gulp.task('download-organisation-units', function() {
 });
 
 gulp.task('download-packaged-data', ['download-metadata', 'download-datasets', 'download-programs', 'download-fieldapp-settings', 'download-organisation-units'], function () {});
+
+gulp.task('generate-service-worker', function (callback) {
+    var path = require('path');
+    var swPrecache = require('sw-precache');
+    var rootDir = 'src/main';
+
+    swPrecache.write(path.join(rootDir, 'service.worker.js'), {
+        staticFileGlobs: [
+            rootDir + '/css/*.css',
+            rootDir + '/fonts/*',
+            rootDir + '/img/*',
+            rootDir + '/js/**/*',
+            rootDir + '/templates/**/*',
+            rootDir + '/*.html'
+        ],
+        stripPrefix: rootDir
+    }, callback);
+});
 
 gulp.task('pack', ['less', 'config', 'download-packaged-data'], function() {
     var stream = shell(["./scripts/crxmake.sh ./src/main key.pem " + "praxis_" + (argv.env || "dev")]);
