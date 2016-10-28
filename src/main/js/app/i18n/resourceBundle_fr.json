@@ -86,7 +86,7 @@
     "openingDateValidation": "Veuillez saisir la Date d'Ouverture.",
     "invalidDateError": "Date non valide.",
     "nameValidation": "Veuillez saisir le nom.",
-    "nameLengthValidation": "Length shouldn't be greater than 50 characters",
+    "nameLengthValidation": "Nom ne doit pas être supérieure à 50 caractères",
     "hospitalUnitCodeValidation": "Veuillez saisir le Code de l'Unité Hospitalière.",
     "loginFailed": "Identifiant et/ou mot de passe non valides.",
     "savedCountry": "Pays sauvegardé avec succès.",
