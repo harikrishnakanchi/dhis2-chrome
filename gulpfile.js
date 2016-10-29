@@ -164,6 +164,8 @@ gulp.task('pack', ['less', 'config', 'download-packaged-data'], function() {
     return stream;
 });
 
+gulp.task('generate-pwa', ['less', 'config', 'download-packaged-data', 'generate-service-worker'], function () {});
+
 gulp.task('zip', ['less', 'config', 'download-metadata'], function() {
     return gulp.src('./src/main/**')
         .pipe(zip("praxis_" + (argv.env || "dev") + ".zip"))
