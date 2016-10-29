@@ -149,6 +149,7 @@ gulp.task('generate-service-worker', function (callback) {
         staticFileGlobs: [
             rootDir + '/css/*.css',
             rootDir + '/fonts/*',
+            rootDir + '/data/*',
             rootDir + '/img/*',
             rootDir + '/js/**/*',
             rootDir + '/templates/**/*',
