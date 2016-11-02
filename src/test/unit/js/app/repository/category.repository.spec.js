@@ -1,4 +1,4 @@
-define(['categoryRepository', 'angularMocks', 'utils'], function (CategoryRepository, mocks, utils) {
+define(['categoryRepository', 'angularMocks', 'utils', 'customAttributes'], function (CategoryRepository, mocks, utils, CustomAttributes) {
     describe('categoryRepository', function () {
         var categoryRepository, q, scope, mockStore,
             mockCategoryOptions, mockCategories, mockCategoryCombos, mockCategoryOptionCombos;
@@ -15,23 +15,31 @@ define(['categoryRepository', 'angularMocks', 'utils'], function (CategoryReposi
                 shortName: 'shortName'
             }];
 
+            spyOn(CustomAttributes, 'getBooleanAttributeValue');
+
             categoryRepository = new CategoryRepository(mockDB.db, q);
         }));
 
         describe('categoryOptions', function () {
             beforeEach(function () {
-                mockCategoryOptions = [{id: 'someCategoryOptionId'}];
+                mockStore.getAll.and.returnValue(utils.getPromise(q, mockCategoryOptions));
             });
 
             it('should get all category options', function () {
-                var actualCategoryOptions;
+                categoryRepository.getAllCategoryOptions().then(function (categoryOptions) {
+                    expect(categoryOptions).toEqual(mockCategoryOptions);
+                });
+                scope.$apply();
+            });
+
+            it('should set excludeFromTotal property from custom attributes', function () {
+                CustomAttributes.getBooleanAttributeValue.and.returnValue('someBooleanValue');
                 mockStore.getAll.and.returnValue(utils.getPromise(q, mockCategoryOptions));
 
                 categoryRepository.getAllCategoryOptions().then(function (categoryOptions) {
-                    actualCategoryOptions = categoryOptions;
+                    expect(_.first(categoryOptions).excludeFromTotal).toEqual('someBooleanValue');
                 });
                 scope.$apply();
-                expect(actualCategoryOptions).toEqual(mockCategoryOptions);
             });
         });
 

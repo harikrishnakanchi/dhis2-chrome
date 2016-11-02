@@ -1,4 +1,4 @@
-define(['lodash'], function (_) {
+define(['customAttributes', 'lodash'], function (CustomAttributes, _) {
     return function (db, $q) {
         var CATEGORY_OPTIONS_STORE = 'categoryOptions',
             CATEGORIES_STORE = 'categories',
@@ -9,7 +9,11 @@ define(['lodash'], function (_) {
 
         _this.getAllCategoryOptions = function () {
             var store = db.objectStore(CATEGORY_OPTIONS_STORE);
-            return store.getAll();
+            return store.getAll().then(function (categoryOptions) {
+                return _.each(categoryOptions, function (categoryOption) {
+                    categoryOption.excludeFromTotal = CustomAttributes.getBooleanAttributeValue(categoryOption.attributeValues, CustomAttributes.EXCLUDE_FROM_TOTAL);
+                });
+            });
         };
 
         _this.enrichWithCategoryOptions = function (collection) {
