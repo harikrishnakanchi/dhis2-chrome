@@ -9,6 +9,12 @@ define(['categoryRepository', 'angularMocks', 'utils'], function (CategoryReposi
             var mockDB = utils.getMockDB(q);
             mockStore = mockDB.objectStore;
 
+            mockCategoryOptions = [{
+                id: 'someCategoryOptionId',
+                name: 'updatedCategoryName',
+                shortName: 'shortName'
+            }];
+
             categoryRepository = new CategoryRepository(mockDB.db, q);
         }));
 
@@ -50,7 +56,7 @@ define(['categoryRepository', 'angularMocks', 'utils'], function (CategoryReposi
                 var actualCategories, expectedCategories;
                 expectedCategories = [{ id: 'someCategoryId', categoryOptions: mockCategoryOptions }];
 
-                mockStore.getAll.and.returnValues(utils.getPromise(q, mockCategoryOptions), utils.getPromise(q, mockCategories));
+                mockStore.getAll.and.returnValues(utils.getPromise(q, mockCategories), utils.getPromise(q, mockCategoryOptions));
 
                 categoryRepository.getAllCategories().then(function (categories) {
                     actualCategories = categories;
@@ -81,12 +87,6 @@ define(['categoryRepository', 'angularMocks', 'utils'], function (CategoryReposi
 
         describe('categoryOptionCombos', function () {
             beforeEach(function () {
-                mockCategoryOptions = [{
-                    id: 'someCategoryOptionId',
-                    name: 'updatedCategoryName',
-                    shortName: 'shortName'
-                }];
-
                 mockCategoryOptionCombos = [{
                     id: 'someCategoryOptionComboId',
                     categoryOptions: [{
@@ -100,7 +100,7 @@ define(['categoryRepository', 'angularMocks', 'utils'], function (CategoryReposi
                 var actualCategoryOptionCombos, expectedCategoryOptionCombos;
                 expectedCategoryOptionCombos = [{ id: 'someCategoryOptionComboId', categoryOptions: mockCategoryOptions }];
 
-                mockStore.getAll.and.returnValues(utils.getPromise(q, mockCategoryOptions), utils.getPromise(q, mockCategoryOptionCombos));
+                mockStore.getAll.and.returnValues(utils.getPromise(q, mockCategoryOptionCombos), utils.getPromise(q, mockCategoryOptions));
 
                 categoryRepository.getAllCategoryOptionCombos().then(function (categoryOptionCombos) {
                     actualCategoryOptionCombos = categoryOptionCombos;
@@ -108,6 +108,27 @@ define(['categoryRepository', 'angularMocks', 'utils'], function (CategoryReposi
 
                 scope.$apply();
                 expect(actualCategoryOptionCombos).toEqual(expectedCategoryOptionCombos);
+            });
+        });
+
+        describe('enrichWithCategoryOptions', function () {
+            beforeEach(function () {
+                mockStore.getAll.and.returnValue(utils.getPromise(q, mockCategoryOptions));
+            });
+
+            it('should enrich the collection with categoryOptions', function () {
+                var item = {
+                    categoryOptions: [{
+                        id: 'someCategoryOptionId',
+                        name: 'oldCategoryOptionName'
+                    }]
+                };
+
+                categoryRepository.enrichWithCategoryOptions([item]).then(function (enrichedItems) {
+                    expect(_.first(enrichedItems).categoryOptions).toEqual(mockCategoryOptions);
+                });
+
+                scope.$apply();
             });
         });
     });

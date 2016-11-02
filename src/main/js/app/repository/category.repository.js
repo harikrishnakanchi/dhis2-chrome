@@ -5,54 +5,38 @@ define(['lodash'], function (_) {
             CATEGORY_COMBOS_STORE = 'categoryCombos',
             CATEGORY_OPTION_COMBOS_STORE = 'categoryOptionCombos';
 
-        var enrichCollectionWithCategoryOptions = function (collection, categoryOptions) {
-            var indexedCategoryOptions = _.indexBy(categoryOptions, 'id');
+        var _this = this;
 
-            return _.each(collection, function (item) {
-                item.categoryOptions = _.map(item.categoryOptions, function (categoryOption) {
-                    return indexedCategoryOptions[categoryOption.id];
-                });
-            });
-        };
-
-        this.getAllCategoryOptions = function () {
+        _this.getAllCategoryOptions = function () {
             var store = db.objectStore(CATEGORY_OPTIONS_STORE);
             return store.getAll();
         };
 
-        this.getAllCategories = function () {
-            var categoriesStore = db.objectStore(CATEGORIES_STORE),
-                categoryOptionsStore = db.objectStore(CATEGORY_OPTIONS_STORE);
+        _this.enrichWithCategoryOptions = function (collection) {
+            return _this.getAllCategoryOptions().then(function (categoryOptions) {
+                var indexedCategoryOptions = _.indexBy(categoryOptions, 'id');
 
-            return $q.all({
-                categoryOptions: categoryOptionsStore.getAll(),
-                categories: categoriesStore.getAll()
-            }).then(function (data) {
-                var categories = data.categories,
-                    categoryOptions = data.categoryOptions;
-
-                return enrichCollectionWithCategoryOptions(categories, categoryOptions);
+                return _.each(collection, function (item) {
+                    item.categoryOptions = _.map(item.categoryOptions, function (categoryOption) {
+                        return indexedCategoryOptions[categoryOption.id];
+                    });
+                });
             });
         };
 
-        this.getAllCategoryCombos = function () {
+        _this.getAllCategories = function () {
+            var categoriesStore = db.objectStore(CATEGORIES_STORE);
+            return categoriesStore.getAll().then(_this.enrichWithCategoryOptions);
+        };
+
+        _this.getAllCategoryCombos = function () {
             var store = db.objectStore(CATEGORY_COMBOS_STORE);
             return store.getAll();
         };
 
-        this.getAllCategoryOptionCombos = function () {
+        _this.getAllCategoryOptionCombos = function () {
             var categoryOptionCombosStore = db.objectStore(CATEGORY_OPTION_COMBOS_STORE);
-            var categoryOptionsStore = db.objectStore(CATEGORY_OPTIONS_STORE);
-
-            return $q.all({
-                categoryOptions: categoryOptionsStore.getAll(),
-                categoryOptionCombos: categoryOptionCombosStore.getAll()
-            }).then(function (data) {
-                var categoryOptionCombos = data.categoryOptionCombos,
-                    categoryOptions = data.categoryOptions;
-
-                return enrichCollectionWithCategoryOptions(categoryOptionCombos, categoryOptions);
-            });
+            return categoryOptionCombosStore.getAll().then(_this.enrichWithCategoryOptions);
         };
     };
 });
