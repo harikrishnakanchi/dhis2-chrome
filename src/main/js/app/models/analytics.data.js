@@ -1,4 +1,4 @@
-define([], function () {
+define(['lodash'], function (_) {
     var VALUE_HEADER = 'value',
         DATA_DIMENSION_NAME_SEPARATOR = ' - ',
         NOT_SPECIFIED_ORG_UNIT_NAME = 'Not Specified';
@@ -38,9 +38,7 @@ define([], function () {
 
     var getExcludedCategoryOptionIds = function(definition) {
         var allCategoryOptions = _.flatten(_.map(definition.categoryDimensions, 'categoryOptions'));
-        return _.map(_.filter(allCategoryOptions, function (categoryOption) {
-            return _.endsWith(categoryOption.code, '_excludeFromTotal');
-        }), 'id');
+        return _.map(_.filter(allCategoryOptions, 'excludeFromTotal'), 'id');
     };
 
     var mapDataValues = function (headers, rows, excludedCategoryOptionIds) {

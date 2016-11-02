@@ -149,10 +149,9 @@ define(['analyticsData'], function (AnalyticsData) {
                         },
                         categoryOptions: [{
                             id: 'someCategoryOptionId',
-                            code: 'someCode_excludeFromTotal'
+                            excludeFromTotal: true
                         }, {
-                            id: 'someOtherCategoryOptionId',
-                            code: 'someOtherCode'
+                            id: 'someOtherCategoryOptionId'
                         }]
                     }]
                 };
