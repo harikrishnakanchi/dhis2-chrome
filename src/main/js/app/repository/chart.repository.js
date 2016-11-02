@@ -34,23 +34,14 @@ define(['chart', 'chartData', 'lodash'], function(Chart, ChartData, _) {
             }));
         };
 
-        var enrichChartDefinitionWithCategoryOptions = function (chartDefinition, categoryOptions) {
-            chartDefinition.categoryDimensions = _.map(chartDefinition.categoryDimensions, function (categoryDimension) {
-                categoryDimension.categoryOptions = _.map(categoryDimension.categoryOptions, function (categoryOption) {
-                    return categoryOptions[categoryOption.id] || categoryOption;
-                });
-                return categoryDimension;
-            });
-            return chartDefinition;
-        };
-
         this.getAll = function() {
             var store = db.objectStore(CHART_STORE_NAME);
-            return $q.all([store.getAll(), categoryRepository.getAllCategoryOptions()]).then(function (data) {
-                var chartDefinitions = _.first(data);
-                var allCategoryOptions = _.indexBy(_.last(data), 'id');
-                var enrichChartDefinitions = _.flowRight(Chart.create, _.partial(enrichChartDefinitionWithCategoryOptions, _, allCategoryOptions));
-                return _.map(chartDefinitions, enrichChartDefinitions);
+
+            return store.getAll().then(function (charts) {
+                var categoryDimensions = _.flatten(_.map(charts, 'categoryDimensions'));
+
+                return categoryRepository.enrichWithCategoryOptions(categoryDimensions)
+                    .then(_.partial(_.map, charts, Chart.create));
             });
         };
 
