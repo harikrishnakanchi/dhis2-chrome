@@ -494,15 +494,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(scope.syncError).toBe(true);
             });
 
-            it("should fetch max length to calculate col span for category options", function() {
-                var maxCols = scope.maxcolumns([
-                    [1, 2],
-                    [4, 5, 4, 5]
-                ]);
-
-                expect(maxCols).toEqual(4);
-            });
-
             it("safe get dataValues should initialize data value and option if not present", function() {
                 scope.$apply();
                 var dataValues = {};

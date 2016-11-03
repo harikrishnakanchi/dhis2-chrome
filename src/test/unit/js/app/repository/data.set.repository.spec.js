@@ -18,6 +18,8 @@ define(["dataSetRepository", "dataSetTransformer", "categoryRepository", "testDa
             }];
 
             spyOn(dataSetTransformer, 'mapDatasetForView').and.callFake(function (dataSet) { return dataSet; });
+            spyOn(dataSetTransformer, 'enrichWithCategoryOptionCombinations').and.callFake(function (dataSet) { return dataSet; });
+
             categoryRepository = new CategoryRepository();
             spyOn(categoryRepository, 'getAllCategoryCombos').and.returnValue(utils.getPromise(q, testData.get('categoryCombos')));
             spyOn(categoryRepository, 'getAllCategories').and.returnValue(utils.getPromise(q, testData.get('categories')));
@@ -102,52 +104,10 @@ define(["dataSetRepository", "dataSetTransformer", "categoryRepository", "testDa
         });
 
         it("should get dataSets with sections headers", function() {
-            var dataSets = [{
-                "id": "DS_OPD",
-                "sections": [{
-                    "id": "Sec1",
-                    "dataElements": [{
-                        "id": "DE1",
-                        "categoryCombo": {
-                            "id": "CC1"
-                        }
-                    }]
-                }]
-            }];
-
-            var actualDataSets;
-
-            dataSetRepository.includeCategoryOptionCombinations(dataSets).then(function(data) {
-                actualDataSets = data;
-            });
-
+            dataSetRepository.includeCategoryOptionCombinations(mockDataSets);
             scope.$apply();
 
-            var expectedSectionHeaders = [
-                [{
-                    "id": "CO1",
-                    "name": "Resident"
-                }, {
-                    "id": "CO2",
-                    "name": "Migrant"
-                }],
-                [{
-                    "id": "CO3",
-                    "name": "LessThan5"
-                }, {
-                    "id": "CO4",
-                    "name": "GreaterThan5"
-                }, {
-                    "id": "CO3",
-                    "name": "LessThan5"
-                }, {
-                    "id": "CO4",
-                    "name": "GreaterThan5"
-                }]
-            ];
-            expect(actualDataSets[0].sections[0].headers).toEqual(expectedSectionHeaders);
-            expect(actualDataSets[0].sections[0].categoryOptionComboIds).toEqual(['1', '2', '3', '4']);
-            expect(actualDataSets[0].sections[0].categoryOptionComboIdsForTotals).toEqual(['2', '3', '4']);
+            expect(dataSetTransformer.enrichWithCategoryOptionCombinations).toHaveBeenCalled();
         });
 
         describe('Upsert dataSets downloaded from dhis', function () {

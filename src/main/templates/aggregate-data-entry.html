@@ -50,14 +50,14 @@
                                         </accordion-heading>
                                         <table locked-table-header class="table table-bordered" ng-if="isDatasetOpen[dataSet.id] || printingTallySheet">
                                             <thead>
-                                                <tr ng-repeat="category in section.headers track by $id(category)">
-                                                    <th class="display-print" ng-if="$index===0">
+                                                <tr ng-repeat="columnConfiguration in section.columnConfigurations">
+                                                    <th class="display-print" ng-if="$first">
                                                         <span>{{ section.name}}</span>
                                                     </th>
-                                                    <th class="display-print" ng-if="$index>0">
+                                                    <th class="display-print" ng-if="!$first">
                                                     </th>
-                                                    <th ng-repeat="option in category track by $index" colspan="{{ maxcolumns(section.headers) / category.length}}">
-                                                        <span>{{ option.name}}</span>
+                                                    <th ng-repeat="column in columnConfiguration" colspan="{{ section.baseColumnConfiguration.length / columnConfiguration.length }}">
+                                                        <span>{{ column.name}}</span>
                                                     </th>
                                                     <th ng-if="!$last" class="last-column">
                                                     </th>
@@ -82,13 +82,13 @@
                                                             <span ng-if="dataSet.isReferralDataset"> {{ referralLocations[dataElement.formName].name }} </span>
                                                         </div>
                                                     </td>
-                                                    <td ng-repeat="option in section.categoryOptionComboIds track by $id(option)">
+                                                    <td ng-repeat="column in section.baseColumnConfiguration">
                                                         <ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
                                                             <input type="text" name="datavalue" id="datafield_{{$index}}" class="form-control input-sm"
                                                                    ng-pattern="validDataValuePattern"
-                                                                   ng-model="safeGet(dataValues, dataElement.id, option, selectedModule.id)['value']"
-                                                                   ng-focus="restoreExpression(selectedModule.id, dataElement.id, option)"
-                                                                   ng-blur="evaluateExpression(selectedModule.id, dataElement.id, option)"
+                                                                   ng-model="safeGet(dataValues, dataElement.id, column.categoryOptionComboId, selectedModule.id)['value']"
+                                                                   ng-focus="restoreExpression(selectedModule.id, dataElement.id, column.categoryOptionComboId)"
+                                                                   ng-blur="evaluateExpression(selectedModule.id, dataElement.id, column.categoryOptionComboId)"
                                                                    ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed" />
                                                         </ng-form>
                                                     </td>
@@ -98,8 +98,8 @@
                                                     <td>
                                                         <span> {{ resourceBundle.totalLabel }}</span>
                                                     </td>
-                                                    <td ng-repeat="option in section.categoryOptionComboIds track by $id(option)">
-                                                        {{columnSum(dataValues[selectedModule.id], section , option, dataSet.isReferralDataset)}}
+                                                    <td ng-repeat="column in section.baseColumnConfiguration">
+                                                        {{columnSum(dataValues[selectedModule.id], section , column.categoryOptionComboId, dataSet.isReferralDataset)}}
                                                     </td>
                                                     <td class="last-column" ng-if="section.shouldDisplayRowTotals "> {{totalSum(section)}}
                                                     </td>
@@ -129,18 +129,18 @@
                                         </accordion-heading>
                                         <table locked-table-header class="table table-bordered" ng-if="isDatasetOpen[dataSet.id] || printingTallySheet">
                                             <thead>
-                                                <tr ng-repeat="category in section.headers track by $id(category)">
-                                                    <th class="display-print" ng-if="$index===0">
-                                                        <span>{{ section.name}}</span>
+                                                <tr ng-repeat="columnConfiguration in section.columnConfigurations">
+                                                    <th class="display-print" ng-if="$first">
+                                                        <span>{{ section.name }}</span>
                                                     </th>
-                                                    <th class="display-print" ng-if="$index>0">
+                                                    <th class="display-print" ng-if="!$first">
                                                     </th>
-                                                    <th ng-repeat="option in category track by $index" colspan="{{ maxcolumns(section.headers) / category.length}}">
-                                                        <span>{{option.name}}</span>
+                                                    <th ng-repeat="column in columnConfiguration" colspan="{{ section.baseColumnConfiguration.length / columnConfiguration.length}}">
+                                                        <span>{{column.name}}</span>
                                                     </th>
                                                     <th ng-hide="$last" class="last-column">
                                                     </th>
-                                                    <th ng-show="$last && section.categoryOptionComboIds.length > 1" class="last-column">
+                                                    <th ng-show="$last && section.shouldDisplayRowTotals" class="last-column">
                                                         {{ resourceBundle.totalLabel }}
                                                     </th>
                                                 </tr>
@@ -150,12 +150,17 @@
                                                     <td>
                                                         <span> {{ orgUnit[dataElement.id] || orgUnit.name}}</span>
                                                     </td>
-                                                    <td ng-repeat="option in section.categoryOptionComboIds track by $id(option)">
+                                                    <td ng-repeat="column in section.baseColumnConfiguration">
                                                         <ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
-                                                            <input type="text" name="datavalue" id="datafield_{{$index}}" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option, orgUnit.id)['value']" ng-focus="restoreExpression(orgUnit.id, dataElement.id, option)" class="form-control input-sm" ng-blur="evaluateExpression(orgUnit.id, dataElement.id, option)" ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed" />
+                                                            <input type="text" name="datavalue" id="datafield_{{$index}}" class="form-control input-sm"
+                                                                   ng-pattern="validDataValuePattern"
+                                                                   ng-model="safeGet(dataValues, dataElement.id, column.categoryOptionComboId, orgUnit.id)['value']"
+                                                                   ng-focus="restoreExpression(orgUnit.id, dataElement.id, column.categoryOptionComboId)"
+                                                                   ng-blur="evaluateExpression(orgUnit.id, dataElement.id, column.categoryOptionComboId)"
+                                                                   ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed" />
                                                         </ng-form>
                                                     </td>
-                                                    <td class="last-column" ng-if="section.categoryOptionComboIds.length > 1">{{sum(dataValues[orgUnit.id][dataElement.id], dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
+                                                    <td class="last-column" ng-if="section.shouldDisplayRowTotals">{{sum(dataValues[orgUnit.id][dataElement.id], dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
                                                 </tr>
                                             </tbody>
                                             <tbody>
@@ -166,7 +171,7 @@
                                                     <td>
                                                         {{originSum(dataValues, section)}}
                                                     </td>
-                                                    <td class="last-column" ng-if="section.categoryOptionComboIds.length > 1"> {{originSum(dataValues, section)}}
+                                                    <td class="last-column" ng-if="section.shouldDisplayRowTotals"> {{originSum(dataValues, section)}}
                                                     </td>
                                                 </tr>
                                             </tbody>

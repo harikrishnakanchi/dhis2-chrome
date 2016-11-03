@@ -1,94 +1,61 @@
 define(['extractHeaders', 'lodash'], function(extractHeaders, _) {
     describe('extractHeaders', function () {
-        var categoryOption1, categoryOption2, categoryOption3, categoryOption4, categoryOption5, categoryOption6, categoryCombo, categories,
-            categoryOptionCombos, categoryOptionComboA, categoryOptionComboB, categoryOptionComboC, categoryOptionComboD;
+        describe('generate', function () {
+            var categoryOptionA, categoryOptionB, categoryOptionX, categoryOptionY, categories,
+                categoryOptionCombo1, categoryOptionCombo2, categoryOptionCombo3, categoryOptionCombo4, categoryOptionCombos;
 
-        beforeEach(function () {
-            categoryOption1 = {
-                id: 'categoryOptionId1',
-                name: 'categoryOptionName1'
-            };
+            beforeEach(function () {
+                categoryOptionA = { id: 'categoryOptionIdA', name: 'categoryOptionNameA', excludeFromTotal: false };
+                categoryOptionB = { id: 'categoryOptionIdB', name: 'categoryOptionNameB', excludeFromTotal: false };
+                categoryOptionX = { id: 'categoryOptionIdX', name: 'categoryOptionNameX', excludeFromTotal: false };
+                categoryOptionY = { id: 'categoryOptionIdY', name: 'categoryOptionNameY', excludeFromTotal: true };
 
-            categoryOption2 = {
-                id: 'categoryOptionId2',
-                name: 'categoryOptionName2'
-            };
+                categories = [
+                    { name: 'category1', categoryOptions: [categoryOptionA, categoryOptionB] },
+                    { name: 'category2', categoryOptions: [categoryOptionX, categoryOptionY] }
+                ];
 
-            categoryOption3 = {
-                id: 'categoryOptionId3',
-                name: 'categoryOptionName3'
-            };
+                categoryOptionCombo1 = { id: 'categoryOptionComboId1', categoryOptions: [categoryOptionA, categoryOptionX] };
+                categoryOptionCombo2 = { id: 'categoryOptionComboId2', categoryOptions: [categoryOptionA, categoryOptionY] };
+                categoryOptionCombo3 = { id: 'categoryOptionComboId3', categoryOptions: [categoryOptionB, categoryOptionX] };
+                categoryOptionCombo4 = { id: 'categoryOptionComboId4', categoryOptions: [categoryOptionB, categoryOptionY] };
 
-            categoryOption4 = {
-                id: 'categoryOptionId4',
-                name: 'categoryOptionName4'
-            };
-
-            categoryOption5 = {
-                id: 'categoryOptionId5',
-                name: 'categoryOptionName5'
-            };
-
-            categoryOption6 = {
-                id: 'categoryOptionId6',
-                name: 'categoryOptionName6'
-            };
-
-            categoryCombo = {
-                "id": "someCategoryComboId"
-            };
-
-            categories = [{
-                id: 'categoryId1',
-                categoryOptions: [categoryOption1]
-            }, {
-                id: 'categoryId2',
-                categoryOptions: [categoryOption2, categoryOption3]
-            }, {
-                id: 'categoryId3',
-                categoryOptions: [categoryOption4, categoryOption5]
-            }];
-
-            categoryOptionComboA = {
-                id: 'categoryOptionComboIdA',
-                categoryCombo: categoryCombo,
-                categoryOptions: [categoryOption1, categoryOption2, categoryOption4]
-            };
-            categoryOptionComboB = {
-                id: 'categoryOptionComboIdB',
-                categoryCombo: categoryCombo,
-                categoryOptions: [categoryOption1, categoryOption2, categoryOption5]
-            };
-            categoryOptionComboC = {
-                id: 'categoryOptionComboIdC',
-                categoryCombo: categoryCombo,
-                categoryOptions: [categoryOption1, categoryOption3, categoryOption4]
-            };
-            categoryOptionComboD = {
-                id: 'categoryOptionComboIdD',
-                categoryCombo: categoryCombo,
-                categoryOptions: [categoryOption1, categoryOption3, categoryOption5]
-            };
-            categoryOptionCombos = [categoryOptionComboA, categoryOptionComboB, categoryOptionComboC, categoryOptionComboD];
-        });
-
-        describe('headers', function() {
-            it('should extract headers 1 X 2 X 3', function() {
-                var result = extractHeaders(categories, categoryCombo, categoryOptionCombos);
-
-                expect(result.headers).toEqual([
-                    [categoryOption1],
-                    [categoryOption2, categoryOption3],
-                    [categoryOption4, categoryOption5, categoryOption4, categoryOption5]
-                ]);
+                categoryOptionCombos = [categoryOptionCombo1, categoryOptionCombo2, categoryOptionCombo3, categoryOptionCombo4];
             });
-        });
 
-        describe('categoryOptionComboIds', function () {
-            it('should extract categoryOptionComboIds', function () {
-                var result = extractHeaders(categories, categoryCombo, categoryOptionCombos);
+            it('should return column configuration using cartesian product of category options', function () {
+                var expectedResult = [
+                    [{
+                        name: categoryOptionA.name,
+                        categoryOptions: [categoryOptionA]
+                    }, {
+                        name: categoryOptionB.name,
+                        categoryOptions: [categoryOptionB]
+                    }],
+                    [{
+                        name: categoryOptionX.name,
+                        categoryOptions: [categoryOptionA, categoryOptionX],
+                        categoryOptionComboId: categoryOptionCombo1.id,
+                        excludeFromTotal: false
+                    }, {
+                        name: categoryOptionY.name,
+                        categoryOptions: [categoryOptionA, categoryOptionY],
+                        categoryOptionComboId: categoryOptionCombo2.id,
+                        excludeFromTotal: true
+                    }, {
+                        name: categoryOptionX.name,
+                        categoryOptions: [categoryOptionB, categoryOptionX],
+                        categoryOptionComboId: categoryOptionCombo3.id,
+                        excludeFromTotal: false
+                    }, {
+                        name: categoryOptionY.name,
+                        categoryOptions: [categoryOptionB, categoryOptionY],
+                        categoryOptionComboId: categoryOptionCombo4.id,
+                        excludeFromTotal: true
+                    }]
+                ];
 
-                expect(result.categoryOptionComboIds).toEqual([categoryOptionComboA.id, categoryOptionComboB.id, categoryOptionComboC.id, categoryOptionComboD.id]);
+                expect(extractHeaders.generate(categories, categoryOptionCombos)).toEqual(expectedResult);
             });
         });
     });

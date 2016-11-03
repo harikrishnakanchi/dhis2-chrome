@@ -55,14 +55,14 @@
                                 </accordion-heading>
                                 <table locked-table-header class="table table-bordered" ng-if="isDatasetOpen[dataSet.id] || printingTallySheet">
                                     <thead>
-                                    <tr ng-repeat="category in section.headers">
-                                        <th class="display-print" ng-if="$index===0">
+                                    <tr ng-repeat="columnConfiguration in section.columnConfigurations">
+                                        <th class="display-print" ng-if="$first">
                                             <span>{{ section.name}}</span>
                                         </th>
-                                        <th class="display-print" ng-if="$index>0">
+                                        <th class="display-print" ng-if="!$first">
                                         </th>
-                                        <th ng-repeat="option in category track by $index" colspan="{{ maxcolumns(section.headers) / category.length}}">
-                                            <span>{{option.name}}</span>
+                                        <th ng-repeat="column in columnConfiguration" colspan="{{ section.baseColumnConfiguration.length / columnConfiguration.length}}">
+                                            <span>{{column.name}}</span>
                                         </th>
                                         <th ng-if="!$last" class="last-column">
                                         </th>
@@ -75,20 +75,20 @@
                                     <tr ng-if="!dataSet.isReferralDataset || (dataSet.isReferralDataset &amp;&amp; referralLocations[dataElement.formName] !== undefined)" ng-repeat="dataElement in section.dataElements | filter:{ isIncluded: true }" ng-form="dataElementForm">
                                         <td>
                                             <div>
-                                                                <span ng-if="!dataSet.isReferralDataset">
-                                                                    <a class="changeColor"
-                                                                       description-popup
-                                                                       dp-title="{{ dataElement.formName }}"
-                                                                       dp-desc="{{ dataElement.description }}">
-                                                                        {{ dataElement.formName }}
-                                                                    </a>
-                                                                </span>
+                                                <span ng-if="!dataSet.isReferralDataset">
+                                                    <a class="changeColor"
+                                                       description-popup
+                                                       dp-title="{{ dataElement.formName }}"
+                                                       dp-desc="{{ dataElement.description }}">
+                                                        {{ dataElement.formName }}
+                                                    </a>
+                                                </span>
                                                 <span ng-if="dataSet.isReferralDataset"> {{ referralLocations[dataElement.formName].name }} </span>
                                             </div>
                                         </td>
-                                        <td ng-repeat="option in section.categoryOptionComboIds">
+                                        <td ng-repeat="column in section.baseColumnConfiguration">
                                             <ng-form name="datavalueForm">
-                                                <input type="text" class="input-sm" name="datavalue" id="datafield_{{$index}}" ng-value="getValue(dataValues, dataElement.id, option, selectedModule)" ng-disabled="true" />
+                                                <input type="text" class="input-sm" name="datavalue" id="datafield_{{$index}}" ng-value="getValue(dataValues, dataElement.id, column.categoryOptionComboId, selectedModule)" ng-disabled="true" />
                                             </ng-form>
                                         </td>
                                         <td ng-if="section.shouldDisplayRowTotals" class="last-column">{{sum(dataValues, selectedModule, dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
@@ -97,8 +97,8 @@
                                         <td>
                                             <span> {{ resourceBundle.totalLabel }}</span>
                                         </td>
-                                        <td ng-repeat="option in section.categoryOptionComboIds track by $id(option)">
-                                            {{columnSum(dataValues, selectedModule, section.dataElements, option, dataSet.isReferralDataset)}}
+                                        <td ng-repeat="column in section.baseColumnConfiguration">
+                                            {{columnSum(dataValues, selectedModule, section.dataElements, column.categoryOptionComboId, dataSet.isReferralDataset)}}
                                         </td>
                                         <td ng-if="section.shouldDisplayRowTotals" class="last-column"> {{totalSum(dataValues, section.dataElements)}}
                                         </td>
@@ -130,18 +130,18 @@
                                 </accordion-heading>
                                 <table locked-table-header class="table table-bordered" ng-if="isDatasetOpen[dataSet.id] || printingTallySheet">
                                     <thead>
-                                    <tr ng-repeat="category in section.headers">
-                                        <th class="display-print" ng-if="$index===0">
+                                    <tr ng-repeat="columnConfiguration in section.columnConfigurations">
+                                        <th class="display-print" ng-if="$first">
                                             <span>{{ section.name}}</span>
                                         </th>
-                                        <th class="display-print" ng-if="$index>0">
+                                        <th class="display-print" ng-if="!$first">
                                         </th>
-                                        <th ng-repeat="option in category track by $index" colspan="{{ maxcolumns(section.headers) / category.length}}">
+                                        <th ng-repeat="column in columnConfiguration" colspan="{{ section.baseColumnConfiguration.length / columnConfiguration.length}}">
                                             <span>{{ option.name}}</span>
                                         </th>
                                         <th ng-hide="$last" class="last-column">
                                         </th>
-                                        <th ng-show="$last && section.categoryOptionComboIds.length > 1" class="last-column">
+                                        <th ng-show="$last && section.shouldDisplayRowTotals" class="last-column">
                                             {{ resourceBundle.totalLabel }}
                                         </th>
                                     </tr>
@@ -151,12 +151,12 @@
                                         <td>
                                             <span>{{ orgUnit[dataElement.id] || orgUnit.name}}</span>
                                         </td>
-                                        <td ng-repeat="option in section.categoryOptionComboIds">
+                                        <td ng-repeat="column in section.baseColumnConfiguration">
                                             <ng-form name="datavalueForm">
-                                                <input type="text" class="input-sm" name="datavalue" id="datafield_{{$index}}" ng-value="getValue(dataValues, dataElement.id, option, orgUnit)" ng-disabled="true" />
+                                                <input type="text" class="input-sm" name="datavalue" id="datafield_{{$index}}" ng-value="getValue(dataValues, dataElement.id, column.categoryOptionComboId, orgUnit)" ng-disabled="true" />
                                             </ng-form>
                                         </td>
-                                        <td ng-if="section.categoryOptionComboIds.length > 1" class="last-column">{{sum(dataValues, orgUnit ,dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
+                                        <td ng-if="section.shouldDisplayRowTotals" class="last-column">{{sum(dataValues, orgUnit ,dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
                                     </tr>
                                     </tbody>
                                     <tbody>
@@ -167,7 +167,7 @@
                                         <td>
                                             {{originSum(dataValues, section)}}
                                         </td>
-                                        <td class="last-column" ng-if="section.categoryOptionComboIds.length > 1"> {{originSum(dataValues,section)}}
+                                        <td class="last-column" ng-if="section.shouldDisplayRowTotals"> {{originSum(dataValues,section)}}
                                         </td>
                                     </tr>
                                     </tbody>

@@ -155,16 +155,12 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             var sum = 0, values;
             _.forEach($scope.originOrgUnits, function(orgUnit) {
                 values = dataValues[orgUnit.id];
-                if (values && values[section.dataElements[0].id] && values[section.dataElements[0].id][section.categoryOptionComboIds[0]]) {
-                    var value = values[section.dataElements[0].id][section.categoryOptionComboIds[0]].value || "0";
+                if (values && values[section.dataElements[0].id] && values[section.dataElements[0].id][section.baseColumnConfiguration[0].categoryOptionComboId]) {
+                    var value = values[section.dataElements[0].id][section.baseColumnConfiguration[0].categoryOptionComboId].value || "0";
                     sum += parseInt(value);
                 }
             });
             return sum;
-        };
-
-        $scope.maxcolumns = function(headers) {
-            return _.last(headers).length;
         };
 
         var save = function(options) {
@@ -174,7 +170,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                     "isPopulationDataset": true
                 });
                 if (populationDataset) {
-                    var categoryOptionComboId = populationDataset.sections[0].categoryOptionComboIds[0];
+                    var categoryOptionComboId = populationDataset.sections[0].baseColumnConfiguration[0].categoryOptionComboId;
                     _.forEach(populationDataset.sections[0].dataElements, function(dataElement) {
                         $scope.dataValues[currentModuleId][dataElement.id] = !$scope.dataValues[currentModuleId][dataElement.id] ? {} : $scope.dataValues[currentModuleId][dataElement.id];
 
@@ -390,7 +386,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                         var setTotalsDisplayPreferencesforDataSetSections = function () {
                             _.each($scope.dataSets, function (dataSet) {
                                 _.each(dataSet.sections, function (dataSetSection) {
-                                    dataSetSection.shouldDisplayRowTotals = dataSetSection.categoryOptionComboIds.length > 1;
+                                    dataSetSection.shouldDisplayRowTotals = dataSetSection.baseColumnConfiguration.length > 1;
                                     dataSetSection.shouldDisplayColumnTotals = (_.filter(dataSetSection.dataElements, {isIncluded: true}).length > 1 && !(dataSetSection.shouldHideTotals));
                                 });
                             });

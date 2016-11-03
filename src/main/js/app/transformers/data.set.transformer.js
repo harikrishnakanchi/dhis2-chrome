@@ -68,24 +68,23 @@ define(["extractHeaders", "lodash", "customAttributes"], function(extractHeaders
     };
 
     this.enrichWithCategoryOptionCombinations = function(dataSets, allCategoryCombos, allCategories, allCategoryOptionCombos) {
-        var enrichedCategories = function(categoryComboId) {
-            var categories = _.find(allCategoryCombos, _.matchesProperty('id', categoryComboId)).categories;
-            return _.map(categories, function(category) {
-                return _.find(allCategories, _.matchesProperty('id', category.id));
-            });
-        };
 
         return _.map(dataSets, function(dataSet) {
             _.each(dataSet.sections, function(section) {
-                var categoryCombo = _.first(section.dataElements).categoryCombo;
-                var categories = enrichedCategories(categoryCombo.id);
-                var result = extractHeaders(categories, categoryCombo, allCategoryOptionCombos);
-                section.headers = result.headers;
-                section.categoryOptionComboIds = result.categoryOptionComboIds;
-                section.categoryOptionComboIdsForTotals = _.pluck(_.reject(allCategoryOptionCombos, function(catOptCombo) {
-                    return _.endsWith(catOptCombo.code, "excludeFromTotal") || !_.contains(section.categoryOptionComboIds, catOptCombo.id);
-                }), "id");
-                return section;
+                var categoryComboId = _.first(section.dataElements).categoryCombo.id,
+                    categoryCombo = _.find(allCategoryCombos, { id: categoryComboId }),
+                    categoryOptionCombos = _.filter(allCategoryOptionCombos, { categoryCombo: { id: categoryComboId } });
+
+                var categories = _.map(categoryCombo.categories, function(category) {
+                    return _.find(allCategories, { id: category.id });
+                });
+
+                section.columnConfigurations = extractHeaders.generate(categories, categoryOptionCombos);
+                section.baseColumnConfiguration = _.last(section.columnConfigurations);
+                section.categoryOptionComboIdsForTotals = _.chain(section.baseColumnConfiguration)
+                    .reject('excludeFromTotal')
+                    .map('categoryOptionComboId')
+                    .value();
             });
 
             return dataSet;

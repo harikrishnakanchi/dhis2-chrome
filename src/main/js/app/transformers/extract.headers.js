@@ -1,46 +1,47 @@
 define(["lodash"], function(_) {
-    return function(categories, categoryCombo, categoryOptionCombos) {
-        var categoryOptionCombosForGivenCategoryCombo = _.filter(categoryOptionCombos, { categoryCombo: { id: categoryCombo.id } });
 
-        var cartesianProductOf = function(twoDimensionalArray) {
-            var multiply = function(arrA, arrB) {
-                return _.flatten(_.map(arrA, function(a) {
-                    return _.map(arrB, function(b) {
-                        a = _.isArray(a) ? a : [a];
-                        b = _.isArray(b) ? b : [b];
-                        return a.concat(b);
-                    });
-                }));
-            };
+    var generate = function(categories, categoryOptionCombos) {
 
-            return twoDimensionalArray.length === 1 ?
-                _.map(_.first(twoDimensionalArray), function(a) { return [a]; }) :
-                _.reduce(twoDimensionalArray, function(result, a) { return multiply(result, a); });
+        var findCategoryOptionComboId = function(categoryOptions) {
+            var requiredCategoryOptionIds = _.map(categoryOptions, 'id');
+
+            return _.find(categoryOptionCombos, function(categoryOptionCombo) {
+                return _.isEmpty(_.xor(requiredCategoryOptionIds, _.map(categoryOptionCombo.categoryOptions, 'id')));
+            }).id;
         };
 
-        var arrayOfCategoryOptions = _.map(categories, 'categoryOptions');
+        var columnConfigurations = _.transform(categories, function (columnConfigurations, category) {
+            var previousColumnConfig = _.last(columnConfigurations);
 
-        var headerLabels = _.reduce(arrayOfCategoryOptions, function (result, categoryOptions) {
-            var previousItemLength = _.get(_.last(result), 'length', 1);
-            var headers = [];
-            _.times(previousItemLength, function () {
-                headers.push(categoryOptions);
-            });
-            result.push(_.flatten(headers));
-            return result;
+            if(previousColumnConfig) {
+                columnConfigurations.push(_.flatten(_.map(previousColumnConfig, function (previousColumnConfigItem) {
+                    return _.map(category.categoryOptions, function (categoryOption) {
+                        return {
+                            name: categoryOption.name,
+                            categoryOptions: previousColumnConfigItem.categoryOptions.concat([categoryOption])
+                        };
+                    });
+                })));
+            } else {
+                columnConfigurations.push(_.map(category.categoryOptions, function (categoryOption) {
+                    return {
+                        name: categoryOption.name,
+                        categoryOptions: [categoryOption]
+                    };
+                }));
+            }
         }, []);
 
-        var comboIds = _.map(cartesianProductOf(arrayOfCategoryOptions), function(categoryOptions) {
-            var requiredCategoryOptionIds = _.map(categoryOptions, 'id').sort();
-
-            return _.find(categoryOptionCombosForGivenCategoryCombo, function(categoryOptionCombo) {
-                return _.isEqual(requiredCategoryOptionIds, _.map(categoryOptionCombo.categoryOptions, 'id').sort());
-            }).id;
+        var baseColumnConfiguration = _.last(columnConfigurations);
+        _.each(baseColumnConfiguration, function (columnConfigItem) {
+            columnConfigItem.excludeFromTotal = _.any(columnConfigItem.categoryOptions, 'excludeFromTotal');
+            columnConfigItem.categoryOptionComboId = findCategoryOptionComboId(columnConfigItem.categoryOptions);
         });
 
-        return {
-            headers: headerLabels,
-            categoryOptionComboIds: comboIds
-        };
+        return columnConfigurations;
+    };
+
+    return {
+        generate: generate
     };
 });

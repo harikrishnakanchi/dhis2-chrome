@@ -1,5 +1,20 @@
-define(["dataSetTransformer", "testData", "lodash"], function(datasetTransformer, testData, _) {
+define(["dataSetTransformer", "testData", "extractHeaders", "lodash"], function(datasetTransformer, testData, extractHeaders, _) {
     describe("datasetTransformer", function() {
+        var mockColumnConfigurations;
+
+        beforeEach(function () {
+            mockColumnConfigurations = [[{
+                name: 'categoryOptionName1',
+                categoryOptionComboId: 'categoryOptionComboIdA',
+                excludeFromTotal: false
+            }, {
+                name: 'categoryOptionName2',
+                categoryOptionComboId: 'categoryOptionComboIdB',
+                excludeFromTotal: true
+            }]];
+            spyOn(extractHeaders, 'generate').and.returnValue(mockColumnConfigurations);
+        });
+
         describe('mapDatasetForView', function () {
             var createMockDataset = function (attributeValue) {
                 return {
@@ -182,49 +197,28 @@ define(["dataSetTransformer", "testData", "lodash"], function(datasetTransformer
             });
         });
 
-        it("should enrich datasets with category option combinations", function() {
+        it("should enrich datasets with column configurations", function() {
             var dataSets = [{
-                "id": "DS_OPD",
-                "sections": [{
-                    "id": "Sec1",
-                    "dataElements": [{
-                        "id": "DE1",
-                        "categoryCombo": {
-                            "id": "CC1"
+                sections: [{
+                    dataElements: [{
+                        categoryCombo: {
+                            id: 'CC1'
                         }
                     }]
                 }]
             }];
 
-            var allCategoryCombos = testData.get("categoryCombos");
-            var allCategories = testData.get("categories");
-            var allCategoryOptionCombos = testData.get("categoryOptionCombos");
+            var allCategoryCombos = testData.get('categoryCombos');
+            var allCategories = testData.get('categories');
+            var allCategoryOptionCombos = testData.get('categoryOptionCombos');
             var enrichedDatasets = datasetTransformer.enrichWithCategoryOptionCombinations(dataSets, allCategoryCombos, allCategories, allCategoryOptionCombos);
 
-            var expectedSectionHeaders = [
-                [{
-                    "id": "CO1",
-                    "name": "Resident"
-                }, {
-                    "id": "CO2",
-                    "name": "Migrant"
-                }],
-                [{
-                    "id": "CO3",
-                    "name": "LessThan5"
-                }, {
-                    "id": "CO4",
-                    "name": "GreaterThan5"
-                }, {
-                    "id": "CO3",
-                    "name": "LessThan5"
-                }, {
-                    "id": "CO4",
-                    "name": "GreaterThan5"
-                }]
-            ];
-            expect(enrichedDatasets[0].sections[0].headers).toEqual(expectedSectionHeaders);
-            expect(enrichedDatasets[0].sections[0].categoryOptionComboIds).toEqual(['1', '2', '3', '4']);
+            var expectedCategoryOptionCombos = _.filter(allCategoryOptionCombos, { categoryCombo: { id: 'CC1' } });
+            expect(extractHeaders.generate).toHaveBeenCalledWith(allCategories, expectedCategoryOptionCombos);
+
+            expect(enrichedDatasets[0].sections[0].columnConfigurations).toEqual(mockColumnConfigurations);
+            expect(enrichedDatasets[0].sections[0].baseColumnConfiguration).toEqual(_.last(mockColumnConfigurations));
+            expect(enrichedDatasets[0].sections[0].categoryOptionComboIdsForTotals).toEqual([mockColumnConfigurations[0][0].categoryOptionComboId]);
         });
 
         it("should enrich data elements with the dataElement Group", function() {

@@ -42,10 +42,6 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
             return $scope.isDatasetOpen;
         };
 
-        $scope.maxcolumns = function(headers) {
-            return _.last(headers).length;
-        };
-
         $scope.getValue = function(dataValues, dataElementId, option, orgUnits) {
             if (dataValues === undefined)
                 return;
@@ -127,8 +123,8 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
             var sum = 0;
             _.forEach($scope.originOrgUnits, function(orgUnit) {
                 values = dataValues[orgUnit.id];
-                if (values && values[section.dataElements[0].id] && values[section.dataElements[0].id][section.categoryOptionComboIds[0]]) {
-                    var value = values[section.dataElements[0].id][section.categoryOptionComboIds[0]].value || "0";
+                if (values && values[section.dataElements[0].id] && values[section.dataElements[0].id][section.baseColumnConfiguration[0].categoryOptionComboId]) {
+                    var value = values[section.dataElements[0].id][section.baseColumnConfiguration[0].categoryOptionComboId].value || "0";
                     sum += parseInt(value);
                 }
             });
@@ -290,7 +286,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
                         var setTotalsDisplayPreferencesforDataSetSections = function () {
                             _.each($scope.dataSets, function (dataSet) {
                                 _.each(dataSet.sections, function (dataSetSection) {
-                                    dataSetSection.shouldDisplayRowTotals = dataSetSection.categoryOptionComboIds.length > 1;
+                                    dataSetSection.shouldDisplayRowTotals = dataSetSection.baseColumnConfiguration.length > 1;
                                     dataSetSection.shouldDisplayColumnTotals = (_.filter(dataSetSection.dataElements, {isIncluded: true}).length > 1 && !(dataSetSection.shouldHideTotals));
                                 });
                             });
