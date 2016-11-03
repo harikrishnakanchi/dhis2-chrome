@@ -125,7 +125,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 datasetRepository = new DatasetRepository();
                 spyOn(datasetRepository, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
                 spyOn(datasetRepository, "includeDataElements").and.returnValue(utils.getPromise(q, []));
-                spyOn(datasetRepository, "includeCategoryOptionCombinations").and.returnValue(utils.getPromise(q, []));
+                spyOn(datasetRepository, "includeColumnConfigurations").and.returnValue(utils.getPromise(q, []));
 
                 referralLocationsRepository = new ReferralLocationsRepository();
                 spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, []));

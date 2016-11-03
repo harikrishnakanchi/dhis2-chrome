@@ -67,7 +67,7 @@ define(["dataEntryTableColumnConfig", "lodash", "customAttributes"], function(da
         });
     };
 
-    this.enrichWithCategoryOptionCombinations = function(dataSets, allCategoryCombos, allCategories, allCategoryOptionCombos) {
+    this.enrichWithColumnConfigurations = function(dataSets, allCategoryCombos, allCategories, allCategoryOptionCombos) {
 
         return _.map(dataSets, function(dataSet) {
             _.each(dataSet.sections, function(section) {

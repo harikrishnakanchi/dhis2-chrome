@@ -211,7 +211,7 @@ define(["dataSetTransformer", "testData", "dataEntryTableColumnConfig", "lodash"
             var allCategoryCombos = testData.get('categoryCombos');
             var allCategories = testData.get('categories');
             var allCategoryOptionCombos = testData.get('categoryOptionCombos');
-            var enrichedDatasets = datasetTransformer.enrichWithCategoryOptionCombinations(dataSets, allCategoryCombos, allCategories, allCategoryOptionCombos);
+            var enrichedDatasets = datasetTransformer.enrichWithColumnConfigurations(dataSets, allCategoryCombos, allCategories, allCategoryOptionCombos);
 
             var expectedCategoryOptionCombos = _.filter(allCategoryOptionCombos, { categoryCombo: { id: 'CC1' } });
             expect(dataEntryTableColumnConfig.generate).toHaveBeenCalledWith(allCategories, expectedCategoryOptionCombos);

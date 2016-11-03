@@ -50,7 +50,7 @@ define(["lodash", "dataSetTransformer", "customAttributes"], function(_, dataSet
 
         };
 
-        this.includeCategoryOptionCombinations = function(dataSets) {
+        this.includeColumnConfigurations = function(dataSets) {
             var categoryCombosPromise = categoryRepository.getAllCategoryCombos();
             var categoriesPromise = categoryRepository.getAllCategories();
             var categoryOptionCombosPromise = categoryRepository.getAllCategoryOptionCombos();
@@ -59,7 +59,7 @@ define(["lodash", "dataSetTransformer", "customAttributes"], function(_, dataSet
                 var allCategoryCombos = data[0];
                 var allCategories = data[1];
                 var allCategoryOptionCombos = data[2];
-                return dataSetTransformer.enrichWithCategoryOptionCombinations(dataSets, allCategoryCombos, allCategories, allCategoryOptionCombos);
+                return dataSetTransformer.enrichWithColumnConfigurations(dataSets, allCategoryCombos, allCategories, allCategoryOptionCombos);
             });
         };
 

@@ -262,7 +262,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
 
                 var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnits)
                     .then(_.curryRight(datasetRepository.includeDataElements)($scope.excludedDataElements))
-                    .then(datasetRepository.includeCategoryOptionCombinations)
+                    .then(datasetRepository.includeColumnConfigurations)
                     .then(function(dataSets) {
 
                         var translateDataSets = function (datasets) {

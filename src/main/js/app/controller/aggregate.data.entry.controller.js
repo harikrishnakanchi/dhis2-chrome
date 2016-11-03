@@ -367,7 +367,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             return $q.all([loadAssociatedOrgUnitsAndPrograms(), loadExcludedDataElements(), loadRefferalLocations(), loadPopulationOptionSet()]).then(function() {
                 var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnits)
                     .then(_.curryRight(datasetRepository.includeDataElements)($scope.excludedDataElements))
-                    .then(datasetRepository.includeCategoryOptionCombinations)
+                    .then(datasetRepository.includeColumnConfigurations)
                     .then(function(dataSets) {
                         var translateDatasets = function (dataSets) {
                             var partitionDatasets = _.partition(dataSets, {

@@ -18,7 +18,7 @@ define(["dataSetRepository", "dataSetTransformer", "categoryRepository", "testDa
             }];
 
             spyOn(dataSetTransformer, 'mapDatasetForView').and.callFake(function (dataSet) { return dataSet; });
-            spyOn(dataSetTransformer, 'enrichWithCategoryOptionCombinations').and.callFake(function (dataSet) { return dataSet; });
+            spyOn(dataSetTransformer, 'enrichWithColumnConfigurations').and.callFake(function (dataSet) { return dataSet; });
 
             categoryRepository = new CategoryRepository();
             spyOn(categoryRepository, 'getAllCategoryCombos').and.returnValue(utils.getPromise(q, testData.get('categoryCombos')));
@@ -104,10 +104,10 @@ define(["dataSetRepository", "dataSetTransformer", "categoryRepository", "testDa
         });
 
         it("should get dataSets with sections headers", function() {
-            dataSetRepository.includeCategoryOptionCombinations(mockDataSets);
+            dataSetRepository.includeColumnConfigurations(mockDataSets);
             scope.$apply();
 
-            expect(dataSetTransformer.enrichWithCategoryOptionCombinations).toHaveBeenCalled();
+            expect(dataSetTransformer.enrichWithColumnConfigurations).toHaveBeenCalled();
         });
 
         describe('Upsert dataSets downloaded from dhis', function () {
