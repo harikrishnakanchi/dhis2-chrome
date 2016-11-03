@@ -152,15 +152,15 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
         };
 
         $scope.originSum = function(dataValues, section) {
-            var sum = 0, values;
-            _.forEach($scope.originOrgUnits, function(orgUnit) {
-                values = dataValues[orgUnit.id];
-                if (values && values[section.dataElements[0].id] && values[section.dataElements[0].id][section.baseColumnConfiguration[0].categoryOptionComboId]) {
-                    var value = values[section.dataElements[0].id][section.baseColumnConfiguration[0].categoryOptionComboId].value || "0";
-                    sum += parseInt(value);
-                }
+            return _.sum($scope.originOrgUnits, function(orgUnit) {
+                var value = _.chain(dataValues)
+                    .get(orgUnit.id)
+                    .get(section.dataElements[0].id)
+                    .get(section.baseColumnConfiguration[0].categoryOptionComboId)
+                    .get('value', '0')
+                    .value();
+                return parseInt(value);
             });
-            return sum;
         };
 
         var save = function(options) {
