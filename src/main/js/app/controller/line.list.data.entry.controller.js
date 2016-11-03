@@ -240,7 +240,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                     }
 
                     if (dv.valueType === "DATE" || dv.valueType === "DATETIME")
-                        return new Date(dv.value);
+                        return dv.value && new Date(dv.value);
 
                     if (dv.valueType === 'NUMBER')
                         return parseFloat(dv.value);
