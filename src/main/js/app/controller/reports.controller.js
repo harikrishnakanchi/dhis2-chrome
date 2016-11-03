@@ -164,7 +164,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 });
         };
 
-        var loadRelevantDatasets = function() {
+        var loadServicesForOrgUnit = function() {
 
             var loadDataSetsForModules = function(data) {
                 var modulesAndOrigins = data.modules.concat(data.origins);
@@ -203,11 +203,16 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 });
             };
 
+            var sortServices = function () {
+                $scope.services = _.sortByOrder($scope.services, 'name');
+            };
+
             return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id)
                 .then(getOrigins)
                 .then(loadDataSetsForModules)
                 .then(loadProgramForOrigins)
-                .then(setDefaultServiceCode);
+                .then(setDefaultServiceCode)
+                .then(sortServices);
         };
 
         var loadOrgUnit = function() {
@@ -267,7 +272,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             $scope.selectedService = null;
 
             loadOrgUnit()
-                .then(loadRelevantDatasets)
+                .then(loadServicesForOrgUnit)
                 .then(loadChartsWithData)
                 .then(loadPivotTablesWithData)
                 .then(loadLastUpdatedForChartsAndReports)

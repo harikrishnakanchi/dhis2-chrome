@@ -93,6 +93,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             beforeEach(function () {
                 programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, undefined));
             });
+
             it('should load dataSets', function() {
                 scope.$apply();
 
@@ -129,6 +130,13 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
 
                 scope.$apply();
                 expect(scope.services).toEqual([]);
+            });
+
+            it('should sort the services', function () {
+                datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [{ name: 'serviceB' }, { name: 'serviceA' }]));
+
+                scope.$apply();
+                expect(_.map(scope.services, 'name')).toEqual(['serviceA', 'serviceB']);
             });
         });
 
