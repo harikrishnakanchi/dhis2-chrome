@@ -296,7 +296,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             return false;
         };
 
-        var deregisterDirtyFormWatcher = $scope.$watch('dataentryForm.$dirty', function(dirty) {
+        var deregisterDirtyFormWatcher = $scope.$watch('forms.dataentryForm.$dirty', function(dirty) {
             if (dirty) {
                 $scope.preventNavigation = true;
             } else {
@@ -424,8 +424,8 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                         $scope.isDataAvailable = moduleDataBlock.submitted || moduleDataBlock.approvedAtAnyLevel;
                     });
 
-                if ($scope.dataentryForm !== undefined)
-                    $scope.dataentryForm.$setPristine();
+                if ($scope.forms.dataentryForm !== undefined)
+                    $scope.forms.dataentryForm.$setPristine();
                 return $q.all([loadDataSetsPromise, loadModuleDataBlock, loadProjectPromise]);
 
             }).finally(function() {
@@ -450,6 +450,8 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
         var init = function() {
             $scope.dataType = "aggregate";
         };
+
+        $scope.forms = {};
 
         resetForm();
         init();

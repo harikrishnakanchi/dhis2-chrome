@@ -92,9 +92,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     result: utils.getPromise(q, {})
                 });
 
-                scope.dataentryForm = { $setPristine: function() {} };
-                spyOn(scope.dataentryForm, '$setPristine');
-
                 var mockOptionSet = {
                     code: 'praxisPopulationDataElements',
                     options: [{code: 'estimatedTargetPopulation'}, {code: 'estPopulationLessThan1Year'}, {code: 'estPopulationBetween1And5Years'}, {code: 'estPopulationOfWomenOfChildBearingAge'}]
@@ -149,6 +146,9 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 spyOn(optionSetRepository, 'getOptionSetByCode').and.returnValue(utils.getPromise(q, mockOptionSet));
 
                 aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, anchorScroll, location, fakeModal, rootScope, window, timeout, dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository, optionSetRepository);
+
+                scope.forms.dataentryForm = { $setPristine: function() {} };
+                spyOn(scope.forms.dataentryForm, '$setPristine');
 
                 scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
             }));
@@ -435,7 +435,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(scope.saveSuccess).toBe(false);
                 expect(scope.submitError).toBe(false);
                 expect(scope.saveError).toBe(false);
-                expect(scope.dataentryForm.$setPristine).toHaveBeenCalled();
+                expect(scope.forms.dataentryForm.$setPristine).toHaveBeenCalled();
             });
 
             it("should save data values as draft to indexeddb", function() {
@@ -448,7 +448,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(scope.saveSuccess).toBe(true);
                 expect(scope.submitError).toBe(false);
                 expect(scope.saveError).toBe(false);
-                expect(scope.dataentryForm.$setPristine).toHaveBeenCalled();
+                expect(scope.forms.dataentryForm.$setPristine).toHaveBeenCalled();
             });
 
             it("should create module data block for current module and period", function() {
@@ -651,16 +651,16 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it('should prevent navigation if data entry form is dirty', function() {
-                scope.dataentryForm.$dirty = false;
-                scope.dataentryForm.$dirty = true;
+                scope.forms.dataentryForm.$dirty = false;
+                scope.forms.dataentryForm.$dirty = true;
                 scope.$apply();
 
                 expect(scope.preventNavigation).toEqual(true);
             });
 
             it('should not prevent navigation if data entry form is not dirty', function() {
-                scope.dataentryForm.$dirty = true;
-                scope.dataentryForm.$dirty = false;
+                scope.forms.dataentryForm.$dirty = true;
+                scope.forms.dataentryForm.$dirty = false;
                 scope.$apply();
 
                 expect(scope.preventNavigation).toEqual(false);
