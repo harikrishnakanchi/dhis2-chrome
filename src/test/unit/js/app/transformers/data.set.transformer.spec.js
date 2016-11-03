@@ -1,4 +1,4 @@
-define(["dataSetTransformer", "testData", "extractHeaders", "lodash"], function(datasetTransformer, testData, extractHeaders, _) {
+define(["dataSetTransformer", "testData", "dataEntryTableColumnConfig", "lodash"], function(datasetTransformer, testData, dataEntryTableColumnConfig, _) {
     describe("datasetTransformer", function() {
         var mockColumnConfigurations;
 
@@ -12,7 +12,7 @@ define(["dataSetTransformer", "testData", "extractHeaders", "lodash"], function(
                 categoryOptionComboId: 'categoryOptionComboIdB',
                 excludeFromTotal: true
             }]];
-            spyOn(extractHeaders, 'generate').and.returnValue(mockColumnConfigurations);
+            spyOn(dataEntryTableColumnConfig, 'generate').and.returnValue(mockColumnConfigurations);
         });
 
         describe('mapDatasetForView', function () {
@@ -214,7 +214,7 @@ define(["dataSetTransformer", "testData", "extractHeaders", "lodash"], function(
             var enrichedDatasets = datasetTransformer.enrichWithCategoryOptionCombinations(dataSets, allCategoryCombos, allCategories, allCategoryOptionCombos);
 
             var expectedCategoryOptionCombos = _.filter(allCategoryOptionCombos, { categoryCombo: { id: 'CC1' } });
-            expect(extractHeaders.generate).toHaveBeenCalledWith(allCategories, expectedCategoryOptionCombos);
+            expect(dataEntryTableColumnConfig.generate).toHaveBeenCalledWith(allCategories, expectedCategoryOptionCombos);
 
             expect(enrichedDatasets[0].sections[0].columnConfigurations).toEqual(mockColumnConfigurations);
             expect(enrichedDatasets[0].sections[0].baseColumnConfiguration).toEqual(_.last(mockColumnConfigurations));

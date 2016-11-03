@@ -69,7 +69,7 @@ require.config({
 
         //Transformers
         "dataSetTransformer": "app/transformers/data.set.transformer",
-        "extractHeaders": "app/transformers/extract.headers",
+        "dataEntryTableColumnConfig": "app/transformers/data.entry.table.column.config",
 
         //Monitors
         "dhisMonitor": "app/monitors/dhis.monitor",

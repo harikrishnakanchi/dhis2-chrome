@@ -1,5 +1,5 @@
-define(['extractHeaders', 'lodash'], function(extractHeaders, _) {
-    describe('extractHeaders', function () {
+define(['dataEntryTableColumnConfig', 'lodash'], function(dataEntryTableColumnConfig, _) {
+    describe('dataEntryTableColumnConfig', function () {
         describe('generate', function () {
             var categoryOptionA, categoryOptionB, categoryOptionX, categoryOptionY, categories,
                 categoryOptionCombo1, categoryOptionCombo2, categoryOptionCombo3, categoryOptionCombo4, categoryOptionCombos;
@@ -55,7 +55,7 @@ define(['extractHeaders', 'lodash'], function(extractHeaders, _) {
                     }]
                 ];
 
-                expect(extractHeaders.generate(categories, categoryOptionCombos)).toEqual(expectedResult);
+                expect(dataEntryTableColumnConfig.generate(categories, categoryOptionCombos)).toEqual(expectedResult);
             });
         });
     });

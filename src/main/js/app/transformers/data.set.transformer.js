@@ -1,4 +1,4 @@
-define(["extractHeaders", "lodash", "customAttributes"], function(extractHeaders, _, CustomAttributes) {
+define(["dataEntryTableColumnConfig", "lodash", "customAttributes"], function(dataEntryTableColumnConfig, _, CustomAttributes) {
     this.mapDatasetForView = function(dataset) {
         var resultDataset = _.pick(dataset, ["id", "name", "shortName", "code", "sections"]);
         resultDataset.isAggregateService = !CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE) &&
@@ -79,7 +79,7 @@ define(["extractHeaders", "lodash", "customAttributes"], function(extractHeaders
                     return _.find(allCategories, { id: category.id });
                 });
 
-                section.columnConfigurations = extractHeaders.generate(categories, categoryOptionCombos);
+                section.columnConfigurations = dataEntryTableColumnConfig.generate(categories, categoryOptionCombos);
                 section.baseColumnConfiguration = _.last(section.columnConfigurations);
                 section.categoryOptionComboIdsForTotals = _.chain(section.baseColumnConfiguration)
                     .reject('excludeFromTotal')

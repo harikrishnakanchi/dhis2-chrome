@@ -138,7 +138,7 @@ require.config({
         "initializationRoutine": "app/factories/initialization.routine",
 
         //Transformers
-        "extractHeaders": "app/transformers/extract.headers",
+        "dataEntryTableColumnConfig": "app/transformers/data.entry.table.column.config",
         "dataValuesMapper": "app/transformers/datavalues.mapper",
         "orgUnitMapper": "app/transformers/orgunit.mapper",
         "toTree": "app/transformers/to.tree",
