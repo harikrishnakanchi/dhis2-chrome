@@ -309,7 +309,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
         });
 
         var initializeForm = function() {
-            $scope.loading = true;
+            $scope.startLoading();
             currentPeriod = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
             $scope.isDataEntryAllowed = moment($scope.week.startOfWeek).isAfter(moment().subtract(properties.projectDataSync.numWeeksToSync, 'week'));
             currentPeriodAndOrgUnit = {
@@ -428,9 +428,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                     $scope.forms.dataentryForm.$setPristine();
                 return $q.all([loadDataSetsPromise, loadModuleDataBlock, loadProjectPromise]);
 
-            }).finally(function() {
-                $scope.loading = false;
-            });
+            }).finally($scope.stopLoading);
         };
 
         var deregisterModuleWeekInfoListener = $scope.$on('moduleWeekInfo', function(event, data) {

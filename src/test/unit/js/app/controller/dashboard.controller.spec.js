@@ -33,6 +33,9 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                     "syncModuleDataBlockDesc": "some description"
                 };
 
+                rootScope.startLoading = jasmine.createSpy('startLoading');
+                rootScope.stopLoading = jasmine.createSpy('stopLoading');
+
                 approvalDataRepository = new ApprovalDataRepository();
                 spyOn(approvalDataRepository, "getApprovalDataForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, []));
                 spyOn(approvalDataRepository, "markAsComplete").and.returnValue(utils.getPromise(q, {}));

@@ -213,7 +213,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
                 "period": currentPeriod,
                 "orgUnit": $scope.selectedModule.id
             };
-            $scope.loading = true;
+            $scope.startLoading();
             $scope.isOfflineApproval = false;
 
             var loadAssociatedOrgUnitsAndPrograms = function() {
@@ -313,9 +313,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
 
                 return $q.all([loadDataSetsPromise, loadModuleDataBlock]);
 
-            }).finally(function() {
-                $scope.loading = false;
-            });
+            }).finally($scope.stopLoading);
         };
 
         var init = function() {

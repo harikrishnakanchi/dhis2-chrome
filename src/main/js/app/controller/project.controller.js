@@ -112,17 +112,17 @@ define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate"], funct
                 });
             };
 
+            $scope.startLoading();
             return saveToDbAndPublishMessage(dhisProject)
                 .then(getModulesInProject)
-                .then(createOrgUnitGroups);
+                .then(createOrgUnitGroups)
+                .finally($scope.stopLoading);
         };
 
         $scope.save = function(newOrgUnit, parentOrgUnit) {
-            $scope.loading = true;
+            $scope.startLoading();
             var dhisProject = orgUnitMapper.mapToProjectForDhis(newOrgUnit, parentOrgUnit);
-            saveToDbAndPublishMessage(dhisProject).finally(function() {
-                $scope.loading = false;
-            });
+            saveToDbAndPublishMessage(dhisProject).finally($scope.stopLoading);
         };
 
         var prepareNewForm = function() {

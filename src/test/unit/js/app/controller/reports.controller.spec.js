@@ -36,6 +36,10 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                 orgUnit: mockModule.id
             };
             rootScope.resourceBundle = {};
+
+            scope.startLoading = jasmine.createSpy('startLoading');
+            scope.stopLoading = jasmine.createSpy('stopLoading');
+
             rootScope.currentUser = {
                 selectedProject: mockProject
             };

@@ -23,6 +23,9 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
                     lastTwelveWeeks: 'Last 12 weeks'
                 };
 
+                scope.startLoading = jasmine.createSpy('startLoading');
+                scope.stopLoading = jasmine.createSpy('stopLoading');
+
                 mockExcludedDataElements = {
                     dataElements: [
                         { id: 'dataElementId1' },

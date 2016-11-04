@@ -88,6 +88,9 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     syncModuleDataBlockDesc: 'some description'
                 };
 
+                scope.startLoading = jasmine.createSpy('startLoading');
+                scope.stopLoading = jasmine.createSpy('stopLoading');
+
                 fakeModal = {
                     close: function() {
                         this.result.confirmCallBack();

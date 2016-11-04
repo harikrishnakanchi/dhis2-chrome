@@ -168,14 +168,12 @@ define(["lodash"], function(_) {
         };
 
         var init = function() {
-            $scope.loading = true;
+            $scope.startLoading();
             return getAllCharts()
                 .then(getUserModules)
                 .then(orgUnitRepository.enrichWithParent)
                 .then(getChartData)
-                .then(function () {
-                $scope.loading = false;
-            });
+                .then($scope.stopLoading);
         };
 
         init();

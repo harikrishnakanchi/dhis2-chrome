@@ -122,6 +122,9 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "uploadExcludedOptionsDesc": "upload excluded options for module "
                 };
 
+                scope.startLoading = jasmine.createSpy('startLoading');
+                scope.stopLoading = jasmine.createSpy('stopLoading');
+
                 scope.isNewMode = true;
                 createLineListModuleController();
             }));

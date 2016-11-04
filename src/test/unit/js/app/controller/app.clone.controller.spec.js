@@ -10,8 +10,8 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
                 timeout = $timeout;
                 location = $location;
 
-                rootScope.startLoading = function () {};
-                rootScope.stopLoading = function () {};
+                rootScope.startLoading = jasmine.createSpy('startLoading');
+                rootScope.stopLoading = jasmine.createSpy('stopLoading');
 
                 filesystemService = new FilesystemService(q);
                 indexeddbUtils = new IndexeddbUtils();

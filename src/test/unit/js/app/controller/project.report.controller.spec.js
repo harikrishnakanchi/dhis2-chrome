@@ -38,6 +38,9 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
                 endDateLabel: 'End Date'
             };
 
+            scope.startLoading = jasmine.createSpy('startLoading');
+            scope.stopLoading = jasmine.createSpy('stopLoading');
+
             mockProjectOrgUnit = {
                 "id": "xyz",
                 "name": "Aweil - SS153",

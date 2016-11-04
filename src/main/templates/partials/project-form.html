@@ -1,7 +1,4 @@
 <div ng-controller="projectController">
-    <div class="loading" ng-show="loading">
-        <img src="img/ajax-loader.gif" class="spinner" />
-    </div>
     <div class="top-actions" ng-if="!isNewMode &amp;&amp; hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver', 'Data entry user', 'Projectadmin'])">
         <input type="button" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.createOperationUnitBtnLabel }}" ng-click="openInNewMode('Operation Unit')" />
         <input type="button" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.createUserLabel }}" ng-click="openInNewMode('User')" />

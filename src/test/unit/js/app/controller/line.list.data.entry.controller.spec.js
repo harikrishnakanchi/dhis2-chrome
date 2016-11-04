@@ -14,6 +14,9 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 scope.resourceBundle = {};
 
+                rootScope.startLoading = jasmine.createSpy('startLoading');
+                rootScope.stopLoading = jasmine.createSpy('stopLoading');
+
                 routeParams = {
                     'eventId': 'event1',
                     'module': 'mod1',

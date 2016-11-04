@@ -43,6 +43,9 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 "upsertOrgUnitDesc": "upsert org unit"
             };
 
+            scope.startLoading = jasmine.createSpy('startLoading');
+            scope.stopLoading = jasmine.createSpy('stopLoading');
+
             scope.locale = "en";
 
             Timecop.install();

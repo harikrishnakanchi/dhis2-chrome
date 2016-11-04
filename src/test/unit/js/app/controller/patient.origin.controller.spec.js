@@ -40,6 +40,9 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit "
             };
 
+            scope.startLoading = jasmine.createSpy('startLoading');
+            scope.stopLoading = jasmine.createSpy('stopLoading');
+
             orgUnitGroupHelper = new OrgUnitGroupHelper();
             spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
 

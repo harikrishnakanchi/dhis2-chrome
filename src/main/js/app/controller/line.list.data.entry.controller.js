@@ -96,7 +96,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
         };
 
         $scope.isReferralLocationPresent = function(dataElement) {
-            return !($scope.loading === false && _.eq(dataElement.offlineSummaryType, "referralLocations") && _.isEmpty($scope.dataElementOptions[dataElement.id]));
+            return !(_.eq(dataElement.offlineSummaryType, "referralLocations") && _.isEmpty($scope.dataElementOptions[dataElement.id]));
         };
 
         $scope.update = function() {
@@ -285,7 +285,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
 
 
 
-            $scope.loading = true;
+            $rootScope.startLoading();
             resetForm();
             loadModule()
                 .then(setEventMinAndMaxDate)
@@ -295,9 +295,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 .then(loadOptionSets)
                 .then(loadExcludedOptions)
                 .then(loadEvent)
-                .finally(function() {
-                    $scope.loading = false;
-                });
+                .finally($rootScope.stopLoading);
         };
         init();
     };

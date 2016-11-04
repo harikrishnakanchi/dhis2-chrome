@@ -34,6 +34,9 @@
                  ]
              };
 
+             rootScope.startLoading = jasmine.createSpy('startLoading');
+             rootScope.stopLoading = jasmine.createSpy('stopLoading');
+
              rootScope.hasRoles = jasmine.createSpy("hasRoles").and.returnValue(false);
 
              userPreferenceRepository = new UserPreferenceRepository();

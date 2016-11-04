@@ -343,10 +343,8 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
                 return $scope.orgUnit.lineListService ? loadLineListRawData() : loadAggregateRawData();
             };
 
-            $scope.loading = true;
-            return loadRawData().finally(function() {
-                $scope.loading = false;
-            });
+            $scope.startLoading();
+            return loadRawData().finally($scope.stopLoading);
         };
 
         $scope.$watchGroup(['orgUnit', 'selectedService', 'selectedWeeksToExport'], reloadView);

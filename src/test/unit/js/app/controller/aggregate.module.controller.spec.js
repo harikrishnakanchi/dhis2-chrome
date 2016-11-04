@@ -95,6 +95,8 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit ",
                     "removeOrgUnitFromDatasetDesc": "remove selected services from module "
                 };
+                scope.startLoading = jasmine.createSpy('startLoading');
+                scope.stopLoading = jasmine.createSpy('stopLoading');
 
                 scope.isNewMode = true;
 

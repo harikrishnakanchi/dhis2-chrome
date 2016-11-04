@@ -54,6 +54,8 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                     patientOriginLabel: 'Patient Origin',
                     yesLabel: 'YES'
                 };
+                scope.startLoading = jasmine.createSpy('startLoading');
+                scope.stopLoading = jasmine.createSpy('stopLoading');
 
                 scope.locale = "en";
 

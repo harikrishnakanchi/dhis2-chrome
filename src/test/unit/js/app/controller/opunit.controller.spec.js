@@ -36,6 +36,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 'uploadPatientOriginDetailsDesc': 'create patient origin ',
                 'upsertOrgUnitDesc': 'upsert org unit'
             };
+            scope.startLoading = jasmine.createSpy('startLoading');
+            scope.stopLoading = jasmine.createSpy('stopLoading');
+
             scope.$parent.closeNewForm = jasmine.createSpy();
 
             Timecop.install();

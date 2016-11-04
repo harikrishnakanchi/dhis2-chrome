@@ -298,19 +298,18 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                     });
                 };
 
-                $scope.loading = true;
+                $scope.startLoading();
                 return getEnrichedModule($scope.module)
                     .then(createModules)
                     .then(_.partial(saveExcludedDataElements, enrichedModule))
                     .then(createOrgUnitGroups)
                     .then(createOriginOrgUnits)
                     .then(_.partial(onSuccess, enrichedModule), onError)
-                    .finally(function() {
-                        $scope.loading = false;
-                    });
+                    .finally($scope.stopLoading);
             };
 
             $scope.update = function() {
+                $scope.startLoading();
                 var enrichedModule = orgUnitMapper.mapToModule($scope.module, $scope.module.id, 6);
 
                 var dataSetsToAssociate = getDatasetsToAssociate();
@@ -321,15 +320,12 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                     });
                 };
 
-                $scope.loading = true;
                 enrichExistingModuleWithDataSets();
                 return $q.all([saveExcludedDataElements(enrichedModule), orgUnitRepository.upsert(enrichedModule),
                         publishMessage({orgUnitId: enrichedModule.id}, "syncOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: enrichedModule.name }))
                     ])
                     .then(_.partial(onSuccess, enrichedModule), onError)
-                    .finally(function() {
-                        $scope.loading = false;
-                    });
+                    .finally($scope.stopLoading);
             };
 
             $scope.areDatasetsSelected = function() {

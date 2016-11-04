@@ -53,14 +53,12 @@ define(["lodash", "dhisId", "moment","interpolate", "orgUnitMapper"], function(_
                 });
             };
 
-            $scope.loading = true;
+            $scope.startLoading();
 
             return orgUnitRepository.upsert([newOrgUnit])
                 .then(saveToDhis)
                 .then(onSuccess, onError)
-                .finally(function() {
-                    $scope.loading = false;
-                });
+                .finally($scope.stopLoading);
         };
 
         $scope.reset = function() {

@@ -3,7 +3,6 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
         orgUnitRepository, approvalDataRepository, referralLocationsRepository, dataSyncFailureRepository, translationsService, filesystemService) {
 
         $scope.filterParams = {};
-        $scope.loadingResults = false;
         $scope.showOfflineSummaryForViewOnly = true;
         $scope.viewRegistrationBook = false;
         $scope.excludedDataElementIds = [];
@@ -330,24 +329,20 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
         };
 
         $scope.filterByCaseNumber = function() {
-            $scope.loadingResults = true;
+            $scope.startLoading();
             programEventRepository.findEventsByCode($scope.program.id, _.pluck($scope.originOrgUnits, "id"), $scope.filterParams.caseNumber)
                 .then(enhanceEvents)
-                .then(function() {
-                    $scope.loadingResults = false;
-                });
+                .then($scope.stopLoading);
         };
 
         $scope.filterByDateRange = function() {
-            $scope.loadingResults = true;
+            $scope.startLoading();
             var startDate = moment($scope.filterParams.startDate).format("YYYY-MM-DD");
             var endDate = moment($scope.filterParams.endDate).format("YYYY-MM-DD");
 
             programEventRepository.findEventsByDateRange($scope.program.id, _.pluck($scope.originOrgUnits, "id"), startDate, endDate)
                 .then(enhanceEvents)
-                .then(function() {
-                    $scope.loadingResults = false;
-                });
+                .then($scope.stopLoading);
         };
 
         $scope.filterSubmittedEvents = function (event) {
@@ -489,16 +484,14 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
                 $scope.filterParams.filterBy = 'caseNumber';
             $scope.eventListTitle = $scope.resourceBundle.eventListTitle;
             $scope.noCasesMsg = $scope.resourceBundle.noCasesFound;
-            $scope.loading = true;
+            $scope.startLoading();
             return loadModule()
                 .then(getreferralLocations)
                 .then(loadOriginOrgUnits)
                 .then(loadPrograms)
                 .then(setUpProjectAutoApprovedFlag)
                 .then(loadEventsView)
-                .finally(function() {
-                    $scope.loading = false;
-                });
+                .finally($scope.stopLoading);
         };
 
         init();

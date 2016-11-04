@@ -128,14 +128,12 @@ define(["lodash", "moment", "dhisId","interpolate", "orgUnitMapper"], function(_
                 "origins": patientOrigins
             };
 
-            $scope.loading = true;
+            $scope.startLoading();
             return patientOriginRepository.upsert(payload)
                 .then(_.partial(publishMessage, payload.orgUnit, "uploadPatientOriginDetails", $scope.resourceBundle.uploadPatientOriginDetailsDesc + _.pluck(payload.origins, "name")))
                 .then(createOrgUnitsAndGroups)
                 .then(onSuccess, onFailure)
-                .finally(function() {
-                    $scope.loading = false;
-                });
+                .finally($scope.stopLoading);
         };
 
         $scope.closeForm = function() {
@@ -195,10 +193,12 @@ define(["lodash", "moment", "dhisId","interpolate", "orgUnitMapper"], function(_
                 });
             };
 
+            $scope.startLoading();
             getOriginsToUpsert()
                 .then(getSystemSetting)
                 .then(publishUpdateMessages)
-                .then(onSuccess, onFailure);
+                .then(onSuccess, onFailure)
+                .finally($scope.stopLoading);
         };
 
         var init = function() {

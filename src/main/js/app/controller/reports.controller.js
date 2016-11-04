@@ -266,7 +266,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
         };
 
         var init = function() {
-            $scope.loading = true;
+            $scope.startLoading();
 
             $scope.currentTab = 'weeklyReport';
             $scope.selectedService = null;
@@ -280,7 +280,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                     $scope.selectedService = _.find($scope.services, function (service) {
                         return !service.isOriginDataset;
                     });
-                    $scope.loading = false;
+                    $scope.stopLoading();
                 });
         };
 

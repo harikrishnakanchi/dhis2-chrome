@@ -87,6 +87,9 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     "syncModuleDataBlockDesc": "some description"
                 };
 
+                scope.startLoading = jasmine.createSpy('startLoading');
+                scope.stopLoading = jasmine.createSpy('stopLoading');
+
                 fakeModal = { open: function() {} };
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})

@@ -122,16 +122,14 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
                 }]
             };
 
-            $scope.loading = true;
+            $scope.startLoading();
             return patientOriginRepository.upsert(patientOriginPayload)
                 .then(_.partial(publishMessage, patientOriginPayload.orgUnit, "uploadPatientOriginDetails", $scope.resourceBundle.uploadPatientOriginDetailsDesc + _.pluck(patientOriginPayload.origins, "name")))
                 .then(_.partial(orgUnitRepository.upsert, opUnit))
                 .then(saveToDhis)
                 .then(_.partial(exitForm, opUnit))
                 .catch(onError)
-                .finally(function() {
-                    $scope.loading = false;
-                });
+                .finally($scope.stopLoading);
         };
 
         $scope.update = function(opUnit) {
@@ -183,16 +181,14 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
                 });
             };
 
-            $scope.loading = true;
+            $scope.startLoading();
             return orgUnitRepository.upsert(opUnit)
                 .then(saveToDhis)
                 .then(getModulesInOpUnit)
                 .then(createOrgUnitGroups)
                 .then(_.partial(exitForm, opUnit))
                 .catch(onError)
-                .finally(function() {
-                    $scope.loading = false;
-                });
+                .finally($scope.stopLoading);
         };
 
         $scope.editPatientOrigin = function(origin) {

@@ -1,7 +1,4 @@
 <div ng-controller="countryController">
-    <div class="loading" ng-show="loading">
-        <img src="img/ajax-loader.gif" class="spinner" />
-    </div>
     <div class="top-actions" ng-if="!isNewMode">
         <input type="button" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.createProjectLabel }}" ng-click="openInNewMode('Project')" />
         <input type="button" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.createUserLabel }}" ng-click="openInNewMode('User')" />

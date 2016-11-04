@@ -170,10 +170,9 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper", "excelBuilder"], funct
 
         var init = function() {
             $scope.pivotTables= [];
-            $scope.loading = true;
-            $q.all([loadProjectBasicInfo(), loadPivotTables(), loadLastUpdatedTimeForProjectReport()]).finally(function () {
-                $scope.loading = false;
-            });
+            $scope.startLoading();
+            $q.all([loadProjectBasicInfo(), loadPivotTables(), loadLastUpdatedTimeForProjectReport()])
+                .finally($scope.stopLoading);
         };
 
         init();

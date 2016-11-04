@@ -394,7 +394,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
                     });
                 };
 
-                $scope.loading = true;
+                $scope.startLoading();
                 return getEnrichedModule($scope.module)
                     .then(createModule)
                     .then(_.partial(saveExcludedDataElements, enrichedModule))
@@ -402,15 +402,13 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
                     .then(associateMandatoryDatasetsToModule)
                     .then(_.partial(saveExcludedLineListOptions, enrichedModule))
                     .then(_.partial(onSuccess, enrichedModule), onError)
-                    .finally(function() {
-                        $scope.loading = false;
-                    });
+                    .finally($scope.stopLoading);
             };
 
             $scope.update = function(module) {
                 var enrichedModule = orgUnitMapper.mapToModule(module, module.id, 6);
 
-                $scope.loading = true;
+                $scope.startLoading();
                 return $q.all([
                     saveExcludedDataElements(enrichedModule),
                     saveExcludedLineListOptions(enrichedModule),
@@ -418,9 +416,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
                     publishMessage(enrichedModule, "upsertOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: enrichedModule.name }))
                 ])
                     .then(_.partial(onSuccess, enrichedModule), onError)
-                    .finally(function() {
-                        $scope.loading = false;
-                    });
+                    .finally($scope.stopLoading);
             };
 
             $scope.shouldDisableSaveOrUpdateButton = function() {
