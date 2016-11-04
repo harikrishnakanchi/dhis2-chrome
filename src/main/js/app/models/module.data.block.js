@@ -31,11 +31,8 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
 
         if(lineListService) {
             return failedToSync && approvedAtAnyLevel;
-        } else {
-            //This can be removed after v6.0 has been released
-            var aggregateDataValuesFailedToSyncAsPerDeprecatedLocalStatus = !!aggregateDataValues && _.any(aggregateDataValues, { localStatus: 'FAILED_TO_SYNC' });
-            return failedToSync || aggregateDataValuesFailedToSyncAsPerDeprecatedLocalStatus;
-        }
+        } else
+            return failedToSync;
     };
 
     var isWaitingForActionAtDataEntryLevel = function(submitted, approvedAtProject, approvedAtCoordination, failedToSync) {

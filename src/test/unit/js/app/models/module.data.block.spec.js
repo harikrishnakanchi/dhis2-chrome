@@ -494,26 +494,6 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             beforeEach(function() {
                 isLineListService = false;
             });
- //These can be removed after v6.0 has been released
-            describe('compatibility with deprecated localStatus flags', function() {
-                it('should be true if localStatus is FAILED_TO_SYNC', function() {
-                    aggregateDataValues = [createMockDataValuesObject({
-                        localStatus: "FAILED_TO_SYNC"
-                    })];
-                    moduleDataBlock = createModuleDataBlock();
-
-                    expect(moduleDataBlock.failedToSync).toEqual(true);
-                });
-
-                it('should be false if localStatus is not FAILED_TO_SYNC', function() {
-                    aggregateDataValues = [createMockDataValuesObject({
-                        localStatus: "SOME_OTHER_STATUS"
-                    })];
-                    moduleDataBlock = createModuleDataBlock();
-
-                    expect(moduleDataBlock.failedToSync).toEqual(false);
-                });
-            });
 
             describe('Line list module', function () {
                beforeEach(function () {
