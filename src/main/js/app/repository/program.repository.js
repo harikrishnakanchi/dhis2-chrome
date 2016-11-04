@@ -69,13 +69,6 @@ define(["lodash", "moment", "customAttributes"], function(_, moment, CustomAttri
                 return programsStore.find(programId);
             };
 
-            // This method can be removed after release > 6.0
-            var addMandatoryFields = function (program) {
-                program.shortName = program.shortName || program.name;
-                program.programType = program.programType || "WITHOUT_REGISTRATION";
-                return program;
-            };
-
             var enrichDataElements = function(program) {
                 if (!program) return undefined;
                 var promises = [];
@@ -97,8 +90,7 @@ define(["lodash", "moment", "customAttributes"], function(_, moment, CustomAttri
 
             return getProgram(programId)
                 .then(addServiceCode)
-                .then(enrichDataElements)
-                .then(addMandatoryFields);
+                .then(enrichDataElements);
         };
 
         this.associateOrgUnits = function(program, orgUnits) {

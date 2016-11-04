@@ -139,18 +139,6 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
 
                 scope.$apply();
             });
-
-            it("should add missing mandatory fields to programs", function() {
-                mockStore.find.and.returnValue(utils.getPromise(q, mockProgram));
-
-                programRepository.get(mockProgram.id).then(function (program) {
-                    expect(program.shortName).toBeDefined();
-                    expect(program.shortName).toEqual(program.name);
-                    expect(program.programType).toBeDefined();
-                });
-
-                scope.$apply();
-            });
         });
 
         describe('getAll', function () {
