@@ -16,18 +16,8 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                     });
                 });
             });
-            var isAnyDataSetIsLocked = function (response) {
-                var responseData = _.isString(response.data) ? response.data : response.data.message;
-                if (response.status == 409 && _.contains(responseData, "Data set is locked:")) {
-                    return $q.when();
-                }
-                else {
-                    return $q.reject();
-                }
-            };
-            // TODO: Remove catch block after 6.0 update
-            return $http.post(dhisUrl.approvalMultipleL1, payload)
-                .catch(isAnyDataSetIsLocked);
+            
+            return $http.post(dhisUrl.approvalMultipleL1, payload);
         };
 
         this.markAsApproved = function(dataSets, periods, orgUnits) {
