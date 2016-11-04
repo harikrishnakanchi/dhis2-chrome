@@ -194,7 +194,7 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
         $scope.editPatientOrigin = function(origin) {
             $scope.patientOrigin = origin;
             $scope.showEditOriginForm = true;
-            $scope.formTemplateUrl = "templates/partials/patient-origin-form.html" + '?' + moment().format("X");
+            $scope.formTemplateUrl = "templates/partials/patient-origin-form.html";
         };
 
         var setBooleanAttributeValue = function(attributeValues, attributeCode) {
