@@ -344,10 +344,6 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
                         expect(orgUnitRepository.findAllByParent).toHaveBeenCalledWith(selectedOrgUnit.id);
                     });
 
-                    it('should filter out data elements with an associatedProgramId', function () {
-                        expect(dataSetSection.dataElements).toEqual(_.reject(dataElements, 'associatedProgramId'));
-                    });
-
                     it('should create two-dimension map of data values by week by orgUnit', function () {
                         var expectedDataValues = {
                             '2016W01': {

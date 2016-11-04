@@ -231,7 +231,6 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
 
                 expect(programRepository.get).toHaveBeenCalledWith('someProgram', ['de1', 'de3']);
                 expect(scope.program).toEqual(programAndStageData);
-                expect(scope.associatedProgramId).toEqual("someProgram");
             });
 
             it("should load patient origin org units on init", function() {

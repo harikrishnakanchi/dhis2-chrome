@@ -199,7 +199,7 @@ define(["lodash", "moment", "properties", "interpolate"], function(_, moment, pr
             };
 
             var getProgram = function(excludedDataElements) {
-                return programRepository.get($scope.associatedProgramId, excludedDataElements).then(function(program) {
+                return programRepository.get($scope.program.id, excludedDataElements).then(function(program) {
                     $scope.program = translationsService.translate(program);
                 });
             };
@@ -285,7 +285,7 @@ define(["lodash", "moment", "properties", "interpolate"], function(_, moment, pr
 
         var init = function() {
             return $q.all([loadOriginsOrgUnits(), loadProgram(), getOptionSetMapping(), getReferralLocations()]).then(function() {
-                return programEventRepository.getEventsForPeriod($scope.associatedProgramId, _.pluck($scope.originOrgUnits, "id"), getPeriod()).then(function(events) {
+                return programEventRepository.getEventsForPeriod($scope.program.id, _.pluck($scope.originOrgUnits, "id"), getPeriod()).then(function(events) {
                     var submittedEvents = _.filter(events, function(event) {
                         return event.localStatus === "READY_FOR_DHIS" || event.localStatus === undefined;
                     });

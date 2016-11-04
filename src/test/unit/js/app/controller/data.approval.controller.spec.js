@@ -703,5 +703,16 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 scope.$apply();
                 expect(scope.sum(dataValues, orgUnits, "de1", ['c1', 'c2'])).toBe(2);
             });
+
+            it("should set program on scope", function() {
+                var program = {
+                    name: 'mockProgram'
+                };
+                programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, program));
+                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
+                scope.$apply();
+
+                expect(scope.program).toEqual(program);
+            });
         });
     });

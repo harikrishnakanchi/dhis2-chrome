@@ -15,7 +15,6 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
             $scope.approveError = false;
             $scope.syncError = false;
             $scope.excludedDataElements = {};
-            $scope.associatedProgramId = undefined;
             $scope.rowTotal = {};
         };
 
@@ -221,12 +220,8 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
                     $scope.moduleAndOriginOrgUnits = [$scope.selectedModule].concat(originOrgUnits);
                     $scope.originOrgUnits = originOrgUnits;
                     return programRepository.getProgramForOrgUnit(originOrgUnits[0].id).then(function(program) {
-                        if (program) {
-                            $scope.associatedProgramId = program.id;
-                            $scope.isLineListModule = true;
-                        } else {
-                            $scope.isLineListModule = false;
-                        }
+                        $scope.program = program;
+                        $scope.isLineListModule = !!program;
                     });
                 });
             };

@@ -202,7 +202,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                     "weekYear": "2015",
                     "weekNumber": "21"
                 };
-                scope.associatedProgramId = "Emergency Department";
+                scope.program =  { id: "Emergency Department" };
 
                 lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService);
                 scope.$apply();

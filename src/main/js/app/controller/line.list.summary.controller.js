@@ -450,7 +450,6 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
                     return programRepository.getProgramForOrgUnit($scope.originOrgUnits[0].id).then(function(program) {
                         return programRepository.get(program.id, excludedDataElements).then(function(program) {
                             $scope.program = translationsService.translate(program);
-                            $scope.associatedProgramId = $scope.program.id;
                             $scope.summaryDataElements = getSummaryDataElementFromProgram($scope.program);
                             $scope.dataElementsForExport = getDataElementsForExport($scope.program);
                         });

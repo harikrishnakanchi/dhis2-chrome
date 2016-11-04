@@ -43,9 +43,6 @@ define(["dataEntryTableColumnConfig", "lodash", "customAttributes"], function(da
         var enrichDataElements = function(dataElements) {
             return _.map(dataElements, function(dataElement) {
                 var enrichedDataElement = _.pick(indexedDataElements[dataElement.id], "id", "name", "formName", "categoryCombo", "description", "code");
-                var associatedProgram = CustomAttributes.getAttributeValue(indexedDataElements[dataElement.id].attributeValues, CustomAttributes.ASSOCIATED_PROGRAM_CODE);
-                if (!_.isEmpty(associatedProgram))
-                    enrichedDataElement.associatedProgramId = associatedProgram;
                 enrichedDataElement.isIncluded = _.isEmpty(excludedDataElements) ? true : !_.contains(excludedDataElements, dataElement.id);
                 enrichedDataElement.isMandatory = CustomAttributes.getBooleanAttributeValue(indexedDataElements[dataElement.id].attributeValues, CustomAttributes.MANDATORY_CODE);
                 var subSection = getSubSection(enrichedDataElement)[0] || {

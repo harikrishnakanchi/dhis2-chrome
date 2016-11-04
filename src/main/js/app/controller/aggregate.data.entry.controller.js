@@ -18,7 +18,6 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             $scope.syncError = false;
             $scope.projectIsAutoApproved = false;
             $scope.excludedDataElements = {};
-            $scope.associatedProgramId = undefined;
             $scope.rowTotal = {};
         };
 
@@ -321,10 +320,6 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                 return orgUnitRepository.findAllByParent([$scope.selectedModule.id]).then(function(originOrgUnits) {
                     $scope.moduleAndOriginOrgUnits = [$scope.selectedModule].concat(originOrgUnits);
                     $scope.originOrgUnits = originOrgUnits;
-                    return programRepository.getProgramForOrgUnit(originOrgUnits[0].id).then(function(program) {
-                        if (program)
-                            $scope.associatedProgramId = program.id;
-                    });
                 });
             };
 

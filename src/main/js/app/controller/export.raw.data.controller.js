@@ -42,10 +42,6 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
         var filterDataElementsAndRetrieveOriginsForOriginDataSet = function () {
             if(!$scope.selectedService.isOriginDataset) return $q.when();
 
-            _.each($scope.sections, function(section) {
-                section.dataElements = _.reject(section.dataElements, 'associatedProgramId');
-            });
-
             return orgUnitRepository.findAllByParent($scope.orgUnit.id).then(function (originOrgUnits) {
                 $scope.originOrgUnits = _.sortBy(originOrgUnits, 'name');
             });
