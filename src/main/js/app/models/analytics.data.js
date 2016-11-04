@@ -64,8 +64,7 @@ define(['lodash'], function (_) {
             });
             return _.map(dimensionConfiguration.items, function (item) {
                 var dataDimensionItem = _.find(dataDimensionItems, { id: item.id });
-                //TODO: Remove item.description once all Praxis instances have re-downloaded all pivotTables (probably after 7.1 release).
-                return _.merge(_.pick(item, 'description'),{
+                return _.merge({
                     id: item.id,
                     name: item.name,
                     dataDimension: true,
