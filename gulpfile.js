@@ -6,11 +6,11 @@ var shell = require('gulp-shell');
 var http = require('http');
 var ecstatic = require('ecstatic');
 var protractor = require('gulp-protractor').protractor;
-var download = require('gulp-download');
+var request = require('request');
+var fs = require('fs');
 var argv = require('yargs').argv;
 var karmaConf = __dirname + '/src/test/unit/conf/karma.conf.js';
 var webserver;
-var rename = require('gulp-rename');
 var path = require('path');
 var zip = require('gulp-zip');
 var template = require('gulp-template');
@@ -29,6 +29,24 @@ var supportEmail = argv.supportEmail || "";
 
 var exportTranslations = require('./tasks/export.translations');
 var importTranslations = require('./tasks/import.translations');
+
+var download = function (url, outputFile, onDone) {
+    var options = {
+        url: url,
+        headers: {
+            'Authorization': auth
+        }
+    };
+
+    return request(options)
+        .on('response', function(response) {
+            if (response.statusCode != 200) {
+                onDone("Server exited with " + response.statusCode);
+                process.exit(1);
+            }
+        })
+        .pipe(fs.createWriteStream(outputFile));
+};
 
 gulp.task('test', function(onDone) {
     new karmaServer({
@@ -108,34 +126,24 @@ gulp.task('less', function() {
         .pipe(gulp.dest('./src/main/css'));
 });
 
-gulp.task('download-metadata', function () {
-    return download(baseIntUrl + "/api/metadata.json?assumeTrue=false&categories=true&categoryCombos=true&categoryOptionCombos=true&categoryOptions=true&dataElementGroups=true&dataElements=true&optionSets=true&organisationUnitGroupSets=true&sections=true&translations=true&users=true&organisationUnitGroups=true", auth)
-        .pipe(rename("metadata.json"))
-        .pipe(gulp.dest(path.dirname("./src/main/data/metadata.json")));
+gulp.task('download-metadata', function (callback) {
+    return download(baseIntUrl + "/api/metadata.json?assumeTrue=false&categories=true&categoryCombos=true&categoryOptionCombos=true&categoryOptions=true&dataElementGroups=true&dataElements=true&optionSets=true&organisationUnitGroupSets=true&sections=true&translations=true&users=true&organisationUnitGroups=true", "./src/main/data/metadata.json", callback);
 });
 
-gulp.task('download-datasets', function () {
-    return download(baseIntUrl + "/api/dataSets.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]],!organisationUnits&paging=false", auth)
-        .pipe(rename("dataSets.json"))
-        .pipe(gulp.dest(path.dirname("./src/main/data/dataSets.json")));
+gulp.task('download-datasets', function (callback) {
+    return download(baseIntUrl + "/api/dataSets.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]],!organisationUnits&paging=false", "./src/main/data/dataSets.json", callback);
 });
 
-gulp.task('download-programs', function () {
-    return download(baseIntUrl + "/api/programs.json?fields=id,name,displayName,organisationUnits,attributeValues[:identifiable,value,attribute[:identifiable]],programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false", auth)
-        .pipe(rename("programs.json"))
-        .pipe(gulp.dest(path.dirname("./src/main/data/programs.json")));
+gulp.task('download-programs', function (callback) {
+    return download(baseIntUrl + "/api/programs.json?fields=id,name,displayName,organisationUnits,attributeValues[:identifiable,value,attribute[:identifiable]],programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false", "./src/main/data/programs.json", callback);
 });
 
-gulp.task('download-fieldapp-settings', function() {
-    return download(baseIntUrl + "/api/systemSettings.json?key=fieldAppSettings,versionCompatibilityInfo", auth)
-        .pipe(rename("systemSettings.json"))
-        .pipe(gulp.dest(path.dirname("./src/main/data/systemSettings.json")));
+gulp.task('download-fieldapp-settings', function(callback) {
+    return download(baseIntUrl + "/api/systemSettings.json?key=fieldAppSettings,versionCompatibilityInfo", "./src/main/data/systemSettings.json", callback);
 });
 
-gulp.task('download-organisation-units', function() {
-    return download(baseIntUrl + "/api/organisationUnits.json?fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid&paging=false", auth)
-        .pipe(rename("organisationUnits.json"))
-        .pipe(gulp.dest(path.dirname("./src/main/data/organisationUnits.json")));
+gulp.task('download-organisation-units', function(callback) {
+    return download(baseIntUrl + "/api/organisationUnits.json?fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid&paging=false", "./src/main/data/organisationUnits.json", callback)
 });
 
 gulp.task('download-packaged-data', ['download-metadata', 'download-datasets', 'download-programs', 'download-fieldapp-settings', 'download-organisation-units'], function () {});

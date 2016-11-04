@@ -6,11 +6,9 @@
   "devDependencies": {
     "ecstatic": "0.7.1",
     "gulp": "^3.9.0",
-    "gulp-download": "DWB-eHealth/gulp-download",
     "gulp-jshint": "^2.0.0",
     "gulp-less": "^3.0.0",
     "gulp-protractor": "2.0.0",
-    "gulp-rename": "1.2.2",
     "gulp-shell": "^0.5.0",
     "gulp-template": "^4.0.0",
     "gulp-zip": "^3.0.0",
@@ -25,6 +23,7 @@
     "karma-live-preprocessor": "0.2.2",
     "karma-ng-html2js-preprocessor": "^0.2.0",
     "karma-requirejs": "^0.2.2",
+    "request": "^2.78.0",
     "requirejs": "^2.3.1",
     "sw-precache": "^4.2.1",
     "yargs": "3.6.0"
