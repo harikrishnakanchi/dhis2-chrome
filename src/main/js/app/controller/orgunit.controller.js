@@ -64,7 +64,7 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
         };
 
         var init = function() {
-            var userHasNotSelectedProject = _.isUndefined($rootScope.currentUser.selectedProject),
+            var userHasNotSelectedProject = _.isUndefined(_.get($rootScope.currentUser, 'selectedProject')),
                 productKeyIsGlobal = $rootScope.productKeyLevel == "global";
             userIsSuperAdmin = $rootScope.currentUser.userCredentials.username === "superadmin";
             userIsProjectAdmin = $rootScope.currentUser.userCredentials.username === "projectadmin";
