@@ -10,6 +10,9 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
                 timeout = $timeout;
                 location = $location;
 
+                rootScope.startLoading = function () {};
+                rootScope.stopLoading = function () {};
+
                 filesystemService = new FilesystemService(q);
                 indexeddbUtils = new IndexeddbUtils();
                 sessionHelper = new SessionHelper();

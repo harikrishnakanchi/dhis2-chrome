@@ -87,7 +87,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
             };
 
             var successCallback = function(fileData) {
-                $rootScope.cloning = true;
+                $rootScope.startLoading();
                 var zipFiles = zipUtils.readZipFile(fileData.target.result);
 
                 var result = {};
@@ -105,9 +105,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
                         sessionHelper.logout();
                         $location.path("/login");
                     }, errorCallback)
-                    .finally(function() {
-                        $rootScope.cloning = false;
-                    });
+                    .finally($rootScope.stopLoading);
             };
 
             var modalMessages = {
@@ -122,14 +120,12 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
         };
 
         var createZip = function(folderName, fileNamePrefix, fileNameExtn, backupCallback) {
-            $rootScope.cloning = true;
+            $rootScope.startLoading();
             return backupCallback().then(function(data) {
-                $rootScope.cloning = false;
+                $rootScope.stopLoading();
                 var zippedData = zipUtils.zipData(folderName, fileNamePrefix, fileNameExtn, data);
                 return filesystemService.writeFile(fileNamePrefix + moment().format("YYYYMMDD-HHmmss") + ".msf", zippedData);
-            }).finally(function() {
-                $rootScope.cloning = false;
-            });
+            }).finally($rootScope.stopLoading);
         };
 
         var showNotification = function(message) {
