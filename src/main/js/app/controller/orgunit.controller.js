@@ -160,12 +160,12 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
         };
 
         $scope.openInNewMode = function(type) {
-            $scope.templateUrl = templateUrlMap[type] + '?' + moment().format("X");
+            $scope.templateUrl = templateUrlMap[type];
             $scope.isNewMode = true;
         };
 
         $scope.openInViewMode = function(type) {
-            $scope.templateUrl = templateUrlMap[type] + '?' + moment().format("X");
+            $scope.templateUrl = templateUrlMap[type];
             $scope.isNewMode = false;
         };
 

@@ -140,7 +140,7 @@ gulp.task('download-organisation-units', function() {
 
 gulp.task('download-packaged-data', ['download-metadata', 'download-datasets', 'download-programs', 'download-fieldapp-settings', 'download-organisation-units'], function () {});
 
-gulp.task('generate-service-worker', function (callback) {
+gulp.task('generate-service-worker', ['less'], function (callback) {
     var path = require('path');
     var swPrecache = require('sw-precache');
     var rootDir = 'src/main';
@@ -165,7 +165,7 @@ gulp.task('pack', ['less', 'config', 'download-packaged-data'], function() {
     return stream;
 });
 
-gulp.task('generate-pwa', ['less', 'config', 'download-packaged-data', 'generate-service-worker'], function () {});
+gulp.task('generate-pwa', ['config', 'download-packaged-data', 'generate-service-worker'], function () {});
 
 gulp.task('zip', ['less', 'config', 'download-metadata'], function() {
     return gulp.src('./src/main/**')
