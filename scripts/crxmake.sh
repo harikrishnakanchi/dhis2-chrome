@@ -18,6 +18,8 @@ trap 'rm -f "$pub" "$sig" "$zip"' EXIT
 
 # zip up the crx dir
 cwd=$(pwd -P)
+
+# zip the contents excluding the `less` directory for reducing the crx size
 (cd "$dir" && zip -qr -x less/\* -9 -X "$cwd/$zip" .)
 
 # signature
