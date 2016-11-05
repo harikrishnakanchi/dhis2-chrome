@@ -92,8 +92,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     "disableOrgUnitDesc": "disable organisation unit",
                     "upsertOrgUnitDesc": "save organisation unit",
                     "uploadSystemSettingDesc": "upload sys settings for ",
-                    "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit ",
-                    "removeOrgUnitFromDatasetDesc": "remove selected services from module "
+                    "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit "
                 };
                 scope.startLoading = jasmine.createSpy('startLoading');
                 scope.stopLoading = jasmine.createSpy('stopLoading');
