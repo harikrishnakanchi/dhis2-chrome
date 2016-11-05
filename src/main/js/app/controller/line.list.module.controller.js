@@ -329,7 +329,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
                             programIds: [program.id],
                             orgUnitIds: _.map(originOrgUnits, 'id')
                         };
-                        return publishMessage(programIdsAndOrgunitIds, 'associateOrgunitToProgram', $scope.resourceBundle.uploadProgramDesc + _.pluck(originOrgUnits, "name"));
+                        return publishMessage(programIdsAndOrgunitIds, 'associateOrgunitToProgram', interpolate($scope.resourceBundle.uploadProgramDesc, { orgunit_name: _.pluck(originOrgUnits, "name").toString() }));
                     });
                 };
 

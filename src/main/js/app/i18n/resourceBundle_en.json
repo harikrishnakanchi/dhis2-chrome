@@ -209,7 +209,7 @@
     "deleteEventDesc": "delete cases",
     "uploadPatientOriginDetailsDesc": "create patient origin ",
     "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit ",
-    "uploadProgramDesc": "associate selected program to ",
+    "uploadProgramDesc": "associate selected program to {{orgunit_name}}",
     "uploadSystemSettingDesc": "sync excluded data elements for ",
     "uploadExcludedOptionsDesc": "upload excluded options for module {{module_name}}",
     "patientOriginValidation": "Patient origin is required",

@@ -118,7 +118,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "upsertOrgUnitDesc": "save organisation unit",
                     "associateOrgUnitToDatasetDesc": "associate datasets for ",
                     "uploadSystemSettingDesc": "upload sys settings for ",
-                    "uploadProgramDesc": "associate selected program to ",
+                    "uploadProgramDesc": "associate selected program to {{orgunit_name}}",
                     "uploadExcludedOptionsDesc": "upload excluded options for module"
                 };
 

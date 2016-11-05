@@ -209,7 +209,7 @@
     "deleteEventDesc": "حذف الحالات",
     "uploadPatientOriginDetailsDesc": "انشاء مكان قدوم المريض",
     "associateOrgUnitToDatasetDesc": "ربط الخدمات المختارة الى الأصول في وحدة العملية",
-    "uploadProgramDesc": "ربط البرنامج المحدد ل",
+    "uploadProgramDesc": "ربط البرنامج المحدد ل {{orgunit_name}}",
     "uploadSystemSettingDesc": "مزامنة عناصر البيانات المستبعدة ل",
     "uploadExcludedOptionsDesc": "upload excluded options for module {{module_name}}",
     "patientOriginValidation": "مطلوب مكان قدوم المريض",

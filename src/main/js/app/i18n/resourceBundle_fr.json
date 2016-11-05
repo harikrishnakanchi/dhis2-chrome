@@ -209,7 +209,7 @@
     "deleteEventDesc": "effacer les cas",
     "uploadPatientOriginDetailsDesc": "créer une origine géographique patient",
     "associateOrgUnitToDatasetDesc": "Associer les services sélectionnés aux origines géographiques de l'Unité Opérationnelle",
-    "uploadProgramDesc": "associer le programme sélectionné à/au",
+    "uploadProgramDesc": "associer le programme sélectionné à/au {{orgunit_name}}",
     "uploadSystemSettingDesc": "la synchronisation a exclu les éléments de données pour",
     "uploadExcludedOptionsDesc": "upload excluded options for module {{module_name}}",
     "patientOriginValidation": "Veuillez saisir une Origine Patient",

@@ -36,7 +36,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             scope.resourceBundle = {
                 "uploadPatientOriginDetailsDesc": "create patient origin ",
                 "upsertOrgUnitDesc": "upsert",
-                "uploadProgramDesc": "upload program for ",
+                "uploadProgramDesc": "upload program for {{orgunit_name}}",
                 "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit "
             };
 
