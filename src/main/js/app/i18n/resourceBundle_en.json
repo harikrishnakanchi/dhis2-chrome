@@ -211,7 +211,7 @@
     "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit ",
     "uploadProgramDesc": "associate selected program to ",
     "uploadSystemSettingDesc": "sync excluded data elements for ",
-    "uploadExcludedOptionsDesc": "upload excluded options for module ",
+    "uploadExcludedOptionsDesc": "upload excluded options for module {{module_name}}",
     "patientOriginValidation": "Patient origin is required",
     "invalidDateRangeMessage": "Date should be within the past 12 weeks",
     "productKeyExpiredMessage": "Your product key has expired. Please contact the admin.",

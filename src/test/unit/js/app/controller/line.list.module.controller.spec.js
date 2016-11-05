@@ -119,7 +119,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "associateOrgUnitToDatasetDesc": "associate datasets for ",
                     "uploadSystemSettingDesc": "upload sys settings for ",
                     "uploadProgramDesc": "associate selected program to ",
-                    "uploadExcludedOptionsDesc": "upload excluded options for module "
+                    "uploadExcludedOptionsDesc": "upload excluded options for module"
                 };
 
                 scope.startLoading = jasmine.createSpy('startLoading');
@@ -472,7 +472,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         "data": enrichedModule.id,
                         "type": "uploadExcludedOptions",
                         "locale": "en",
-                        "desc": "upload excluded options for module Module2"
+                        "desc": scope.resourceBundle.uploadExcludedOptionsDesc
                     }, "dataValues");
                 });
 
@@ -499,7 +499,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         "data": scope.module.id,
                         "type": "uploadExcludedOptions",
                         "locale": "en",
-                        "desc": "upload excluded options for module Module2"
+                        "desc": scope.resourceBundle.uploadExcludedOptionsDesc
                     }, "dataValues");
                 });
 

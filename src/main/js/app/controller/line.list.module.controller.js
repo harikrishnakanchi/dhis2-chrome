@@ -315,7 +315,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
                     }
                 });
                 return excludedLineListOptionsRepository.upsert(excludedLineListOptions).then(function () {
-                    return publishMessageOnlyOnce(enrichedModule.id, "uploadExcludedOptions", $scope.resourceBundle.uploadExcludedOptionsDesc + enrichedModule.name);
+                    return publishMessageOnlyOnce(enrichedModule.id, "uploadExcludedOptions", interpolate($scope.resourceBundle.uploadExcludedOptionsDesc, { module_name: enrichedModule.name }));
                 });
             };
 

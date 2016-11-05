@@ -211,7 +211,7 @@
     "associateOrgUnitToDatasetDesc": "Associer les services sélectionnés aux origines géographiques de l'Unité Opérationnelle",
     "uploadProgramDesc": "associer le programme sélectionné à/au",
     "uploadSystemSettingDesc": "la synchronisation a exclu les éléments de données pour",
-    "uploadExcludedOptionsDesc": "upload excluded options for module ",
+    "uploadExcludedOptionsDesc": "upload excluded options for module {{module_name}}",
     "patientOriginValidation": "Veuillez saisir une Origine Patient",
     "invalidDateRangeMessage": "La date doit être dans les 12 dernières semaines",
     "productKeyExpiredMessage": "Votre Clé Produit est périmée. Svp contacter l'administrateur.",
