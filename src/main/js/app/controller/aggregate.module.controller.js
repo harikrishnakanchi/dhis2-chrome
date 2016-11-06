@@ -256,7 +256,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                 };
                 return excludedDataElementsRepository.upsert(systemSetting).
                 then(_.partial(publishMessage, enrichedModule.id, "uploadExcludedDataElements",
-                    $scope.resourceBundle.uploadSystemSettingDesc + enrichedModule.name));
+                    interpolate($scope.resourceBundle.uploadSystemSettingDesc, { module_name: enrichedModule.name })));
             };
 
             var getDatasetsToAssociate = function() {

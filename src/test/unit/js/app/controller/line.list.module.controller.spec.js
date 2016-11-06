@@ -117,7 +117,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 scope.resourceBundle = {
                     "upsertOrgUnitDesc": "save organisation unit",
                     "associateOrgUnitToDatasetDesc": "associate datasets for {{orgunit_name}}",
-                    "uploadSystemSettingDesc": "upload sys settings for ",
+                    "uploadSystemSettingDesc": "upload sys settings for {{module_name}}",
                     "uploadProgramDesc": "associate selected program to {{orgunit_name}}",
                     "uploadExcludedOptionsDesc": "upload excluded options for module"
                 };

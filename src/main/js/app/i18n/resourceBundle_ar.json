@@ -210,7 +210,7 @@
     "uploadPatientOriginDetailsDesc": "انشاء مكان قدوم المريض {{origin_name}}",
     "associateOrgUnitToDatasetDesc": "ربط الخدمات المختارة الى الأصول في وحدة العملية {{orgunit_name}}",
     "uploadProgramDesc": "ربط البرنامج المحدد ل {{orgunit_name}}",
-    "uploadSystemSettingDesc": "مزامنة عناصر البيانات المستبعدة ل",
+    "uploadSystemSettingDesc": "مزامنة عناصر البيانات المستبعدة ل {{module_name}}",
     "uploadExcludedOptionsDesc": "upload excluded options for module {{module_name}}",
     "patientOriginValidation": "مطلوب مكان قدوم المريض",
     "invalidDateRangeMessage": "يجب أن يكون تاريخ غضون 12 أسابيع الماضية",

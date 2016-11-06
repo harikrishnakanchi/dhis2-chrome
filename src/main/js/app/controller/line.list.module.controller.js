@@ -289,7 +289,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
                 };
                 return excludedDataElementsRepository.upsert(excludedDataElementSetting)
                     .then(_.partial(publishMessage, enrichedModule.id, "uploadExcludedDataElements",
-                        $scope.resourceBundle.uploadSystemSettingDesc + enrichedModule.name));
+                        interpolate($scope.resourceBundle.uploadSystemSettingDesc, { module_name: enrichedModule.name })));
             };
 
             var saveExcludedLineListOptions = function (enrichedModule) {

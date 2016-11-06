@@ -210,7 +210,7 @@
     "uploadPatientOriginDetailsDesc": "create patient origin {{origin_name}}",
     "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit {{orgunit_name}}",
     "uploadProgramDesc": "associate selected program to {{orgunit_name}}",
-    "uploadSystemSettingDesc": "sync excluded data elements for ",
+    "uploadSystemSettingDesc": "sync excluded data elements for {{module_name}}",
     "uploadExcludedOptionsDesc": "upload excluded options for module {{module_name}}",
     "patientOriginValidation": "Patient origin is required",
     "invalidDateRangeMessage": "Date should be within the past 12 weeks",

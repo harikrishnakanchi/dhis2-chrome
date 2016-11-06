@@ -91,7 +91,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.resourceBundle = {
                     "disableOrgUnitDesc": "disable organisation unit",
                     "upsertOrgUnitDesc": "save organisation unit",
-                    "uploadSystemSettingDesc": "upload sys settings for "
+                    "uploadSystemSettingDesc": "upload sys settings for {{module_name}}"
                 };
                 scope.startLoading = jasmine.createSpy('startLoading');
                 scope.stopLoading = jasmine.createSpy('stopLoading');
