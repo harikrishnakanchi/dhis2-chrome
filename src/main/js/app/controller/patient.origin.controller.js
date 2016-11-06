@@ -96,12 +96,12 @@ define(["lodash", "moment", "dhisId","interpolate", "orgUnitMapper"], function(_
                         return originOrgunitCreator.create(module, $scope.patientOrigin).then(function (originOrgUnits) {
                             orgUnitsForGroups = isLinelistService(module) ? orgUnitsForGroups.concat(originOrgUnits) : orgUnitsForGroups.concat(module);
                             if (isLinelistService(module)) {
-                                return publishMessage(originOrgUnits, "upsertOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, {orgUnit: _.uniq(_.pluck(originOrgUnits, "name"))})).then(function () {
+                                return publishMessage(originOrgUnits, "upsertOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, {orgUnit: _.uniq(_.pluck(originOrgUnits, "name")).toString()})).then(function () {
                                     return doAssociations(originOrgUnits, siblingOriginOrgUnits[0]);
                                 });
                             } else {
                                 _.map(originOrgUnits, function (originOrgUnit) {
-                                    return publishMessage({orgUnitId: originOrgUnit.id}, "syncOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, {orgUnit: _.uniq(_.pluck(originOrgUnits, "name"))}));
+                                    return publishMessage({orgUnitId: originOrgUnit.id}, "syncOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, {orgUnit: _.uniq(_.pluck(originOrgUnits, "name")).toString()}));
                                 });
                             }
                         });
@@ -189,7 +189,7 @@ define(["lodash", "moment", "dhisId","interpolate", "orgUnitMapper"], function(_
                     publishMessage(updatedPatientOrigin.orgUnit, "uploadPatientOriginDetails", interpolate($scope.resourceBundle.uploadPatientOriginDetailsDesc, { origin_name: _.map(updatedPatientOrigin.origins, 'name').toString() }));
                 });
                 orgUnitRepository.upsert(originsToUpsert).then(function() {
-                    publishMessage(originsToUpsert, "upsertOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: _.uniq(_.pluck(originsToUpsert, "name")) }));
+                    publishMessage(originsToUpsert, "upsertOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: _.uniq(_.pluck(originsToUpsert, "name")).toString() }));
                 });
             };
 
