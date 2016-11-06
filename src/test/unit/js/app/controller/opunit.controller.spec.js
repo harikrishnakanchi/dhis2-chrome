@@ -33,7 +33,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope.isNewMode = true;
             scope.locale = 'en';
             scope.resourceBundle = {
-                'uploadPatientOriginDetailsDesc': 'create patient origin ',
+                'uploadPatientOriginDetailsDesc': 'create patient origin {{origin_name}}',
                 'upsertOrgUnitDesc': 'upsert org unit'
             };
             scope.startLoading = jasmine.createSpy('startLoading');

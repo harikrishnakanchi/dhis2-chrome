@@ -207,7 +207,7 @@
     "updateUserDesc": "تحديث المستخدم {{username}}",
     "upsertOrgUnitGroupsDesc": "تعيين وحدة المؤسسة إلى المجموعات المناسبة",
     "deleteEventDesc": "حذف الحالات",
-    "uploadPatientOriginDetailsDesc": "انشاء مكان قدوم المريض",
+    "uploadPatientOriginDetailsDesc": "انشاء مكان قدوم المريض {{origin_name}}",
     "associateOrgUnitToDatasetDesc": "ربط الخدمات المختارة الى الأصول في وحدة العملية",
     "uploadProgramDesc": "ربط البرنامج المحدد ل {{orgunit_name}}",
     "uploadSystemSettingDesc": "مزامنة عناصر البيانات المستبعدة ل",

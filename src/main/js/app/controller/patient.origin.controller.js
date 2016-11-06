@@ -130,7 +130,7 @@ define(["lodash", "moment", "dhisId","interpolate", "orgUnitMapper"], function(_
 
             $scope.startLoading();
             return patientOriginRepository.upsert(payload)
-                .then(_.partial(publishMessage, payload.orgUnit, "uploadPatientOriginDetails", $scope.resourceBundle.uploadPatientOriginDetailsDesc + _.pluck(payload.origins, "name")))
+                .then(_.partial(publishMessage, payload.orgUnit, "uploadPatientOriginDetails", interpolate($scope.resourceBundle.uploadPatientOriginDetailsDesc, { origin_name: _.map(payload.origins, 'name').toString() })))
                 .then(createOrgUnitsAndGroups)
                 .then(onSuccess, onFailure)
                 .finally($scope.stopLoading);
@@ -186,7 +186,7 @@ define(["lodash", "moment", "dhisId","interpolate", "orgUnitMapper"], function(_
 
             var publishUpdateMessages = function() {
                 patientOriginRepository.upsert(updatedPatientOrigin).then(function() {
-                    publishMessage(updatedPatientOrigin.orgUnit, "uploadPatientOriginDetails", $scope.resourceBundle.uploadPatientOriginDetailsDesc + _.pluck(updatedPatientOrigin.origins, "name"));
+                    publishMessage(updatedPatientOrigin.orgUnit, "uploadPatientOriginDetails", interpolate($scope.resourceBundle.uploadPatientOriginDetailsDesc, { origin_name: _.map(updatedPatientOrigin.origins, 'name').toString() }));
                 });
                 orgUnitRepository.upsert(originsToUpsert).then(function() {
                     publishMessage(originsToUpsert, "upsertOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: _.uniq(_.pluck(originsToUpsert, "name")) }));

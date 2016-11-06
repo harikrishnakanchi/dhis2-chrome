@@ -207,7 +207,7 @@
     "updateUserDesc": "mettre à jour l'utilisateur {{username}}",
     "upsertOrgUnitGroupsDesc": "attribuer l'unité organisationnelle aux groupes appropriés",
     "deleteEventDesc": "effacer les cas",
-    "uploadPatientOriginDetailsDesc": "créer une origine géographique patient",
+    "uploadPatientOriginDetailsDesc": "créer une origine géographique patient {{origin_name}}",
     "associateOrgUnitToDatasetDesc": "Associer les services sélectionnés aux origines géographiques de l'Unité Opérationnelle",
     "uploadProgramDesc": "associer le programme sélectionné à/au {{orgunit_name}}",
     "uploadSystemSettingDesc": "la synchronisation a exclu les éléments de données pour",
