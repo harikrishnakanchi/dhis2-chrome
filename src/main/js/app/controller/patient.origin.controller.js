@@ -52,7 +52,7 @@ define(["lodash", "moment", "dhisId","interpolate", "orgUnitMapper"], function(_
                         "dataSetIds": dataSetIds
                     };
                     return orgUnitRepository.associateDataSetsToOrgUnits(dataSetIds, orgUnits).then(function () {
-                        return publishMessage(orgUnitAndDatasetAssociations, 'associateOrgUnitToDataset', $scope.resourceBundle.associateOrgUnitToDatasetDesc + $scope.orgUnit.name);
+                        return publishMessage(orgUnitAndDatasetAssociations, 'associateOrgUnitToDataset', interpolate($scope.resourceBundle.associateOrgUnitToDatasetDesc, { orgunit_name: $scope.orgUnit.name }));
                     });
                 };
 

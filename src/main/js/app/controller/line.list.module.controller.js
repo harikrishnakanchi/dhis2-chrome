@@ -355,7 +355,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
                                 "dataSetIds": datasetIds
                             };
                             return publishMessage(orgunitIdsAndDatasetIds, "associateOrgUnitToDataset",
-                                $scope.resourceBundle.associateOrgUnitToDatasetDesc + $scope.orgUnit.name);
+                                interpolate($scope.resourceBundle.associateOrgUnitToDatasetDesc, { orgunit_name: $scope.orgUnit.name }));
                         });
                     });
                 };
@@ -390,7 +390,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
                             "dataSetIds": datasetIds
                         };
                         return publishMessage(orgunitIdsAndDatasetIds, "associateOrgUnitToDataset",
-                            $scope.resourceBundle.associateOrgUnitToDatasetDesc + enrichedModule.displayName);
+                            interpolate($scope.resourceBundle.associateOrgUnitToDatasetDesc, { orgunit_name: enrichedModule.displayName }));
                     });
                 };
 

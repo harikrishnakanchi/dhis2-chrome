@@ -37,7 +37,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 "uploadPatientOriginDetailsDesc": "create patient origin {{origin_name}}",
                 "upsertOrgUnitDesc": "upsert",
                 "uploadProgramDesc": "upload program for {{orgunit_name}}",
-                "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit "
+                "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit {{orgunit_name}}"
             };
 
             scope.startLoading = jasmine.createSpy('startLoading');

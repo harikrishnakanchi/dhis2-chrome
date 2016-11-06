@@ -208,7 +208,7 @@
     "upsertOrgUnitGroupsDesc": "assign organisation unit to appropriate groups",
     "deleteEventDesc": "delete cases",
     "uploadPatientOriginDetailsDesc": "create patient origin {{origin_name}}",
-    "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit ",
+    "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit {{orgunit_name}}",
     "uploadProgramDesc": "associate selected program to {{orgunit_name}}",
     "uploadSystemSettingDesc": "sync excluded data elements for ",
     "uploadExcludedOptionsDesc": "upload excluded options for module {{module_name}}",
