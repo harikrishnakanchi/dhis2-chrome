@@ -88,24 +88,26 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
 
             var successCallback = function(fileData) {
                 $rootScope.startLoading();
-                var zipFiles = zipUtils.readZipFile(fileData.target.result);
+                $timeout(function () {
+                    var zipFiles = zipUtils.readZipFile(fileData.target.result);
 
-                var result = {};
-                _.each(zipFiles, function(file) {
-                    if (_.endsWith(file.name, ".clone")) {
-                        var content = JSON.parse(arrayBufferToString(file._data.getContent()));
-                        return _.merge(result, content);
-                    }
-                });
+                    var result = {};
+                    _.each(zipFiles, function(file) {
+                        if (_.endsWith(file.name, ".clone")) {
+                            var content = JSON.parse(arrayBufferToString(file._data.getContent()));
+                            return _.merge(result, content);
+                        }
+                    });
 
 
 
-                indexeddbUtils.restore(result)
-                    .then(function() {
-                        sessionHelper.logout();
-                        $location.path("/login");
-                    }, errorCallback)
-                    .finally($rootScope.stopLoading);
+                    indexeddbUtils.restore(result)
+                        .then(function() {
+                            sessionHelper.logout();
+                            $location.path("/login");
+                        }, errorCallback)
+                        .finally($rootScope.stopLoading);
+                }, 0);
             };
 
             var modalMessages = {

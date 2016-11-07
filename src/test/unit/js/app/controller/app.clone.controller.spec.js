@@ -106,6 +106,7 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
 
                 scope.loadClone();
                 scope.$apply();
+                timeout.flush();
 
                 expect(filesystemService.readFile).toHaveBeenCalled();
                 expect(indexeddbUtils.restore).toHaveBeenCalled();
