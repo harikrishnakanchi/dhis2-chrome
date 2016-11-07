@@ -24,9 +24,17 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
         $scope.contactSupport = interpolate($scope.resourceBundle.contactSupport, { supportEmail:properties.support_email });
 
         $scope.printWindow = function() {
-            $scope.printingTallySheet = true;
+            $scope.startLoading();
+
+            //wait for AngularJS digest cycle to paint loding screen
             $timeout(function() {
-                $window.print();
+                $scope.printingTallySheet = true;
+
+                //wait for AngularJS digest cycle to setup template for printing
+                $timeout(function() {
+                    $scope.stopLoading();
+                    $window.print();
+                }, 0);
             }, 0);
         };
 
