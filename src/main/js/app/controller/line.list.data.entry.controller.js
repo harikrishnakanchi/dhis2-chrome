@@ -96,7 +96,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
         };
 
         $scope.isReferralLocationPresent = function(dataElement) {
-            return !(_.eq(dataElement.offlineSummaryType, "referralLocations") && _.isEmpty($scope.dataElementOptions[dataElement.id]));
+            return !(_.eq(dataElement.offlineSummaryType, "referralLocations") && _.isEmpty(_.get($scope.dataElementOptions, dataElement.id)));
         };
 
         $scope.update = function() {
