@@ -107,7 +107,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
                             $location.path("/login");
                         }, errorCallback)
                         .finally($rootScope.stopLoading);
-                }, 0);
+                }, 1000);
             };
 
             var modalMessages = {
