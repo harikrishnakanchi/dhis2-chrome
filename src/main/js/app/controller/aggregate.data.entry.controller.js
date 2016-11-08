@@ -28,11 +28,11 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
 
             //wait for AngularJS digest cycle to paint loding screen
             $timeout(function() {
+                $scope.stopLoading();
                 $scope.printingTallySheet = true;
 
                 //wait for AngularJS digest cycle to setup template for printing
                 $timeout(function() {
-                    $scope.stopLoading();
                     $window.print();
                 }, 0);
             }, 0);
