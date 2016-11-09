@@ -204,8 +204,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                         'id': 'someOtherDataSetId'
                     }];
 
-                    dataSetRepo.getAll.and.returnValue(utils.getPromise(q, datasets));
-
                     scope.associatedDatasets = [datasets[0]];
                     scope.save();
                     scope.$apply();
@@ -238,6 +236,29 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                         dataSets: [
                             {
                                 id: 'populationDataSetId'
+                            }]
+                    };
+                    expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedModule);
+                });
+
+                it('should associate the referral location dataset if the associateReferralLocation is set', function () {
+                    var datasets = [{
+                        id: 'someDataSetId',
+                        isReferralDataset: true
+                    }];
+                    dataSetRepo.getAll.and.returnValue(utils.getPromise(q, datasets));
+
+                    scope.$apply();
+                    scope.associatedDatasets = [];
+                    scope.associateReferralLocation = true;
+                    scope.save();
+                    scope.$apply();
+
+                    var expectedModule = {
+                        id: 'someModuleId',
+                        dataSets: [
+                            {
+                                id: 'someDataSetId'
                             }]
                     };
                     expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedModule);
@@ -588,70 +609,82 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 }, "dataValues");
             });
 
-            it('should upsert the module with the assosciated datasets for existing module', function () {
-                var datasetOne = {
-                    "id": "ds1",
-                    "isAggregateService": true,
-                    "sections": []
-                };
-                var datasetTwo = {
-                    "id": "ds2",
-                    "isAggregateService": true,
-                    "sections": []
-                };
+            describe('update', function () {
+                var mockOrgUnit;
 
-                var referralDataSet = {
-                    id: 'referralDataSetId',
-                    isReferralDataset: true
-                };
+                beforeEach(function () {
+                    mockOrgUnit = {id: 'someOrgUnitId'};
+                    spyOn(orgUnitMapper, 'mapToModule').and.returnValue(mockOrgUnit);
+                });
 
-                var populationDataSet = {
-                    id: 'populationDataSetId',
-                    isPopulationDataset: true
-                };
+                it('should upsert the module with the associated dataSets for existing module', function () {
+                    var datasetOne = {
+                        "id": "ds1"
+                    };
+                    var datasetTwo = {
+                        "id": "ds2"
+                    };
 
-                var dataSets = [datasetOne, datasetTwo, referralDataSet, populationDataSet];
+                    scope.$apply();
+                    scope.associatedDatasets = [datasetOne, datasetTwo];
 
-                scope.orgUnit = {
-                    id: 'mod1',
-                    name: 'module name',
-                    parent: {
-                        id : "org1",
-                        name: 'parent'
-                    }
-                };
+                    scope.update();
+                    scope.$apply();
 
-                scope.isNewMode = false;
+                    var expectedOrgUnit = {
+                        id: 'someOrgUnitId',
+                        dataSets: [{
+                            id: datasetOne.id
+                        }, {
+                            id: datasetTwo.id
+                        }]
+                    };
+                    expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOrgUnit);
+                });
 
+                it('should associate the module with the population dataSet', function () {
+                    var populationDataset = {
+                        id: "someId",
+                        isPopulationDataset: true
+                    };
 
-                dataSetRepo.getAll.and.returnValue(utils.getPromise(q, dataSets));
-                dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [datasetOne, referralDataSet, populationDataSet]));
-                dataSetRepo.includeDataElements.and.returnValue(utils.getPromise(q, dataSets));
-                translationsService.translate.and.returnValue(dataSets);
-                var mockOrgUnit = {id: 'someOrgUnitId'};
-                spyOn(orgUnitMapper, 'mapToModule').and.returnValue(mockOrgUnit);
+                    dataSetRepo.getAll.and.returnValue(utils.getPromise(q, [populationDataset]));
+                    scope.$apply();
 
-                initialiseController();
-                scope.$apply();
+                    scope.update();
+                    scope.$apply();
 
-                scope.associatedDatasets = [datasetOne, datasetTwo];
+                    var expectedOrgUnit = {
+                        id: 'someOrgUnitId',
+                        dataSets: [{
+                            id: populationDataset.id
+                        }]
+                    };
+                    expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOrgUnit);
+                });
 
-                scope.update();
-                scope.$apply();
+                it('should associate the module with referralLocation dataSet only if configured', function () {
+                    var referralDataSet = {
+                        id: "someId",
+                        isReferralDataset: true
+                    };
 
-                var expectedOrgUnit = {
-                    id: 'someOrgUnitId',
-                    dataSets: [{
-                        id: datasetOne.id
-                    }, {
-                        id: datasetTwo.id
-                    }, {
-                        id: referralDataSet.id
-                    }, {
-                        id: populationDataSet.id
-                    }]
-                };
-                expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOrgUnit);
+                    dataSetRepo.getAll.and.returnValue(utils.getPromise(q, [referralDataSet]));
+                    scope.$apply();
+                    scope.associateReferralLocation  = true;
+
+                    scope.update();
+                    scope.$apply();
+
+                    var expectedOrgUnit = {
+                        id: 'someOrgUnitId',
+                        dataSets: [{
+                            id: referralDataSet.id
+                        }]
+                    };
+                    expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOrgUnit);
+                });
+
             });
 
             it("should return false if datasets for modules are selected", function() {

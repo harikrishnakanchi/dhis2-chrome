@@ -260,7 +260,10 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
             };
 
             var getDatasetsToAssociate = function() {
-                return _.compact([].concat($scope.associatedDatasets).concat(referralDataset).concat(populationDataset));
+                if($scope.associateReferralLocation) {
+                    $scope.associatedDatasets = $scope.associatedDatasets.concat(referralDataset);
+                }
+                return _.compact($scope.associatedDatasets.concat(populationDataset));
             };
 
             $scope.save = function() {
