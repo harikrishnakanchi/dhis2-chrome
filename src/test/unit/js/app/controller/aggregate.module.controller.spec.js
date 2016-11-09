@@ -1,8 +1,8 @@
 define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "timecop", "dhisId", "dataSetRepository",
-        "orgUnitRepository", "originOrgunitCreator", "excludedDataElementsRepository", "systemSettingRepository", "translationsService", "orgUnitMapper"
+        "orgUnitRepository", "originOrgunitCreator", "excludedDataElementsRepository", "systemSettingRepository", "translationsService", "orgUnitMapper", "systemSettingsTransformer"
     ],
     function(AggregateModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, timecop, dhisId, DatasetRepository,
-        OrgUnitRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, SystemSettingRepository, TranslationsService, orgUnitMapper) {
+        OrgUnitRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, SystemSettingRepository, TranslationsService, orgUnitMapper, systemSettingsTransformer) {
 
         var scope, mockOrgStore, db, q, location, orgUnitRepo, orgunitGroupRepo, hustle,
             dataSetRepo, systemSettingRepository, excludedDataElementsRepository, fakeModal, allPrograms, originOrgunitCreator, translationsService, orgUnitGroupHelper;
@@ -52,6 +52,8 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
 
                 translationsService = new TranslationsService();
                 spyOn(translationsService, "translate").and.returnValue([]);
+
+                spyOn(systemSettingsTransformer, "excludedDataElementsForAggregateModule").and.returnValue([]);
 
                 mockOrgStore = {
                     upsert: function() {},
@@ -267,55 +269,25 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
 
             it("should save excluded data elements for the module", function() {
                 var parent = {
-                    "name": "Project1",
-                    "id": "someid",
-                    "children": []
+                    "id": "someid"
                 };
 
                 orgUnitRepo.get.and.returnValue(utils.getPromise(q, parent));
 
-                spyOn(dhisId, "get").and.callFake(function(name) {
-                    return name;
+                spyOn(orgUnitMapper, 'mapToModule').and.returnValue({
+                    'id': "Module1" + parent.id,
+                    'name': "Module1",
+                    'parent': parent
                 });
 
-                scope.$apply();
-                var projectId = "someid";
-
-                scope.orgUnit = parent;
-                scope.module = {
-                    'name': "Module1",
-                    'serviceType': "Aggregate",
-                    'openingDate': new Date(),
-                    'parent': parent
-                };
-                var enrichedAssociatedDatasets = [{
-                    "name": "OPD",
-                    "id": "DS_OPD",
-                    "organisationUnits": [{
-                        "id": "mod1"
-                    }],
-                    "attributeValues": [{
-                        "attribute": {
-                            "id": "wFC6joy3I8Q",
-                            "code": "isNewDataModel",
-                        },
-                        "value": "false"
-                    }],
-                    "sections": [{
-                        "dataElements": [{
-                            "id": "de1",
-                            "isIncluded": false
-                        }, {
-                            "id": "de2",
-                            "isIncluded": true
-                        }, {
-                            "id": "de3",
-                            "isIncluded": false
-                        }]
-                    }]
+                var excludedDataElements = [{
+                    id: 'de1'
+                },{
+                    id: 'de3'
                 }];
 
-                scope.associatedDatasets = enrichedAssociatedDatasets;
+                systemSettingsTransformer.excludedDataElementsForAggregateModule.and.returnValue(excludedDataElements);
+
                 scope.save();
                 scope.$apply();
 
@@ -509,6 +481,15 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     parent: parent
                 };
                 scope.module = updatedModule;
+
+                var excludedDataElements = [{
+                    id: 'de1'
+                },{
+                    id: 'de3'
+                }];
+
+                systemSettingsTransformer.excludedDataElementsForAggregateModule.and.returnValue(excludedDataElements);
+
                 scope.update();
                 scope.$apply();
 
@@ -1393,6 +1374,41 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
 
                 scope.changeDataElementSelection(section);
                 expect(section).toEqual(expectedSection);
+            });
+
+            describe('associateReferralLocation', function () {
+                it('should set to true if referral location is associated to an existing module', function () {
+                    var referralDataset = {
+                        id: 'someId',
+                        isReferralDataset: true
+                    };
+                    scope.isNewMode = false;
+                    orgUnitRepo.getAllDataSetsForOrgUnit.and.returnValue(utils.getPromise(q, [referralDataset]));
+                    initialiseController();
+                    scope.$apply();
+
+                    expect(scope.associateReferralLocation).toBeTruthy();
+                });
+                
+                it('should set to false if the referral location is not associated to an existing module', function () {
+                    scope.isNewMode = false;
+                    orgUnitRepo.getAllDataSetsForOrgUnit.and.returnValue(utils.getPromise(q, []));
+                    initialiseController();
+                    scope.$apply();
+
+                    expect(scope.associateReferralLocation).toBeFalsy();
+                });
+
+                it('should set to true when creating a new module', function () {
+                    var referralDataset = {
+                        id: 'someId',
+                        isReferralDataset: true
+                    };
+                    scope.isNewMode = true;
+                    scope.$apply();
+
+                    expect(scope.associateReferralLocation).toBeTruthy();
+                });
             });
 
         });
