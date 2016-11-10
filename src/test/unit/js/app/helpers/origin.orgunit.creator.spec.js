@@ -1,13 +1,18 @@
-define(["originOrgunitCreator", "angularMocks", "utils", "lodash", "orgUnitRepository", "patientOriginRepository", "dhisId", "orgUnitGroupHelper", "dataSetRepository"],
-    function(OriginOrgunitCreator, mocks, utils, _, OrgUnitRepository, PatientOriginRepository, dhisId, OrgUnitGroupHelper, DatasetRepository) {
+define(["originOrgunitCreator", "angularMocks", "utils", "lodash", "orgUnitRepository", "patientOriginRepository", "dhisId", "orgUnitGroupHelper", "dataSetRepository", "orgUnitMapper"],
+    function(OriginOrgunitCreator, mocks, utils, _, OrgUnitRepository, PatientOriginRepository, dhisId, OrgUnitGroupHelper, DatasetRepository, orgUnitMapper) {
         describe("origin orgunit creator", function() {
 
-            var scope, q, originOrgunitCreator, orgUnitRepository, patientOriginRepository, orgUnitGroupHelper, dataSetRepository;
+            var scope, mockOrigin, q, originOrgunitCreator, orgUnitRepository, patientOriginRepository, orgUnitGroupHelper, dataSetRepository;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q) {
                 scope = $rootScope.$new();
                 q = $q;
+
+                mockOrigin = {
+                    id: 'mockOriginId',
+                    name: 'someName'
+                };
 
                 orgUnitRepository = new OrgUnitRepository();
                 patientOriginRepository = new PatientOriginRepository();
@@ -18,13 +23,15 @@ define(["originOrgunitCreator", "angularMocks", "utils", "lodash", "orgUnitRepos
 
                 spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, {}));
 
-                spyOn(patientOriginRepository, "get");
+                spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, mockOrigin));
 
                 spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
 
                 spyOn(dhisId, "get").and.callFake(function(name) {
                     return name;
                 });
+
+                spyOn(orgUnitMapper, "createPatientOriginPayload").and.returnValue([mockOrigin]);
 
                 originOrgunitCreator = new OriginOrgunitCreator(q, orgUnitRepository, patientOriginRepository, orgUnitGroupHelper, dataSetRepository);
             }));
@@ -39,95 +46,65 @@ define(["originOrgunitCreator", "angularMocks", "utils", "lodash", "orgUnitRepos
                 }, options);
             };
 
-            var createOriginOrgUnit = function (options) {
-              return _.merge({
-                  "name": 'o1',
-                  "shortName": 'o1',
-                  "displayName": 'o1',
-                  "id": 'o1mod1',
-                  "level": 7,
-                  "openingDate": undefined,
-                  "attributeValues": [{
-                      "attribute": {
-                          "code": 'Type',
-                          "name": 'Type'
-                      },
-                      "value": 'Patient Origin'
-                  }, {
-                      "attribute": {
-                          "code": 'isNewDataModel',
-                          "name": 'Is New Data Model'
-                      },
-                      "value": 'true'
-                  }],
-                  "parent": {
-                      "id": 'mod1'
-                  },
-                  "dataSets": []
-              }, options);
+            var createMockOrigin = function (options) {
+                return _.merge({
+                    id: 'mockOriginId',
+                    name: 'someName'
+                }, options);
             };
 
             describe('create', function () {
-                var module, patientOrigin;
+                var module, patientOrigin, mockOriginDataset;
                 beforeEach(function () {
                     module = createModule();
                     patientOrigin = {
-                        "id": "o1",
-                        "name": "o1"
+                        "id": "mockOriginId",
+                        "name": "someName"
                     };
-                });
-
-                it("should create origin orgunits for the given patient origin", function() {
-                    var originOrgUnit = createOriginOrgUnit();
-                    var expectedOriginOrgUnits = [originOrgUnit];
-                    originOrgunitCreator.create(module, patientOrigin);
-                    scope.$apply();
-
-                    expect(orgUnitRepository.upsert).toHaveBeenCalledWith(expectedOriginOrgUnits);
-                });
-
-                it('should upsert origin orgUnit with origin dataSet', function () {
-                    var originDataSet = {
-                        id: 'originDataSetId',
+                    mockOriginDataset = {
+                        id: 'originDataSet',
                         isOriginDataset: true
                     };
-                    var mockDataSets = [originDataSet];
-                    dataSetRepository.getAll.and.returnValue(utils.getPromise(q, mockDataSets));
+                });
 
-
+                it("should create patient origin payload for the given patient origin", function() {
                     originOrgunitCreator.create(module, patientOrigin);
                     scope.$apply();
 
-                    var originOrgUnit = createOriginOrgUnit({
-                        dataSets: [{
-                            id: "originDataSetId"
-                        }]
-                    });
-                    var expectedOriginOrgUnits = [originOrgUnit];
-                    expect(orgUnitRepository.upsert).toHaveBeenCalledWith(expectedOriginOrgUnits);
+                    expect(orgUnitMapper.createPatientOriginPayload).toHaveBeenCalledWith([createMockOrigin()], module);
                 });
 
+                it('should associate and upsert geographic origins dataSets if associateGeographicOrigin flag is set to true', function () {
+                    var associateGeographicOrigins = true;
+
+                    dataSetRepository.getAll.and.returnValue(utils.getPromise(q, [mockOriginDataset]));
+                    originOrgunitCreator.create(module, patientOrigin, associateGeographicOrigins);
+                    scope.$apply();
+
+
+                    var enrichedOriginWithDataSet = createMockOrigin({ dataSets: [{ id: mockOriginDataset.id }]});
+                    expect(orgUnitRepository.upsert).toHaveBeenCalledWith([enrichedOriginWithDataSet]);
+                });
+
+                it('should not associate geographic origins dataSets if associateGeographicOrigin flag is set to false', function () {
+                    var associateGeographicOrigins = false;
+
+                    dataSetRepository.getAll.and.returnValue(utils.getPromise(q, [mockOriginDataset]));
+                    originOrgunitCreator.create(module, patientOrigin, associateGeographicOrigins);
+                    scope.$apply();
+
+                    var enrichedOriginWithDataSet = createMockOrigin({ dataSets: []});
+                    expect(orgUnitRepository.upsert).toHaveBeenCalledWith([enrichedOriginWithDataSet]);
+                });
             });
 
-            it("should get patient origin info from repository and create origin org units if no patient origin is passed", function() {
+            it("should get patient origin info from repository if no patient origin is passed", function() {
                 var module = createModule();
-
-                var patientOrigins = {
-                    "origins": [{
-                        "id": "o1",
-                        "name": "o1"
-                    }]
-                };
-
-                var originOrgUnit = createOriginOrgUnit();
-                var expectedOriginOrgUnits = [originOrgUnit];
-
-                patientOriginRepository.get.and.returnValue(utils.getPromise(q, patientOrigins));
 
                 originOrgunitCreator.create(module);
                 scope.$apply();
 
-                expect(orgUnitRepository.upsert).toHaveBeenCalledWith(expectedOriginOrgUnits);
+                expect(patientOriginRepository.get).toHaveBeenCalledWith(module.parent.id);
             });
         });
     });
