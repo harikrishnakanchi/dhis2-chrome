@@ -327,5 +327,6 @@
     "aggregateDataNotAvailableMessage": "Il n’y a pas de données pour cette semaine.",
     "linelistDataNotAvailableMessage": "Il n’y a pas de synthèse des données pour cette semaine.",
     "praxisDownloadMessage": "Une des raisons peut être que Praxis ne télécharge que les 52 dernières semaines de données. Toute donnée collectée avant ces 52 semaines ne sera pas disponible sur cette page. Cependant, ces données sont disponibles dans la section des rapports et graphiques.",
-    "contactSupport": "Contactez {{supportEmail}} pour toute question"
+    "contactSupport": "Contactez {{supportEmail}} pour toute question",
+    "referralLocationCheckboxLabel": "Afficher l'emplacement de référence pour l'utilisateur de saisie de données"
 }

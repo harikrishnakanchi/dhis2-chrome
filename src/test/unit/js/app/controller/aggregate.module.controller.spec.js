@@ -1387,7 +1387,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                         isReferralDataset: true
                     };
                     scope.isNewMode = false;
-                    orgUnitRepo.getAllDataSetsForOrgUnit.and.returnValue(utils.getPromise(q, [referralDataset]));
+                    dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [referralDataset]));
                     initialiseController();
                     scope.$apply();
 
@@ -1396,7 +1396,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 
                 it('should set to false if the referral location is not associated to an existing module', function () {
                     scope.isNewMode = false;
-                    orgUnitRepo.getAllDataSetsForOrgUnit.and.returnValue(utils.getPromise(q, []));
+                    dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, []));
                     initialiseController();
                     scope.$apply();
 
@@ -1404,11 +1404,8 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 });
 
                 it('should set to true when creating a new module', function () {
-                    var referralDataset = {
-                        id: 'someId',
-                        isReferralDataset: true
-                    };
                     scope.isNewMode = true;
+                    initialiseController();
                     scope.$apply();
 
                     expect(scope.associateReferralLocation).toBeTruthy();

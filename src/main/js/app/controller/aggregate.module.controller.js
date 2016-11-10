@@ -70,7 +70,6 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                             "serviceType": "",
                             "parent": $scope.orgUnit
                         };
-                        $scope.associateReferralLocation =  true;
                         return $q.when([]);
                     } else {
                         return orgUnitRepository.getAllDataSetsForOrgUnit($scope.orgUnit.id).then(function (dataSets) {
@@ -83,7 +82,6 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                                 'attributeValues': $scope.orgUnit.attributeValues,
                                 'dataSets': dataSets
                             };
-                            $scope.associateReferralLocation = _.any(dataSets, 'isReferralDataset');
                         });
                     }
                 };
@@ -146,6 +144,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                                 return false;
                             });
 
+                            $scope.associateReferralLocation = $scope.isNewMode ? true: _.any(dataSets, 'isReferralDataset');
                             $scope.associatedDatasets = partitionedDatasets[0];
                             existingAssociatedDatasetIds = _.map(partitionedDatasets[0], 'id');
                             $scope.nonAssociatedDataSets = partitionedDatasets[1];
