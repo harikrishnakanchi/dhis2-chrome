@@ -16,6 +16,7 @@ var document = {
         };
     }
 };
+self.worker = self;
 
 require.config({
     baseUrl: "/js/"
@@ -25,8 +26,8 @@ require(["app/bg.pwa.config", "app/bg.shared.config"], function(config) {
     require(["app/bg.app"], function(app) {
         require(["chromeUtils"], function(chromeUtils) {
             var bootstrapData;
-            var onDbReady = function(request, sender, sendResponse) {
-                if (!bootstrapData && request === "dbReady") {
+            var onDbReady = function() {
+                if (!bootstrapData) {
                     console.log("dB ready");
                     app.bootstrap(app.init()).then(function(data) {
                         bootstrapData = data;
@@ -34,7 +35,8 @@ require(["app/bg.pwa.config", "app/bg.shared.config"], function(config) {
                 }
             };
 
-            chromeUtils.addListener(onDbReady);
+            chromeUtils.addListener("dbReady", onDbReady);
+            self.worker.postMessage("backgroundReady");
         });
     });
 });
