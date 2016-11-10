@@ -269,6 +269,14 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     };
                     expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedModule);
                 });
+
+                it('should associate geographic origin dataSet if associateOriginDataSet is set', function () {
+                    scope.associateOriginDataSet = true;
+                    scope.save();
+                    scope.$apply();
+
+                    expect(originOrgunitCreator.create).toHaveBeenCalledWith(mockModule, undefined, true);
+                });
             });
 
             it("should save excluded data elements for the module", function() {
@@ -989,7 +997,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 expect(scope.getCollapsed("sectionId")).toEqual(true);
             });
 
-            it("should create patient origin org units", function() {
+            it("should create patient origin org units", function()  {
                 scope.module = {
                     "id": "mod1",
                     "name": "mod1",
@@ -1054,7 +1062,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.save();
                 scope.$apply();
 
-                expect(originOrgunitCreator.create).toHaveBeenCalledWith(enrichedAggregateModule);
+                expect(originOrgunitCreator.create).toHaveBeenCalledWith(enrichedAggregateModule, undefined, undefined);
                 expect(hustle.publish.calls.count()).toEqual(3);
                 expect(hustle.publish.calls.argsFor(2)).toEqual([{
                     "data": { orgUnitId: originOrgUnits[0].id},
