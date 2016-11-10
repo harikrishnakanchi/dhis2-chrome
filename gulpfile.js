@@ -167,6 +167,10 @@ gulp.task('generate-service-worker', ['less'], function (callback) {
     }, callback);
 });
 
+gulp.task('watch', function () {
+    gulp.watch('src/main/**/*' , ['generate-service-worker']);
+});
+
 gulp.task('pack', ['less', 'config', 'download-packaged-data'], function() {
     var stream = shell(["./scripts/crxmake.sh ./src/main key.pem " + "praxis_" + (argv.env || "dev")]);
     stream.write(process.stdout);
