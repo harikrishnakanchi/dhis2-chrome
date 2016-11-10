@@ -11,6 +11,9 @@ define([], function() {
         createNotification: fakeFunction,
         getPraxisVersion: fakeFunction,
         getOS: fakeFunction,
-        init: fakeFunction
+        init: fakeFunction,
+        createAlarm: fakeFunction,
+        addAlarmListener: fakeFunction,
+        clearAlarm: fakeFunction
     };
 });
