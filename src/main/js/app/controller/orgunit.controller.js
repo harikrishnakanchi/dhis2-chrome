@@ -160,13 +160,21 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
         };
 
         $scope.openInNewMode = function(type) {
-            $scope.templateUrl = templateUrlMap[type];
-            $scope.isNewMode = true;
+            $scope.templateUrl = undefined;
+            // to reload controller for the same template
+            $timeout(function () {
+                $scope.templateUrl = templateUrlMap[type];
+                $scope.isNewMode = true;
+            });
         };
 
         $scope.openInViewMode = function(type) {
-            $scope.templateUrl = templateUrlMap[type];
-            $scope.isNewMode = false;
+            $scope.templateUrl = undefined;
+            // to reload controller for the same template
+            $timeout(function () {
+                $scope.templateUrl = templateUrlMap[type];
+                $scope.isNewMode = false;
+            });
         };
 
         init();
