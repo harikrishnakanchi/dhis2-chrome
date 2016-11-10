@@ -7,6 +7,13 @@ define(["lodash", "properties", "appSettingsUtils"], function(_, properties, app
         };
     };
 
+    var registerAlarmCallback = function(alarmName, callback) {
+        return function(alarm) {
+            if (alarm.name === alarmName)
+                callback();
+        };
+    };
+
     var addListener = function(message, callback) {
         chrome.runtime.onMessage.addListener(registerMessageCallback(message, callback));
     };
@@ -64,6 +71,18 @@ define(["lodash", "properties", "appSettingsUtils"], function(_, properties, app
         });
     };
 
+    var createAlarm = function (name, options) {
+        chrome.alarms.create(name, options);
+    };
+
+    var addAlarmListener = function (alarmName, callback) {
+        chrome.alarms.onAlarm.addListener(registerAlarmCallback(alarmName, callback));
+    };
+
+    var clearAlarm = function (alarmName) {
+        chrome.alarms.clear(alarmName);
+    };
+
     return {
         addListener: addListener,
         sendMessage: sendMessage,
@@ -72,6 +91,9 @@ define(["lodash", "properties", "appSettingsUtils"], function(_, properties, app
         createNotification: createNotification,
         getPraxisVersion: getPraxisVersion,
         getOS: getOS,
-        init: _.once(init)
+        init: _.once(init),
+        createAlarm: createAlarm,
+        addAlarmListener: addAlarmListener,
+        clearAlarm: clearAlarm
     };
 });
