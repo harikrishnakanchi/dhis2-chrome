@@ -4,16 +4,17 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
     function(AggregateModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, timecop, dhisId, DatasetRepository,
         OrgUnitRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, SystemSettingRepository, TranslationsService, orgUnitMapper, systemSettingsTransformer) {
 
-        var scope, mockOrgStore, db, q, location, orgUnitRepo, orgunitGroupRepo, hustle,
+        var scope,rootScope, mockOrgStore, db, q, location, orgUnitRepo, orgunitGroupRepo, hustle,
             dataSetRepo, systemSettingRepository, excludedDataElementsRepository, fakeModal, allPrograms, originOrgunitCreator, translationsService, orgUnitGroupHelper;
 
         describe("aggregate module controller", function() {
             var initialiseController = function() {
-                new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal, orgUnitGroupHelper, originOrgunitCreator, translationsService);
+                new AggregateModuleController(scope, rootScope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal, orgUnitGroupHelper, originOrgunitCreator, translationsService);
             };
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
+                rootScope = $rootScope;
                 scope = $rootScope.$new();
                 q = $q;
                 hustle = $hustle;
@@ -23,6 +24,9 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
 
                 orgUnitRepo = new OrgUnitRepository();
                 orgunitGroupRepo = utils.getMockRepo(q);
+
+                rootScope.startLoading = jasmine.createSpy('startLoading');
+                rootScope.stopLoading = jasmine.createSpy('stopLoading');
 
                 spyOn(orgUnitRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, {}));

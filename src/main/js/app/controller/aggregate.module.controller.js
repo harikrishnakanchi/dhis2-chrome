@@ -1,6 +1,6 @@
 define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransformer"],
     function(_, orgUnitMapper, moment, interpolate, systemSettingsTransformer) {
-        return function($scope, $hustle, orgUnitRepository, datasetRepository, systemSettingRepository, excludedDataElementsRepository, db, $location, $q, $modal,
+        return function($scope, $rootScope, $hustle, orgUnitRepository, datasetRepository, systemSettingRepository, excludedDataElementsRepository, db, $location, $q, $modal,
             orgUnitGroupHelper, originOrgunitCreator, translationsService) {
 
             $scope.originalDatasets = [];
@@ -60,6 +60,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
             };
 
             var init = function() {
+                $rootScope.startLoading();
                 var initModule = function() {
 
                     if ($scope.isNewMode) {
@@ -174,7 +175,10 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                     .then(getAllModules)
                     .then(setDisabled)
                     .then(getMandatoryDatasetsToBeAssociated)
-                    .then(getTemplates);
+                    .then(getTemplates)
+                    .then(function () {
+                        $rootScope.stopLoading();
+                    });
             };
 
             $scope.changeCollapsed = function(sectionId) {
