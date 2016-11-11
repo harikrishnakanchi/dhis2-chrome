@@ -8,4 +8,5 @@ screenShots/*.png
 npm-debug.log
 .idea
 *.iml
+src/main/service.worker.js
 !src/main/js/lib/custom
