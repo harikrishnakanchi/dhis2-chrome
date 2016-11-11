@@ -164,7 +164,7 @@ gulp.task('generate-service-worker', ['less'], function (callback) {
             rootDir + '/*.html'
         ],
         stripPrefix: rootDir + '/',
-        importScripts: ['js/app/fetch.interceptor.js']
+        importScripts: ['js/app/interceptors/fetch.interceptor.js']
     }, callback);
 });
 
