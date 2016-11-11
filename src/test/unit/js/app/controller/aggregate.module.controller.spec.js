@@ -35,6 +35,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 spyOn(orgUnitRepo, "associateDataSetsToOrgUnits").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "removeDataSetsFromOrgUnits").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "getAllDataSetsForOrgUnit").and.returnValue(utils.getPromise(q, {}));
+                spyOn(orgUnitRepo, "findAllByParent").and.returnValue(utils.getPromise(q, []));
 
                 originOrgunitCreator = new OriginOrgunitCreator();
                 spyOn(originOrgunitCreator, "create").and.returnValue(utils.getPromise(q, {}));
@@ -678,6 +679,47 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOrgUnit);
                 });
 
+                describe('geographicOriginDataSet', function () {
+                    var mockOrigins, mockOriginDataSets;
+                    beforeEach(function () {
+                        mockOrigins = [{ id: 'patientOriginId' }];
+                        mockOriginDataSets = [{ id: 'mockOriginDataSet', isOriginDataset: true }];
+                        orgUnitRepo.findAllByParent.and.returnValue(utils.getPromise(q, mockOrigins));
+                        dataSetRepo.getAll.and.returnValue(utils.getPromise(q, mockOriginDataSets));
+                    });
+
+                    it('should upsert origins with associated dataSets into indexedDb', function () {
+                        scope.associateOriginDataSet = true;
+                        scope.update();
+                        scope.$apply();
+
+                        expect(orgUnitRepo.upsert).toHaveBeenCalledTimes(2);
+                        expect(orgUnitRepo.upsert).toHaveBeenCalledWith({ id: 'patientOriginId', dataSets: [{ id: 'mockOriginDataSet' }]});
+                    });
+
+                    it('should upsert origins without dataSets into indexedDb if associateOriginDataset flag is false', function () {
+                        scope.associateOriginDataSet = false;
+                        scope.update();
+                        scope.$apply();
+
+                        expect(orgUnitRepo.upsert).toHaveBeenCalledTimes(2);
+                        expect(orgUnitRepo.upsert).toHaveBeenCalledWith({ id: 'patientOriginId', dataSets: []});
+                    });
+
+                    it('should publish hustle calls to sync to DHIS', function () {
+                        scope.update();
+                        scope.$apply();
+
+                        var expectedHustleMessage = {
+                            data: { orgUnitId: _.first(mockOrigins).id },
+                            type: "syncOrgUnit",
+                            locale: "en",
+                            desc: scope.resourceBundle.upsertOrgUnitDesc
+                        };
+
+                        expect(hustle.publish.calls.argsFor(0)).toEqual([expectedHustleMessage, 'dataValues']);
+                    });
+                });
             });
 
             it("should return false if datasets for modules are selected", function() {

@@ -326,12 +326,41 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                     enrichedModule.dataSets = _.map(dataSetsToAssociate, function (dataSet) {
                         return {id: dataSet.id};
                     });
+                    return $q.when(enrichedModule);
                 };
 
-                enrichExistingModuleWithDataSets();
-                return $q.all([saveExcludedDataElements(enrichedModule), orgUnitRepository.upsert(enrichedModule),
-                        publishMessage({orgUnitId: enrichedModule.id}, "syncOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: enrichedModule.name }))
-                    ])
+                var enrichOriginsWithDatasets = function () {
+                    return $q.all({
+                        origins: orgUnitRepository.findAllByParent($scope.module.id),
+                        dataSets: datasetRepository.getAll()})
+                        .then(function (data) {
+                            var originDatasets = _.filter(data.dataSets, 'isOriginDataset');
+                            var datasetsForAssociation = _.map(originDatasets, function (originDataset) {
+                                return {id: originDataset.id};
+                            });
+                            _.map(data.origins, function (origin) {
+                                origin.dataSets = $scope.associateOriginDataSet ? datasetsForAssociation : [];
+                            });
+                            return data.origins;
+                        });
+                };
+
+                var saveOrigins = function (enrichedOrigins) {
+                  return _.map(enrichedOrigins, function (origin) {
+                      return orgUnitRepository.upsert(origin).then(function () {
+                          return publishMessage({orgUnitId: origin.id}, "syncOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: origin.name }));
+                      });
+                  });
+                };
+
+                return enrichExistingModuleWithDataSets()
+                    .then(enrichOriginsWithDatasets)
+                    .then(saveOrigins)
+                    .then(function(){
+                        $q.all([saveExcludedDataElements(enrichedModule), orgUnitRepository.upsert(enrichedModule),
+                            publishMessage({orgUnitId: enrichedModule.id}, "syncOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: enrichedModule.name }))
+                        ]);
+                    })
                     .then(_.partial(onSuccess, enrichedModule), onError)
                     .finally($scope.stopLoading);
             };
