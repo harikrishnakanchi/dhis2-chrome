@@ -1,6 +1,6 @@
 console.log('Setting up web worker');
 
-importScripts('/js/lib/requirejs/require.js');
+importScripts('../lib/requirejs/require.js');
 
 var window = self;
 self.history = {};
