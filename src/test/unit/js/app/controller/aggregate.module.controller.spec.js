@@ -35,7 +35,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 spyOn(orgUnitRepo, "associateDataSetsToOrgUnits").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "removeDataSetsFromOrgUnits").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "getAllDataSetsForOrgUnit").and.returnValue(utils.getPromise(q, {}));
-                spyOn(orgUnitRepo, "findAllByParent").and.returnValue(utils.getPromise(q, []));
+                spyOn(orgUnitRepo, "findAllByParent").and.returnValue(utils.getPromise(q, [{ id: 'someId' }]));
 
                 originOrgunitCreator = new OriginOrgunitCreator();
                 spyOn(originOrgunitCreator, "create").and.returnValue(utils.getPromise(q, {}));
@@ -1459,6 +1459,29 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     scope.$apply();
 
                     expect(scope.associateReferralLocation).toBeTruthy();
+                });
+            });
+
+            describe('associateOriginDataSet', function () {
+                it('should set to true if the origins for a module are associated with originDataset for an existing module', function () {
+                    scope.isNewMode = false;
+                    var mockOrigin = {
+                        id: 'someOriginId',
+                        dataSets: [{ id: 'someId' }]
+                    };
+                    orgUnitRepo.findAllByParent.and.returnValue(utils.getPromise(q, [mockOrigin]));
+                    initialiseController();
+                    scope.$apply();
+
+                    expect(scope.associateOriginDataSet).toBeTruthy();
+                });
+
+                it('should set to true when creating a new module', function () {
+                    scope.isNewMode = true;
+                    initialiseController();
+                    scope.$apply();
+
+                    expect(scope.associateOriginDataSet).toBeTruthy();
                 });
             });
 

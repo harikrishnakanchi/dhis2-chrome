@@ -109,6 +109,20 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                     });
                 };
 
+                var isOriginDataSetEnabled = function () {
+                    if ($scope.isNewMode) {
+                        $scope.associateOriginDataSet = true;
+                        return $q.when();
+                    }
+                    else {
+                        return orgUnitRepository.findAllByParent($scope.module.id).then(function (origins) {
+                            var originDataSet = _.first(origins).dataSets;
+                            $scope.associateOriginDataSet = !_.isEmpty(originDataSet);
+                            return $q.when();
+                        });
+                    }
+                };
+
                 var getExcludedDataElements = function() {
                     if (!$scope.module.id)
                         return;
@@ -175,6 +189,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                     .then(setDisabled)
                     .then(getMandatoryDatasetsToBeAssociated)
                     .then(getTemplates)
+                    .then(isOriginDataSetEnabled)
                     .then(function () {
                         $rootScope.stopLoading();
                     });
