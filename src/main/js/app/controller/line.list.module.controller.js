@@ -1,6 +1,6 @@
 define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTransformer"],
     function(_, orgUnitMapper, moment, interpolate, systemSettingsTransformer) {
-        return function($scope, $hustle, orgUnitRepository, excludedDataElementsRepository, $q, $modal,
+        return function($scope, $rootScope, $hustle, orgUnitRepository, excludedDataElementsRepository, $q, $modal,
             programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService, excludedLineListOptionsRepository) {
 
             $scope.module = {};
@@ -15,6 +15,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
 
             var init = function() {
                 var initModule = function() {
+                    $rootScope.startLoading();
                     if ($scope.isNewMode) {
                         $scope.module = {
                             'openingDate': moment.utc().toDate(),
@@ -192,7 +193,10 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
                     .then(getAllModules)
                     .then(getExcludedModuleData)
                     .then(getAssociatedProgram)
-                    .then(setUpModule);
+                    .then(setUpModule)
+                    .then(function () {
+                        $rootScope.stopLoading();
+                    });
             };
 
             $scope.changeCollapsed = function(sectionId) {

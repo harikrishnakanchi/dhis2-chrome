@@ -5,14 +5,19 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
         OrgUnitRepository, DatasetRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, ProgramRepository, ExcludedLineListOptionsRepository, TranslationsService) {
 
         describe("line list module controller", function() {
-            var scope, lineListModuleController, mockOrgStore, db, q, datasets, sections, dataElements, sectionsdata,
+            var scope, rootScope, lineListModuleController, mockOrgStore, db, q, datasets, sections, dataElements, sectionsdata,
                 dataElementsdata, orgUnitRepository, hustle, excludedDataElementsRepository, excludedLineListOptionsRepository,
                 fakeModal, allPrograms, programRepository, datasetRepository, originOrgunitCreator, translationsService;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle) {
+                rootScope = $rootScope;
                 scope = $rootScope.$new();
+
                 q = $q;
+
+                rootScope.startLoading = jasmine.createSpy('startLoading');
+                rootScope.stopLoading = jasmine.createSpy('stopLoading');
 
                 hustle = $hustle;
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
@@ -122,9 +127,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "uploadExcludedOptionsDesc": "upload excluded options for module"
                 };
 
-                scope.startLoading = jasmine.createSpy('startLoading');
-                scope.stopLoading = jasmine.createSpy('stopLoading');
-
                 scope.isNewMode = true;
                 createLineListModuleController();
             }));
@@ -135,7 +137,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             });
 
             var createLineListModuleController = function () {
-                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService, excludedLineListOptionsRepository);
+                lineListModuleController = new LineListModuleController(scope, rootScope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService, excludedLineListOptionsRepository);
             };
 
             it("should save sorted list of all programs", function() {

@@ -100,8 +100,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     "upsertOrgUnitDesc": "save organisation unit",
                     "uploadSystemSettingDesc": "upload sys settings for {{module_name}}"
                 };
-                scope.startLoading = jasmine.createSpy('startLoading');
-                scope.stopLoading = jasmine.createSpy('stopLoading');
 
                 scope.isNewMode = true;
 
