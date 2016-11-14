@@ -150,6 +150,10 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             });
         };
 
+        $scope.getDisplayName = function (dataElement) {
+            return dataElement.formName || dataElement.name;
+        };
+
         var init = function() {
             var allDataElementsMap = {};
             var loadModule = function() {
