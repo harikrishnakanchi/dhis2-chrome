@@ -10,8 +10,6 @@ define([], function() {
         executeEventListener(event.data);
     };
 
-    self.worker.addEventListener("message", messageEvenHandler);
-
     var fakeFunction = function () {
 
     };
@@ -25,6 +23,10 @@ define([], function() {
         self.worker.postMessage(message);
     };
 
+    var init = function () {
+        self.worker.addEventListener("message", messageEvenHandler);
+    };
+
     return {
         addListener: addListener,
         sendMessage: sendMessage,
@@ -33,7 +35,7 @@ define([], function() {
         createNotification: fakeFunction,
         getPraxisVersion: fakeFunction,
         getOS: fakeFunction,
-        init: fakeFunction,
+        init: _.once(init),
         createAlarm: fakeFunction,
         addAlarmListener: fakeFunction,
         clearAlarm: fakeFunction

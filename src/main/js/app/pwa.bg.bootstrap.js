@@ -22,7 +22,7 @@ require.config({
     baseUrl: "../../js/"
 });
 
-require(["app/bg.pwa.config", "app/bg.shared.config"], function(config) {
+require(["app/bg.pwa.config", "app/bg.shared.config"], function() {
     require(["app/bg.app"], function(app) {
         require(["chromeUtils"], function(chromeUtils) {
             var bootstrapData;
@@ -34,7 +34,7 @@ require(["app/bg.pwa.config", "app/bg.shared.config"], function(config) {
                     });
                 }
             };
-
+            chromeUtils.init();
             chromeUtils.addListener("dbReady", onDbReady);
             self.worker.postMessage("backgroundReady");
         });
