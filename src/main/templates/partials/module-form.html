@@ -96,9 +96,9 @@
                                                                     <input type="checkbox" ng-disabled="isDisabled || element.isMandatory" ng-model="element.isIncluded" ng-change="changeSubSectionSelection(subSection, section)">
                                                                     <a class="changeColor"
                                                                        description-popup
-                                                                       dp-title="{{ element.formName}}"
+                                                                       dp-title="{{ getDisplayName(element) }}"
                                                                        dp-desc="{{ element.description }}">
-                                                                        {{ element.formName}}
+                                                                        {{ getDisplayName(element) }}
                                                                     </a>
                                                                 </label>
                                                             </li>
@@ -110,9 +110,9 @@
                                                         <input type="checkbox" ng-disabled="isDisabled || element.isMandatory" ng-model="element.isIncluded" ng-change="changeSectionSelection(section)">
                                                         <a class="changeColor"
                                                            description-popup
-                                                           dp-title="{{ element.formName}}"
+                                                           dp-title="{{ getDisplayName(element) }}"
                                                            dp-desc="{{ element.description }}">
-                                                        {{ element.formName}}
+                                                        {{ getDisplayName(element) }}
                                                         </a>
                                                     </label>
                                                 </li>

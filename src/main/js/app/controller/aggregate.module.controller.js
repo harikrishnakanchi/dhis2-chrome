@@ -467,6 +467,10 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                 $scope.selectedDataset = undefined;
             };
 
+            $scope.getDisplayName = function (dataElement) {
+                return dataElement.formName || dataElement.name;
+            };
+
             init();
         };
     });
