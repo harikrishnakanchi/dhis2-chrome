@@ -206,6 +206,10 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
                 .finally(scrollToTop);
         };
 
+        $scope.getDisplayName = function (dataElement) {
+            return dataElement.formName || dataElement.name;
+        };
+
         var initializeForm = function() {
             currentPeriod = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
             currentPeriodAndOrgUnit = {

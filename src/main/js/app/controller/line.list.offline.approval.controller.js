@@ -158,6 +158,10 @@ define(["lodash", "moment", "properties", "interpolate"], function(_, moment, pr
             return $scope.showFilters && ($scope.showOfflineSummaryForViewOnly || ($scope.isCompleted && hasRoles(['Coordination Level Approver', 'Observer'])) || (hasRoles(['Project Level Approver', 'Observer'])));
         };
 
+        $scope.getDisplayName = function (dataElement) {
+            return dataElement.formName || dataElement.name;
+        };
+
         var getDescriptionsForProceduresPerformed = function () {
             var proceduresPerformed = _.uniq($scope.dataValues._procedures, 'formName');
             proceduresPerformed =  _.map(proceduresPerformed, function (procedurePerformed) {
