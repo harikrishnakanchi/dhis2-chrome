@@ -170,6 +170,10 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             });
         };
 
+        $scope.getDisplayName = function (dataElement) {
+            return dataElement.formName || dataElement.name;
+        };
+
         var save = function(options) {
             var updateDataValuesWithPopulationData = function() {
                 var currentModuleId = $scope.selectedModule.id;

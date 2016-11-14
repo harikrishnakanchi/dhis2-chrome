@@ -73,10 +73,10 @@
                                                             <span ng-if="!dataSet.isReferralDataset">
                                                                 <a description-popup
                                                                    class="changeColor"
-                                                                   dp-title="{{ dataElement.formName }}"
+                                                                   dp-title="{{ getDisplayName(dataElement) }}"
                                                                    dp-desc="{{ dataElement.description }}"
                                                                    >
-                                                                {{ dataElement.formName }}
+                                                                {{ getDisplayName(dataElement) }}
                                                                 </a>
                                                             </span>
                                                             <span ng-if="dataSet.isReferralDataset"> {{ referralLocations[dataElement.formName].name }} </span>
