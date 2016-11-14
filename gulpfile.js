@@ -178,7 +178,7 @@ gulp.task('pack', ['less', 'config', 'download-packaged-data'], function() {
     return stream;
 });
 
-gulp.task('generate-pwa', ['config', 'download-packaged-data', 'generate-service-worker'], function () {});
+gulp.task('generate-pwa', ['config', 'generate-service-worker'], function () {});
 
 gulp.task('zip', ['less', 'config', 'download-metadata'], function() {
     return gulp.src('./src/main/**')
