@@ -1,4 +1,4 @@
-define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], function (moment, _, dateUtils, excelBuilder, eventsAggregator) {
+define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'dataElementUtils'], function (moment, _, dateUtils, excelBuilder, eventsAggregator, dataElementUtils) {
     return function($scope, $q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository, excludedLineListOptionsRepository) {
         var EMPTY_LINE = [];
 
@@ -100,7 +100,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
 
             var buildDataElement = function (dataElement) {
                 return _.flatten([
-                    dataElement.formName,
+                    $scope.getDisplayName(dataElement),
                     _.map($scope.weeks, function(week) { return $scope.dataValuesMap[week] && $scope.dataValuesMap[week][dataElement.id]; })
                 ]);
             };
@@ -145,7 +145,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
             var buildDataElementSection = function (dataElement) {
                 return [
                     EMPTY_LINE,
-                    [dataElement.formName]
+                    [$scope.getDisplayName(dataElement)]
                 ].concat(_.map(_.get(dataElement.optionSet, 'options'), _.partial(buildOption, dataElement)));
             };
 
@@ -275,6 +275,8 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
         $scope.isReferralDataAvailable = function () {
             return !_.isEmpty($scope.events) && !!$scope.eventSummary[$scope.referralLocationDataElement.id];
         };
+
+        $scope.getDisplayName = dataElementUtils.getDisplayName;
         
         var fetchEventsForProgram = function (program) {
             var startDate = moment(_.first($scope.weeks), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),

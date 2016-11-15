@@ -1,4 +1,4 @@
-define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpolate", "excelBuilder"], function(_, moment, properties, dateUtils, orgUnitMapper, interpolate, excelBuilder) {
+define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpolate", "excelBuilder", "dataElementUtils"], function(_, moment, properties, dateUtils, orgUnitMapper, interpolate, excelBuilder, dataElementUtils) {
     return function($scope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, historyService, programRepository, programEventRepository, excludedDataElementsRepository,
         orgUnitRepository, approvalDataRepository, referralLocationsRepository, dataSyncFailureRepository, translationsService, filesystemService) {
 
@@ -385,6 +385,8 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
                 "id": orgUnitId
             }).name;
         };
+
+        $scope.getDisplayName = dataElementUtils.getDisplayName;
 
         $scope.$on('moduleWeekInfo', function(event, data) {
             $scope.errorMessage = undefined;

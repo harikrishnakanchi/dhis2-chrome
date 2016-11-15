@@ -12,7 +12,7 @@
                                 </th>
                             </tr>
                             <tr ng-repeat="psde in section.programStageDataElements">
-                                <td ng-if="psde.dataElement.isIncluded">{{psde.dataElement.formName}}</td>
+                                <td ng-if="psde.dataElement.isIncluded">{{ getDisplayName(psde.dataElement) }}</td>
                             </tr>
                         </table>
                     </div>
@@ -113,7 +113,7 @@
                                             <th>{{ resourceBundle.eventDateLabel }}</th>
                                             <th ng-if="showPatientOriginInSummaryTable()">{{ resourceBundle.patientOriginLabel }}</th>
                                             <th ng-repeat="dataElement in summaryDataElements">
-                                                {{ dataElement.formName }}
+                                                {{ getDisplayName(dataElement) }}
                                             </th>
                                             <th></th>
                                             <th></th>

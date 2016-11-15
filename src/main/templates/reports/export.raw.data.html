@@ -76,7 +76,7 @@
                     <tbody ng-repeat="dataElement in summaryDataElements" ng-if="eventSummary[dataElement.id]">
                     <tr>
                         <td class="active" colspan="{{ weeks.length + 1 }}">
-                            <strong>{{ dataElement.formName }}</strong>
+                            <strong>{{ getDisplayName(dataElement) }}</strong>
                         </td>
                     </tr>
                     <tr ng-repeat="option in dataElement.optionSet.options" ng-if="eventSummary[dataElement.id][option.id]">
@@ -125,7 +125,7 @@
                     </td>
                 </tr>
                 <tr ng-repeat="dataElement in section.dataElements" ng-if="isDataAvailableForDataElement(dataElement)">
-                    <td>{{ dataElement.formName }}</td>
+                    <td>{{ getDisplayName(dataElement) }}</td>
                     <td ng-repeat="week in weeks">{{ dataValuesMap[week][dataElement.id] }}</td>
                 </tr>
                 </tbody>
