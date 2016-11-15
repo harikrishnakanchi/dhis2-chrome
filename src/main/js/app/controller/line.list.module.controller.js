@@ -1,5 +1,5 @@
-define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTransformer"],
-    function(_, orgUnitMapper, moment, interpolate, systemSettingsTransformer) {
+define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTransformer", "dataElementUtils"],
+    function(_, orgUnitMapper, moment, interpolate, systemSettingsTransformer, dataElementUtils) {
         return function($scope, $rootScope, $hustle, orgUnitRepository, excludedDataElementsRepository, $q, $modal,
             programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService, excludedLineListOptionsRepository) {
 
@@ -12,6 +12,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
             $scope.allPrograms = [];
             $scope.program = {};
             $scope.enrichedProgram = {};
+            $scope.getDisplayName = dataElementUtils.getDisplayName;
 
             var init = function() {
                 var initModule = function() {
