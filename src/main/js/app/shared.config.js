@@ -175,6 +175,7 @@ require.config({
         "interpolate": "app/utils/interpolate",
         "xlsxLoader": "app/utils/xlsx.loader",
         "excelBuilder": "app/utils/excel.builder",
+        "dataElementUtils": "app/utils/data.element.utils",
 
         //Helpers
         "helpers": "app/helpers/helpers",
