@@ -141,7 +141,6 @@
                                         </div>
 
                                         <div ng-show="eventDataEntryForm[psdeFormName].$dirty && eventDataEntryForm[psdeFormName].$invalid">
-                                            <span class="errortxt" ng-show="eventDataEntryForm[psdeFormName].$error.required"> {{ getDisplayName(programStageDE.dataElement) }} {{resourceBundle.required}}</span>
                                             <span class="errortxt" ng-show="eventDataEntryForm[psdeFormName].$error.date"> {{resourceBundle.dateInvalid}}</span>
                                             <span class="errortxt" ng-show="eventDataEntryForm[psdeFormName].$error.datetimelocal"> {{resourceBundle.dateInvalid}}</span>
                                             <span class="errortxt" ng-show="eventDataEntryForm[psdeFormName].$error.min || eventDataEntryForm[psdeFormName].$error.max"> {{resourceBundle.invalidDateRangeMessage}}</span>
