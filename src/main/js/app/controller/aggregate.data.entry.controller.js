@@ -1,4 +1,4 @@
-define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "interpolate", "customAttributes"], function(_, dataValuesMapper, orgUnitMapper, moment, properties, interpolate, CustomAttributes) {
+define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "interpolate", "customAttributes", "dataElementUtils"], function(_, dataValuesMapper, orgUnitMapper, moment, properties, interpolate, CustomAttributes, dataElementUtils) {
     return function($scope, $routeParams, $q, $hustle, $anchorScroll, $location, $modal, $rootScope, $window, $timeout,
         dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository, optionSetRepository) {
 
@@ -170,9 +170,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             });
         };
 
-        $scope.getDisplayName = function (dataElement) {
-            return dataElement.formName || dataElement.name;
-        };
+        $scope.getDisplayName = dataElementUtils.getDisplayName;
 
         var save = function(options) {
             var updateDataValuesWithPopulationData = function() {

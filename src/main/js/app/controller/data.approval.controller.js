@@ -1,4 +1,4 @@
-define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransformer", "properties", "interpolate"], function(_, dataValuesMapper, orgUnitMapper, moment, datasetTransformer, properties, interpolate) {
+define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransformer", "properties", "interpolate", "dataElementUtils"], function(_, dataValuesMapper, orgUnitMapper, moment, datasetTransformer, properties, interpolate, dataElementUtils) {
     return function($scope, $routeParams, $q, $hustle, dataRepository, excludedDataElementsRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
         $timeout, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository) {
 
@@ -206,9 +206,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
                 .finally(scrollToTop);
         };
 
-        $scope.getDisplayName = function (dataElement) {
-            return dataElement.formName || dataElement.name;
-        };
+        $scope.getDisplayName = dataElementUtils.getDisplayName;
 
         var initializeForm = function() {
             currentPeriod = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");

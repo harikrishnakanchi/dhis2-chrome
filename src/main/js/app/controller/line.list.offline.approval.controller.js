@@ -1,4 +1,4 @@
-define(["lodash", "moment", "properties", "interpolate"], function(_, moment, properties, interpolate) {
+define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], function(_, moment, properties, interpolate, dataElementUtils) {
     return function($scope, $q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, datasetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService) {
 
         $scope.isGenderFilterApplied = false;
@@ -158,9 +158,7 @@ define(["lodash", "moment", "properties", "interpolate"], function(_, moment, pr
             return $scope.showFilters && ($scope.showOfflineSummaryForViewOnly || ($scope.isCompleted && hasRoles(['Coordination Level Approver', 'Observer'])) || (hasRoles(['Project Level Approver', 'Observer'])));
         };
 
-        $scope.getDisplayName = function (dataElement) {
-            return dataElement.formName || dataElement.name;
-        };
+        $scope.getDisplayName = dataElementUtils.getDisplayName;
 
         var getDescriptionsForProceduresPerformed = function () {
             var proceduresPerformed = _.uniq($scope.dataValues._procedures, 'formName');

@@ -1,5 +1,5 @@
-define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransformer"],
-    function(_, orgUnitMapper, moment, interpolate, systemSettingsTransformer) {
+define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransformer", "dataElementUtils"],
+    function(_, orgUnitMapper, moment, interpolate, systemSettingsTransformer, dataElementUtils) {
         return function($scope, $rootScope, $hustle, orgUnitRepository, datasetRepository, systemSettingRepository, excludedDataElementsRepository, db, $location, $q, $modal,
             orgUnitGroupHelper, originOrgunitCreator, translationsService) {
 
@@ -467,9 +467,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                 $scope.selectedDataset = undefined;
             };
 
-            $scope.getDisplayName = function (dataElement) {
-                return dataElement.formName || dataElement.name;
-            };
+            $scope.getDisplayName = dataElementUtils.getDisplayName;
 
             init();
         };

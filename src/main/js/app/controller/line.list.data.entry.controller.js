@@ -1,4 +1,4 @@
-define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, moment, dhisId, dateUtils, properties) {
+define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUtils"], function(_, moment, dhisId, dateUtils, properties, dataElementUtils) {
     return function($scope, $rootScope, $routeParams, $location, $anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService) {
 
         var resetForm = function() {
@@ -150,9 +150,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             });
         };
 
-        $scope.getDisplayName = function (dataElement) {
-            return dataElement.formName || dataElement.name;
-        };
+        $scope.getDisplayName = dataElementUtils.getDisplayName;
 
         var init = function() {
             var allDataElementsMap = {};
