@@ -14,7 +14,7 @@ define(["lodash", "moment"], function(_, moment) {
 
                 var recursivelyDownloadAndUpsertChartData = function(modulesAndCharts) {
                     var onSuccess = function(data) {
-                        return chartRepository.upsertChartData(datum.chart.name, datum.moduleId, data).then(function() {
+                        return chartRepository.upsertChartData(datum.chart.id, datum.moduleId, data).then(function() {
                             return recursivelyDownloadAndUpsertChartData(modulesAndCharts);
                         });
                     };

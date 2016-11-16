@@ -402,6 +402,55 @@ define(['dateUtils', 'lodash'], function(dateUtils, _) {
         chartDataStore.deleteIndex('by_chart');
         pivotTableDataStore.deleteIndex('by_pivot_table');
     };
+
+    var migrate_chart_and_pivot_table_keys_from_names_to_ids = function (db, tx) {
+        var chartDefinitionsStore = tx.objectStore('chartDefinitions');
+        var chartDataStore = tx.objectStore('chartData');
+
+        var pivotTableDefinitionsStore = tx.objectStore('pivotTableDefinitions');
+        var pivotTableDataStore = tx.objectStore('pivotTableData');
+
+        chartDefinitionsStore.getAll().onsuccess = function (e) {
+            var chartDefinitions = e.target.result;
+            var chartNamesAndIdsMap = _.reduce(chartDefinitions, function (map, chartDefinition) {
+                map[chartDefinition.name] = chartDefinition.id;
+                return map;
+            }, {});
+
+            chartDataStore.getAll().onsuccess = function (e) {
+                var chartData = e.target.result;
+                _.each(chartData, function (chartDatum) {
+                    var chartName = chartDatum.chart;
+                    if(chartNamesAndIdsMap[chartName]) {
+                        chartDatum.chart = chartNamesAndIdsMap[chartName];
+                        chartDataStore.put(chartDatum);
+                        chartDataStore.delete([chartName, chartDatum.orgUnit]);
+                    }
+                });
+            };
+        };
+
+        pivotTableDefinitionsStore.getAll().onsuccess = function (e) {
+            var pivotTableDefinitions = e.target.result;
+            var pivotTableNamesAndIdsMap = _.reduce(pivotTableDefinitions, function (map, pivotTableDefinition) {
+                map[pivotTableDefinition.name] = pivotTableDefinition.id;
+                return map;
+            }, {});
+
+            pivotTableDataStore.getAll().onsuccess = function (e) {
+                var pivotTableData = e.target.result;
+                _.each(pivotTableData, function (pivotTableDatum) {
+                    var pivotTableName = pivotTableDatum.pivotTable;
+                    if(pivotTableNamesAndIdsMap[pivotTableName]) {
+                        pivotTableDatum.pivotTable = pivotTableNamesAndIdsMap[pivotTableName];
+                        pivotTableDataStore.put(pivotTableDatum);
+                        pivotTableDataStore.delete([pivotTableName, pivotTableDatum.orgUnit]);
+                    }
+                });
+            };
+        };
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -451,6 +500,7 @@ define(['dateUtils', 'lodash'], function(dateUtils, _) {
         force_charts_to_redownload,
         format_event_dates,
         migrate_organisation_unit_data_set_association,
-        delete_indices_for_chart_data_and_pivot_table_data
+        delete_indices_for_chart_data_and_pivot_table_data,
+        migrate_chart_and_pivot_table_keys_from_names_to_ids
     ];
 });

@@ -15,10 +15,10 @@ define(["lodash", "pivotTable", "pivotTableData"], function(_, PivotTableModel, 
             }));
         };
 
-        this.upsertPivotTableData = function(pivotTableName, moduleId, data) {
+        this.upsertPivotTableData = function(pivotTableId, moduleId, data) {
             var store = db.objectStore(PIVOT_TABLE_DATA_STORE_NAME);
             var pivotTableDataItem = {
-                pivotTable: pivotTableName,
+                pivotTable: pivotTableId,
                 orgUnit: moduleId,
                 data: data
             };
@@ -38,7 +38,7 @@ define(["lodash", "pivotTable", "pivotTableData"], function(_, PivotTableModel, 
 
         this.getPivotTableData = function (pivotTableDefinition, orgUnitId) {
             var store = db.objectStore(PIVOT_TABLE_DATA_STORE_NAME);
-            return store.find([pivotTableDefinition.name, orgUnitId]).then(function (pivotTableData) {
+            return store.find([pivotTableDefinition.id, orgUnitId]).then(function (pivotTableData) {
                 return pivotTableData && PivotTableData.create(pivotTableDefinition, pivotTableData.data);
             });
         };

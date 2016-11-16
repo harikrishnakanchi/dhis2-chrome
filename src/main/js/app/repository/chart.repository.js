@@ -8,10 +8,10 @@ define(['chart', 'chartData', 'lodash'], function(Chart, ChartData, _) {
             return store.upsert(charts);
         };
 
-        this.upsertChartData = function(chartName, moduleId, data) {
+        this.upsertChartData = function(chartId, moduleId, data) {
             var store = db.objectStore(CHART_DATA_STORE_NAME);
             var chartDataItem = {
-                chart: chartName,
+                chart: chartId,
                 orgUnit: moduleId,
                 data: data
             };
@@ -54,7 +54,7 @@ define(['chart', 'chartData', 'lodash'], function(Chart, ChartData, _) {
 
         this.getChartData = function (chartDefinition, orgUnitId) {
             var store = db.objectStore(CHART_DATA_STORE_NAME);
-            return store.find([chartDefinition.name, orgUnitId]).then(function (chartData) {
+            return store.find([chartDefinition.id, orgUnitId]).then(function (chartData) {
                 return chartData && ChartData.create(chartDefinition, chartData.data);
             });
         };

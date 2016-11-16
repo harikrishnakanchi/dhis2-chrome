@@ -7,7 +7,7 @@ define(["lodash", "moment"], function(_, moment) {
 
                 var recursivelyDownloadAndUpsertPivotTableData = function(orgUnitsAndTables) {
                     var onSuccess = function(data) {
-                        return pivotTableRepository.upsertPivotTableData(datum.pivotTable.name, datum.orgUnitId, data).then(function() {
+                        return pivotTableRepository.upsertPivotTableData(datum.pivotTable.id, datum.orgUnitId, data).then(function() {
                             return recursivelyDownloadAndUpsertPivotTableData(orgUnitsAndTables);
                         });
                     };

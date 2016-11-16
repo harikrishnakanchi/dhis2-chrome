@@ -117,7 +117,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
-                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(mockPivotTable.name, mockModule.id, mockPivotTableData);
+                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(mockPivotTable.id, mockModule.id, mockPivotTableData);
             });
 
             it('should retrieve modules for each project', function () {
@@ -229,9 +229,9 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
-                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(mockPivotTable.name, 'module1', "data1");
-                expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalledWith(mockPivotTable.name, 'module2', "data2");
-                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(mockPivotTable.name, 'module3', "data3");
+                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(mockPivotTable.id, 'module1', "data1");
+                expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalledWith(mockPivotTable.id, 'module2', "data2");
+                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(mockPivotTable.id, 'module3', "data3");
                 expect(changeLogRepository.upsert).not.toHaveBeenCalled();
             });
 

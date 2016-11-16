@@ -137,7 +137,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 downloadChartDataConsumer.run();
                 scope.$apply();
 
-                expect(chartRepository.upsertChartData).toHaveBeenCalledWith(mockChart.name, mockModule.id, mockChartData);
+                expect(chartRepository.upsertChartData).toHaveBeenCalledWith(mockChart.id, mockModule.id, mockChartData);
                 });
 
             it('should download chart data for relevant modules and datasets', function() {
@@ -214,9 +214,9 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 downloadChartDataConsumer.run();
                 scope.$apply();
 
-                expect(chartRepository.upsertChartData).toHaveBeenCalledWith(mockChart.name, 'Mod1', 'data1');
-                expect(chartRepository.upsertChartData).not.toHaveBeenCalledWith(mockChart.name, 'Mod2', 'data2');
-                expect(chartRepository.upsertChartData).toHaveBeenCalledWith(mockChart.name, 'Mod3', 'data3');
+                expect(chartRepository.upsertChartData).toHaveBeenCalledWith(mockChart.id, 'Mod1', 'data1');
+                expect(chartRepository.upsertChartData).not.toHaveBeenCalledWith(mockChart.id, 'Mod2', 'data2');
+                expect(chartRepository.upsertChartData).toHaveBeenCalledWith(mockChart.id, 'Mod3', 'data3');
             });
 
             it('should not download chart data if user has no modules', function() {

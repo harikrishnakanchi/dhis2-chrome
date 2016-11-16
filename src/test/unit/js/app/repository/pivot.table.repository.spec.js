@@ -89,7 +89,7 @@ define(["pivotTableRepository", "pivotTable", "pivotTableData", "categoryReposit
                 };
                 mockPivotTableDataModel = 'someInstanceOfModel';
                 pivotTableDefinition = {
-                    name: 'somePivotTableName'
+                    id: 'somePivotTableId'
                 };
 
                 mockStore.find.and.returnValue(utils.getPromise(q, mockPivotTableData));
@@ -102,7 +102,7 @@ define(["pivotTableRepository", "pivotTable", "pivotTableData", "categoryReposit
                 });
 
                 scope.$apply();
-                expect(mockStore.find).toHaveBeenCalledWith([pivotTableDefinition.name, orgUnitId]);
+                expect(mockStore.find).toHaveBeenCalledWith([pivotTableDefinition.id, orgUnitId]);
                 expect(PivotTableData.create).toHaveBeenCalledWith(pivotTableDefinition, mockPivotTableData.data);
             });
 
