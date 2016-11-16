@@ -1,5 +1,9 @@
 define([], function() {
-    var FIELD_APP_NAME_REGEX = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]([0-9\s]*)([a-zA-Z0-9-\s]+)/;
+    // TODO: [#2144] remove 'FieldApp' from regular expression and decrement the indices if capture group is removed.
+    var FIELD_APP_NAME_REGEX = /^\[(Praxis|FieldApp) - ([a-zA-Z0-9()><]+)\]([0-9\s]*)([a-zA-Z0-9-\s]+)/;
+
+    var SERVICE_CODE_INDEX = 2,
+        DISPLAY_POSITION_INDEX = 3;
 
     var Chart = function(config) {
         this.id = config.id;
@@ -22,12 +26,12 @@ define([], function() {
 
     var parseServiceCode = function(chartName) {
         var matches = FIELD_APP_NAME_REGEX.exec(chartName);
-        return matches && matches[1];
+        return matches && matches[SERVICE_CODE_INDEX];
     };
 
     var parseDisplayPosition = function(chartName) {
         var matches = FIELD_APP_NAME_REGEX.exec(chartName);
-        return matches && parseInt(matches[2]);
+        return matches && parseInt(matches[DISPLAY_POSITION_INDEX]);
     };
 
     var isMonthlyChart = function(relativePeriods) {
