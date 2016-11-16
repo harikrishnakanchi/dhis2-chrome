@@ -45,6 +45,12 @@ define(["dataEntryTableColumnConfig", "lodash", "customAttributes"], function(da
                 var enrichedDataElement = _.pick(indexedDataElements[dataElement.id], "id", "name", "formName", "categoryCombo", "description", "code");
                 enrichedDataElement.isIncluded = _.isEmpty(excludedDataElements) ? true : !_.contains(excludedDataElements, dataElement.id);
                 enrichedDataElement.isMandatory = CustomAttributes.getBooleanAttributeValue(indexedDataElements[dataElement.id].attributeValues, CustomAttributes.MANDATORY_CODE);
+                // TODO REMOVE AFTER 10.0
+                var associatedProgram = CustomAttributes.getAttributeValue(indexedDataElements[dataElement.id].attributeValues, CustomAttributes.ASSOCIATED_PROGRAM_CODE);
+                if (!_.isEmpty(associatedProgram)) {
+                    enrichedDataElement.associatedProgramId = associatedProgram;
+                }
+
                 var subSection = getSubSection(enrichedDataElement)[0] || {
                     "name": "Default"
                 };
