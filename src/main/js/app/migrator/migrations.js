@@ -1,4 +1,4 @@
-define(['dateUtils'], function(dateUtils) {
+define(['dateUtils', 'lodash'], function(dateUtils, _) {
     var create_data_store = function(stores, db) {
         _.each(stores, function(type) {
             db.createObjectStore(type, {
@@ -395,6 +395,13 @@ define(['dateUtils'], function(dateUtils) {
         dataSetsStore.deleteIndex('by_organisationUnit');
     };
 
+    var delete_indices_for_chart_data_and_pivot_table_data = function (db, tx) {
+        var chartDataStore = tx.objectStore('chartData');
+        var pivotTableDataStore = tx.objectStore('pivotTableData');
+
+        chartDataStore.deleteIndex('by_chart');
+        pivotTableDataStore.deleteIndex('by_pivot_table');
+    };
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -443,6 +450,7 @@ define(['dateUtils'], function(dateUtils) {
         create_excluded_line_list_options_store,
         force_charts_to_redownload,
         format_event_dates,
-        migrate_organisation_unit_data_set_association
+        migrate_organisation_unit_data_set_association,
+        delete_indices_for_chart_data_and_pivot_table_data
     ];
 });
