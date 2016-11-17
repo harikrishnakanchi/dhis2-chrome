@@ -88,7 +88,7 @@
                                     </span>
                                     <span ng-show="filterParams.filterBy === 'dateRange'">
                                         <input type="date" class="form-control" ng-model="filterParams.startDate" /> {{resourceBundle.toLabel}} <input type="date" class="form-control" ng-model="filterParams.endDate" />
-                                        <input type="button" value="{{resourceBundle.search}}" class="btn btn-default" ng-click="filterByDateRange()" ng-disabled="filterParams.filterBy === 'dateRange' && dateRangeError" />
+                                        <input type="button" value="{{resourceBundle.search}}" class="btn btn-default" ng-click="filterByDateRange()" ng-disabled="filterParams.filterBy === 'dateRange' && dateRangeError || eventfilterForm.$invalid" />
                                     </span>
                                     <span>
                                         <button class="btn btn-primary" ng-class="layoutDirection.direction != 'rtl' ? 'pull-right' : 'pull-left'"
@@ -96,6 +96,7 @@
                                             type="button" ng-click="exportToExcel()" ng-disabled="!(events | filter:filterSubmittedEvents).length"> {{ resourceBundle.exportEventData }}</button>
                                     </span>
                                     <div class="errortxt" ng-if="filterParams.filterBy === 'dateRange' && dateRangeError">{{resourceBundle.dateRangeError}}</div>
+                                    <div class="errortxt" ng-if="filterParams.filterBy === 'dateRange' && eventfilterForm.$invalid">{{ resourceBundle.invalidDateError }}</div>
                                 </form>
                             </div>
                         </div>
