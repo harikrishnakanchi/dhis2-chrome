@@ -1,6 +1,6 @@
 console.log('Setting up web worker');
 
-importScripts('../lib/requirejs/require.js');
+importScripts('../../lib/requirejs/require.js');
 
 var window = self;
 self.history = {};
@@ -19,10 +19,10 @@ var document = {
 self.worker = self;
 
 require.config({
-    baseUrl: "../../js/"
+    baseUrl: "../../../js/"
 });
 
-require(["app/pwa.bg.config", "app/shared.bg.config"], function() {
+require(["app/pwa/pwa.bg.config", "app/shared.bg.config"], function() {
     require(["app/bg.app"], function(app) {
         require(["chromeUtils"], function(chromeUtils) {
             var bootstrapData;

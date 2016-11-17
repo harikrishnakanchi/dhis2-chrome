@@ -1,6 +1,6 @@
 require.config({
     paths: {
         //Utils
-        "chromeUtils": "app/utils/chrome.utils"
+        "chromeUtils": "app/chrome/chrome.utils"
     }
 });

@@ -1,6 +1,6 @@
 require.config({
     paths: {
         //Utils
-        "chromeUtils": "app/utils/pwa.utils"
+        "chromeUtils": "app/pwa/pwa.utils"
     }
 });
