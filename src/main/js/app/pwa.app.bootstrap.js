@@ -2,7 +2,7 @@ require.config({
     baseUrl: "js/"
 });
 
-require(["app/pwa.config", "app/shared.config"], function() {
+require(["app/pwa.app.config", "app/shared.app.config"], function() {
     require(["app/app", "chromeUtils"], function(app, chromeUtils) {
         var initializeForeground = function () {
             app.bootstrap(app.init());

@@ -2,7 +2,7 @@ require.config({
     baseUrl: "js/"
 });
 
-require(["app/bg.config", "app/bg.shared.config"], function(config) {
+require(["app/chrome.bg.config", "app/shared.bg.config"], function(config) {
     require(["app/bg.app"], function(app) {
         require(["properties"], function(properties) {
             var bootstrapData;

@@ -23,7 +23,7 @@ module.exports = function(config) {
         ],
         exclude: [
             'main/js/lib/**/*spec.js',
-            'main/js/app/bg.bootstrap.js'
+            'main/js/app/chrome.bg.bootstrap.js'
         ],
         ngHtml2JsPreprocessor: {
             stripPrefix: 'main/'

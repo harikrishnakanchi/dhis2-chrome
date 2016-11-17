@@ -22,7 +22,7 @@ require.config({
     baseUrl: "../../js/"
 });
 
-require(["app/bg.pwa.config", "app/bg.shared.config"], function() {
+require(["app/pwa.bg.config", "app/shared.bg.config"], function() {
     require(["app/bg.app"], function(app) {
         require(["chromeUtils"], function(chromeUtils) {
             var bootstrapData;
