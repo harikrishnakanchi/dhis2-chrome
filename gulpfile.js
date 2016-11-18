@@ -159,7 +159,7 @@ gulp.task('generate-service-worker', ['less'], function (callback) {
             rootDir + '/fonts/*',
             rootDir + '/data/*',
             rootDir + '/img/*',
-            rootDir + '/js/**/*',
+            rootDir + '/js/**/*/!(chrome.*.js)',
             rootDir + '/templates/**/*',
             rootDir + '/*.html'
         ],
