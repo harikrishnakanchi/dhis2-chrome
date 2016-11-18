@@ -28,7 +28,7 @@ define(['lodash'], function (_) {
 
         this.getDisplayName = function (item) {
             if(item.dataDimension) {
-                var itemName = item.name && _.first(item.name.split(DATA_DIMENSION_NAME_SEPARATOR));
+                var itemName = item.name;
                 // In case of DataElement displayName should be formName if not there, fallback on name. So, we download only formName and name for dataelement
                 // In case of Indicator displayName should be shortName if not there, fallback on name. So, we download only shortName and name for Indicator.
                 return item.formName || item.shortName || itemName;

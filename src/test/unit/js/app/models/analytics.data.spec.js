@@ -204,12 +204,12 @@ define(['analyticsData'], function (AnalyticsData) {
                     expect(analyticsData.getDisplayName(item)).toEqual('someShortName');
                 });
         
-                it('should split the name by hyphen if formName and shortName is not available', function () {
+                it('should use name if formName and shortName is not available', function () {
                     item = {
                         name: 'someName - someOtherName - yetAnotherName',
                         dataDimension: true
                     };
-                    expect(analyticsData.getDisplayName(item)).toEqual('someName');
+                    expect(analyticsData.getDisplayName(item)).toEqual('someName - someOtherName - yetAnotherName');
                 });
             });
         });
