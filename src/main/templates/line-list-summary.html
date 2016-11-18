@@ -88,7 +88,7 @@
                                     </span>
                                     <span ng-show="filterParams.filterBy === 'dateRange'">
                                         <input type="date" class="form-control" ng-model="filterParams.startDate" /> {{resourceBundle.toLabel}} <input type="date" class="form-control" ng-model="filterParams.endDate" />
-                                        <input type="button" value="{{resourceBundle.search}}" class="btn btn-default" ng-click="filterByDateRange()" ng-disabled="filterParams.filterBy === 'dateRange' && dateRangeError || eventfilterForm.$invalid" />
+                                        <input type="button" value="{{resourceBundle.search}}" class="btn btn-default" ng-click="filterByDateRange()" ng-disabled="filterParams.filterBy === 'dateRange' && (!filterParams.startDate || !filterParams.endDate || dateRangeError || eventfilterForm.$invalid)" />
                                     </span>
                                     <span>
                                         <button class="btn btn-primary" ng-class="layoutDirection.direction != 'rtl' ? 'pull-right' : 'pull-left'"
