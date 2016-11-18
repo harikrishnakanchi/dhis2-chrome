@@ -19,6 +19,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             $scope.projectIsAutoApproved = false;
             $scope.excludedDataElements = {};
             $scope.rowTotal = {};
+            $scope.hasDataValues = false;
         };
 
         $scope.contactSupport = interpolate($scope.resourceBundle.contactSupport, { supportEmail:properties.support_email });
@@ -427,6 +428,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                         $scope.isCompleted = moduleDataBlock.approvedAtProjectLevel;
                         $scope.isApproved = moduleDataBlock.approvedAtCoordinationLevel;
                         $scope.isDataAvailable = moduleDataBlock.submitted || moduleDataBlock.approvedAtAnyLevel;
+                        $scope.checkForPristine = $scope.isSubmitted || (!$scope.isSubmitted && _.isEmpty(moduleDataBlock.dataValues));
                     });
 
                 if ($scope.forms.dataentryForm !== undefined)
