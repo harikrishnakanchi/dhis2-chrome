@@ -152,6 +152,9 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
 
                 scope.forms.dataentryForm = { $setPristine: function() {} };
                 spyOn(scope.forms.dataentryForm, '$setPristine');
+                scope.dataentryForm = { $dirty: function() {} };
+                spyOn(scope.dataentryForm, '$dirty');
+
 
                 scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
             }));
@@ -654,16 +657,16 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it('should prevent navigation if data entry form is dirty', function() {
-                scope.forms.dataentryForm.$dirty = false;
-                scope.forms.dataentryForm.$dirty = true;
+                scope.dataentryForm.$dirty = false;
+                scope.dataentryForm.$dirty = true;
                 scope.$apply();
 
                 expect(scope.preventNavigation).toEqual(true);
             });
 
             it('should not prevent navigation if data entry form is not dirty', function() {
-                scope.forms.dataentryForm.$dirty = true;
-                scope.forms.dataentryForm.$dirty = false;
+                scope.dataentryForm.$dirty = true;
+                scope.dataentryForm.$dirty = false;
                 scope.$apply();
 
                 expect(scope.preventNavigation).toEqual(false);
