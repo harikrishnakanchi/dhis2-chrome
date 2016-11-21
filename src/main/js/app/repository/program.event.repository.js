@@ -91,8 +91,8 @@ define(["moment", "lodash", "properties", "dateUtils", "customAttributes"], func
         };
 
         this.getEventsFromPeriod = function(startPeriod, orgUnitIds) {
-            var startDate = moment.utc(startPeriod, 'GGGG[W]W').startOf('day').toISOString();
-            var endDate = moment().endOf('day').toISOString();
+            var startDate = dateUtils.toISODate(moment.utc(startPeriod, 'GGGG[W]W').startOf('day'));
+            var endDate = dateUtils.toISODate(moment().endOf('day'));
 
             var store = db.objectStore('programEvents');
             var query = db.queryBuilder().$between(startDate, endDate).$index("by_event_date").compile();
