@@ -161,7 +161,7 @@ gulp.task('generate-service-worker', ['less'], function (callback) {
             rootDir + '/img/*',
             rootDir + '/js/**/*/!(chrome.*.js)',
             rootDir + '/templates/**/*',
-            rootDir + '/*.html'
+            rootDir + '/{background,index}.html'
         ],
         stripPrefix: rootDir + '/',
         importScripts: ['js/app/interceptors/fetch.interceptor.js']
