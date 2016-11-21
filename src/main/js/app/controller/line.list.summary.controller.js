@@ -357,7 +357,7 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
             };
 
             var buildHeaders = function () {
-                var formNames = _.map($scope.dataElementsForExport, 'formName');
+                var formNames = _.map($scope.dataElementsForExport, dataElementUtils.getDisplayName);
                 return formNames.concat($scope.resourceBundle.patientOriginLabel);
             };
 
