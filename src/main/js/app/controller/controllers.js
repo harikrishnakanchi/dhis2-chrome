@@ -42,7 +42,7 @@ define(['reportsController', 'moduleWeekSelectorController', 'headerController',
             app.controller('footerController', ['$rootScope', '$scope','systemSettingRepository', footerController]);
             app.controller('exportRawDataController', ['$scope', '$q', 'dataSetRepository', 'excludedDataElementsRepository', 'orgUnitRepository', 'referralLocationsRepository', 'moduleDataBlockFactory', 'filesystemService', 'translationsService', 'programRepository', 'programEventRepository', 'excludedLineListOptionsRepository', exportRawDataController]);
             app.controller('alertDialogController', ['$scope', '$modalInstance', alertDialogController]);
-            app.controller('opunitReportController', ['$rootScope', '$q', '$scope', '$routeParams', 'orgUnitRepository','changeLogRepository', opunitReportController]);
+            app.controller('opunitReportController', ['$rootScope', '$q', '$scope', '$routeParams', 'orgUnitRepository','changeLogRepository','pivotTableRepository', opunitReportController]);
         };
         return {
             init: init
