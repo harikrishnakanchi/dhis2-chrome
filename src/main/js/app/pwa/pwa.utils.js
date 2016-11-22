@@ -1,5 +1,6 @@
 define(['lodash'], function(_) {
     var messageListeners = {};
+    var alarms = {};
 
     var executeEventListener = function (message) {
         if (messageListeners[message] instanceof Function) {
@@ -23,6 +24,52 @@ define(['lodash'], function(_) {
         self.worker.postMessage(message);
     };
 
+    var createAlarmObject = function (name, duration) {
+        var listeners = [];
+        var interval;
+
+        var addListener = function (callback) {
+            listeners.push(callback);
+        };
+
+        var stop = function () {
+            clearInterval(interval);
+        };
+
+        var executeListeners = function () {
+            listeners.forEach(function (listener) {
+                listener.call({});
+            });
+        };
+
+        var start = function () {
+            interval = setInterval(executeListeners, duration);
+        };
+
+        start();
+
+        return {
+            stop: stop,
+            addListener: addListener
+        };
+    };
+    
+    var createAlarm = function (alarmName, options) {
+        var durationInMilliseconds = options.periodInMinutes * 60 * 1000;
+        alarms[alarmName] = alarms[alarmName] || createAlarmObject(alarmName, durationInMilliseconds);
+    };
+
+    var addAlarmListener = function (alarmName, callback) {
+        return alarms[alarmName] && alarms[alarmName].addListener(callback);
+    };
+
+    var clearAlarm = function (alarmName) {
+        if (alarms[alarmName]) {
+            alarms[alarmName].stop();
+            alarms[alarmName] = null;
+        }
+    };
+
     var init = function () {
         self.worker.addEventListener("message", messageEvenHandler);
     };
@@ -36,8 +83,8 @@ define(['lodash'], function(_) {
         getPraxisVersion: fakeFunction,
         getOS: fakeFunction,
         init: _.once(init),
-        createAlarm: fakeFunction,
-        addAlarmListener: fakeFunction,
-        clearAlarm: fakeFunction
+        createAlarm: createAlarm,
+        addAlarmListener: addAlarmListener,
+        clearAlarm: clearAlarm
     };
 });
