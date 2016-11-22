@@ -9,7 +9,7 @@ define(["pivotTableRepository", "pivotTable", "pivotTableData", "categoryReposit
             mockStore = mockDB.objectStore;
 
             categoryRepository = new CategoryRepository();
-            spyOn(categoryRepository, 'getAllCategoryOptions').and.returnValue(utils.getPromise(q, []));
+            spyOn(categoryRepository, 'enrichWithCategoryOptions').and.callFake(function (arg) { return utils.getPromise(q, arg); });
 
             spyOn(PivotTableData, 'create').and.returnValue({});
 
@@ -72,23 +72,10 @@ define(["pivotTableRepository", "pivotTable", "pivotTableData", "categoryReposit
             });
 
             it('should enrich pivot table definitions with the updated category options', function () {
-                var allPivotTables = [{
-                    id: 'pivotTable1',
-                    categoryDimensions: [{
-                        categoryOptions: [{id: 'categoryOptionId', name: 'oldName'}]
-                    }]
-                }];
-                mockStore.getAll.and.returnValue(utils.getPromise(q, allPivotTables));
-
-                var mockCategoryOptions = [{id: 'categoryOptionId', name: 'newName'}];
-                categoryRepository.getAllCategoryOptions.and.returnValue(utils.getPromise(q, mockCategoryOptions));
-
-                pivotTableRepository.getAll().then(function (pivotTables) {
-                    var categoryOptions = _.first(_.first(pivotTables).categoryDimensions).categoryOptions;
-                    expect(_.first(categoryOptions)).toEqual(_.first(mockCategoryOptions));
-                });
+                pivotTableRepository.getAll();
                 scope.$apply();
-                expect(categoryRepository.getAllCategoryOptions).toHaveBeenCalled();
+
+                expect(categoryRepository.enrichWithCategoryOptions).toHaveBeenCalled();
             });
         });
 
@@ -102,7 +89,7 @@ define(["pivotTableRepository", "pivotTable", "pivotTableData", "categoryReposit
                 };
                 mockPivotTableDataModel = 'someInstanceOfModel';
                 pivotTableDefinition = {
-                    name: 'somePivotTableName'
+                    id: 'somePivotTableId'
                 };
 
                 mockStore.find.and.returnValue(utils.getPromise(q, mockPivotTableData));
@@ -115,7 +102,7 @@ define(["pivotTableRepository", "pivotTable", "pivotTableData", "categoryReposit
                 });
 
                 scope.$apply();
-                expect(mockStore.find).toHaveBeenCalledWith([pivotTableDefinition.name, orgUnitId]);
+                expect(mockStore.find).toHaveBeenCalledWith([pivotTableDefinition.id, orgUnitId]);
                 expect(PivotTableData.create).toHaveBeenCalledWith(pivotTableDefinition, mockPivotTableData.data);
             });
 

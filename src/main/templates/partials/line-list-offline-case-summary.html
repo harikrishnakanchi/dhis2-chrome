@@ -13,7 +13,7 @@
 
         <div ng-if="showFilters">
             <accordion close-others="false">
-                <div ng-class="'dataset-acc-wrapper'">
+                <div class="data-set-acc-wrapper">
                     <accordion-group ng-repeat="dataSet in associatedDataSets | filter:{ isOriginDataset: false }" ng-init="dataSet.open=true" is-open="dataSet.open">
                         <accordion-heading>
                             <span>{{dataSet.name}}</span>
@@ -33,17 +33,17 @@
                         </div>
                         <div class="exp-coll-group" ng-if="!isGenderFilterApplied &amp;&amp; !isAgeFilterApplied">
                             <accordion close-others="false">
-                                <div ng-repeat="programStage in program.programStages" ng-class="'dataset-acc-wrapper'">
+                                <div ng-repeat="programStage in program.programStages" class="data-set-acc-wrapper">
                                     <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
                                         <div ng-repeat="psde in section.programStageDataElements" ng-if="canShowDataElement(psde.dataElement.optionSet.id, psde.dataElement.id)">
                                             <div class="spacing-div-accordian" class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) && psde.dataElement.isIncluded">
                                                 <accordion-group is-open="status.open">
                                                     <accordion-heading>
                                                          <div class="description-popup">
-                                                            {{psde.dataElement.formName}}
+                                                            {{ getDisplayName(psde.dataElement) }}
                                                              <a class="description-popup-icon"
                                                                 description-popup
-                                                                dp-title="{{psde.dataElement.formName}}"
+                                                                dp-title="{{ getDisplayName(psde.dataElement) }}"
                                                                 dp-desc="{{psde.dataElement.description}}"
                                                                 >
                                                                   <i class="fa fa-info-circle" tooltip-placement="top"></i>
@@ -113,10 +113,10 @@
                                                 <accordion-group is-open="status.open">
                                                     <accordion-heading>
                                                         <div class="description-popup">
-                                                            {{psde.dataElement.formName}}
+                                                            {{ getDisplayName(psde.dataElement) }}
                                                             <a class="description-popup-icon"
                                                                description-popup
-                                                               dp-title="{{psde.dataElement.formName}}"
+                                                               dp-title="{{ getDisplayName(psde.dataElement) }}"
                                                                dp-desc="{{psde.dataElement.description}}"
                                                                >
                                                                 <i class="fa fa-info-circle" tooltip-placement="top"></i>
@@ -189,10 +189,10 @@
                                                 <accordion-group is-open="status.open">
                                                     <accordion-heading>
                                                         <div class="description-popup">
-                                                            {{psde.dataElement.formName}}
+                                                            {{ getDisplayName(psde.dataElement) }}
                                                             <a class="description-popup-icon"
                                                                description-popup
-                                                               dp-title="{{psde.dataElement.formName}}"
+                                                               dp-title="{{ getDisplayName(psde.dataElement) }}"
                                                                dp-desc="{{psde.dataElement.description}}">
                                                                 <i class="fa fa-info-circle" tooltip-placement="top"></i>
                                                             </a>
@@ -269,10 +269,10 @@
                                                 <accordion-group is-open="status.open">
                                                     <accordion-heading>
                                                         <div class="description-popup">
-                                                            {{psde.dataElement.formName}}
+                                                            {{ getDisplayName(psde.dataElement) }}
                                                             <a class="description-popup-icon"
                                                                description-popup
-                                                               dp-title="{{psde.dataElement.formName}}"
+                                                               dp-title="{{ getDisplayName(psde.dataElement) }}"
                                                                dp-desc="{{psde.dataElement.description}}">
                                                                 <i class="fa fa-info-circle" tooltip-placement="top"></i>
                                                             </a>
@@ -362,7 +362,7 @@
                         </div>
                     </accordion-group>
                 </div>
-                <div ng-class="'dataset-acc-wrapper'">
+                <div class="data-set-acc-wrapper">
                     <accordion-group ng-repeat="dataSet in associatedDataSets | filter:{ isOriginDataset: true }" ng-init="dataSet.open=true" is-open="dataSet.open">
                         <accordion-heading>
                             <span>{{ dataSet.name }}</span>
@@ -397,7 +397,7 @@
             </accordion>
             <div class="offlineProcedure" ng-if="shouldShowReferrals">
                 <accordion close-others="false">
-                    <div ng-class="'dataset-acc-wrapper'">
+                    <div class="data-set-acc-wrapper">
                         <accordion-group is-open="status.open">
                             <accordion-heading>
                                 <span>{{ resourceBundle.referralLocationLabel }}</span>

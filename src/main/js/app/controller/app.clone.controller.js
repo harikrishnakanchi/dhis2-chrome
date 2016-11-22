@@ -87,27 +87,27 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
             };
 
             var successCallback = function(fileData) {
-                $rootScope.cloning = true;
-                var zipFiles = zipUtils.readZipFile(fileData.target.result);
+                $rootScope.startLoading();
+                $timeout(function () {
+                    var zipFiles = zipUtils.readZipFile(fileData.target.result);
 
-                var result = {};
-                _.each(zipFiles, function(file) {
-                    if (_.endsWith(file.name, ".clone")) {
-                        var content = JSON.parse(arrayBufferToString(file._data.getContent()));
-                        return _.merge(result, content);
-                    }
-                });
-
-
-
-                indexeddbUtils.restore(result)
-                    .then(function() {
-                        sessionHelper.logout();
-                        $location.path("/login");
-                    }, errorCallback)
-                    .finally(function() {
-                        $rootScope.cloning = false;
+                    var result = {};
+                    _.each(zipFiles, function(file) {
+                        if (_.endsWith(file.name, ".clone")) {
+                            var content = JSON.parse(arrayBufferToString(file._data.getContent()));
+                            return _.merge(result, content);
+                        }
                     });
+
+
+
+                    indexeddbUtils.restore(result)
+                        .then(function() {
+                            sessionHelper.logout();
+                            $location.path("/login");
+                        }, errorCallback)
+                        .finally($rootScope.stopLoading);
+                }, 1000);
             };
 
             var modalMessages = {
@@ -122,14 +122,12 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
         };
 
         var createZip = function(folderName, fileNamePrefix, fileNameExtn, backupCallback) {
-            $rootScope.cloning = true;
+            $rootScope.startLoading();
             return backupCallback().then(function(data) {
-                $rootScope.cloning = false;
+                $rootScope.stopLoading();
                 var zippedData = zipUtils.zipData(folderName, fileNamePrefix, fileNameExtn, data);
                 return filesystemService.writeFile(fileNamePrefix + moment().format("YYYYMMDD-HHmmss") + ".msf", zippedData);
-            }).finally(function() {
-                $rootScope.cloning = false;
-            });
+            }).finally($rootScope.stopLoading);
         };
 
         var showNotification = function(message) {

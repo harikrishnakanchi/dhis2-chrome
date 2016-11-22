@@ -21,21 +21,21 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
         };
 
         var getModuleDataBlocks = function(data) {
-            return moduleDataBlockFactory.createForModule(data.moduleId, data.periodRange).then(function(moduleDataBlocks) {
+            return moduleDataBlockFactory.createForModule(data.module.id, data.periodRange).then(function(moduleDataBlocks) {
                 return _.merge({ moduleDataBlocks: moduleDataBlocks }, data);
             });
         };
 
         var getOriginsForModule = function(data) {
-            return orgUnitRepository.findAllByParent([data.moduleId]).then(function (originOrgUnits) {
+            return orgUnitRepository.findAllByParent([data.module.id]).then(function (originOrgUnits) {
                 return _.merge({ originOrgUnits: originOrgUnits }, data);
             });
         };
 
         var getDataSetsForModuleAndOrigins = function(data) {
-            var originOrgUnitIds = _.pluck(data.originOrgUnits, 'id');
+            var orgUnits = [data.module].concat(data.originOrgUnits);
 
-            return datasetRepository.findAllForOrgUnits(originOrgUnitIds.concat(data.moduleId)).then(function(dataSets){
+            return datasetRepository.findAllForOrgUnits(orgUnits).then(function(dataSets){
                 var aggregatedDataSetIds = getAggregateDataSetIds(dataSets);
 
                 return _.merge({
@@ -56,20 +56,20 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
         };
 
         var getIndexedDataValuesFromDhis = function(data) {
-            return dataService.downloadData(data.moduleId, data.aggregateDataSetIds, data.periodRange, data.lastUpdatedTimestamp)
+            return dataService.downloadData(data.module.id, data.aggregateDataSetIds, data.periodRange, data.lastUpdatedTimestamp)
                 .then(function (dataValues) {
                     var indexedDataValues = _.groupBy(dataValues, function(dataValue) {
-                        return dataValue.period + data.moduleId;
+                        return dataValue.period + data.module.id;
                     });
                     return _.merge({ indexedDhisDataValues: indexedDataValues }, data);
                 });
         };
 
         var getEventsFromDhis = function(data) {
-            return eventService.getEvents(data.moduleId, data.periodRange, data.lastUpdatedTimestamp).then(function(events) {
+            return eventService.getEvents(data.module.id, data.periodRange, data.lastUpdatedTimestamp).then(function(events) {
                 var groupedEvents = _.groupBy(events, function(event) {
                         var period = moment(event.eventDate).format('GGGG[W]WW');
-                        return period + data.moduleId;
+                        return period + data.module.id;
                     });
 
                 return _.merge({ indexedDhisEvents: groupedEvents }, data);
@@ -77,13 +77,13 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
         };
 
         var getEventIdsFromDhis = function(data) {
-            return eventService.getEventIds(data.moduleId, data.periodRange).then(function (eventIds) {
+            return eventService.getEventIds(data.module.id, data.periodRange).then(function (eventIds) {
                 return _.merge({ eventIds: eventIds }, data);
             });
         };
 
         var getIndexedCompletionsFromDhis = function (data) {
-            return approvalService.getCompletionData(data.moduleId, data.originOrgUnits, data.allDataSetIds, data.periodRange).then(function(allCompletionData) {
+            return approvalService.getCompletionData(data.module.id, data.originOrgUnits, data.allDataSetIds, data.periodRange).then(function(allCompletionData) {
                 var indexedCompletions = _.indexBy(allCompletionData, function(completionData) {
                     return completionData.period + completionData.orgUnit;
                 });
@@ -92,7 +92,7 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
         };
 
         var getIndexedApprovalsFromDhis = function (data) {
-            return approvalService.getApprovalData(data.moduleId, data.allDataSetIds, data.periodRange).then(function (allApprovalData) {
+            return approvalService.getApprovalData(data.module.id, data.allDataSetIds, data.periodRange).then(function (allApprovalData) {
                 var indexedApprovals = _.indexBy(allApprovalData, function(approvalData) {
                     return approvalData.period + approvalData.orgUnit;
                 });
@@ -129,7 +129,7 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
             };
 
             return getModuleDataBlocks({
-                moduleId: options.modules.pop().id,
+                module: options.modules.pop(),
                 periodRange: options.periodRange,
                 lastUpdatedTimestamp: options.lastUpdatedTimestamp
             })

@@ -46,15 +46,15 @@ define(['pivotTable'], function(PivotTable) {
            });
        });
 
-       describe('dataSetCode', function() {
+       describe('serviceCode', function() {
            it('should parse the dataSet code from the pivot table name', function() {
-               pivotTable = PivotTable.create({ name: '[FieldApp - someDataSetCode] # Name' });
-               expect(pivotTable.dataSetCode).toEqual('someDataSetCode');
+               pivotTable = PivotTable.create({ name: '[FieldApp - someServiceCode] # Name' });
+               expect(pivotTable.serviceCode).toEqual('someServiceCode');
            });
 
            it('should leave the dataSet code as null if the pivot table name is malformed', function() {
                pivotTable = PivotTable.create({ name: 'some malformed pivot table name' });
-               expect(pivotTable.dataSetCode).toBeNull();
+               expect(pivotTable.serviceCode).toBeNull();
            });
        });
 
@@ -108,12 +108,12 @@ define(['pivotTable'], function(PivotTable) {
 
        describe('title', function() {
            it('should parse the title from the pivot table name', function() {
-               pivotTable = PivotTable.create({ name: '[FieldApp - someDataSetCode] 1 SomePivotTableTitle' });
+               pivotTable = PivotTable.create({ name: '[FieldApp - someServiceCode] 1 SomePivotTableTitle' });
                expect(pivotTable.title).toEqual('SomePivotTableTitle');
            });
 
            it('should parse the title from the pivot table name with special characters', function() {
-               pivotTable = PivotTable.create({ name: '[FieldApp - someDataSetCode] 1 Some\'Pi/vo>t< & Tab=le%Title' });
+               pivotTable = PivotTable.create({ name: '[FieldApp - someServiceCode] 1 Some\'Pi/vo>t< & Tab=le%Title' });
                expect(pivotTable.title).toEqual('Some\'Pi/vo>t< & Tab=le%Title');
            });
 
@@ -125,7 +125,7 @@ define(['pivotTable'], function(PivotTable) {
 
        describe('displayPosition', function() {
            it('should parse the display position from the pivot table name', function() {
-               pivotTable = PivotTable.create({ name: '[FieldApp - someDataSetCode] 88 SomePivotTableTitle' });
+               pivotTable = PivotTable.create({ name: '[FieldApp - someServiceCode] 88 SomePivotTableTitle' });
                expect(pivotTable.displayPosition).toEqual(88);
            });
 

@@ -25,12 +25,12 @@
 
             <div class="alert alert-danger" ng-show="syncError && moduleDataBlock.awaitingActionAtDataEntryLevel && !submitError">{{resourceBundle.aggregateDataSyncError}}</div>
 
-            <form name="dataentryForm" id="dataentry" ng-if="hasRoles(['Data entry user', 'Observer']) && (isDataAvailable || isDataEntryAllowed)">
+            <form name="forms.dataentryForm" id="dataentry" ng-if="hasRoles(['Data entry user', 'Observer']) && (isDataAvailable || isDataEntryAllowed)">
                 <div ng-class="layoutDirection.direction == 'rtl' ? 'text-left' : 'text-right'">
                     <button class="btn btn-sm btn-primary printTallySheetBtn" ng-click="printWindow()" ng-show="selectedModule">{{resourceBundle.printTallySheetBtnValue}}</button>
                 </div>
                 <accordion close-others="false">
-                    <div ng-class="'dataset-acc-wrapper'">
+                    <div class="data-set-acc-wrapper">
                         <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: false, isPopulationDataset: false } | orderBy: 'name' track by dataSet.id" is-open="getDatasetState(dataSet.id, $first)[dataSet.id]">
                             <accordion-heading>
                                 <span>{{ dataSet.name }}</span>
@@ -50,14 +50,14 @@
                                         </accordion-heading>
                                         <table locked-table-header class="table table-bordered" ng-if="isDatasetOpen[dataSet.id] || printingTallySheet">
                                             <thead>
-                                                <tr ng-repeat="category in section.headers track by $id(category)">
-                                                    <th class="display-print" ng-if="$index===0">
+                                                <tr ng-repeat="columnConfiguration in section.columnConfigurations">
+                                                    <th class="display-print" ng-if="$first">
                                                         <span>{{ section.name}}</span>
                                                     </th>
-                                                    <th class="display-print" ng-if="$index>0">
+                                                    <th class="display-print" ng-if="!$first">
                                                     </th>
-                                                    <th ng-repeat="option in category track by $index" colspan="{{ maxcolumns(section.headers) / category.length}}">
-                                                        <span>{{ option.name}}</span>
+                                                    <th ng-repeat="column in columnConfiguration" colspan="{{ section.baseColumnConfiguration.length / columnConfiguration.length }}">
+                                                        <span>{{ column.name}}</span>
                                                     </th>
                                                     <th ng-if="!$last" class="last-column">
                                                     </th>
@@ -73,22 +73,22 @@
                                                             <span ng-if="!dataSet.isReferralDataset">
                                                                 <a description-popup
                                                                    class="changeColor"
-                                                                   dp-title="{{ dataElement.formName }}"
+                                                                   dp-title="{{ getDisplayName(dataElement) }}"
                                                                    dp-desc="{{ dataElement.description }}"
                                                                    >
-                                                                {{ dataElement.formName }}
+                                                                {{ getDisplayName(dataElement) }}
                                                                 </a>
                                                             </span>
                                                             <span ng-if="dataSet.isReferralDataset"> {{ referralLocations[dataElement.formName].name }} </span>
                                                         </div>
                                                     </td>
-                                                    <td ng-repeat="option in section.categoryOptionComboIds track by $id(option)">
+                                                    <td ng-repeat="column in section.baseColumnConfiguration">
                                                         <ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
                                                             <input type="text" name="datavalue" id="datafield_{{$index}}" class="form-control input-sm"
                                                                    ng-pattern="validDataValuePattern"
-                                                                   ng-model="safeGet(dataValues, dataElement.id, option, selectedModule.id)['value']"
-                                                                   ng-focus="restoreExpression(selectedModule.id, dataElement.id, option)"
-                                                                   ng-blur="evaluateExpression(selectedModule.id, dataElement.id, option)"
+                                                                   ng-model="safeGet(dataValues, dataElement.id, column.categoryOptionComboId, selectedModule.id)['value']"
+                                                                   ng-focus="restoreExpression(selectedModule.id, dataElement.id, column.categoryOptionComboId)"
+                                                                   ng-blur="evaluateExpression(selectedModule.id, dataElement.id, column.categoryOptionComboId)"
                                                                    ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed" />
                                                         </ng-form>
                                                     </td>
@@ -98,8 +98,8 @@
                                                     <td>
                                                         <span> {{ resourceBundle.totalLabel }}</span>
                                                     </td>
-                                                    <td ng-repeat="option in section.categoryOptionComboIds track by $id(option)">
-                                                        {{columnSum(dataValues[selectedModule.id], section , option, dataSet.isReferralDataset)}}
+                                                    <td ng-repeat="column in section.baseColumnConfiguration">
+                                                        {{columnSum(dataValues[selectedModule.id], section , column.categoryOptionComboId, dataSet.isReferralDataset)}}
                                                     </td>
                                                     <td class="last-column" ng-if="section.shouldDisplayRowTotals "> {{totalSum(section)}}
                                                     </td>
@@ -129,44 +129,50 @@
                                         </accordion-heading>
                                         <table locked-table-header class="table table-bordered" ng-if="isDatasetOpen[dataSet.id] || printingTallySheet">
                                             <thead>
-                                                <tr ng-repeat="category in section.headers track by $id(category)">
-                                                    <th class="display-print" ng-if="$index===0">
-                                                        <span>{{ section.name}}</span>
+                                                <tr ng-repeat="columnConfiguration in section.columnConfigurations">
+                                                    <th class="display-print" ng-if="$first">
+                                                        <span>{{ section.name }}</span>
                                                     </th>
-                                                    <th class="display-print" ng-if="$index>0">
+                                                    <th class="display-print" ng-if="!$first">
                                                     </th>
-                                                    <th ng-repeat="option in category track by $index" colspan="{{ maxcolumns(section.headers) / category.length}}">
-                                                        <span>{{option.name}}</span>
+                                                    <th ng-repeat="column in columnConfiguration" colspan="{{ section.baseColumnConfiguration.length / columnConfiguration.length}}">
+                                                        <span>{{column.name}}</span>
                                                     </th>
                                                     <th ng-hide="$last" class="last-column">
                                                     </th>
-                                                    <th ng-show="$last && section.categoryOptionComboIds.length > 1" class="last-column">
+                                                    <th ng-show="$last && section.shouldDisplayRowTotals" class="last-column">
                                                         {{ resourceBundle.totalLabel }}
                                                     </th>
                                                 </tr>
                                             </thead>
-                                            <tbody ng-repeat="orgUnit in dataSet.organisationUnits | orderBy: 'name'  track by orgUnit.id" ng-if="moduleAndOriginOrgUnitIds.indexOf(orgUnit.id) &gt;= 0">
-                                                <tr ng-repeat="dataElement in section.dataElements track by dataElement.id" ng-if="dataElement.associatedProgramId === associatedProgramId" ng-form="dataElementForm">
+                                            <tbody ng-repeat="orgUnit in originOrgUnits | orderBy: 'name'" >
+                                            <!-- TODO remove ng-if after 10.0-->
+                                                <tr ng-repeat="dataElement in section.dataElements track by dataElement.id" ng-if="dataElement.associatedProgramId === undefined" ng-form="dataElementForm">
                                                     <td>
-                                                        <span> {{ orgUnit[dataElement.id] || orgUnit.name}}</span>
+                                                        <span> {{ orgUnit.name }}</span>
                                                     </td>
-                                                    <td ng-repeat="option in section.categoryOptionComboIds track by $id(option)">
+                                                    <td ng-repeat="column in section.baseColumnConfiguration">
                                                         <ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
-                                                            <input type="text" name="datavalue" id="datafield_{{$index}}" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option, orgUnit.id)['value']" ng-focus="restoreExpression(orgUnit.id, dataElement.id, option)" class="form-control input-sm" ng-blur="evaluateExpression(orgUnit.id, dataElement.id, option)" ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed" />
+                                                            <input type="text" name="datavalue" id="datafield_{{$index}}" class="form-control input-sm"
+                                                                   ng-pattern="validDataValuePattern"
+                                                                   ng-model="safeGet(dataValues, dataElement.id, column.categoryOptionComboId, orgUnit.id)['value']"
+                                                                   ng-focus="restoreExpression(orgUnit.id, dataElement.id, column.categoryOptionComboId)"
+                                                                   ng-blur="evaluateExpression(orgUnit.id, dataElement.id, column.categoryOptionComboId)"
+                                                                   ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed" />
                                                         </ng-form>
                                                     </td>
-                                                    <td class="last-column" ng-if="section.categoryOptionComboIds.length > 1">{{sum(dataValues[orgUnit.id][dataElement.id], dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
+                                                    <td class="last-column" ng-if="section.shouldDisplayRowTotals">{{sum(dataValues[orgUnit.id][dataElement.id], dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
                                                 </tr>
                                             </tbody>
-                                            <tbody ng-if="showTotalLabelForOriginDatasetSection(dataSet)">
+                                            <tbody>
                                                 <tr class="hide-from-print">
                                                     <td>
                                                         <span> {{ resourceBundle.totalLabel }}</span>
                                                     </td>
                                                     <td>
-                                                        {{originSum(dataValues, dataSet, section)}}
+                                                        {{originSum(dataValues, section)}}
                                                     </td>
-                                                    <td class="last-column" ng-if="section.categoryOptionComboIds.length > 1"> {{originSum(dataValues, dataSet,section)}}
+                                                    <td class="last-column" ng-if="section.shouldDisplayRowTotals"> {{originSum(dataValues, section)}}
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -178,9 +184,10 @@
                     </div>
                 </accordion>
                 <div>
-                    <input type="submit" class="btn btn-main" id="dataEntrySave" ng-click="saveAsDraft()" ng-disabled="dataentryForm.$invalid" ng-if="hasRoles(['Data entry user'])" ng-hide="isSubmitted" value="{{resourceBundle.saveBtnValue}}" />
-                    <input type="submit" class="btn btn-main" id="dataEntrySubmit" ng-click="submit()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid || !isDataEntryAllowed" ng-if="hasRoles(['Data entry user']) &amp;&amp; !projectIsAutoApproved" value="{{ (syncError && moduleDataBlock.awaitingActionAtDataEntryLevel) ? resourceBundle.resubmitButton : resourceBundle.submitBtnValue }}" />
-                    <input type="submit" class="btn btn-main" id="dataEntrySubmitAndApprove" ng-click="submitAndApprove()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid || !isDataEntryAllowed" ng-if="hasRoles(['Data entry user']) &amp;&amp; projectIsAutoApproved" value="{{ syncError ? resourceBundle.resubmitButton : resourceBundle.submitBtnValue }}" />
+                    <input type="submit" class="btn btn-main" id="dataEntrySave" ng-click="saveAsDraft()" ng-disabled="forms.dataentryForm.$invalid" ng-if="hasRoles(['Data entry user'])" ng-hide="isSubmitted" value="{{resourceBundle.saveBtnValue}}" />
+                    <input type="submit" class="btn btn-main" id="dataEntrySubmit" ng-click="submit()" ng-disabled="isCurrentWeekSelected(week) || (checkForPristine && forms.dataentryForm.$pristine) || forms.dataentryForm.$invalid || !isDataEntryAllowed" ng-if="hasRoles(['Data entry user']) &amp;&amp; !projectIsAutoApproved && !(syncError && moduleDataBlock.awaitingActionAtDataEntryLevel)" value="{{  resourceBundle.submitBtnValue }}" />
+                    <input type="submit" class="btn btn-main" id="dataEntryReSubmit" ng-click="submit()" ng-disabled="isCurrentWeekSelected(week) || forms.dataentryForm.$invalid || !isDataEntryAllowed" ng-if="hasRoles(['Data entry user']) &amp;&amp; !projectIsAutoApproved && (syncError && moduleDataBlock.awaitingActionAtDataEntryLevel)" value = "{{ resourceBundle.resubmitButton }}" />
+                    <input type="submit" class="btn btn-main" id="dataEntrySubmitAndApprove" ng-click="submitAndApprove()" ng-disabled="isCurrentWeekSelected(week) || forms.dataentryForm.$invalid || !isDataEntryAllowed" ng-if="hasRoles(['Data entry user']) &amp;&amp; projectIsAutoApproved" value="{{ syncError ? resourceBundle.resubmitButton : resourceBundle.submitBtnValue }}" />
                 </div>
             </form>
         </section>

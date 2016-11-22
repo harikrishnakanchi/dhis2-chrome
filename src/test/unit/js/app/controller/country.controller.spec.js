@@ -1,6 +1,6 @@
 define(["countryController", "angularMocks", "utils", "moment", "timecop", "dhisId"], function(CountryController, mocks, utils, moment, timecop, dhisId) {
 
-    describe("contry controller", function() {
+    describe("country controller", function() {
 
         var scope, timeout, q, location, anchorScroll, hustle, orgUnitRepo, DhisId;
 
@@ -28,8 +28,11 @@ define(["countryController", "angularMocks", "utils", "moment", "timecop", "dhis
             scope.locale = "en";
 
             scope.resourceBundle = {
-                "upsertOrgUnitDesc": "create organisation unit: ",
+                "upsertOrgUnitDesc": "create organisation unit"
             };
+
+            scope.startLoading = jasmine.createSpy('startLoading');
+            scope.stopLoading = jasmine.createSpy('stopLoading');
 
             Timecop.install();
             Timecop.freeze(new Date('2014-10-29T12:43:54.972Z'));
@@ -117,7 +120,7 @@ define(["countryController", "angularMocks", "utils", "moment", "timecop", "dhis
                 "data": [expectedNewOrgUnit],
                 "type": "upsertOrgUnit",
                 "locale": "en",
-                "desc": "create organisation unit: Org1"
+                "desc": "create organisation unit"
             }, 'dataValues');
         });
 

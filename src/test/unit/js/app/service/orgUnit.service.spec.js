@@ -1,6 +1,6 @@
 define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUnitService, mocks, properties, utils) {
     describe("org unit service", function() {
-        var http, httpBackend, projectService, db, mockOrgStore, q;
+        var http, httpBackend, projectService, orgUnitService, db, mockOrgStore, q;
 
         beforeEach(mocks.inject(function($httpBackend, $http, $q) {
             http = $http;
@@ -143,7 +143,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
 
             orgUnitService.get(orgUnitId);
 
-            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?filter=id:eq:org1234&paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],!dataSets,!access,!href,!uuid').respond(200, "ok");
+            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?filter=id:eq:org1234&paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid').respond(200, "ok");
             httpBackend.flush();
         });
 
@@ -153,7 +153,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
             orgUnitService.get(orgUnitId);
 
             httpBackend.expectGET(properties.dhis.url +
-                '/api/organisationUnits.json?filter=id:eq:id1&filter=id:eq:id2&filter=id:eq:id3&paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],!dataSets,!access,!href,!uuid').respond(200, "ok");
+                '/api/organisationUnits.json?filter=id:eq:id1&filter=id:eq:id2&filter=id:eq:id3&paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid').respond(200, "ok");
             httpBackend.flush();
         });
 
@@ -162,14 +162,14 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
 
             orgUnitService.getAll(lastUpdatedTime);
 
-            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],!dataSets,!access,!href,!uuid&filter=lastUpdated:gte:2014-12-30T09:13:41.092Z').respond(200, "ok");
+            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid&filter=lastUpdated:gte:2014-12-30T09:13:41.092Z').respond(200, "ok");
             httpBackend.flush();
         });
 
         it("should get all org units", function() {
             orgUnitService.getAll();
 
-            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],!dataSets,!access,!href,!uuid').respond(200, "ok");
+            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid').respond(200, "ok");
             httpBackend.flush();
         });
 
@@ -192,6 +192,80 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
 
             httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?filter=id:eq:abcd1234&filter=id:eq:wert3456&filter=id:eq:iujk8765&paging=false&fields=id').respond(200, httpResponse);
             httpBackend.flush();
+        });
+
+        it('should assign dataSet to orgUnit', function() {
+            var dataSetId = 'dataSetId';
+            var orgUnitId = 'orgUnitId';
+
+            orgUnitService.assignDataSetToOrgUnit(orgUnitId, dataSetId);
+
+            httpBackend.expectPOST(properties.dhis.url + '/api/organisationUnits/' + orgUnitId + '/dataSets/' + dataSetId).respond(204);
+            httpBackend.flush();
+        });
+
+        it('should remove dataSet from orgUnit', function() {
+            var dataSetId = 'dataSetId';
+            var orgUnitId = 'orgUnitId';
+
+            orgUnitService.removeDataSetFromOrgUnit(orgUnitId, dataSetId);
+
+            httpBackend.expectDELETE(properties.dhis.url + '/api/organisationUnits/' + orgUnitId + '/dataSets/' + dataSetId).respond(204);
+            httpBackend.flush();
+        });
+
+        it('should save organization unit to DHIS using the orgUnit API', function () {
+            var newMockOrgUnit = {
+                id: 'mockOrgUnitId',
+                dataSets: [{
+                    id: 'someDataSetId'
+                }, {
+                    id: 'someOtherDataSetId'
+                }]
+            };
+
+            orgUnitService.create(newMockOrgUnit);
+
+            httpBackend.expectPOST(properties.dhis.url + "/api/organisationUnits", newMockOrgUnit).respond(200, 'ok');
+            httpBackend.flush();
+        });
+
+        it('should update organization unit to DHIS using the orgUnit API', function () {
+            var existingMockOrgUnit = {
+                id: 'mockOrgUnitId',
+                dataSets: [{
+                    id: 'someDataSetId'
+                }, {
+                    id: 'someOtherDataSetId'
+                }]
+            };
+
+            orgUnitService.update(existingMockOrgUnit);
+
+            httpBackend.expectPUT(properties.dhis.url + "/api/organisationUnits/" + existingMockOrgUnit.id, existingMockOrgUnit).respond(200, 'ok');
+            httpBackend.flush();
+        });
+
+        it("should load pre-packaged organisationUnits data", function() {
+            var orgUnitsFromFile = {
+                "organisationUnits": [{
+                    "id": "someOrgUnit"
+                }]
+            };
+
+            httpBackend.expectGET("data/organisationUnits.json").respond(200, orgUnitsFromFile);
+
+            var actualResult;
+            orgUnitService.loadFromFile().then(function(result) {
+                actualResult = result;
+            });
+            httpBackend.flush();
+
+            var expectedOrgUnits = [{
+                "id": "someOrgUnit"
+            }];
+
+            expect(actualResult).toEqual(expectedOrgUnits);
         });
     });
 });

@@ -1,13 +1,13 @@
-define(["dataRepository", "datasetRepository", "userPreferenceRepository", "approvalDataRepository", "orgUnitRepository", "patientOriginRepository", "programEventRepository",
+define(["dataRepository", "dataSetRepository", "userPreferenceRepository", "approvalDataRepository", "orgUnitRepository", "patientOriginRepository", "programEventRepository",
         "orgUnitGroupRepository", "changeLogRepository", "programRepository", "systemSettingRepository", "metadataRepository", "chartRepository",
         "referralLocationsRepository", "pivotTableRepository", "excludedDataElementsRepository", "dataSyncFailureRepository", "dataElementRepository", "excludedLineListOptionsRepository", "categoryRepository"
     ],
-    function(dataRepository, datasetRepository, userPreferenceRepository, approvalDataRepository, orgUnitRepository, patientOriginRepository,
+    function(dataRepository, dataSetRepository, userPreferenceRepository, approvalDataRepository, orgUnitRepository, patientOriginRepository,
         programEventRepository, orgUnitGroupRepository, changeLogRepository, programRepository, systemSettingRepository, metadataRepository, chartRepository,
         referralLocationsRepository, pivotTableRepository, excludedDataElementsRepository, dataSyncFailureRepository, dataElementRepository, excludedLineListOptionsRepository, categoryRepository) {
         var init = function(app) {
             app.service('dataRepository', ['$q', '$indexedDB', dataRepository]);
-            app.service('datasetRepository', ['$indexedDB', '$q', datasetRepository]);
+            app.service('dataSetRepository', ['$indexedDB', '$q', dataSetRepository]);
             app.service('orgUnitRepository', ['$indexedDB', '$q', orgUnitRepository]);
             app.service('userPreferenceRepository', ['$indexedDB', 'orgUnitRepository', userPreferenceRepository]);
             app.service('approvalDataRepository', ['$indexedDB', '$q', approvalDataRepository]);
@@ -21,7 +21,7 @@ define(["dataRepository", "datasetRepository", "userPreferenceRepository", "appr
             app.service('excludedDataElementsRepository', ['$indexedDB', '$q', excludedDataElementsRepository]);
             app.service('metadataRepository', ['$indexedDB', "$q", metadataRepository]);
             app.service('chartRepository', ['$indexedDB', '$q', 'categoryRepository', chartRepository]);
-            app.service('referralLocationsRepository', ['$indexedDB', '$q', 'datasetRepository', referralLocationsRepository]);
+            app.service('referralLocationsRepository', ['$indexedDB', '$q', 'dataSetRepository', referralLocationsRepository]);
             app.service('pivotTableRepository', ['$indexedDB', '$q', 'categoryRepository', pivotTableRepository]);
             app.service('dataSyncFailureRepository', ['$indexedDB', dataSyncFailureRepository]);
             app.service('excludedLineListOptionsRepository', ['$indexedDB', excludedLineListOptionsRepository]);

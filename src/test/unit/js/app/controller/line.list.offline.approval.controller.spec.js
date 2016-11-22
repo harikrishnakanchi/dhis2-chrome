@@ -1,7 +1,11 @@
-define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEventRepository", "orgUnitRepository", "programRepository", "optionSetRepository", "datasetRepository", "referralLocationsRepository", "excludedDataElementsRepository", "translationsService", "timecop"],
+define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEventRepository", "orgUnitRepository", "programRepository", "optionSetRepository", "dataSetRepository", "referralLocationsRepository", "excludedDataElementsRepository", "translationsService", "timecop"],
     function(LineListOfflineApprovalController, mocks, utils, ProgramEventRepository, OrgUnitRepository, ProgramRepository, OptionSetRepository, DatasetRepository, ReferralLocationsRepository, ExcludedDataElementsRepository, TranslationsService, timecop) {
         describe("lineListOfflineApprovalController", function() {
-            var lineListOfflineApprovalController, scope, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, q, origins, program, optionSetMapping, events, origin1, origin2, origin3, origin4, dataSetRepository, associatedDataSets, referralLocationsRepository, excludedDataElementsRepository, translationsService;
+            var lineListOfflineApprovalController,
+                scope, q,
+                programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository,
+                origins, program, optionSetMapping, events, origin1, origin2, origin3, origin4, associatedDataSets,
+                translationsService;
 
             beforeEach(mocks.inject(function($rootScope, $q) {
                 scope = $rootScope.$new();
@@ -36,7 +40,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                     "os1": [{
                         "id": 'os1o1',
                         "name": 'os1o1 name',
-                        "displayName": 'os1o1 name',
+                        "displayName": 'os1o1 name'
                     }],
                     "os2": [{
                         "id": 'os2o1',
@@ -117,7 +121,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                     "dataValues": [{
                         "offlineSummaryType": "showInOfflineSummary",
                         "value": "Green",
-                        "dataElement": "Triage Status",
+                        "dataElement": "Triage Status"
                     }, {
                         "offlineSummaryType": "procedures",
                         "value": "procedure 1",
@@ -139,11 +143,11 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                     }, {
                         "offlineSummaryType": "sex",
                         "value": "Female_er",
-                        "dataElement": "gender",
+                        "dataElement": "gender"
                     }, {
                         "offlineSummaryType": "age",
                         "value": 4,
-                        "dataElement": "age",
+                        "dataElement": "age"
                     }, {
                         "offlineSummaryType": "referralLocations",
                         "value": "ref_id",
@@ -198,7 +202,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                     "weekYear": "2015",
                     "weekNumber": "21"
                 };
-                scope.associatedProgramId = "Emergency Department";
+                scope.program =  { id: "Emergency Department" };
 
                 lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService);
                 scope.$apply();

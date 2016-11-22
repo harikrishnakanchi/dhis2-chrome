@@ -96,5 +96,23 @@ define(["optionSetRepository", "angularMocks", "utils", "referralLocationsReposi
 
 
         });
+
+        it('should filter the optionSets by code', function () {
+            var filteredOptionSet,
+                mockOptionSets = [{
+                    code: 'someOptionSetCode'
+                }, {
+                    code: 'someOtherOptionSetCode'
+                }];
+
+            mockStore.getAll.and.returnValue(utils.getPromise(q, mockOptionSets));
+
+            optionSetRepository.getOptionSetByCode('someOptionSetCode').then(function (data) {
+                filteredOptionSet = data;
+            });
+
+            scope.$apply();
+            expect(filteredOptionSet).toEqual(mockOptionSets[0]);
+        });
     });
 });

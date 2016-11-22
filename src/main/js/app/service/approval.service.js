@@ -16,33 +16,18 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                     });
                 });
             });
-            var isAnyDataSetIsLocked = function (response) {
-                var responseData = _.isString(response.data) ? response.data : response.data.message;
-                if (response.status == 409 && _.contains(responseData, "Data set is locked:")) {
-                    return $q.when();
-                }
-                else {
-                    return $q.reject();
-                }
-            };
-            // TODO: Remove catch block after 6.0 update
-            return $http.post(dhisUrl.approvalMultipleL1, payload)
-                .catch(isAnyDataSetIsLocked);
+            
+            return $http.post(dhisUrl.approvalMultipleL1, payload);
         };
 
-        this.markAsApproved = function(dataSets, periodsAndOrgUnits, approvedBy, approvalDate) {
-            var payload = [];
-            _.each(periodsAndOrgUnits, function(periodAndOrgUnit) {
-                _.each(dataSets, function(ds) {
-                    payload.push({
-                        "ds": ds,
-                        "pe": periodAndOrgUnit.period,
-                        "ou": periodAndOrgUnit.orgUnit,
-                        "ab": approvedBy,
-                        "ad": approvalDate
-                    });
-                });
-            });
+        this.markAsApproved = function(dataSets, periods, orgUnits) {
+            var payload = {
+                ds: dataSets,
+                pe: periods,
+                approvals: _.map(orgUnits, function (orgUnit) {
+                    return { ou : orgUnit };
+                })
+            };
 
             return $http.post(dhisUrl.approvalMultipleL2, payload);
         };
@@ -79,23 +64,24 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
             };
 
             var doDelete = function(periodAndOrgUnit, responseFromGET) {
-                var mayUnapprovePermissions = _.map(responseFromGET.data.dataApprovalStateResponses, function(status) {
+                var filterApprovedDataSets = function(status) {
                     return status.permissions.mayUnapprove;
-                });
+                };
 
-                if (!_.isEmpty(responseFromGET.data.dataApprovalStateResponses) && _.any(mayUnapprovePermissions)) {
-                    return $http.delete(dhisUrl.approvalL2, {
-                        params: {
-                            "ds": dataSets,
-                            "pe": periodAndOrgUnit.period,
-                            "ou": periodAndOrgUnit.orgUnit
+                var filteredDataSets = _.chain(responseFromGET.data.dataApprovalStateResponses).filter(filterApprovedDataSets).map('dataSet').map("id").value();
+
+                if (!_.isEmpty(responseFromGET.data.dataApprovalStateResponses) && !_.isEmpty(filteredDataSets)) {
+                    return $http.post(dhisUrl.unApprovals, {
+                            "ds": filteredDataSets,
+                            "pe": [periodAndOrgUnit.period],
+                            "approvals": [{"ou": periodAndOrgUnit.orgUnit}]
                         }
-                    });
+                    );
                 }
             };
 
             var markAsUnapprovedPromises = _.map(periodsAndOrgUnits, function(periodAndOrgUnit) {
-                return doGet(periodAndOrgUnit).then(_.curry(doDelete)(periodAndOrgUnit));
+                return doGet(periodAndOrgUnit).then(_.partial(doDelete, periodAndOrgUnit));
             });
 
             return $q.all(markAsUnapprovedPromises);

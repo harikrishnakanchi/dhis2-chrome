@@ -47,17 +47,15 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
 
                 scope.resourceBundle = {
                     syncModuleDataBlockDesc: 'some description',
-                    uploadProgramEventsDesc: 'submit cases for ',
                     deleteEventDesc: 'delete cases',
-                    uploadApprovalDataDesc: 'approve data at coordination level for ',
-                    uploadCompletionDataDesc: 'approve data at project level for ',
-                    deleteApprovalsDesc: 'restart approval process for ',
                     eventSubmitAndApproveSuccess: '{{number_of_events}} some success message',
                     eventSubmitSuccess: '{{number_of_events}} some other success message',
                     eventDateLabel: 'Event Date',
                     patientOriginLabel: 'Patient Origin',
                     yesLabel: 'YES'
                 };
+                scope.startLoading = jasmine.createSpy('startLoading');
+                scope.stopLoading = jasmine.createSpy('stopLoading');
 
                 scope.locale = "en";
 
@@ -233,7 +231,6 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
 
                 expect(programRepository.get).toHaveBeenCalledWith('someProgram', ['de1', 'de3']);
                 expect(scope.program).toEqual(programAndStageData);
-                expect(scope.associatedProgramId).toEqual("someProgram");
             });
 
             it("should load patient origin org units on init", function() {
@@ -433,7 +430,6 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                     };
 
                     scope.dataElementsForExport = [{id: 'referralLocationDataElement', offlineSummaryType: 'referralLocations'}];
-
                     scope.referralLocations = {
                         Referral1: {
                             name: 'LocationName1'

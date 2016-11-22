@@ -21,7 +21,7 @@ define(["metadataService", "properties", "angularMocks", "moment"], function(Met
                 "created": lastWeek
             };
 
-            httpBackend.expectGET("/data/metadata.json").respond(200, metadataInFile);
+            httpBackend.expectGET("data/metadata.json").respond(200, metadataInFile);
 
             var actualMetadata;
             metadataService.loadMetadataFromFile().then(function(data) {
@@ -41,7 +41,7 @@ define(["metadataService", "properties", "angularMocks", "moment"], function(Met
                 "created": lastWeek
             };
 
-            httpBackend.expectGET("/data/metadata.json").respond(200, metadataInFile);
+            httpBackend.expectGET("data/metadata.json").respond(200, metadataInFile);
 
             var actualMetadata;
             metadataService.loadMetadataFromFile(lastUpdated).then(function(data) {

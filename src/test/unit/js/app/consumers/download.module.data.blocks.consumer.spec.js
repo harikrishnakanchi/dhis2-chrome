@@ -1,4 +1,4 @@
-define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'datasetRepository', 'userPreferenceRepository', 'changeLogRepository', 'orgUnitRepository', 'moduleDataBlockFactory',
+define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', "dataSetRepository", 'userPreferenceRepository', 'changeLogRepository', 'orgUnitRepository', 'moduleDataBlockFactory',
         'moduleDataBlockMerger', 'eventService', 'angularMocks', 'dateUtils', 'utils', 'timecop', 'moment'],
     function(DownloadModuleDataBlocksConsumer, DataService, ApprovalService, DataSetRepository, UserPreferenceRepository, ChangeLogRepository, OrgUnitRepository, ModuleDataBlockFactory,
              ModuleDataBlockMerger, EventService, mocks, dateUtils, utils, timecop, moment) {
@@ -194,8 +194,8 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
 
                 runConsumer();
 
-                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockOriginForA.id, mockModuleA.id]);
-                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockOriginForB.id, mockModuleB.id]);
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModuleA, mockOriginForA]);
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModuleB, mockOriginForB]);
            });
 
             it('should instantiate module data blocks for each module', function() {

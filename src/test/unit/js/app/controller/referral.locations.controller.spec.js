@@ -1,4 +1,4 @@
-define(["referralLocationsController", "angularMocks", "utils", "lodash", "referralLocationsRepository", "datasetRepository", "translationsService", "moment", "timecop"],
+define(["referralLocationsController", "angularMocks", "utils", "lodash", "referralLocationsRepository", "dataSetRepository", "translationsService", "moment", "timecop"],
     function(ReferralLocationsController, mocks, utils, _, ReferralLocationsRepository, DatasetRepository, TranslationsService, moment, timecop) {
         describe("referral locations controller", function() {
             var scope,

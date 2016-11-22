@@ -1,4 +1,4 @@
-define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, moment, dhisId, dateUtils, properties) {
+define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUtils"], function(_, moment, dhisId, dateUtils, properties, dataElementUtils) {
     return function($scope, $rootScope, $routeParams, $location, $anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService) {
 
         var resetForm = function() {
@@ -96,7 +96,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
         };
 
         $scope.isReferralLocationPresent = function(dataElement) {
-            return !($scope.loading === false && _.eq(dataElement.offlineSummaryType, "referralLocations") && _.isEmpty($scope.dataElementOptions[dataElement.id]));
+            return !(_.eq(dataElement.offlineSummaryType, "referralLocations") && _.isEmpty(_.get($scope.dataElementOptions, dataElement.id)));
         };
 
         $scope.update = function() {
@@ -149,6 +149,8 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 }
             });
         };
+
+        $scope.getDisplayName = dataElementUtils.getDisplayName;
 
         var init = function() {
             var allDataElementsMap = {};
@@ -240,7 +242,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                     }
 
                     if (dv.valueType === "DATE" || dv.valueType === "DATETIME")
-                        return new Date(dv.value);
+                        return dv.value && new Date(dv.value);
 
                     if (dv.valueType === 'NUMBER')
                         return parseFloat(dv.value);
@@ -285,7 +287,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
 
 
 
-            $scope.loading = true;
+            $rootScope.startLoading();
             resetForm();
             loadModule()
                 .then(setEventMinAndMaxDate)
@@ -295,9 +297,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 .then(loadOptionSets)
                 .then(loadExcludedOptions)
                 .then(loadEvent)
-                .finally(function() {
-                    $scope.loading = false;
-                });
+                .finally($rootScope.stopLoading);
         };
         init();
     };

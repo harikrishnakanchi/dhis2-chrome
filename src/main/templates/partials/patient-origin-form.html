@@ -1,7 +1,4 @@
 <div ng-controller="patientOriginController">
-    <div class="loading" ng-show="loading">
-        <img src="img/ajax-loader.gif" class="spinner" />
-    </div>
     <div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorAddingPatientOriginDetails }}</div>
     <div ng-show="updateFailure" class="alert alert-danger">{{ resourceBundle.errorUpdatingPatientOriginDetails }}</div>
     <form name="createForm" class="form-horizontal" role="form" novalidate>
@@ -15,10 +12,11 @@
                     <li class="form-group">
                         <label for="name" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.enterOriginNameLabel }}</label>
                         <div class="col-sm-6 col-md-6">
-                            <input type="text" class="form-control" name="name" id="name" ng-model="patientOrigin.name" not-in="existingPatientOrigins" required/>
+                            <input type="text" class="form-control" name="name" id="name" ng-maxlength="50" ng-model="patientOrigin.name" not-in="existingPatientOrigins" required/>
                             <div ng-show="createForm.name.$dirty &amp;&amp; createForm.name.$invalid">
                                 <span ng-show="createForm.name.$error.required" class="errortxt">{{resourceBundle.nameValidation}}</span>
                                 <span ng-show="createForm.name.$error.isWithin" class="errortxt">{{resourceBundle.patientOriginExists}}</span>
+                                <span ng-show="createForm.name.$error.maxlength" class="errortxt">{{resourceBundle.nameLengthValidation}}</span>
                             </div>
                         </div>
                     </li>

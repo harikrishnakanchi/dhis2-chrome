@@ -184,11 +184,7 @@ define(['moment', 'lodash'],
 
                 var uploadApprovalData = function (dataSetIds) {
                   if(moduleDataBlock.approvedAtCoordinationLevel && (dataOnDhisNotPreviouslyApproved || dataHasBeenModifiedLocally || dataHasBeenCompletedLocallyButNotOnDhis)) {
-                      var periodAndOrgUnit = {period: moduleDataBlock.period, orgUnit: moduleDataBlock.moduleId};
-                      var approvedBy = moduleDataBlock.approvedAtCoordinationLevelBy;
-                      var approvedOn = moduleDataBlock.approvedAtCoordinationLevelAt.toISOString();
-
-                      return approvalService.markAsApproved(dataSetIds, [periodAndOrgUnit], approvedBy, approvedOn);
+                      return approvalService.markAsApproved(dataSetIds, [moduleDataBlock.period], [moduleDataBlock.moduleId]);
                   }
                   return $q.when({});
                 };

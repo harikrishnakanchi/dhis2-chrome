@@ -175,10 +175,9 @@ define(["properties", "moment", "dateUtils", "lodash", "interpolate"], function(
             checkVersionCompatibility($scope.compatibilityInfo);
 
             if ($rootScope.currentUser && $rootScope.currentUser.selectedProject) {
-                $scope.loading = true;
-                return loadDashboard().finally(function() {
-                    $scope.loading = false;
-                });
+                $rootScope.startLoading();
+                return loadDashboard()
+                    .finally($rootScope.stopLoading);
             }
         };
 

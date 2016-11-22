@@ -1,6 +1,9 @@
-define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop", "orgUnitRepository", "patientOriginRepository", "datasetRepository", "originOrgunitCreator", "programRepository", "orgUnitGroupHelper", "systemSettingRepository"], function(PatientOriginController, mocks, utils, dhisId, timecop, OrgUnitRepository, PatientOriginRepository, DatasetRepository, OriginOrgunitCreator, ProgramRepository, OrgUnitGroupHelper, SystemSettingRepository) {
+define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop", "orgUnitRepository", "patientOriginRepository", "dataSetRepository", "originOrgunitCreator", "programRepository", "orgUnitGroupHelper"], function(PatientOriginController, mocks, utils, dhisId, timecop, OrgUnitRepository, PatientOriginRepository, DatasetRepository, OriginOrgunitCreator, ProgramRepository, OrgUnitGroupHelper) {
     describe("patientOriginController", function() {
-        var scope, patientOriginController, q, patientOriginRepository, hustle, origins, orgUnitRepository, originOrgunitCreator, programRepository, orgUnitGroupHelper, systemSettingRepository;
+        var scope, q, hustle,
+            patientOriginController,
+            datasetRepository, patientOriginRepository, orgUnitRepository, programRepository, originOrgunitCreator,
+            orgUnitGroupHelper, origins;
 
         beforeEach(module("hustle"));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle) {
@@ -31,11 +34,14 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             scope.locale ="en";
 
             scope.resourceBundle = {
-                "uploadPatientOriginDetailsDesc": "create patient origin ",
-                "upsertOrgUnitDesc": "upsert ",
-                "uploadProgramDesc": "upload program for ",
-                "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit "
+                "uploadPatientOriginDetailsDesc": "create patient origin {{origin_name}}",
+                "upsertOrgUnitDesc": "upsert",
+                "uploadProgramDesc": "upload program for {{orgunit_name}}",
+                "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit {{orgunit_name}}"
             };
+
+            scope.startLoading = jasmine.createSpy('startLoading');
+            scope.stopLoading = jasmine.createSpy('stopLoading');
 
             orgUnitGroupHelper = new OrgUnitGroupHelper();
             spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
@@ -48,12 +54,12 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             spyOn(orgUnitRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modules));
             spyOn(orgUnitRepository, "getAllOriginsByName").and.returnValue(utils.getPromise(q, []));
+            spyOn(orgUnitRepository, "associateDataSetsToOrgUnits").and.returnValue(utils.getPromise(q, {}));
 
             spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, siblingOriginOrgUnits));
 
             datasetRepository = new DatasetRepository();
             spyOn(datasetRepository, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
-            spyOn(datasetRepository, "associateOrgUnits").and.returnValue(utils.getPromise(q, {}));
 
             originOrgunitCreator = new OriginOrgunitCreator();
             spyOn(originOrgunitCreator, "create").and.returnValue(utils.getPromise(q, []));
@@ -204,11 +210,9 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             expect(originOrgunitCreator.create).toHaveBeenCalledWith(modules[0], patientOrigin);
         });
 
-        it("should associate datasets and programs to the newly created origin org units", function() {
+        it("should associate datasets and programs to the newly created origin org units for line list module", function() {
             scope.patientOrigin = {
-                "name": "Origin1",
-                "longitude": 100,
-                "latitude": 80
+                "name": "Origin1"
             };
 
             var originOrgUnits = [{
@@ -226,6 +230,19 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 "name": "Program1"
             };
 
+            var lineListModule = {
+                id: 'someLineListModule',
+                attributeValues: [
+                    {
+                        attribute: {
+                            code: 'isLineListService'
+                        },
+                        value: 'true'
+                    }
+                ]
+            };
+
+            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [lineListModule]));
             originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnits));
             datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasets));
             programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, program));
@@ -236,7 +253,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             scope.save();
             scope.$apply();
 
-            expect(datasetRepository.associateOrgUnits).toHaveBeenCalledWith([datasets[0].id], originOrgUnits);
+            expect(orgUnitRepository.associateDataSetsToOrgUnits).toHaveBeenCalledWith([datasets[0].id], originOrgUnits);
             expect(programRepository.associateOrgUnits).toHaveBeenCalledWith(program, originOrgUnits);
 
             expect(hustle.publish.calls.count()).toEqual(4);
@@ -245,7 +262,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 "data": originOrgUnits,
                 "type": "upsertOrgUnit",
                 "locale": "en",
-                "desc": "upsert origin org unit"
+                "desc": "upsert"
             }, "dataValues"]);
 
             expect(hustle.publish.calls.argsFor(2)).toEqual([{
@@ -262,6 +279,48 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 "desc": "upload program for origin org unit"
             }, "dataValues"]);
         });
+
+        it("should associate datasets  to the newly created origin org units for aggregate module", function() {
+            scope.patientOrigin = {
+                "name": "Origin1"
+            };
+
+            var originOrgUnits = [{
+                "id": "ou1",
+                "name": "origin org unit"
+            }];
+
+            var aggregateModule = {
+                id: 'someAggregateModule',
+                attributeValues: [
+                    {
+                        attribute: {
+                            code: 'isLineListService'
+                        },
+                        value: 'false'
+                    }
+                ]
+            };
+
+            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [aggregateModule]));
+            originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnits));
+
+            patientOriginController = new PatientOriginController(scope, hustle, q, patientOriginRepository, orgUnitRepository, datasetRepository, programRepository, originOrgunitCreator, orgUnitGroupHelper);
+            scope.$apply();
+
+            scope.save();
+            scope.$apply();
+
+            expect(hustle.publish.calls.count()).toEqual(2);
+
+            expect(hustle.publish.calls.argsFor(1)).toEqual([{
+                "data": { orgUnitId: originOrgUnits[0].id },
+                "type": "syncOrgUnit",
+                "locale": "en",
+                "desc": "upsert"
+            }, "dataValues"]);
+        });
+
 
         it("should take the user to the view page of the parent opUnit on clicking cancel", function() {
             scope.orgUnit = {
@@ -377,7 +436,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 "data": [newOrigin1],
                 "type": "upsertOrgUnit",
                 "locale": "en",
-                "desc": "upsert New Origin 1"
+                "desc": "upsert"
             }, "dataValues"]);
         });
 

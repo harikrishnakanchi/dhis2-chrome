@@ -10,6 +10,9 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
                 timeout = $timeout;
                 location = $location;
 
+                rootScope.startLoading = jasmine.createSpy('startLoading');
+                rootScope.stopLoading = jasmine.createSpy('stopLoading');
+
                 filesystemService = new FilesystemService(q);
                 indexeddbUtils = new IndexeddbUtils();
                 sessionHelper = new SessionHelper();
@@ -103,6 +106,7 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
 
                 scope.loadClone();
                 scope.$apply();
+                timeout.flush();
 
                 expect(filesystemService.readFile).toHaveBeenCalled();
                 expect(indexeddbUtils.restore).toHaveBeenCalled();

@@ -1,9 +1,9 @@
-define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'timecop', 'reportService', 'pivotTableRepository', 'userPreferenceRepository', 'datasetRepository', 'changeLogRepository', 'orgUnitRepository'],
-    function(DownloadPivotTableDataConsumer, mocks, utils, moment, timecop, ReportService, PivotTableRepository, UserPreferenceRepository, DatasetRepository, ChangeLogRepository, OrgUnitRepository) {
+define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'timecop', 'reportService', 'pivotTableRepository', 'userPreferenceRepository', "dataSetRepository", 'changeLogRepository', 'orgUnitRepository', 'programRepository'],
+    function(DownloadPivotTableDataConsumer, mocks, utils, moment, timecop, ReportService, PivotTableRepository, UserPreferenceRepository, DatasetRepository, ChangeLogRepository, OrgUnitRepository, ProgramRepository) {
         describe('Download Pivot Table Data Consumer', function() {
             var downloadPivotTableDataConsumer,
-                reportService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository,
-                scope, q, currentTime, mockProjectId, mockModule, mockDataSet, mockPivotTable;
+                reportService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository,
+                scope, q, currentTime, mockProjectId, mockModule, mockDataSet, mockProgram, mockPivotTable;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
                 scope = $rootScope;
@@ -16,13 +16,18 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
 
                 mockDataSet = {
                     id: 'mockDataSetId',
-                    code: 'mockDataSetCode'
+                    serviceCode: 'mockDataSetServiceCode'
+                };
+
+                mockProgram = {
+                    id: 'someProgramId',
+                    serviceCode: 'someProgramServiceCode'
                 };
 
                 mockPivotTable = {
                     id: 'mockTableId',
                     name: 'someTableName',
-                    dataSetCode: mockDataSet.code,
+                    serviceCode: mockDataSet.serviceCode,
                     weeklyReport: true
                 };
 
@@ -47,11 +52,14 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, null));
                 spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
 
+                programRepository = new ProgramRepository();
+                spyOn(programRepository, 'getProgramForOrgUnit').and.returnValue(utils.getPromise(q, mockProgram));
+
                 currentTime = moment('2016-02-29T02:03:00.000Z');
                 Timecop.install();
                 Timecop.freeze(currentTime.toISOString());
 
-                downloadPivotTableDataConsumer = new DownloadPivotTableDataConsumer(reportService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, $q);
+                downloadPivotTableDataConsumer = new DownloadPivotTableDataConsumer(reportService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository, $q);
             }));
 
             afterEach(function() {
@@ -63,12 +71,12 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 var pivotTableRelevantToDataSet = {
                     id: 'mockTableId',
                     name: 'mockTableName',
-                    dataSetCode: mockDataSet.code,
+                    serviceCode: mockDataSet.serviceCode,
                     weeklyReport: true
                 }, someOtherPivotTable = {
                     id: 'mockTableId',
                     name: 'mockTableName',
-                    dataSetCode: 'someOtherDataSetCode',
+                    serviceCode: 'someOtherDataSetServiceCode',
                     weeklyReport: true
                 };
 
@@ -78,6 +86,24 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 scope.$apply();
 
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(pivotTableRelevantToDataSet, mockModule.id);
+                expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalledWith(someOtherPivotTable, mockModule.id);
+            });
+
+            it('should download pivot table data for relevant program associated to module', function () {
+                var pivotTableForAssosciatedProgram = {
+                    id: 'mockTableId',
+                    serviceCode: mockProgram.serviceCode
+                }, someOtherPivotTable = {
+                    id: 'someOtherTableId',
+                    serviceCode: 'someOtherServiceCode'
+                };
+
+                pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [pivotTableForAssosciatedProgram, someOtherPivotTable]));
+
+                downloadPivotTableDataConsumer.run();
+                scope.$apply();
+
+                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(pivotTableForAssosciatedProgram, mockModule.id);
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalledWith(someOtherPivotTable, mockModule.id);
             });
 
@@ -91,7 +117,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
-                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(mockPivotTable.name, mockModule.id, mockPivotTableData);
+                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(mockPivotTable.id, mockModule.id, mockPivotTableData);
             });
 
             it('should retrieve modules for each project', function () {
@@ -118,8 +144,18 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
-                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModuleA.id]);
-                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModuleB.id]);
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModuleA]);
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModuleB]);
+            });
+
+            it('should retrieve programs for each module', function () {
+                var mockOrigin = { id: 'someMockOrigin' };
+
+                orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, [mockOrigin]));
+
+                downloadPivotTableDataConsumer.run();
+                scope.$apply();
+                expect(programRepository.getProgramForOrgUnit).toHaveBeenCalledWith(mockOrigin.id);
             });
 
             it('should retrieve dataSets for both module and its origins', function() {
@@ -132,7 +168,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 scope.$apply();
 
                 expect(orgUnitRepository.findAllByParent).toHaveBeenCalledWith(mockModule.id);
-                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModule.id, mockOrigin.id]);
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModule, mockOrigin]);
             });
 
             it('should download pivot table data using origin orgUnits for geographicOriginReports', function () {
@@ -142,7 +178,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 var geographicOriginPivotTable = {
                     id: 'mockTableId',
                     name: 'mockTableName',
-                    dataSetCode: mockDataSet.code,
+                    serviceCode: mockDataSet.serviceCode,
                     weeklyReport: true,
                     geographicOriginReport: true
                 };
@@ -193,9 +229,9 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
-                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(mockPivotTable.name, 'module1', "data1");
-                expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalledWith(mockPivotTable.name, 'module2', "data2");
-                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(mockPivotTable.name, 'module3', "data3");
+                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(mockPivotTable.id, 'module1', "data1");
+                expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalledWith(mockPivotTable.id, 'module2', "data2");
+                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(mockPivotTable.id, 'module3', "data3");
                 expect(changeLogRepository.upsert).not.toHaveBeenCalled();
             });
 
@@ -212,7 +248,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 var mockWeeklyPivotTable = {
                     id: 'someId',
                     weeklyReport: true,
-                    dataSetCode: mockDataSet.code
+                    serviceCode: mockDataSet.serviceCode
                 };
 
                 pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [mockWeeklyPivotTable]));
@@ -229,7 +265,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 var mockMonthlyPivotTable = {
                     id: 'someId',
                     monthlyReport: true,
-                    dataSetCode: mockDataSet.code
+                    serviceCode: mockDataSet.serviceCode
                 };
 
                 var lastDownlaodedTime =  moment('2016-02-27T01:03:00.000Z').toISOString();
@@ -250,7 +286,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 var mockMonthlyPivotTable = {
                     id: 'someId',
                     monthlyReport: true,
-                    dataSetCode: mockDataSet.code
+                    serviceCode: mockDataSet.serviceCode
                 };
 
                 var lastDownloadedTime = moment('2016-02-27T02:03:00.000Z').toISOString();

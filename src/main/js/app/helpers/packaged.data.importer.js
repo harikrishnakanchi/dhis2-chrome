@@ -1,5 +1,5 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function($q, metadataService, systemSettingService, datasetService, programService, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository, systemSettingRepository) {
+    return function($q, metadataService, systemSettingService, datasetService, programService, orgUnitService, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository, systemSettingRepository) {
         this.run = function() {
             return verifyIsNewInstall().then(importData);
         };
@@ -32,7 +32,7 @@ define(["lodash", "moment"], function(_, moment) {
             if (!isNewInstall)
                 return;
 
-            return $q.all([importMetadata(), importSystemSettings(), importDataSets(), importPrograms()])
+            return $q.all([importMetadata(), importSystemSettings(), importDataSets(), importPrograms(), importOrgUnits()])
                 .then(updateChangeLog);
         };
 
@@ -42,7 +42,6 @@ define(["lodash", "moment"], function(_, moment) {
                     return;
                 var promises = [];
                 promises.push(metadataRepository.upsertMetadata(metadata));
-                promises.push(orgUnitRepository.upsertDhisDownloadedData(metadata.organisationUnits));
                 promises.push(orgUnitGroupRepository.upsertDhisDownloadedData(metadata.organisationUnitGroups));
                 return $q.all(promises).then(function() {
                     return metadata;
@@ -63,6 +62,11 @@ define(["lodash", "moment"], function(_, moment) {
         var importPrograms = function() {
             return programService.loadFromFile()
                 .then(programRepository.upsertDhisDownloadedData);
+        };
+
+        var importOrgUnits = function () {
+            return orgUnitService.loadFromFile()
+                .then(orgUnitRepository.upsertDhisDownloadedData);
         };
     };
 });

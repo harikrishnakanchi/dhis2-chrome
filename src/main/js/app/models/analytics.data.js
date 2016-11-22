@@ -1,4 +1,4 @@
-define([], function () {
+define(['lodash'], function (_) {
     var VALUE_HEADER = 'value',
         DATA_DIMENSION_NAME_SEPARATOR = ' - ',
         NOT_SPECIFIED_ORG_UNIT_NAME = 'Not Specified';
@@ -28,11 +28,10 @@ define([], function () {
 
         this.getDisplayName = function (item) {
             if(item.dataDimension) {
-                //TODO: Remove this formatting of names after we complete transition to using formName for dataElement and shortName for indicators
-                var itemName = item.name && _.first(item.name.split(DATA_DIMENSION_NAME_SEPARATOR)),
-                    itemShortName = item.shortName && _.first(item.shortName.split(DATA_DIMENSION_NAME_SEPARATOR));
-
-                return item.formName || itemShortName || itemName;
+                var itemName = item.name;
+                // In case of DataElement displayName should be formName if not there, fallback on name. So, we download only formName and name for dataelement
+                // In case of Indicator displayName should be shortName if not there, fallback on name. So, we download only shortName and name for Indicator.
+                return item.formName || item.shortName || itemName;
             } else {
                 return item.name;
             }
@@ -41,9 +40,7 @@ define([], function () {
 
     var getExcludedCategoryOptionIds = function(definition) {
         var allCategoryOptions = _.flatten(_.map(definition.categoryDimensions, 'categoryOptions'));
-        return _.map(_.filter(allCategoryOptions, function (categoryOption) {
-            return _.endsWith(categoryOption.code, '_excludeFromTotal');
-        }), 'id');
+        return _.map(_.filter(allCategoryOptions, 'excludeFromTotal'), 'id');
     };
 
     var mapDataValues = function (headers, rows, excludedCategoryOptionIds) {
@@ -69,8 +66,7 @@ define([], function () {
             });
             return _.map(dimensionConfiguration.items, function (item) {
                 var dataDimensionItem = _.find(dataDimensionItems, { id: item.id });
-                //TODO: Remove item.description once all Praxis instances have re-downloaded all pivotTables (probably after 7.1 release).
-                return _.merge(_.pick(item, 'description'),{
+                return _.merge({
                     id: item.id,
                     name: item.name,
                     dataDimension: true,

@@ -1,5 +1,6 @@
 define(["moment", "lodashUtils"], function(moment, _) {
     return function(db, $q) {
+        var ORGANISATION_UNITS_STORE_NAME = 'organisationUnits';
         var isOfType = function(orgUnit, type) {
             return _.any(orgUnit.attributeValues, {
                 attribute: {
@@ -43,7 +44,7 @@ define(["moment", "lodashUtils"], function(moment, _) {
             payload = addClientLastUpdatedField(payload);
             payload = addParentIdField(payload);
 
-            var store = db.objectStore("organisationUnits");
+            var store = db.objectStore(ORGANISATION_UNITS_STORE_NAME);
             return store.upsert(payload).then(function() {
                 return payload;
             });
@@ -51,25 +52,25 @@ define(["moment", "lodashUtils"], function(moment, _) {
 
         var upsertDhisDownloadedData = function(payload) {
             payload = addParentIdField(payload);
-            var store = db.objectStore("organisationUnits");
+            var store = db.objectStore(ORGANISATION_UNITS_STORE_NAME);
             return store.upsert(payload).then(function() {
                 return payload;
             });
         };
 
         var getAll = function() {
-            var store = db.objectStore("organisationUnits");
+            var store = db.objectStore(ORGANISATION_UNITS_STORE_NAME);
             var orgUnits = store.getAll();
             return orgUnits.then(rejectCurrentAndDisabled);
         };
 
         var get = function(orgUnitId) {
-            var store = db.objectStore("organisationUnits");
+            var store = db.objectStore(ORGANISATION_UNITS_STORE_NAME);
             return store.find(orgUnitId);
         };
 
         var findAll = function(orgUnitIds) {
-            var store = db.objectStore("organisationUnits");
+            var store = db.objectStore(ORGANISATION_UNITS_STORE_NAME);
             var query = db.queryBuilder().$in(orgUnitIds).compile();
             return store.each(query);
         };
@@ -77,7 +78,7 @@ define(["moment", "lodashUtils"], function(moment, _) {
         var findAllByParent = function(parentIds, rejectDisabled) {
             rejectDisabled = _.isUndefined(rejectDisabled) ? true : rejectDisabled;
             parentIds = _.isArray(parentIds) ? parentIds : [parentIds];
-            var store = db.objectStore("organisationUnits");
+            var store = db.objectStore(ORGANISATION_UNITS_STORE_NAME);
             var query = db.queryBuilder().$in(parentIds).$index("by_parent").compile();
 
             if (rejectDisabled)
@@ -239,7 +240,7 @@ define(["moment", "lodashUtils"], function(moment, _) {
 
         var getChildOrgUnitNames = function(parentIds) {
             parentIds = _.isArray(parentIds) ? parentIds : [parentIds];
-            var store = db.objectStore("organisationUnits");
+            var store = db.objectStore(ORGANISATION_UNITS_STORE_NAME);
             var query = db.queryBuilder().$in(parentIds).$index("by_parent").compile();
             return store.each(query).then(function(children) {
                 return _.pluck(children, "name");
@@ -269,6 +270,38 @@ define(["moment", "lodashUtils"], function(moment, _) {
             return _.isArray(orgUnit) ? $q.all(_.map(orgUnit, getAndStoreParent)) : getAndStoreParent(orgUnit);
         };
 
+        var associateDataSetsToOrgUnits = function (dataSetIds, orgUnits) {
+            var store = db.objectStore(ORGANISATION_UNITS_STORE_NAME);
+            return $q.all(_.map(orgUnits, function (orgUnit) {
+                var payload = orgUnit;
+                var dataSetsToAdd = _.transform(dataSetIds, function (result, dataSetId) {
+                    var dataSetToAdd = { id: dataSetId };
+                    if (!_.some(payload.dataSets, dataSetToAdd)) {
+                        result.push({id: dataSetId});
+                    }
+                });
+                payload.dataSets = payload.dataSets ? payload.dataSets.concat(dataSetsToAdd) : [].concat(dataSetsToAdd);
+                return store.upsert(payload);
+            }));
+        };
+
+        var removeDataSetsFromOrgUnits = function (dataSetIdsToRemoved, orgUnits) {
+            var store = db.objectStore(ORGANISATION_UNITS_STORE_NAME);
+            return $q.all(_.map(orgUnits, function (orgUnit) {
+                var payload = orgUnit;
+                payload.dataSets = _.reject(orgUnit.dataSets, function (dataSet) {
+                    return _.contains(dataSetIdsToRemoved, dataSet.id);
+                });
+                return store.upsert(orgUnit);
+            }));
+        };
+
+        var getAllDataSetsForOrgUnit = function (orgUnitId) {
+            return get(orgUnitId).then(function (orgUnit) {
+                return orgUnit.dataSets;
+            });
+        };
+
         return {
             "upsert": upsert,
             "upsertDhisDownloadedData": upsertDhisDownloadedData,
@@ -285,7 +318,10 @@ define(["moment", "lodashUtils"], function(moment, _) {
             "getAllOriginsInOrgUnits": getAllOriginsInOrgUnits,
             "getAllOrgUnitsUnderProject": getAllOrgUnitsUnderProject,
             "getOrgUnitAndDescendants": getOrgUnitAndDescendants,
-            "enrichWithParent": enrichWithParent
+            "enrichWithParent": enrichWithParent,
+            "associateDataSetsToOrgUnits": associateDataSetsToOrgUnits,
+            "removeDataSetsFromOrgUnits": removeDataSetsFromOrgUnits,
+            "getAllDataSetsForOrgUnit": getAllDataSetsForOrgUnit
         };
     };
 });

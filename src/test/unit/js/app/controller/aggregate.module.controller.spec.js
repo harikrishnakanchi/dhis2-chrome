@@ -1,19 +1,20 @@
-define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "timecop", "dhisId", "datasetRepository",
-        "orgUnitRepository", "originOrgunitCreator", "excludedDataElementsRepository", "systemSettingRepository", "translationsService"
+define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "timecop", "dhisId", "dataSetRepository",
+        "orgUnitRepository", "originOrgunitCreator", "excludedDataElementsRepository", "systemSettingRepository", "translationsService", "orgUnitMapper", "systemSettingsTransformer"
     ],
     function(AggregateModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, timecop, dhisId, DatasetRepository,
-        OrgUnitRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, SystemSettingRepository, TranslationsService) {
+        OrgUnitRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, SystemSettingRepository, TranslationsService, orgUnitMapper, systemSettingsTransformer) {
 
-        var scope, mockOrgStore, db, q, location, orgUnitRepo, orgunitGroupRepo, hustle,
+        var scope,rootScope, mockOrgStore, db, q, location, orgUnitRepo, orgunitGroupRepo, hustle,
             dataSetRepo, systemSettingRepository, excludedDataElementsRepository, fakeModal, allPrograms, originOrgunitCreator, translationsService, orgUnitGroupHelper;
 
         describe("aggregate module controller", function() {
             var initialiseController = function() {
-                new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal, orgUnitGroupHelper, originOrgunitCreator, translationsService);
+                new AggregateModuleController(scope, rootScope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal, orgUnitGroupHelper, originOrgunitCreator, translationsService);
             };
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
+                rootScope = $rootScope;
                 scope = $rootScope.$new();
                 q = $q;
                 hustle = $hustle;
@@ -24,10 +25,17 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 orgUnitRepo = new OrgUnitRepository();
                 orgunitGroupRepo = utils.getMockRepo(q);
 
+                rootScope.startLoading = jasmine.createSpy('startLoading');
+                rootScope.stopLoading = jasmine.createSpy('stopLoading');
+
                 spyOn(orgUnitRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "getProjectAndOpUnitAttributes").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "get").and.returnValue(utils.getPromise(q, {}));
+                spyOn(orgUnitRepo, "associateDataSetsToOrgUnits").and.returnValue(utils.getPromise(q, {}));
+                spyOn(orgUnitRepo, "removeDataSetsFromOrgUnits").and.returnValue(utils.getPromise(q, {}));
+                spyOn(orgUnitRepo, "getAllDataSetsForOrgUnit").and.returnValue(utils.getPromise(q, {}));
+                spyOn(orgUnitRepo, "findAllByParent").and.returnValue(utils.getPromise(q, [{ id: 'someId' }]));
 
                 originOrgunitCreator = new OriginOrgunitCreator();
                 spyOn(originOrgunitCreator, "create").and.returnValue(utils.getPromise(q, {}));
@@ -35,8 +43,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 dataSetRepo = new DatasetRepository();
                 spyOn(dataSetRepo, "getAll").and.returnValue(utils.getPromise(q, []));
                 spyOn(dataSetRepo, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
-                spyOn(dataSetRepo, "associateOrgUnits").and.returnValue(utils.getPromise(q, undefined));
-                spyOn(dataSetRepo, "removeOrgUnits").and.returnValue(utils.getPromise(q, undefined));
                 spyOn(dataSetRepo, "includeDataElements").and.returnValue(utils.getPromise(q, []));
 
                 systemSettingRepository = new SystemSettingRepository();
@@ -51,6 +57,8 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
 
                 translationsService = new TranslationsService();
                 spyOn(translationsService, "translate").and.returnValue([]);
+
+                spyOn(systemSettingsTransformer, "excludedDataElementsForAggregateModule").and.returnValue([]);
 
                 mockOrgStore = {
                     upsert: function() {},
@@ -88,11 +96,9 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.locale = "en";
 
                 scope.resourceBundle = {
-                    "disableOrgUnitDesc": "disable organisation unit: ",
-                    "upsertOrgUnitDesc": "save organisation unit: ",
-                    "uploadSystemSettingDesc": "upload sys settings for ",
-                    "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit ",
-                    "removeOrgUnitFromDatasetDesc": "remove selected services from module "
+                    "disableOrgUnitDesc": "disable organisation unit",
+                    "upsertOrgUnitDesc": "save organisation unit",
+                    "uploadSystemSettingDesc": "upload sys settings for {{module_name}}"
                 };
 
                 scope.isNewMode = true;
@@ -167,7 +173,8 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     parent: {
                         name: 'Project1',
                         id: 'someid'
-                    }
+                    },
+                    dataSets: []
                 };
 
                 scope.save();
@@ -178,136 +185,120 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedAggregateModule);
 
                 expect(hustle.publish).toHaveBeenCalledWith({
-                    data: enrichedAggregateModule,
-                    type: "upsertOrgUnit",
+                    data: { orgUnitId: enrichedAggregateModule.id },
+                    type: "syncOrgUnit",
                     locale: "en",
-                    desc: "save organisation unit: Module1"
+                    desc: "save organisation unit"
                 }, "dataValues");
             });
 
-            it("should associate aggregate datasets with module", function() {
-                scope.module = {
-                    "id": "mod1",
-                    "name": "mod1",
-                    "openingDate": "2014-04-01",
-                    "parent": {
-                        "id": "pid",
-                        "name": "parent",
-                        "level": 5
-                    }
-                };
+            describe('save', function () {
+                var mockModule;
 
-                var enrichedModule = {
-                    "name": 'mod1',
-                    "shortName": 'mod1',
-                    "displayName": 'parent - mod1',
-                    "id": 'mod1pid',
-                    "level": 6,
-                    "openingDate": moment.utc("2014-04-01").format('YYYY-MM-DD'),
-                    "attributeValues": [{
-                        "created": '2014-04-01T00:00:00.000Z',
-                        "lastUpdated": '2014-04-01T00:00:00.000Z',
-                        "attribute": {
-                            "code": 'Type',
-                            "name": 'Type'
-                        },
-                        "value": 'Module'
-                    }, {
-                        "created": '2014-04-01T00:00:00.000Z',
-                        "lastUpdated": '2014-04-01T00:00:00.000Z',
-                        "attribute": {
-                            "code": 'isLineListService',
-                            "name": 'Is Linelist Service'
-                        },
-                        "value": 'false'
-                    }, {
-                        "created": '2014-04-01T00:00:00.000Z',
-                        "lastUpdated": '2014-04-01T00:00:00.000Z',
-                        "attribute": {
-                            "code": "isNewDataModel",
-                            "name": "Is New Data Model"
-                        },
-                        "value": 'true'
-                    }],
-                    "parent": {
-                        "name": 'parent',
-                        "id": 'pid'
-                    }
-                };
-
-                var associatedDatasets = [{
-                    "id": "ds1",
-                    "name": "ds1"
-                }];
-
-                scope.associatedDatasets = associatedDatasets;
-                spyOn(dhisId, "get").and.callFake(function(name) {
-                    return name;
+                beforeEach(function () {
+                    mockModule = {
+                        id: 'someModuleId'
+                    };
+                    spyOn(orgUnitMapper, 'mapToModule').and.returnValue(mockModule);
                 });
 
-                scope.save();
-                scope.$apply();
+                it("should upsert the module with the associated datasets for newly created module", function() {
+                    var datasets = [{
+                        'id': 'someDataSetId'
+                    }, {
+                        'id': 'someOtherDataSetId'
+                    }];
 
-                expect(dataSetRepo.associateOrgUnits).toHaveBeenCalledWith(["ds1"], [enrichedModule]);
-                expect(hustle.publish.calls.argsFor(1)).toEqual([{
-                    data: {"orgUnitIds":["mod1pid"], "dataSetIds":["ds1"]},
-                    type: "associateOrgUnitToDataset",
-                    locale: "en",
-                    desc: "associate selected services to origins of Op Unit SomeName"
-                }, "dataValues"]);
+                    scope.associatedDatasets = [datasets[0]];
+                    scope.save();
+                    scope.$apply();
+
+                    var expectedModule = {
+                        id: 'someModuleId',
+                        dataSets: [
+                            {
+                                id: 'someDataSetId'
+                            }]
+                    };
+                    expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedModule);
+                });
+
+                it('should associate the population dataset for the newly created module', function () {
+                    var datasets = [{
+                        'id': 'populationDataSetId',
+                        'isPopulationDataset': true
+                    }];
+
+                    dataSetRepo.getAll.and.returnValue(utils.getPromise(q, datasets));
+
+                    scope.$apply();
+                    scope.associatedDatasets = [];
+                    scope.save();
+                    scope.$apply();
+
+                    var expectedModule = {
+                        id: 'someModuleId',
+                        dataSets: [
+                            {
+                                id: 'populationDataSetId'
+                            }]
+                    };
+                    expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedModule);
+                });
+
+                it('should associate the referral location dataset if the associateReferralLocation is set', function () {
+                    var datasets = [{
+                        id: 'someDataSetId',
+                        isReferralDataset: true
+                    }];
+                    dataSetRepo.getAll.and.returnValue(utils.getPromise(q, datasets));
+
+                    scope.$apply();
+                    scope.associatedDatasets = [];
+                    scope.associateReferralLocation = true;
+                    scope.save();
+                    scope.$apply();
+
+                    var expectedModule = {
+                        id: 'someModuleId',
+                        dataSets: [
+                            {
+                                id: 'someDataSetId'
+                            }]
+                    };
+                    expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedModule);
+                });
+
+                it('should associate geographic origin dataSet if associateOriginDataSet is set', function () {
+                    scope.associateOriginDataSet = true;
+                    scope.save();
+                    scope.$apply();
+
+                    expect(originOrgunitCreator.create).toHaveBeenCalledWith(mockModule, undefined, true);
+                });
             });
 
             it("should save excluded data elements for the module", function() {
                 var parent = {
-                    "name": "Project1",
-                    "id": "someid",
-                    "children": []
+                    "id": "someid"
                 };
 
                 orgUnitRepo.get.and.returnValue(utils.getPromise(q, parent));
 
-                spyOn(dhisId, "get").and.callFake(function(name) {
-                    return name;
+                spyOn(orgUnitMapper, 'mapToModule').and.returnValue({
+                    'id': "Module1" + parent.id,
+                    'name': "Module1",
+                    'parent': parent
                 });
 
-                scope.$apply();
-                var projectId = "someid";
-
-                scope.orgUnit = parent;
-                scope.module = {
-                    'name': "Module1",
-                    'serviceType': "Aggregate",
-                    'openingDate': new Date(),
-                    'parent': parent
-                };
-                var enrichedAssociatedDatasets = [{
-                    "name": "OPD",
-                    "id": "DS_OPD",
-                    "organisationUnits": [{
-                        "id": "mod1"
-                    }],
-                    "attributeValues": [{
-                        "attribute": {
-                            "id": "wFC6joy3I8Q",
-                            "code": "isNewDataModel",
-                        },
-                        "value": "false"
-                    }],
-                    "sections": [{
-                        "dataElements": [{
-                            "id": "de1",
-                            "isIncluded": false
-                        }, {
-                            "id": "de2",
-                            "isIncluded": true
-                        }, {
-                            "id": "de3",
-                            "isIncluded": false
-                        }]
-                    }]
+                var excludedDataElements = [{
+                    id: 'de1'
+                },{
+                    id: 'de3'
                 }];
 
-                scope.associatedDatasets = enrichedAssociatedDatasets;
+                systemSettingsTransformer.excludedDataElementsForAggregateModule.and.returnValue(excludedDataElements);
+
                 scope.save();
                 scope.$apply();
 
@@ -329,7 +320,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 };
 
                 expect(excludedDataElementsRepository.upsert).toHaveBeenCalledWith(expectedExcludedDataElements);
-                expect(hustle.publish.calls.argsFor(2)).toEqual([expectedHustleMessage, 'dataValues']);
+                expect(hustle.publish.calls.argsFor(1)).toEqual([expectedHustleMessage, 'dataValues']);
             });
 
             it("should create org unit groups", function() {
@@ -384,7 +375,8 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     "parent": {
                         "name": 'parent',
                         "id": 'pid'
-                    }
+                    },
+                    "dataSets": [{id: "ds1"}]
                 };
 
                 scope.associatedDatasets = associatedDatasets;
@@ -401,16 +393,10 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
             it("should set datasets associated with module for edit", function() {
                 var datasets = [{
                     "id": "ds1",
-                    "organisationUnits": [{
-                        "id": "mod1"
-                    }],
                     "isAggregateService": true,
                     "sections": []
                 }, {
                     "id": "ds2",
-                    "organisationUnits": [{
-                        "id": "mod2"
-                    }],
                     "isAggregateService": true,
                     "sections": []
                 }];
@@ -425,7 +411,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.isNewMode = false;
 
                 dataSetRepo.getAll.and.returnValue(utils.getPromise(q, datasets));
-                dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasets));
+                dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [datasets[1]]));
                 dataSetRepo.includeDataElements.and.returnValue(utils.getPromise(q, datasets));
                 translationsService.translate.and.returnValue(datasets);
 
@@ -506,6 +492,15 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     parent: parent
                 };
                 scope.module = updatedModule;
+
+                var excludedDataElements = [{
+                    id: 'de1'
+                },{
+                    id: 'de3'
+                }];
+
+                systemSettingsTransformer.excludedDataElementsForAggregateModule.and.returnValue(excludedDataElements);
+
                 scope.update();
                 scope.$apply();
 
@@ -593,121 +588,136 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     parent: {
                         name: "Par1",
                         id: 'par1'
-                    }
+                    },
+                    dataSets: []
                 };
 
                 expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedModule);
                 expect(hustle.publish).toHaveBeenCalledWith({
-                    data: expectedModule,
-                    type: "upsertOrgUnit",
+                    data: { orgUnitId: expectedModule.id },
+                    type: "syncOrgUnit",
                     locale: "en",
-                    desc: "save organisation unit: module NEW name"
+                    desc: "save organisation unit"
                 }, "dataValues");
             });
 
-            it('should update assoscaiated dataset when a new dataset is added to existing module', function () {
-                var datasetOne = {
-                    "id": "ds1",
-                    "organisationUnits": [{
-                        "id": "mod1"
-                    }],
-                    "isAggregateService": true,
-                    "sections": []
-                };
-                var datasetTwo = {
-                    "id": "ds2",
-                    "organisationUnits": [{
-                        "id": "mod2"
-                    }],
-                    "isAggregateService": true,
-                    "sections": []
-                };
+            describe('update', function () {
+                var mockOrgUnit;
 
-                var dataSets = [datasetOne, datasetTwo];
+                beforeEach(function () {
+                    mockOrgUnit = {id: 'someOrgUnitId'};
+                    spyOn(orgUnitMapper, 'mapToModule').and.returnValue(mockOrgUnit);
+                });
 
-                scope.orgUnit = {
-                    id: 'mod1',
-                    name: 'module name',
-                    parent: {
-                        id : "org1",
-                        name: 'parent'
-                    }
-                };
+                it('should upsert the module with the associated dataSets for existing module', function () {
+                    var datasetOne = {
+                        "id": "ds1"
+                    };
+                    var datasetTwo = {
+                        "id": "ds2"
+                    };
 
-                scope.isNewMode = false;
+                    scope.$apply();
+                    scope.associatedDatasets = [datasetOne, datasetTwo];
 
-                dataSetRepo.getAll.and.returnValue(utils.getPromise(q, dataSets));
-                dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, dataSets));
-                dataSetRepo.includeDataElements.and.returnValue(utils.getPromise(q, dataSets));
-                translationsService.translate.and.returnValue(dataSets);
+                    scope.update();
+                    scope.$apply();
 
-                initialiseController();
-                scope.$apply();
+                    var expectedOrgUnit = {
+                        id: 'someOrgUnitId',
+                        dataSets: [{
+                            id: datasetOne.id
+                        }, {
+                            id: datasetTwo.id
+                        }]
+                    };
+                    expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOrgUnit);
+                });
 
-                scope.associatedDatasets = [datasetOne, datasetTwo];
+                it('should associate the module with the population dataSet', function () {
+                    var populationDataset = {
+                        id: "someId",
+                        isPopulationDataset: true
+                    };
 
-                scope.update();
-                scope.$apply();
+                    dataSetRepo.getAll.and.returnValue(utils.getPromise(q, [populationDataset]));
+                    scope.$apply();
 
-                expect(hustle.publish.calls.argsFor(2)).toEqual([{
-                    data: {"orgUnitIds":["mod1"], "dataSetIds":["ds2"]},
-                    type: "associateOrgUnitToDataset",
-                    locale: "en",
-                    desc: "associate selected services to origins of Op Unit module name"
-                }, "dataValues"]);
-            });
+                    scope.update();
+                    scope.$apply();
 
-            // TODO: This test is skipped until we play orgUnit-Dataset association removal as part of story #2017
-            xit('should update assoscaiated datasets when a dataset is removed from existing module', function () {
-                var datasetOne = {
-                    "id": "ds1",
-                    "organisationUnits": [{
-                        "id": "mod1"
-                    }],
-                    "isAggregateService": true,
-                    "sections": []
-                };
-                var datasetTwo = {
-                    "id": "ds2",
-                    "organisationUnits": [{
-                        "id": "mod1"
-                    }],
-                    "isAggregateService": true,
-                    "sections": []
-                };
+                    var expectedOrgUnit = {
+                        id: 'someOrgUnitId',
+                        dataSets: [{
+                            id: populationDataset.id
+                        }]
+                    };
+                    expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOrgUnit);
+                });
 
-                var dataSets = [datasetOne, datasetTwo];
+                it('should associate the module with referralLocation dataSet only if configured', function () {
+                    var referralDataSet = {
+                        id: "someId",
+                        isReferralDataset: true
+                    };
 
-                scope.orgUnit = {
-                    id: 'mod1',
-                    name: 'moduleName',
-                    parent: {
-                        id: "org1",
-                        name: 'parent'
-                    }
-                };
+                    dataSetRepo.getAll.and.returnValue(utils.getPromise(q, [referralDataSet]));
+                    scope.$apply();
+                    scope.associateReferralLocation  = true;
 
-                scope.isNewMode = false;
+                    scope.update();
+                    scope.$apply();
 
-                dataSetRepo.getAll.and.returnValue(utils.getPromise(q, dataSets));
-                dataSetRepo.includeDataElements.and.returnValue(utils.getPromise(q, dataSets));
-                translationsService.translate.and.returnValue(dataSets);
+                    var expectedOrgUnit = {
+                        id: 'someOrgUnitId',
+                        dataSets: [{
+                            id: referralDataSet.id
+                        }]
+                    };
+                    expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOrgUnit);
+                });
 
-                initialiseController();
-                scope.$apply();
+                describe('geographicOriginDataSet', function () {
+                    var mockOrigins, mockOriginDataSets;
+                    beforeEach(function () {
+                        mockOrigins = [{ id: 'patientOriginId' }];
+                        mockOriginDataSets = [{ id: 'mockOriginDataSet', isOriginDataset: true }];
+                        orgUnitRepo.findAllByParent.and.returnValue(utils.getPromise(q, mockOrigins));
+                        dataSetRepo.getAll.and.returnValue(utils.getPromise(q, mockOriginDataSets));
+                    });
 
-                scope.associatedDatasets = [datasetOne];
+                    it('should upsert origins with associated dataSets into indexedDb', function () {
+                        scope.associateOriginDataSet = true;
+                        scope.update();
+                        scope.$apply();
 
-                scope.update();
-                scope.$apply();
+                        expect(orgUnitRepo.upsert).toHaveBeenCalledTimes(2);
+                        expect(orgUnitRepo.upsert).toHaveBeenCalledWith({ id: 'patientOriginId', dataSets: [{ id: 'mockOriginDataSet' }]});
+                    });
 
-                expect(dataSetRepo.removeOrgUnits).toHaveBeenCalledWith(["ds2"], ["mod1"]);
-                expect(hustle.publish.calls.argsFor(3)).toEqual([{
-                    data: {"orgUnitIds": ["mod1"], "dataSetIds": ["ds2"]},
-                    type: "removeOrgUnitFromDataset",
-                    locale: "en",
-                    desc: "remove selected services from module moduleName"
-                }, "dataValues"]);
+                    it('should upsert origins without dataSets into indexedDb if associateOriginDataset flag is false', function () {
+                        scope.associateOriginDataSet = false;
+                        scope.update();
+                        scope.$apply();
+
+                        expect(orgUnitRepo.upsert).toHaveBeenCalledTimes(2);
+                        expect(orgUnitRepo.upsert).toHaveBeenCalledWith({ id: 'patientOriginId', dataSets: []});
+                    });
+
+                    it('should publish hustle calls to sync to DHIS', function () {
+                        scope.update();
+                        scope.$apply();
+
+                        var expectedHustleMessage = {
+                            data: { orgUnitId: _.first(mockOrigins).id },
+                            type: "syncOrgUnit",
+                            locale: "en",
+                            desc: scope.resourceBundle.upsertOrgUnitDesc
+                        };
+
+                        expect(hustle.publish.calls.argsFor(0)).toEqual([expectedHustleMessage, 'dataValues']);
+                    });
+                });
             });
 
             it("should return false if datasets for modules are selected", function() {
@@ -992,7 +1002,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     data: expectedModule,
                     type: "upsertOrgUnit",
                     locale: "en",
-                    desc: "disable organisation unit: test1"
+                    desc: "disable organisation unit"
                 };
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})
@@ -1027,7 +1037,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 expect(scope.getCollapsed("sectionId")).toEqual(true);
             });
 
-            it("should create patient origin org units", function() {
+            it("should create patient origin org units", function()  {
                 scope.module = {
                     "id": "mod1",
                     "name": "mod1",
@@ -1074,10 +1084,11 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     parent: {
                         name: 'parent',
                         id: 'pid'
-                    }
+                    },
+                    dataSets: []
                 };
 
-                var originOrgUnit = [{
+                var originOrgUnits = [{
                     "id": "ou1",
                     "name": "origin org unit"
                 }];
@@ -1086,73 +1097,19 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     return name;
                 });
 
-                originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnit));
+                originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnits));
 
                 scope.save();
                 scope.$apply();
 
-                expect(originOrgunitCreator.create).toHaveBeenCalledWith(enrichedAggregateModule);
-                expect(hustle.publish.calls.count()).toEqual(5);
-                expect(hustle.publish.calls.argsFor(3)).toEqual([{
-                    "data": originOrgUnit,
-                    "type": "upsertOrgUnit",
+                expect(originOrgunitCreator.create).toHaveBeenCalledWith(enrichedAggregateModule, undefined, undefined);
+                expect(hustle.publish.calls.count()).toEqual(3);
+                expect(hustle.publish.calls.argsFor(2)).toEqual([{
+                    "data": { orgUnitId: originOrgUnits[0].id},
+                    "type": "syncOrgUnit",
                     "locale": "en",
-                    "desc": "save organisation unit: origin org unit"
+                    "desc": "save organisation unit"
                 }, "dataValues"]);
-            });
-
-            it("should associate geographic origin dataset to patient origin org unit", function() {
-                scope.module = {
-                    "id": "mod1",
-                    "name": "mod1",
-                    "openingDate": "2014-04-01",
-                    "parent": {
-                        "id": "pid",
-                        "name": "parent",
-                        "level": 5
-                    }
-                };
-
-                var allDatasets = [{
-                    "id": "ds1",
-                    "isOriginDataset": false
-                }, {
-                    "id": "originds1",
-                    "isOriginDataset": true
-                }];
-
-                var originOrgUnit = [{
-                    "name": "Unknown",
-                    "shortName": "Unknown",
-                    "displayName": "Unknown",
-                    "id": "Unknownmod1pid",
-                    "level": 7,
-                    "openingDate": moment("2014-04-01").toDate(),
-                    "attributeValues": [{
-                        "attribute": {
-                            "code": "Type",
-                            "name": "Type"
-                        },
-                        "value": "Patient Origin"
-                    }],
-                    "parent": {
-                        "id": "mod1pid"
-                    }
-                }];
-
-                spyOn(dhisId, "get").and.callFake(function(name) {
-                    return name;
-                });
-
-                dataSetRepo.getAll.and.returnValue(utils.getPromise(q, allDatasets));
-                originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnit));
-
-                scope.save();
-                scope.$apply();
-
-                expect(dataSetRepo.associateOrgUnits.calls.count()).toEqual(2);
-                expect(dataSetRepo.associateOrgUnits.calls.argsFor(1)[0]).toEqual(["originds1"]);
-                expect(dataSetRepo.associateOrgUnits.calls.argsFor(1)[1]).toEqual(originOrgUnit);
             });
 
             it("should apply module templates", function() {
@@ -1471,83 +1428,59 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 expect(section).toEqual(expectedSection);
             });
 
-            it("should associate all the necessary datasets", function() {
+            describe('associateReferralLocation', function () {
+                it('should set to true if referral location is associated to an existing module', function () {
+                    var referralDataset = {
+                        id: 'someId',
+                        isReferralDataset: true
+                    };
+                    scope.isNewMode = false;
+                    dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [referralDataset]));
+                    initialiseController();
+                    scope.$apply();
 
-                var datasets = [{
-                    "id": "ds1",
-                    "name": "Aggregate Dataset",
-                    "organisationUnits": [{
-                        "id": "ou1"
-                    }],
-                    "isAggregateService": true,
-                    "isLineListService": false,
-                    "isOriginDataset": false,
-                    "isNewDataModel": true,
-                    "isReferralDataset": false,
-                    "isPopulationDataset": false
-                }, {
-                    "id": "ds2",
-                    "name": "Referral Dataset",
-                    "organisationUnits": [{
-                        "id": "ou1"
-                    }],
-                    "isAggregateService": false,
-                    "isLineListService": false,
-                    "isOriginDataset": false,
-                    "isNewDataModel": true,
-                    "isReferralDataset": true,
-                    "isPopulationDataset": false
-                }, {
-                    "id": "ds3",
-                    "name": "Linelist Dataset",
-                    "organisationUnits": [{
-                        "id": "ou1"
-                    }],
-                    "isAggregateService": false,
-                    "isLineListService": true,
-                    "isOriginDataset": false,
-                    "isNewDataModel": true,
-                    "isReferralDataset": false,
-                    "isPopulationDataset": false
-                }, {
-                    "id": "ds4",
-                    "name": "population Dataset",
-                    "organisationUnits": [{
-                        "id": "ou1"
-                    }],
-                    "isAggregateService": false,
-                    "isLineListService": false,
-                    "isOriginDataset": false,
-                    "isNewDataModel": true,
-                    "isReferralDataset": false,
-                    "isPopulationDataset": true
-                }];
+                    expect(scope.associateReferralLocation).toBeTruthy();
+                });
+                
+                it('should set to false if the referral location is not associated to an existing module', function () {
+                    scope.isNewMode = false;
+                    dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, []));
+                    initialiseController();
+                    scope.$apply();
 
-                dataSetRepo.getAll.and.returnValue(utils.getPromise(q, datasets));
-
-                scope.module = {
-                    "id": "mod1",
-                    "name": "mod1",
-                    "openingDate": "2014-04-01",
-                    "parent": {
-                        "id": "pid",
-                        "name": "parent",
-                        "level": 5
-                    }
-                };
-
-                spyOn(dhisId, "get").and.callFake(function(name) {
-                    return name;
+                    expect(scope.associateReferralLocation).toBeFalsy();
                 });
 
-                scope.$apply();
+                it('should set to true when creating a new module', function () {
+                    scope.isNewMode = true;
+                    initialiseController();
+                    scope.$apply();
 
-                scope.associatedDatasets = [datasets[0]];
-                scope.save();
-                scope.$apply();
+                    expect(scope.associateReferralLocation).toBeTruthy();
+                });
+            });
 
-                expect(dataSetRepo.associateOrgUnits).toHaveBeenCalledWith(["ds1", "ds2", "ds4"], jasmine.any(Object));
+            describe('associateOriginDataSet', function () {
+                it('should set to true if the origins for a module are associated with originDataset for an existing module', function () {
+                    scope.isNewMode = false;
+                    var mockOrigin = {
+                        id: 'someOriginId',
+                        dataSets: [{ id: 'someId' }]
+                    };
+                    orgUnitRepo.findAllByParent.and.returnValue(utils.getPromise(q, [mockOrigin]));
+                    initialiseController();
+                    scope.$apply();
 
+                    expect(scope.associateOriginDataSet).toBeTruthy();
+                });
+
+                it('should set to true when creating a new module', function () {
+                    scope.isNewMode = true;
+                    initialiseController();
+                    scope.$apply();
+
+                    expect(scope.associateOriginDataSet).toBeTruthy();
+                });
             });
 
         });

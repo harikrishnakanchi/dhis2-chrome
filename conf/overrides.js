@@ -1,11 +1,11 @@
 define([], function() {
-    var url = '/* @echo DHIS_URL */';
-    var metdataSyncInterval = '/* @echo METADATA_SYNC_INTERVAL */';
-    var passphrase = '/* @echo PASSPHRASE */';
-    var iter = parseInt('/* @echo ITER */');
-    var ks = parseInt('/* @echo KS */');
-    var ts = parseInt('/* @echo TS */');
-    var supportEmail = '/* @echo SUPPORT_EMAIL */';
+    var url = '<%= DHIS_URL %>';
+    var metdataSyncInterval = '<%= METADATA_SYNC_INTERVAL %>';
+    var passphrase = '<%= PASSPHRASE %>';
+    var iter = parseInt('<%= ITER %>');
+    var ks = parseInt('<%= KS %>');
+    var ts = parseInt('<%= TS %>');
+    var supportEmail = '<%= SUPPORT_EMAIL %>';
 
     return {
         dhisPing: {

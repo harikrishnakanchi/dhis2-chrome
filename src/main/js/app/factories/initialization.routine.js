@@ -16,6 +16,14 @@ define(['lodash', 'chromeUtils'], function (_, chromeUtils) {
             });
         };
 
+        $rootScope.startLoading = function () {
+            $rootScope.loading = true;
+        };
+
+        $rootScope.stopLoading = function () {
+            $rootScope.loading = false;
+        };
+
         var redirectIfProductKeyNotSet = function() {
             return systemSettingRepository.isProductKeySet().then(function(productKeyIsSet) {
                 if (productKeyIsSet) {

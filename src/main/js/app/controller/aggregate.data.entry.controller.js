@@ -1,9 +1,9 @@
-define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "interpolate"], function(_, dataValuesMapper, orgUnitMapper, moment, properties, interpolate) {
+define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "interpolate", "customAttributes", "dataElementUtils"], function(_, dataValuesMapper, orgUnitMapper, moment, properties, interpolate, CustomAttributes, dataElementUtils) {
     return function($scope, $routeParams, $q, $hustle, $anchorScroll, $location, $modal, $rootScope, $window, $timeout,
-        dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository) {
+        dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository, optionSetRepository) {
 
         var currentPeriod, currentPeriodAndOrgUnit;
-        var removeReferral = false;
+        var noReferralLocationConfigured = false;
         $scope.rowTotal = {};
 
         var resetForm = function() {
@@ -18,16 +18,24 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             $scope.syncError = false;
             $scope.projectIsAutoApproved = false;
             $scope.excludedDataElements = {};
-            $scope.associatedProgramId = undefined;
             $scope.rowTotal = {};
+            $scope.hasDataValues = false;
         };
 
         $scope.contactSupport = interpolate($scope.resourceBundle.contactSupport, { supportEmail:properties.support_email });
 
         $scope.printWindow = function() {
-            $scope.printingTallySheet = true;
+            $scope.startLoading();
+
+            //wait for AngularJS digest cycle to paint loding screen
             $timeout(function() {
-                $window.print();
+                $scope.stopLoading();
+                $scope.printingTallySheet = true;
+
+                //wait for AngularJS digest cycle to setup template for printing
+                $timeout(function() {
+                    $window.print();
+                }, 0);
             }, 0);
         };
 
@@ -119,15 +127,6 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             return sum;
         };
 
-        $scope.showTotalLabelForOriginDatasetSection = function (dataSet) {
-            var count = 0;
-            _.each(dataSet.organisationUnits, function (orgUnit) {
-                if ($scope.moduleAndOriginOrgUnitIds.indexOf(orgUnit.id) >= 0)
-                    count++;
-            });
-            return count > 1;
-        };
-
         var getReferralDataElementIds = function(dataElements) {
             var dataElementsForReferral = _.filter(dataElements, function(de) {
                 return $scope.referralLocations[de.formName] !== undefined;
@@ -160,21 +159,19 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             }, 0);
         };
 
-        $scope.originSum = function(dataValues, dataSet, section) {
-            var sum = 0;
-            _.forEach(dataSet.organisationUnits, function(orgUnit) {
-                values = dataValues[orgUnit.id];
-                if (values && values[section.dataElements[0].id] && values[section.dataElements[0].id][section.categoryOptionComboIds[0]]) {
-                    var value = values[section.dataElements[0].id][section.categoryOptionComboIds[0]].value || "0";
-                    sum += parseInt(value);
-                }
+        $scope.originSum = function(dataValues, section) {
+            return _.sum($scope.originOrgUnits, function(orgUnit) {
+                var value = _.chain(dataValues)
+                    .get(orgUnit.id)
+                    .get(section.dataElements[0].id)
+                    .get(section.baseColumnConfiguration[0].categoryOptionComboId)
+                    .get('value', '0')
+                    .value();
+                return parseInt(value);
             });
-            return sum;
         };
 
-        $scope.maxcolumns = function(headers) {
-            return _.last(headers).length;
-        };
+        $scope.getDisplayName = dataElementUtils.getDisplayName;
 
         var save = function(options) {
             var updateDataValuesWithPopulationData = function() {
@@ -183,10 +180,12 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                     "isPopulationDataset": true
                 });
                 if (populationDataset) {
-                    var categoryOptionComboId = populationDataset.sections[0].categoryOptionComboIds[0];
+                    var categoryOptionComboId = populationDataset.sections[0].baseColumnConfiguration[0].categoryOptionComboId;
                     _.forEach(populationDataset.sections[0].dataElements, function(dataElement) {
                         $scope.dataValues[currentModuleId][dataElement.id] = !$scope.dataValues[currentModuleId][dataElement.id] ? {} : $scope.dataValues[currentModuleId][dataElement.id];
-                        var code = dataElement.code.split("_")[1];
+
+                        // TODO: Remove this backward compatible code once we are sure that all the fields are upgraded to 9.0
+                        var code = dataElement.populationDataElementCode || dataElement.code.split("_")[1];
                         var value = _.isEmpty($scope.projectPopulationDetails[code]) ? "0" : $scope.projectPopulationDetails[code];
                         $scope.dataValues[currentModuleId][dataElement.id][categoryOptionComboId] = {
                             "formula": value,
@@ -307,7 +306,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             return false;
         };
 
-        var deregisterDirtyFormWatcher = $scope.$watch('dataentryForm.$dirty', function(dirty) {
+        var deregisterDirtyFormWatcher = $scope.$watch('forms.dataentryForm.$dirty', function(dirty) {
             if (dirty) {
                 $scope.preventNavigation = true;
             } else {
@@ -320,7 +319,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
         });
 
         var initializeForm = function() {
-            $scope.loading = true;
+            $scope.startLoading();
             currentPeriod = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
             $scope.isDataEntryAllowed = moment($scope.week.startOfWeek).isAfter(moment().subtract(properties.projectDataSync.numWeeksToSync, 'week'));
             currentPeriodAndOrgUnit = {
@@ -330,11 +329,8 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
 
             var loadAssociatedOrgUnitsAndPrograms = function() {
                 return orgUnitRepository.findAllByParent([$scope.selectedModule.id]).then(function(originOrgUnits) {
-                    $scope.moduleAndOriginOrgUnitIds = _.pluck(_.flattenDeep([$scope.selectedModule, originOrgUnits]), "id");
-                    return programRepository.getProgramForOrgUnit(originOrgUnits[0].id).then(function(program) {
-                        if (program)
-                            $scope.associatedProgramId = program.id;
-                    });
+                    $scope.moduleAndOriginOrgUnits = [$scope.selectedModule].concat(originOrgUnits);
+                    $scope.originOrgUnits = originOrgUnits;
                 });
             };
 
@@ -350,21 +346,15 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                         data = _.omit(data, function(o) {
                             return o.isDisabled !== false;
                         });
-                        removeReferral = _.keys(data).length === 0 ? true : false;
+                        noReferralLocationConfigured = _.keys(data).length === 0;
                         $scope.referralLocations = data;
                         return;
                     }
-                    removeReferral = true;
+                    noReferralLocationConfigured = true;
                 });
             };
 
-            var findallOrgUnits = function(orgUnits) {
-                var orgUnitIds = _.pluck(orgUnits, "id");
-                return orgUnitRepository.findAll(orgUnitIds);
-            };
-
-            var extractPopulationDetails = function(orgUnitAttrs) {
-                var populationDataCodes = ["estimatedTargetPopulation", "estPopulationLessThan1Year", "estPopulationBetween1And5Years", "estPopulationOfWomenOfChildBearingAge"];
+            var extractPopulationDetails = function(orgUnitAttrs, populationDataCodes) {
                 var populationDetails = {};
                 _.forEach(orgUnitAttrs, function(attr) {
                     if (_.includes(populationDataCodes, attr.attribute.code)) {
@@ -373,19 +363,18 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                 });
                 return populationDetails;
             };
+            
+            var loadPopulationOptionSet = function () {
+                optionSetRepository.getOptionSetByCode(CustomAttributes.PRAXIS_POPULATION_DATA_ELEMENTS).then(function (populationOptionSet) {
+                    $scope.populationDataCodes = _.map(populationOptionSet.options, 'code');
+                });
+            };
 
-            return $q.all([loadAssociatedOrgUnitsAndPrograms(), loadExcludedDataElements(), loadRefferalLocations()]).then(function() {
-                var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnitIds)
+            return $q.all([loadAssociatedOrgUnitsAndPrograms(), loadExcludedDataElements(), loadRefferalLocations(), loadPopulationOptionSet()]).then(function() {
+                var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnits)
                     .then(_.curryRight(datasetRepository.includeDataElements)($scope.excludedDataElements))
-                    .then(datasetRepository.includeCategoryOptionCombinations)
-                    .then(function(datasets) {
-                        var dataSetPromises = _.map(datasets, function(dataset) {
-                            return findallOrgUnits(dataset.organisationUnits).then(function(orgunits) {
-                                dataset.organisationUnits = orgunits;
-                                return dataset;
-                            });
-                        });
-
+                    .then(datasetRepository.includeColumnConfigurations)
+                    .then(function(dataSets) {
                         var translateDatasets = function (dataSets) {
                             var partitionDatasets = _.partition(dataSets, {
                                 "isReferralDataset": false
@@ -396,30 +385,28 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                             return translatedOtherDatasets.concat(translatedReferralDatasets);
                         };
 
-                        var filterDatasets = function (datasets) {
-                            if (removeReferral)
-                                return _.filter(datasets, { "isReferralDataset": false });
-                            return datasets;
+                        var filterOutReferralLocations = function (dataSets) {
+                            return _.filter(dataSets, { isReferralDataset: false });
                         };
 
-                        var setTotalsDisplayPreferencesforDataSetSections = function (dataSets) {
-                            _.each(dataSets, function (dataSet) {
+                        var setTotalsDisplayPreferencesforDataSetSections = function () {
+                            _.each($scope.dataSets, function (dataSet) {
                                 _.each(dataSet.sections, function (dataSetSection) {
-                                    dataSetSection.shouldDisplayRowTotals = dataSetSection.categoryOptionComboIds.length > 1;
+                                    dataSetSection.shouldDisplayRowTotals = dataSetSection.baseColumnConfiguration.length > 1;
                                     dataSetSection.shouldDisplayColumnTotals = (_.filter(dataSetSection.dataElements, {isIncluded: true}).length > 1 && !(dataSetSection.shouldHideTotals));
                                 });
                             });
                         };
-                        var setDatasets = function (datasets) {
-                            $scope.dataSets = datasets;
-                            return $scope.dataSets;
+                        var setDataSets = function (dataSets) {
+                            $scope.dataSets = dataSets;
                         };
 
-                        return $q.all(dataSetPromises)
-                            .then(filterDatasets)
-                            .then(translateDatasets)
-                            .then(setDatasets)
-                            .then(setTotalsDisplayPreferencesforDataSetSections);
+                        if (noReferralLocationConfigured) {
+                            dataSets = filterOutReferralLocations(dataSets);
+                        }
+                        dataSets = translateDatasets(dataSets);
+                        setDataSets(dataSets);
+                        setTotalsDisplayPreferencesforDataSetSections();
                     });
 
                 var loadProjectPromise = orgUnitRepository.getParentProject($scope.selectedModule.id).then(function(orgUnit) {
@@ -429,7 +416,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                         },
                         "value": "true"
                     });
-                    $scope.projectPopulationDetails = extractPopulationDetails(orgUnit.attributeValues);
+                    $scope.projectPopulationDetails = extractPopulationDetails(orgUnit.attributeValues, $scope.populationDataCodes);
                 });
 
                 var loadModuleDataBlock = moduleDataBlockFactory.create($scope.selectedModule.id, currentPeriod)
@@ -441,15 +428,14 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                         $scope.isCompleted = moduleDataBlock.approvedAtProjectLevel;
                         $scope.isApproved = moduleDataBlock.approvedAtCoordinationLevel;
                         $scope.isDataAvailable = moduleDataBlock.submitted || moduleDataBlock.approvedAtAnyLevel;
+                        $scope.checkForPristine = $scope.isSubmitted || (!$scope.isSubmitted && _.isEmpty(moduleDataBlock.dataValues));
                     });
 
-                if ($scope.dataentryForm !== undefined)
-                    $scope.dataentryForm.$setPristine();
+                if ($scope.forms.dataentryForm !== undefined)
+                    $scope.forms.dataentryForm.$setPristine();
                 return $q.all([loadDataSetsPromise, loadModuleDataBlock, loadProjectPromise]);
 
-            }).finally(function() {
-                $scope.loading = false;
-            });
+            }).finally($scope.stopLoading);
         };
 
         var deregisterModuleWeekInfoListener = $scope.$on('moduleWeekInfo', function(event, data) {
@@ -469,6 +455,8 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
         var init = function() {
             $scope.dataType = "aggregate";
         };
+
+        $scope.forms = {};
 
         resetForm();
         init();

@@ -1,10 +1,10 @@
-define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment', 'reportService', 'chartRepository', 'userPreferenceRepository', 'datasetRepository', 'changeLogRepository', 'orgUnitRepository'],
-    function(DownloadChartDataConsumer, mocks, utils, timecop, moment, ReportService, ChartRepository, UserPreferenceRepository, DatasetRepository, ChangeLogRepository, OrgUnitRepository) {
+define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment', 'reportService', 'chartRepository', 'userPreferenceRepository', "dataSetRepository", 'changeLogRepository', 'orgUnitRepository', 'programRepository'],
+    function(DownloadChartDataConsumer, mocks, utils, timecop, moment, ReportService, ChartRepository, UserPreferenceRepository, DatasetRepository, ChangeLogRepository, OrgUnitRepository, ProgramRepository) {
 
         describe('Download Chart Data Consumer', function() {
             var downloadChartDataConsumer,
-                reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository,
-                scope, q, currentTime, mockProjectId, mockModule, mockDataSet, mockChart;
+                reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository,
+                scope, q, currentTime, mockProjectId, mockModule, mockProgram, mockDataSet, mockChart;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
                 scope = $rootScope;
@@ -16,11 +16,15 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 };
                 mockDataSet = {
                     id: 'someDataSetId',
-                    code: 'someDataSetCode'
+                    serviceCode: 'someDataSetServiceCode'
+                };
+                mockProgram = {
+                    id: 'someProgramId',
+                    serviceCode: 'someProgramServiceCode'
                 };
                 mockChart = {
                     id: 'someChartId',
-                    dataSetCode: 'someDataSetCode'
+                    serviceCode: mockDataSet.serviceCode
                 };
 
                 datasetRepository = new DatasetRepository();
@@ -44,11 +48,14 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, null));
                 spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
 
+                programRepository = new ProgramRepository();
+                spyOn(programRepository, 'getProgramForOrgUnit').and.returnValue(utils.getPromise(q, mockProgram));
+
                 currentTime = moment('2014-10-01T12:00:00.000Z');
                 Timecop.install();
                 Timecop.freeze(currentTime.toISOString());
 
-                downloadChartDataConsumer = new DownloadChartDataConsumer(reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, $q);
+                downloadChartDataConsumer = new DownloadChartDataConsumer(reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository, $q);
             }));
 
             afterEach(function() {
@@ -94,8 +101,8 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 downloadChartDataConsumer.run();
                 scope.$apply();
 
-                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModuleA.id]);
-                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModuleB.id]);
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModuleA]);
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModuleB]);
             });
 
             it('should retrieve dataSets for module and its origins', function() {
@@ -107,7 +114,17 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 downloadChartDataConsumer.run();
                 scope.$apply();
 
-                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModule.id, mockOrigin.id]);
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModule, mockOrigin]);
+            });
+
+            it('should retrieve programs for each module', function () {
+                var mockOrigin = { id: 'someMockOrigin' };
+
+                orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, [mockOrigin]));
+
+                downloadChartDataConsumer.run();
+                scope.$apply();
+                expect(programRepository.getProgramForOrgUnit).toHaveBeenCalledWith(mockOrigin.id);
             });
 
             it('should save chart data to the database', function() {
@@ -120,16 +137,16 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 downloadChartDataConsumer.run();
                 scope.$apply();
 
-                expect(chartRepository.upsertChartData).toHaveBeenCalledWith(mockChart.name, mockModule.id, mockChartData);
+                expect(chartRepository.upsertChartData).toHaveBeenCalledWith(mockChart.id, mockModule.id, mockChartData);
                 });
 
             it('should download chart data for relevant modules and datasets', function() {
                 var chartRelevantToDataSet = {
                     id: 'mockChartId',
-                    dataSetCode: mockDataSet.code
+                    serviceCode: mockDataSet.serviceCode
                 }, someOtherChart = {
                     id: 'mockChartId',
-                    dataSetCode: 'someOtherDataSetCode'
+                    serviceCode: 'someOtherDataSetServiceCode'
                 };
                 chartRepository.getAll.and.returnValue(utils.getPromise(q, [chartRelevantToDataSet, someOtherChart]));
 
@@ -140,10 +157,28 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalledWith(someOtherChart, mockModule.id);
             });
 
+            it('should download chart data for relevant program associated to module', function () {
+                var chartForAssosciatedProgram = {
+                    id: 'mockChartId',
+                    serviceCode: mockProgram.serviceCode
+                }, someOtherChartTable = {
+                    id: 'someOtherChartId',
+                    serviceCode: 'someOtherDataSetServiceCode'
+                };
+
+                chartRepository.getAll.and.returnValue(utils.getPromise(q, [chartForAssosciatedProgram, someOtherChartTable]));
+
+                downloadChartDataConsumer.run();
+                scope.$apply();
+
+                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(chartForAssosciatedProgram, mockModule.id);
+                expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalledWith(someOtherChartTable, mockModule.id);
+            });
+
             it('should download chart data for origins for geographicOriginCharts', function() {
                 var geographicOriginChart = {
                     id: 'mockChartId',
-                    dataSetCode: mockDataSet.code,
+                    serviceCode: mockDataSet.serviceCode,
                     geographicOriginChart: true
                 },  mockOrigin = {
                     id: 'someOriginId'
@@ -179,9 +214,9 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 downloadChartDataConsumer.run();
                 scope.$apply();
 
-                expect(chartRepository.upsertChartData).toHaveBeenCalledWith(mockChart.name, 'Mod1', 'data1');
-                expect(chartRepository.upsertChartData).not.toHaveBeenCalledWith(mockChart.name, 'Mod2', 'data2');
-                expect(chartRepository.upsertChartData).toHaveBeenCalledWith(mockChart.name, 'Mod3', 'data3');
+                expect(chartRepository.upsertChartData).toHaveBeenCalledWith(mockChart.id, 'Mod1', 'data1');
+                expect(chartRepository.upsertChartData).not.toHaveBeenCalledWith(mockChart.id, 'Mod2', 'data2');
+                expect(chartRepository.upsertChartData).toHaveBeenCalledWith(mockChart.id, 'Mod3', 'data3');
             });
 
             it('should not download chart data if user has no modules', function() {
@@ -232,7 +267,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 var mockMonthlyChart = {
                     id: 'someChartId',
                     monthlyChart: true,
-                    dataSetCode: 'someDataSetCode'
+                    serviceCode: 'someDataSetServiceCode'
                 };
 
                 var lastDownloadedTime = moment('2014-10-01T12:00:00.000Z').toISOString();

@@ -4,7 +4,7 @@ define(['analyticsData', 'lodash'], function (AnalyticsData, _) {
         this.id = definition.id;
         this.title = definition.title;
         this.type = definition.type;
-        this.dataSetCode = definition.dataSetCode;
+        this.serviceCode = definition.serviceCode;
         this.displayPosition = definition.displayPosition;
         this.weeklyChart = definition.weeklyChart;
         this.monthlyChart = definition.monthlyChart;

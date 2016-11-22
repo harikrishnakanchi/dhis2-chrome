@@ -1,13 +1,13 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function(reportService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, $q) {
+    return function(reportService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository, $q) {
 
         this.run = function() {
-            var downloadPivotTableDataForProject = function(pivotTables, projectId, userModuleIds) {
+            var downloadPivotTableDataForProject = function(pivotTables, projectId, userModules) {
                 var allDownloadsWereSuccessful = true;
 
                 var recursivelyDownloadAndUpsertPivotTableData = function(orgUnitsAndTables) {
                     var onSuccess = function(data) {
-                        return pivotTableRepository.upsertPivotTableData(datum.pivotTable.name, datum.orgUnitId, data).then(function() {
+                        return pivotTableRepository.upsertPivotTableData(datum.pivotTable.id, datum.orgUnitId, data).then(function() {
                             return recursivelyDownloadAndUpsertPivotTableData(orgUnitsAndTables);
                         });
                     };
@@ -26,23 +26,26 @@ define(["lodash", "moment"], function(_, moment) {
 
                 var getModuleInformation = function() {
                     var getOriginsForModule = function (data) {
-                        return orgUnitRepository.findAllByParent(data.moduleId).then(function (origins) {
+                        return orgUnitRepository.findAllByParent(data.module.id).then(function (origins) {
                             return _.merge({ origins: origins }, data);
                         });
                     };
 
                     var getDataSetsForModuleAndOrigins = function (data) {
-                        var orgUnitIds = [data.moduleId];
-                        if(!_.isEmpty(data.origins)) {
-                            orgUnitIds.push(_.first(data.origins).id);
-                        }
-                        return datasetRepository.findAllForOrgUnits(orgUnitIds).then(function (dataSets) {
+                        return datasetRepository.findAllForOrgUnits([data.module].concat(data.origins)).then(function (dataSets) {
                             return _.merge({ dataSets: dataSets }, data);
                         });
                     };
 
-                    var moduleInfoPromises = _.transform(userModuleIds, function (promises, moduleId) {
-                        promises[moduleId] = getOriginsForModule({ moduleId: moduleId }).then(getDataSetsForModuleAndOrigins);
+                    var getProgramForModule = function (data) {
+                        var origin = _.first(data.origins);
+                        return programRepository.getProgramForOrgUnit(_.get(origin, 'id')).then(function (program) {
+                            return _.merge({ program: program }, data);
+                        });
+                    };
+
+                    var moduleInfoPromises = _.transform(userModules, function (promises, module) {
+                        promises[module.id] = getOriginsForModule({ module: module }).then(getDataSetsForModuleAndOrigins).then(getProgramForModule);
                     }, {});
 
                     return $q.all(moduleInfoPromises);
@@ -51,14 +54,17 @@ define(["lodash", "moment"], function(_, moment) {
                 var filterPivotTablesForEachModule = function(moduleInformation) {
                     var modulesAndPivotTables = [];
 
-                    _.forEach(userModuleIds, function(moduleId) {
-                        _.forEach(moduleInformation[moduleId].dataSets, function(dataSet) {
-                            var pivotTablesForDataSet = _.filter(pivotTables, { dataSetCode: dataSet.code });
-                            _.forEach(pivotTablesForDataSet, function(pivotTable) {
+                    _.forEach(userModules, function(module) {
+                        var allServices = moduleInformation[module.id].dataSets.concat([moduleInformation[module.id].program]),
+                            allServiceCodes = _.compact(_.map(allServices, 'serviceCode'));
+
+                        _.forEach(allServiceCodes, function(serviceCode) {
+                            var pivotTablesForService = _.filter(pivotTables, { serviceCode: serviceCode });
+                            _.forEach(pivotTablesForService, function(pivotTable) {
                                 modulesAndPivotTables.push({
-                                    orgUnitId: moduleId,
+                                    orgUnitId: module.id,
                                     pivotTable: pivotTable,
-                                    orgUnitDimensionItems: pivotTable.geographicOriginReport ? _.map(moduleInformation[moduleId].origins, 'id') : moduleId
+                                    orgUnitDimensionItems: pivotTable.geographicOriginReport ? _.map(moduleInformation[module.id].origins, 'id') : module.id
                                 });
                             });
                         });
@@ -127,13 +133,11 @@ define(["lodash", "moment"], function(_, moment) {
                     modules: orgUnitRepository.getAllModulesInOrgUnits([projectId]),
                     pivotTables: pivotTableRepository.getAll()
                 }).then(function (data) {
-                    var moduleIds = _.pluck(data.modules, 'id');
-
                     return applyDownloadFrequencyStrategy(projectId, data.pivotTables).then(function(strategyResult) {
                         var pivotTablesToDownload = strategyResult.pivotTables,
                             changeLogKeysToUpdate = strategyResult.changeLogKeys;
 
-                        return downloadPivotTableDataForProject(pivotTablesToDownload, projectId, moduleIds).then(function(allDownloadsWereSuccessful) {
+                        return downloadPivotTableDataForProject(pivotTablesToDownload, projectId, data.modules).then(function(allDownloadsWereSuccessful) {
                             if(allDownloadsWereSuccessful) {
                                 return updateChangeLogs(changeLogKeysToUpdate);
                             }

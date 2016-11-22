@@ -1,4 +1,4 @@
-define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], function (moment, _, dateUtils, excelBuilder, eventsAggregator) {
+define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'dataElementUtils'], function (moment, _, dateUtils, excelBuilder, eventsAggregator, dataElementUtils) {
     return function($scope, $q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository, excludedLineListOptionsRepository) {
         var EMPTY_LINE = [];
 
@@ -28,7 +28,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
         };
 
         var createSections = function (excludedDataElements) {
-            return datasetRepository.includeDataElements([$scope.selectedDataset], excludedDataElements).then(function (enrichedDatasets) {
+            return datasetRepository.includeDataElements([$scope.selectedService], excludedDataElements).then(function (enrichedDatasets) {
                 var currentDataset = _.first(enrichedDatasets),
                     translatedDataSet = translationsService.translate(currentDataset);
 
@@ -40,11 +40,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
         };
 
         var filterDataElementsAndRetrieveOriginsForOriginDataSet = function () {
-            if(!$scope.selectedDataset.isOriginDataset) return $q.when();
-
-            _.each($scope.sections, function(section) {
-                section.dataElements = _.reject(section.dataElements, 'associatedProgramId');
-            });
+            if(!$scope.selectedService.isOriginDataset) return $q.when();
 
             return orgUnitRepository.findAllByParent($scope.orgUnit.id).then(function (originOrgUnits) {
                 $scope.originOrgUnits = _.sortBy(originOrgUnits, 'name');
@@ -52,7 +48,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
         };
 
         var filterDataElementsAndRetrieveAliasesForReferralDataSet = function () {
-            if(!$scope.selectedDataset.isReferralDataset) return $q.when();
+            if(!$scope.selectedService.isReferralDataset) return $q.when();
 
             return referralLocationsRepository.getWithId($scope.orgUnit.parent.id).then(function (referralLocations) {
                 _.each($scope.sections, function (section) {
@@ -75,7 +71,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
 
                 $scope.dataValuesMap = _.transform(submittedDataValues, function (map, dataValue) {
                     if(_.contains(selectedDataSetDataElementIds, dataValue.dataElement)) {
-                        var dataDimension = $scope.selectedDataset.isOriginDataset ? dataValue.orgUnit : dataValue.dataElement;
+                        var dataDimension = $scope.selectedService.isOriginDataset ? dataValue.orgUnit : dataValue.dataElement;
                         map[dataValue.period] = map[dataValue.period] || {};
                         map[dataValue.period][dataDimension] = map[dataValue.period][dataDimension] || 0;
                         map[dataValue.period][dataDimension] += parseInt(dataValue.value);
@@ -98,13 +94,13 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
 
         var buildAggregateSpreadSheetContent = function() {
             var buildHeader = function () {
-                var columnHeader = $scope.selectedDataset.isOriginDataset ? $scope.resourceBundle.originLabel : $scope.resourceBundle.dataElement;
+                var columnHeader = $scope.selectedService.isOriginDataset ? $scope.resourceBundle.originLabel : $scope.resourceBundle.dataElement;
                 return [columnHeader].concat($scope.weeks);
             };
 
             var buildDataElement = function (dataElement) {
                 return _.flatten([
-                    dataElement.formName,
+                    $scope.getDisplayName(dataElement),
                     _.map($scope.weeks, function(week) { return $scope.dataValuesMap[week] && $scope.dataValuesMap[week][dataElement.id]; })
                 ]);
             };
@@ -117,7 +113,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
             };
 
             var buildSection = function (section) {
-                if($scope.selectedDataset.isOriginDataset) {
+                if($scope.selectedService.isOriginDataset) {
                     return _.map($scope.originOrgUnits, buildOriginData);
                 } else {
                     return [
@@ -132,8 +128,8 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
 
         var buildLineListSpreadSheetContent = function () {
             var buildHeaders = function () {
-                var rowHeader = $scope.selectedDataset.isOriginDataset && $scope.resourceBundle.originLabel ||
-                                $scope.selectedDataset.isReferralDataset && $scope.resourceBundle.referralLocationLabel ||
+                var rowHeader = $scope.selectedService.isOriginDataset && $scope.resourceBundle.originLabel ||
+                                $scope.selectedService.isReferralDataset && $scope.resourceBundle.referralLocationLabel ||
                                 $scope.resourceBundle.optionName;
 
                 return [rowHeader].concat($scope.weeks);
@@ -149,7 +145,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
             var buildDataElementSection = function (dataElement) {
                 return [
                     EMPTY_LINE,
-                    [dataElement.formName]
+                    [$scope.getDisplayName(dataElement)]
                 ].concat(_.map(_.get(dataElement.optionSet, 'options'), _.partial(buildOption, dataElement)));
             };
 
@@ -197,9 +193,9 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
             };
 
             var spreadSheetContent = [buildHeaders()];
-            if($scope.selectedDataset.isOriginDataset) {
+            if($scope.selectedService.isOriginDataset) {
                 return spreadSheetContent.concat(buildOriginData());
-            } else if($scope.selectedDataset.isReferralDataset) {
+            } else if($scope.selectedService.isReferralDataset) {
                 return spreadSheetContent.concat(buildReferralLocationData());
             } else {
                 return spreadSheetContent.concat(_.flatten(_.map($scope.summaryDataElements, buildDataElementSection))).concat(buildProceduresPerformedSection());
@@ -207,9 +203,9 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
         };
 
         $scope.exportToExcel = function () {
-            var fileName = [$scope.orgUnit.name, $scope.selectedDataset.name, 'export', moment().format('DD-MMM-YYYY')].join('.'),
+            var fileName = [$scope.orgUnit.name, $scope.selectedService.name, 'export', moment().format('DD-MMM-YYYY')].join('.'),
                 spreadSheetContent = [{
-                    name: $scope.selectedDataset.name,
+                    name: $scope.selectedService.name,
                     data: $scope.orgUnit.lineListService ? buildLineListSpreadSheetContent() : buildAggregateSpreadSheetContent()
                 }];
 
@@ -279,6 +275,8 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
         $scope.isReferralDataAvailable = function () {
             return !_.isEmpty($scope.events) && !!$scope.eventSummary[$scope.referralLocationDataElement.id];
         };
+
+        $scope.getDisplayName = dataElementUtils.getDisplayName;
         
         var fetchEventsForProgram = function (program) {
             var startDate = moment(_.first($scope.weeks), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
@@ -308,7 +306,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
                 });
             };
 
-            if ($scope.selectedDataset.isOriginDataset) {
+            if ($scope.selectedService.isOriginDataset) {
                 $scope.originSummary = eventsAggregator.nest($scope.events, ['orgUnit', 'period']);
             } else {
                 var byPeriod = 'period';
@@ -318,7 +316,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
                 $scope.procedureDataElements = _.filter($scope.allDataElements, { offlineSummaryType: 'procedures' });
                 $scope.summaryDataElements = _.filter($scope.allDataElements, { offlineSummaryType: 'showInOfflineSummary' });
                 $scope.summaryDataElements = excludeLineListDataElementsOptions();
-                if($scope.selectedDataset.isReferralDataset) {
+                if($scope.selectedService.isReferralDataset) {
                     referralLocationsRepository.get($scope.orgUnit.parent.id).then(function (referralLocations) {
                         $scope.referralLocations = referralLocations;
                     });
@@ -336,20 +334,18 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator'], fu
         };
 
         var reloadView = function () {
-            if(!($scope.orgUnit && $scope.selectedDataset && $scope.selectedWeeksToExport)) return;
+            if(!($scope.orgUnit && $scope.selectedService && $scope.selectedWeeksToExport)) return;
             $scope.weeks = dateUtils.getPeriodRange($scope.selectedWeeksToExport, { excludeCurrentWeek: true });
 
             var loadRawData = function () {
                 return $scope.orgUnit.lineListService ? loadLineListRawData() : loadAggregateRawData();
             };
 
-            $scope.loading = true;
-            return loadRawData().finally(function() {
-                $scope.loading = false;
-            });
+            $scope.startLoading();
+            return loadRawData().finally($scope.stopLoading);
         };
 
-        $scope.$watchGroup(['orgUnit', 'selectedDataset', 'selectedWeeksToExport'], reloadView);
+        $scope.$watchGroup(['orgUnit', 'selectedService', 'selectedWeeksToExport'], reloadView);
         $scope.selectedWeeksToExport = _.find($scope.weeksToExportOptions, 'default').value;
 
         $scope.dataValuesMap = {};

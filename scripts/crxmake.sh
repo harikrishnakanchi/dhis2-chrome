@@ -18,7 +18,9 @@ trap 'rm -f "$pub" "$sig" "$zip"' EXIT
 
 # zip up the crx dir
 cwd=$(pwd -P)
-(cd "$dir" && zip -qr -9 -X "$cwd/$zip" .)
+
+# zip the contents excluding the `less` `pwa` directory and index.html for reducing the crx size
+(cd "$dir" && zip -qr -x less/\* js/app/pwa/\* index.html -9 -X "$cwd/$zip" .)
 
 # signature
 openssl sha1 -sha1 -binary -sign "$key" < "$zip" > "$sig"

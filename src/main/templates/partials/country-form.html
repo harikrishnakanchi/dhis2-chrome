@@ -1,7 +1,4 @@
 <div ng-controller="countryController">
-    <div class="loading" ng-show="loading">
-        <img src="img/ajax-loader.gif" class="spinner" />
-    </div>
     <div class="top-actions" ng-if="!isNewMode">
         <input type="button" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.createProjectLabel }}" ng-click="openInNewMode('Project')" />
         <input type="button" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.createUserLabel }}" ng-click="openInNewMode('User')" />
@@ -18,10 +15,11 @@
                     <li class="form-group">
                         <label for="newOrgUnitName" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.nameLabel }}</label>
                         <div class="col-sm-6">
-                            <input ng-disabled="!isNewMode" type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-model="newOrgUnit.name" required not-in="allCountries" />
+                            <input ng-disabled="!isNewMode" type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-maxlength="50" ng-model="newOrgUnit.name" required not-in="allCountries" />
                             <div ng-show="createForm.newOrgUnitName.$dirty &amp;&amp; createForm.newOrgUnitName.$invalid">
                                 <span ng-show="createForm.newOrgUnitName.$error.required" class="errortxt">{{resourceBundle.nameValidation}}</span>
                                 <span ng-show="createForm.newOrgUnitName.$error.isWithin" class="errortxt">{{resourceBundle.countryExists}}</span>
+                                <span ng-show="createForm.newOrgUnitName.$error.maxlength" class="errortxt">{{resourceBundle.nameLengthValidation}}</span>
                             </div>
                         </div>
                     </li>

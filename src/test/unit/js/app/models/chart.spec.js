@@ -28,19 +28,19 @@ define(['chart'], function(Chart) {
             });
         });
 
-        describe('dataSetCode', function() {
+        describe('serviceCode', function() {
             it('should parse the dataSet code from the chart name', function() {
                 chart = Chart.create({
-                   name: '[FieldApp - DataSetCode] 1 someName'
+                   name: '[FieldApp - ServiceCode] 1 someName'
                });
-                expect(chart.dataSetCode).toEqual('DataSetCode');
+                expect(chart.serviceCode).toEqual('ServiceCode');
             });
 
             it('should return null if chart name is malformed', function() {
                 chart = Chart.create({
                     name: 'some malformed chart name'
                 });
-                expect(chart.dataSetCode).toBeNull();
+                expect(chart.serviceCode).toBeNull();
             });
         });
 
@@ -59,7 +59,7 @@ define(['chart'], function(Chart) {
         describe('displayPosition', function() {
             it('should parse the position from the chart name', function() {
                 chart = Chart.create({
-                    'name': '[FieldApp - someDataSetCode] 88 Name'
+                    'name': '[FieldApp - someServiceCode] 88 Name'
                 });
                 expect(chart.displayPosition).toEqual(88);
             });

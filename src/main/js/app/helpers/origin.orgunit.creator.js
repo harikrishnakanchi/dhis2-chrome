@@ -1,7 +1,7 @@
 define(["lodash", "orgUnitMapper"], function(_, orgUnitMapper) {
     return function($q, orgUnitRepository, patientOriginRepository, orgUnitGroupHelper, datasetRepository) {
 
-        var create = function(module, patientOrigins) {
+        var create = function(module, patientOrigins, associateOriginDataset) {
             var getPatientOrigins = function() {
                 var getFromRepository = function() {
                     return patientOriginRepository.get(module.parent.id).then(function(patientOrigins) {
@@ -21,14 +21,31 @@ define(["lodash", "orgUnitMapper"], function(_, orgUnitMapper) {
                 });
             };
 
-            return getOriginOUPayload().then(function(originOUPayload) {
-                return datasetRepository.getAll().then(function(allDatasets) {
-                    var originDatasetIds = _.pluck(_.filter(allDatasets, "isOriginDataset"), "id");
-                    return orgUnitRepository.upsert(originOUPayload)
-                        .then(function() {
-                            return originOUPayload;
+            return getOriginOUPayload().then(function (originOUPayload) {
+                var getOriginDatasetsForModule = function () {
+                    if(!associateOriginDataset) return $q.when([]);
+                    return datasetRepository.getAll().then(function (allDatasets) {
+                        var originDataSets = _.filter(allDatasets, "isOriginDataset");
+                        return _.map(originDataSets, function (dataSet) {
+                            return {id: dataSet.id};
                         });
-                });
+                    });
+                };
+
+                var enrichOriginsWithDataSets = function (dataSets) {
+                    return _.map(originOUPayload, function (origin) {
+                        origin.dataSets = dataSets;
+                    });
+                };
+
+                return getOriginDatasetsForModule()
+                    .then(enrichOriginsWithDataSets)
+                    .then(function () {
+                        return orgUnitRepository.upsert(originOUPayload)
+                            .then(function () {
+                                return originOUPayload;
+                            });
+                    });
             });
         };
 

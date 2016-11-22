@@ -1,9 +1,6 @@
 <div class="dataentrypage parent-margin {{ layoutDirection.direction }} dashboardpage" ng-controller="dashboardController"
      ng-if="hasRoles(['Data entry user', 'Project Level Approver', 'Coordination Level Approver','Observer'])">
     <div class="panel-group-custom-spacing">
-        <div class="loading" ng-show="loading">
-            <img src="img/ajax-loader.gif" class="spinner"/>
-        </div>
         <div class="info-error-section">
             <div ng-show="approveSuccess &amp;&amp; hasRoles(['Project Level Approver'])" class="alert alert-success">
                 {{resourceBundle.firstLevelApproveSuccess}}

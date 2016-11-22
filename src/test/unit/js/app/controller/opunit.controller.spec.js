@@ -33,9 +33,12 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope.isNewMode = true;
             scope.locale = 'en';
             scope.resourceBundle = {
-                'uploadPatientOriginDetailsDesc': 'create patient origin ',
-                'upsertOrgUnitDesc': 'upsert org unit '
+                'uploadPatientOriginDetailsDesc': 'create patient origin {{origin_name}}',
+                'upsertOrgUnitDesc': 'upsert org unit'
             };
+            scope.startLoading = jasmine.createSpy('startLoading');
+            scope.stopLoading = jasmine.createSpy('stopLoading');
+
             scope.$parent.closeNewForm = jasmine.createSpy();
 
             Timecop.install();
@@ -154,7 +157,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "data": [expectedOpUnit],
                 "type": "upsertOrgUnit",
                 "locale": "en",
-                "desc": "upsert org unit OpUnit1"
+                "desc": "upsert org unit"
             }, "dataValues");
         });
 
@@ -254,7 +257,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "data": [expectedOpUnit],
                 "type": "upsertOrgUnit",
                 "locale": "en",
-                "desc": "upsert org unit OpUnit1"
+                "desc": "upsert org unit"
             }, "dataValues");
         });
 
@@ -310,7 +313,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "data": [expectedOpUnit],
                 "type": "upsertOrgUnit",
                 "locale": "en",
-                "desc": "upsert org unit OpUnit1"
+                "desc": "upsert org unit"
             }, "dataValues");
         });
 
@@ -459,7 +462,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "data": expectedOrgUnits,
                 "type": "upsertOrgUnit",
                 "locale": "en",
-                "desc": scope.resourceBundle.upsertOrgUnitDesc + "mod1"
+                "desc": scope.resourceBundle.upsertOrgUnitDesc
             };
             orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modulesUnderOpunit));
 
@@ -568,7 +571,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "data": [expectedOpUnit],
                 "type": "upsertOrgUnit",
                 "locale": "en",
-                "desc": "upsert org unit OpUnit1"
+                "desc": "upsert org unit"
             }, "dataValues");
             expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalled();
         });
@@ -635,7 +638,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "data": [expectedOpUnit],
                 "type": "upsertOrgUnit",
                 "locale": "en",
-                "desc": "upsert org unit OpUnit1"
+                "desc": "upsert org unit"
             }, "dataValues");
         });
 
@@ -811,7 +814,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "data": expectedOrgUnitUpsert,
                 "type": "upsertOrgUnit",
                 "locale": "en",
-                "desc": "upsert org unit origin1"
+                "desc": "upsert org unit"
             }, "dataValues");
         });
 
@@ -879,7 +882,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "data": expectedOrgUnitUpsert,
                 "type": "upsertOrgUnit",
                 "locale": "en",
-                "desc": "upsert org unit origin1"
+                "desc": "upsert org unit"
             }, "dataValues");
         });
 

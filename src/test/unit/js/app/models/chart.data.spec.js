@@ -7,7 +7,7 @@ define(['chartData', 'analyticsData'], function (ChartData, AnalyticsData) {
                 id: 'someId',
                 title: 'someTitle',
                 type: 'someType',
-                dataSetCode: 'someDataSetCode',
+                serviceCode: 'someDataSetServiceCode',
                 displayPosition: 'someDisplayPosition',
                 weeklyChart: 'someBooleanValue',
                 monthlyChart: 'anotherBooleanValue'
@@ -30,7 +30,7 @@ define(['chartData', 'analyticsData'], function (ChartData, AnalyticsData) {
                 expect(chartData.id).toEqual(definition.id);
                 expect(chartData.title).toEqual(definition.title);
                 expect(chartData.type).toEqual(definition.type);
-                expect(chartData.dataSetCode).toEqual(definition.dataSetCode);
+                expect(chartData.serviceCode).toEqual(definition.serviceCode);
                 expect(chartData.displayPosition).toEqual(definition.displayPosition);
                 expect(chartData.weeklyChart).toEqual(definition.weeklyChart);
                 expect(chartData.monthlyChart).toEqual(definition.monthlyChart);

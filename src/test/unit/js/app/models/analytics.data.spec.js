@@ -149,10 +149,9 @@ define(['analyticsData'], function (AnalyticsData) {
                         },
                         categoryOptions: [{
                             id: 'someCategoryOptionId',
-                            code: 'someCode_excludeFromTotal'
+                            excludeFromTotal: true
                         }, {
-                            id: 'someOtherCategoryOptionId',
-                            code: 'someOtherCode'
+                            id: 'someOtherCategoryOptionId'
                         }]
                     }]
                 };
@@ -197,20 +196,20 @@ define(['analyticsData'], function (AnalyticsData) {
                     expect(analyticsData.getDisplayName(item)).toEqual(item.formName);
                 });
         
-                it('should split the shortName by hyphen if formName is not available', function () {
+                it('should use the shortName if formName is not available', function () {
                     item = {
-                        shortName: 'someShortName - someOtherName - yetAnotherName',
+                        shortName: 'someShortName',
                         dataDimension: true
                     };
                     expect(analyticsData.getDisplayName(item)).toEqual('someShortName');
                 });
         
-                it('should split the name by hyphen if formName and shortName is not available', function () {
+                it('should use name if formName and shortName is not available', function () {
                     item = {
                         name: 'someName - someOtherName - yetAnotherName',
                         dataDimension: true
                     };
-                    expect(analyticsData.getDisplayName(item)).toEqual('someName');
+                    expect(analyticsData.getDisplayName(item)).toEqual('someName - someOtherName - yetAnotherName');
                 });
             });
         });

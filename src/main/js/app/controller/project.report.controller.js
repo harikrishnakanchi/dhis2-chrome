@@ -36,7 +36,6 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper", "excelBuilder"], funct
             };
 
             var spreadSheetContent = getProjectBasicInfo().concat([EMPTY_ROW]).concat(getPivotTableData());
-            console.log(spreadSheetContent);
             if ($scope.lastUpdatedTimeForProjectReport) {
                 spreadSheetContent.unshift(getLastUpdatedTimeDetails(), EMPTY_ROW);
             }
@@ -170,10 +169,9 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper", "excelBuilder"], funct
 
         var init = function() {
             $scope.pivotTables= [];
-            $scope.loading = true;
-            $q.all([loadProjectBasicInfo(), loadPivotTables(), loadLastUpdatedTimeForProjectReport()]).finally(function () {
-                $scope.loading = false;
-            });
+            $scope.startLoading();
+            $q.all([loadProjectBasicInfo(), loadPivotTables(), loadLastUpdatedTimeForProjectReport()])
+                .finally($scope.stopLoading);
         };
 
         init();

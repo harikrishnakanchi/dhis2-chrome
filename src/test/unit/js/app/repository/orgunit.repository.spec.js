@@ -542,5 +542,118 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
                 scope.$apply();
             });
         });
+
+        describe('associateDataSetsToOrgUnits', function () {
+           it('should associate the dataSets with the orgUnit', function () {
+               var orgunits = [{
+                   id: 'someOrgUnitId',
+                   name: 'someOrgUnitName',
+                   dataSets: [{id: 'someOtherDataSetId'}]
+               }, {
+                   id: 'someOtherOrgUnitId',
+                   name: 'someOrgUnitName',
+                   dataSets: [{id: 'someOtherDataSetId'}]
+               }];
+               var expectedOrgUnitUpsert = {
+                   "id": "someOrgUnitId",
+                   "name": "someOrgUnitName",
+                   "dataSets": [{"id": "someOtherDataSetId"}, {"id": "someDataSetId"}]
+               };
+               var expectedSomeOtherOrgUnitUpsert = {
+                   "id": "someOtherOrgUnitId",
+                   "name": "someOrgUnitName",
+                   "dataSets": [{"id": "someOtherDataSetId"}, {"id": "someDataSetId"}]
+               };
+               mockOrgStore.each.and.returnValue(utils.getPromise(q, orgunits));
+
+               orgUnitRepository.associateDataSetsToOrgUnits(['someDataSetId'], orgunits);
+               scope.$apply();
+
+               expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedOrgUnitUpsert);
+               expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedSomeOtherOrgUnitUpsert);
+           });
+
+            it('should not associate the already existing dataSet with orgUnit', function () {
+                var orgunits = [{
+                    id: 'someOrgUnitId',
+                    name: 'someOrgUnitName',
+                    dataSets: [{id: 'someOtherDataSetId'}]
+                }, {
+                    id: 'someOtherOrgUnitId',
+                    name: 'someOrgUnitName',
+                    dataSets: [{id: 'someOtherDataSetId'}]
+                }];
+                var expectedOrgUnitUpsert = {
+                    "id": "someOrgUnitId",
+                    "name": "someOrgUnitName",
+                    "dataSets": [{"id": "someOtherDataSetId"}]
+                };
+                var expectedSomeOtherOrgUnitUpsert = {
+                    "id": "someOtherOrgUnitId",
+                    "name": "someOrgUnitName",
+                    "dataSets": [{"id": "someOtherDataSetId"}]
+                };
+                mockOrgStore.each.and.returnValue(utils.getPromise(q, orgunits));
+
+                orgUnitRepository.associateDataSetsToOrgUnits(['someOtherDataSetId'], orgunits);
+                scope.$apply();
+
+                expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedOrgUnitUpsert);
+                expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedSomeOtherOrgUnitUpsert);
+            });
+
+        });
+
+        describe('removeDataSetsToOrgUnits', function () {
+            it('should remove the dataSets from the orgUnits', function () {
+                var orgUnits = [{
+                    id: 'someOrgUnitId',
+                    name: 'someOrgUnitName',
+                    dataSets: [{id: 'someDataSetId'}, {
+                        id: 'dataSetToBeRemoved'
+                    }]
+                }, {
+                    id: 'someOtherOrgUnitId',
+                    name: 'someOtherOrgUnitName',
+                    dataSets: [{id: 'someDataSetId'}, {id: 'dataSetToBeRemoved'}]
+                }];
+                var expectedOrgUnitUpsert = {
+                    "id": "someOrgUnitId",
+                    "name": "someOrgUnitName",
+                    "dataSets": [{"id": "someDataSetId"}]
+                };
+
+                var expectedSomeOtherOrgUnitUpsert = {
+                    "id": "someOtherOrgUnitId",
+                    "name": "someOtherOrgUnitName",
+                    "dataSets": [{"id": "someDataSetId"}]
+                };
+                mockOrgStore.each.and.returnValue(utils.getPromise(q, orgUnits));
+
+                orgUnitRepository.removeDataSetsFromOrgUnits(['dataSetToBeRemoved'], orgUnits);
+                scope.$apply();
+
+                expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedOrgUnitUpsert);
+                expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedSomeOtherOrgUnitUpsert);
+            });
+        });
+
+        describe('getAllDataSets',function () {
+            it('should return all the associatewd dataSets for the orgUnit id', function () {
+                var dataSets = [{
+                    id: 'someDataSetId'
+                }];
+                var mockOrgUnit = {
+                    id: 'mockOrgUnitId',
+                    dataSets: dataSets
+                };
+                spyOn(orgUnitRepository, 'get').and.returnValue(mockOrgUnit);
+                var expectedDataSets = dataSets;
+                orgUnitRepository.getAllDataSetsForOrgUnit(mockOrgUnit.id).then(function (dataSets) {
+                    expect(expectedDataSets).toEqual(dataSets);
+                });
+            });
+        });
+
     });
 });

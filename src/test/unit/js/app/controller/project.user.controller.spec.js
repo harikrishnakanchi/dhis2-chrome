@@ -28,8 +28,8 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
             scope.locale = "en";
 
             scope.resourceBundle = {
-                "createUserDesc": "create user ",
-                "updateUserDesc": "update user ",
+                "createUserDesc": "create user",
+                "updateUserDesc": "update user",
                 "usernamePrefixValidation": "Username should begin with"
             };
 
@@ -87,7 +87,7 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
                 data: expectedUserPayload,
                 type: "createUser",
                 locale: "en",
-                desc: "create user proj_1_blah"
+                desc: "create user"
             };
 
             spyOn(dhisId, "get").and.callFake(function(name) {
@@ -219,7 +219,7 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
                 data: user,
                 type: 'updateUser',
                 locale: 'en',
-                desc: 'update user blah blah'
+                desc: 'update user'
             };
 
             scope.toggleUserDisabledState(user);

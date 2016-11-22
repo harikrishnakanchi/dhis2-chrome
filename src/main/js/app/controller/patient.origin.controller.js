@@ -1,4 +1,4 @@
-define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhisId, orgUnitMapper) {
+define(["lodash", "moment", "dhisId","interpolate", "orgUnitMapper"], function(_, moment, dhisId, interpolate, orgUnitMapper) {
     return function($scope, $hustle, $q, patientOriginRepository, orgUnitRepository, datasetRepository, programRepository, originOrgunitCreator, orgUnitGroupHelper) {
         var patientOrigins = [];
         var oldName = "";
@@ -37,7 +37,7 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                             "programIds": [program.id]
                         };
                         return programRepository.associateOrgUnits(program, orgUnits).then(function () {
-                            return publishMessage(orgUnitAndProgramAssociations, 'associateOrgunitToProgram', $scope.resourceBundle.uploadProgramDesc + _.pluck(orgUnits, "name"));
+                            return publishMessage(orgUnitAndProgramAssociations, 'associateOrgunitToProgram', interpolate($scope.resourceBundle.uploadProgramDesc, { orgunit_name: _.pluck(orgUnits, "name").toString() }));
                         });
                     }
                     else {
@@ -45,29 +45,29 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                     }
                 };
 
-                var associateOrgunitsToDatasets = function (datasets, orgUnits) {
+                var associateDataSetsToOrgUnits = function (datasets, orgUnits) {
                     var dataSetIds = _.map(datasets, "id");
                     var orgUnitAndDatasetAssociations = {
                         "orgUnitIds": _.map(orgUnits, 'id'),
                         "dataSetIds": dataSetIds
                     };
-                    return datasetRepository.associateOrgUnits(dataSetIds, orgUnits).then(function () {
-                        return publishMessage(orgUnitAndDatasetAssociations, 'associateOrgUnitToDataset', $scope.resourceBundle.associateOrgUnitToDatasetDesc + $scope.orgUnit.name);
+                    return orgUnitRepository.associateDataSetsToOrgUnits(dataSetIds, orgUnits).then(function () {
+                        return publishMessage(orgUnitAndDatasetAssociations, 'associateOrgUnitToDataset', interpolate($scope.resourceBundle.associateOrgUnitToDatasetDesc, { orgunit_name: $scope.orgUnit.name }));
                     });
                 };
 
                 var doAssociations = function(originOrgUnits, siblingOriginOrgUnit) {
                     var associate = function(datasets, program) {
-                        return associateOrgunitsToDatasets(datasets, originOrgUnits).then(function() {
+                        return associateDataSetsToOrgUnits(datasets, originOrgUnits).then(function() {
                             return associateOrgunitsToPrograms(program, originOrgUnits);
                         });
                     };
 
-                    var getDatasetsAndProgram = function(orgUnitId) {
-                        return $q.all([datasetRepository.findAllForOrgUnits([orgUnitId]), programRepository.getProgramForOrgUnit(orgUnitId)]);
+                    var getDatasetsAndProgram = function(orgUnit) {
+                        return $q.all([datasetRepository.findAllForOrgUnits([orgUnit]), programRepository.getProgramForOrgUnit(orgUnit.id)]);
                     };
 
-                    return getDatasetsAndProgram(siblingOriginOrgUnit.id).then(function(data) {
+                    return getDatasetsAndProgram(siblingOriginOrgUnit).then(function(data) {
                         return associate(data[0], data[1]);
                     });
                 };
@@ -91,13 +91,19 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                         return orgUnitGroupHelper.createOrgUnitGroups(orgUnitsForGroups, false);
                 };
 
-                var createOrgUnits = function(module) {
-                    return orgUnitRepository.findAllByParent(module.id).then(function(siblingOriginOrgUnits) {
-                        return originOrgunitCreator.create(module, $scope.patientOrigin).then(function(originOrgUnits) {
+                var createOrgUnits = function (module) {
+                    return orgUnitRepository.findAllByParent(module.id).then(function (siblingOriginOrgUnits) {
+                        return originOrgunitCreator.create(module, $scope.patientOrigin).then(function (originOrgUnits) {
                             orgUnitsForGroups = isLinelistService(module) ? orgUnitsForGroups.concat(originOrgUnits) : orgUnitsForGroups.concat(module);
-                            return publishMessage(originOrgUnits, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + _.uniq(_.pluck(originOrgUnits, "name"))).then(function () {
-                                return doAssociations(originOrgUnits, siblingOriginOrgUnits[0]);
-                            });
+                            if (isLinelistService(module)) {
+                                return publishMessage(originOrgUnits, "upsertOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, {orgUnit: _.uniq(_.pluck(originOrgUnits, "name")).toString()})).then(function () {
+                                    return doAssociations(originOrgUnits, siblingOriginOrgUnits[0]);
+                                });
+                            } else {
+                                _.map(originOrgUnits, function (originOrgUnit) {
+                                    return publishMessage({orgUnitId: originOrgUnit.id}, "syncOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, {orgUnit: _.uniq(_.pluck(originOrgUnits, "name")).toString()}));
+                                });
+                            }
                         });
                     });
                 };
@@ -122,14 +128,12 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                 "origins": patientOrigins
             };
 
-            $scope.loading = true;
+            $scope.startLoading();
             return patientOriginRepository.upsert(payload)
-                .then(_.partial(publishMessage, payload.orgUnit, "uploadPatientOriginDetails", $scope.resourceBundle.uploadPatientOriginDetailsDesc + _.pluck(payload.origins, "name")))
+                .then(_.partial(publishMessage, payload.orgUnit, "uploadPatientOriginDetails", interpolate($scope.resourceBundle.uploadPatientOriginDetailsDesc, { origin_name: _.map(payload.origins, 'name').toString() })))
                 .then(createOrgUnitsAndGroups)
                 .then(onSuccess, onFailure)
-                .finally(function() {
-                    $scope.loading = false;
-                });
+                .finally($scope.stopLoading);
         };
 
         $scope.closeForm = function() {
@@ -182,17 +186,19 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
 
             var publishUpdateMessages = function() {
                 patientOriginRepository.upsert(updatedPatientOrigin).then(function() {
-                    publishMessage(updatedPatientOrigin.orgUnit, "uploadPatientOriginDetails", $scope.resourceBundle.uploadPatientOriginDetailsDesc + _.pluck(updatedPatientOrigin.origins, "name"));
+                    publishMessage(updatedPatientOrigin.orgUnit, "uploadPatientOriginDetails", interpolate($scope.resourceBundle.uploadPatientOriginDetailsDesc, { origin_name: _.map(updatedPatientOrigin.origins, 'name').toString() }));
                 });
                 orgUnitRepository.upsert(originsToUpsert).then(function() {
-                    publishMessage(originsToUpsert, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + _.uniq(_.pluck(originsToUpsert, "name")));
+                    publishMessage(originsToUpsert, "upsertOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: _.uniq(_.pluck(originsToUpsert, "name")).toString() }));
                 });
             };
 
+            $scope.startLoading();
             getOriginsToUpsert()
                 .then(getSystemSetting)
                 .then(publishUpdateMessages)
-                .then(onSuccess, onFailure);
+                .then(onSuccess, onFailure)
+                .finally($scope.stopLoading);
         };
 
         var init = function() {

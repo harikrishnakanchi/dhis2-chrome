@@ -323,47 +323,6 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
             });
         });
 
-        describe('approvedAtCoordinationLevelBy', function() {
-            it('should be null if there is no approval data', function() {
-                approvalData = undefined;
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.approvedAtCoordinationLevelBy).toBeNull();
-            });
-
-
-            it('should return completedBy if there is approval data', function() {
-                approvalData = { approvedBy: 'Kuala', isApproved: true };
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.approvedAtCoordinationLevelBy).toEqual('Kuala');
-            });
-
-            it('should return null if approval status is false', function() {
-                approvalData = { approvedBy: 'Kuala', isApproved: false };
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.approvedAtCoordinationLevelBy).toBeNull();
-            });
-        });
-
-        describe('approvedAtCoordinationLevelAt', function() {
-            it('should be null if there is no approval data', function() {
-                approvalData = undefined;
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.approvedAtCoordinationLevelAt).toBeNull();
-            });
-
-            it('should return approvedOn if there is approval data', function() {
-                approvalData = { approvedOn: someMomentInTime.toISOString(), isApproved: true };
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.approvedAtCoordinationLevelAt).toEqual(someMomentInTime);
-            });
-
-            it('should return null if completed status is false', function() {
-                approvalData = { approvedOn: someMomentInTime.toISOString(), isApproved: false };
-                moduleDataBlock = createModuleDataBlock();
-                expect(moduleDataBlock.approvedAtCoordinationLevelAt).toBeNull();
-            });
-        });
-
         describe('approvedAtAnyLevel', function() {
             it('should be false if approvalData is not present', function() {
                 approvalData = undefined;
@@ -534,26 +493,6 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
         describe('failedToSync', function() {
             beforeEach(function() {
                 isLineListService = false;
-            });
- //These can be removed after v6.0 has been released
-            describe('compatibility with deprecated localStatus flags', function() {
-                it('should be true if localStatus is FAILED_TO_SYNC', function() {
-                    aggregateDataValues = [createMockDataValuesObject({
-                        localStatus: "FAILED_TO_SYNC"
-                    })];
-                    moduleDataBlock = createModuleDataBlock();
-
-                    expect(moduleDataBlock.failedToSync).toEqual(true);
-                });
-
-                it('should be false if localStatus is not FAILED_TO_SYNC', function() {
-                    aggregateDataValues = [createMockDataValuesObject({
-                        localStatus: "SOME_OTHER_STATUS"
-                    })];
-                    moduleDataBlock = createModuleDataBlock();
-
-                    expect(moduleDataBlock.failedToSync).toEqual(false);
-                });
             });
 
             describe('Line list module', function () {

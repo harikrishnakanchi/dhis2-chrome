@@ -1,4 +1,4 @@
-define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', 'orgUnitRepository', 'moduleDataBlockFactory', 'dataService', 'eventService', 'moduleDataBlockMerger', 'changeLogRepository', 'utils', 'angularMocks', 'dateUtils', 'properties'],
+define(['syncModuleDataBlockConsumer', "dataSetRepository", 'approvalService', 'orgUnitRepository', 'moduleDataBlockFactory', 'dataService', 'eventService', 'moduleDataBlockMerger', 'changeLogRepository', 'utils', 'angularMocks', 'dateUtils', 'properties'],
     function (SyncModuleDataBlockConsumer, DataSetRepository, ApprovalService, OrgUnitRepository, ModuleDataBlockFactory, DataService, EventService, ModuleDataBlockMerger, ChangeLogRepository, utils, mocks, dateUtils, properties) {
         var syncModuleDataBlockConsumer, moduleDataBlockFactory, dataSetRepository, dataService, eventService, approvalService, orgUnitRepository, moduleDataBlockMerger, changeLogRepository,
             scope, q,
@@ -50,6 +50,7 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
                 spyOn(moduleDataBlockFactory, 'create').and.returnValue(utils.getPromise(q, {}));
 
                 orgUnitRepository = new OrgUnitRepository();
+                spyOn(orgUnitRepository, 'get').and.returnValue(utils.getPromise(q, mockModule));
                 spyOn(orgUnitRepository, 'findAllByParent').and.returnValue(utils.getPromise(q, mockOriginOrgUnits));
                 spyOn(orgUnitRepository, 'getParentProject').and.returnValue(utils.getPromise(q, mockProject));
 
@@ -78,6 +79,11 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
                 syncModuleDataBlockConsumer.run(message);
                 scope.$apply();
             };
+
+            it('should load the module from the repository', function () {
+                runConsumer();
+                expect(orgUnitRepository.get).toHaveBeenCalledWith(mockModule.id);
+            });
 
             it('should instantiate a module data block for one module', function() {
                 runConsumer();
@@ -161,7 +167,7 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
 
             it('should download data and approval only for dataSets associated with each module and origin', function(){
                 runConsumer();
-                expect(dataSetRepository.findAllForOrgUnits).toHaveBeenCalledWith(_.pluck(mockOriginOrgUnits, 'id').concat(mockModule.id));
+                expect(dataSetRepository.findAllForOrgUnits).toHaveBeenCalledWith(mockOriginOrgUnits.concat(mockModule));
             });
 
             it('should merge and save module data block', function() {
@@ -221,4 +227,3 @@ define(['syncModuleDataBlockConsumer', 'datasetRepository', 'approvalService', '
             });
         });
     });
-

@@ -10,7 +10,7 @@ define(["chartRepository", "chart", "chartData", "categoryRepository", "angularM
             spyOn(ChartData, 'create').and.returnValue({});
 
             categoryRepository = new CategoryRepository();
-            spyOn(categoryRepository, 'getAllCategoryOptions').and.returnValue(utils.getPromise(q, []));
+            spyOn(categoryRepository, 'enrichWithCategoryOptions').and.callFake(function (arg) { return utils.getPromise(q, arg); });
 
 
             chartRepository = new ChartRepository(mockDB.db, q, categoryRepository);
@@ -43,24 +43,10 @@ define(["chartRepository", "chart", "chartData", "categoryRepository", "angularM
             });
 
             it('should enrich chart definition with updated categoryOption', function() {
-                var allChartDefinitions = [{
-                    id: 'chartId',
-                    categoryDimensions: [{
-                        categoryOptions: [{id: 'categoryOptionId', name: 'oldName'}]
-                    }]
-                }];
-
-                mockStore.getAll.and.returnValue(utils.getPromise(q, allChartDefinitions));
-
-                var mockCategoryOptions = [{id: 'categoryOptionId', name: 'newName'}];
-                categoryRepository.getAllCategoryOptions.and.returnValue(utils.getPromise(q, mockCategoryOptions));
-
-                chartRepository.getAll().then(function (charts) {
-                    var categoryOptions = _.first(_.first(charts).categoryDimensions).categoryOptions;
-                    expect(_.first(categoryOptions)).toEqual(_.first(mockCategoryOptions));
-                });
+                chartRepository.getAll();
                 scope.$apply();
-                expect(categoryRepository.getAllCategoryOptions).toHaveBeenCalled();
+
+                expect(categoryRepository.enrichWithCategoryOptions).toHaveBeenCalled();
             });
         });
 
@@ -159,7 +145,7 @@ define(["chartRepository", "chart", "chartData", "categoryRepository", "angularM
                 };
                 mockChartDataModel = 'someInstanceOfModel';
                 chartDefinition = {
-                    name: 'someChartName'
+                    id: 'someChartId'
                 };
 
                 mockStore.find.and.returnValue(utils.getPromise(q, mockChartData));
@@ -172,7 +158,7 @@ define(["chartRepository", "chart", "chartData", "categoryRepository", "angularM
                 });
 
                 scope.$apply();
-                expect(mockStore.find).toHaveBeenCalledWith([chartDefinition.name, orgUnitId]);
+                expect(mockStore.find).toHaveBeenCalledWith([chartDefinition.id, orgUnitId]);
                 expect(ChartData.create).toHaveBeenCalledWith(chartDefinition, mockChartData.data);
             });
 

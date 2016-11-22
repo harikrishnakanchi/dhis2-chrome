@@ -6,6 +6,12 @@ define(['properties', 'dateUtils'], function (properties, dateUtils) {
             });
         };
 
+        var getModuleOrgUnit = function (data) {
+            return orgUnitRepository.get(data.moduleId).then(function (module) {
+                return _.merge({ module: module }, data);
+            });
+        };
+
         var getOriginOrgUnits = function(data) {
             return orgUnitRepository.findAllByParent([data.moduleId]).then(function(originOrgUnits){
                 return _.merge({ originOrgUnits: originOrgUnits }, data);
@@ -18,9 +24,7 @@ define(['properties', 'dateUtils'], function (properties, dateUtils) {
                 return _.pluck(aggregateDataSets, 'id');
             };
 
-            var originOrgUnitIds = _.pluck(data.originOrgUnits, 'id');
-
-            return datasetRepository.findAllForOrgUnits(originOrgUnitIds.concat(data.moduleId)).then(function(allDataSets) {
+            return datasetRepository.findAllForOrgUnits(data.originOrgUnits.concat(data.module)).then(function(allDataSets) {
                 var aggregateDataSetIds = getAggregateDataSetIds(allDataSets);
                 return _.merge({
                     allDataSetIds: _.pluck(allDataSets, 'id'),
@@ -91,6 +95,7 @@ define(['properties', 'dateUtils'], function (properties, dateUtils) {
                 moduleId: messageData.moduleId,
                 period: messageData.period
             })
+                .then(getModuleOrgUnit)
                 .then(getOriginOrgUnits)
                 .then(getDataSetsForModulesAndOrigins)
                 .then(getLastUpdatedTime)

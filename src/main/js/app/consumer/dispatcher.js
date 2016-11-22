@@ -1,10 +1,10 @@
 define(["lodash"], function(_) {
-    return function($q, $log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, updateDatasetConsumer,
-        createUserConsumer, updateUserConsumer, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer,
-        downloadProgramConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer,
-        downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
+    return function($q, $log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDataSetConsumer, assignDataSetsToOrgUnitsConsumer,
+        createUserConsumer, updateUserConsumer, uploadProgramConsumer,
+        downloadProgramConsumer, downloadMetadataConsumer,
+        downloadOrgUnitGroupConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
         uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
-        downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, removeOrgunitDatasetAssociationConsumer, associateOrgunitToProgramConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer) {
+        downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, removeOrgunitDataSetAssociationConsumer, associateOrgunitToProgramConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer, syncOrgUnitConsumer) {
 
         this.run = function(message) {
             $log.info("Processing message: " + message.data.type, message.data);
@@ -15,7 +15,7 @@ define(["lodash"], function(_) {
                         .then(_.partial(downloadOrgUnitConsumer.run, message))
                         .then(_.partial(downloadOrgUnitGroupConsumer.run, message))
                         .then(_.partial(downloadProgramConsumer.run, message))
-                        .then(_.partial(downloadDatasetConsumer.run, message))
+                        .then(_.partial(downloadDataSetConsumer.run, message))
                         .then(function() {
                             $log.info('Metadata sync complete');
                         });
@@ -45,35 +45,21 @@ define(["lodash"], function(_) {
                 case "syncModuleDataBlock":
                     return syncModuleDataBlockConsumer.run(message);
 
-                case "uploadDataValues":
-                    return downloadDataConsumer.run(message)
-                        .then(_.partial(uploadDataConsumer.run, message));
-
-                case "uploadCompletionData":
-                    return downloadDataConsumer.run(message)
-                        .then(_.partial(downloadApprovalConsumer.run, message))
-                        .then(_.partial(uploadCompletionDataConsumer.run, message));
-
-                case "deleteApprovals":
-                    return deleteApprovalConsumer.run(message);
-
-                case "uploadApprovalData":
-                    return downloadDataConsumer.run(message)
-                        .then(_.partial(downloadApprovalConsumer.run, message))
-                        .then(_.partial(uploadApprovalDataConsumer.run, message));
-
                 case "upsertOrgUnit":
                     return downloadOrgUnitConsumer.run(message)
                         .then(_.partial(uploadOrgUnitConsumer.run, message));
+
+                case "syncOrgUnit":
+                    return syncOrgUnitConsumer.run(message);
 
                 case "upsertOrgUnitGroups":
                     return uploadOrgUnitGroupConsumer.run(message);
 
                 case "associateOrgUnitToDataset":
-                    return updateDatasetConsumer.run(message);
+                    return assignDataSetsToOrgUnitsConsumer.run(message);
 
                 case "removeOrgUnitFromDataset":
-                    return removeOrgunitDatasetAssociationConsumer.run(message);
+                    return removeOrgunitDataSetAssociationConsumer.run(message);
                 
                 case "associateOrgunitToProgram":
                     return associateOrgunitToProgramConsumer.run(message);
@@ -87,12 +73,6 @@ define(["lodash"], function(_) {
                 case "uploadProgram":
                     return downloadProgramConsumer.run(message)
                         .then(_.partial(uploadProgramConsumer.run, message));
-
-                case "uploadProgramEvents":
-                    return uploadEventDataConsumer.run(message);
-
-                case "deleteEvent":
-                    return deleteEventConsumer.run(message);
 
                 case "uploadPatientOriginDetails":
                     return uploadPatientOriginConsumer.run(message);

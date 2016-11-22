@@ -107,7 +107,7 @@ define(["dhisId", "interpolate", "properties"], function(dhisId, interpolate, pr
             var okConfirmation = function() {
                 user.userCredentials.disabled = $scope.isUserToBeDisabled;
                 return userRepository.upsert(user).then(function(data) {
-                    return publishMessage(data, "updateUser", $scope.resourceBundle.updateUserDesc + user.userCredentials.username);
+                    return publishMessage(data, "updateUser", interpolate($scope.resourceBundle.updateUserDesc, { username: user.userCredentials.username }));
                 });
             };
 
@@ -160,7 +160,7 @@ define(["dhisId", "interpolate", "properties"], function(dhisId, interpolate, pr
                 return error;
             };
             userRepository.upsert(userPayload).then(function() {
-                return publishMessage(userPayload, "createUser", $scope.resourceBundle.createUserDesc + userPayload.username);
+                return publishMessage(userPayload, "createUser", interpolate($scope.resourceBundle.createUserDesc, { username : userPayload.username }));
             }).then(onSuccess, onFailure);
         };
 

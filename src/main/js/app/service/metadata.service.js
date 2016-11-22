@@ -18,7 +18,7 @@ define(["dhisUrl", "moment", "properties"], function(dhisUrl, moment, properties
         };
 
         this.loadMetadataFromFile = function(lastUpdatedTime) {
-            return $http.get("/data/metadata.json").then(function(response) {
+            return $http.get("data/metadata.json").then(function(response) {
                 var metaData = response.data;
                 if (lastUpdatedTime && moment(lastUpdatedTime).isAfter(metaData.created))
                     return;

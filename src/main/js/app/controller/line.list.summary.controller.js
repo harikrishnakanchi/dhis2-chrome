@@ -1,9 +1,8 @@
-define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpolate", "excelBuilder"], function(_, moment, properties, dateUtils, orgUnitMapper, interpolate, excelBuilder) {
+define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpolate", "excelBuilder", "dataElementUtils"], function(_, moment, properties, dateUtils, orgUnitMapper, interpolate, excelBuilder, dataElementUtils) {
     return function($scope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, historyService, programRepository, programEventRepository, excludedDataElementsRepository,
         orgUnitRepository, approvalDataRepository, referralLocationsRepository, dataSyncFailureRepository, translationsService, filesystemService) {
 
         $scope.filterParams = {};
-        $scope.loadingResults = false;
         $scope.showOfflineSummaryForViewOnly = true;
         $scope.viewRegistrationBook = false;
         $scope.excludedDataElementIds = [];
@@ -65,7 +64,7 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
 
         var isReferralLocationDataValue = function (dataValue) {
             var dataElement = _.find($scope.dataElementsForExport, {id: dataValue.dataElement});
-            return (dataElement && dataElement.offlineSummaryType == 'referralLocations') ? true : false;
+            return !!(dataElement && dataElement.offlineSummaryType == 'referralLocations');
         };
 
         var enhanceEvents = function (events) {
@@ -330,24 +329,20 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
         };
 
         $scope.filterByCaseNumber = function() {
-            $scope.loadingResults = true;
+            $scope.startLoading();
             programEventRepository.findEventsByCode($scope.program.id, _.pluck($scope.originOrgUnits, "id"), $scope.filterParams.caseNumber)
                 .then(enhanceEvents)
-                .then(function() {
-                    $scope.loadingResults = false;
-                });
+                .then($scope.stopLoading);
         };
 
         $scope.filterByDateRange = function() {
-            $scope.loadingResults = true;
+            $scope.startLoading();
             var startDate = moment($scope.filterParams.startDate).format("YYYY-MM-DD");
             var endDate = moment($scope.filterParams.endDate).format("YYYY-MM-DD");
 
             programEventRepository.findEventsByDateRange($scope.program.id, _.pluck($scope.originOrgUnits, "id"), startDate, endDate)
                 .then(enhanceEvents)
-                .then(function() {
-                    $scope.loadingResults = false;
-                });
+                .then($scope.stopLoading);
         };
 
         $scope.filterSubmittedEvents = function (event) {
@@ -362,7 +357,7 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
             };
 
             var buildHeaders = function () {
-                var formNames = _.map($scope.dataElementsForExport, 'formName');
+                var formNames = _.map($scope.dataElementsForExport, dataElementUtils.getDisplayName);
                 return formNames.concat($scope.resourceBundle.patientOriginLabel);
             };
 
@@ -370,6 +365,7 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
                 var dataValues = _.reject(event.dataValues, function (dataValue) {
                     return _.contains($scope.excludedDataElementIds, dataValue.dataElement);
                 });
+
                 var values = _.map(dataValues, $scope.getDisplayValue);
                 return values.concat(event.orgUnitName);
             };
@@ -389,6 +385,8 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
                 "id": orgUnitId
             }).name;
         };
+
+        $scope.getDisplayName = dataElementUtils.getDisplayName;
 
         $scope.$on('moduleWeekInfo', function(event, data) {
             $scope.errorMessage = undefined;
@@ -454,7 +452,6 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
                     return programRepository.getProgramForOrgUnit($scope.originOrgUnits[0].id).then(function(program) {
                         return programRepository.get(program.id, excludedDataElements).then(function(program) {
                             $scope.program = translationsService.translate(program);
-                            $scope.associatedProgramId = $scope.program.id;
                             $scope.summaryDataElements = getSummaryDataElementFromProgram($scope.program);
                             $scope.dataElementsForExport = getDataElementsForExport($scope.program);
                         });
@@ -488,16 +485,14 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
                 $scope.filterParams.filterBy = 'caseNumber';
             $scope.eventListTitle = $scope.resourceBundle.eventListTitle;
             $scope.noCasesMsg = $scope.resourceBundle.noCasesFound;
-            $scope.loading = true;
+            $scope.startLoading();
             return loadModule()
                 .then(getreferralLocations)
                 .then(loadOriginOrgUnits)
                 .then(loadPrograms)
                 .then(setUpProjectAutoApprovedFlag)
                 .then(loadEventsView)
-                .finally(function() {
-                    $scope.loading = false;
-                });
+                .finally($scope.stopLoading);
         };
 
         init();

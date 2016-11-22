@@ -40,10 +40,11 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             };
 
             scope.resourceBundle = {
-                "upsertOrgUnitDesc": "upsert org unit ",
-                "uploadApprovalDataDesc": "approve data at coordination level for ",
-                "uploadCompletionDataDesc": "approve data at project level for "
+                "upsertOrgUnitDesc": "upsert org unit"
             };
+
+            scope.startLoading = jasmine.createSpy('startLoading');
+            scope.stopLoading = jasmine.createSpy('stopLoading');
 
             scope.locale = "en";
 
@@ -251,7 +252,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 data: [expectedNewOrgUnit],
                 type: "upsertOrgUnit",
                 locale: "en",
-                desc: "upsert org unit blah"
+                desc: "upsert org unit"
             }, "dataValues");
         });
 

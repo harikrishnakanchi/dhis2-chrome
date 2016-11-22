@@ -1,7 +1,4 @@
 <div class="dataentrypage {{ layoutDirection.direction }}">
-    <div class="loading" ng-show="loading">
-        <img src="img/ajax-loader.gif" class="spinner" />
-    </div>
     <section id="top" class="panel tab-panel">
         <form name="eventDataEntryForm" id="eventDataEntryForm" class="form-horizontal">
             <accordion close-others="false">
@@ -40,10 +37,10 @@
                                         <label ng-class="{'required': programStageDE.compulsory}" ng-if="isReferralLocationPresent(programStageDE.dataElement)">
                                             <a class="changeColor"
                                                description-popup
-                                               dp-title="{{ programStageDE.dataElement.formName }}"
+                                               dp-title="{{ getDisplayName(programStageDE.dataElement) }}"
                                                dp-desc="{{ programStageDE.dataElement.description }}"
                                             >
-                                            {{ programStageDE.dataElement.formName }}
+                                            {{ getDisplayName(programStageDE.dataElement) }}
                                             </a>
                                         </label>
 
@@ -144,7 +141,6 @@
                                         </div>
 
                                         <div ng-show="eventDataEntryForm[psdeFormName].$dirty && eventDataEntryForm[psdeFormName].$invalid">
-                                            <span class="errortxt" ng-show="eventDataEntryForm[psdeFormName].$error.required"> {{programStageDE.dataElement.formName}} {{resourceBundle.required}}</span>
                                             <span class="errortxt" ng-show="eventDataEntryForm[psdeFormName].$error.date"> {{resourceBundle.dateInvalid}}</span>
                                             <span class="errortxt" ng-show="eventDataEntryForm[psdeFormName].$error.datetimelocal"> {{resourceBundle.dateInvalid}}</span>
                                             <span class="errortxt" ng-show="eventDataEntryForm[psdeFormName].$error.min || eventDataEntryForm[psdeFormName].$error.max"> {{resourceBundle.invalidDateRangeMessage}}</span>

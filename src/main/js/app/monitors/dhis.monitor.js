@@ -4,14 +4,6 @@ define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils
         var offlineEventHandlers = [];
         var isDhisOnline;
 
-
-        var registerAlarmCallback = function(alarmName, callback) {
-            return function(alarm) {
-                if (alarm.name === alarmName)
-                    callback();
-            };
-        };
-
         var dhisConnectivityCheck = function() {
 
             var hasRoles = function(allowedRoles, userRoles) {
@@ -21,15 +13,6 @@ define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils
                 return _.any(userRoles, function(userAuth) {
                     return _.contains(allowedRoles, userAuth.name);
                 });
-            };
-
-            var getAttributeValue = function (attributeValues, attributeCode) {
-                var attr = _.find(attributeValues, {
-                    "attribute": {
-                        "code": attributeCode
-                    }
-                });
-                return attr ? attr.value : "";
             };
 
             var sendHeadRequest = function (url) {
@@ -92,14 +75,12 @@ define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils
             }, timeoutDelay);
         };
 
-        var createAlarms = function() {
-            if (chrome.alarms) {
-                $log.info("Registering dhis monitor alarm");
-                chrome.alarms.create("dhisConnectivityCheckAlarm", {
-                    periodInMinutes: properties.dhisPing.retryIntervalInMinutes
-                });
-                chrome.alarms.onAlarm.addListener(registerAlarmCallback("dhisConnectivityCheckAlarm", dhisConnectivityCheck));
-            }
+        var createAlarms = function () {
+            $log.info("Registering dhis monitor alarm");
+            chromeUtils.createAlarm("dhisConnectivityCheckAlarm", {
+                periodInMinutes: properties.dhisPing.retryIntervalInMinutes
+            });
+            chromeUtils.addAlarmListener("dhisConnectivityCheckAlarm", dhisConnectivityCheck);
         };
 
         var start = function() {
@@ -108,9 +89,7 @@ define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils
         };
 
         var stop = function() {
-            if (chrome.alarms) {
-                chrome.alarms.clear("dhisConnectivityCheckAlarm");
-            }
+            chromeUtils.clearAlarm("dhisConnectivityCheckAlarm");
         };
 
         var isOnline = function() {

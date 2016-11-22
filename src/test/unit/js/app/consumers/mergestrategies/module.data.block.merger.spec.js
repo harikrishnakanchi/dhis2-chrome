@@ -1,4 +1,4 @@
-define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'datasetRepository', 'dataService', 'approvalService', 'angularMocks', 'utils', 'moment', 'lodash', 'dataSyncFailureRepository', 'programEventRepository', 'eventService', 'aggregateDataValuesMerger', 'lineListEventsMerger'],
+define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', "dataSetRepository", 'dataService', 'approvalService', 'angularMocks', 'utils', 'moment', 'lodash', 'dataSyncFailureRepository', 'programEventRepository', 'eventService', 'aggregateDataValuesMerger', 'lineListEventsMerger'],
     function(ModuleDataBlockMerger, DataRepository, ApprovalDataRepository, DatasetRepository, DataService, ApprovalService, mocks, utils, moment, _, DataSyncFailureRepository, ProgramEventRepository, EventService, AggregateDataValuesMerger, LineListEventsMerger) {
         describe('moduleDataBlockMerger', function() {
             var q, scope, moduleDataBlockMerger,
@@ -129,8 +129,6 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                     approvedAtProjectLevelBy: null,
                     approvedAtProjectLevelAt: null,
                     approvedAtCoordinationLevel: false,
-                    approvedAtCoordinationLevelBy: null,
-                    approvedAtCoordinationLevelAt: null,
                     approvedAtAnyLevel: false
                 }, options);
             };
@@ -668,18 +666,15 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                             moduleDataBlock.approvedAtProjectLevelAt.toISOString());
                     });
 
-                    it('should upload approval data from Praxis to DHIS', function() {
+                    it('should upload approval data from Praxis to DHIS', function () {
                         moduleDataBlock = createMockModuleDataBlock({
-                            approvedAtCoordinationLevel: true,
-                            approvedAtCoordinationLevelBy: 'Kuala',
-                            approvedAtCoordinationLevelAt: someMomentInTime
+                            approvedAtCoordinationLevel: true
                         });
 
                         performUpload();
                         expect(approvalService.markAsApproved).toHaveBeenCalledWith(dataSetIds,
-                            [periodAndOrgUnit],
-                            moduleDataBlock.approvedAtCoordinationLevelBy,
-                            moduleDataBlock.approvedAtCoordinationLevelAt.toISOString());
+                            [moduleDataBlock.period], [moduleDataBlock.moduleId]
+                        );
                     });
 
                     it('should not re-upload completion and approval data to DHIS', function() {
@@ -689,9 +684,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                             approvedAtProjectLevel: true,
                             approvedAtProjectLevelBy: 'Kuala',
                             approvedAtProjectLevelAt: someMomentInTime,
-                            approvedAtCoordinationLevel: true,
-                            approvedAtCoordinationLevelBy: 'Kuala',
-                            approvedAtCoordinationLevelAt: someMomentInTime
+                            approvedAtCoordinationLevel: true
                         });
 
                         performUpload();
@@ -708,9 +701,7 @@ define(['moduleDataBlockMerger', 'dataRepository', 'approvalDataRepository', 'da
                             approvedAtProjectLevel: true,
                             approvedAtProjectLevelBy: 'Kuala',
                             approvedAtProjectLevelAt: someMomentInTime,
-                            approvedAtCoordinationLevel: true,
-                            approvedAtCoordinationLevelBy: 'Kuala',
-                            approvedAtCoordinationLevelAt: someMomentInTime
+                            approvedAtCoordinationLevel: true
                         });
 
                         performUpload();

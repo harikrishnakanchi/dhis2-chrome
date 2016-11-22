@@ -1,8 +1,9 @@
 define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURItoBlob"], function(d3, _, moment, CustomAttributes, SVGUtils, dataURItoBlob) {
-    return function($rootScope, $scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService, changeLogRepository) {
+    return function($rootScope, $scope, $q, $routeParams, datasetRepository, programRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService, changeLogRepository) {
 
         var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
         var REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY hh[.]mm A";
+        var DEFAULT_SERVICE_CODE = 'noServiceCode';
 
         var NVD3_CHART_OPTIONS = {
             DEFAULT: {
@@ -89,7 +90,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 else {
                     lastUpdatedTimeDetails = moment().format("DD-MMM-YYYY");
                 }
-                return [chart.dataSetCode, chart.title, lastUpdatedTimeDetails, 'png'].join('.');
+                return [chart.serviceCode, chart.title, lastUpdatedTimeDetails, 'png'].join('.');
             };
 
             SVGUtils.svgAsPngUri(svgElement, {}, function(uri) {
@@ -99,9 +100,9 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
         };
 
         var filterReportsForCurrentModule = function (allReports) {
-            var dataSetCodes = _.map($scope.datasets, 'code');
+            var serviceCodes = _.map($scope.services, 'serviceCode');
             return _.filter(allReports, function(report) {
-                return _.contains(dataSetCodes, report.dataSetCode);
+                return _.contains(serviceCodes, report.serviceCode);
             });
         };
 
@@ -163,29 +164,55 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 });
         };
 
-        var loadRelevantDatasets = function() {
+        var loadServicesForOrgUnit = function() {
 
-            var loadDataSetsForModules = function(orgUnits) {
-                return datasetRepository.findAllForOrgUnits(_.pluck(orgUnits, "id")).then(function(dataSets) {
+            var loadDataSetsForModules = function(data) {
+                var modulesAndOrigins = data.modules.concat(data.origins);
+
+                return datasetRepository.findAllForOrgUnits(modulesAndOrigins).then(function(dataSets) {
                     var filteredDataSets = _.reject(dataSets, function(ds) {
-                        return ds.isPopulationDataset || ds.isReferralDataset;
+                        return ds.isPopulationDataset || ds.isReferralDataset || ds.isLineListService;
                     });
                     
                     var translatedDataSets = translationsService.translate(filteredDataSets);
-                    $scope.datasets = _.sortByOrder(translatedDataSets, 'name');
+                    return _.merge({ dataSets: translatedDataSets }, data);
                 });
             };
 
             var getOrigins = function(modules) {
-                var moduleIds = _.pluck(modules, "id");
+                var moduleIds = _.map(modules, 'id');
                 return orgUnitRepository.findAllByParent(moduleIds, true).then(function(origins) {
-                    return modules.concat(origins);
+                    return {
+                        modules: modules,
+                        origins: origins
+                    };
                 });
+            };
+
+            var loadProgramForOrigins = function (data) {
+                var oneOriginId = _.get(_.first(data.origins), 'id');
+                return programRepository.getProgramForOrgUnit(oneOriginId).then(function (program) {
+                    var translatedProgram = translationsService.translate(program);
+                    $scope.services = _.compact(data.dataSets.concat([translatedProgram]));
+                });
+            };
+
+            var setDefaultServiceCode = function () {
+                return _.map($scope.services, function (service) {
+                    return service.serviceCode ? service : _.set(service, 'serviceCode', DEFAULT_SERVICE_CODE);
+                });
+            };
+
+            var sortServices = function () {
+                $scope.services = _.sortByOrder($scope.services, 'name');
             };
 
             return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id)
                 .then(getOrigins)
-                .then(loadDataSetsForModules);
+                .then(loadDataSetsForModules)
+                .then(loadProgramForOrigins)
+                .then(setDefaultServiceCode)
+                .then(sortServices);
         };
 
         var loadOrgUnit = function() {
@@ -239,19 +266,21 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
         };
 
         var init = function() {
-            $scope.loading = true;
+            $scope.startLoading();
 
             $scope.currentTab = 'weeklyReport';
-            $scope.selectedDataset = null;
+            $scope.selectedService = null;
 
             loadOrgUnit()
-                .then(loadRelevantDatasets)
+                .then(loadServicesForOrgUnit)
                 .then(loadChartsWithData)
                 .then(loadPivotTablesWithData)
                 .then(loadLastUpdatedForChartsAndReports)
                 .finally(function() {
-                    $scope.selectedDataset = _.find($scope.datasets, { isOriginDataset: false });
-                    $scope.loading = false;
+                    $scope.selectedService = _.find($scope.services, function (service) {
+                        return !service.isOriginDataset;
+                    });
+                    $scope.stopLoading();
                 });
         };
 

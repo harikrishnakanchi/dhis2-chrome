@@ -165,47 +165,6 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
             expect(chromeUtils.sendMessage.calls.argsFor(2)).toEqual(["productKeyExpired"]);
         });
 
-        it("should change dataValues status for specific period and orgUnit to 'FAILED_TO_SYNC' after maxretries", function() {
-            var periodAndOrgUnit = {
-                "period": "2016W01",
-                "orgUnit": "abcd"
-            };
-            var job = {
-                "id": 1,
-                "data": {
-                    "type": "uploadDataValues",
-                    "data": periodAndOrgUnit
-                },
-                "releases": properties.queue.maxretries + 1
-            };
-
-            queuePostProcessInterceptor.shouldRetry(job, {});
-
-            scope.$apply();
-
-            expect(dataRepository.setLocalStatus).toHaveBeenCalledWith(periodAndOrgUnit, "FAILED_TO_SYNC");
-        });
-
-        it("should not call dataRepository for other jobs except 'uploadDataValues'", function() {
-            var periodsAndOrgUnits = [{
-                "period": "2016W01",
-                "orgUnit": "abcd"
-            }];
-            var job = {
-                "id": 1,
-                "data": {
-                    "type": "NOTUploadDataValues",
-                    "data": periodsAndOrgUnits
-                },
-                "releases": properties.queue.maxretries + 1
-            };
-
-            queuePostProcessInterceptor.shouldRetry(job, {});
-            scope.$apply();
-
-            expect(dataRepository.setLocalStatus).not.toHaveBeenCalled();
-        });
-
         it("should mark the failed to sync module by period after maxretries", function() {
             var job = {
                 data: {

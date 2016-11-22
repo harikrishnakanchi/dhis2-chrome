@@ -3,7 +3,7 @@ module.exports = function(config) {
     config.set({
         basePath: '../../../',
         files: [
-            'main/js/lib/angular/angular.js',
+            'main/js/lib/angular/angular.min.js',
             'test/unit/test.main.js', {
                 pattern: 'test/unit/test.config.js',
                 included: false
@@ -23,7 +23,7 @@ module.exports = function(config) {
         ],
         exclude: [
             'main/js/lib/**/*spec.js',
-            'main/js/app/bg.bootstrap.js'
+            'main/js/app/chrome/chrome.bg.bootstrap.js'
         ],
         ngHtml2JsPreprocessor: {
             stripPrefix: 'main/'

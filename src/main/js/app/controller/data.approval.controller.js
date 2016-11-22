@@ -1,10 +1,10 @@
-define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransformer", "properties", "interpolate"], function(_, dataValuesMapper, orgUnitMapper, moment, datasetTransformer, properties, interpolate) {
+define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransformer", "properties", "interpolate", "dataElementUtils"], function(_, dataValuesMapper, orgUnitMapper, moment, datasetTransformer, properties, interpolate, dataElementUtils) {
     return function($scope, $routeParams, $q, $hustle, dataRepository, excludedDataElementsRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
         $timeout, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository) {
 
         $scope.rowTotal = {};
         var currentPeriod, currentPeriodAndOrgUnit;
-        var removeReferral = false;
+        var noReferralLocationConfigured = false;
 
         var resetForm = function() {
             $scope.isopen = {};
@@ -15,7 +15,6 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             $scope.approveError = false;
             $scope.syncError = false;
             $scope.excludedDataElements = {};
-            $scope.associatedProgramId = undefined;
             $scope.rowTotal = {};
         };
 
@@ -40,10 +39,6 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                 $scope.isDatasetOpen[id] = true;
             }
             return $scope.isDatasetOpen;
-        };
-
-        $scope.maxcolumns = function(headers) {
-            return _.last(headers).length;
         };
 
         $scope.getValue = function(dataValues, dataElementId, option, orgUnits) {
@@ -123,16 +118,16 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
 
         };
 
-        $scope.originSum = function(dataValues, dataSet, section) {
-            var sum = 0;
-            _.forEach(dataSet.organisationUnits, function(orgUnit) {
-                values = dataValues[orgUnit.id];
-                if (values && values[section.dataElements[0].id] && values[section.dataElements[0].id][section.categoryOptionComboIds[0]]) {
-                    var value = values[section.dataElements[0].id][section.categoryOptionComboIds[0]].value || "0";
-                    sum += parseInt(value);
-                }
+        $scope.originSum = function(dataValues, section) {
+            return _.sum($scope.originOrgUnits, function(orgUnit) {
+                var value = _.chain(dataValues)
+                    .get(orgUnit.id)
+                    .get(section.dataElements[0].id)
+                    .get(section.baseColumnConfiguration[0].categoryOptionComboId)
+                    .get('value', '0')
+                    .value();
+                return parseInt(value);
             });
-            return sum;
         };
 
         $scope.firstLevelApproval = function() {
@@ -211,14 +206,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                 .finally(scrollToTop);
         };
 
-        $scope.showTotalLabelForOriginDatasetSection = function (dataSet) {
-            var count = 0;
-            _.each(dataSet.organisationUnits, function (orgUnit) {
-                if ($scope.moduleAndOriginOrgUnitIds.indexOf(orgUnit.id) >= 0)
-                    count++;
-            });
-            return count > 1;
-        };
+        $scope.getDisplayName = dataElementUtils.getDisplayName;
 
         var initializeForm = function() {
             currentPeriod = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
@@ -226,19 +214,16 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                 "period": currentPeriod,
                 "orgUnit": $scope.selectedModule.id
             };
-            $scope.loading = true;
+            $scope.startLoading();
             $scope.isOfflineApproval = false;
 
             var loadAssociatedOrgUnitsAndPrograms = function() {
                 return orgUnitRepository.findAllByParent([$scope.selectedModule.id]).then(function(originOrgUnits) {
-                    $scope.moduleAndOriginOrgUnitIds = _.pluck(_.flattenDeep([$scope.selectedModule, originOrgUnits]), "id");
+                    $scope.moduleAndOriginOrgUnits = [$scope.selectedModule].concat(originOrgUnits);
+                    $scope.originOrgUnits = originOrgUnits;
                     return programRepository.getProgramForOrgUnit(originOrgUnits[0].id).then(function(program) {
-                        if (program) {
-                            $scope.associatedProgramId = program.id;
-                            $scope.isLineListModule = true;
-                        } else {
-                            $scope.isLineListModule = false;
-                        }
+                        $scope.program = program;
+                        $scope.isLineListModule = !!program;
                     });
                 });
             };
@@ -255,15 +240,15 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                         data = _.omit(data, function(o) {
                             return o.isDisabled !== false;
                         });
-                        removeReferral = _.keys(data).length === 0 ? true : false;
+                        noReferralLocationConfigured = _.keys(data).length === 0 ? true : false;
                         $scope.referralLocations = data;
                         return;
                     }
-                    removeReferral = true;
+                    noReferralLocationConfigured = true;
                 });
             };
 
-            var findallOrgUnits = function(orgUnits) {
+            var findAllOrgUnits = function(orgUnits) {
                 var orgUnitIds = _.pluck(orgUnits, "id");
                 return orgUnitRepository.findAll(orgUnitIds);
             };
@@ -272,16 +257,10 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                 return;
             return $q.all([loadAssociatedOrgUnitsAndPrograms(), loadExcludedDataElements(), loadRefferalLocations()]).then(function() {
 
-                var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnitIds)
+                var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnits)
                     .then(_.curryRight(datasetRepository.includeDataElements)($scope.excludedDataElements))
-                    .then(datasetRepository.includeCategoryOptionCombinations)
-                    .then(function(datasets) {
-                        var dataSetPromises = _.map(datasets, function (dataset) {
-                            return findallOrgUnits(dataset.organisationUnits).then(function (orgunits) {
-                                dataset.organisationUnits = orgunits;
-                                return dataset;
-                            });
-                        });
+                    .then(datasetRepository.includeColumnConfigurations)
+                    .then(function(dataSets) {
 
                         var translateDataSets = function (datasets) {
                             var partitionDatasets = _.partition(datasets, {
@@ -293,29 +272,28 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                             return translatedOtherDatasets.concat(translatedReferralDatasets);
                         };
 
-                        var setDatasets = function (translatedDatasets) {
-                            if (removeReferral)
-                                $scope.dataSets = _.filter(translatedDatasets, {
-                                    "isReferralDataset": false
-                                });
-                            else
-                                $scope.dataSets = translatedDatasets;
-                            return $scope.dataSets;
+                        var filterOutReferralLocations = function(dataSets) {
+                            return _.reject(dataSets, 'isReferralDataset');
                         };
 
-                        var setTotalsDisplayPreferencesforDataSetSections = function (dataSets) {
-                            _.each(dataSets, function (dataSet) {
+                        var setDatasets = function (translatedDatasets) {
+                            $scope.dataSets = translatedDatasets;
+                        };
+
+                        var setTotalsDisplayPreferencesforDataSetSections = function () {
+                            _.each($scope.dataSets, function (dataSet) {
                                 _.each(dataSet.sections, function (dataSetSection) {
-                                    dataSetSection.shouldDisplayRowTotals = dataSetSection.categoryOptionComboIds.length > 1;
+                                    dataSetSection.shouldDisplayRowTotals = dataSetSection.baseColumnConfiguration.length > 1;
                                     dataSetSection.shouldDisplayColumnTotals = (_.filter(dataSetSection.dataElements, {isIncluded: true}).length > 1 && !(dataSetSection.shouldHideTotals));
                                 });
                             });
                         };
-
-                        return $q.all(dataSetPromises)
-                            .then(translateDataSets)
-                            .then(setDatasets)
-                            .then(setTotalsDisplayPreferencesforDataSetSections);
+                        if (noReferralLocationConfigured) {
+                            dataSets = filterOutReferralLocations(dataSets);
+                        }
+                        dataSets = translateDataSets(dataSets);
+                        setDatasets(dataSets);
+                        setTotalsDisplayPreferencesforDataSetSections();
                     });
 
                 var loadModuleDataBlock = moduleDataBlockFactory.create($scope.selectedModule.id, currentPeriod).then(function(moduleDataBlock) {
@@ -332,9 +310,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
 
                 return $q.all([loadDataSetsPromise, loadModuleDataBlock]);
 
-            }).finally(function() {
-                $scope.loading = false;
-            });
+            }).finally($scope.stopLoading);
         };
 
         var init = function() {

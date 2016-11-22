@@ -2,7 +2,7 @@ define(['lodash'], function(_){
     return function($q, db, $rootScope, ngI18nResourceBundle, systemSettingRepository) {
         var TRANSLATABLE_ENTITIES = ["sections", "dataElements", "headers", "programStages", "programStageSections", "programStageDataElements", "dataElement", "optionSet", "options", "dataValues", "attribute"],
             TRANSLATABLE_PROPERTIES = ["name", "description", "formName", "shortName", "displayName"],
-            translations, categoryOptionCombosAndOptions, _locale, self = this;
+            translations, _locale, self = this;
 
         var refreshResourceBundle = function () {
             return ngI18nResourceBundle.get({ locale: _locale }).then(function (data) {
@@ -14,28 +14,11 @@ define(['lodash'], function(_){
             return systemSettingRepository.upsertLocale(_locale);
         };
 
-        var buildCategoryOptionComboHash = function () {
-            if(categoryOptionCombosAndOptions) return;
-
-            var store = db.objectStore('categoryOptionCombos');
-            return store.getAll().then(function(categoryOptionCombos) {
-                categoryOptionCombosAndOptions = _.reduce(categoryOptionCombos, function (result, categoryOptionCombo) {
-                    var categoryOptions = categoryOptionCombo.name.split(", ");
-                    result[categoryOptionCombo.id] = _.map(categoryOptions, function (categoryOption) {
-                        var originalCategoryOption = _.find(categoryOptionCombo.categoryOptions, { name: categoryOption});
-                        return _.get(originalCategoryOption, 'id');
-                    });
-                    return result;
-                }, {});
-            });
-        };
-
         this.setLocale = function(locale){
             _locale = locale;
 
             refreshResourceBundle();
             updateLocaleInSystemSettings();
-            buildCategoryOptionComboHash();
             
             var store = db.objectStore('translations');
             var query = db.queryBuilder().$index('by_locale').$eq(locale).compile();

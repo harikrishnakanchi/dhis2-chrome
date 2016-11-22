@@ -5,9 +5,9 @@ define(["properties"], function(properties) {
 
     return {
         "approvalMultipleL1": with_host("/api/completeDataSetRegistrations/multiple"),
-        "approvalMultipleL2": with_host("/api/dataApprovals/multiple"),
+        "approvalMultipleL2": with_host("/api/dataApprovals/approvals"),
         "approvalL1": with_host("/api/completeDataSetRegistrations"),
-        "approvalL2": with_host("/api/dataApprovals"),
+        "unApprovals": with_host("/api/dataApprovals/unapprovals"),
         "approvalStatus": with_host("/api/dataApprovals/status"),
         "dataValueSets": with_host("/api/dataValueSets"),
         "metadata": with_host("/api/metadata"),
@@ -16,7 +16,7 @@ define(["properties"], function(properties) {
         "systemSettings": with_host("/api/systemSettings"),
         "translations": with_host("/api/translations"),
         "orgUnitGroups": with_host("/api/organisationUnitGroups"),
-        "orgUnits": with_host("/api/organisationUnits.json"),
+        "orgUnits": with_host("/api/organisationUnits"),
         "users": with_host("/api/users"),
         "getProgramsAndStages": with_host("/api/programs.json?fields=id,name,displayName,shortName,programType,organisationUnits,attributeValues[:identifiable,value,attribute[:identifiable]],programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false"),
         "programs": with_host("/api/programs"),

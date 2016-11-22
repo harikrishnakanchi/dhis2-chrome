@@ -1,4 +1,4 @@
-define(["moment", "orgUnitMapper", "properties", "lodash"], function(moment, orgUnitMapper, properties, _) {
+define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate"], function(moment, orgUnitMapper, properties, _, interpolate) {
 
     return function($scope, $rootScope, $hustle, orgUnitRepository, $q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository, translationsService) {
 
@@ -52,7 +52,7 @@ define(["moment", "orgUnitMapper", "properties", "lodash"], function(moment, org
 
             return orgUnitRepository.upsert([dhisProject])
                 .then(function(data) {
-                    return publishMessage(data, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + data[0].name);
+                    return publishMessage(data, "upsertOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: data[0].name }));
                 })
                 .then(onSuccess, onError);
         };
@@ -112,17 +112,17 @@ define(["moment", "orgUnitMapper", "properties", "lodash"], function(moment, org
                 });
             };
 
+            $scope.startLoading();
             return saveToDbAndPublishMessage(dhisProject)
                 .then(getModulesInProject)
-                .then(createOrgUnitGroups);
+                .then(createOrgUnitGroups)
+                .finally($scope.stopLoading);
         };
 
         $scope.save = function(newOrgUnit, parentOrgUnit) {
-            $scope.loading = true;
+            $scope.startLoading();
             var dhisProject = orgUnitMapper.mapToProjectForDhis(newOrgUnit, parentOrgUnit);
-            saveToDbAndPublishMessage(dhisProject).finally(function() {
-                $scope.loading = false;
-            });
+            saveToDbAndPublishMessage(dhisProject).finally($scope.stopLoading);
         };
 
         var prepareNewForm = function() {

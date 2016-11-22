@@ -1,5 +1,5 @@
 define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties', 'moment', 'downloadHistoricalDataConsumer', 'dataService',
-        'userPreferenceRepository', 'orgUnitRepository', 'datasetRepository', 'changeLogRepository', 'dataRepository', 'programEventRepository','eventService','customAttributes'],
+        'userPreferenceRepository', 'orgUnitRepository', 'dataSetRepository', 'changeLogRepository', 'dataRepository', 'programEventRepository','eventService','customAttributes'],
     function (utils, timecop, mocks, _, dateUtils, properties, moment, DownloadHistoricalDataConsumer, DataService, UserPreferenceRepository,
               OrgUnitRepository, DatasetRepository, ChangeLogRepository, DataRepository, ProgramEventRepository, EventService, CustomAttributes) {
         describe('DownloadHistoricalDataConsumer', function () {
@@ -105,8 +105,7 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                 downloadHistoricalDataConsumer.run();
                 scope.$apply();
 
-                var orgUnitIds = [mockModuleA.id].concat(_.map(mockOrigins, 'id'));
-                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(orgUnitIds);
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith([mockModuleA].concat(mockOrigins));
             });
 
             it('should continue download of historical data even if one module fails', function() {

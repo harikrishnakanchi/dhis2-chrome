@@ -313,8 +313,9 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
 
             scope.openInNewMode('Country');
+            timeout.flush();
 
-            expect(scope.templateUrl.split('?')[0]).toEqual('templates/partials/country-form.html');
+            expect(scope.templateUrl).toEqual('templates/partials/country-form.html');
             expect(scope.isNewMode).toEqual(true);
         });
 
@@ -322,8 +323,9 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
 
             scope.openInViewMode('Module');
+            timeout.flush();
 
-            expect(scope.templateUrl.split('?')[0]).toEqual('templates/partials/module-form.html');
+            expect(scope.templateUrl).toEqual('templates/partials/module-form.html');
             expect(scope.isNewMode).toEqual(false);
         });
 

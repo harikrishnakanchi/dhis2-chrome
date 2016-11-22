@@ -64,7 +64,7 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
         };
 
         var init = function() {
-            var userHasNotSelectedProject = _.isUndefined($rootScope.currentUser.selectedProject),
+            var userHasNotSelectedProject = _.isUndefined(_.get($rootScope.currentUser, 'selectedProject')),
                 productKeyIsGlobal = $rootScope.productKeyLevel == "global";
             userIsSuperAdmin = $rootScope.currentUser.userCredentials.username === "superadmin";
             userIsProjectAdmin = $rootScope.currentUser.userCredentials.username === "projectadmin";
@@ -160,13 +160,21 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
         };
 
         $scope.openInNewMode = function(type) {
-            $scope.templateUrl = templateUrlMap[type] + '?' + moment().format("X");
-            $scope.isNewMode = true;
+            $scope.templateUrl = undefined;
+            // to reload controller for the same template
+            $timeout(function () {
+                $scope.templateUrl = templateUrlMap[type];
+                $scope.isNewMode = true;
+            });
         };
 
         $scope.openInViewMode = function(type) {
-            $scope.templateUrl = templateUrlMap[type] + '?' + moment().format("X");
-            $scope.isNewMode = false;
+            $scope.templateUrl = undefined;
+            // to reload controller for the same template
+            $timeout(function () {
+                $scope.templateUrl = templateUrlMap[type];
+                $scope.isNewMode = false;
+            });
         };
 
         init();

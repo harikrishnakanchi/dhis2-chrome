@@ -1,18 +1,23 @@
 define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "timecop", "dhisId",
-        "orgUnitRepository", "datasetRepository", "originOrgunitCreator", "excludedDataElementsRepository", "programRepository", "excludedLineListOptionsRepository", "translationsService"
+        "orgUnitRepository", "dataSetRepository", "originOrgunitCreator", "excludedDataElementsRepository", "programRepository", "excludedLineListOptionsRepository", "translationsService"
     ],
     function(LineListModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, timecop, dhisId,
         OrgUnitRepository, DatasetRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, ProgramRepository, ExcludedLineListOptionsRepository, TranslationsService) {
 
         describe("line list module controller", function() {
-            var scope, lineListModuleController, mockOrgStore, db, q, datasets, sections, dataElements, sectionsdata,
+            var scope, rootScope, lineListModuleController, mockOrgStore, db, q, datasets, sections, dataElements, sectionsdata,
                 dataElementsdata, orgUnitRepository, hustle, excludedDataElementsRepository, excludedLineListOptionsRepository,
                 fakeModal, allPrograms, programRepository, datasetRepository, originOrgunitCreator, translationsService;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle) {
+                rootScope = $rootScope;
                 scope = $rootScope.$new();
+
                 q = $q;
+
+                rootScope.startLoading = jasmine.createSpy('startLoading');
+                rootScope.stopLoading = jasmine.createSpy('stopLoading');
 
                 hustle = $hustle;
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
@@ -51,6 +56,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, [{
                     "id": "originOrgUnit"
                 }]));
+                spyOn(orgUnitRepository, "associateDataSetsToOrgUnits").and.returnValue(utils.getPromise(q, {}));
 
                 translationsService = new TranslationsService();
                 spyOn(translationsService, "translate").and.returnValue([]);
@@ -70,7 +76,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 }];
 
                 datasetRepository = new DatasetRepository();
-                spyOn(datasetRepository, "associateOrgUnits").and.returnValue(utils.getPromise(q, {}));
                 spyOn(datasetRepository, "getAll").and.returnValue(utils.getPromise(q, allDatasets));
 
                 excludedLineListOptionsRepository = new ExcludedLineListOptionsRepository();
@@ -115,12 +120,11 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 scope.locale = "en";
 
                 scope.resourceBundle = {
-                    "disableOrgUnitDesc": "disable organisation unit: ",
-                    "upsertOrgUnitDesc": "save organisation unit: ",
-                    "associateOrgUnitToDatasetDesc": "associate datasets for ",
-                    "uploadSystemSettingDesc": "upload sys settings for ",
-                    "uploadProgramDesc": "associate selected program to ",
-                    "uploadExcludedOptionsDesc": "upload excluded options for module "
+                    "upsertOrgUnitDesc": "save organisation unit",
+                    "associateOrgUnitToDatasetDesc": "associate datasets for {{orgunit_name}}",
+                    "uploadSystemSettingDesc": "upload sys settings for {{module_name}}",
+                    "uploadProgramDesc": "associate selected program to {{orgunit_name}}",
+                    "uploadExcludedOptionsDesc": "upload excluded options for module"
                 };
 
                 scope.isNewMode = true;
@@ -133,7 +137,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             });
 
             var createLineListModuleController = function () {
-                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService, excludedLineListOptionsRepository);
+                lineListModuleController = new LineListModuleController(scope, rootScope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService, excludedLineListOptionsRepository);
             };
 
             it("should save sorted list of all programs", function() {
@@ -321,7 +325,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     data: newLineListModule,
                     type: "upsertOrgUnit",
                     locale: "en",
-                    desc: "save organisation unit: Module2"
+                    desc: "save organisation unit"
                 }, "dataValues");
 
                 expect(scope.saveFailure).toBe(false);
@@ -470,7 +474,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         "data": enrichedModule.id,
                         "type": "uploadExcludedOptions",
                         "locale": "en",
-                        "desc": "upload excluded options for module Module2"
+                        "desc": scope.resourceBundle.uploadExcludedOptionsDesc
                     }, "dataValues");
                 });
 
@@ -497,7 +501,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         "data": scope.module.id,
                         "type": "uploadExcludedOptions",
                         "locale": "en",
-                        "desc": "upload excluded options for module Module2"
+                        "desc": scope.resourceBundle.uploadExcludedOptionsDesc
                     }, "dataValues");
                 });
 
@@ -985,7 +989,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     data: enrichedLineListModule,
                     type: "upsertOrgUnit",
                     locale: "en",
-                    desc: "save organisation unit: new name"
+                    desc: "save organisation unit"
                 }, "dataValues");
             });
 
@@ -1330,7 +1334,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "data": originOrgUnit,
                     "type": "upsertOrgUnit",
                     "locale": "en",
-                    "desc": "save organisation unit: origin org unit"
+                    "desc": "save organisation unit"
                 }, "dataValues"]);
             });
 
@@ -1396,7 +1400,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 scope.$apply();
 
                 expect(programRepository.associateOrgUnits).toHaveBeenCalledWith(program, originOrgUnit);
-                expect(datasetRepository.associateOrgUnits).toHaveBeenCalledWith(["Ds1", "OrgDs1"], originOrgUnit);
+                expect(orgUnitRepository.associateDataSetsToOrgUnits).toHaveBeenCalledWith(["Ds1", "OrgDs1"], originOrgUnit);
                 expect(hustle.publish.calls.argsFor(3)).toEqual([{
                     data: messageData,
                     type: "associateOrgunitToProgram",

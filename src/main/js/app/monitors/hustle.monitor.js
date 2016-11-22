@@ -12,21 +12,12 @@ define(["properties", "chromeUtils"], function(properties, chromeUtils) {
             });
         };
 
-        var registerCallback = function(alarmName, callback) {
-            return function(alarm) {
-                if (alarm.name === alarmName)
-                    callback();
-            };
-        };
-
-        var setupAlarms = function() {
-            if (chrome.alarms) {
-                $log.info("Registering checkHustleQueueCountAlarm");
-                chrome.alarms.create('checkHustleQueueCountAlarm', {
-                    periodInMinutes: properties.queue.checkMsgcountDelayInMinutes
-                });
-                chrome.alarms.onAlarm.addListener(registerCallback("checkHustleQueueCountAlarm", checkHustleQueueCount));
-            }
+        var setupAlarms = function () {
+            $log.info("Registering checkHustleQueueCountAlarm");
+            chromeUtils.createAlarm('checkHustleQueueCountAlarm', {
+                periodInMinutes: properties.queue.checkMsgcountDelayInMinutes
+            });
+            chromeUtils.addAlarmListener("checkHustleQueueCountAlarm", checkHustleQueueCount);
         };
 
         var start = function() {

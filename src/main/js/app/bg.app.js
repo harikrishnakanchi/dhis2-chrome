@@ -52,13 +52,6 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
 
                     $hustle.registerInterceptor(queuePostProcessInterceptor);
 
-                    var registerCallback = function(alarmName, callback) {
-                        return function(alarm) {
-                            if (alarm.name === alarmName)
-                                callback();
-                        };
-                    };
-
                     var metadataSync = function() {
                         if (!dhisMonitor.isOnline())
                             return;
@@ -97,15 +90,15 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     };
 
                     var setupAlarms = function() {
-                        chrome.alarms.create('metadataSyncAlarm', {
+                        chromeUtils.createAlarm('metadataSyncAlarm', {
                             periodInMinutes: properties.metadata.sync.intervalInMinutes
                         });
-                        chrome.alarms.onAlarm.addListener(registerCallback("metadataSyncAlarm", metadataSync));
+                        chromeUtils.addAlarmListener("metadataSyncAlarm", metadataSync);
 
-                        chrome.alarms.create('projectDataSyncAlarm', {
+                        chromeUtils.createAlarm('projectDataSyncAlarm', {
                             periodInMinutes: properties.projectDataSync.intervalInMinutes
                         });
-                        chrome.alarms.onAlarm.addListener(registerCallback("projectDataSyncAlarm", projectDataSync));
+                        chromeUtils.addAlarmListener("projectDataSyncAlarm", projectDataSync);
                     };
 
                     hustleMonitor.start();

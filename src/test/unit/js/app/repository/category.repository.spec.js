@@ -1,4 +1,4 @@
-define(['categoryRepository', 'angularMocks', 'utils'], function (CategoryRepository, mocks, utils) {
+define(['categoryRepository', 'angularMocks', 'utils', 'customAttributes'], function (CategoryRepository, mocks, utils, CustomAttributes) {
     describe('categoryRepository', function () {
         var categoryRepository, q, scope, mockStore,
             mockCategoryOptions, mockCategories, mockCategoryCombos, mockCategoryOptionCombos;
@@ -9,23 +9,37 @@ define(['categoryRepository', 'angularMocks', 'utils'], function (CategoryReposi
             var mockDB = utils.getMockDB(q);
             mockStore = mockDB.objectStore;
 
+            mockCategoryOptions = [{
+                id: 'someCategoryOptionId',
+                name: 'updatedCategoryName',
+                shortName: 'shortName'
+            }];
+
+            spyOn(CustomAttributes, 'getBooleanAttributeValue');
+
             categoryRepository = new CategoryRepository(mockDB.db, q);
         }));
 
         describe('categoryOptions', function () {
             beforeEach(function () {
-                mockCategoryOptions = [{id: 'someCategoryOptionId'}];
+                mockStore.getAll.and.returnValue(utils.getPromise(q, mockCategoryOptions));
             });
 
             it('should get all category options', function () {
-                var actualCategoryOptions;
+                categoryRepository.getAllCategoryOptions().then(function (categoryOptions) {
+                    expect(categoryOptions).toEqual(mockCategoryOptions);
+                });
+                scope.$apply();
+            });
+
+            it('should set excludeFromTotal property from custom attributes', function () {
+                CustomAttributes.getBooleanAttributeValue.and.returnValue('someBooleanValue');
                 mockStore.getAll.and.returnValue(utils.getPromise(q, mockCategoryOptions));
 
                 categoryRepository.getAllCategoryOptions().then(function (categoryOptions) {
-                    actualCategoryOptions = categoryOptions;
+                    expect(_.first(categoryOptions).excludeFromTotal).toEqual('someBooleanValue');
                 });
                 scope.$apply();
-                expect(actualCategoryOptions).toEqual(mockCategoryOptions);
             });
         });
 
@@ -50,7 +64,7 @@ define(['categoryRepository', 'angularMocks', 'utils'], function (CategoryReposi
                 var actualCategories, expectedCategories;
                 expectedCategories = [{ id: 'someCategoryId', categoryOptions: mockCategoryOptions }];
 
-                mockStore.getAll.and.returnValues(utils.getPromise(q, mockCategoryOptions), utils.getPromise(q, mockCategories));
+                mockStore.getAll.and.returnValues(utils.getPromise(q, mockCategories), utils.getPromise(q, mockCategoryOptions));
 
                 categoryRepository.getAllCategories().then(function (categories) {
                     actualCategories = categories;
@@ -81,12 +95,6 @@ define(['categoryRepository', 'angularMocks', 'utils'], function (CategoryReposi
 
         describe('categoryOptionCombos', function () {
             beforeEach(function () {
-                mockCategoryOptions = [{
-                    id: 'someCategoryOptionId',
-                    name: 'updatedCategoryName',
-                    shortName: 'shortName'
-                }];
-
                 mockCategoryOptionCombos = [{
                     id: 'someCategoryOptionComboId',
                     categoryOptions: [{
@@ -100,7 +108,7 @@ define(['categoryRepository', 'angularMocks', 'utils'], function (CategoryReposi
                 var actualCategoryOptionCombos, expectedCategoryOptionCombos;
                 expectedCategoryOptionCombos = [{ id: 'someCategoryOptionComboId', categoryOptions: mockCategoryOptions }];
 
-                mockStore.getAll.and.returnValues(utils.getPromise(q, mockCategoryOptions), utils.getPromise(q, mockCategoryOptionCombos));
+                mockStore.getAll.and.returnValues(utils.getPromise(q, mockCategoryOptionCombos), utils.getPromise(q, mockCategoryOptions));
 
                 categoryRepository.getAllCategoryOptionCombos().then(function (categoryOptionCombos) {
                     actualCategoryOptionCombos = categoryOptionCombos;
@@ -108,6 +116,27 @@ define(['categoryRepository', 'angularMocks', 'utils'], function (CategoryReposi
 
                 scope.$apply();
                 expect(actualCategoryOptionCombos).toEqual(expectedCategoryOptionCombos);
+            });
+        });
+
+        describe('enrichWithCategoryOptions', function () {
+            beforeEach(function () {
+                mockStore.getAll.and.returnValue(utils.getPromise(q, mockCategoryOptions));
+            });
+
+            it('should enrich the collection with categoryOptions', function () {
+                var item = {
+                    categoryOptions: [{
+                        id: 'someCategoryOptionId',
+                        name: 'oldCategoryOptionName'
+                    }]
+                };
+
+                categoryRepository.enrichWithCategoryOptions([item]).then(function (enrichedItems) {
+                    expect(_.first(enrichedItems).categoryOptions).toEqual(mockCategoryOptions);
+                });
+
+                scope.$apply();
             });
         });
     });

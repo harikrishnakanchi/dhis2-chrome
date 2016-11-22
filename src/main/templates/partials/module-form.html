@@ -1,7 +1,4 @@
 <div class="panel panel-default" ng-controller="aggregateModuleController">
-    <div class="loading" ng-show="loading">
-        <img src="img/ajax-loader.gif" class="spinner" />
-    </div>
     <div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorModule }}</div>
     <div class="panel-heading">
         <h3 class="panel-title">{{ resourceBundle.moduleDetailsLabel }}</h3>
@@ -13,10 +10,11 @@
                     <li class="form-group">
                         <label for="moduleName" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.moduleNameLabel }}</label>
                         <div class="col-sm-4">
-                            <input type="text" class="form-control" name="moduleName{{$index}}" id="moduleName{{$index}}" placeholder="{{ resourceBundle.moduleNameLabel }}" ng-model="module.name" not-in="otherModules" ng-disabled="isDisabled==true" required>
+                            <input type="text" class="form-control" name="moduleName{{$index}}" id="moduleName{{$index}}" placeholder="{{ resourceBundle.moduleNameLabel }}" ng-maxlength="50" ng-model="module.name" not-in="otherModules" ng-disabled="isDisabled==true" required>
                             <div ng-show="form.moduleName{{$index}}.$dirty &amp;&amp; form.moduleName{{$index}}.$invalid">
                                 <span class="errortxt" ng-show="form.moduleName{{$index}}.$error.required">{{resourceBundle.nameValidation}}</span>
                                 <span class="errortxt" ng-show="form.moduleName{{$index}}.$error.isWithin">{{resourceBundle.moduleNameAlreadyExists}}</span>
+                                <span class="errortxt" ng-show="form.moduleName{{$index}}.$error.maxlength">{{resourceBundle.nameLengthValidation}}</span>
                             </div>
                         </div>
                     </li>
@@ -30,6 +28,20 @@
                             </div>
                         </div>
                     </li>
+                    <li class="form-group add-service-checkbox">
+                        <div class="col-sm-4 col-md-4">
+                            <input type="checkbox" ng-model="associateReferralLocation"/>
+                        </div>
+                        <label class="col-sm-6 col-md-6 control-label">{{ resourceBundle.referralLocationCheckboxLabel }}</label>
+
+                    </li>
+                    <li class="form-group add-service-checkbox">
+                        <div class="col-sm-4 col-md-4">
+                            <input type="checkbox" ng-model="associateOriginDataSet"/>
+                        </div>
+                        <label class="col-sm-6 col-md-6 control-label">{{ resourceBundle.geographicOriginCheckboxLabel }}</label>
+
+                    </li>
                     <li class="form-group add-service-label">
                         <label for="moduleName" class="col-sm-4 col-md-4 control-label required" ng-show="isNewMode">{{ resourceBundle.addServiceLabel }}</label>
                         <label for="moduleName" class="col-sm-4 col-md-4 control-label" ng-hide="isNewMode">{{ resourceBundle.servicesLabel }}</label>
@@ -42,7 +54,7 @@
                                         <span class="glyphicon glyphicon-info-sign"></span>
                                         <span>{{resourceBundle.selectDatasets}}</span>
                                     </div>
-                                    <multiselect resource-bundle="resourceBundle" left-list="nonAssociatedDataSets" name="name" ng-model="associatedDatasets" on-right-item-select="selectDataSet(item)" on-move-left="discardDataSet(module, items)" disabled="!isNewMode"
+                                    <multiselect resource-bundle="resourceBundle" left-list="nonAssociatedDataSets" name="name" ng-model="associatedDatasets" on-right-item-select="selectDataSet(item)" on-move-left="discardDataSet(module, items)"
                                                  select-first-item="true"></multiselect>
                                 </div>
                                 <div class="details" ng-show="selectedDataset.sections.length > 0">
@@ -84,9 +96,9 @@
                                                                     <input type="checkbox" ng-disabled="isDisabled || element.isMandatory" ng-model="element.isIncluded" ng-change="changeSubSectionSelection(subSection, section)">
                                                                     <a class="changeColor"
                                                                        description-popup
-                                                                       dp-title="{{ element.formName}}"
+                                                                       dp-title="{{ getDisplayName(element) }}"
                                                                        dp-desc="{{ element.description }}">
-                                                                        {{ element.formName}}
+                                                                        {{ getDisplayName(element) }}
                                                                     </a>
                                                                 </label>
                                                             </li>
@@ -98,9 +110,9 @@
                                                         <input type="checkbox" ng-disabled="isDisabled || element.isMandatory" ng-model="element.isIncluded" ng-change="changeSectionSelection(section)">
                                                         <a class="changeColor"
                                                            description-popup
-                                                           dp-title="{{ element.formName}}"
+                                                           dp-title="{{ getDisplayName(element) }}"
                                                            dp-desc="{{ element.description }}">
-                                                        {{ element.formName}}
+                                                        {{ getDisplayName(element) }}
                                                         </a>
                                                     </label>
                                                 </li>

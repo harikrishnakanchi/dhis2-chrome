@@ -14,6 +14,8 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome", "us
             spyOn(chromeUtils, "sendMessage").and.callFake(mockChrome.sendMessage);
             spyOn(chromeUtils, "addListener").and.callFake(mockChrome.addListener);
             spyOn(chromeUtils, "getPraxisVersion").and.returnValue("5.1");
+            spyOn(chromeUtils, 'createAlarm');
+            spyOn(chromeUtils, 'addAlarmListener');
             rootScope.praxisUid = "ade3fab1ab0";
             userPreferenceRepository = new UserPreferenceRepository();
             var userPreferences = {

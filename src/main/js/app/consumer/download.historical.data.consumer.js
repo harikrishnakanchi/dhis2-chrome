@@ -22,15 +22,15 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], func
         var getAllOriginsOfModules = function (modules) {
             return $q.all(_.map(modules, function (module) {
                 return orgUnitRepository.findAllByParent(module.id).then(function (origins) {
-                    return _.set(module, 'originIds', _.map(origins, 'id'));
+                    return _.set(module, 'origins', origins);
                 });
             }));
         };
 
         var getAllDataSetsForAllOrgUnits = function (modules) {
             return $q.all(_.map(modules, function (module) {
-                var moduleAndOriginIds = [module.id].concat(module.originIds);
-                return datasetRepository.findAllForOrgUnits(moduleAndOriginIds).then(function (dataSets) {
+                var moduleAndOrigins = [module].concat(module.origins);
+                return datasetRepository.findAllForOrgUnits(moduleAndOrigins).then(function (dataSets) {
                     return _.set(module, 'dataSetIds', _.map(dataSets, 'id'));
                 });
             }));
@@ -59,7 +59,7 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], func
                         return eventService.getEvents(module.id, periodRange).then(programEventRepository.upsert);
                     };
 
-                    var isLinelistModule = customAttributes.getBooleanAttributeValue(module.attributeValues, 'isLineListService');
+                    var isLinelistModule = customAttributes.getBooleanAttributeValue(module.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE);
                     return isLinelistModule ? downloadLineListEvents() : downloadModuleDataValues();
                 };
 
