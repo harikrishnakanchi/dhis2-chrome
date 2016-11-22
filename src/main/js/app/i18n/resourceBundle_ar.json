@@ -246,6 +246,7 @@
     "noCasesFound": "لم يتم العثور على حالات",
     "noCasesToSummarize": "لا يوجد حالات مقدمة للتلخيص",
     "reportsLabel": "تقارير",
+    "reportLabel": "تقرير",
     "observerDataLabel": "البيانات المجمعة",
     "warTemplateLabel": "حرب",
     "emergencyTemplateLabel": "حالة طوارئ",
@@ -329,5 +330,6 @@
     "praxisDownloadMessage": "One of the reasons might be because Praxis downloads only last 52 weeks of data. Any data collected before 52 weeks will not be available on this page. However this data is available for use in the reports and chart sections.",
     "contactSupport": "Contact {{supportEmail}} for any questions.",
     "referralLocationCheckboxLabel": "عرض موقع إشارة للمستخدم إدخال البيانات",
-    "geographicOriginCheckboxLabel": "عرض الأصل الجغرافي للمستخدم إدخال البيانات"
+    "geographicOriginCheckboxLabel": "عرض الأصل الجغرافي للمستخدم إدخال البيانات",
+    "updated": "تحديث"
 }

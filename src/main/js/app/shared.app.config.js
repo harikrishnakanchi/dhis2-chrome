@@ -79,6 +79,7 @@ require.config({
         "headerController": "app/controller/header.controller",
         "footerController": "app/controller/footer.controller",
         "exportRawDataController": "app/controller/export.raw.data.controller",
+        "opunitReportController": "app/controller/opunit.report.controller",
 
         //Services
         "services": "app/service/services",

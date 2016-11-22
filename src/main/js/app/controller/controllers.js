@@ -2,13 +2,13 @@ define(['reportsController', 'moduleWeekSelectorController', 'headerController',
         'lineListModuleController', 'projectController', 'countryController', 'confirmDialogController', 'projectUserController',
         'aggregateDataEntryController', 'lineListDataEntryController', 'patientOriginController', 'productKeyController',
         'lineListSummaryController', 'dataApprovalController', 'dashboardController', 'lineListOfflineApprovalController', 'appCloneController', 'downloadDataController', 'notificationDialogController', 'selectLanguageController',
-        'referralLocationsController', 'notificationsController', 'selectProjectPreferenceController', 'projectReportController', 'footerController', 'exportRawDataController', 'alertDialogController'
+        'referralLocationsController', 'notificationsController', 'selectProjectPreferenceController', 'projectReportController', 'footerController', 'exportRawDataController', 'alertDialogController', 'opunitReportController'
     ],
     function(reportsController, moduleWeekSelectorController, headerController, orgUnitContoller, loginController, opUnitController, aggregateModuleController,
         lineListModuleController, projectController, countryController, confirmDialogController, projectUserController,
         aggregateDataEntryController, lineListDataEntryController, patientOriginController, productKeyController,
         lineListSummaryController, dataApprovalController, dashboardController, lineListOfflineApprovalController, appCloneController, downloadDataController, notificationDialogController, selectLanguageController,
-        referralLocationsController, notificationsController, selectProjectPreferenceController, projectReportController, footerController, exportRawDataController, alertDialogController) {
+        referralLocationsController, notificationsController, selectProjectPreferenceController, projectReportController, footerController, exportRawDataController, alertDialogController, opunitReportController) {
 
         var init = function(app) {
             app.controller('reportsController', ['$rootScope', '$scope', '$q', '$routeParams', 'dataSetRepository', 'programRepository', 'orgUnitRepository', 'chartRepository', 'pivotTableRepository', 'translationsService', 'filesystemService','changeLogRepository', reportsController]);
@@ -42,6 +42,7 @@ define(['reportsController', 'moduleWeekSelectorController', 'headerController',
             app.controller('footerController', ['$rootScope', '$scope','systemSettingRepository', footerController]);
             app.controller('exportRawDataController', ['$scope', '$q', 'dataSetRepository', 'excludedDataElementsRepository', 'orgUnitRepository', 'referralLocationsRepository', 'moduleDataBlockFactory', 'filesystemService', 'translationsService', 'programRepository', 'programEventRepository', 'excludedLineListOptionsRepository', exportRawDataController]);
             app.controller('alertDialogController', ['$scope', '$modalInstance', alertDialogController]);
+            app.controller('opunitReportController', ['$rootScope', '$q', '$scope', '$routeParams', 'orgUnitRepository','changeLogRepository', opunitReportController]);
         };
         return {
             init: init

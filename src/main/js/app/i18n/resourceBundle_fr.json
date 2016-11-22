@@ -246,6 +246,7 @@
     "noCasesFound": "Pas de Cas trouvés",
     "noCasesToSummarize": "Pas de Cas envoyés",
     "reportsLabel": "Rapports",
+    "reportLabel": "Rapport",
     "observerDataLabel": "Données aggrégées",
     "warTemplateLabel": "Guerre",
     "emergencyTemplateLabel": "Urgence",
@@ -329,5 +330,6 @@
     "praxisDownloadMessage": "Une des raisons peut être que Praxis ne télécharge que les 52 dernières semaines de données. Toute donnée collectée avant ces 52 semaines ne sera pas disponible sur cette page. Cependant, ces données sont disponibles dans la section des rapports et graphiques.",
     "contactSupport": "Contactez {{supportEmail}} pour toute question",
     "referralLocationCheckboxLabel": "Afficher l'emplacement de référence pour l'utilisateur de saisie de données",
-    "geographicOriginCheckboxLabel": "Afficher origine géographique pour l'utilisateur de saisie de données"
+    "geographicOriginCheckboxLabel": "Afficher origine géographique pour l'utilisateur de saisie de données",
+    "updated": "Actualisé"
 }

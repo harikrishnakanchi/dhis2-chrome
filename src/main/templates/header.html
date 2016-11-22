@@ -97,7 +97,7 @@
                     </li>
                 </ul>
             </li>
-            <li role="presentation" ng-class="{ active: isActive('\/reports') || isActive('\/projectReport')}"
+            <li role="presentation" ng-class="{ active: isActive('\/reports') || isActive('\/projectReport') || isActive('\/opUnitReport') }"
                 class="dropdown praxis-dropdown-menu"
                 ng-if="hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver', 'Data entry user']) &amp;&amp; allUserModules.length > 0"
                 dropdown>
@@ -116,6 +116,10 @@
                                ng-class="layoutDirection.direction == 'rtl' ? 'fa-caret-left' : 'fa-caret-right'"></i>
                         </a>
                         <ul class="dropdown-menu">
+                            <li>
+                                <a class="submenu-item" href="#/opunitReport/{{ opUnitWithModule.opUnitId }}">{{ opUnitWithModule.opUnitName }} {{ resourceBundle.reportLabel }}</a>
+                            </li>
+                            <li class="divider"></li>
                             <li ng-repeat="module in opUnitWithModule.modules | orderBy:'name'">
                                 <a class="submenu-item" ng-href="#/reports/{{ module.id }}" tabindex="-1">{{ module.name
                                     }}</a>

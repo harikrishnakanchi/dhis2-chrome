@@ -53,6 +53,7 @@ define(["lodash", "chromeUtils"], function(_, chromeUtils) {
             return orgUnitRepository.getAllModulesInOrgUnits(opUnit.id, "Module").then(function(modules) {
                 return {
                     'opUnitName': opUnit.name,
+                    'opUnitId': opUnit.id,
                     'modules': modules
                 };
             });
