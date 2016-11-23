@@ -116,13 +116,13 @@
                                ng-class="layoutDirection.direction == 'rtl' ? 'fa-caret-left' : 'fa-caret-right'"></i>
                         </a>
                         <ul class="dropdown-menu">
-                            <li>
-                                <a class="submenu-item" href="#/opunitReport/{{ opUnitWithModule.opUnitId }}">{{ opUnitWithModule.opUnitName }} {{ resourceBundle.reportLabel }}</a>
-                            </li>
-                            <li class="divider"></li>
                             <li ng-repeat="module in opUnitWithModule.modules | orderBy:'name'">
                                 <a class="submenu-item" ng-href="#/reports/{{ module.id }}" tabindex="-1">{{ module.name
                                     }}</a>
+                            </li>
+                            <li class="divider"></li>
+                            <li>
+                                <a class="submenu-item" href="#/opunitReport/{{ opUnitWithModule.opUnitId }}">{{ opUnitWithModule.opUnitName }} {{ resourceBundle.reportLabel }}</a>
                             </li>
                         </ul>
                     </li>
