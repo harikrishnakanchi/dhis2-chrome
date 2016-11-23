@@ -23,14 +23,14 @@ define(['lodash'], function(_) {
         return getAttributeValue(attributeValues, attributeCode) == "true";
     };
 
-    var getAttributeValue = function(attributeValues, attributeCode) {
+    var getAttributeValue = function(attributeValues, attributeCode, defaultValue) {
         var correspondingAttributeValue = _.find(attributeValues, {
             attribute: {
                 code: attributeCode
             }
         });
 
-        return correspondingAttributeValue && correspondingAttributeValue.value;
+        return correspondingAttributeValue ? correspondingAttributeValue.value : defaultValue;
     };
 
     var cleanAttributeValues = function (attributeValues) {

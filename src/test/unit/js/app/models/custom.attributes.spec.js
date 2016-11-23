@@ -36,9 +36,15 @@ define(['customAttributes'], function(CustomAttributes) {
                 expect(CustomAttributes.getAttributeValue(attributeValues, 'attributeCode')).toEqual("validValue");
             });
 
-            it('should return undefined if corresponding attribute value does not exist', function() {
+            it('should return undefined if corresponding attribute value does not exist and no default value given', function() {
                 attributeValues = [];
                 expect(CustomAttributes.getAttributeValue(attributeValues, 'attributeCode')).toBeUndefined();
+            });
+
+            it('should return the default value if the corresponding attribute value does not exist', function () {
+                var defaultValue = 10, expectedValue = 10;
+                attributeValues = [];
+                expect(CustomAttributes.getAttributeValue(attributeValues, 'attributeCode', defaultValue)).toBe(expectedValue);
             });
         });
 
