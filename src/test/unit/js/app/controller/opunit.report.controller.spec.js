@@ -1,7 +1,7 @@
-define(['moment', 'timecop', 'angularMocks', 'utils', 'orgUnitRepository', 'changeLogRepository', 'opunitReportController', 'pivotTableRepository'],
-    function (moment, timecop, mocks, utils, OrgUnitRepository, ChangeLogRepository, OpunitReportController, PivotTableRepository) {
+define(['moment', 'timecop', 'angularMocks', 'utils', 'orgUnitRepository', 'changeLogRepository', 'pivotTableRepository', 'filesystemService', 'excelBuilder', 'pivotTableExportBuilder', 'opunitReportController'],
+    function (moment, timecop, mocks, utils, OrgUnitRepository, ChangeLogRepository, PivotTableRepository, FileSystemService, ExcelBuilder, PivotTableExportBuilder, OpunitReportController) {
     var scope, q, routeParams, rootScope, mockOpUnit, lastUpdatedTime, currentTime, mockPivotTables, mockPivotTableData,
-        orgUnitRepository, changeLogRepository, pivotTableRepository, opunitReportController;
+        orgUnitRepository, changeLogRepository, pivotTableRepository, filesystemService, pivotTableExportBuilder, opunitReportController;
     describe('opunitReportController', function () {
         beforeEach(mocks.inject(function ($rootScope, $q) {
             rootScope = $rootScope;
@@ -36,10 +36,10 @@ define(['moment', 'timecop', 'angularMocks', 'utils', 'orgUnitRepository', 'chan
                 isDataAvailable: true
             };
 
-            currentTime = moment('2015-10-29T12:43:54.972Z');
+            currentTime = moment('2016-11-23T12:43:54.972Z');
             Timecop.install();
             Timecop.freeze(currentTime);
-            lastUpdatedTime = '2015-10-28T12:43:54.972Z';
+            lastUpdatedTime = '2016-11-22T12:43:54.972Z';
 
             scope.startLoading = jasmine.createSpy('startLoading');
             scope.stopLoading = jasmine.createSpy('stopLoading');
@@ -54,7 +54,15 @@ define(['moment', 'timecop', 'angularMocks', 'utils', 'orgUnitRepository', 'chan
             spyOn(pivotTableRepository, 'getAll').and.returnValue(utils.getPromise(q, mockPivotTables));
             spyOn(pivotTableRepository, 'getPivotTableData').and.returnValue(utils.getPromise(q, mockPivotTableData));
 
-            opunitReportController = new OpunitReportController(rootScope, q, scope, routeParams, orgUnitRepository, changeLogRepository, pivotTableRepository);
+            filesystemService = new FileSystemService();
+            spyOn(filesystemService, 'promptAndWriteFile').and.returnValue(utils.getPromise(q, {}));
+
+            pivotTableExportBuilder = new PivotTableExportBuilder();
+            spyOn(pivotTableExportBuilder, 'build');
+
+            spyOn(ExcelBuilder, 'createWorkBook').and.returnValue(new Blob());
+
+            opunitReportController = new OpunitReportController(rootScope, q, scope, routeParams, orgUnitRepository, changeLogRepository, pivotTableRepository, filesystemService, pivotTableExportBuilder);
         }));
 
         afterEach(function () {
@@ -92,6 +100,46 @@ define(['moment', 'timecop', 'angularMocks', 'utils', 'orgUnitRepository', 'chan
             scope.$apply();
 
             expect(scope.pivotTables).toEqual([]);
+        });
+
+        describe('should export to excel', function () {
+            var spreadSheetContent;
+            beforeEach(function () {
+                scope.$apply();
+
+                spreadSheetContent = undefined;
+                ExcelBuilder.createWorkBook.and.callFake(function (workBookContent) {
+                    spreadSheetContent = _.first(workBookContent);
+                    return new Blob();
+                });
+            });
+
+            it('should prompt the user to save the Excel file with suggested filename', function () {
+                scope.exportToExcel();
+
+                var expectedFilename = 'opUnitName.OpunitReport.[updated 22 November 2016 06.13 PM].xlsx';
+                expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.XLSX);
+            });
+
+            it('should contain project last downloaded time information', function () {
+                scope.exportToExcel();
+
+                expect(spreadSheetContent.data).toContain(['Updated', '22 November 2016 06.13 PM']);
+            });
+
+            it('should contain the title of each table', function () {
+                scope.exportToExcel();
+
+                expect(spreadSheetContent.data).toContain([mockPivotTableData.title]);
+            });
+
+            it('should contain the results of the pivot table export builder', function () {
+                var mockPivotTableExport = ['mockPivotTableExport'];
+                pivotTableExportBuilder.build.and.returnValue([mockPivotTableExport]);
+
+                scope.exportToExcel();
+                expect(spreadSheetContent.data).toContain(mockPivotTableExport);
+            });
         });
     });
 });
