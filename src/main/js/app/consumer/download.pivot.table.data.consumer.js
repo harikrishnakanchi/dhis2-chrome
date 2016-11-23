@@ -85,9 +85,28 @@ define(["lodash", "moment"], function(_, moment) {
                     return $q.when(orgUnitsAndTables);
                 };
 
+                var addOpunitReportPivotTables = function (orgUnitsAndTables) {
+                    return orgUnitRepository.getAllOpUnitsInOrgUnits([projectId]).then(function (opUnits) {
+                        var opUnitIds = _.map(opUnits, 'id');
+                        var opUnitReportPivotTables = _.filter(pivotTables, { opUnitReport: true });
+
+                        _.forEach(opUnitReportPivotTables, function(pivotTable) {
+                            _.forEach(opUnitIds, function (opUnitId) {
+                                orgUnitsAndTables.push({
+                                    orgUnitId: opUnitId,
+                                    pivotTable: pivotTable,
+                                    orgUnitDimensionItems: opUnitId
+                                });
+                            });
+                        });
+                        return $q.when(orgUnitsAndTables);
+                    });
+                };
+
                 return getModuleInformation()
                     .then(filterPivotTablesForEachModule)
                     .then(addProjectReportPivotTables)
+                    .then(addOpunitReportPivotTables)
                     .then(recursivelyDownloadAndUpsertPivotTableData)
                     .then(function() {
                         return $q.when(allDownloadsWereSuccessful);
