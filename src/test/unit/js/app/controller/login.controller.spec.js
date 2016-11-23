@@ -1,5 +1,5 @@
-define(["loginController", "angularMocks", "utils", "sessionHelper", "userPreferenceRepository", "orgUnitRepository", "systemSettingRepository", "userRepository", "chromeUtils", "checkVersionCompatibility", "translationsService"],
-    function (LoginController, mocks, utils, SessionHelper, UserPreferenceRepository, OrgUnitRepository, SystemSettingRepository, UserRepository, chromeUtils, CheckVersionCompatibility, TranslationsService) {
+define(["loginController", "angularMocks", "utils", "sessionHelper", "userPreferenceRepository", "orgUnitRepository", "systemSettingRepository", "userRepository", "platformUtils", "checkVersionCompatibility", "translationsService"],
+    function (LoginController, mocks, utils, SessionHelper, UserPreferenceRepository, OrgUnitRepository, SystemSettingRepository, UserRepository, platformUtils, CheckVersionCompatibility, TranslationsService) {
     describe("login controller", function () {
         var rootScope, loginController, scope, location, q, fakeUserStore, fakeUserCredentialsStore, fakeUserStoreSpy, sessionHelper, hustle, userPreferenceRepository, systemSettingRepository, userRepository, orgUnitRepository, checkVersionCompatibility, translationsService;
 
@@ -58,7 +58,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             translationsService = new TranslationsService();
             spyOn(translationsService, "setLocale");
 
-            spyOn(chromeUtils, "getPraxisVersion").and.returnValue("5.1");
+            spyOn(platformUtils, "getPraxisVersion").and.returnValue("5.1");
 
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, {}));

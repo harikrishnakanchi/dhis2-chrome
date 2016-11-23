@@ -24,7 +24,7 @@ require.config({
 
 require(["app/pwa/pwa.bg.config", "app/shared.bg.config"], function() {
     require(["app/bg.app"], function(app) {
-        require(["chromeUtils"], function(chromeUtils) {
+        require(["platformUtils"], function(platformUtils) {
             var bootstrapData;
             var onDbReady = function() {
                 if (!bootstrapData) {
@@ -34,8 +34,8 @@ require(["app/pwa/pwa.bg.config", "app/shared.bg.config"], function() {
                     });
                 }
             };
-            chromeUtils.init();
-            chromeUtils.addListener("dbReady", onDbReady);
+            platformUtils.init();
+            platformUtils.addListener("dbReady", onDbReady);
             self.worker.postMessage("backgroundReady");
         });
     });

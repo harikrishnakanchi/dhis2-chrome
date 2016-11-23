@@ -1,10 +1,10 @@
-define(["properties", "chromeUtils"], function(properties, chromeUtils) {
+define(["properties", "platformUtils"], function(properties, platformUtils) {
     return function($q, $injector, $timeout) {
         return {
             'responseError': function(response) {
                 var dhisMonitor = $injector.get('dhisMonitor');
                 if (dhisMonitor.isOnline() && response.config.method === "GET" && (response.status === 0 || response.status === 504)) {
-                    chromeUtils.sendMessage("timeoutOccurred");
+                    platformUtils.sendMessage("timeoutOccurred");
                     var $http = $injector.get('$http');
                     response.config.params = response.config.params || {};
                     response.config.params.retry = response.config.params.retry || 0;

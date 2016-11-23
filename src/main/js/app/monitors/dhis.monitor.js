@@ -1,4 +1,4 @@
-define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils, _) {
+define(["properties", "platformUtils", "lodash"], function(properties, platformUtils, _) {
     return function($http, $log, $timeout, $rootScope, userPreferenceRepository) {
         var onlineEventHandlers = [];
         var offlineEventHandlers = [];
@@ -21,12 +21,12 @@ define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils
                 }).then(function(response) {
                     $log.info("DHIS is accessible");
                     isDhisOnline = true;
-                    chromeUtils.sendMessage("dhisOnline");
+                    platformUtils.sendMessage("dhisOnline");
                 }).
                 catch(function(response) {
                     $log.info("DHIS is not accessible");
                     isDhisOnline = false;
-                    chromeUtils.sendMessage("dhisOffline");
+                    platformUtils.sendMessage("dhisOffline");
                 });
             };
 
@@ -43,7 +43,7 @@ define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils
                         getRequestParams = "&prj=" + projCode;
                     }
                 }
-                var praxisVersion = chromeUtils.getPraxisVersion();
+                var praxisVersion = platformUtils.getPraxisVersion();
                 return properties.dhisPing.url + "?" + (new Date()).getTime() + "&pv=" + praxisVersion +
                     "&pid=" + $rootScope.praxisUid + getRequestParams ;
             };
@@ -77,10 +77,10 @@ define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils
 
         var createAlarms = function () {
             $log.info("Registering dhis monitor alarm");
-            chromeUtils.createAlarm("dhisConnectivityCheckAlarm", {
+            platformUtils.createAlarm("dhisConnectivityCheckAlarm", {
                 periodInMinutes: properties.dhisPing.retryIntervalInMinutes
             });
-            chromeUtils.addAlarmListener("dhisConnectivityCheckAlarm", dhisConnectivityCheck);
+            platformUtils.addAlarmListener("dhisConnectivityCheckAlarm", dhisConnectivityCheck);
         };
 
         var start = function() {
@@ -89,7 +89,7 @@ define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils
         };
 
         var stop = function() {
-            chromeUtils.clearAlarm("dhisConnectivityCheckAlarm");
+            platformUtils.clearAlarm("dhisConnectivityCheckAlarm");
         };
 
         var isOnline = function() {
@@ -114,10 +114,10 @@ define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils
             return $rootScope.timeoutEventReferenceCount !== undefined && $rootScope.timeoutEventReferenceCount > 0;
         };
 
-        chromeUtils.addListener("dhisOffline", onDhisOffline);
-        chromeUtils.addListener("dhisOnline", onDhisOnline);
-        chromeUtils.addListener("checkNow", checkNow);
-        chromeUtils.addListener("timeoutOccurred", onTimeoutOccurred);
+        platformUtils.addListener("dhisOffline", onDhisOffline);
+        platformUtils.addListener("dhisOnline", onDhisOnline);
+        platformUtils.addListener("checkNow", checkNow);
+        platformUtils.addListener("timeoutOccurred", onTimeoutOccurred);
 
         return {
             "start": start,

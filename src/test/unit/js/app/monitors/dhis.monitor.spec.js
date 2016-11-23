@@ -1,4 +1,4 @@
-define(["dhisMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome", "userPreferenceRepository", "properties", "timecop"], function(DhisMonitor, utils, mocks, chromeUtils, MockChrome, UserPreferenceRepository, properties, timecop) {
+define(["dhisMonitor", "utils", "angularMocks", "platformUtils", "mockChrome", "userPreferenceRepository", "properties", "timecop"], function(DhisMonitor, utils, mocks, platformUtils, MockChrome, UserPreferenceRepository, properties, timecop) {
     describe("dhis.monitor", function() {
         var q, log, http, httpBackend, rootScope, timeout, userPreferenceRepository, dhisMonitor, currentTime, favIconUrl;
         var callbacks = {};
@@ -11,11 +11,11 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome", "us
             http = $injector.get('$http');
             httpBackend = $injector.get('$httpBackend');
             mockChrome = new MockChrome();
-            spyOn(chromeUtils, "sendMessage").and.callFake(mockChrome.sendMessage);
-            spyOn(chromeUtils, "addListener").and.callFake(mockChrome.addListener);
-            spyOn(chromeUtils, "getPraxisVersion").and.returnValue("5.1");
-            spyOn(chromeUtils, 'createAlarm');
-            spyOn(chromeUtils, 'addAlarmListener');
+            spyOn(platformUtils, "sendMessage").and.callFake(mockChrome.sendMessage);
+            spyOn(platformUtils, "addListener").and.callFake(mockChrome.addListener);
+            spyOn(platformUtils, "getPraxisVersion").and.returnValue("5.1");
+            spyOn(platformUtils, 'createAlarm');
+            spyOn(platformUtils, 'addAlarmListener');
             rootScope.praxisUid = "ade3fab1ab0";
             userPreferenceRepository = new UserPreferenceRepository();
             var userPreferences = {

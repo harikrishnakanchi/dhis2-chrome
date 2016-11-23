@@ -1,4 +1,4 @@
-define(["hustleMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome"], function(HustleMonitor, utils, mocks, chromeUtils, MockChrome) {
+define(["hustleMonitor", "utils", "angularMocks", "platformUtils", "mockChrome"], function(HustleMonitor, utils, mocks, platformUtils, MockChrome) {
     describe("hustle.monitor", function() {
         var q, log, scope;
         var callbacks = {};
@@ -11,10 +11,10 @@ define(["hustleMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome"], 
             scope = $rootScope.$new();
 
             mockChrome = new MockChrome();
-            spyOn(chromeUtils, "sendMessage").and.callFake(mockChrome.sendMessage);
-            spyOn(chromeUtils, "addListener").and.callFake(mockChrome.addListener);
-            spyOn(chromeUtils, 'createAlarm');
-            spyOn(chromeUtils, 'addAlarmListener');
+            spyOn(platformUtils, "sendMessage").and.callFake(mockChrome.sendMessage);
+            spyOn(platformUtils, "addListener").and.callFake(mockChrome.addListener);
+            spyOn(platformUtils, 'createAlarm');
+            spyOn(platformUtils, 'addAlarmListener');
             spyOn(hustle, "getCount").and.returnValue(utils.getPromise(q, 3));
             spyOn(hustle, "getReservedCount").and.returnValue(utils.getPromise(q, 3));
         }));

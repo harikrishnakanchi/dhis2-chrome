@@ -3,13 +3,13 @@ require.config({
 });
 
 require(["app/pwa/pwa.app.config", "app/shared.app.config"], function() {
-    require(["app/app", "chromeUtils"], function(app, chromeUtils) {
+    require(["app/app", "platformUtils"], function(app, platformUtils) {
         var initializeForeground = function () {
             app.bootstrap(app.init());
         };
 
         self.worker = new Worker('js/app/pwa/pwa.bg.bootstrap.js');
-        chromeUtils.init();
-        chromeUtils.addListener("backgroundReady", initializeForeground);
+        platformUtils.init();
+        platformUtils.addListener("backgroundReady", initializeForeground);
     });
 });

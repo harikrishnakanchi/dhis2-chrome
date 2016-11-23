@@ -1,5 +1,5 @@
-define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtils", "utils", "dataRepository", "approvalDataRepository", "orgUnitRepository", "dataSyncFailureRepository"],
-    function(QueuePostProcessInterceptor, mocks, properties, chromeUtils, utils, DataRepository, ApprovalDataRepository, OrgUnitRepository, DataSyncFailureRepository) {
+define(["queuePostProcessInterceptor", "angularMocks", "properties", "platformUtils", "utils", "dataRepository", "approvalDataRepository", "orgUnitRepository", "dataSyncFailureRepository"],
+    function(QueuePostProcessInterceptor, mocks, properties, platformUtils, utils, DataRepository, ApprovalDataRepository, OrgUnitRepository, DataSyncFailureRepository) {
     describe('queuePostProcessInterceptor', function() {
 
         var queuePostProcessInterceptor, q, rootScope, ngI18nResourceBundle, scope, dataRepository, approvalDataRepository, orgUnitRepository, dataSyncFailureRepository;
@@ -19,8 +19,8 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, []));
 
-            spyOn(chromeUtils, "sendMessage");
-            spyOn(chromeUtils, "createNotification");
+            spyOn(platformUtils, "sendMessage");
+            spyOn(platformUtils, "createNotification");
 
             dataSyncFailureRepository = new DataSyncFailureRepository();
             spyOn(dataSyncFailureRepository, "add").and.returnValue(utils.getPromise(q, undefined));
@@ -73,7 +73,7 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
                 "releases": 1
             }, {});
 
-            expect(chromeUtils.sendMessage).toHaveBeenCalledWith({
+            expect(platformUtils.sendMessage).toHaveBeenCalledWith({
                 "message": "aFailed",
                 "requestId": "1"
             });
@@ -89,7 +89,7 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
                 "releases": 1
             }, {});
 
-            expect(chromeUtils.sendMessage).toHaveBeenCalledWith({
+            expect(platformUtils.sendMessage).toHaveBeenCalledWith({
                 "message": "aDone",
                 "requestId": "1"
             });
@@ -123,7 +123,7 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
 
             scope.$apply();
 
-            expect(chromeUtils.createNotification).toHaveBeenCalled();
+            expect(platformUtils.createNotification).toHaveBeenCalled();
         });
 
         it('should notify user after max retries has exceeded', function() {
@@ -138,7 +138,7 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
 
             scope.$apply();
 
-            expect(chromeUtils.createNotification).toHaveBeenCalled();
+            expect(platformUtils.createNotification).toHaveBeenCalled();
         });
 
         it("should notify user if product key has expired", function() {
@@ -159,10 +159,10 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
 
             scope.$apply();
 
-            expect(chromeUtils.createNotification).toHaveBeenCalled();
-            expect(chromeUtils.sendMessage.calls.count()).toEqual(3);
-            expect(chromeUtils.sendMessage.calls.argsFor(1)).toEqual(["dhisOffline"]);
-            expect(chromeUtils.sendMessage.calls.argsFor(2)).toEqual(["productKeyExpired"]);
+            expect(platformUtils.createNotification).toHaveBeenCalled();
+            expect(platformUtils.sendMessage.calls.count()).toEqual(3);
+            expect(platformUtils.sendMessage.calls.argsFor(1)).toEqual(["dhisOffline"]);
+            expect(platformUtils.sendMessage.calls.argsFor(2)).toEqual(["productKeyExpired"]);
         });
 
         it("should mark the failed to sync module by period after maxretries", function() {

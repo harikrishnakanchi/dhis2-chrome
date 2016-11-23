@@ -1,4 +1,4 @@
-define(["handleTimeoutInterceptor", "angularMocks", "properties", "chromeUtils"], function(HandleTimeoutInterceptor, mocks, properties, chromeUtils) {
+define(["handleTimeoutInterceptor", "angularMocks", "properties", "platformUtils"], function(HandleTimeoutInterceptor, mocks, properties, platformUtils) {
     describe("httpInterceptor", function() {
         var q, injector, fakeHttp, timeout, handleTimeoutInterceptor;
 
@@ -28,7 +28,7 @@ define(["handleTimeoutInterceptor", "angularMocks", "properties", "chromeUtils"]
 
         it("should retry in case of timeout", function() {
             spyOn(q, "reject");
-            spyOn(chromeUtils, "sendMessage");
+            spyOn(platformUtils, "sendMessage");
 
             var rejection = {
                 "config": {
@@ -41,7 +41,7 @@ define(["handleTimeoutInterceptor", "angularMocks", "properties", "chromeUtils"]
             handleTimeoutInterceptor.responseError(rejection);
 
             expect(q.reject).not.toHaveBeenCalled();
-            expect(chromeUtils.sendMessage).toHaveBeenCalledWith("timeoutOccurred");
+            expect(platformUtils.sendMessage).toHaveBeenCalledWith("timeoutOccurred");
 
             timeout.flush();
 
@@ -56,7 +56,7 @@ define(["handleTimeoutInterceptor", "angularMocks", "properties", "chromeUtils"]
 
         it("should not retry in case of non-GET requests", function() {
             spyOn(q, "reject");
-            spyOn(chromeUtils, "sendMessage");
+            spyOn(platformUtils, "sendMessage");
 
             var rejection = {
                 "config": {
@@ -69,7 +69,7 @@ define(["handleTimeoutInterceptor", "angularMocks", "properties", "chromeUtils"]
             handleTimeoutInterceptor.responseError(rejection);
 
             expect(q.reject).toHaveBeenCalledWith(rejection);
-            expect(chromeUtils.sendMessage).not.toHaveBeenCalled();
+            expect(platformUtils.sendMessage).not.toHaveBeenCalled();
             expect(fakeHttp).not.toHaveBeenCalled();
         });
     });

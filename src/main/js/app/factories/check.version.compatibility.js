@@ -1,4 +1,4 @@
-define(['chromeUtils', 'lodash'], function (chromeUtils, _) {
+define(['platformUtils', 'lodash'], function (platformUtils, _) {
     return function (systemSettingRepository) {
 
         var versionStringComparator = function (a, b) {
@@ -19,7 +19,7 @@ define(['chromeUtils', 'lodash'], function (chromeUtils, _) {
 
         return function (compatibilityInfo) {
             var checkCompatibility = function (compatiblePraxisVersions) {
-                var praxisVersion = chromeUtils.getPraxisVersion();
+                var praxisVersion = platformUtils.getPraxisVersion();
 
                 compatibilityInfo.incompatibleVersion = !_.contains(compatiblePraxisVersions, praxisVersion);
 

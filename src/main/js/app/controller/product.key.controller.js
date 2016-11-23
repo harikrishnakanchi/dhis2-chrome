@@ -1,10 +1,10 @@
-define(["chromeUtils"], function(chromeUtils) {
+define(["platformUtils"], function(platformUtils) {
     return function($scope, $location, $rootScope, packagedDataImporter, sessionHelper, systemSettingRepository) {
         var triggerImportAndSync = function() {
             packagedDataImporter.run().then(function() {
-                chromeUtils.sendMessage("dbReady");
+                platformUtils.sendMessage("dbReady");
             });
-            chromeUtils.sendMessage("productKeyDecrypted");
+            platformUtils.sendMessage("productKeyDecrypted");
         };
 
         var onSuccess = function() {

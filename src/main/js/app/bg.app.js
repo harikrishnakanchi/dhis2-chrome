@@ -1,5 +1,5 @@
-define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "queuePostProcessInterceptor", "monitors", "logRequestReponseInterceptor", "indexedDBLogger", "chromeUtils", "factories", "angular-indexedDB", "ng-i18n"],
-    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, queuePostProcessInterceptor, monitors, logRequestReponseInterceptor, indexedDBLogger, chromeUtils, factories) {
+define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "queuePostProcessInterceptor", "monitors", "logRequestReponseInterceptor", "indexedDBLogger", "platformUtils", "factories", "angular-indexedDB", "ng-i18n"],
+    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, queuePostProcessInterceptor, monitors, logRequestReponseInterceptor, indexedDBLogger, platformUtils, factories) {
         var init = function() {
             var app = angular.module('PRAXIS', ["xc.indexedDB", "hustle", "ngI18n"]);
             services.init(app);
@@ -90,20 +90,20 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     };
 
                     var setupAlarms = function() {
-                        chromeUtils.createAlarm('metadataSyncAlarm', {
+                        platformUtils.createAlarm('metadataSyncAlarm', {
                             periodInMinutes: properties.metadata.sync.intervalInMinutes
                         });
-                        chromeUtils.addAlarmListener("metadataSyncAlarm", metadataSync);
+                        platformUtils.addAlarmListener("metadataSyncAlarm", metadataSync);
 
-                        chromeUtils.createAlarm('projectDataSyncAlarm', {
+                        platformUtils.createAlarm('projectDataSyncAlarm', {
                             periodInMinutes: properties.projectDataSync.intervalInMinutes
                         });
-                        chromeUtils.addAlarmListener("projectDataSyncAlarm", projectDataSync);
+                        platformUtils.addAlarmListener("projectDataSyncAlarm", projectDataSync);
                     };
 
                     hustleMonitor.start();
 
-                    chromeUtils.addListener("productKeyDecrypted", function() {
+                    platformUtils.addListener("productKeyDecrypted", function() {
                         systemSettingRepository.loadProductKey().then(function() {
                             setupAlarms();
                             consumerRegistry.register()
@@ -111,7 +111,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         });
                     });
 
-                    chromeUtils.addListener("productKeyExpired", function() {
+                    platformUtils.addListener("productKeyExpired", function() {
                         dhisMonitor.stop();
                     });
 

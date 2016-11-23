@@ -1,5 +1,5 @@
-define(["dashboardController", "angularMocks", "approvalDataRepository", "moduleDataBlockFactory", "utils", "moment", "timecop", "properties", "lodash", "dateUtils", "checkVersionCompatibility", "systemSettingRepository", "chromeUtils", "dataSyncFailureRepository"],
-    function(DashboardController, mocks, ApprovalDataRepository, ModuleDataBlockFactory, utils, moment, timecop, properties, _, dateUtils, CheckVersionCompatibility, SystemSettingRepository, chromeUtils, DataSyncFailureRepository) {
+define(["dashboardController", "angularMocks", "approvalDataRepository", "moduleDataBlockFactory", "utils", "moment", "timecop", "properties", "lodash", "dateUtils", "checkVersionCompatibility", "systemSettingRepository", "platformUtils", "dataSyncFailureRepository"],
+    function(DashboardController, mocks, ApprovalDataRepository, ModuleDataBlockFactory, utils, moment, timecop, properties, _, dateUtils, CheckVersionCompatibility, SystemSettingRepository, platformUtils, DataSyncFailureRepository) {
         describe("dashboardController", function() {
             var q, rootScope, hustle, scope, location, anchorScroll, timeout, fakeModal, dashboardController,
                 approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility, systemSettingRepository, dataSyncFailureRepository;
@@ -47,7 +47,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                 systemSettingRepository = new SystemSettingRepository();
                 checkVersionCompatibility = CheckVersionCompatibility(systemSettingRepository);
                 spyOn(systemSettingRepository, "get").and.returnValue(utils.getPromise(q, []));
-                spyOn(chromeUtils, "getPraxisVersion").and.returnValue('5.1');
+                spyOn(platformUtils, "getPraxisVersion").and.returnValue('5.1');
 
                 spyOn(hustle, "publish");
                 spyOn(hustle, "publishOnce");

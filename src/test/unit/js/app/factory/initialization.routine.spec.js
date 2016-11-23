@@ -1,5 +1,5 @@
-define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter', 'systemSettingRepository', 'translationsService', 'chromeUtils'],
-    function (mocks, utils, InitializationRoutine, PackagedDataImporter, SystemSettingRepository, TranslationsService, chromeUtils) {
+define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter', 'systemSettingRepository', 'translationsService', 'platformUtils'],
+    function (mocks, utils, InitializationRoutine, PackagedDataImporter, SystemSettingRepository, TranslationsService, platformUtils) {
         var initializationRoutine, packagedDataImporter, q, location, rootScope, systemSettingRepository, translationsService;
 
         describe("InitializationRoutine", function () {
@@ -9,8 +9,8 @@ define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter'
                 location = $location;
 
                 spyOn(location, 'path');
-                spyOn(chromeUtils, 'sendMessage');
-                spyOn(chromeUtils, 'init');
+                spyOn(platformUtils, 'sendMessage');
+                spyOn(platformUtils, 'init');
 
                 packagedDataImporter = new PackagedDataImporter();
                 spyOn(packagedDataImporter, 'run').and.returnValue(utils.getPromise(q, {}));
@@ -126,12 +126,12 @@ define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter'
                 expect(packagedDataImporter.run).toHaveBeenCalled();
             });
 
-            it('should initialize chromeUtils', function () {
+            it('should initialize platformUtils', function () {
                 initializationRoutine.run();
 
                 rootScope.$apply();
 
-                expect(chromeUtils.init).toHaveBeenCalled();
+                expect(platformUtils.init).toHaveBeenCalled();
             });
         });
     });

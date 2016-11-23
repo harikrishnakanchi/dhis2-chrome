@@ -1,4 +1,4 @@
-define(['lodash', 'chromeUtils'], function (_, chromeUtils) {
+define(['lodash', 'platformUtils'], function (_, platformUtils) {
     return function ($rootScope, $location, systemSettingRepository, translationsService, packagedDataImporter) {
 
         $rootScope.setLocale = function (locale) {
@@ -27,7 +27,7 @@ define(['lodash', 'chromeUtils'], function (_, chromeUtils) {
         var redirectIfProductKeyNotSet = function() {
             return systemSettingRepository.isProductKeySet().then(function(productKeyIsSet) {
                 if (productKeyIsSet) {
-                    chromeUtils.sendMessage('dbReady');
+                    platformUtils.sendMessage('dbReady');
                     $location.path('/login');
                 } else {
                     $location.path('/productKeyPage');
@@ -39,7 +39,7 @@ define(['lodash', 'chromeUtils'], function (_, chromeUtils) {
             systemSettingRepository.getLocale().then($rootScope.setLocale);
             packagedDataImporter.run();
             systemSettingRepository.loadProductKey().finally(redirectIfProductKeyNotSet);
-            chromeUtils.init();
+            platformUtils.init();
         };
 
         return {

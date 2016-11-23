@@ -1,4 +1,4 @@
-define(["lodash", "chromeUtils"], function(_, chromeUtils) {
+define(["lodash", "platformUtils"], function(_, platformUtils) {
     return function($q, $scope, $location, $rootScope, $hustle, $timeout, db, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor) {
         $scope.projects = [];
 
@@ -100,7 +100,7 @@ define(["lodash", "chromeUtils"], function(_, chromeUtils) {
         };
 
         $scope.versionNumber = function () {
-            var praxisVersion = chromeUtils.getPraxisVersion();
+            var praxisVersion = platformUtils.getPraxisVersion();
             if (!praxisVersion) return '';
             return praxisVersion;
         };

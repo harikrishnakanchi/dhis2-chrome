@@ -1,4 +1,4 @@
-define(["properties", "chromeUtils", "interpolate", "moment", "lodash"], function(properties, chromeUtils, interpolate, moment, _) {
+define(["properties", "platformUtils", "interpolate", "moment", "lodash"], function(properties, platformUtils, interpolate, moment, _) {
     return function($log, ngI18nResourceBundle, dataRepository, dataSyncFailureRepository) {
         var getResourceBundle = function(locale) {
             return ngI18nResourceBundle.get({
@@ -21,9 +21,9 @@ define(["properties", "chromeUtils", "interpolate", "moment", "lodash"], functio
             if (data && data.status === 401) {
                 getResourceBundle(job.data.locale).then(function(data) {
                     var resourceBundle = data;
-                    chromeUtils.createNotification(resourceBundle.notificationTitle, getCurrentDateTime() + resourceBundle.productKeyExpiredMessage);
-                    chromeUtils.sendMessage("dhisOffline");
-                    chromeUtils.sendMessage("productKeyExpired");
+                    platformUtils.createNotification(resourceBundle.notificationTitle, getCurrentDateTime() + resourceBundle.productKeyExpiredMessage);
+                    platformUtils.sendMessage("dhisOffline");
+                    platformUtils.sendMessage("productKeyExpired");
                 });
             } else if (job.releases === 2) {
                 getResourceBundle(job.data.locale).then(function(resourceBundle) {
@@ -32,7 +32,7 @@ define(["properties", "chromeUtils", "interpolate", "moment", "lodash"], functio
                         job_description: job.data.desc || resourceBundle.downloadDataDesc,
                         retry_delay: getRetryDelay(3, job.data.locale)
                     });
-                    chromeUtils.createNotification(resourceBundle.notificationTitle, notificationMessage);
+                    platformUtils.createNotification(resourceBundle.notificationTitle, notificationMessage);
                 });
             } else if (job.releases === properties.queue.maxretries) {
                 getResourceBundle(job.data.locale).then(function(resourceBundle) {
@@ -40,13 +40,13 @@ define(["properties", "chromeUtils", "interpolate", "moment", "lodash"], functio
                     notificationMessage += interpolate(resourceBundle.notificationAbortRetryMessage, {
                         job_description: job.data.desc || resourceBundle.downloadDataDesc
                     });
-                    chromeUtils.createNotification(resourceBundle.notificationTitle, notificationMessage);
+                    platformUtils.createNotification(resourceBundle.notificationTitle, notificationMessage);
                 });
             }
         };
 
         var sendChromeMessage = function(job, messageType) {
-            chromeUtils.sendMessage({
+            platformUtils.sendMessage({
                 "message": job.data.type + messageType,
                 "requestId": job.data.requestId
             });

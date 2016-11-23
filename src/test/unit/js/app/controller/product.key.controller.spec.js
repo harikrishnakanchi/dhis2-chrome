@@ -1,4 +1,4 @@
-define(["productKeyController", "angularMocks", "packagedDataImporter", "utils", "chromeUtils", "sessionHelper", "systemSettingRepository"], function(ProductKeyController, mocks, PackagedDataImporter, utils, chromeUtils, SessioHelper, SystemSettingRepository) {
+define(["productKeyController", "angularMocks", "packagedDataImporter", "utils", "platformUtils", "sessionHelper", "systemSettingRepository"], function(ProductKeyController, mocks, PackagedDataImporter, utils, platformUtils, SessioHelper, SystemSettingRepository) {
     describe("productKeyController", function() {
         var scope, location, productKeyController, packagedDataImporter, rootscope, q, sessionHelper, systemSettingRepository;
 
@@ -12,8 +12,8 @@ define(["productKeyController", "angularMocks", "packagedDataImporter", "utils",
 
             spyOn(systemSettingRepository, "upsertProductKey").and.returnValue(utils.getPromise(q, []));
 
-            spyOn(chromeUtils, "sendMessage");
-            spyOn(chromeUtils, "setAuthHeader").and.returnValue(utils.getPromise(q, {}));
+            spyOn(platformUtils, "sendMessage");
+            spyOn(platformUtils, "setAuthHeader").and.returnValue(utils.getPromise(q, {}));
 
             packagedDataImporter = new PackagedDataImporter();
             spyOn(packagedDataImporter, "run").and.returnValue(utils.getPromise(q, {}));
@@ -59,8 +59,8 @@ define(["productKeyController", "angularMocks", "packagedDataImporter", "utils",
             scope.$apply();
             scope.setAuthHeaderAndProceed();
             scope.$apply();
-            expect(chromeUtils.sendMessage.calls.argsFor(1)).toEqual(["dbReady"]);
-            expect(chromeUtils.sendMessage.calls.argsFor(0)).toEqual(["productKeyDecrypted"]);
+            expect(platformUtils.sendMessage.calls.argsFor(1)).toEqual(["dbReady"]);
+            expect(platformUtils.sendMessage.calls.argsFor(0)).toEqual(["productKeyDecrypted"]);
         });
     });
 });

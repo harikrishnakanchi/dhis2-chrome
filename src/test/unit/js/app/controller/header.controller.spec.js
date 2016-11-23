@@ -1,5 +1,5 @@
-define(["headerController", "angularMocks", "utils", "sessionHelper", "chromeUtils", "orgUnitRepository", "systemSettingRepository", "dhisMonitor"],
-    function(HeaderController, mocks, utils, SessionHelper, chromeUtils, OrgUnitRepository, SystemSettingRepository, DhisMonitor) {
+define(["headerController", "angularMocks", "utils", "sessionHelper", "platformUtils", "orgUnitRepository", "systemSettingRepository", "dhisMonitor"],
+    function(HeaderController, mocks, utils, SessionHelper, platformUtils, OrgUnitRepository, SystemSettingRepository, DhisMonitor) {
         describe("headerController", function() {
             var rootScope, headerController, scope, q, timeout, db,
                 translationStore, location, sessionHelper, orgUnitRepository, hustle, systemSettingRepository;
@@ -12,8 +12,8 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "chromeUti
                 hustle = $hustle;
                 timeout = $timeout;
 
-                spyOn(chromeUtils, "sendMessage");
-                spyOn(chromeUtils, "addListener");
+                spyOn(platformUtils, "sendMessage");
+                spyOn(platformUtils, "addListener");
 
                 sessionHelper = new SessionHelper();
                 orgUnitRepository = new OrgUnitRepository();
@@ -144,7 +144,7 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "chromeUti
 
             describe('Praxis Version', function () {
                 beforeEach(function () {
-                    spyOn(chromeUtils, 'getPraxisVersion').and.returnValue('7.0');
+                    spyOn(platformUtils, 'getPraxisVersion').and.returnValue('7.0');
                 });
 
                 it('should get the correct Praxis Version', function () {
@@ -154,7 +154,7 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "chromeUti
                 });
 
                 it('should not show version number if praxisVersion is undefined', function () {
-                    chromeUtils.getPraxisVersion.and.returnValue(undefined);
+                    platformUtils.getPraxisVersion.and.returnValue(undefined);
                     scope.$apply();
 
                     expect(scope.versionNumber()).toEqual('');

@@ -1,4 +1,4 @@
-define(['lodash', 'chromeUtils'], function(_, chromeUtils) {
+define(['lodash', 'platformUtils'], function(_, platformUtils) {
     return function($q) {
         var FILE_TYPE_OPTIONS = {
             XLSX: {
@@ -34,7 +34,7 @@ define(['lodash', 'chromeUtils'], function(_, chromeUtils) {
 
         var promptAndWriteFile = function(fileName, contents, options) {
 
-            if(chromeUtils.getOS() == 'win')
+            if(platformUtils.getOS() == 'win')
                 fileName = replaceSpecialCharsInFileName(fileName);
 
             var deferred = $q.defer(),
