@@ -41,6 +41,9 @@ define(['moment', 'timecop', 'angularMocks', 'utils', 'orgUnitRepository', 'chan
             Timecop.freeze(currentTime);
             lastUpdatedTime = '2015-10-28T12:43:54.972Z';
 
+            scope.startLoading = jasmine.createSpy('startLoading');
+            scope.stopLoading = jasmine.createSpy('stopLoading');
+
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, 'get').and.returnValue(utils.getPromise(q, mockOpUnit));
             

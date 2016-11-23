@@ -34,12 +34,15 @@ define(['moment'], function (moment) {
             };
 
             var loadOpunitPivotTable = function () {
+                $scope.pivotTables= [];
+                $scope.startLoading();
                 return pivotTableRepository.getAll()
                     .then(filterOpunitPivotTables)
                     .then(getDataForPivotTables);
             };
 
-            return $q.all([getOpUnitName(), getLastUpdatedTimeForOpUnitPivotTables()], loadOpunitPivotTable());
+            return $q.all([getOpUnitName(), getLastUpdatedTimeForOpUnitPivotTables()], loadOpunitPivotTable())
+                .finally($scope.stopLoading);
         };
 
         init();

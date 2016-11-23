@@ -12,11 +12,26 @@
                     {{resourceBundle.downloadReport}}
                 </button>
             </div>
-
         </div>
 
-        <div>
+        <div ng-if="!(pivotTables)">
             <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
+        </div>
+
+        <div ng-if="(pivotTables)" class="exp-coll-group">
+            <div ng-repeat="table in pivotTables" ng-show="table.isDataAvailable">
+                <accordion >
+                    <accordion-group is-open="status.open">
+                        <accordion-heading>
+                            <span>{{ table.title }}</span>
+                            <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                        </accordion-heading>
+                        <div>
+                            <pivot-table table="table" resource-bundle="resourceBundle" disable-download="true"></pivot-table>
+                        </div>
+                    </accordion-group>
+                </accordion>
+            </div>
         </div>
     </section>
 </div>
