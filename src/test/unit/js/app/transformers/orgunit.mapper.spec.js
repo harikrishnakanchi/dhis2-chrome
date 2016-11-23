@@ -1,4 +1,4 @@
-define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], function(orgUnitMapper, mocks, moment, timecop, dhisId) {
+define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customAttributes"], function(orgUnitMapper, mocks, moment, timecop, dhisId, customAttributes) {
     describe("orgUnitMapper", function() {
         beforeEach(function() {
             Timecop.install();
@@ -143,6 +143,25 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "englishName": "Some Type"
             }];
 
+            spyOn(customAttributes, 'getAttributeValue').and.callFake(function (attributeValues, code) {
+                var fakeAttributeValues = {
+                    prjEndDate: '2011-01-01',
+                    autoApprove: 'true',
+                    prjLoc: 'val3',
+                    projCode: 'RU118',
+                    estimatedTargetPopulation: 1000,
+                    estPopulationLessThan1Year: 11,
+                    estPopulationBetween1And5Years: 12,
+                    estPopulationOfWomenOfChildBearingAge: 13,
+                    prjCon: 'val2',
+                    prjPopType: 'val5',
+                    projectType: 'Some Type',
+                    reasonForIntervention: 'Armed Conflict',
+                    'modeOfOperation': 'Direct Operation',
+                    'modelOfManagement': 'Collaboration'
+                };
+                return fakeAttributeValues[code];
+            });
             var result = orgUnitMapper.mapToProject(dhisProject, allContexts, allPopTypes, reasonForIntervention, modeOfOperation, modelOfManagement, allProjectTypes);
 
             var expectedResult = {

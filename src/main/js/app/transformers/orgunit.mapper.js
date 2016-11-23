@@ -1,4 +1,4 @@
-define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, moment, CustomAttributes) {
+define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, moment, customAttributes) {
     var buildProjectAttributeValues = function(orgUnit) {
         var attributeValues = [{
             "created": moment().toISOString(),
@@ -134,7 +134,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
                 "value": moment(orgUnit.endDate).format("YYYY-MM-DD")
             });
 
-        return CustomAttributes.cleanAttributeValues(attributeValues);
+        return customAttributes.cleanAttributeValues(attributeValues);
     };
 
     this.disable = function(orgUnits) {
@@ -182,36 +182,25 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
         return projectOrgUnit;
     };
 
-    this.getAttributeValue = function(dhisProject, code) {
-        var attribute = _.find(dhisProject.attributeValues, {
-            'attribute': {
-                'code': code
-            }
-        });
-
-        return attribute ? attribute.value : undefined;
-    };
-
-
     this.mapToProject = function(dhisProject, allContexts, allPopTypes, reasonForIntervention, modeOfOperation, modelOfManagement, allProjectTypes) {
 
         var getTranslatedName = function (allOptions, code) {
-            var value = self.getAttributeValue(dhisProject, code);
+            var value = customAttributes.getAttributeValue(dhisProject.attributeValues, code);
             var result = _.filter(allOptions, function (option) {
                 return option.englishName == value;
             });
             return result[0] ? result[0] : undefined;
         };
 
-        var endDate = self.getAttributeValue(dhisProject, "prjEndDate");
-        var autoApprove = self.getAttributeValue(dhisProject, "autoApprove");
+        var endDate = customAttributes.getAttributeValue(dhisProject.attributeValues, "prjEndDate");
+        var autoApprove = customAttributes.getAttributeValue(dhisProject.attributeValues, "autoApprove");
         return {
             'name': dhisProject.name,
             'openingDate': moment(dhisProject.openingDate).toDate(),
             'endDate': endDate ? moment(endDate).toDate() : undefined,
 
-            'location': self.getAttributeValue(dhisProject, "prjLoc"),
-            'projectCode': self.getAttributeValue(dhisProject, "projCode"),
+            'location': customAttributes.getAttributeValue(dhisProject.attributeValues, "prjLoc"),
+            'projectCode': customAttributes.getAttributeValue(dhisProject.attributeValues, "projCode"),
 
             'context': getTranslatedName(allContexts, "prjCon"),
             'populationType': getTranslatedName(allPopTypes, "prjPopType"),
@@ -220,10 +209,10 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             'modeOfOperation': getTranslatedName(modeOfOperation, "modeOfOperation"),
             'modelOfManagement': getTranslatedName(modelOfManagement, "modelOfManagement"),
 
-            'estimatedTargetPopulation': parseInt(self.getAttributeValue(dhisProject, "estimatedTargetPopulation")),
-            'estPopulationLessThan1Year': parseInt(self.getAttributeValue(dhisProject, "estPopulationLessThan1Year")),
-            'estPopulationBetween1And5Years': parseInt(self.getAttributeValue(dhisProject, "estPopulationBetween1And5Years")),
-            'estPopulationOfWomenOfChildBearingAge': parseInt(self.getAttributeValue(dhisProject, "estPopulationOfWomenOfChildBearingAge")),
+            'estimatedTargetPopulation': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, "estimatedTargetPopulation")),
+            'estPopulationLessThan1Year': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, "estPopulationLessThan1Year")),
+            'estPopulationBetween1And5Years': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, "estPopulationBetween1And5Years")),
+            'estPopulationOfWomenOfChildBearingAge': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, "estPopulationOfWomenOfChildBearingAge")),
             'autoApprove': autoApprove === undefined ? "false" : autoApprove
         };
     };
