@@ -25,7 +25,8 @@ define(['lodash'], function(_) {
     };
 
     var createNotification = function(title, message) {
-        Notification.requestPermission().then(function(permission) {
+        var requestPermission = (Notification.requestPermission && Notification.requestPermission()) || Promise.resolve("granted");
+        requestPermission.then(function(permission) {
             if (permission === "granted") {
                 var options = {
                     "icon": "/img/logo.png",

@@ -58,7 +58,8 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
 
                         $hustle.publishOnce({
                             "type": "downloadMetadata",
-                            "data": []
+                            "data": [],
+                            "locale": "en"
                         }, "dataValues");
 
                     };
@@ -69,7 +70,8 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
 
                         $hustle.publishOnce({
                             "type": "downloadProjectData",
-                            "data": []
+                            "data": [],
+                            "locale": "en"
                         }, "dataValues");
                     };
 
