@@ -70,6 +70,18 @@ define(['pivotTable'], function(PivotTable) {
            });
        });
 
+       describe('opunitReport', function() {
+           it('should return true if pivot table name contains OpunitReport', function() {
+               pivotTable = PivotTable.create({ name: '[Praxis - OpunitReport] # Name' });
+               expect(pivotTable.opUnitReport).toBeTruthy();
+           });
+
+           it('should return false if pivot table name does not contain OpunitReport', function() {
+               pivotTable = PivotTable.create({ name: 'some malformed pivot table name' });
+               expect(pivotTable.opUnitReport).toBeFalsy();
+           });
+       });
+
        describe('geographicOriginReport', function() {
            it('should return true if pivot table name contains GeographicOrigin', function() {
                pivotTable = PivotTable.create({ name: '[FieldApp - GeographicOrigin] # Name' });
