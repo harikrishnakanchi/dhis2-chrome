@@ -24,6 +24,24 @@ define(['lodash'], function(_) {
         self.worker.postMessage(message);
     };
 
+    var createNotification = function(title, message) {
+        Notification.requestPermission().then(function(permission) {
+            if (permission === "granted") {
+                var options = {
+                    "icon": "/img/logo.png",
+                    "body": message
+                };
+                var notification = new Notification(title, options);
+                notification.addEventListener('click', function () {
+                    notification.close();
+                });
+            }
+            else if (permission !== "denied"){
+                createNotification(title, message);
+            }
+        });
+    };
+
     var createAlarmObject = function (name, duration) {
         var listeners = [];
         var interval;
@@ -79,7 +97,7 @@ define(['lodash'], function(_) {
         sendMessage: sendMessage,
         setAuthHeader: fakeFunction,
         getAuthHeader: fakeFunction,
-        createNotification: fakeFunction,
+        createNotification: createNotification,
         getPraxisVersion: fakeFunction,
         getOS: fakeFunction,
         init: _.once(init),
