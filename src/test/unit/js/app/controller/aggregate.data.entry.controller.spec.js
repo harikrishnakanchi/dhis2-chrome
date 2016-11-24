@@ -1,5 +1,5 @@
 define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "excludedDataElementsRepository", "dataSetRepository", "programRepository", "referralLocationsRepository", "translationsService", "moduleDataBlockFactory", "dataSyncFailureRepository", "optionSetRepository", "customAttributes"],
-    function(AggregateDataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, ExcludedDataElementsRepository, DatasetRepository, ProgramRepository, ReferralLocationsRepository, TranslationsService, ModuleDataBlockFactory, DataSyncFailureRepository, OptionSetRepository, CustomAttributes) {
+    function(AggregateDataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, ExcludedDataElementsRepository, DatasetRepository, ProgramRepository, ReferralLocationsRepository, TranslationsService, ModuleDataBlockFactory, DataSyncFailureRepository, OptionSetRepository, customAttributes) {
         describe("aggregateDataEntryController ", function() {
             var scope, routeParams, q, location, anchorScroll, aggregateDataEntryController, rootScope, parentProject, fakeModal,
                 window, hustle, timeout, origin1, origin2, mockModuleDataBlock, selectedPeriod,
@@ -155,7 +155,8 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.dataentryForm = { $dirty: function() {} };
                 spyOn(scope.dataentryForm, '$dirty');
 
-
+                spyOn(customAttributes, 'getAttributeValue').and.returnValue('');
+                spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(false);
                 scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
             }));
 
@@ -591,22 +592,10 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it("should display the correct submit option for auto approved projects", function() {
+                customAttributes.getBooleanAttributeValue.and.returnValue(true);
                 orgUnitRepository.getParentProject.and.returnValue(utils.getPromise(q, {
                     "id": "proj1",
-                    "attributeValues": [{
-                        'attribute': {
-                            'code': 'autoApprove',
-                            'name': 'Auto Approve',
-                            'id': 'e65afaec61d'
-                        },
-                        'value': 'true'
-                    }, {
-                        'attribute': {
-                            'code': 'Type',
-                            'name': 'Type',
-                        },
-                        'value': 'Project'
-                    }]
+                    "attributeValues": []
                 }));
 
                 scope.$apply();
@@ -646,7 +635,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
 
                 scope.$apply();
 
-                expect(optionSetRepository.getOptionSetByCode).toHaveBeenCalledWith(CustomAttributes.PRAXIS_POPULATION_DATA_ELEMENTS);
+                expect(optionSetRepository.getOptionSetByCode).toHaveBeenCalledWith(customAttributes.PRAXIS_POPULATION_DATA_ELEMENTS);
 
                 expect(scope.projectPopulationDetails).toEqual({
                     "estimatedTargetPopulation": '1000',

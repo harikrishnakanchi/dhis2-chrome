@@ -1,4 +1,4 @@
-define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "interpolate", "customAttributes", "dataElementUtils"], function(_, dataValuesMapper, orgUnitMapper, moment, properties, interpolate, CustomAttributes, dataElementUtils) {
+define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "interpolate", "customAttributes", "dataElementUtils"], function(_, dataValuesMapper, orgUnitMapper, moment, properties, interpolate, customAttributes, dataElementUtils) {
     return function($scope, $routeParams, $q, $hustle, $anchorScroll, $location, $modal, $rootScope, $window, $timeout,
         dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository, optionSetRepository) {
 
@@ -365,7 +365,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             };
             
             var loadPopulationOptionSet = function () {
-                optionSetRepository.getOptionSetByCode(CustomAttributes.PRAXIS_POPULATION_DATA_ELEMENTS).then(function (populationOptionSet) {
+                optionSetRepository.getOptionSetByCode(customAttributes.PRAXIS_POPULATION_DATA_ELEMENTS).then(function (populationOptionSet) {
                     $scope.populationDataCodes = _.map(populationOptionSet.options, 'code');
                 });
             };
@@ -410,12 +410,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                     });
 
                 var loadProjectPromise = orgUnitRepository.getParentProject($scope.selectedModule.id).then(function(orgUnit) {
-                    $scope.projectIsAutoApproved = _.any(orgUnit.attributeValues, {
-                        'attribute': {
-                            'code': "autoApprove"
-                        },
-                        "value": "true"
-                    });
+                    $scope.projectIsAutoApproved = customAttributes.getBooleanAttributeValue(orgUnit.attributeValues, customAttributes.AUTO_APPROVE);
                     $scope.projectPopulationDetails = extractPopulationDetails(orgUnit.attributeValues, $scope.populationDataCodes);
                 });
 

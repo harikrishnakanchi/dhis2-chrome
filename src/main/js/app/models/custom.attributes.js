@@ -18,7 +18,8 @@ define(['lodash'], function(_) {
         SERVICE_CODE: 'praxisServiceCode',
         EXCLUDE_FROM_TOTAL: 'praxisExcludeFromTotal',
         TYPE: 'Type',
-        PROJECT_CODE: 'projCode'
+        PROJECT_CODE: 'projCode',
+        AUTO_APPROVE: 'autoApprove'
     };
 
     var getBooleanAttributeValue = function(attributeValues, attributeCode) {
