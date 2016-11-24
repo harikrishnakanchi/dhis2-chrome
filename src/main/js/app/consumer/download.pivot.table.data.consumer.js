@@ -85,7 +85,7 @@ define(["lodash", "moment"], function(_, moment) {
                     return $q.when(orgUnitsAndTables);
                 };
 
-                var addOpunitReportPivotTables = function (orgUnitsAndTables) {
+                var addOpUnitReportPivotTables = function (orgUnitsAndTables) {
                     return orgUnitRepository.getAllOpUnitsInOrgUnits([projectId]).then(function (opUnits) {
                         var opUnitIds = _.map(opUnits, 'id');
                         var opUnitReportPivotTables = _.filter(pivotTables, { opUnitReport: true });
@@ -106,7 +106,7 @@ define(["lodash", "moment"], function(_, moment) {
                 return getModuleInformation()
                     .then(filterPivotTablesForEachModule)
                     .then(addProjectReportPivotTables)
-                    .then(addOpunitReportPivotTables)
+                    .then(addOpUnitReportPivotTables)
                     .then(recursivelyDownloadAndUpsertPivotTableData)
                     .then(function() {
                         return $q.when(allDownloadsWereSuccessful);

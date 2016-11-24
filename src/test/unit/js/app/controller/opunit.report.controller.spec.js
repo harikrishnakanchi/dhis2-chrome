@@ -1,8 +1,8 @@
-define(['moment', 'timecop', 'angularMocks', 'utils', 'orgUnitRepository', 'changeLogRepository', 'pivotTableRepository', 'filesystemService', 'excelBuilder', 'pivotTableExportBuilder', 'opunitReportController'],
-    function (moment, timecop, mocks, utils, OrgUnitRepository, ChangeLogRepository, PivotTableRepository, FileSystemService, ExcelBuilder, PivotTableExportBuilder, OpunitReportController) {
+define(['moment', 'timecop', 'angularMocks', 'utils', 'orgUnitRepository', 'changeLogRepository', 'pivotTableRepository', 'filesystemService', 'excelBuilder', 'pivotTableExportBuilder', 'opUnitReportController'],
+    function (moment, timecop, mocks, utils, OrgUnitRepository, ChangeLogRepository, PivotTableRepository, FileSystemService, ExcelBuilder, PivotTableExportBuilder, OpUnitReportController) {
     var scope, q, routeParams, rootScope, mockOpUnit, lastUpdatedTime, currentTime, mockPivotTables, mockPivotTableData,
-        orgUnitRepository, changeLogRepository, pivotTableRepository, filesystemService, pivotTableExportBuilder, opunitReportController;
-    describe('opunitReportController', function () {
+        orgUnitRepository, changeLogRepository, pivotTableRepository, filesystemService, pivotTableExportBuilder, opUnitReportController;
+    describe('opUnitReportController', function () {
         beforeEach(mocks.inject(function ($rootScope, $q) {
             rootScope = $rootScope;
             scope = $rootScope.$new();
@@ -62,7 +62,7 @@ define(['moment', 'timecop', 'angularMocks', 'utils', 'orgUnitRepository', 'chan
 
             spyOn(ExcelBuilder, 'createWorkBook').and.returnValue(new Blob());
 
-            opunitReportController = new OpunitReportController(rootScope, q, scope, routeParams, orgUnitRepository, changeLogRepository, pivotTableRepository, filesystemService, pivotTableExportBuilder);
+            opUnitReportController = new OpUnitReportController(rootScope, q, scope, routeParams, orgUnitRepository, changeLogRepository, pivotTableRepository, filesystemService, pivotTableExportBuilder);
         }));
 
         afterEach(function () {
@@ -117,7 +117,7 @@ define(['moment', 'timecop', 'angularMocks', 'utils', 'orgUnitRepository', 'chan
             it('should prompt the user to save the Excel file with suggested filename', function () {
                 scope.exportToExcel();
 
-                var expectedFilename = 'opUnitName.OpunitReport.[updated 22 November 2016 06.13 PM].xlsx';
+                var expectedFilename = 'opUnitName.OpUnitReport.[updated 22 November 2016 06.13 PM].xlsx';
                 expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.XLSX);
             });
 

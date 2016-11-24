@@ -41,7 +41,7 @@ define(['moment', 'excelBuilder'], function (moment, excelBuilder) {
             else {
                 lastUpdatedTimeDetails = moment().format("DD-MMM-YYYY");
             }
-            var filename = [$scope.opUnitName, 'OpunitReport', lastUpdatedTimeDetails, 'xlsx'].join('.');
+            var filename = [$scope.opUnitName, 'OpUnitReport', lastUpdatedTimeDetails, 'xlsx'].join('.');
             filesystemService.promptAndWriteFile(filename, excelBuilder.createWorkBook(buildSpreadSheetContent()), filesystemService.FILE_TYPE_OPTIONS.XLSX);
         };
 
@@ -62,17 +62,17 @@ define(['moment', 'excelBuilder'], function (moment, excelBuilder) {
                 });
             };
 
-            var filterOpunitPivotTables = function(tables) {
+            var filterOpUnitPivotTables = function(tables) {
                 return _.filter(tables, { 'opUnitReport': true });
             };
 
-            var getDataForPivotTables = function (opunitPivotTables) {
-                var promises = _.map(opunitPivotTables, function(report) {
+            var getDataForPivotTables = function (opUnitPivotTables) {
+                var promises = _.map(opUnitPivotTables, function(report) {
                     return pivotTableRepository.getPivotTableData(report, opunitId);
                 });
 
-                return $q.all(promises).then(function (opunitPivotTableData) {
-                    $scope.pivotTables =  _.filter(opunitPivotTableData, 'isDataAvailable');
+                return $q.all(promises).then(function (opUnitPivotTableData) {
+                    $scope.pivotTables =  _.filter(opUnitPivotTableData, 'isDataAvailable');
                 });
             };
 
@@ -80,7 +80,7 @@ define(['moment', 'excelBuilder'], function (moment, excelBuilder) {
                 $scope.pivotTables= [];
                 $scope.startLoading();
                 return pivotTableRepository.getAll()
-                    .then(filterOpunitPivotTables)
+                    .then(filterOpUnitPivotTables)
                     .then(getDataForPivotTables);
             };
 

@@ -97,7 +97,7 @@
                     </li>
                 </ul>
             </li>
-            <li role="presentation" ng-class="{ active: isActive('\/reports') || isActive('\/projectReport') || isActive('\/opunitReport') }"
+            <li role="presentation" ng-class="{ active: isActive('\/reports') || isActive('\/projectReport') || isActive('\/opUnitReport') }"
                 class="dropdown praxis-dropdown-menu"
                 ng-if="hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver', 'Data entry user']) &amp;&amp; allUserModules.length > 0"
                 dropdown>
@@ -122,7 +122,7 @@
                             </li>
                             <li class="divider"></li>
                             <li>
-                                <a class="submenu-item" href="#/opunitReport/{{ opUnitWithModule.opUnitId }}">{{ opUnitWithModule.opUnitName }} {{ resourceBundle.reportLabel }}</a>
+                                <a class="submenu-item" href="#/opUnitReport/{{ opUnitWithModule.opUnitId }}">{{ opUnitWithModule.opUnitName }} {{ resourceBundle.reportLabel }}</a>
                             </li>
                         </ul>
                     </li>
