@@ -1,4 +1,4 @@
-define(["lodash", "moment", "dhisId","interpolate", "orgUnitMapper"], function(_, moment, dhisId, interpolate, orgUnitMapper) {
+define(["lodash", "moment", "dhisId","interpolate", "orgUnitMapper", "customAttributes"], function(_, moment, dhisId, interpolate, orgUnitMapper, customAttributes) {
     return function($scope, $hustle, $q, patientOriginRepository, orgUnitRepository, datasetRepository, programRepository, originOrgunitCreator, orgUnitGroupHelper) {
         var patientOrigins = [];
         var oldName = "";
@@ -72,18 +72,8 @@ define(["lodash", "moment", "dhisId","interpolate", "orgUnitMapper"], function(_
                     });
                 };
 
-                var getBooleanAttributeValue = function(attributeValues, attributeCode) {
-                    var attr = _.find(attributeValues, {
-                        "attribute": {
-                            "code": attributeCode
-                        }
-                    });
-
-                    return attr && attr.value === 'true';
-                };
-
                 var isLinelistService = function(orgUnit) {
-                    return getBooleanAttributeValue(orgUnit.attributeValues, "isLineListService");
+                    return customAttributes.getBooleanAttributeValue(orgUnit.attributeValues, "isLineListService");
                 };
 
                 var createOrgUnitGroups = function() {

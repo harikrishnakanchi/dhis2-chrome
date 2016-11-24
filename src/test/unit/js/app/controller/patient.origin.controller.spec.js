@@ -1,4 +1,4 @@
-define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop", "orgUnitRepository", "patientOriginRepository", "dataSetRepository", "originOrgunitCreator", "programRepository", "orgUnitGroupHelper"], function(PatientOriginController, mocks, utils, dhisId, timecop, OrgUnitRepository, PatientOriginRepository, DatasetRepository, OriginOrgunitCreator, ProgramRepository, OrgUnitGroupHelper) {
+define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop", "orgUnitRepository", "patientOriginRepository", "dataSetRepository", "originOrgunitCreator", "programRepository", "orgUnitGroupHelper", "customAttributes"], function(PatientOriginController, mocks, utils, dhisId, timecop, OrgUnitRepository, PatientOriginRepository, DatasetRepository, OriginOrgunitCreator, ProgramRepository, OrgUnitGroupHelper, customAttributes) {
     describe("patientOriginController", function() {
         var scope, q, hustle,
             patientOriginController,
@@ -77,6 +77,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 "clientLastUpdated": "2014-05-30T12:43:54.972Z"
             }];
 
+            spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(false);
             Timecop.install();
             Timecop.freeze(new Date("2014-04-01T00:00:00.000Z"));
         }));
@@ -232,20 +233,14 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
 
             var lineListModule = {
                 id: 'someLineListModule',
-                attributeValues: [
-                    {
-                        attribute: {
-                            code: 'isLineListService'
-                        },
-                        value: 'true'
-                    }
-                ]
+                attributeValues: []
             };
 
             orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [lineListModule]));
             originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnits));
             datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasets));
             programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, program));
+            customAttributes.getBooleanAttributeValue.and.returnValue(true);
 
             patientOriginController = new PatientOriginController(scope, hustle, q, patientOriginRepository, orgUnitRepository, datasetRepository, programRepository, originOrgunitCreator, orgUnitGroupHelper);
             scope.$apply();
