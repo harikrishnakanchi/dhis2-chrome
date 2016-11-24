@@ -1,4 +1,4 @@
-define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpolate", "excelBuilder", "dataElementUtils"], function(_, moment, properties, dateUtils, orgUnitMapper, interpolate, excelBuilder, dataElementUtils) {
+define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpolate", "excelBuilder", "dataElementUtils", "customAttributes"], function(_, moment, properties, dateUtils, orgUnitMapper, interpolate, excelBuilder, dataElementUtils, customAttributes) {
     return function($scope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, historyService, programRepository, programEventRepository, excludedDataElementsRepository,
         orgUnitRepository, approvalDataRepository, referralLocationsRepository, dataSyncFailureRepository, translationsService, filesystemService) {
 
@@ -463,12 +463,7 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
 
             var setUpProjectAutoApprovedFlag = function() {
                 return orgUnitRepository.getParentProject($scope.selectedModuleId).then(function(orgUnit) {
-                    $scope.projectIsAutoApproved = _.any(orgUnit.attributeValues, {
-                        'attribute': {
-                            'code': "autoApprove"
-                        },
-                        "value": "true"
-                    });
+                    $scope.projectIsAutoApproved = customAttributes.getBooleanAttributeValue(orgUnit.attributeValues, customAttributes.AUTO_APPROVE);
                 });
             };
 
