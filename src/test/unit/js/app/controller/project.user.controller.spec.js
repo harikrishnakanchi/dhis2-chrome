@@ -130,7 +130,7 @@ define(["projectUserController", "angularMocks", "utils", "dhisId", "customAttri
                 'userCredentials': {
                     'username': 'foobar',
                     'userRoles': [{
-                        "name": 'Data Entry User',
+                        "name": 'Data entry user',
                         "id": 'Role1Id'
                     }, {
                         "name": 'Project Level Approver',
@@ -141,9 +141,6 @@ define(["projectUserController", "angularMocks", "utils", "dhisId", "customAttri
                 'userCredentials': {
                     'username': 'blah',
                     'userRoles': [{
-                        "name": 'Data Entry User',
-                        "id": 'Role1Id'
-                    }, {
                         "name": 'Coordination Level Approver',
                         "id": 'Role3Id'
                     }]
@@ -151,11 +148,11 @@ define(["projectUserController", "angularMocks", "utils", "dhisId", "customAttri
             }];
 
             var expectedUsers = [{
-                'roles': 'Data Entry User, Project Level Approver',
+                'roles': 'Data entry user, Project Level Approver',
                 'userCredentials': {
                     'username': 'foobar',
                     'userRoles': [{
-                        "name": 'Data Entry User',
+                        "name": 'Data entry user',
                         "id": 'Role1Id'
                     }, {
                         "name": 'Project Level Approver',

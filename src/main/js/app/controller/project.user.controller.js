@@ -46,7 +46,7 @@ define(["dhisId", "interpolate", "properties", "customAttributes"], function(dhi
                 var roleNamesToDisplay = _.pluck($scope.userRoles, "name");
 
                 var shouldDisplayUser = function(userRoleNames) {
-                    return _.intersection(_.pluck(userRoleNames, "name"), roleNamesToDisplay).length === 1;
+                    return _.intersection(_.pluck(userRoleNames, "name"), roleNamesToDisplay).length >= 1;
                 };
 
                 $scope.orgUnitUsers = [];
