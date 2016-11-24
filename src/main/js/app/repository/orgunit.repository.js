@@ -1,27 +1,13 @@
-define(["moment", "lodashUtils"], function(moment, _) {
+define(["moment", "lodashUtils", "customAttributes"], function(moment, _, customAttributes) {
     return function(db, $q) {
         var ORGANISATION_UNITS_STORE_NAME = 'organisationUnits';
         var isOfType = function(orgUnit, type) {
-            return _.any(orgUnit.attributeValues, {
-                attribute: {
-                    "code": "Type"
-                },
-                value: type
-            });
+            return customAttributes.getAttributeValue(orgUnit.attributeValues, customAttributes.TYPE) === type;
         };
 
         var rejectCurrentAndDisabled = function(orgUnits) {
-            var getBooleanAttributeValue = function(attributeValues, attributeCode) {
-                var attr = _.find(attributeValues, {
-                    "attribute": {
-                        "code": attributeCode
-                    }
-                });
-
-                return attr && attr.value === 'true';
-            };
             return _.filter(orgUnits, function(ou) {
-                return getBooleanAttributeValue(ou.attributeValues, "isNewDataModel") && !getBooleanAttributeValue(ou.attributeValues, "isDisabled");
+                return customAttributes.getBooleanAttributeValue(ou.attributeValues, customAttributes.NEW_DATA_MODEL_CODE) && !customAttributes.getBooleanAttributeValue(ou.attributeValues, customAttributes.DISABLED_CODE);
             });
         };
 

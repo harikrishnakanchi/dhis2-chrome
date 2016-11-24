@@ -1,4 +1,4 @@
-define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], function(OrgUnitRepository, utils, mocks, timecop, _) {
+define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash", "customAttributes"], function(OrgUnitRepository, utils, mocks, timecop, _, customAttributes) {
     describe('orgUnitRepository', function() {
         var mockOrgStore, mockDb, orgUnitRepository, q, orgUnits, scope, company, country, project, opUnit, originOU, opcenter, module1, module2;
         var getAttr = function(key, value) {
@@ -18,34 +18,14 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
                 "id": "company1",
                 "name": "MSF",
                 "level": 1,
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }, {
-                    "attribute": {
-                        "code": "Type"
-                    },
-                    "value": "Company"
-                }]
+                "attributeValues": []
             };
 
             opcenter = {
                 "id": "oc1",
                 "name": "OCP",
                 "level": 2,
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }, {
-                    "attribute": {
-                        "code": "Type"
-                    },
-                    "value": "Operational Center"
-                }],
+                "attributeValues": [],
                 "parent": {
                     "id": "company1"
                 }
@@ -55,17 +35,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
                 "id": "country1",
                 "name": "country",
                 "level": 3,
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }, {
-                    "attribute": {
-                        "code": "Type"
-                    },
-                    "value": "Country"
-                }],
+                "attributeValues": [],
                 "parent": {
                     "id": "oc1"
                 }
@@ -77,19 +47,9 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
                 "level": 4,
                 "attributeValues": [{
                     "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }, {
-                    "attribute": {
                         "code": "Type"
                     },
                     "value": "Project"
-                }, {
-                    "attribute": {
-                        "code": "projCode"
-                    },
-                    "value": "PRJ001"
                 }],
                 "parent": {
                     "id": "country1"
@@ -101,11 +61,6 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
                 "name": "opUnit",
                 "level": 5,
                 "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }, {
                     "attribute": {
                         "code": "Type"
                     },
@@ -122,11 +77,6 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
                 "level": 6,
                 "attributeValues": [{
                     "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }, {
-                    "attribute": {
                         "code": "Type"
                     },
                     "value": "Module"
@@ -141,11 +91,6 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
                 "name": "module 2",
                 "level": 6,
                 "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }, {
                     "attribute": {
                         "code": "Type"
                     },
@@ -163,11 +108,6 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
                 "level": 7,
                 "attributeValues": [{
                     "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }, {
-                    "attribute": {
                         "code": "Type"
                     },
                     "value": "Patient Origin"
@@ -184,6 +124,13 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
 
             Timecop.install();
             Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
+            spyOn(customAttributes, 'getBooleanAttributeValue').and.callFake(function (attributeValues, code) {
+                var fakeAttributeValues = {
+                    isNewDataModel: true,
+                    isDisabled: false
+                };
+                return fakeAttributeValues[code];
+            });
 
             orgUnitRepository = new OrgUnitRepository(mockDb.db, q);
         }));
@@ -311,29 +258,14 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
             var actualAttributes;
             var expectedAttributes = [{
                 "attribute": {
-                    "code": "isNewDataModel"
-                },
-                "value": "true"
-            }, {
-                "attribute": {
                     "code": "Type"
                 },
                 "value": "Operation Unit"
             }, {
                 "attribute": {
-                    "code": "isNewDataModel"
-                },
-                "value": "true"
-            }, {
-                "attribute": {
                     "code": "Type"
                 },
                 "value": "Project"
-            }, {
-                "attribute": {
-                    "code": "projCode"
-                },
-                "value": "PRJ001"
             }];
 
             orgUnitRepository.getProjectAndOpUnitAttributes(module1.id).then(function(data) {
