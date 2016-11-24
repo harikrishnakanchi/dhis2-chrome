@@ -17,7 +17,8 @@ define(['lodash'], function(_) {
         ASSOCIATED_PROGRAM_CODE: 'associatedProgram', // TODO REMOVE AFTER 10.0
         SERVICE_CODE: 'praxisServiceCode',
         EXCLUDE_FROM_TOTAL: 'praxisExcludeFromTotal',
-        TYPE: 'Type'
+        TYPE: 'Type',
+        PROJECT_CODE: 'projCode'
     };
 
     var getBooleanAttributeValue = function(attributeValues, attributeCode) {

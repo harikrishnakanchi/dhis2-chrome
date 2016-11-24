@@ -1,4 +1,4 @@
-define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate"], function(moment, orgUnitMapper, properties, _, interpolate) {
+define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "customAttributes"], function(moment, orgUnitMapper, properties, _, interpolate, customAttributes) {
 
     return function($scope, $rootScope, $hustle, orgUnitRepository, $q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository, translationsService) {
 
@@ -88,12 +88,7 @@ define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate"], funct
                     return;
 
                 var partitionedModules = _.partition(modules, function(module) {
-                    return _.any(module.attributeValues, {
-                        "attribute": {
-                            "code": "isLineListService"
-                        },
-                        "value": "true"
-                    });
+                    return customAttributes.getBooleanAttributeValue(module.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE);
                 });
 
                 var aggregateModules = partitionedModules[1];
@@ -129,13 +124,9 @@ define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate"], funct
             $scope.reset();
             orgUnitRepository.getAllProjects().then(function(allProjects) {
                 $scope.existingProjectCodes = _.transform(allProjects, function(acc, project) {
-                    var projCodeAttribute = _.find(project.attributeValues, {
-                        'attribute': {
-                            'code': "projCode"
-                        }
-                    });
-                    if (!_.isEmpty(projCodeAttribute) && !_.isEmpty(projCodeAttribute.value)) {
-                        acc.push(projCodeAttribute.value);
+                    var projCode = customAttributes.getAttributeValue(project.attributeValues, customAttributes.PROJECT_CODE);
+                    if (projCode) {
+                        acc.push(projCode);
                     }
                 }, []);
             });
