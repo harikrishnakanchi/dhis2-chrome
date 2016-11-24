@@ -1,5 +1,5 @@
 define(['moment', 'excelBuilder'], function (moment, excelBuilder) {
-    return function ($rootScope, $q, $scope, $routeParams, orgUnitRepository, changeLogRepository, pivotTableRepository, filesystemService, pivotTableExportBuilder) {
+    return function ($rootScope, $q, $scope, $routeParams, orgUnitRepository, changeLogRepository, pivotTableRepository, filesystemService, translationsService, pivotTableExportBuilder) {
         var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
         var REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY hh[.]mm A";
 
@@ -72,8 +72,12 @@ define(['moment', 'excelBuilder'], function (moment, excelBuilder) {
                 });
 
                 return $q.all(promises).then(function (opUnitPivotTableData) {
-                    $scope.pivotTables =  _.filter(opUnitPivotTableData, 'isDataAvailable');
+                    return _.filter(opUnitPivotTableData, 'isDataAvailable');
                 });
+            };
+
+            var translatePivotTableData = function (pivotTables) {
+                return translationsService.translatePivotTableData(pivotTables);
             };
 
             var loadOpunitPivotTable = function () {
@@ -81,7 +85,11 @@ define(['moment', 'excelBuilder'], function (moment, excelBuilder) {
                 $scope.startLoading();
                 return pivotTableRepository.getAll()
                     .then(filterOpUnitPivotTables)
-                    .then(getDataForPivotTables);
+                    .then(getDataForPivotTables)
+                    .then(translatePivotTableData)
+                    .then(function (pivotTables) {
+                        $scope.pivotTables = pivotTables;
+                    });
             };
 
             return $q.all([getOpUnitName(), getLastUpdatedTimeForOpUnitPivotTables()], loadOpunitPivotTable())

@@ -1,7 +1,7 @@
-define(['moment', 'timecop', 'angularMocks', 'utils', 'orgUnitRepository', 'changeLogRepository', 'pivotTableRepository', 'filesystemService', 'excelBuilder', 'pivotTableExportBuilder', 'opUnitReportController'],
-    function (moment, timecop, mocks, utils, OrgUnitRepository, ChangeLogRepository, PivotTableRepository, FileSystemService, ExcelBuilder, PivotTableExportBuilder, OpUnitReportController) {
+define(['moment', 'timecop', 'angularMocks', 'utils', 'orgUnitRepository', 'changeLogRepository', 'pivotTableRepository', 'filesystemService', 'translationsService', 'excelBuilder', 'pivotTableExportBuilder', 'opUnitReportController'],
+    function (moment, timecop, mocks, utils, OrgUnitRepository, ChangeLogRepository, PivotTableRepository, FileSystemService, TranslationsService, ExcelBuilder, PivotTableExportBuilder, OpUnitReportController) {
     var scope, q, routeParams, rootScope, mockOpUnit, lastUpdatedTime, currentTime, mockPivotTables, mockPivotTableData,
-        orgUnitRepository, changeLogRepository, pivotTableRepository, filesystemService, pivotTableExportBuilder, opUnitReportController;
+        orgUnitRepository, changeLogRepository, pivotTableRepository, filesystemService, translationsService, pivotTableExportBuilder, opUnitReportController;
     describe('opUnitReportController', function () {
         beforeEach(mocks.inject(function ($rootScope, $q) {
             rootScope = $rootScope;
@@ -57,12 +57,15 @@ define(['moment', 'timecop', 'angularMocks', 'utils', 'orgUnitRepository', 'chan
             filesystemService = new FileSystemService();
             spyOn(filesystemService, 'promptAndWriteFile').and.returnValue(utils.getPromise(q, {}));
 
+            translationsService = new TranslationsService();
+            spyOn(translationsService, 'translatePivotTableData').and.callFake(function(object) { return object; });
+
             pivotTableExportBuilder = new PivotTableExportBuilder();
             spyOn(pivotTableExportBuilder, 'build');
 
             spyOn(ExcelBuilder, 'createWorkBook').and.returnValue(new Blob());
 
-            opUnitReportController = new OpUnitReportController(rootScope, q, scope, routeParams, orgUnitRepository, changeLogRepository, pivotTableRepository, filesystemService, pivotTableExportBuilder);
+            opUnitReportController = new OpUnitReportController(rootScope, q, scope, routeParams, orgUnitRepository, changeLogRepository, pivotTableRepository, filesystemService, translationsService, pivotTableExportBuilder);
         }));
 
         afterEach(function () {
@@ -100,6 +103,12 @@ define(['moment', 'timecop', 'angularMocks', 'utils', 'orgUnitRepository', 'chan
             scope.$apply();
 
             expect(scope.pivotTables).toEqual([]);
+        });
+
+        it('should translate pivot table data', function() {
+            scope.$apply();
+
+            expect(translationsService.translatePivotTableData).toHaveBeenCalledWith([mockPivotTableData]);
         });
 
         describe('should export to excel', function () {
