@@ -151,7 +151,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
         var disableOrgUnit = function(orgUnit) {
             orgUnit.attributeValues = _.reject(orgUnit.attributeValues, {
                 "attribute": {
-                    "code": "isDisabled"
+                    "code": customAttributes.DISABLED_CODE
                 }
             });
             orgUnit.attributeValues.push(attributeValue);
