@@ -1,5 +1,5 @@
-define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTransformer", "dataElementUtils"],
-    function(_, orgUnitMapper, moment, interpolate, systemSettingsTransformer, dataElementUtils) {
+define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTransformer", "dataElementUtils", "customAttributes"],
+    function(_, orgUnitMapper, moment, interpolate, systemSettingsTransformer, dataElementUtils, customAttributes) {
         return function($scope, $rootScope, $hustle, orgUnitRepository, excludedDataElementsRepository, $q, $modal,
             programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService, excludedLineListOptionsRepository) {
 
@@ -164,12 +164,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
                     if (!_.isEmpty($scope.enrichedProgram))
                         resetCollapse();
 
-                    var isDisabled = _.find($scope.module.attributeValues, {
-                        "attribute": {
-                            "code": "isDisabled"
-                        }
-                    });
-                    $scope.isDisabled = isDisabled && isDisabled.value === "true" ? true : false;
+                    $scope.isDisabled = customAttributes.getBooleanAttributeValue($scope.module.attributeValues, customAttributes.DISABLED_CODE);
                     $scope.updateDisabled = $scope.isDisabled;
                 };
 
@@ -346,11 +341,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
                         referralDatasetId = _.find(allDatasets, "isReferralDataset").id;
                         populationDatasetId = _.find(allDatasets, "isPopulationDataset").id;
 
-                        var summaryDatasetId = _.find($scope.program.attributeValues, {
-                            "attribute": {
-                                "code": "associatedDataSet"
-                            }
-                        }).value;
+                        var summaryDatasetId = customAttributes.getAttributeValue($scope.program.attributeValues, customAttributes.ASSOCIATED_DATA_SET_CODE);
 
                         var datasetIds = _.flattenDeep([summaryDatasetId, originDatasetIds]);
 

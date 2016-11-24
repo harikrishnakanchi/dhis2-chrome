@@ -1,8 +1,8 @@
-define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "timecop", "dhisId",
-        "orgUnitRepository", "dataSetRepository", "originOrgunitCreator", "excludedDataElementsRepository", "programRepository", "excludedLineListOptionsRepository", "translationsService"
+define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "timecop", "dhisId", "orgUnitRepository", "dataSetRepository",
+    "originOrgunitCreator", "excludedDataElementsRepository", "programRepository", "excludedLineListOptionsRepository", "translationsService", "customAttributes"
     ],
-    function(LineListModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, timecop, dhisId,
-        OrgUnitRepository, DatasetRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, ProgramRepository, ExcludedLineListOptionsRepository, TranslationsService) {
+    function(LineListModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, timecop, dhisId, OrgUnitRepository,
+             DatasetRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, ProgramRepository, ExcludedLineListOptionsRepository, TranslationsService, customAttributes) {
 
         describe("line list module controller", function() {
             var scope, rootScope, lineListModuleController, mockOrgStore, db, q, datasets, sections, dataElements, sectionsdata,
@@ -830,24 +830,15 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "associatedDatasets": [{
                         "id": "ds1",
                         "name": "dataset1",
-                        "attributeValues": [{
-                            "attribute": {
-                                "code": "isNewDataModel"
-                            },
-                            "value": true
-                        }]
+                        "attributeValues": []
                     }],
-                    "attributeValues": [{
-                        "attribute": {
-                            "code": "isDisabled"
-                        },
-                        "value": "true"
-                    }]
+                    "attributeValues": []
                 };
                 scope.isNewMode = false;
                 programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, program));
                 programRepository.get.and.returnValue(utils.getPromise(q, program));
                 translationsService.translate.and.returnValue(program);
+                spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(true);
 
                 createLineListModuleController();
 
@@ -1354,12 +1345,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     'id': 'prog1',
                     'name': 'ER Linelist',
                     'organisationUnits': [],
-                    'attributeValues': [{
-                        "attribute": {
-                            "code": "associatedDataSet"
-                        },
-                        "value": "Ds1"
-                    }]
+                    'attributeValues': []
                 };
 
                 var originOrgUnit = [{
@@ -1369,13 +1355,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "id": "UnknownModule2someId",
                     "level": 7,
                     "openingDate": moment().toDate(),
-                    "attributeValues": [{
-                        "attribute": {
-                            "code": "Type",
-                            "name": "Type"
-                        },
-                        "value": "Patient Origin"
-                    }],
+                    "attributeValues": [],
                     "parent": {
                         "id": "Module2someId"
                     }
@@ -1395,6 +1375,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
                 scope.program = program;
                 programRepository.get.and.returnValue(utils.getPromise(q, program));
+                spyOn(customAttributes, 'getAttributeValue').and.returnValue('Ds1');
 
                 scope.save();
                 scope.$apply();

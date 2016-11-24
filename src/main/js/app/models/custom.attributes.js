@@ -20,7 +20,8 @@ define(['lodash'], function(_) {
         TYPE: 'Type',
         PROJECT_CODE: 'projCode',
         AUTO_APPROVE: 'autoApprove',
-        EVENT_DATE: 'useAsEventDate'
+        EVENT_DATE: 'useAsEventDate',
+        ASSOCIATED_DATA_SET_CODE: 'associatedDataSet'
     };
 
     var getBooleanAttributeValue = function(attributeValues, attributeCode) {
