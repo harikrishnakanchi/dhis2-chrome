@@ -1,4 +1,5 @@
-define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "timecop", "moment", "dhisId", "orgUnitRepository", "patientOriginRepository", "orgUnitGroupSetRepository"], function(OpUnitController, mocks, utils, OrgUnitGroupHelper, timecop, moment, dhisId, OrgUnitRepository, PatientOriginRepository, OrgUnitGroupSetRepository) {
+define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "timecop", "moment", "dhisId", "orgUnitRepository", "patientOriginRepository", "orgUnitGroupSetRepository", "customAttributes"],
+    function(OpUnitController, mocks, utils, OrgUnitGroupHelper, timecop, moment, dhisId, OrgUnitRepository, PatientOriginRepository, OrgUnitGroupSetRepository, customAttributes) {
     describe('opUnitController', function() {
         var scope, db, q, hustle, fakeModal,
             opUnitController,
@@ -400,6 +401,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             };
             scope.isNewMode = false;
 
+            spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(true);
             scope.$apply();
             expect(scope.isDisabled).toBeTruthy();
         });
