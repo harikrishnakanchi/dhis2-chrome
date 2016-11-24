@@ -1,5 +1,5 @@
-define(["lodash", "moment", "interpolate"],
-    function(_, moment, interpolate) {
+define(["lodash", "moment", "interpolate", "customAttributes"],
+    function(_, moment, interpolate, customAttributes) {
         return function($scope, $routeParams, $q, $location, $rootScope, orgUnitRepository) {
 
             var deregisterWeekModulerWatcher = $scope.$watchCollection('[week, currentModule, resourceBundle]', function() {
@@ -33,12 +33,7 @@ define(["lodash", "moment", "interpolate"],
             });
 
             var isLineListService = function(orgUnit) {
-                var attr = _.find(orgUnit.attributeValues, {
-                    "attribute": {
-                        "code": "isLineListService"
-                    }
-                });
-                return attr && attr.value == "true";
+                return customAttributes.getBooleanAttributeValue(orgUnit.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE);
             };
 
             var getAggregateModules = function(modules) {
