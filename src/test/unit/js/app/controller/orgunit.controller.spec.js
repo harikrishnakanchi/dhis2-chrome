@@ -1,5 +1,5 @@
 /*global Date:true*/
-define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepository"], function(OrgUnitController, mocks, utils, _, OrgUnitRepository) {
+define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepository", "customAttributes"], function(OrgUnitController, mocks, utils, _, OrgUnitRepository, customAttributes) {
     describe("org unit controller", function() {
         var q, scope, orgUnitContoller, location, timeout, anchorScroll, orgUnitRepository, rootScope;
 
@@ -32,6 +32,13 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, "getOrgUnitAndDescendants").and.returnValue(utils.getPromise(q, orgunits));
             spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, {}));
+            spyOn(customAttributes, 'getAttributeValue').and.callFake(function (attributeValues, code) {
+                var fakeAttributeValues = {
+                    'isLineListService': true,
+                    'Type': 'someType'
+                };
+                return fakeAttributeValues[code];
+            });
 
             anchorScroll = jasmine.createSpy();
         }));
