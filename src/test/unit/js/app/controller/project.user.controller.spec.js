@@ -1,4 +1,4 @@
-define(["projectUserController", "angularMocks", "utils", "dhisId"], function(ProjectUserController, mocks, utils, dhisId) {
+define(["projectUserController", "angularMocks", "utils", "dhisId", "customAttributes"], function(ProjectUserController, mocks, utils, dhisId, customAttributes) {
     describe("projectUserControllerspec", function() {
         var scope, projectUserController, q, userRepository, hustle, fakeModal, timeout;
 
@@ -12,17 +12,7 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
             scope.orgUnit = {
                 "name": "Proj 1",
                 "id": "someId",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "projCode"
-                    },
-                    "value": "PRJ"
-                }, {
-                    "attribute": {
-                        "code": "Type"
-                    },
-                    "value": "Project"
-                }]
+                "attributeValues": []
             };
 
             scope.locale = "en";
@@ -50,6 +40,13 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
             spyOn(userRepository, "getAllUsernames").and.returnValue(utils.getPromise(q, {}));
             spyOn(userRepository, "getAllProjectUsers").and.returnValue(utils.getPromise(q, {}));
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+            spyOn(customAttributes, "getAttributeValue").and.callFake(function (attributeValues, code) {
+                var fakeAttributeValues = {
+                    Type: 'Project',
+                    projCode: 'PRJ'
+                };
+                return fakeAttributeValues[code];
+            });
             projectUserController = new ProjectUserController(scope, hustle, timeout, fakeModal, userRepository);
         }));
 

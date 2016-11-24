@@ -1,4 +1,4 @@
-define(["dhisId", "interpolate", "properties"], function(dhisId, interpolate, properties) {
+define(["dhisId", "interpolate", "properties", "customAttributes"], function(dhisId, interpolate, properties, customAttributes) {
     return function($scope, $hustle, $timeout, $modal, userRepository) {
 
         $scope.projectUser = {};
@@ -22,8 +22,8 @@ define(["dhisId", "interpolate", "properties"], function(dhisId, interpolate, pr
         };
 
         var init = function() {
-            var projCode = getAttributeValue($scope.orgUnit.attributeValues, 'projCode').toLowerCase();
-            var orgUnitType = getAttributeValue($scope.orgUnit.attributeValues, 'Type');
+            var projCode = customAttributes.getAttributeValue($scope.orgUnit.attributeValues, 'projCode', '').toLowerCase();
+            var orgUnitType = customAttributes.getAttributeValue($scope.orgUnit.attributeValues, 'Type', '');
             var userNamePrefix = _.isEmpty(projCode) ? projCode : projCode + "_";
             $scope.userNameMatchExpr = orgUnitType === "Country" ? new RegExp("[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+\\.[a-zA-Z]{2,4}$", "i") : new RegExp(userNamePrefix + "(.)+", "i");
             $scope.patternValidationMessage = orgUnitType === "Country" ? $scope.resourceBundle.emailValidation :  interpolate($scope.resourceBundle.usernamePrefixValidation, { username_prefix: userNamePrefix });
@@ -35,16 +35,6 @@ define(["dhisId", "interpolate", "properties"], function(dhisId, interpolate, pr
             userRepository.getAllUsernames()
                 .then(setExistingUserNames)
                 .then(loadOrgUnitUsers);
-        };
-
-        var getAttributeValue = function(attributeValues, attributeCode) {
-            var attr = _.find(attributeValues, {
-                'attribute': {
-                    'code': attributeCode
-                }
-            });
-
-            return attr ? attr.value : "";
         };
 
         var setExistingUserNames = function(data) {
