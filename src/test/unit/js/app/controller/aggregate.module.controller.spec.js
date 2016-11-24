@@ -1,8 +1,8 @@
-define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "timecop", "dhisId", "dataSetRepository",
-        "orgUnitRepository", "originOrgunitCreator", "excludedDataElementsRepository", "systemSettingRepository", "translationsService", "orgUnitMapper", "systemSettingsTransformer"
+define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "timecop", "dhisId", "dataSetRepository", "orgUnitRepository",
+    "originOrgunitCreator", "excludedDataElementsRepository", "systemSettingRepository", "translationsService", "orgUnitMapper", "systemSettingsTransformer", "customAttributes"
     ],
     function(AggregateModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, timecop, dhisId, DatasetRepository,
-        OrgUnitRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, SystemSettingRepository, TranslationsService, orgUnitMapper, systemSettingsTransformer) {
+        OrgUnitRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, SystemSettingRepository, TranslationsService, orgUnitMapper, systemSettingsTransformer, customAttributes) {
 
         var scope,rootScope, mockOrgStore, db, q, location, orgUnitRepo, orgunitGroupRepo, hustle,
             dataSetRepo, systemSettingRepository, excludedDataElementsRepository, fakeModal, allPrograms, originOrgunitCreator, translationsService, orgUnitGroupHelper;
@@ -102,6 +102,8 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 };
 
                 scope.isNewMode = true;
+
+                spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(false);
 
                 Timecop.install();
                 Timecop.freeze(new Date("2014-04-01T00:00:00.000Z"));
@@ -433,22 +435,13 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     "dataSets": [{
                         "id": "ds1",
                         "name": "dataset1",
-                        "attributeValues": [{
-                            "attribute": {
-                                "code": "isNewDataModel"
-                            },
-                            "value": true
-                        }]
+                        "attributeValues": []
                     }],
-                    "attributeValues": [{
-                        "attribute": {
-                            "code": "isDisabled"
-                        },
-                        "value": "true"
-                    }]
+                    "attributeValues": []
                 };
                 scope.isNewMode = false;
 
+                customAttributes.getBooleanAttributeValue.and.returnValue(true);
                 initialiseController();
 
                 scope.$apply();

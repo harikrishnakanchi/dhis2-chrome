@@ -1,5 +1,5 @@
-define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransformer", "dataElementUtils"],
-    function(_, orgUnitMapper, moment, interpolate, systemSettingsTransformer, dataElementUtils) {
+define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransformer", "dataElementUtils", "customAttributes"],
+    function(_, orgUnitMapper, moment, interpolate, systemSettingsTransformer, dataElementUtils, customAttributes) {
         return function($scope, $rootScope, $hustle, orgUnitRepository, datasetRepository, systemSettingRepository, excludedDataElementsRepository, db, $location, $q, $modal,
             orgUnitGroupHelper, originOrgunitCreator, translationsService) {
 
@@ -132,12 +132,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                 };
 
                 var setDisabled = function() {
-                    var isDisabled = _.find($scope.module.attributeValues, {
-                        "attribute": {
-                            "code": "isDisabled"
-                        }
-                    });
-                    $scope.isDisabled = isDisabled && isDisabled.value === "true" ? true : false;
+                    $scope.isDisabled = customAttributes.getBooleanAttributeValue($scope.module.attributeValues, customAttributes.DISABLED_CODE);
                 };
 
                 var getAllAggregateDatasets = function() {
