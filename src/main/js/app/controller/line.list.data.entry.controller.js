@@ -1,4 +1,4 @@
-define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUtils"], function(_, moment, dhisId, dateUtils, properties, dataElementUtils) {
+define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUtils", "customAttributes"], function(_, moment, dhisId, dateUtils, properties, dataElementUtils, customAttributes) {
     return function($scope, $rootScope, $routeParams, $location, $anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService) {
 
         var resetForm = function() {
@@ -89,10 +89,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
         };
 
         $scope.isEventDateSubstitute = function(dataElement) {
-            var attr = _.find(dataElement.attributeValues, function(attributeValue) {
-                return attributeValue.attribute.code === "useAsEventDate";
-            });
-            return attr && attr.value === "true";
+            return customAttributes.getBooleanAttributeValue(dataElement.attributeValues, customAttributes.EVENT_DATE);
         };
 
         $scope.isReferralLocationPresent = function(dataElement) {

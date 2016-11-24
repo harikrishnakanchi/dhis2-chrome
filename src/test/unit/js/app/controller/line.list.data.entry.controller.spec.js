@@ -1,5 +1,7 @@
-define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timecop", "programEventRepository", "optionSetRepository", "orgUnitRepository", "excludedDataElementsRepository", "programRepository", "translationsService", "historyService", "excludedLineListOptionsRepository"],
-    function(LineListDataEntryController, mocks, utils, moment, timecop, ProgramEventRepository, OptionSetRepository, OrgUnitRepository, ExcludedDataElementsRepository, ProgramRepository, TranslationsService, HistoryService, ExcludedLineListOptionsRepository) {
+define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timecop", "programEventRepository", "optionSetRepository", "orgUnitRepository",
+    "excludedDataElementsRepository", "programRepository", "translationsService", "historyService", "excludedLineListOptionsRepository", "customAttributes"],
+    function(LineListDataEntryController, mocks, utils, moment, timecop, ProgramEventRepository, OptionSetRepository, OrgUnitRepository,
+             ExcludedDataElementsRepository, ProgramRepository, TranslationsService, HistoryService, ExcludedLineListOptionsRepository, customAttributes) {
         describe("lineListDataEntryController ", function() {
 
             var scope, lineListDataEntryController, q, routeparams, location, programEventRepository, mockStore, allEvents, optionSets, originOrgUnits, mockModule, mockProgram, optionSetRepository, optionSetMapping, orgUnitRepository, excludedDataElementsRepository, programRepository, anchorScroll, translationsService, historyService,excludedLineListOptionsRepository;
@@ -552,6 +554,14 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     "dataElement": 'de5',
                     "value": undefined
                 }]);
+            });
+
+            it('should set isEventDateSubstitute to true for the corresponding data element', function () {
+                var mockDataElement = {
+                    id: 'someDataElementId'
+                };
+                spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(true);
+                expect(scope.isEventDateSubstitute(mockDataElement)).toEqual(true);
             });
         });
     });
