@@ -1,4 +1,4 @@
-define(["lodash", "platformUtils"], function(_, platformUtils) {
+define(["lodash", "platformUtils", "customAttributes"], function(_, platformUtils, customAttributes) {
     return function($q, $scope, $location, $rootScope, $hustle, $timeout, db, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor) {
         $scope.projects = [];
 
@@ -37,12 +37,7 @@ define(["lodash", "platformUtils"], function(_, platformUtils) {
                         return {
                             "id": module.id,
                             "displayName": module.parent.name + ' - ' + module.name,
-                            "isLineListService": _.any(module.attributeValues, {
-                                "attribute": {
-                                    "code": "isLineListService"
-                                },
-                                "value": "true"
-                            })
+                            "isLineListService": customAttributes.getBooleanAttributeValue(module.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE)
                         };
                     });
                 });
