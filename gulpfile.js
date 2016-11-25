@@ -73,7 +73,7 @@ gulp.task('update-webdriver', shell.task([
     './node_modules/protractor/bin/webdriver-manager update'
 ]));
 
-gulp.task('serve', ['generate-service-worker'], function() {
+gulp.task('serve', ['generate-service-worker', 'watch'], function() {
     webserver = http.createServer(
         ecstatic({
             root: __dirname + '/src/main',
