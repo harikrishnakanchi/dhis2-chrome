@@ -11,5 +11,13 @@ require(["app/pwa/pwa.app.config", "app/shared.app.config"], function() {
         self.worker = new Worker('js/app/pwa/pwa.bg.bootstrap.js');
         platformUtils.init();
         platformUtils.addListener("backgroundReady", initializeForeground);
+
+        window.addEventListener('online', function () {
+            platformUtils.sendMessage('online');
+        });
+
+        window.addEventListener('offline', function () {
+            platformUtils.sendMessage('offline');
+        });
     });
 });

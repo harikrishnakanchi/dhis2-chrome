@@ -17,7 +17,6 @@ define(["properties", "platformUtils"], function(properties, platformUtils) {
             platformUtils.createAlarm('checkHustleQueueCountAlarm', {
                 periodInMinutes: properties.queue.checkMsgcountDelayInMinutes
             });
-            platformUtils.addAlarmListener("checkHustleQueueCountAlarm", checkHustleQueueCount);
         };
 
         var start = function() {
@@ -34,9 +33,10 @@ define(["properties", "platformUtils"], function(properties, platformUtils) {
         };
 
         return {
-            "start": start,
-            "msgInSyncQueue": msgInSyncQueue,
-            "noMsgInSyncQueue": noMsgInSyncQueue
+            start: start,
+            msgInSyncQueue: msgInSyncQueue,
+            noMsgInSyncQueue: noMsgInSyncQueue,
+            checkHustleQueueCount: checkHustleQueueCount
         };
 
     };

@@ -1,6 +1,7 @@
 define(['lodash'], function(_) {
     var messageListeners = {};
     var alarms = {};
+    var alarmListeners = {};
 
     var executeEventListener = function (message) {
         if (messageListeners[message] instanceof Function) {
@@ -44,48 +45,46 @@ define(['lodash'], function(_) {
     };
 
     var createAlarmObject = function (name, duration) {
-        var listeners = [];
         var interval;
-
-        var addListener = function (callback) {
-            listeners.push(callback);
-        };
 
         var stop = function () {
             clearInterval(interval);
+            interval = null;
         };
 
         var executeListeners = function () {
+            var listeners = alarmListeners[name] || [];
             listeners.forEach(function (listener) {
                 listener.call({});
             });
         };
 
         var start = function () {
-            interval = setInterval(executeListeners, duration);
+            if (!interval) {
+                interval = setInterval(executeListeners, duration);
+            }
         };
-
-        start();
 
         return {
-            stop: stop,
-            addListener: addListener
+            start: start,
+            stop: stop
         };
     };
-    
+
     var createAlarm = function (alarmName, options) {
         var durationInMilliseconds = options.periodInMinutes * 60 * 1000;
         alarms[alarmName] = alarms[alarmName] || createAlarmObject(alarmName, durationInMilliseconds);
+        alarms[alarmName].start();
     };
 
     var addAlarmListener = function (alarmName, callback) {
-        return alarms[alarmName] && alarms[alarmName].addListener(callback);
+        alarmListeners[alarmName] = alarmListeners[alarmName] || [];
+        alarmListeners[alarmName].push(callback);
     };
 
     var clearAlarm = function (alarmName) {
         if (alarms[alarmName]) {
             alarms[alarmName].stop();
-            alarms[alarmName] = null;
         }
     };
 

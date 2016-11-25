@@ -75,16 +75,19 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         }, "dataValues");
                     };
 
-                    var checkOnlineStatusAndSync = function() {
-                        dhisMonitor.online(function() {
-                            $log.info("Starting all hustle consumers");
-                            consumerRegistry.startAllConsumers();
-                        });
+                    var startConsumers = function() {
+                        $log.info("Starting all hustle consumers");
+                        consumerRegistry.startAllConsumers();
+                    };
 
-                        dhisMonitor.offline(function() {
-                            $log.info("Stopping all hustle consumers");
-                            consumerRegistry.stopAllConsumers();
-                        });
+                    var stopConsumers = function() {
+                        $log.info("Stopping all hustle consumers");
+                        consumerRegistry.stopAllConsumers();
+                    };
+
+                    var checkOnlineStatusAndSync = function() {
+                        dhisMonitor.online(startConsumers);
+                        dhisMonitor.offline(stopConsumers);
 
                         dhisMonitor.start()
                             .then(metadataSync)
@@ -95,12 +98,10 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         platformUtils.createAlarm('metadataSyncAlarm', {
                             periodInMinutes: properties.metadata.sync.intervalInMinutes
                         });
-                        platformUtils.addAlarmListener("metadataSyncAlarm", metadataSync);
 
                         platformUtils.createAlarm('projectDataSyncAlarm', {
                             periodInMinutes: properties.projectDataSync.intervalInMinutes
                         });
-                        platformUtils.addAlarmListener("projectDataSyncAlarm", projectDataSync);
                     };
 
                     hustleMonitor.start();
@@ -116,6 +117,14 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     platformUtils.addListener("productKeyExpired", function() {
                         dhisMonitor.stop();
                     });
+
+                    platformUtils.addListener('online', dhisMonitor.start);
+                    platformUtils.addListener('offline', dhisMonitor.stop);
+
+                    platformUtils.addAlarmListener("metadataSyncAlarm", metadataSync);
+                    platformUtils.addAlarmListener("projectDataSyncAlarm", projectDataSync);
+                    platformUtils.addAlarmListener("dhisConnectivityCheckAlarm", dhisMonitor.checkNow);
+                    platformUtils.addAlarmListener("checkHustleQueueCountAlarm", hustleMonitor.checkHustleQueueCount);
 
                     systemSettingRepository.isProductKeySet()
                         .then(systemSettingRepository.loadProductKey)

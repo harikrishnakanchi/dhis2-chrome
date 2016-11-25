@@ -36,7 +36,7 @@ require(["app/pwa/pwa.bg.config", "app/shared.bg.config"], function() {
             };
             platformUtils.init();
             platformUtils.addListener("dbReady", onDbReady);
-            self.worker.postMessage("backgroundReady");
+            platformUtils.sendMessage("backgroundReady");
         });
     });
 });

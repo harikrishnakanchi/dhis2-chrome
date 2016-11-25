@@ -80,7 +80,6 @@ define(["properties", "platformUtils", "lodash"], function(properties, platformU
             platformUtils.createAlarm("dhisConnectivityCheckAlarm", {
                 periodInMinutes: properties.dhisPing.retryIntervalInMinutes
             });
-            platformUtils.addAlarmListener("dhisConnectivityCheckAlarm", dhisConnectivityCheck);
         };
 
         var start = function() {
@@ -90,6 +89,7 @@ define(["properties", "platformUtils", "lodash"], function(properties, platformU
 
         var stop = function() {
             platformUtils.clearAlarm("dhisConnectivityCheckAlarm");
+            platformUtils.sendMessage('dhisOffline');
         };
 
         var isOnline = function() {
@@ -97,12 +97,12 @@ define(["properties", "platformUtils", "lodash"], function(properties, platformU
         };
 
         var online = function(callBack) {
-            if (onlineEventHandlers)
+            if (!_.includes(onlineEventHandlers, callBack))
                 onlineEventHandlers.push(callBack);
         };
 
         var offline = function(callBack) {
-            if (offlineEventHandlers)
+            if (!_.includes(offlineEventHandlers, callBack))
                 offlineEventHandlers.push(callBack);
         };
 
@@ -116,7 +116,6 @@ define(["properties", "platformUtils", "lodash"], function(properties, platformU
 
         platformUtils.addListener("dhisOffline", onDhisOffline);
         platformUtils.addListener("dhisOnline", onDhisOnline);
-        platformUtils.addListener("checkNow", checkNow);
         platformUtils.addListener("timeoutOccurred", onTimeoutOccurred);
 
         return {

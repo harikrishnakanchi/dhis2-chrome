@@ -144,16 +144,20 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                         }
                     });
 
-                    dhisMonitor.online(function() {
+                    var onlineListener = function() {
                         $rootScope.$apply(function() {
                             $rootScope.isDhisOnline = true;
                         });
-                    });
-                    dhisMonitor.offline(function() {
+                    };
+
+                    var offlineListener = function() {
                         $rootScope.$apply(function() {
                             $rootScope.isDhisOnline = false;
                         });
-                    });
+                    };
+
+                    dhisMonitor.online(onlineListener);
+                    dhisMonitor.offline(offlineListener);
 
                     hustleMonitor.msgInSyncQueue(function() {
                         $rootScope.$apply(function() {
