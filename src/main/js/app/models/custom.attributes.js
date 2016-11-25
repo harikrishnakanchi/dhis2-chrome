@@ -22,7 +22,19 @@ define(['lodash'], function(_) {
         AUTO_APPROVE: 'autoApprove',
         EVENT_DATE: 'useAsEventDate',
         ASSOCIATED_DATA_SET_CODE: 'associatedDataSet',
-        PEDIATRIC_AGE_FIELD_CODE: 'pediatricAgeField'
+        PEDIATRIC_AGE_FIELD_CODE: 'pediatricAgeField',
+        EST_POPULATION_OF_WOMEN_OF_CHILD_BEARING_AGE_CODE: 'estPopulationOfWomenOfChildBearingAge',
+        EST_POPULATION_BETWEEN_1_AND_5_YEARS_CODE: 'estPopulationBetween1And5Years',
+        EST_POPULATION_LESS_THAN_1_YEAR_CODE: 'estPopulationLessThan1Year',
+        ESTIMATED_TARGET_POPULATION_CODE: 'estimatedTargetPopulation',
+        PROJECT_END_DATE_CODE: 'prjEndDate',
+        PROJECT_CONTEXT_CODE: 'prjCon',
+        PROJECT_LOCATION_CODE: 'prjLoc',
+        PROJECT_POPULATION_TYPE_CODE: 'prjPopType',
+        REASON_FOR_INTERVENTION_CODE: 'reasonForIntervention',
+        MODE_OF_OPERATION_CODE: 'modeOfOperation',
+        MODEL_OF_MANAGEMENT_CODE: 'modelOfManagement',
+        PROJECT_TYPE_CODE: 'projectType'
     };
 
     var getBooleanAttributeValue = function(attributeValues, attributeCode) {

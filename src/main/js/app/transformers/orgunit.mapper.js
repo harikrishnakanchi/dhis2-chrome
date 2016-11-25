@@ -4,7 +4,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
             "attribute": {
-                "code": "Type",
+                "code": customAttributes.TYPE,
                 "name": "Type"
             },
             value: "Project"
@@ -13,7 +13,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
             "attribute": {
-                "code": "prjCon",
+                "code": customAttributes.PROJECT_CONTEXT_CODE,
                 "name": "Context"
             },
             "value": orgUnit.context ? (orgUnit.context.originalObject ? orgUnit.context.originalObject.englishName : orgUnit.context.englishName) : orgUnit.context
@@ -21,7 +21,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
             "attribute": {
-                "code": "prjLoc",
+                "code": customAttributes.PROJECT_LOCATION_CODE,
                 "name": "Location"
             },
             "value": orgUnit.location
@@ -29,7 +29,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
             "attribute": {
-                "code": "prjPopType",
+                "code": customAttributes.PROJECT_POPULATION_TYPE_CODE,
                 "name": "Type of population"
             },
             "value": orgUnit.populationType ? (orgUnit.populationType.originalObject ? orgUnit.populationType.originalObject.englishName : orgUnit.populationType.englishName) : orgUnit.populationType
@@ -37,7 +37,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
             "attribute": {
-                "code": "projCode",
+                "code": customAttributes.PROJECT_CODE,
                 "name": "Project Code"
             },
             "value": orgUnit.projectCode
@@ -45,7 +45,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
             "attribute": {
-                "code": "reasonForIntervention",
+                "code": customAttributes.REASON_FOR_INTERVENTION_CODE,
                 "name": "Reason For Intervention"
             },
             "value": orgUnit.reasonForIntervention ? (orgUnit.reasonForIntervention.originalObject ? orgUnit.reasonForIntervention.originalObject.englishName : orgUnit.reasonForIntervention.englishName) : orgUnit.reasonForIntervention
@@ -53,7 +53,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
             "attribute": {
-                "code": "modeOfOperation",
+                "code": customAttributes.MODE_OF_OPERATION_CODE,
                 "name": "Mode Of Operation"
             },
             "value": orgUnit.modeOfOperation ? (orgUnit.modeOfOperation.originalObject ? orgUnit.modeOfOperation.originalObject.englishName : orgUnit.modeOfOperation.englishName) : orgUnit.modeOfOperation
@@ -61,7 +61,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
             "attribute": {
-                "code": "modelOfManagement",
+                "code": customAttributes.MODEL_OF_MANAGEMENT_CODE,
                 "name": "Model Of Management"
             },
             "value": orgUnit.modelOfManagement ? (orgUnit.modelOfManagement.originalObject ? orgUnit.modelOfManagement.originalObject.englishName : orgUnit.modelOfManagement.englishName) : orgUnit.modelOfManagement
@@ -69,7 +69,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
             "attribute": {
-                "code": "autoApprove",
+                "code": customAttributes.AUTO_APPROVE,
                 "name": "Auto Approve"
             },
             "value": orgUnit.autoApprove
@@ -77,7 +77,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
             "attribute": {
-                "code": "isNewDataModel",
+                "code": customAttributes.NEW_DATA_MODEL_CODE,
                 "name": "Is New Data Model"
             },
             "value": "true"
@@ -85,7 +85,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
             "attribute": {
-                "code": "projectType",
+                "code": customAttributes.PROJECT_TYPE_CODE,
                 "name": "Project Type"
             },
             "value": orgUnit.projectType ? (orgUnit.projectType.originalObject ? orgUnit.projectType.originalObject.englishName : orgUnit.projectType.englishName) : orgUnit.projectType
@@ -93,7 +93,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
             "attribute": {
-                "code": "estimatedTargetPopulation",
+                "code": customAttributes.ESTIMATED_TARGET_POPULATION_CODE,
                 "name": "Estimated target population"
             },
             "value": orgUnit.estimatedTargetPopulation ? orgUnit.estimatedTargetPopulation.toString() : ""
@@ -101,7 +101,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
             "attribute": {
-                "code": "estPopulationLessThan1Year",
+                "code": customAttributes.EST_POPULATION_LESS_THAN_1_YEAR_CODE,
                 "name": "Est. population less than 1 year"
             },
             "value": orgUnit.estPopulationLessThan1Year ? orgUnit.estPopulationLessThan1Year.toString() : ""
@@ -109,7 +109,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
             "attribute": {
-                "code": "estPopulationBetween1And5Years",
+                "code": customAttributes.EST_POPULATION_BETWEEN_1_AND_5_YEARS_CODE,
                 "name": "Est. population between 1 and 5 years"
             },
             "value": orgUnit.estPopulationBetween1And5Years ? orgUnit.estPopulationBetween1And5Years.toString() : ""
@@ -117,7 +117,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
             "attribute": {
-                "code": "estPopulationOfWomenOfChildBearingAge",
+                "code": customAttributes.EST_POPULATION_OF_WOMEN_OF_CHILD_BEARING_AGE_CODE,
                 "name": "Est. population of women of child bearing age"
             },
             "value": orgUnit.estPopulationOfWomenOfChildBearingAge ? orgUnit.estPopulationOfWomenOfChildBearingAge.toString() : ""
@@ -128,7 +128,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
                 "created": moment().toISOString(),
                 "lastUpdated": moment().toISOString(),
                 "attribute": {
-                    "code": "prjEndDate",
+                    "code": customAttributes.PROJECT_END_DATE_CODE,
                     "name": "End date"
                 },
                 "value": moment(orgUnit.endDate).format("YYYY-MM-DD")
@@ -192,27 +192,27 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             return result[0] ? result[0] : undefined;
         };
 
-        var endDate = customAttributes.getAttributeValue(dhisProject.attributeValues, "prjEndDate");
-        var autoApprove = customAttributes.getAttributeValue(dhisProject.attributeValues, "autoApprove");
+        var endDate = customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.PROJECT_END_DATE_CODE);
+        var autoApprove = customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.AUTO_APPROVE);
         return {
             'name': dhisProject.name,
             'openingDate': moment(dhisProject.openingDate).toDate(),
             'endDate': endDate ? moment(endDate).toDate() : undefined,
 
-            'location': customAttributes.getAttributeValue(dhisProject.attributeValues, "prjLoc"),
-            'projectCode': customAttributes.getAttributeValue(dhisProject.attributeValues, "projCode"),
+            'location': customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.PROJECT_LOCATION_CODE),
+            'projectCode': customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.PROJECT_CODE),
 
-            'context': getTranslatedName(allContexts, "prjCon"),
-            'populationType': getTranslatedName(allPopTypes, "prjPopType"),
-            'projectType': getTranslatedName(allProjectTypes, "projectType"),
-            'reasonForIntervention': getTranslatedName(reasonForIntervention, "reasonForIntervention"),
-            'modeOfOperation': getTranslatedName(modeOfOperation, "modeOfOperation"),
-            'modelOfManagement': getTranslatedName(modelOfManagement, "modelOfManagement"),
+            'context': getTranslatedName(allContexts, customAttributes.PROJECT_CONTEXT_CODE),
+            'populationType': getTranslatedName(allPopTypes, customAttributes.PROJECT_POPULATION_TYPE_CODE),
+            'projectType': getTranslatedName(allProjectTypes, customAttributes.PROJECT_TYPE_CODE),
+            'reasonForIntervention': getTranslatedName(reasonForIntervention, customAttributes.REASON_FOR_INTERVENTION_CODE),
+            'modeOfOperation': getTranslatedName(modeOfOperation, customAttributes.MODE_OF_OPERATION_CODE),
+            'modelOfManagement': getTranslatedName(modelOfManagement, customAttributes.MODEL_OF_MANAGEMENT_CODE),
 
-            'estimatedTargetPopulation': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, "estimatedTargetPopulation")),
-            'estPopulationLessThan1Year': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, "estPopulationLessThan1Year")),
-            'estPopulationBetween1And5Years': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, "estPopulationBetween1And5Years")),
-            'estPopulationOfWomenOfChildBearingAge': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, "estPopulationOfWomenOfChildBearingAge")),
+            'estimatedTargetPopulation': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.ESTIMATED_TARGET_POPULATION_CODE)),
+            'estPopulationLessThan1Year': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.EST_POPULATION_LESS_THAN_1_YEAR_CODE)),
+            'estPopulationBetween1And5Years': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.EST_POPULATION_BETWEEN_1_AND_5_YEARS_CODE)),
+            'estPopulationOfWomenOfChildBearingAge': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.EST_POPULATION_OF_WOMEN_OF_CHILD_BEARING_AGE_CODE)),
             'autoApprove': autoApprove === undefined ? "false" : autoApprove
         };
     };
@@ -229,7 +229,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
                 created: moment().toISOString(),
                 lastUpdated: moment().toISOString(),
                 attribute: {
-                    "code": "Type",
+                    "code": customAttributes.TYPE,
                     "name": "Type"
                 },
                 value: "Module"
@@ -237,7 +237,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
                 created: moment().toISOString(),
                 lastUpdated: moment().toISOString(),
                 attribute: {
-                    "code": "isLineListService",
+                    "code": customAttributes.LINE_LIST_ATTRIBUTE_CODE,
                     "name": "Is Linelist Service"
                 },
                 value: module.serviceType === "Linelist" ? "true" : "false"
@@ -245,7 +245,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
                 created: moment().toISOString(),
                 lastUpdated: moment().toISOString(),
                 attribute: {
-                    "code": "isNewDataModel",
+                    "code": customAttributes.NEW_DATA_MODEL_CODE,
                     "name": "Is New Data Model"
                 },
                 value: "true"
@@ -294,13 +294,13 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
                     "openingDate": parent.openingDate,
                     "attributeValues": [{
                         "attribute": {
-                            "code": "Type",
+                            "code": customAttributes.TYPE,
                             "name": "Type"
                         },
                         "value": "Patient Origin"
                     }, {
                         "attribute": {
-                            "code": "isNewDataModel",
+                            "code": customAttributes.NEW_DATA_MODEL_CODE,
                             "name": "Is New Data Model"
                         },
                         "value": "true"
@@ -313,7 +313,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
                 if (patientOrigin.isDisabled === true) {
                     var isDisabledAttr = {
                         "attribute": {
-                            "code": "isDisabled",
+                            "code": customAttributes.DISABLED_CODE,
                         },
                         "value": "true"
                     };

@@ -73,7 +73,7 @@ define(["lodash", "moment", "dhisId","interpolate", "orgUnitMapper", "customAttr
                 };
 
                 var isLinelistService = function(orgUnit) {
-                    return customAttributes.getBooleanAttributeValue(orgUnit.attributeValues, "isLineListService");
+                    return customAttributes.getBooleanAttributeValue(orgUnit.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE);
                 };
 
                 var createOrgUnitGroups = function() {

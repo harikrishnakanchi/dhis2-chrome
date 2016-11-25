@@ -22,8 +22,8 @@ define(["dhisId", "interpolate", "properties", "customAttributes"], function(dhi
         };
 
         var init = function() {
-            var projCode = customAttributes.getAttributeValue($scope.orgUnit.attributeValues, 'projCode', '').toLowerCase();
-            var orgUnitType = customAttributes.getAttributeValue($scope.orgUnit.attributeValues, 'Type', '');
+            var projCode = customAttributes.getAttributeValue($scope.orgUnit.attributeValues, customAttributes.PROJECT_CODE, '').toLowerCase();
+            var orgUnitType = customAttributes.getAttributeValue($scope.orgUnit.attributeValues, customAttributes.TYPE, '');
             var userNamePrefix = _.isEmpty(projCode) ? projCode : projCode + "_";
             $scope.userNameMatchExpr = orgUnitType === "Country" ? new RegExp("[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+\\.[a-zA-Z]{2,4}$", "i") : new RegExp(userNamePrefix + "(.)+", "i");
             $scope.patternValidationMessage = orgUnitType === "Country" ? $scope.resourceBundle.emailValidation :  interpolate($scope.resourceBundle.usernamePrefixValidation, { username_prefix: userNamePrefix });
