@@ -331,5 +331,6 @@
     "contactSupport": "Contact {{supportEmail}} for any questions.",
     "referralLocationCheckboxLabel": "Display Referral Location for Data Entry User",
     "geographicOriginCheckboxLabel": "Display Geographic Origin for Data Entry User",
-    "updated": "Updated"
+    "updated": "Updated",
+    "help": "Help"
 }

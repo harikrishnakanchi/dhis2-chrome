@@ -331,5 +331,6 @@
     "contactSupport": "Contact {{supportEmail}} for any questions.",
     "referralLocationCheckboxLabel": "عرض موقع إشارة للمستخدم إدخال البيانات",
     "geographicOriginCheckboxLabel": "عرض الأصل الجغرافي للمستخدم إدخال البيانات",
-    "updated": "تحديث"
+    "updated": "تحديث",
+    "help": ""
 }

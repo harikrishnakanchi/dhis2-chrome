@@ -331,5 +331,6 @@
     "contactSupport": "Contactez {{supportEmail}} pour toute question",
     "referralLocationCheckboxLabel": "Afficher l'emplacement de référence pour l'utilisateur de saisie de données",
     "geographicOriginCheckboxLabel": "Afficher origine géographique pour l'utilisateur de saisie de données",
-    "updated": "Actualisé"
+    "updated": "Actualisé",
+    "help": "Aidez"
 }

@@ -1,4 +1,4 @@
-define(["lodash", "platformUtils", "customAttributes"], function(_, platformUtils, customAttributes) {
+define(["lodash", "platformUtils", "customAttributes", "properties", "interpolate"], function(_, platformUtils, customAttributes, properties, interpolate) {
     return function($q, $scope, $location, $rootScope, $hustle, $timeout, db, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor) {
         $scope.projects = [];
 
@@ -17,6 +17,10 @@ define(["lodash", "platformUtils", "customAttributes"], function(_, platformUtil
 
         $scope.showTestLogo = function() {
             return !systemSettingRepository.isKeyGeneratedFromProd();
+        };
+
+        $scope.getSupportEmailMessage = function () {
+            return interpolate($scope.resourceBundle.contactSupport, {supportEmail: properties.support_email});
         };
 
         var loadProjects = function() {
