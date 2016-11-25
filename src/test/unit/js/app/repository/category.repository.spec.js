@@ -1,4 +1,4 @@
-define(['categoryRepository', 'angularMocks', 'utils', 'customAttributes'], function (CategoryRepository, mocks, utils, CustomAttributes) {
+define(['categoryRepository', 'angularMocks', 'utils', 'customAttributes'], function (CategoryRepository, mocks, utils, customAttributes) {
     describe('categoryRepository', function () {
         var categoryRepository, q, scope, mockStore,
             mockCategoryOptions, mockCategories, mockCategoryCombos, mockCategoryOptionCombos;
@@ -15,7 +15,7 @@ define(['categoryRepository', 'angularMocks', 'utils', 'customAttributes'], func
                 shortName: 'shortName'
             }];
 
-            spyOn(CustomAttributes, 'getBooleanAttributeValue');
+            spyOn(customAttributes, 'getBooleanAttributeValue');
 
             categoryRepository = new CategoryRepository(mockDB.db, q);
         }));
@@ -33,7 +33,7 @@ define(['categoryRepository', 'angularMocks', 'utils', 'customAttributes'], func
             });
 
             it('should set excludeFromTotal property from custom attributes', function () {
-                CustomAttributes.getBooleanAttributeValue.and.returnValue('someBooleanValue');
+                customAttributes.getBooleanAttributeValue.and.returnValue('someBooleanValue');
                 mockStore.getAll.and.returnValue(utils.getPromise(q, mockCategoryOptions));
 
                 categoryRepository.getAllCategoryOptions().then(function (categoryOptions) {

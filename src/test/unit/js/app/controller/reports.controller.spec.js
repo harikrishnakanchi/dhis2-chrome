@@ -1,5 +1,5 @@
 define(["angularMocks", "utils", "moment", "timecop", "reportsController", "dataSetRepository", "programRepository", "orgUnitRepository", "chartRepository", "pivotTableRepository", "translationsService", "changeLogRepository", "customAttributes", "filesystemService", "saveSvgAsPng", "dataURItoBlob", "lodash"],
-    function(mocks, utils, moment, timecop, ReportsController, DatasetRepository, ProgramRepository, OrgUnitRepository, ChartRepository, PivotTableRepository, TranslationsService, ChangeLogRepository, CustomAttributes, FilesystemService, SVGUtils, dataURItoBlob, _) {
+    function(mocks, utils, moment, timecop, ReportsController, DatasetRepository, ProgramRepository, OrgUnitRepository, ChartRepository, PivotTableRepository, TranslationsService, ChangeLogRepository, customAttributes, FilesystemService, SVGUtils, dataURItoBlob, _) {
     describe("reportsController", function() {
         var scope, q, rootScope, routeParams,
             mockModule, mockDataSet, mockProgram, mockProject, mockOrigin,
@@ -70,7 +70,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             filesystemService = new FilesystemService();
             spyOn(filesystemService, 'promptAndWriteFile').and.returnValue(utils.getPromise(q, {}));
 
-            spyOn(CustomAttributes, 'getBooleanAttributeValue').and.returnValue(false);
+            spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(false);
 
             translationsService = new TranslationsService();
             spyOn(translationsService, 'translate').and.callFake(function (object) { return object; });
@@ -86,10 +86,10 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
         });
 
         it('should set the flag whether current orgUnit is a linelist module', function() {
-            CustomAttributes.getBooleanAttributeValue.and.returnValue('someBooleanValue');
+            customAttributes.getBooleanAttributeValue.and.returnValue('someBooleanValue');
             scope.$apply();
 
-            expect(CustomAttributes.getBooleanAttributeValue).toHaveBeenCalledWith(mockModule.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
+            expect(customAttributes.getBooleanAttributeValue).toHaveBeenCalledWith(mockModule.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE);
             expect(scope.orgUnit.lineListService).toEqual('someBooleanValue');
         });
 
