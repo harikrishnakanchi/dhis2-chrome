@@ -501,6 +501,7 @@ define(['dateUtils', 'lodash'], function(dateUtils, _) {
         format_event_dates,
         migrate_organisation_unit_data_set_association,
         delete_indices_for_chart_data_and_pivot_table_data,
-        migrate_chart_and_pivot_table_keys_from_names_to_ids
+        migrate_chart_and_pivot_table_keys_from_names_to_ids,
+        delete_keys_chart_and_reports_from_changelog
     ];
 });
