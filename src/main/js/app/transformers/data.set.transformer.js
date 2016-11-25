@@ -1,16 +1,16 @@
-define(["dataEntryTableColumnConfig", "lodash", "customAttributes"], function(dataEntryTableColumnConfig, _, CustomAttributes) {
+define(["dataEntryTableColumnConfig", "lodash", "customAttributes"], function(dataEntryTableColumnConfig, _, customAttributes) {
     this.mapDatasetForView = function(dataset) {
         var resultDataset = _.pick(dataset, ["id", "name", "shortName", "code", "sections"]);
-        resultDataset.isAggregateService = !CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE) &&
-            !CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, CustomAttributes.ORIGIN_DATA_SET_CODE) &&
-            !CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, CustomAttributes.REFERRAL_DATA_SET_CODE) &&
-            !CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, CustomAttributes.POPULATION_DATA_SET_CODE);
-        resultDataset.isLineListService = CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
-        resultDataset.isOriginDataset = CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, CustomAttributes.ORIGIN_DATA_SET_CODE);
-        resultDataset.isNewDataModel = CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, CustomAttributes.NEW_DATA_MODEL_CODE);
-        resultDataset.isReferralDataset = CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, CustomAttributes.REFERRAL_DATA_SET_CODE);
-        resultDataset.isPopulationDataset = CustomAttributes.getBooleanAttributeValue(dataset.attributeValues, CustomAttributes.POPULATION_DATA_SET_CODE);
-        resultDataset.serviceCode = CustomAttributes.getAttributeValue(dataset.attributeValues, CustomAttributes.SERVICE_CODE);
+        resultDataset.isAggregateService = !customAttributes.getBooleanAttributeValue(dataset.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE) &&
+            !customAttributes.getBooleanAttributeValue(dataset.attributeValues, customAttributes.ORIGIN_DATA_SET_CODE) &&
+            !customAttributes.getBooleanAttributeValue(dataset.attributeValues, customAttributes.REFERRAL_DATA_SET_CODE) &&
+            !customAttributes.getBooleanAttributeValue(dataset.attributeValues, customAttributes.POPULATION_DATA_SET_CODE);
+        resultDataset.isLineListService = customAttributes.getBooleanAttributeValue(dataset.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE);
+        resultDataset.isOriginDataset = customAttributes.getBooleanAttributeValue(dataset.attributeValues, customAttributes.ORIGIN_DATA_SET_CODE);
+        resultDataset.isNewDataModel = customAttributes.getBooleanAttributeValue(dataset.attributeValues, customAttributes.NEW_DATA_MODEL_CODE);
+        resultDataset.isReferralDataset = customAttributes.getBooleanAttributeValue(dataset.attributeValues, customAttributes.REFERRAL_DATA_SET_CODE);
+        resultDataset.isPopulationDataset = customAttributes.getBooleanAttributeValue(dataset.attributeValues, customAttributes.POPULATION_DATA_SET_CODE);
+        resultDataset.serviceCode = customAttributes.getAttributeValue(dataset.attributeValues, customAttributes.SERVICE_CODE);
         return resultDataset;
     };
 
@@ -44,9 +44,9 @@ define(["dataEntryTableColumnConfig", "lodash", "customAttributes"], function(da
             return _.map(dataElements, function(dataElement) {
                 var enrichedDataElement = _.pick(indexedDataElements[dataElement.id], "id", "name", "formName", "categoryCombo", "description", "code");
                 enrichedDataElement.isIncluded = _.isEmpty(excludedDataElements) ? true : !_.contains(excludedDataElements, dataElement.id);
-                enrichedDataElement.isMandatory = CustomAttributes.getBooleanAttributeValue(indexedDataElements[dataElement.id].attributeValues, CustomAttributes.MANDATORY_CODE);
+                enrichedDataElement.isMandatory = customAttributes.getBooleanAttributeValue(indexedDataElements[dataElement.id].attributeValues, customAttributes.MANDATORY_CODE);
                 // TODO REMOVE AFTER 10.0
-                var associatedProgram = CustomAttributes.getAttributeValue(indexedDataElements[dataElement.id].attributeValues, CustomAttributes.ASSOCIATED_PROGRAM_CODE);
+                var associatedProgram = customAttributes.getAttributeValue(indexedDataElements[dataElement.id].attributeValues, customAttributes.ASSOCIATED_PROGRAM_CODE);
                 if (!_.isEmpty(associatedProgram)) {
                     enrichedDataElement.associatedProgramId = associatedProgram;
                 }
@@ -54,10 +54,10 @@ define(["dataEntryTableColumnConfig", "lodash", "customAttributes"], function(da
                 var subSection = getSubSection(enrichedDataElement)[0] || {
                     "name": "Default"
                 };
-                enrichedDataElement.shouldHideTotals = CustomAttributes.getBooleanAttributeValue(indexedDataElements[dataElement.id].attributeValues, CustomAttributes.HIDE_AGGREGATE_DATA_SET_SECTION_TOTALS);
+                enrichedDataElement.shouldHideTotals = customAttributes.getBooleanAttributeValue(indexedDataElements[dataElement.id].attributeValues, customAttributes.HIDE_AGGREGATE_DATA_SET_SECTION_TOTALS);
                 enrichedDataElement.subSection = subSection.name;
 
-                var populationDataElementCode = CustomAttributes.getAttributeValue(indexedDataElements[dataElement.id].attributeValues, CustomAttributes.PRAXIS_POPULATION_DATA_ELEMENTS);
+                var populationDataElementCode = customAttributes.getAttributeValue(indexedDataElements[dataElement.id].attributeValues, customAttributes.PRAXIS_POPULATION_DATA_ELEMENTS);
                 if(populationDataElementCode)
                     enrichedDataElement.populationDataElementCode = populationDataElementCode;
                 return enrichedDataElement;

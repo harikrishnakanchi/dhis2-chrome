@@ -1,10 +1,10 @@
-define(["lodash", "moment", "customAttributes"], function(_, moment, CustomAttributes) {
+define(["lodash", "moment", "customAttributes"], function(_, moment, customAttributes) {
     return function(db, $q, dataElementRepository) {
         var addServiceCode = function (program) {
             if (_.isArray(program)) {
                 return _.map(program, addServiceCode);
             } else {
-                return _.set(program, 'serviceCode', CustomAttributes.getAttributeValue(_.get(program, 'attributeValues'), CustomAttributes.SERVICE_CODE));
+                return _.set(program, 'serviceCode', customAttributes.getAttributeValue(_.get(program, 'attributeValues'), customAttributes.SERVICE_CODE));
             }
         };
 
@@ -19,7 +19,7 @@ define(["lodash", "moment", "customAttributes"], function(_, moment, CustomAttri
                 .then(addServiceCode)
                 .then(function(programs) {
                 return _.filter(programs, function(p) {
-                    return CustomAttributes.getBooleanAttributeValue(p.attributeValues, CustomAttributes.NEW_DATA_MODEL_CODE);
+                    return customAttributes.getBooleanAttributeValue(p.attributeValues, customAttributes.NEW_DATA_MODEL_CODE);
                 });
             });
         };
