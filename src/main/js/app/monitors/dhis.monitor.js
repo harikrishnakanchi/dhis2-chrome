@@ -116,16 +116,16 @@ define(["properties", "platformUtils", "lodash"], function(properties, platformU
 
         platformUtils.addListener("dhisOffline", onDhisOffline);
         platformUtils.addListener("dhisOnline", onDhisOnline);
-        platformUtils.addListener("timeoutOccurred", onTimeoutOccurred);
 
         return {
-            "start": start,
-            "stop": stop,
-            "hasPoorConnectivity": hasPoorConnectivity,
-            "isOnline": isOnline,
-            "online": online,
-            "offline": offline,
-            "checkNow": checkNow
+            start: start,
+            stop: stop,
+            hasPoorConnectivity: hasPoorConnectivity,
+            isOnline: isOnline,
+            online: online,
+            offline: offline,
+            checkNow: checkNow,
+            onTimeoutOccurred: onTimeoutOccurred
         };
     };
 });

@@ -119,11 +119,13 @@ define(["dhisMonitor", "utils", "angularMocks", "platformUtils", "mockChrome", "
         });
 
         it("should set hasPoorConnectivity to true on timeout", function() {
+            mockChrome.addListener('timeoutOccurred', dhisMonitor.onTimeoutOccurred);
             mockChrome.sendMessage("timeoutOccurred");
             expect(dhisMonitor.hasPoorConnectivity()).toBe(true);
         });
 
         it("should reset hasPoorConnectivity to false if the timeoutOccurred event does not re-occur after some time", function() {
+            mockChrome.addListener('timeoutOccurred', dhisMonitor.onTimeoutOccurred);
             mockChrome.sendMessage("timeoutOccurred");
             expect(dhisMonitor.hasPoorConnectivity()).toBe(true);
 
