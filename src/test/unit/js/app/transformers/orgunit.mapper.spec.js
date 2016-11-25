@@ -461,7 +461,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                 "id": "id1",
                 "attributeValues": [{
                     "attribute": {
-                        "code": "type"
+                        "code": "Type"
                     },
                     "value": "Project"
                 }]
@@ -471,7 +471,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                 "name": "Module1",
                 "attributeValues": [{
                     "attribute": {
-                        "code": "type"
+                        "code": "Type"
                     },
                     "value": "Module"
                 }],
@@ -486,7 +486,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                 "id": "opunit1",
                 "attributeValues": [{
                     "attribute": {
-                        "code": "type"
+                        "code": "Type"
                     },
                     "value": "Operation Unit"
                 }],
@@ -500,7 +500,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                 "name": "Module2",
                 "attributeValues": [{
                     "attribute": {
-                        "code": "type"
+                        "code": "Type"
                     },
                     "value": "Module"
                 }],

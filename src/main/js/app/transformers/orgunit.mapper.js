@@ -258,12 +258,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
     };
 
     var isOfType = function(orgUnit, type) {
-        return _.any(orgUnit.attributeValues, {
-            attribute: {
-                code: "type"
-            },
-            value: type
-        });
+        return customAttributes.getAttributeValue(orgUnit.attributeValues, customAttributes.TYPE) === type;
     };
 
     this.filterModules = function(orgUnits) {
