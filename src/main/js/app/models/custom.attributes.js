@@ -21,7 +21,8 @@ define(['lodash'], function(_) {
         PROJECT_CODE: 'projCode',
         AUTO_APPROVE: 'autoApprove',
         EVENT_DATE: 'useAsEventDate',
-        ASSOCIATED_DATA_SET_CODE: 'associatedDataSet'
+        ASSOCIATED_DATA_SET_CODE: 'associatedDataSet',
+        PEDIATRIC_AGE_FIELD_CODE: 'pediatricAgeField'
     };
 
     var getBooleanAttributeValue = function(attributeValues, attributeCode) {

@@ -18,12 +18,8 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
         };
 
         $scope.getNumberPattern = function(dataElement) {
-            var attr = _.find(dataElement.attributeValues, {
-                attribute: {
-                    name: 'Pediatric Age Field'
-                }
-            });
-            if((!_.isEmpty(attr)) && attr.value === 'true')
+            var isPediatricAgeDataElement = customAttributes.getBooleanAttributeValue(dataElement.attributeValues, customAttributes.PEDIATRIC_AGE_FIELD_CODE);
+            if(isPediatricAgeDataElement)
                 return '^((0.5)|[1-9][0-9]?)$';
             else
                 return '^[1-9][0-9]?$';
