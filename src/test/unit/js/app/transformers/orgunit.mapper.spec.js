@@ -779,184 +779,256 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
             expect(projectToBeSaved).toEqual(expectedSavedProject);
         });
 
-        it("should create patient origin orgunit payload", function() {
-            spyOn(dhisId, "get").and.callFake(function(name) {
-                return name;
+        describe('createPatientOriginPayload', function () {
+
+            beforeEach(function () {
+                spyOn(dhisId, "get").and.callFake(function(name) {
+                    return name;
+                });
             });
 
-            var parents = [{
-                "id": "p1",
-                "name": "p1",
-                "openingDate": "2014-02-02"
-            }, {
-                "id": "p2",
-                "name": "p2",
-                "openingDate": "2015-02-02"
-            }];
+            it("should return the created patient origin payload", function() {
+                var parents = [{
+                    "id": "p1",
+                    "name": "p1",
+                    "openingDate": "2014-02-02"
+                }, {
+                    "id": "p2",
+                    "name": "p2",
+                    "openingDate": "2015-02-02"
+                }];
 
-            var patientOrigins = [{
-                "name": "Origin1",
-                "latitude": 23.21,
-                "longitude": 32.12
-            }, {
-                "name": "Origin2",
-                "latitude": 43.96,
-                "longitude": 84.142
-            }, {
-                "name": "Unknown"
-            }];
+                var patientOrigins = [{
+                    "name": "Origin1",
+                    "latitude": 23.21,
+                    "longitude": 32.12
+                }, {
+                    "name": "Origin2",
+                    "latitude": 43.96,
+                    "longitude": 84.142
+                }, {
+                    "name": "Unknown"
+                }];
 
-            var expectedPayload = [{
-                "name": patientOrigins[0].name,
-                "shortName": patientOrigins[0].name,
-                "displayName": patientOrigins[0].name,
-                "id": dhisId.get(patientOrigins[0].name + "p1"),
-                "level": 7,
-                "openingDate": "2014-02-02",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "Type",
-                        "name": "Type"
+                var expectedPayload = [{
+                    "name": patientOrigins[0].name,
+                    "shortName": patientOrigins[0].name,
+                    "displayName": patientOrigins[0].name,
+                    "id": dhisId.get(patientOrigins[0].name + "p1"),
+                    "level": 7,
+                    "openingDate": "2014-02-02",
+                    "attributeValues": [{
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "Type",
+                            "name": "Type"
+                        },
+                        "value": "Patient Origin"
+                    }, {
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "isNewDataModel",
+                            "name": "Is New Data Model"
+                        },
+                        "value": "true"
+                    }],
+                    "parent": {
+                        "id": "p1"
                     },
-                    "value": "Patient Origin"
+                    "coordinates": "[" + patientOrigins[0].longitude + "," + patientOrigins[0].latitude + "]",
+                    "featureType": "POINT"
                 }, {
-                    "attribute": {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
+                    "name": patientOrigins[0].name,
+                    "shortName": patientOrigins[0].name,
+                    "displayName": patientOrigins[0].name,
+                    "id": dhisId.get(patientOrigins[0].name + "p2"),
+                    "level": 7,
+                    "openingDate": "2015-02-02",
+                    "attributeValues": [{
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "Type",
+                            "name": "Type"
+                        },
+                        "value": "Patient Origin"
+                    }, {
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "isNewDataModel",
+                            "name": "Is New Data Model"
+                        },
+                        "value": "true"
+                    }],
+                    "parent": {
+                        "id": "p2"
                     },
-                    "value": "true"
-                }],
-                "parent": {
-                    "id": "p1"
-                },
-                "coordinates": "[" + patientOrigins[0].longitude + "," + patientOrigins[0].latitude + "]",
-                "featureType": "POINT"
-            }, {
-                "name": patientOrigins[0].name,
-                "shortName": patientOrigins[0].name,
-                "displayName": patientOrigins[0].name,
-                "id": dhisId.get(patientOrigins[0].name + "p2"),
-                "level": 7,
-                "openingDate": "2015-02-02",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "Type",
-                        "name": "Type"
-                    },
-                    "value": "Patient Origin"
+                    "coordinates": "[" + patientOrigins[0].longitude + "," + patientOrigins[0].latitude + "]",
+                    "featureType": "POINT"
                 }, {
-                    "attribute": {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
+                    "name": patientOrigins[1].name,
+                    "shortName": patientOrigins[1].name,
+                    "displayName": patientOrigins[1].name,
+                    "id": dhisId.get(patientOrigins[1].name + "p1"),
+                    "level": 7,
+                    "openingDate": "2014-02-02",
+                    "attributeValues": [{
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "Type",
+                            "name": "Type"
+                        },
+                        "value": "Patient Origin"
+                    }, {
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "isNewDataModel",
+                            "name": "Is New Data Model"
+                        },
+                        "value": "true"
+                    }],
+                    "parent": {
+                        "id": "p1"
                     },
-                    "value": "true"
-                }],
-                "parent": {
-                    "id": "p2"
-                },
-                "coordinates": "[" + patientOrigins[0].longitude + "," + patientOrigins[0].latitude + "]",
-                "featureType": "POINT"
-            }, {
-                "name": patientOrigins[1].name,
-                "shortName": patientOrigins[1].name,
-                "displayName": patientOrigins[1].name,
-                "id": dhisId.get(patientOrigins[1].name + "p1"),
-                "level": 7,
-                "openingDate": "2014-02-02",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "Type",
-                        "name": "Type"
-                    },
-                    "value": "Patient Origin"
+                    "coordinates": "[" + patientOrigins[1].longitude + "," + patientOrigins[1].latitude + "]",
+                    "featureType": "POINT"
                 }, {
-                    "attribute": {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
+                    "name": patientOrigins[1].name,
+                    "shortName": patientOrigins[1].name,
+                    "displayName": patientOrigins[1].name,
+                    "id": dhisId.get(patientOrigins[1].name + "p2"),
+                    "level": 7,
+                    "openingDate": "2015-02-02",
+                    "attributeValues": [{
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "Type",
+                            "name": "Type"
+                        },
+                        "value": "Patient Origin"
+                    }, {
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "isNewDataModel",
+                            "name": "Is New Data Model"
+                        },
+                        "value": "true"
+                    }],
+                    "parent": {
+                        "id": "p2"
                     },
-                    "value": "true"
-                }],
-                "parent": {
-                    "id": "p1"
-                },
-                "coordinates": "[" + patientOrigins[1].longitude + "," + patientOrigins[1].latitude + "]",
-                "featureType": "POINT"
-            }, {
-                "name": patientOrigins[1].name,
-                "shortName": patientOrigins[1].name,
-                "displayName": patientOrigins[1].name,
-                "id": dhisId.get(patientOrigins[1].name + "p2"),
-                "level": 7,
-                "openingDate": "2015-02-02",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "Type",
-                        "name": "Type"
-                    },
-                    "value": "Patient Origin"
+                    "coordinates": "[" + patientOrigins[1].longitude + "," + patientOrigins[1].latitude + "]",
+                    "featureType": "POINT"
                 }, {
-                    "attribute": {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
-                    },
-                    "value": "true"
-                }],
-                "parent": {
-                    "id": "p2"
-                },
-                "coordinates": "[" + patientOrigins[1].longitude + "," + patientOrigins[1].latitude + "]",
-                "featureType": "POINT"
-            }, {
-                "name": patientOrigins[2].name,
-                "shortName": patientOrigins[2].name,
-                "displayName": patientOrigins[2].name,
-                "id": dhisId.get(patientOrigins[2].name + "p1"),
-                "level": 7,
-                "openingDate": "2014-02-02",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "Type",
-                        "name": "Type"
-                    },
-                    "value": "Patient Origin"
+                    "name": patientOrigins[2].name,
+                    "shortName": patientOrigins[2].name,
+                    "displayName": patientOrigins[2].name,
+                    "id": dhisId.get(patientOrigins[2].name + "p1"),
+                    "level": 7,
+                    "openingDate": "2014-02-02",
+                    "attributeValues": [{
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "Type",
+                            "name": "Type"
+                        },
+                        "value": "Patient Origin"
+                    }, {
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "isNewDataModel",
+                            "name": "Is New Data Model"
+                        },
+                        "value": "true"
+                    }],
+                    "parent": {
+                        "id": "p1"
+                    }
                 }, {
-                    "attribute": {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
-                    },
-                    "value": "true"
-                }],
-                "parent": {
-                    "id": "p1"
-                }
-            }, {
-                "name": patientOrigins[2].name,
-                "shortName": patientOrigins[2].name,
-                "displayName": patientOrigins[2].name,
-                "id": dhisId.get(patientOrigins[2].name + "p2"),
-                "level": 7,
-                "openingDate": "2015-02-02",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "Type",
-                        "name": "Type"
-                    },
-                    "value": "Patient Origin"
-                }, {
-                    "attribute": {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
-                    },
-                    "value": "true"
-                }],
-                "parent": {
-                    "id": "p2"
-                }
-            }];
+                    "name": patientOrigins[2].name,
+                    "shortName": patientOrigins[2].name,
+                    "displayName": patientOrigins[2].name,
+                    "id": dhisId.get(patientOrigins[2].name + "p2"),
+                    "level": 7,
+                    "openingDate": "2015-02-02",
+                    "attributeValues": [{
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "Type",
+                            "name": "Type"
+                        },
+                        "value": "Patient Origin"
+                    }, {
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "isNewDataModel",
+                            "name": "Is New Data Model"
+                        },
+                        "value": "true"
+                    }],
+                    "parent": {
+                        "id": "p2"
+                    }
+                }];
 
-            var actualPayload = orgUnitMapper.createPatientOriginPayload(patientOrigins, parents);
+                var actualPayload = orgUnitMapper.createPatientOriginPayload(patientOrigins, parents);
 
-            expect(actualPayload).toEqual(expectedPayload);
+                expect(actualPayload).toEqual(expectedPayload);
+            });
+
+            it("should return the disabled patient origin payload for disabled patient origin", function() {
+                var parents = [{
+                    "id": "p1",
+                    "name": "p1",
+                    "openingDate": "2014-02-02"
+                }];
+
+                var patientOrigins = [{
+                    "name": "Origin1",
+                    "latitude": 23.21,
+                    "longitude": 32.12,
+                    "isDisabled": true
+                }];
+
+                var expectedAttributeValues = [{
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "Type",
+                        "name": "Type"
+                    },
+                    "value": "Patient Origin"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "isNewDataModel",
+                        "name": "Is New Data Model"
+                    },
+                    "value": "true"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "isDisabled"
+                    },
+                    "value": "true"
+                }];
+                var actualPayload = orgUnitMapper.createPatientOriginPayload(patientOrigins, parents);
+
+                expect(actualPayload[0].attributeValues).toEqual(expectedAttributeValues);
+            });
         });
     });
 });
