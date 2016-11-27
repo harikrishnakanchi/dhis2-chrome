@@ -1,4 +1,4 @@
-define(["lodash", "dhisId", "moment","interpolate", "orgUnitMapper"], function(_, dhisId, moment, interpolate, orgUnitMapper) {
+define(["lodash", "dhisId", "moment","interpolate", "orgUnitMapper", "customAttributes"], function(_, dhisId, moment, interpolate, orgUnitMapper, customAttributes) {
     return function($scope, $hustle, orgUnitRepository, $q, $location, $timeout, $anchorScroll) {
         $scope.openOpeningDate = function($event) {
             $event.preventDefault();
@@ -7,6 +7,8 @@ define(["lodash", "dhisId", "moment","interpolate", "orgUnitMapper"], function(_
         };
 
         $scope.save = function(orgUnit, parentOrgUnit) {
+            var typeAttr = customAttributes.createAttribute(customAttributes.TYPE, "Country", "Type");
+            var newDataModelAttr = customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true", "Is New Data Model");
             newOrgUnit = {
                 'id': dhisId.get(orgUnit.name + parentOrgUnit.id),
                 'name': orgUnit.name,
@@ -14,23 +16,7 @@ define(["lodash", "dhisId", "moment","interpolate", "orgUnitMapper"], function(_
                 'shortName': orgUnit.name,
                 'openingDate': moment(orgUnit.openingDate).format("YYYY-MM-DD"),
                 'parent': _.pick(parentOrgUnit, "name", "id"),
-                'attributeValues': [{
-                    'created': moment().toISOString(),
-                    'lastUpdated': moment().toISOString(),
-                    'attribute': {
-                        "code": "Type",
-                        "name": "Type"
-                    },
-                    'value': "Country"
-                }, {
-                    'created': moment().toISOString(),
-                    'lastUpdated': moment().toISOString(),
-                    'attribute': {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
-                    },
-                    'value': "true"
-                }]
+                'attributeValues': [typeAttr, newDataModelAttr]
             };
 
             var onSuccess = function(data) {
