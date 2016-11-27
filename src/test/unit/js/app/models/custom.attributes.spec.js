@@ -1,4 +1,4 @@
-define(['customAttributes'], function(customAttributes) {
+define(['customAttributes', 'moment'], function(customAttributes, moment) {
     describe('customAttributes', function() {
         var attributeValues;
 
@@ -64,5 +64,53 @@ define(['customAttributes'], function(customAttributes) {
                 expect(customAttributes.cleanAttributeValues(attributeValues)).toEqual(attributeValues);
             });
         });
+
+        describe('createAttribute', function () {
+            beforeEach(function () {
+                var currentTime = '2016-11-27';
+                Timecop.install();
+                Timecop.freeze(new Date(currentTime));
+            });
+
+            afterEach(function () {
+                Timecop.returnToPresent();
+                Timecop.uninstall();
+            });
+
+            it('should create and return the new attribute', function () {
+                var attributeCode = 'someType';
+                var attributeName = 'someName';
+                var value = 'someValue';
+
+                var actualAttribute = customAttributes.createAttribute(attributeCode, value, attributeName);
+                var expectedAttribute = {
+                    "created": moment().toISOString(),
+                    "lastUpdated": moment().toISOString(),
+                    "attribute": {
+                        "code": attributeCode,
+                        "name": attributeName
+                    },
+                    "value": value
+                };
+                expect(expectedAttribute).toEqual(actualAttribute);
+            });
+
+            it('should not add attribute name if attributeName is not given', function () {
+                var attributeCode = 'someType';
+                var value = 'someValue';
+
+                var actualAttribute = customAttributes.createAttribute(attributeCode, value);
+                var expectedAttribute = {
+                    "created": moment().toISOString(),
+                    "lastUpdated": moment().toISOString(),
+                    "attribute": {
+                        "code": attributeCode
+                    },
+                    "value": value
+                };
+                expect(expectedAttribute).toEqual(actualAttribute);
+            });
+        });
+
     });
 });

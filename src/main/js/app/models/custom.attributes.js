@@ -1,4 +1,4 @@
-define(['lodash'], function(_) {
+define(['lodash', 'moment'], function(_, moment) {
     var ATTRIBUTE_CODES = {
         LINE_LIST_ATTRIBUTE_CODE: 'isLineListService',
         LINE_LIST_OFFLINE_SUMMARY_CODE: 'praxisLineListSummaryType',
@@ -55,9 +55,25 @@ define(['lodash'], function(_) {
         return _.filter(attributeValues, 'value');
     };
 
+    var createAttribute = function (attributeCode, value, attributeName) {
+        var attribute = {
+            "created": moment().toISOString(),
+            "lastUpdated": moment().toISOString(),
+            "attribute": {
+                "code": attributeCode
+            },
+            "value": value
+        };
+        if(attributeName) {
+            attribute.attribute.name = attributeName;
+        }
+        return attribute;
+    };
+
     return _.merge(ATTRIBUTE_CODES, {
         getBooleanAttributeValue: getBooleanAttributeValue,
         getAttributeValue: getAttributeValue,
-        cleanAttributeValues: cleanAttributeValues
+        cleanAttributeValues: cleanAttributeValues,
+        createAttribute: createAttribute
     });
 });
