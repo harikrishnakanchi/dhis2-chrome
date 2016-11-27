@@ -41,35 +41,11 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
             hospitalUnitCode = type === "Hospital" ? hospitalUnitCode : {
                 "name": ""
             };
-            var attributes = [{
-                "created": moment().toISOString(),
-                "lastUpdated": moment().toISOString(),
-                "attribute": {
-                    "code": "opUnitType"
-                },
-                "value": opUnitType.title || opUnitType.name
-            }, {
-                "created": moment().toISOString(),
-                "lastUpdated": moment().toISOString(),
-                "attribute": {
-                    "code": "Type"
-                },
-                "value": "Operation Unit"
-            }, {
-                "created": moment().toISOString(),
-                "lastUpdated": moment().toISOString(),
-                "attribute": {
-                    "code": "hospitalUnitCode"
-                },
-                "value": hospitalUnitCode.title || hospitalUnitCode.name
-            }, {
-                "created": moment().toISOString(),
-                "lastUpdated": moment().toISOString(),
-                "attribute": {
-                    "code": "isNewDataModel"
-                },
-                "value": "true"
-            }];
+            var opUnitTypeAttr = customAttributes.createAttribute(customAttributes.OPERATION_UNIT_TYPE_CODE, opUnitType.title || opUnitType.name);
+            var typeAttr = customAttributes.createAttribute(customAttributes.TYPE, "Operation Unit");
+            var hospitalUnitCodeAttr = customAttributes.createAttribute(customAttributes.HOSPITAL_UNIT_CODE, hospitalUnitCode.title || hospitalUnitCode.name);
+            var isNewDataModelAttr = customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true");
+            var attributes = [opUnitTypeAttr, typeAttr, hospitalUnitCodeAttr, isNewDataModelAttr];
 
             return customAttributes.cleanAttributeValues(attributes);
         };
@@ -199,12 +175,8 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
                 }
             });
             if (_.isEmpty(attr)) {
-                attr.push({
-                    "attribute": {
-                        "code": "isDisabled"
-                    },
-                    "value": 'false'
-                });
+                var isDisabledAttr = customAttributes.createAttribute(customAttributes.DISABLED_CODE, 'false', '');
+                attr.push(isDisabledAttr);
             }
 
             attr[0].value = attr[0].value === 'true' ? 'false' : 'true';

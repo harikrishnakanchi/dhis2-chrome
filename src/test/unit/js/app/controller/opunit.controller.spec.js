@@ -781,6 +781,8 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     },
                     "value": "false"
                 }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
                         "code": "isDisabled"
                     },
