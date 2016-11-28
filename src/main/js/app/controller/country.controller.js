@@ -7,8 +7,6 @@ define(["lodash", "dhisId", "moment","interpolate", "orgUnitMapper", "customAttr
         };
 
         $scope.save = function(orgUnit, parentOrgUnit) {
-            var typeAttr = customAttributes.createAttribute(customAttributes.TYPE, "Country");
-            var newDataModelAttr = customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true");
             newOrgUnit = {
                 'id': dhisId.get(orgUnit.name + parentOrgUnit.id),
                 'name': orgUnit.name,
@@ -16,7 +14,8 @@ define(["lodash", "dhisId", "moment","interpolate", "orgUnitMapper", "customAttr
                 'shortName': orgUnit.name,
                 'openingDate': moment(orgUnit.openingDate).format("YYYY-MM-DD"),
                 'parent': _.pick(parentOrgUnit, "name", "id"),
-                'attributeValues': [typeAttr, newDataModelAttr]
+                'attributeValues': [customAttributes.createAttribute(customAttributes.TYPE, "Country"),
+                    customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true")]
             };
 
             var onSuccess = function(data) {

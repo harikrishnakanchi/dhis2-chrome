@@ -12,24 +12,21 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
         var estPopulationBetween1And5Years = orgUnit.estPopulationBetween1And5Years ? orgUnit.estPopulationBetween1And5Years.toString() : "";
         var estimatedPopulationOfWomenOfChildBearingAge = orgUnit.estPopulationOfWomenOfChildBearingAge ? orgUnit.estPopulationOfWomenOfChildBearingAge.toString() : "";
 
-        var typeAttr = customAttributes.createAttribute(customAttributes.TYPE, "Project");
-        var projectContextAttr = customAttributes.createAttribute(customAttributes.PROJECT_CONTEXT_CODE, projectContext);
-        var projectLocationAttr = customAttributes.createAttribute(customAttributes.PROJECT_LOCATION_CODE, orgUnit.location);
-        var projectPopulationAttr = customAttributes.createAttribute(customAttributes.PROJECT_POPULATION_TYPE_CODE, populationType);
-        var projectCodeAttr = customAttributes.createAttribute(customAttributes.PROJECT_CODE, orgUnit.projectCode);
-        var reasonForInterventionAttr = customAttributes.createAttribute(customAttributes.REASON_FOR_INTERVENTION_CODE, reasonForIntervention);
-        var modeOfOperationAttr = customAttributes.createAttribute(customAttributes.MODE_OF_OPERATION_CODE, modeOfOperation);
-        var modelOfManagementAttr = customAttributes.createAttribute(customAttributes.MODEL_OF_MANAGEMENT_CODE, modelOfManagement);
-        var autoApproveAttr = customAttributes.createAttribute(customAttributes.AUTO_APPROVE, orgUnit.autoApprove);
-        var newDataModelAttr = customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true");
-        var projectTypeAttr = customAttributes.createAttribute(customAttributes.PROJECT_TYPE_CODE, projectType);
-        var estimatedTargetPopulationAttr = customAttributes.createAttribute(customAttributes.ESTIMATED_TARGET_POPULATION_CODE, estimatedTargetPopulation);
-        var estimatedPopulationLessThan1YearAttr = customAttributes.createAttribute(customAttributes.EST_POPULATION_LESS_THAN_1_YEAR_CODE, estimatedPopulationLessThan1Year);
-        var estimatedPopulationBetween1And5YearsAttr = customAttributes.createAttribute(customAttributes.EST_POPULATION_BETWEEN_1_AND_5_YEARS_CODE, estPopulationBetween1And5Years);
-        var estimatedPopulationOfWomenOfChildBearingAgeAttr = customAttributes.createAttribute(customAttributes.EST_POPULATION_OF_WOMEN_OF_CHILD_BEARING_AGE_CODE, estimatedPopulationOfWomenOfChildBearingAge);
-        attributeValues.push(typeAttr, projectContextAttr, projectLocationAttr, projectPopulationAttr, projectCodeAttr, reasonForInterventionAttr,
-            modeOfOperationAttr, modelOfManagementAttr, autoApproveAttr, newDataModelAttr, projectTypeAttr, estimatedTargetPopulationAttr,
-            estimatedPopulationLessThan1YearAttr, estimatedPopulationBetween1And5YearsAttr, estimatedPopulationOfWomenOfChildBearingAgeAttr);
+        attributeValues.push(customAttributes.createAttribute(customAttributes.TYPE, "Project"),
+            customAttributes.createAttribute(customAttributes.PROJECT_CONTEXT_CODE, projectContext),
+            customAttributes.createAttribute(customAttributes.PROJECT_LOCATION_CODE, orgUnit.location),
+            customAttributes.createAttribute(customAttributes.PROJECT_POPULATION_TYPE_CODE, populationType),
+            customAttributes.createAttribute(customAttributes.PROJECT_CODE, orgUnit.projectCode),
+            customAttributes.createAttribute(customAttributes.REASON_FOR_INTERVENTION_CODE, reasonForIntervention),
+            customAttributes.createAttribute(customAttributes.MODE_OF_OPERATION_CODE, modeOfOperation),
+            customAttributes.createAttribute(customAttributes.MODEL_OF_MANAGEMENT_CODE, modelOfManagement),
+            customAttributes.createAttribute(customAttributes.AUTO_APPROVE, orgUnit.autoApprove),
+            customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true"),
+            customAttributes.createAttribute(customAttributes.PROJECT_TYPE_CODE, projectType),
+            customAttributes.createAttribute(customAttributes.ESTIMATED_TARGET_POPULATION_CODE, estimatedTargetPopulation),
+            customAttributes.createAttribute(customAttributes.EST_POPULATION_LESS_THAN_1_YEAR_CODE, estimatedPopulationLessThan1Year),
+            customAttributes.createAttribute(customAttributes.EST_POPULATION_BETWEEN_1_AND_5_YEARS_CODE, estPopulationBetween1And5Years),
+            customAttributes.createAttribute(customAttributes.EST_POPULATION_OF_WOMEN_OF_CHILD_BEARING_AGE_CODE, estimatedPopulationOfWomenOfChildBearingAge));
 
         if (orgUnit.endDate)
             attributeValues.push(customAttributes.createAttribute(customAttributes.PROJECT_END_DATE_CODE, moment(orgUnit.endDate).format("YYYY-MM-DD")));
@@ -111,9 +108,6 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
 
     this.mapToModule = function(module, moduleId, moduleLevel) {
         var isLineList = module.serviceType === "Linelist" ? "true" : "false";
-        var typeAttr = customAttributes.createAttribute(customAttributes.TYPE, "Module");
-        var isLineListServiceAttr = customAttributes.createAttribute(customAttributes.LINE_LIST_ATTRIBUTE_CODE, isLineList);
-        var isNewDataModelAttr = customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true");
         return {
             name: module.name,
             shortName: module.name,
@@ -121,7 +115,9 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             id: moduleId || dhisId.get(module.name + module.parent.id),
             level: moduleLevel || parseInt(module.parent.level) + 1,
             openingDate: moment.utc(module.openingDate).format('YYYY-MM-DD'),
-            attributeValues: [typeAttr, isLineListServiceAttr, isNewDataModelAttr],
+            attributeValues: [customAttributes.createAttribute(customAttributes.TYPE, "Module"),
+                customAttributes.createAttribute(customAttributes.LINE_LIST_ATTRIBUTE_CODE, isLineList),
+                customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true")],
             parent: {
                 name: module.parent.name,
                 id: module.parent.id
@@ -154,8 +150,6 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
         patientOrigins = _.isArray(patientOrigins) ? patientOrigins : [patientOrigins];
         parentOrgUnits = _.isArray(parentOrgUnits) ? parentOrgUnits : [parentOrgUnits];
 
-        var typeAttr = customAttributes.createAttribute(customAttributes.TYPE, "Patient Origin");
-        var isNewDataModelAttr = customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true");
         var payload = _.map(patientOrigins, function(patientOrigin) {
             return _.map(parentOrgUnits, function(parent) {
 
@@ -166,15 +160,15 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
                     "id": dhisId.get(patientOrigin.name + parent.id),
                     "level": 7,
                     "openingDate": parent.openingDate,
-                    "attributeValues": [typeAttr, isNewDataModelAttr],
+                    "attributeValues": [customAttributes.createAttribute(customAttributes.TYPE, "Patient Origin"),
+                        customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true")],
                     "parent": {
                         "id": parent.id
                     }
                 };
 
                 if (patientOrigin.isDisabled === true) {
-                    var isDisabledAttr = customAttributes.createAttribute(customAttributes.DISABLED_CODE, "true");
-                    patientOriginPayload.attributeValues.push(isDisabledAttr);
+                    patientOriginPayload.attributeValues.push(customAttributes.createAttribute(customAttributes.DISABLED_CODE, "true"));
                 }
 
                 if (!_.isUndefined(patientOrigin.longitude) && !_.isUndefined(patientOrigin.latitude)) {
