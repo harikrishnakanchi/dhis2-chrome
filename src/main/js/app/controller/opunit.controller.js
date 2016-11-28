@@ -175,7 +175,7 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
                 }
             });
             if (_.isEmpty(attr)) {
-                var isDisabledAttr = customAttributes.createAttribute(customAttributes.DISABLED_CODE, 'false', '');
+                var isDisabledAttr = customAttributes.createAttribute(customAttributes.DISABLED_CODE, 'false');
                 attr.push(isDisabledAttr);
             }
 

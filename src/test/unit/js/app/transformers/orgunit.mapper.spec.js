@@ -197,128 +197,112 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "Type",
-                        "name": "Type"
+                        "code": "Type"
                     },
                     "value": "Project"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "prjCon",
-                        "name": "Context"
+                        "code": "prjCon"
                     },
                     "value": "val2"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "prjLoc",
-                        "name": "Location"
+                        "code": "prjLoc"
                     },
                     "value": "val3"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "prjPopType",
-                        "name": "Type of population"
+                        "code": "prjPopType"
                     },
                     "value": "val6"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "projCode",
-                        "name": "Project Code"
+                        "code": "projCode"
                     },
                     "value": "AB001"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "reasonForIntervention",
-                        "name": "Reason For Intervention"
+                        "code": "reasonForIntervention"
                     },
                     "value": "Armed Conflict"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "modeOfOperation",
-                        "name": "Mode Of Operation"
+                        "code": "modeOfOperation"
                     },
                     "value": "Direct Operation"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "modelOfManagement",
-                        "name": "Model Of Management"
+                        "code": "modelOfManagement"
                     },
                     "value": "Collaboration"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "autoApprove",
-                        "name": "Auto Approve"
+                        "code": "autoApprove"
                     },
                     "value": "true"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
+                        "code": "isNewDataModel"
                     },
                     "value": "true"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "projectType",
-                        "name": "Project Type"
+                        "code": "projectType"
                     },
                     "value": "Some Type"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "estimatedTargetPopulation",
-                        "name": "Estimated target population"
+                        "code": "estimatedTargetPopulation"
                     },
                     "value": "1000"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "estPopulationLessThan1Year",
-                        "name": "Est. population less than 1 year",
+                        "code": "estPopulationLessThan1Year"
                     },
                     "value": "11"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "estPopulationBetween1And5Years",
-                        "name": "Est. population between 1 and 5 years"
+                        "code": "estPopulationBetween1And5Years"
                     },
                     "value": "12"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "estPopulationOfWomenOfChildBearingAge",
-                        "name": "Est. population of women of child bearing age"
+                        "code": "estPopulationOfWomenOfChildBearingAge"
                     },
                     "value": "13"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "prjEndDate",
-                        "name": "End date"
+                        "code": "prjEndDate"
                     },
                     "value": "2011-01-01"
                 }]
@@ -364,24 +348,21 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                     "created": moment().toISOString(),
                     "lastUpdated": moment().toISOString(),
                     "attribute": {
-                        "code": "Type",
-                        "name": "Type"
+                        "code": "Type"
                     },
                     "value": "Module"
                 }, {
                     "created": moment().toISOString(),
                     "lastUpdated": moment().toISOString(),
                     "attribute": {
-                        "code": "isLineListService",
-                        "name": "Is Linelist Service"
+                        "code": "isLineListService"
                     },
                     "value": "false"
                 }, {
                     "created": moment().toISOString(),
                     "lastUpdated": moment().toISOString(),
                     "attribute": {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
+                        "code": "isNewDataModel"
                     },
                     "value": "true"
                 }],
@@ -427,24 +408,21 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                     "created": moment().toISOString(),
                     "lastUpdated": moment().toISOString(),
                     "attribute": {
-                        "code": "Type",
-                        "name": "Type"
+                        "code": "Type"
                     },
                     "value": "Module"
                 }, {
                     "created": moment().toISOString(),
                     "lastUpdated": moment().toISOString(),
                     "attribute": {
-                        "code": "isLineListService",
-                        "name": "Is Linelist Service"
+                        "code": "isLineListService"
                     },
                     "value": "false"
                 }, {
                     "created": moment().toISOString(),
                     "lastUpdated": moment().toISOString(),
                     "attribute": {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
+                        "code": "isNewDataModel"
                     },
                     "value": "true"
                 }],
@@ -529,8 +507,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "isDisabled",
-                        "name": "Is Disabled"
+                        "code": "isDisabled"
                     },
                     "value": "false"
                 }],
@@ -542,8 +519,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "isDisabled",
-                        "name": "Is Disabled"
+                        "code": "isDisabled"
                     },
                     "value": "true"
                 }],
@@ -568,8 +544,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "isDisabled",
-                        "name": "Is Disabled"
+                        "code": "isDisabled"
                     },
                     "value": "true"
                 }],
@@ -579,8 +554,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "isDisabled",
-                        "name": "Is Disabled"
+                        "code": "isDisabled"
                     },
                     "value": "true"
                 }],
@@ -647,128 +621,112 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "Type",
-                        "name": "Type"
+                        "code": "Type"
                     },
                     "value": "Project"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "prjCon",
-                        "name": "Context"
+                        "code": "prjCon"
                     },
                     "value": "val2"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "prjLoc",
-                        "name": "Location"
+                        "code": "prjLoc"
                     },
                     "value": "val3"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "prjPopType",
-                        "name": "Type of population"
+                        "code": "prjPopType"
                     },
                     "value": "val6"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "projCode",
-                        "name": "Project Code"
+                        "code": "projCode"
                     },
                     "value": "AB001"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "reasonForIntervention",
-                        "name": "Reason For Intervention"
+                        "code": "reasonForIntervention"
                     },
                     "value": "Armed Conflict"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "modeOfOperation",
-                        "name": "Mode Of Operation"
+                        "code": "modeOfOperation"
                     },
                     "value": "Direct Operation"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "modelOfManagement",
-                        "name": "Model Of Management"
+                        "code": "modelOfManagement"
                     },
                     "value": "Collaboration"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "autoApprove",
-                        "name": "Auto Approve"
+                        "code": "autoApprove"
                     },
                     "value": "true"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
+                        "code": "isNewDataModel"
                     },
                     "value": "true"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "projectType",
-                        "name": "Project Type"
+                        "code": "projectType"
                     },
                     "value": "Some Type"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "estimatedTargetPopulation",
-                        "name": "Estimated target population"
+                        "code": "estimatedTargetPopulation"
                     },
                     "value": "1000"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "estPopulationLessThan1Year",
-                        "name": "Est. population less than 1 year",
+                        "code": "estPopulationLessThan1Year"
                     },
                     "value": "11"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "estPopulationBetween1And5Years",
-                        "name": "Est. population between 1 and 5 years"
+                        "code": "estPopulationBetween1And5Years"
                     },
                     "value": "12"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "estPopulationOfWomenOfChildBearingAge",
-                        "name": "Est. population of women of child bearing age"
+                        "code": "estPopulationOfWomenOfChildBearingAge"
                     },
                     "value": "13"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "prjEndDate",
-                        "name": "End date"
+                        "code": "prjEndDate"
                     },
                     "value": "2011-01-01"
                 }]
@@ -821,16 +779,14 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                         "created": "2014-10-29T12:43:54.972Z",
                         "lastUpdated": "2014-10-29T12:43:54.972Z",
                         "attribute": {
-                            "code": "Type",
-                            "name": "Type"
+                            "code": "Type"
                         },
                         "value": "Patient Origin"
                     }, {
                         "created": "2014-10-29T12:43:54.972Z",
                         "lastUpdated": "2014-10-29T12:43:54.972Z",
                         "attribute": {
-                            "code": "isNewDataModel",
-                            "name": "Is New Data Model"
+                            "code": "isNewDataModel"
                         },
                         "value": "true"
                     }],
@@ -850,16 +806,14 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                         "created": "2014-10-29T12:43:54.972Z",
                         "lastUpdated": "2014-10-29T12:43:54.972Z",
                         "attribute": {
-                            "code": "Type",
-                            "name": "Type"
+                            "code": "Type"
                         },
                         "value": "Patient Origin"
                     }, {
                         "created": "2014-10-29T12:43:54.972Z",
                         "lastUpdated": "2014-10-29T12:43:54.972Z",
                         "attribute": {
-                            "code": "isNewDataModel",
-                            "name": "Is New Data Model"
+                            "code": "isNewDataModel"
                         },
                         "value": "true"
                     }],
@@ -879,16 +833,14 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                         "created": "2014-10-29T12:43:54.972Z",
                         "lastUpdated": "2014-10-29T12:43:54.972Z",
                         "attribute": {
-                            "code": "Type",
-                            "name": "Type"
+                            "code": "Type"
                         },
                         "value": "Patient Origin"
                     }, {
                         "created": "2014-10-29T12:43:54.972Z",
                         "lastUpdated": "2014-10-29T12:43:54.972Z",
                         "attribute": {
-                            "code": "isNewDataModel",
-                            "name": "Is New Data Model"
+                            "code": "isNewDataModel"
                         },
                         "value": "true"
                     }],
@@ -908,16 +860,14 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                         "created": "2014-10-29T12:43:54.972Z",
                         "lastUpdated": "2014-10-29T12:43:54.972Z",
                         "attribute": {
-                            "code": "Type",
-                            "name": "Type"
+                            "code": "Type"
                         },
                         "value": "Patient Origin"
                     }, {
                         "created": "2014-10-29T12:43:54.972Z",
                         "lastUpdated": "2014-10-29T12:43:54.972Z",
                         "attribute": {
-                            "code": "isNewDataModel",
-                            "name": "Is New Data Model"
+                            "code": "isNewDataModel"
                         },
                         "value": "true"
                     }],
@@ -937,16 +887,14 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                         "created": "2014-10-29T12:43:54.972Z",
                         "lastUpdated": "2014-10-29T12:43:54.972Z",
                         "attribute": {
-                            "code": "Type",
-                            "name": "Type"
+                            "code": "Type"
                         },
                         "value": "Patient Origin"
                     }, {
                         "created": "2014-10-29T12:43:54.972Z",
                         "lastUpdated": "2014-10-29T12:43:54.972Z",
                         "attribute": {
-                            "code": "isNewDataModel",
-                            "name": "Is New Data Model"
+                            "code": "isNewDataModel"
                         },
                         "value": "true"
                     }],
@@ -964,16 +912,14 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                         "created": "2014-10-29T12:43:54.972Z",
                         "lastUpdated": "2014-10-29T12:43:54.972Z",
                         "attribute": {
-                            "code": "Type",
-                            "name": "Type"
+                            "code": "Type"
                         },
                         "value": "Patient Origin"
                     }, {
                         "created": "2014-10-29T12:43:54.972Z",
                         "lastUpdated": "2014-10-29T12:43:54.972Z",
                         "attribute": {
-                            "code": "isNewDataModel",
-                            "name": "Is New Data Model"
+                            "code": "isNewDataModel"
                         },
                         "value": "true"
                     }],
@@ -1005,16 +951,14 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "Type",
-                        "name": "Type"
+                        "code": "Type"
                     },
                     "value": "Patient Origin"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
+                        "code": "isNewDataModel"
                     },
                     "value": "true"
                 }, {

@@ -349,7 +349,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             var expectedOrgUnits = [{
                 "name": "mod1",
                 "id": "mod1",
-                "attributeValues": [createMockAttribute('isDisabled', 'true', "Is Disabled")],
+                "attributeValues": [createMockAttribute('isDisabled', 'true')],
                 "parent": {
                     "id": "opunit1",
                 }
@@ -357,7 +357,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "name": "opunit1",
                 "id": "opunit1",
                 "datasets": [],
-                "attributeValues": [createMockAttribute('isDisabled', 'true', "Is Disabled")],
+                "attributeValues": [createMockAttribute('isDisabled', 'true')],
                 "parent": {
                     "id": "parent"
                 }

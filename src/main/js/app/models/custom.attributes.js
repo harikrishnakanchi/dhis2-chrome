@@ -55,7 +55,7 @@ define(['lodash', 'moment'], function(_, moment) {
         return _.filter(attributeValues, 'value');
     };
 
-    var createAttribute = function (attributeCode, value, attributeName) {
+    var createAttribute = function (attributeCode, value) {
         var attribute = {
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
@@ -64,9 +64,6 @@ define(['lodash', 'moment'], function(_, moment) {
             },
             "value": value
         };
-        if(attributeName) {
-            attribute.attribute.name = attributeName;
-        }
         return attribute;
     };
 

@@ -293,24 +293,21 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         "created": moment().toISOString(),
                         "lastUpdated": moment().toISOString(),
                         "attribute": {
-                            "code": "Type",
-                            "name": "Type"
+                            "code": "Type"
                         },
                         "value": "Module"
                     }, {
                         "created": moment().toISOString(),
                         "lastUpdated": moment().toISOString(),
                         "attribute": {
-                            "code": "isLineListService",
-                            "name": "Is Linelist Service"
+                            "code": "isLineListService"
                         },
                         "value": "true"
                     }, {
                         "created": moment().toISOString(),
                         "lastUpdated": moment().toISOString(),
                         "attribute": {
-                            "code": 'isNewDataModel',
-                            "name": "Is New Data Model"
+                            "code": 'isNewDataModel'
                         },
                         "value": 'true'
                     }],
@@ -945,24 +942,21 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         "created": moment().toISOString(),
                         "lastUpdated": moment().toISOString(),
                         "attribute": {
-                            "code": "Type",
-                            "name": "Type"
+                            "code": "Type"
                         },
                         "value": "Module"
                     }, {
                         "created": moment().toISOString(),
                         "lastUpdated": moment().toISOString(),
                         "attribute": {
-                            "code": "isLineListService",
-                            "name": "Is Linelist Service"
+                            "code": "isLineListService"
                         },
                         "value": "true"
                     }, {
                         "created": moment().toISOString(),
                         "lastUpdated": moment().toISOString(),
                         "attribute": {
-                            "code": 'isNewDataModel',
-                            "name": "Is New Data Model"
+                            "code": 'isNewDataModel'
                         },
                         "value": 'true'
                     }],
@@ -1276,24 +1270,21 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         "created": "2014-04-01T00:00:00.000Z",
                         "lastUpdated": "2014-04-01T00:00:00.000Z",
                         "attribute": {
-                            "code": "Type",
-                            "name": "Type"
+                            "code": "Type"
                         },
                         "value": "Module"
                     }, {
                         "created": "2014-04-01T00:00:00.000Z",
                         "lastUpdated": "2014-04-01T00:00:00.000Z",
                         "attribute": {
-                            "code": "isLineListService",
-                            "name": "Is Linelist Service"
+                            "code": "isLineListService"
                         },
                         "value": "true"
                     }, {
                         "created": "2014-04-01T00:00:00.000Z",
                         "lastUpdated": "2014-04-01T00:00:00.000Z",
                         "attribute": {
-                            "code": 'isNewDataModel',
-                            "name": "Is New Data Model"
+                            "code": 'isNewDataModel'
                         },
                         "value": 'true'
                     }],

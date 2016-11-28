@@ -12,33 +12,33 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
         var estPopulationBetween1And5Years = orgUnit.estPopulationBetween1And5Years ? orgUnit.estPopulationBetween1And5Years.toString() : "";
         var estimatedPopulationOfWomenOfChildBearingAge = orgUnit.estPopulationOfWomenOfChildBearingAge ? orgUnit.estPopulationOfWomenOfChildBearingAge.toString() : "";
 
-        var typeAttr = customAttributes.createAttribute(customAttributes.TYPE, "Project", "Type");
-        var projectContextAttr = customAttributes.createAttribute(customAttributes.PROJECT_CONTEXT_CODE, projectContext, "Context");
-        var projectLocationAttr = customAttributes.createAttribute(customAttributes.PROJECT_LOCATION_CODE, orgUnit.location, "Location");
-        var projectPopulationAttr = customAttributes.createAttribute(customAttributes.PROJECT_POPULATION_TYPE_CODE, populationType, "Type of population");
-        var projectCodeAttr = customAttributes.createAttribute(customAttributes.PROJECT_CODE, orgUnit.projectCode, "Project Code");
-        var reasonForInterventionAttr = customAttributes.createAttribute(customAttributes.REASON_FOR_INTERVENTION_CODE, reasonForIntervention, "Reason For Intervention");
-        var modeOfOperationAttr = customAttributes.createAttribute(customAttributes.MODE_OF_OPERATION_CODE, modeOfOperation, "Mode Of Operation");
-        var modelOfManagementAttr = customAttributes.createAttribute(customAttributes.MODEL_OF_MANAGEMENT_CODE, modelOfManagement, "Model Of Management");
-        var autoApproveAttr = customAttributes.createAttribute(customAttributes.AUTO_APPROVE, orgUnit.autoApprove, "Auto Approve");
-        var newDataModelAttr = customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true", "Is New Data Model");
-        var projectTypeAttr = customAttributes.createAttribute(customAttributes.PROJECT_TYPE_CODE, projectType, "Project Type");
-        var estimatedTargetPopulationAttr = customAttributes.createAttribute(customAttributes.ESTIMATED_TARGET_POPULATION_CODE, estimatedTargetPopulation, "Estimated target population");
-        var estimatedPopulationLessThan1YearAttr = customAttributes.createAttribute(customAttributes.EST_POPULATION_LESS_THAN_1_YEAR_CODE, estimatedPopulationLessThan1Year, "Est. population less than 1 year");
-        var estimatedPopulationBetween1And5YearsAttr = customAttributes.createAttribute(customAttributes.EST_POPULATION_BETWEEN_1_AND_5_YEARS_CODE, estPopulationBetween1And5Years, "Est. population between 1 and 5 years");
-        var estimatedPopulationOfWomenOfChildBearingAgeAttr = customAttributes.createAttribute(customAttributes.EST_POPULATION_OF_WOMEN_OF_CHILD_BEARING_AGE_CODE, estimatedPopulationOfWomenOfChildBearingAge, "Est. population of women of child bearing age");
+        var typeAttr = customAttributes.createAttribute(customAttributes.TYPE, "Project");
+        var projectContextAttr = customAttributes.createAttribute(customAttributes.PROJECT_CONTEXT_CODE, projectContext);
+        var projectLocationAttr = customAttributes.createAttribute(customAttributes.PROJECT_LOCATION_CODE, orgUnit.location);
+        var projectPopulationAttr = customAttributes.createAttribute(customAttributes.PROJECT_POPULATION_TYPE_CODE, populationType);
+        var projectCodeAttr = customAttributes.createAttribute(customAttributes.PROJECT_CODE, orgUnit.projectCode);
+        var reasonForInterventionAttr = customAttributes.createAttribute(customAttributes.REASON_FOR_INTERVENTION_CODE, reasonForIntervention);
+        var modeOfOperationAttr = customAttributes.createAttribute(customAttributes.MODE_OF_OPERATION_CODE, modeOfOperation);
+        var modelOfManagementAttr = customAttributes.createAttribute(customAttributes.MODEL_OF_MANAGEMENT_CODE, modelOfManagement);
+        var autoApproveAttr = customAttributes.createAttribute(customAttributes.AUTO_APPROVE, orgUnit.autoApprove);
+        var newDataModelAttr = customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true");
+        var projectTypeAttr = customAttributes.createAttribute(customAttributes.PROJECT_TYPE_CODE, projectType);
+        var estimatedTargetPopulationAttr = customAttributes.createAttribute(customAttributes.ESTIMATED_TARGET_POPULATION_CODE, estimatedTargetPopulation);
+        var estimatedPopulationLessThan1YearAttr = customAttributes.createAttribute(customAttributes.EST_POPULATION_LESS_THAN_1_YEAR_CODE, estimatedPopulationLessThan1Year);
+        var estimatedPopulationBetween1And5YearsAttr = customAttributes.createAttribute(customAttributes.EST_POPULATION_BETWEEN_1_AND_5_YEARS_CODE, estPopulationBetween1And5Years);
+        var estimatedPopulationOfWomenOfChildBearingAgeAttr = customAttributes.createAttribute(customAttributes.EST_POPULATION_OF_WOMEN_OF_CHILD_BEARING_AGE_CODE, estimatedPopulationOfWomenOfChildBearingAge);
         attributeValues.push(typeAttr, projectContextAttr, projectLocationAttr, projectPopulationAttr, projectCodeAttr, reasonForInterventionAttr,
             modeOfOperationAttr, modelOfManagementAttr, autoApproveAttr, newDataModelAttr, projectTypeAttr, estimatedTargetPopulationAttr,
             estimatedPopulationLessThan1YearAttr, estimatedPopulationBetween1And5YearsAttr, estimatedPopulationOfWomenOfChildBearingAgeAttr);
 
         if (orgUnit.endDate)
-            attributeValues.push(customAttributes.createAttribute(customAttributes.PROJECT_END_DATE_CODE, moment(orgUnit.endDate).format("YYYY-MM-DD"),"End date"));
+            attributeValues.push(customAttributes.createAttribute(customAttributes.PROJECT_END_DATE_CODE, moment(orgUnit.endDate).format("YYYY-MM-DD")));
 
         return customAttributes.cleanAttributeValues(attributeValues);
     };
 
     this.disable = function(orgUnits) {
-        var isDisabledAttr = customAttributes.createAttribute(customAttributes.DISABLED_CODE, "true", "Is Disabled");
+        var isDisabledAttr = customAttributes.createAttribute(customAttributes.DISABLED_CODE, "true");
 
         var disableOrgUnit = function(orgUnit) {
             orgUnit.attributeValues = _.reject(orgUnit.attributeValues, {
@@ -111,9 +111,9 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
 
     this.mapToModule = function(module, moduleId, moduleLevel) {
         var isLineList = module.serviceType === "Linelist" ? "true" : "false";
-        var typeAttr = customAttributes.createAttribute(customAttributes.TYPE, "Module" , "Type");
-        var isLineListServiceAttr = customAttributes.createAttribute(customAttributes.LINE_LIST_ATTRIBUTE_CODE, isLineList , "Is Linelist Service");
-        var isNewDataModelAttr = customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true" , "Is New Data Model");
+        var typeAttr = customAttributes.createAttribute(customAttributes.TYPE, "Module");
+        var isLineListServiceAttr = customAttributes.createAttribute(customAttributes.LINE_LIST_ATTRIBUTE_CODE, isLineList);
+        var isNewDataModelAttr = customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true");
         return {
             name: module.name,
             shortName: module.name,
@@ -154,8 +154,8 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
         patientOrigins = _.isArray(patientOrigins) ? patientOrigins : [patientOrigins];
         parentOrgUnits = _.isArray(parentOrgUnits) ? parentOrgUnits : [parentOrgUnits];
 
-        var typeAttr = customAttributes.createAttribute(customAttributes.TYPE, "Patient Origin", "Type");
-        var isNewDataModelAttr = customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true", "Is New Data Model");
+        var typeAttr = customAttributes.createAttribute(customAttributes.TYPE, "Patient Origin");
+        var isNewDataModelAttr = customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true");
         var payload = _.map(patientOrigins, function(patientOrigin) {
             return _.map(parentOrgUnits, function(parent) {
 
@@ -173,7 +173,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
                 };
 
                 if (patientOrigin.isDisabled === true) {
-                    var isDisabledAttr = customAttributes.createAttribute(customAttributes.DISABLED_CODE, "true", "");
+                    var isDisabledAttr = customAttributes.createAttribute(customAttributes.DISABLED_CODE, "true");
                     patientOriginPayload.attributeValues.push(isDisabledAttr);
                 }
 
