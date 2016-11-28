@@ -182,8 +182,13 @@ gulp.task('generate-pwa', ['config', 'generate-service-worker'], function () {})
 
 gulp.task('zip', ['less', 'config', 'download-metadata'], function() {
     var basePath = './src/main';
-    return gulp.src([ basePath + '/**',
-                    '!' + basePath + '/js/app/pwa{,/**}'])
+    return gulp.src([
+        `${basePath}/**`,
+        `!${basePath}/js/app/pwa{,/**}`,
+        `!${basePath}/less{,/**}`,
+        `!${basePath}/index.html`,
+        `!${basePath}/service.worker.js`
+    ])
         .pipe(zip("praxis_" + (argv.env || "dev") + ".zip"))
         .pipe(gulp.dest(''));
 });
