@@ -13,8 +13,18 @@
                     <div class="nav navbar-nav" ng-class="{'navbar-right': layoutDirection.direction != 'rtl'}">
                         <p class="text-right login-message">
                                 <span ng-show="isLoggedIn">
-                                    <strong>{{currentUser.userCredentials.username}}</strong> |
-                                    <a ng-click="logout()" href="#/login"
+                                     <strong>{{currentUser.userCredentials.username}}</strong> |
+                                </span>
+                                <span>
+                                    <a description-popup
+                                       dp-title="{{ resourceBundle.help }}"
+                                       dp-desc="{{ getSupportEmailMessage() }}"
+                                    >
+                                    {{ resourceBundle.help }}
+                                    </a>
+                                </span>
+                                <span ng-show="isLoggedIn">
+                                    | <a ng-click="logout()" href="#/login"
                                        tabindex="-1">{{ resourceBundle.logoutLabel }}</a>
                                 </span>
                         </p>

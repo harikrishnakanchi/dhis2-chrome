@@ -20,7 +20,7 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
         };
 
         $scope.getSupportEmailMessage = function () {
-            return interpolate($scope.resourceBundle.contactSupport, {supportEmail: properties.support_email});
+            return interpolate(_.get($scope.resourceBundle, 'contactSupport'), {supportEmail: properties.support_email});
         };
 
         var loadProjects = function() {
