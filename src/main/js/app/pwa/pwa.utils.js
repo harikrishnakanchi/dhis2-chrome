@@ -8,9 +8,6 @@ define(['lodash'], function(_) {
             messageListeners[message].call({});
         }
     };
-    var messageEvenHandler = function (event) {
-        executeEventListener(event.data);
-    };
 
     var fakeFunction = function () {
 
@@ -88,8 +85,12 @@ define(['lodash'], function(_) {
         }
     };
 
+    var messageEventHandler = function (event) {
+        executeEventListener(event.data);
+    };
+
     var init = function () {
-        self.worker.addEventListener("message", messageEvenHandler);
+        self.worker.addEventListener("message", messageEventHandler);
     };
 
     return {
