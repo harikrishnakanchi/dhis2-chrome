@@ -13,7 +13,6 @@ define(["productKeyController", "angularMocks", "packagedDataImporter", "utils",
             spyOn(systemSettingRepository, "upsertProductKey").and.returnValue(utils.getPromise(q, []));
 
             spyOn(platformUtils, "sendMessage");
-            spyOn(platformUtils, "setAuthHeader").and.returnValue(utils.getPromise(q, {}));
 
             packagedDataImporter = new PackagedDataImporter();
             spyOn(packagedDataImporter, "run").and.returnValue(utils.getPromise(q, {}));

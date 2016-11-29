@@ -100,8 +100,6 @@ define(['lodash'], function(_) {
     return {
         addListener: addListener,
         sendMessage: sendMessage,
-        setAuthHeader: fakeFunction,
-        getAuthHeader: fakeFunction,
         createNotification: createNotification,
         getPraxisVersion: fakeFunction,
         getOS: fakeFunction,

@@ -1,4 +1,4 @@
-define(["lodash", "properties", "appSettingsUtils"], function(_, properties, appSettingsUtils) {
+define(['lodash'], function(_) {
     var registerMessageCallback = function(messageName, callback) {
         return function(message) {
             if (message.name === messageName)
@@ -22,28 +22,6 @@ define(["lodash", "properties", "appSettingsUtils"], function(_, properties, app
             name: messageName,
             data: data
         });
-    };
-
-    var setAuthHeader = function(value) {
-        return appSettingsUtils.upsert("authHeader", {
-            "authHeader": value
-        });
-    };
-
-    var getAuthHeader = function(callback) {
-        var doCallback = function(storedObject) {
-            if (storedObject === null && properties.devMode) {
-                callback({
-                    "authHeader": "Basic c2VydmljZS5hY2NvdW50OiFBQkNEMTIzNA=="
-                });
-                return;
-            }
-            if (storedObject === null)
-                callback();
-            else
-                callback(storedObject.value.value);
-        };
-        appSettingsUtils.get("authHeader").then(doCallback);
     };
 
     var createNotification = function(title, message) {
@@ -88,8 +66,6 @@ define(["lodash", "properties", "appSettingsUtils"], function(_, properties, app
     return {
         addListener: addListener,
         sendMessage: sendMessage,
-        setAuthHeader: setAuthHeader,
-        getAuthHeader: getAuthHeader,
         createNotification: createNotification,
         getPraxisVersion: getPraxisVersion,
         getOS: getOS,

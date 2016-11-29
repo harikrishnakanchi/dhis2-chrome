@@ -169,7 +169,6 @@ require.config({
         "dhisUrl": "app/utils/dhis.url",
         "zipUtils": "app/utils/zip.utils",
         "cipherUtils": "app/utils/cipher.utils",
-        "appSettingsUtils": "app/utils/app.settings.utils",
         "authenticationUtils": "app/utils/authentication.utils",
         "dataURItoBlob": "app/utils/data.uri.to.blob",
         "interpolate": "app/utils/interpolate",

@@ -136,8 +136,7 @@ require.config({
         "cipherUtils": "app/utils/cipher.utils",
         "httpUtils": "app/utils/http.utils",
         "dhisUrl": "app/utils/dhis.url",
-        "interpolate": "app/utils/interpolate",
-        "appSettingsUtils": "app/utils/app.settings.utils"
+        "interpolate": "app/utils/interpolate"
     },
     shim: {
         'angular': {
