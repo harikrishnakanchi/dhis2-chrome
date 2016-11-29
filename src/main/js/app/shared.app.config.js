@@ -21,7 +21,7 @@ require.config({
         "sjcl": "lib/sjcl/sjcl",
         "saveSvgAsPng": "lib/save-svg-as-png/saveSvgAsPng",
         "angular-sanitize": "lib/angular-sanitize/angular-sanitize.min",
-        "xlsx": "lib/js-xlsx/xlsx",
+        "xlsx": "lib/js-xlsx-style/xlsx",
 
         //3rd party angular modules
         "angular-indexedDB": "lib/angular-indexedDB/indexeddb",
