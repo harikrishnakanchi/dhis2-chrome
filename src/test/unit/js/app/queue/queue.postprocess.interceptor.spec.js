@@ -61,40 +61,6 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "platformUt
             expect(actualResult).toBeFalsy();
         });
 
-
-
-        it("should send message on failure", function() {
-            queuePostProcessInterceptor.onFailure({
-                "id": 1,
-                "data": {
-                    "type": "a",
-                    "requestId": "1"
-                },
-                "releases": 1
-            }, {});
-
-            expect(platformUtils.sendMessage).toHaveBeenCalledWith({
-                "message": "aFailed",
-                "requestId": "1"
-            });
-        });
-
-        it("should send message on success", function() {
-            queuePostProcessInterceptor.onSuccess({
-                "id": 1,
-                "data": {
-                    "type": "a",
-                    "requestId": "1"
-                },
-                "releases": 1
-            }, {});
-
-            expect(platformUtils.sendMessage).toHaveBeenCalledWith({
-                "message": "aDone",
-                "requestId": "1"
-            });
-        });
-
         it('should return false for retry if job type is blacklisted for retrial', function() {
 
             properties.queue.skipRetryMessages = ['downloadMetadata'];
@@ -160,9 +126,9 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "platformUt
             scope.$apply();
 
             expect(platformUtils.createNotification).toHaveBeenCalled();
-            expect(platformUtils.sendMessage.calls.count()).toEqual(3);
-            expect(platformUtils.sendMessage.calls.argsFor(1)).toEqual(["dhisOffline"]);
-            expect(platformUtils.sendMessage.calls.argsFor(2)).toEqual(["productKeyExpired"]);
+            expect(platformUtils.sendMessage.calls.count()).toEqual(2);
+            expect(platformUtils.sendMessage.calls.argsFor(0)).toEqual(["dhisOffline"]);
+            expect(platformUtils.sendMessage.calls.argsFor(1)).toEqual(["productKeyExpired"]);
         });
 
         it("should mark the failed to sync module by period after maxretries", function() {

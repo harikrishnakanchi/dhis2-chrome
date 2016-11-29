@@ -45,20 +45,9 @@ define(["properties", "platformUtils", "interpolate", "moment", "lodash"], funct
             }
         };
 
-        var sendChromeMessage = function(job, messageType) {
-            platformUtils.sendMessage({
-                "message": job.data.type + messageType,
-                "requestId": job.data.requestId
-            });
-        };
-
         return {
-            "onSuccess": function(job) {
-                sendChromeMessage(job, "Done");
-            },
+            "onSuccess": function(job) {},
             "shouldRetry": function(job, data) {
-                sendChromeMessage(job, "Failed");
-
                 notifyUser(job, data);
 
                 if (_.contains(properties.queue.skipRetryMessages, job.data.type)) {
@@ -80,9 +69,7 @@ define(["properties", "platformUtils", "interpolate", "moment", "lodash"], funct
                 }
                 return false;
             },
-            "onFailure": function(job, data, hustleQueue) {
-                sendChromeMessage(job, "Failed");
-            }
+            "onFailure": function(job) {}
         };
     };
 });
