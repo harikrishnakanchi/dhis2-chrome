@@ -332,5 +332,6 @@
     "referralLocationCheckboxLabel": "عرض موقع إشارة للمستخدم إدخال البيانات",
     "geographicOriginCheckboxLabel": "عرض الأصل الجغرافي للمستخدم إدخال البيانات",
     "updated": "تحديث",
-    "help": "مساعدة?"
+    "help": "مساعدة?",
+    "exportTallySheetButton": "Export Tally Sheet"
 }
