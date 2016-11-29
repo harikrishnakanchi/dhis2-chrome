@@ -4,8 +4,8 @@ define(['lodash'], function(_) {
     var alarmListeners = {};
 
     var executeEventListener = function (message) {
-        if (messageListeners[message] instanceof Function) {
-            messageListeners[message].call({});
+        if (messageListeners[message.name] instanceof Function) {
+            messageListeners[message.name].call({}, message.data);
         }
     };
 
@@ -17,9 +17,13 @@ define(['lodash'], function(_) {
         messageListeners[message] = callback;
     };
 
-    var sendMessage = function (message) {
-        executeEventListener(message);
-        self.worker.postMessage(message);
+    var sendMessage = function (messageName, data) {
+        var payload = {
+            name: messageName,
+            data: data
+        };
+        executeEventListener(payload);
+        self.worker.postMessage(payload);
     };
 
     var createNotification = function(title, message) {

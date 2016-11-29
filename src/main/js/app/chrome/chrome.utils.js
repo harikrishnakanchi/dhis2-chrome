@@ -1,9 +1,8 @@
 define(["lodash", "properties", "appSettingsUtils"], function(_, properties, appSettingsUtils) {
     var registerMessageCallback = function(messageName, callback) {
-        return function(request, sender, sendResponse) {
-            if (request === messageName)
-                callback();
-
+        return function(message) {
+            if (message.name === messageName)
+                callback(message.data);
         };
     };
 
@@ -18,8 +17,11 @@ define(["lodash", "properties", "appSettingsUtils"], function(_, properties, app
         chrome.runtime.onMessage.addListener(registerMessageCallback(message, callback));
     };
 
-    var sendMessage = function(message) {
-        chrome.runtime.sendMessage(message);
+    var sendMessage = function(messageName, data) {
+        chrome.runtime.sendMessage({
+            name: messageName,
+            data: data
+        });
     };
 
     var setAuthHeader = function(value) {
