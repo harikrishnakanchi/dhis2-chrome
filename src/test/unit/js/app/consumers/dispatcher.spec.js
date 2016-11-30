@@ -6,7 +6,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadSystemSettingConsumer, uploadPatientOriginConsumer, uploadExcludedDataElementsConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
             uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer,
             uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadOrgUnitConsumer, downloadOrgUnitGroupConsumer, userPreferenceRepository, downloadModuleDataBlocksConsumer,
-            syncModuleDataBlockConsumer, removeOrgunitDataSetAssociationConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer;
+            syncModuleDataBlockConsumer, removeOrgunitDataSetAssociationConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer, syncOrgUnitConsumer;
 
         beforeEach(mocks.inject(function($q, $log, $rootScope) {
             downloadOrgUnitConsumer = {
@@ -90,6 +90,9 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadHistoricalDataConsumer = {
                 'run': jasmine.createSpy("downloadHistoricalDataConsumer")
             };
+            syncOrgUnitConsumer = {
+                'run': jasmine.createSpy("syncOrgUnitConsumer")
+            };
 
             hustleMonitor = {
                 checkHustleQueueCount: jasmine.createSpy('checkHustleQueueCount')
@@ -117,13 +120,14 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             removeOrgunitDataSetAssociationConsumer.run.and.returnValue(utils.getPromise(q, {}));
             syncExcludedLinelistOptionsConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadHistoricalDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
+            syncOrgUnitConsumer.run.and.returnValue(utils.getPromise(q, {}));
 
             dispatcher = new Dispatcher(q, log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDataSetConsumer, updateDataSetConsumer,
                 createUserConsumer, updateUserConsumer, uploadProgramConsumer,
                 downloadProgramConsumer, downloadMetadataConsumer,
                 downloadOrgUnitGroupConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
                 uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
-                downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, removeOrgunitDataSetAssociationConsumer, associateOrgunitToProgramConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer, hustleMonitor);
+                downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, removeOrgunitDataSetAssociationConsumer, associateOrgunitToProgramConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer, syncOrgUnitConsumer, hustleMonitor);
         }));
 
         it("should call syncModuleDataBlock consumer for syncing moduleDataBlock", function() {
@@ -382,6 +386,19 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             scope.$apply();
 
             expect(associateOrgunitToProgramConsumer.run).toHaveBeenCalledWith(message);
+        });
+
+
+        it("should call sync org unit consumer", function() {
+            message.data = {
+                "data": {},
+                "type": "syncOrgUnit"
+            };
+
+            dispatcher.run(message);
+            scope.$apply();
+
+            expect(syncOrgUnitConsumer.run).toHaveBeenCalledWith(message);
         });
     });
 });
