@@ -1,6 +1,7 @@
-define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "interpolate", "customAttributes", "dataElementUtils"], function(_, dataValuesMapper, orgUnitMapper, moment, properties, interpolate, customAttributes, dataElementUtils) {
+define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "interpolate", "customAttributes", "dataElementUtils", "excelBuilder"], function(_, dataValuesMapper, orgUnitMapper, moment, properties, interpolate, customAttributes, dataElementUtils, excelBuilder) {
     return function($scope, $routeParams, $q, $hustle, $anchorScroll, $location, $modal, $rootScope, $window, $timeout,
-        dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository, optionSetRepository) {
+        dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository,
+                    translationsService, moduleDataBlockFactory, dataSyncFailureRepository, optionSetRepository, filesystemService) {
 
         var currentPeriod, currentPeriodAndOrgUnit;
         var noReferralLocationConfigured = false;
@@ -37,6 +38,49 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                     $window.print();
                 }, 0);
             }, 0);
+        };
+
+        var buildSpreadSheetContent = function () {
+            var EMPTY_CELL = '',
+                EMPTY_ROW = [];
+
+            var getPeriodInformation = function () {
+                return [[$scope.resourceBundle.yearLabel, EMPTY_CELL, $scope.resourceBundle.monthLabel, EMPTY_CELL, $scope.resourceBundle.weekLabel, EMPTY_CELL]].concat([EMPTY_ROW]);
+            };
+
+            var getModuleName = function () {
+                return [[$scope.resourceBundle.moduleNameLabel, $scope.selectedModule.name]].concat([EMPTY_ROW]);
+            };
+
+            var buildDataElements = function (dataElement) {
+                return [dataElementUtils.getDisplayName(dataElement)];
+            };
+
+            var buildSections = function (dataSet) {
+                return _.flatten(_.map(dataSet.sections, function (section) {
+                    return [[section.name].concat(_.map(section.baseColumnConfiguration, 'name'))].concat(_.map(section.dataElements, buildDataElements), [EMPTY_ROW]);
+                }));
+            };
+
+            var buildDataSet = function (dataSet) {
+                return [[dataSet.name], EMPTY_ROW].concat(buildSections(dataSet), [EMPTY_ROW]);
+            };
+
+            var buildDataSetBlocks = function () {
+                return _.flatten(_.map($scope.dataSets, buildDataSet));
+            };
+
+            var spreadSheetContent = getPeriodInformation().concat(getModuleName()).concat(buildDataSetBlocks());
+
+            return [{
+                name: $scope.selectedModule.name,
+                data: spreadSheetContent
+            }];
+        };
+
+        $scope.exportTallySheetToExcel = function () {
+            var filename = [$scope.selectedModule.name, 'export'].join('.');
+            return filesystemService.promptAndWriteFile(filename, excelBuilder.createWorkBook(buildSpreadSheetContent()), filesystemService.FILE_TYPE_OPTIONS.XLSX);
         };
 
         var confirmAndProceed = function(okCallback, message, doNotConfirm) {

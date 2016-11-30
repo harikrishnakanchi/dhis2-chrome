@@ -1,9 +1,14 @@
-define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "excludedDataElementsRepository", "dataSetRepository", "programRepository", "referralLocationsRepository", "translationsService", "moduleDataBlockFactory", "dataSyncFailureRepository", "optionSetRepository", "customAttributes"],
-    function(AggregateDataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, ExcludedDataElementsRepository, DatasetRepository, ProgramRepository, ReferralLocationsRepository, TranslationsService, ModuleDataBlockFactory, DataSyncFailureRepository, OptionSetRepository, customAttributes) {
+define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop",
+    "dataRepository", "approvalDataRepository", "orgUnitRepository", "excludedDataElementsRepository", "dataSetRepository", "programRepository", "referralLocationsRepository",
+    "translationsService", "moduleDataBlockFactory", "dataSyncFailureRepository", "optionSetRepository", "customAttributes", "filesystemService", "excelBuilder"],
+    function(AggregateDataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, timecop,
+             DataRepository, ApprovalDataRepository, OrgUnitRepository, ExcludedDataElementsRepository, DatasetRepository, ProgramRepository, ReferralLocationsRepository,
+             TranslationsService, ModuleDataBlockFactory, DataSyncFailureRepository, OptionSetRepository, customAttributes, FilesystemService, ExcelBuilder) {
         describe("aggregateDataEntryController ", function() {
             var scope, routeParams, q, location, anchorScroll, aggregateDataEntryController, rootScope, parentProject, fakeModal,
                 window, hustle, timeout, origin1, origin2, mockModuleDataBlock, selectedPeriod,
-                dataRepository, approvalDataRepository, programRepository, orgUnitRepository, datasetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository, optionSetRepository;
+                dataRepository, approvalDataRepository, programRepository, orgUnitRepository, datasetRepository, referralLocationsRepository,
+                excludedDataElementsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository, optionSetRepository, filesystemService;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $anchorScroll, $location, $window, $timeout) {
@@ -148,7 +153,12 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 optionSetRepository = new OptionSetRepository();
                 spyOn(optionSetRepository, 'getOptionSetByCode').and.returnValue(utils.getPromise(q, mockOptionSet));
 
-                aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, anchorScroll, location, fakeModal, rootScope, window, timeout, dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository, optionSetRepository);
+                filesystemService = new FilesystemService();
+                spyOn(filesystemService, 'promptAndWriteFile').and.returnValue(utils.getPromise(q, {}));
+
+                aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, anchorScroll, location, fakeModal, rootScope, window, timeout,
+                    dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository,
+                    translationsService, moduleDataBlockFactory, dataSyncFailureRepository, optionSetRepository, filesystemService);
 
                 scope.forms.dataentryForm = { $setPristine: function() {} };
                 spyOn(scope.forms.dataentryForm, '$setPristine');
@@ -790,6 +800,74 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.$apply();
 
                 expect(scope.isApproved).toBeTruthy();
+            });
+
+            describe('exportTallySheetToExcel', function () {
+                var spreadSheetContent, mockDataset, mockDataValues;
+
+                beforeEach(function () {
+                    scope.$apply();
+                    scope.resourceBundle = {
+                        yearLabel: 'year',
+                        weekLabel: 'week',
+                        monthLabel: 'month',
+                        moduleNameLabel: 'module name'
+                    };
+                    spreadSheetContent = undefined;
+
+                    mockDataset = {
+                        name: 'datasetName',
+                        sections:[{
+                            name: 'sectionName',
+                            columnConfigurations:[{
+                                name: 'categoryOptionNameA'
+                            }],
+                            baseColumnConfiguration:[{
+                                name: 'categoryOptionNameA',
+                                categoryOptionComboId: 'someCategoryOptionComboId'
+                            }],
+                            dataElements:[{
+                                id: 'dataElementId',
+                                name: 'dataElementName'
+                            }]
+                        }]
+                    };
+
+                    scope.dataSets = [mockDataset];
+
+                    spyOn(ExcelBuilder, 'createWorkBook').and.callFake(function (workBookContent) {
+                        spreadSheetContent = _.first(workBookContent);
+                        return new Blob();
+                    });
+
+                    scope.exportTallySheetToExcel();
+                });
+
+                it('should prompt the user to save excel with the suggested name', function () {
+                    var expectedFilename = 'Mod1.export';
+                    expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.XLSX);
+                });
+
+                it('should have the period information', function () {
+                    expect(spreadSheetContent.data).toContain(['year', '', 'month', '', 'week', '']);
+                });
+
+                it('should have the module information', function () {
+                    expect(spreadSheetContent.data).toContain(['module name', 'Mod1']);
+                });
+
+                it('should have dataset information', function () {
+                    expect(spreadSheetContent.data).toContain([mockDataset.name]);
+                });
+
+                it('should have the headers for a dataset section', function () {
+                    expect(spreadSheetContent.data).toContain(['sectionName', 'categoryOptionNameA']);
+                });
+
+                it('should have the data element name', function () {
+                    expect(spreadSheetContent.data).toContain(['dataElementName']);
+                });
+
             });
         });
     });
