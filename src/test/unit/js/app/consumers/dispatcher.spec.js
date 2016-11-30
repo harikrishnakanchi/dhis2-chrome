@@ -1,6 +1,6 @@
 define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, utils) {
     describe("dispatcher", function() {
-        var dispatcher, message, q, log, scope,
+        var dispatcher, message, q, log, scope, hustleMonitor,
             createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer,
             downloadMetadataConsumer, downloadDataSetConsumer, updateDataSetConsumer, associateOrgunitToProgramConsumer,
             downloadSystemSettingConsumer, uploadPatientOriginConsumer, uploadExcludedDataElementsConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
@@ -91,6 +91,10 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
                 'run': jasmine.createSpy("downloadHistoricalDataConsumer")
             };
 
+            hustleMonitor = {
+                checkHustleQueueCount: jasmine.createSpy('checkHustleQueueCount')
+            };
+
             message = {};
             q = $q;
             log = $log;
@@ -119,7 +123,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
                 downloadProgramConsumer, downloadMetadataConsumer,
                 downloadOrgUnitGroupConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
                 uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
-                downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, removeOrgunitDataSetAssociationConsumer, associateOrgunitToProgramConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer);
+                downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, removeOrgunitDataSetAssociationConsumer, associateOrgunitToProgramConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer, hustleMonitor);
         }));
 
         it("should call syncModuleDataBlock consumer for syncing moduleDataBlock", function() {

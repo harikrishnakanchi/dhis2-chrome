@@ -1,27 +1,14 @@
 define(["properties", "platformUtils"], function(properties, platformUtils) {
-    return function($hustle, $log) {
+    return function($hustle, $log, $q) {
 
         var checkHustleQueueCount = function() {
-            return $hustle.getCount("dataValues").then(function(count) {
-                return $hustle.getReservedCount().then(function(reservedCount) {
-                    if (count > 0 || reservedCount > 0)
-                        platformUtils.sendMessage("msgInSyncQueue");
-                    else
-                        platformUtils.sendMessage("noMsgInSyncQueue");
-                });
+            return $q.all({
+                count: $hustle.getCount('dataValues'),
+                reservedCount: $hustle.getReservedCount()
+            }).then(function (data) {
+                var message = (data.count > 0 || data.reservedCount > 0) ? 'msgInSyncQueue' : 'noMsgInSyncQueue';
+                platformUtils.sendMessage(message);
             });
-        };
-
-        var setupAlarms = function () {
-            $log.info("Registering checkHustleQueueCountAlarm");
-            platformUtils.createAlarm('checkHustleQueueCountAlarm', {
-                periodInMinutes: properties.queue.checkMsgcountDelayInMinutes
-            });
-        };
-
-        var start = function() {
-            setupAlarms();
-            return checkHustleQueueCount();
         };
 
         var msgInSyncQueue = function(callback) {
@@ -33,11 +20,9 @@ define(["properties", "platformUtils"], function(properties, platformUtils) {
         };
 
         return {
-            start: start,
             msgInSyncQueue: msgInSyncQueue,
             noMsgInSyncQueue: noMsgInSyncQueue,
             checkHustleQueueCount: checkHustleQueueCount
         };
-
     };
 });

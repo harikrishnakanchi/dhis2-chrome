@@ -22,7 +22,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
             directives.init(app);
             transformers.init(app);
 
-            app.factory('queuePostProcessInterceptor', ['$log', 'ngI18nResourceBundle', queuePostProcessInterceptor]);
+            app.factory('queuePostProcessInterceptor', ['$log', 'ngI18nResourceBundle', 'dataRepository','dataSyncFailureRepository', 'hustleMonitor', queuePostProcessInterceptor]);
 
             app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider', '$hustleProvider', '$compileProvider', '$provide', '$tooltipProvider',
                 function($routeProvider, $indexedDBProvider, $httpProvider, $hustleProvider, $compileProvider, $provide, $tooltipProvider) {

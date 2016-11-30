@@ -4,9 +4,12 @@ define(["lodash"], function(_) {
         downloadProgramConsumer, downloadMetadataConsumer,
         downloadOrgUnitGroupConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
         uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
-        downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, removeOrgunitDataSetAssociationConsumer, associateOrgunitToProgramConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer, syncOrgUnitConsumer) {
+        downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, removeOrgunitDataSetAssociationConsumer, associateOrgunitToProgramConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer, syncOrgUnitConsumer, hustleMonitor) {
 
         this.run = function(message) {
+
+            hustleMonitor.checkHustleQueueCount();
+
             $log.info("Processing message: " + message.data.type, message.data);
             switch (message.data.type) {
                 case "downloadMetadata":

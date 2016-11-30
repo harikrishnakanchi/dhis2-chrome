@@ -1,5 +1,5 @@
 define(["properties", "platformUtils", "interpolate", "moment", "lodash"], function(properties, platformUtils, interpolate, moment, _) {
-    return function($log, ngI18nResourceBundle, dataRepository, dataSyncFailureRepository) {
+    return function($log, ngI18nResourceBundle, dataRepository, dataSyncFailureRepository, hustleMonitor) {
         var getResourceBundle = function(locale) {
             return ngI18nResourceBundle.get({
                 "locale": locale
@@ -46,8 +46,16 @@ define(["properties", "platformUtils", "interpolate", "moment", "lodash"], funct
         };
 
         return {
-            "onSuccess": function(job) {},
-            "shouldRetry": function(job, data) {
+            onSuccess: function(job) {
+                hustleMonitor.checkHustleQueueCount();
+            },
+            onFailure: function(job, failureMessage) {
+                hustleMonitor.checkHustleQueueCount();
+            },
+            onPublish: function(job) {
+                hustleMonitor.checkHustleQueueCount();
+            },
+            shouldRetry: function(job, data) {
                 notifyUser(job, data);
 
                 if (_.contains(properties.queue.skipRetryMessages, job.data.type)) {
@@ -68,8 +76,7 @@ define(["properties", "platformUtils", "interpolate", "moment", "lodash"], funct
                     });
                 }
                 return false;
-            },
-            "onFailure": function(job) {}
+            }
         };
     };
 });

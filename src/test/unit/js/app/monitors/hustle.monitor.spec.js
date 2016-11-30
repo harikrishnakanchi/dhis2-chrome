@@ -1,7 +1,6 @@
 define(["hustleMonitor", "utils", "angularMocks", "platformUtils", "mockChrome"], function(HustleMonitor, utils, mocks, platformUtils, MockChrome) {
     describe("hustle.monitor", function() {
-        var q, log, scope;
-        var callbacks = {};
+        var q, log, scope, hustle;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($q, $log, $hustle, $rootScope) {
@@ -20,17 +19,18 @@ define(["hustleMonitor", "utils", "angularMocks", "platformUtils", "mockChrome"]
         }));
 
         it("should check hustle queue count", function() {
-            var hustleMonitor = new HustleMonitor(hustle, log);
+            var hustleMonitor = new HustleMonitor(hustle, log, q);
 
-            hustleMonitor.start();
+            hustleMonitor.checkHustleQueueCount();
 
             expect(hustle.getCount).toHaveBeenCalled();
+            expect(hustle.getReservedCount).toHaveBeenCalled();
         });
 
         it("should call the msgInSyncQueue callback if count greater than zero", function() {
             var msgInQCallback = jasmine.createSpy();
             var noMsgInQCallback = jasmine.createSpy();
-            var hustleMonitor = new HustleMonitor(hustle, log);
+            var hustleMonitor = new HustleMonitor(hustle, log, q);
 
             hustleMonitor.msgInSyncQueue(function() {
                 msgInQCallback();
@@ -39,7 +39,7 @@ define(["hustleMonitor", "utils", "angularMocks", "platformUtils", "mockChrome"]
                 noMsgInQCallback();
             });
 
-            hustleMonitor.start();
+            hustleMonitor.checkHustleQueueCount();
             scope.$apply();
 
             expect(msgInQCallback.calls.count()).toBe(1);
@@ -52,7 +52,7 @@ define(["hustleMonitor", "utils", "angularMocks", "platformUtils", "mockChrome"]
             hustle.getCount.and.returnValue(utils.getPromise(q, 0));
             hustle.getReservedCount.and.returnValue(utils.getPromise(q, 0));
 
-            var hustleMonitor = new HustleMonitor(hustle, log);
+            var hustleMonitor = new HustleMonitor(hustle, log, q);
 
             hustleMonitor.msgInSyncQueue(function() {
                 msgInQCallback();
@@ -61,7 +61,7 @@ define(["hustleMonitor", "utils", "angularMocks", "platformUtils", "mockChrome"]
                 noMsgInQCallback();
             });
 
-            hustleMonitor.start();
+            hustleMonitor.checkHustleQueueCount();
             scope.$apply();
 
             expect(msgInQCallback.calls.count()).toBe(0);

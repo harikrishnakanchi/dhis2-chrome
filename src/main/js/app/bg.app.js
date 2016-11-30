@@ -12,7 +12,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
             app.factory('cleanupPayloadInterceptor', [cleanupPayloadInterceptor]);
             app.factory('handleTimeoutInterceptor', ['$q', '$injector', '$timeout', handleTimeoutInterceptor]);
             app.factory('logRequestReponseInterceptor', ['$log', '$q', logRequestReponseInterceptor]);
-            app.factory('queuePostProcessInterceptor', ['$log', 'ngI18nResourceBundle', 'dataRepository','dataSyncFailureRepository', queuePostProcessInterceptor]);
+            app.factory('queuePostProcessInterceptor', ['$log', 'ngI18nResourceBundle', 'dataRepository','dataSyncFailureRepository', 'hustleMonitor', queuePostProcessInterceptor]);
 
             app.config(['$indexedDBProvider', '$httpProvider', '$hustleProvider', '$provide',
                 function($indexedDBProvider, $httpProvider, $hustleProvider, $provide) {
@@ -104,8 +104,6 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         });
                     };
 
-                    hustleMonitor.start();
-
                     platformUtils.addListener("productKeyDecrypted", function() {
                         systemSettingRepository.loadProductKey().then(function() {
                             setupAlarms();
@@ -124,7 +122,6 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     platformUtils.addAlarmListener("metadataSyncAlarm", metadataSync);
                     platformUtils.addAlarmListener("projectDataSyncAlarm", projectDataSync);
                     platformUtils.addAlarmListener("dhisConnectivityCheckAlarm", dhisMonitor.checkNow);
-                    platformUtils.addAlarmListener("checkHustleQueueCountAlarm", hustleMonitor.checkHustleQueueCount);
 
                     systemSettingRepository.isProductKeySet()
                         .then(systemSettingRepository.loadProductKey)

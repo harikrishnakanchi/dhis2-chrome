@@ -47,8 +47,7 @@ define(['lodash', 'overrides'], function(_, overrides) {
                 2: 10000,
                 3: 10000,
                 4: 10000
-            },
-            checkMsgcountDelayInMinutes: 1
+            }
         },
         eventsSync: {
             maximumNumberOfEventsToSync: 10000,
