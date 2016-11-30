@@ -819,13 +819,22 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                         name: 'datasetName',
                         sections:[{
                             name: 'sectionName',
-                            columnConfigurations:[{
-                                name: 'categoryOptionNameA'
-                            }],
-                            baseColumnConfiguration:[{
-                                name: 'categoryOptionNameA',
-                                categoryOptionComboId: 'someCategoryOptionComboId'
-                            }],
+                            columnConfigurations: [
+                                [{
+                                    name: 'categoryOptionNameA'
+                                }, {
+                                    name: 'categoryOptionNameB'
+                                }],
+                                [{
+                                    name: 'categoryOptionNameX'
+                                },{
+                                    name: 'categoryOptionNameY'
+                                }, {
+                                    name: 'categoryOptionNameX'
+                                }, {
+                                    name: 'categoryOptionNameY'
+                                }]
+                            ],
                             dataElements:[{
                                 id: 'dataElementId',
                                 name: 'dataElementName'
@@ -861,7 +870,8 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 });
 
                 it('should have the headers for a dataset section', function () {
-                    expect(spreadSheetContent.data).toContain(['sectionName', 'categoryOptionNameA']);
+                    expect(spreadSheetContent.data).toContain(['sectionName', 'categoryOptionNameA', 'categoryOptionNameB']);
+                    expect(spreadSheetContent.data).toContain(['', 'categoryOptionNameX', 'categoryOptionNameY', 'categoryOptionNameX', 'categoryOptionNameY']);
                 });
 
                 it('should have the data element name', function () {

@@ -56,9 +56,16 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                 return [dataElementUtils.getDisplayName(dataElement)];
             };
 
+            var buildHeaders = function (section) {
+                return _.map(section.columnConfigurations, function (configuration, index) {
+                    var initialElement = index === 0 ? [section.name] : [EMPTY_CELL];
+                    return initialElement.concat(_.map(configuration, 'name'));
+                });
+            };
+
             var buildSections = function (dataSet) {
                 return _.flatten(_.map(dataSet.sections, function (section) {
-                    return [[section.name].concat(_.map(section.baseColumnConfiguration, 'name'))].concat(_.map(section.dataElements, buildDataElements), [EMPTY_ROW]);
+                    return buildHeaders(section).concat(_.map(section.dataElements, buildDataElements), [EMPTY_ROW]);
                 }));
             };
 
