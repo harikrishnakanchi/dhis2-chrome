@@ -2,7 +2,7 @@ define(["properties", "platformUtils", "lodash"], function(properties, platformU
     return function($http, $log, $timeout, $rootScope, userPreferenceRepository) {
         var onlineEventHandlers = [];
         var offlineEventHandlers = [];
-        var isDhisOnline;
+        var isDhisOnline, isMaxTriesForOfflineReached;
 
         var dhisConnectivityCheck = function() {
 
@@ -21,6 +21,7 @@ define(["properties", "platformUtils", "lodash"], function(properties, platformU
                 }).then(function(response) {
                     $log.info("DHIS is accessible");
                     isDhisOnline = true;
+                    isMaxTriesForOfflineReached = false;
                     platformUtils.sendMessage("dhisOnline");
                 }).
                 catch(function(response) {
@@ -89,6 +90,7 @@ define(["properties", "platformUtils", "lodash"], function(properties, platformU
 
         var stop = function() {
             platformUtils.clearAlarm("dhisConnectivityCheckAlarm");
+            isDhisOnline = false;
             platformUtils.sendMessage('dhisOffline');
         };
 
@@ -114,6 +116,14 @@ define(["properties", "platformUtils", "lodash"], function(properties, platformU
             return $rootScope.timeoutEventReferenceCount !== undefined && $rootScope.timeoutEventReferenceCount > 0;
         };
 
+        var setMaxTriesIfNoNetwork = function () {
+                isMaxTriesForOfflineReached = true;
+        };
+
+        var maxTriesReachedForNoNetwork = function () {
+            return isMaxTriesForOfflineReached;
+        };
+
         platformUtils.addListener("dhisOffline", onDhisOffline);
         platformUtils.addListener("dhisOnline", onDhisOnline);
 
@@ -125,7 +135,9 @@ define(["properties", "platformUtils", "lodash"], function(properties, platformU
             online: online,
             offline: offline,
             checkNow: checkNow,
-            onTimeoutOccurred: onTimeoutOccurred
+            onTimeoutOccurred: onTimeoutOccurred,
+            setMaxTriesIfNoNetwork: setMaxTriesIfNoNetwork,
+            maxTriesReachedForNoNetwork: maxTriesReachedForNoNetwork
         };
     };
 });
