@@ -55,7 +55,7 @@ define(["downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupC
                 "downloadProgramConsumer", "downloadMetadataConsumer",
                 "downloadOrgUnitGroupConsumer", "downloadSystemSettingConsumer", "uploadPatientOriginConsumer", "downloadPivotTableDataConsumer", "downloadChartDataConsumer",
                 "uploadReferralLocationsConsumer", "downloadProjectSettingsConsumer", "uploadExcludedDataElementsConsumer", "downloadChartsConsumer", "downloadPivotTablesConsumer", "userPreferenceRepository",
-                "downloadModuleDataBlocksConsumer", "syncModuleDataBlockConsumer", "removeOrgunitDataSetAssociationConsumer", "associateOrgunitToProgramConsumer", "syncExcludedLinelistOptionsConsumer", "downloadHistoricalDataConsumer", "syncOrgUnitConsumer", "hustleMonitor", dispatcher
+                "downloadModuleDataBlocksConsumer", "syncModuleDataBlockConsumer", "removeOrgunitDataSetAssociationConsumer", "associateOrgunitToProgramConsumer", "syncExcludedLinelistOptionsConsumer", "downloadHistoricalDataConsumer", "syncOrgUnitConsumer", dispatcher
             ]);
 
         };
