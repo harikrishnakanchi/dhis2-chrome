@@ -803,7 +803,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             describe('exportTallySheetToExcel', function () {
-                var spreadSheetContent, mockDataset, mockDataValues;
+                var spreadSheetContent, mockDataset, originDataset;
 
                 beforeEach(function () {
                     scope.$apply();
@@ -842,7 +842,21 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                         }]
                     };
 
-                    scope.dataSets = [mockDataset];
+                    originDataset = {
+                        name: 'datasetName',
+                        isOriginDataset: true,
+                        sections:[{
+                            name: 'sectionName'
+                        }]
+                    };
+
+                    scope.dataSets = [mockDataset, originDataset];
+
+                    scope.originOrgUnits = [{
+                        name: 'originA'
+                    },{
+                        name: 'originB'
+                    }];
 
                     spyOn(ExcelBuilder, 'createWorkBook').and.callFake(function (workBookContent) {
                         spreadSheetContent = _.first(workBookContent);
@@ -876,6 +890,10 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
 
                 it('should have the data element name', function () {
                     expect(spreadSheetContent.data).toContain(['dataElementName']);
+                });
+
+                it('should have the origin name under origin dataset section', function () {
+                    expect(spreadSheetContent.data).toContain(['originA'], ['originB']);
                 });
 
             });

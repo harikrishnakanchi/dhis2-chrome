@@ -52,8 +52,10 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                 return [[$scope.resourceBundle.moduleNameLabel, $scope.selectedModule.name]].concat([EMPTY_ROW]);
             };
 
-            var buildDataElements = function (dataElement) {
-                return [dataElementUtils.getDisplayName(dataElement)];
+            var buildDataElements = function (section) {
+                return _.map(section.dataElements, function (dataElement) {
+                    return [dataElementUtils.getDisplayName(dataElement)];
+                });
             };
 
             var buildHeaders = function (section) {
@@ -63,9 +65,16 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                 });
             };
 
+            var buildOrigins = function () {
+                return _.map($scope.originOrgUnits, function (originOrgUnit) {
+                    return [originOrgUnit.name];
+                });
+            };
+
             var buildSections = function (dataSet) {
                 return _.flatten(_.map(dataSet.sections, function (section) {
-                    return buildHeaders(section).concat(_.map(section.dataElements, buildDataElements), [EMPTY_ROW]);
+                    var sectionContent = dataSet.isOriginDataset ? buildOrigins() : buildDataElements(section);
+                    return buildHeaders(section).concat(sectionContent, [EMPTY_ROW]);
                 }));
             };
 
