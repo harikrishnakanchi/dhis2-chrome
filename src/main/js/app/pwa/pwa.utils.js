@@ -13,6 +13,10 @@ define(['properties', 'lodash'], function(properties, _) {
         return properties.praxis.version;
     };
 
+    var getOS = function () {
+        return _.includes(window.navigator.platform, 'Win') ? 'win' : '';
+    };
+
     var addListener = function (message, callback) {
         messageListeners[message] = callback;
     };
@@ -102,7 +106,7 @@ define(['properties', 'lodash'], function(properties, _) {
         sendMessage: sendMessage,
         createNotification: createNotification,
         getPraxisVersion: getPraxisVersion,
-        getOS: function () {},
+        getOS: getOS,
         init: _.once(init),
         createAlarm: createAlarm,
         addAlarmListener: addAlarmListener,
