@@ -36,6 +36,9 @@ define(['lodash', 'overrides'], function(_, overrides) {
         dhis: {
             url: url
         },
+        praxis: {
+            version: '10.0'
+        },
         queue: {
             maxretries: 5,
             delay: 100,

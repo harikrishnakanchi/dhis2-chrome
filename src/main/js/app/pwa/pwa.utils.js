@@ -1,4 +1,4 @@
-define(['lodash'], function(_) {
+define(['properties', 'lodash'], function(properties, _) {
     var messageListeners = {};
     var alarms = {};
     var alarmListeners = {};
@@ -9,8 +9,8 @@ define(['lodash'], function(_) {
         }
     };
 
-    var fakeFunction = function () {
-
+    var getPraxisVersion = function () {
+        return properties.praxis.version;
     };
 
     var addListener = function (message, callback) {
@@ -101,8 +101,8 @@ define(['lodash'], function(_) {
         addListener: addListener,
         sendMessage: sendMessage,
         createNotification: createNotification,
-        getPraxisVersion: fakeFunction,
-        getOS: fakeFunction,
+        getPraxisVersion: getPraxisVersion,
+        getOS: function () {},
         init: _.once(init),
         createAlarm: createAlarm,
         addAlarmListener: addAlarmListener,
