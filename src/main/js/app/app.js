@@ -129,8 +129,8 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                 basePath: "js/app/i18n"
             });
 
-            app.run(['dhisMonitor', 'hustleMonitor', 'queueInterceptor', '$rootScope', '$location', '$hustle', '$document', 'initializationRoutine',
-                function(dhisMonitor, hustleMonitor, queueInterceptor, $rootScope, $location, $hustle, $document, InitializationRoutine) {
+            app.run(['dhisMonitor', 'hustleMonitor', 'queueInterceptor', '$rootScope', '$location', '$hustle', '$document', '$timeout', 'initializationRoutine',
+                function(dhisMonitor, hustleMonitor, queueInterceptor, $rootScope, $location, $hustle, $document, $timeout, InitializationRoutine) {
 
                     $document.on('keydown', function(e) {
                         disableBackspaceKey(e);
@@ -161,14 +161,12 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
 
                     platformUtils.addListener("timeoutOccurred", dhisMonitor.onTimeoutOccurred);
 
-                    var updateView = function(data) {
-                        $rootScope.$apply(function() {
+                    hustleMonitor.onSyncQueueChange(function(data) {
+                        $timeout(function() {
                             $rootScope.remainingJobs = data.count + data.reservedCount;
                             $rootScope.msgInQueue = $rootScope.remainingJobs > 0;
                         });
-                    };
-
-                    hustleMonitor.onSyncQueueChange(_.throttle(updateView, 500));
+                    });
 
                     InitializationRoutine.run();
                 }
