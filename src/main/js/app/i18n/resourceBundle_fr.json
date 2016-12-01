@@ -224,6 +224,8 @@
     "connectedWithPendingRequests": "CONNECTE - DEMANDES EN ATTENTE",
     "notConnectedNoPendingRequests": "DECONNECTE - AUCUNE DEMANDE EN ATTENTE",
     "notConnectedWithPendingRequests": "DECONNECTE - DEMANDES EN ATTENTE",
+    "jobsRemaining": "tâches restantes",
+    "jobRemaining": "tâche restante",
     "menu": "Menu",
     "projectTypeLabel": "Type de Projet",
     "gender": "Genre",

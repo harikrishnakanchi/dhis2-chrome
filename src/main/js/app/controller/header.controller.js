@@ -104,6 +104,11 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
             return praxisVersion;
         };
 
+        $scope.getRemainingJobs = function () {
+            var resourceBundleKey = $rootScope.remainingJobs == 1 ? 'jobRemaining' : 'jobsRemaining';
+            return $rootScope.remainingJobs + ' ' + $scope.resourceBundle[resourceBundleKey];
+        };
+
         var init = function() {
             checkConnectionQuality();
         };

@@ -224,6 +224,8 @@
     "connectedWithPendingRequests": "طلبات معلقة - أون لاين",
     "notConnectedNoPendingRequests": "لا طلبات معلقة - لا يوجد اتصال",
     "notConnectedWithPendingRequests": "طلبات معلقة - لا يوجد اتصال",
+    "jobsRemaining": "المهام المتبقية",
+    "jobRemaining": "المهمة المتبقية",
     "menu": "قائمة",
     "projectTypeLabel": "نوع المشروع",
     "gender": "جنس",

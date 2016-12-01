@@ -161,5 +161,22 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
                 });
             });
 
+            describe('getRemainingTasks', function () {
+                beforeEach(function () {
+                    rootScope.resourceBundle = {
+                        jobRemaining: 'task remaining',
+                        jobsRemaining: 'tasks remaining'
+                    };
+                });
+
+                it('should return correct phrase based on the remaining tasks', function () {
+                    rootScope.remainingJobs = 1;
+                    expect(scope.getRemainingJobs()).toEqual('1 task remaining');
+
+                    rootScope.remainingJobs = 2;
+                    expect(scope.getRemainingJobs()).toEqual('2 tasks remaining');
+                });
+            });
+
         });
     });

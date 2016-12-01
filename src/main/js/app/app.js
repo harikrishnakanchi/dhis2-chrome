@@ -161,17 +161,15 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
 
                     platformUtils.addListener("timeoutOccurred", dhisMonitor.onTimeoutOccurred);
 
-                    hustleMonitor.msgInSyncQueue(function() {
+                    var updateView = function(data) {
                         $rootScope.$apply(function() {
-                            $rootScope.msgInQueue = true;
+                            $rootScope.remainingJobs = data.count + data.reservedCount;
+                            $rootScope.msgInQueue = $rootScope.remainingJobs > 0;
                         });
-                    });
+                    };
 
-                    hustleMonitor.noMsgInSyncQueue(function() {
-                        $rootScope.$apply(function() {
-                            $rootScope.msgInQueue = false;
-                        });
-                    });
+                    hustleMonitor.noMsgInSyncQueue(updateView);
+                    hustleMonitor.msgInSyncQueue(updateView);
 
                     InitializationRoutine.run();
                 }

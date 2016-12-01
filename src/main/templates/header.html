@@ -29,11 +29,22 @@
                                 </span>
                         </p>
                         <ul class="nav navbar-nav" ng-class="{'navbar-right': layoutDirection.direction != 'rtl'}">
+                            <li class="sync-status" ng-if="remainingJobs > 0">
+                                <span>
+                                    <i class="fa fa-refresh fa-spin" ng-if="isDhisOnline"></i>
+                                    <i class="fa fa-warning" ng-if="!isDhisOnline" title="{{ resourceBundle.notConnectedWithPendingRequests }}"></i>
+                                </span>
+                            </li>
+                            <li class="sync-status" ng-if="remainingJobs > 0">
+                                <span class="badge">{{ getRemainingJobs() }}</span>
+                            </li>
                             <li>
-                                    <span class="glyphicon dhis-status"
-                                          ng-class="{'glyphicon-cloud':!msgInQueue, 'glyphicon-cloud-upload':msgInQueue, 'dhis-online':isDhisOnline &amp;&amp; !poorConnection, 'dhis-poor-connection': poorConnection, 'dhis-offline':!isDhisOnline}"
-                                          ng-attr-title="{{isDhisOnline &amp;&amp; !msgInQueue &amp;&amp; resourceBundle.connectedNoPendingRequests || isDhisOnline &amp;&amp; msgInQueue &amp;&amp; resourceBundle.connectedWithPendingRequests
-                                        || !isDhisOnline &amp;&amp; !msgInQueue &amp;&amp; resourceBundle.notConnectedNoPendingRequests || !isDhisOnline &amp;&amp; msgInQueue &amp;&amp; resourceBundle.notConnectedWithPendingRequests}}"></span>
+                                <span class="glyphicon dhis-status glyphicon-cloud"
+                                      ng-class="{
+                                        'dhis-online':isDhisOnline && !poorConnection,
+                                        'dhis-poor-connection': poorConnection,
+                                        'dhis-offline':!isDhisOnline}">
+                                </span>
                             </li>
                             <li>
                                 <div dropdown>

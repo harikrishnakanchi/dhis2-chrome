@@ -224,6 +224,8 @@
     "connectedWithPendingRequests": "ONLINE - PENDING REQUESTS",
     "notConnectedNoPendingRequests": "OFFLINE - NO PENDING REQUESTS",
     "notConnectedWithPendingRequests": "OFFLINE - PENDING REQUESTS",
+    "jobsRemaining": "tasks remaining",
+    "jobRemaining": "task remaining",
     "menu": "Menu",
     "projectTypeLabel": "Project Type",
     "gender": "Gender",
