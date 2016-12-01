@@ -6,22 +6,16 @@ define(["properties", "platformUtils"], function(properties, platformUtils) {
                 count: $hustle.getCount('dataValues'),
                 reservedCount: $hustle.getReservedCount()
             }).then(function (data) {
-                var message = (data.count > 0 || data.reservedCount > 0) ? 'msgInSyncQueue' : 'noMsgInSyncQueue';
-                platformUtils.sendMessage(message);
+                platformUtils.sendMessage('syncQueueChange', data);
             });
         };
 
-        var msgInSyncQueue = function(callback) {
-            platformUtils.addListener("msgInSyncQueue", callback);
-        };
-
-        var noMsgInSyncQueue = function(callback) {
-            platformUtils.addListener("noMsgInSyncQueue", callback);
+        var onSyncQueueChange = function(callback) {
+            platformUtils.addListener('syncQueueChange', callback);
         };
 
         return {
-            msgInSyncQueue: msgInSyncQueue,
-            noMsgInSyncQueue: noMsgInSyncQueue,
+            onSyncQueueChange: onSyncQueueChange,
             checkHustleQueueCount: checkHustleQueueCount
         };
     };

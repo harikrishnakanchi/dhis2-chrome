@@ -27,45 +27,18 @@ define(["hustleMonitor", "utils", "angularMocks", "platformUtils", "mockChrome"]
             expect(hustle.getReservedCount).toHaveBeenCalled();
         });
 
-        it("should call the msgInSyncQueue callback if count greater than zero", function() {
-            var msgInQCallback = jasmine.createSpy();
-            var noMsgInQCallback = jasmine.createSpy();
+        it("should call the onSyncQueue callback", function() {
+            var onSyncQCallback = jasmine.createSpy();
             var hustleMonitor = new HustleMonitor(hustle, log, q);
 
-            hustleMonitor.msgInSyncQueue(function() {
-                msgInQCallback();
-            });
-            hustleMonitor.noMsgInSyncQueue(function() {
-                noMsgInQCallback();
+            hustleMonitor.onSyncQueueChange(function() {
+                onSyncQCallback();
             });
 
             hustleMonitor.checkHustleQueueCount();
             scope.$apply();
 
-            expect(msgInQCallback.calls.count()).toBe(1);
-            expect(noMsgInQCallback.calls.count()).toBe(0);
-        });
-
-        it("should call the noMsgInSyncQueue callback if count equal to zero", function() {
-            var msgInQCallback = jasmine.createSpy();
-            var noMsgInQCallback = jasmine.createSpy();
-            hustle.getCount.and.returnValue(utils.getPromise(q, 0));
-            hustle.getReservedCount.and.returnValue(utils.getPromise(q, 0));
-
-            var hustleMonitor = new HustleMonitor(hustle, log, q);
-
-            hustleMonitor.msgInSyncQueue(function() {
-                msgInQCallback();
-            });
-            hustleMonitor.noMsgInSyncQueue(function() {
-                noMsgInQCallback();
-            });
-
-            hustleMonitor.checkHustleQueueCount();
-            scope.$apply();
-
-            expect(msgInQCallback.calls.count()).toBe(0);
-            expect(noMsgInQCallback.calls.count()).toBe(1);
+            expect(onSyncQCallback).toHaveBeenCalled();
         });
     });
 });
