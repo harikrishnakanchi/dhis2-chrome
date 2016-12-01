@@ -168,7 +168,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                         });
                     };
 
-                    hustleMonitor.onSyncQueueChange(updateView);
+                    hustleMonitor.onSyncQueueChange(_.throttle(updateView, 500));
 
                     InitializationRoutine.run();
                 }
