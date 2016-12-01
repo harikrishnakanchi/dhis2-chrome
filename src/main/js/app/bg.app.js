@@ -1,5 +1,5 @@
-define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "queuePostProcessInterceptor", "monitors", "logRequestReponseInterceptor", "indexedDBLogger", "platformUtils", "factories", "angular-indexedDB", "ng-i18n"],
-    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, queuePostProcessInterceptor, monitors, logRequestReponseInterceptor, indexedDBLogger, platformUtils, factories) {
+define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "queueInterceptor", "monitors", "logRequestReponseInterceptor", "indexedDBLogger", "platformUtils", "factories", "angular-indexedDB", "ng-i18n"],
+    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, queueInterceptor, monitors, logRequestReponseInterceptor, indexedDBLogger, platformUtils, factories) {
         var init = function() {
             var app = angular.module('PRAXIS', ["xc.indexedDB", "hustle", "ngI18n"]);
             services.init(app);
@@ -12,7 +12,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
             app.factory('cleanupPayloadInterceptor', [cleanupPayloadInterceptor]);
             app.factory('handleTimeoutInterceptor', ['$q', '$injector', '$timeout', handleTimeoutInterceptor]);
             app.factory('logRequestReponseInterceptor', ['$log', '$q', logRequestReponseInterceptor]);
-            app.factory('queuePostProcessInterceptor', ['$log', 'ngI18nResourceBundle', 'dataRepository','dataSyncFailureRepository', 'hustleMonitor', queuePostProcessInterceptor]);
+            app.factory('queueInterceptor', ['$log', 'ngI18nResourceBundle', 'dataRepository','dataSyncFailureRepository', 'hustleMonitor', queueInterceptor]);
 
             app.config(['$indexedDBProvider', '$httpProvider', '$hustleProvider', '$provide',
                 function($indexedDBProvider, $httpProvider, $hustleProvider, $provide) {
@@ -46,11 +46,11 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                 basePath: "/js/app/i18n"
             });
 
-            app.run(['consumerRegistry', 'dhisMonitor', 'hustleMonitor', 'queuePostProcessInterceptor', '$hustle', '$log', '$rootScope', 'systemSettingRepository',
+            app.run(['consumerRegistry', 'dhisMonitor', 'hustleMonitor', 'queueInterceptor', '$hustle', '$log', '$rootScope', 'systemSettingRepository',
 
-                function(consumerRegistry, dhisMonitor, hustleMonitor, queuePostProcessInterceptor, $hustle, $log, $rootScope, systemSettingRepository) {
+                function(consumerRegistry, dhisMonitor, hustleMonitor, queueInterceptor, $hustle, $log, $rootScope, systemSettingRepository) {
 
-                    $hustle.registerInterceptor(queuePostProcessInterceptor);
+                    $hustle.registerInterceptor(queueInterceptor);
 
                     var metadataSync = function() {
                         if (!dhisMonitor.isOnline())

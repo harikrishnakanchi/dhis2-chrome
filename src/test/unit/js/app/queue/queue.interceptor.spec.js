@@ -1,8 +1,8 @@
-define(["queuePostProcessInterceptor", "angularMocks", "properties", "platformUtils", "utils", "dataRepository", "approvalDataRepository", "orgUnitRepository", "dataSyncFailureRepository"],
-    function(QueuePostProcessInterceptor, mocks, properties, platformUtils, utils, DataRepository, ApprovalDataRepository, OrgUnitRepository, DataSyncFailureRepository) {
-    describe('queuePostProcessInterceptor', function() {
+define(["queueInterceptor", "angularMocks", "properties", "platformUtils", "utils", "dataRepository", "approvalDataRepository", "orgUnitRepository", "dataSyncFailureRepository"],
+    function(QueueInterceptor, mocks, properties, platformUtils, utils, DataRepository, ApprovalDataRepository, OrgUnitRepository, DataSyncFailureRepository) {
+    describe('queueInterceptor', function() {
 
-        var queuePostProcessInterceptor, q, rootScope, ngI18nResourceBundle, scope, dataRepository, approvalDataRepository, orgUnitRepository, dataSyncFailureRepository;
+        var queueInterceptor, q, rootScope, ngI18nResourceBundle, scope, dataRepository, approvalDataRepository, orgUnitRepository, dataSyncFailureRepository;
 
         beforeEach(mocks.inject(function($q, $rootScope, $log) {
             q = $q;
@@ -33,11 +33,11 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "platformUt
                 }))
             };
 
-            queuePostProcessInterceptor = new QueuePostProcessInterceptor($log, ngI18nResourceBundle, dataRepository, dataSyncFailureRepository);
+            queueInterceptor = new QueueInterceptor($log, ngI18nResourceBundle, dataRepository, dataSyncFailureRepository);
         }));
 
         it('should return true for retry if number of releases is less than max retries', function() {
-            var actualResult = queuePostProcessInterceptor.shouldRetry({
+            var actualResult = queueInterceptor.shouldRetry({
                 "id": 1,
                 "data": {
                     "type": "a",
@@ -49,7 +49,7 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "platformUt
         });
 
         it('should return false for retry if number of releases is more than max retries', function() {
-            var actualResult = queuePostProcessInterceptor.shouldRetry({
+            var actualResult = queueInterceptor.shouldRetry({
                 "id": 1,
                 "data": {
                     "type": "a",
@@ -65,7 +65,7 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "platformUt
 
             properties.queue.skipRetryMessages = ['downloadMetadata'];
 
-            var actualResult = queuePostProcessInterceptor.shouldRetry({
+            var actualResult = queueInterceptor.shouldRetry({
                 "id": 1,
                 "data": {
                     "type": "downloadMetadata",
@@ -78,7 +78,7 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "platformUt
         });
 
         it('should notify user after 3 retries', function() {
-            var actualResult = queuePostProcessInterceptor.shouldRetry({
+            var actualResult = queueInterceptor.shouldRetry({
                 "id": 1,
                 "data": {
                     "type": "a",
@@ -93,7 +93,7 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "platformUt
         });
 
         it('should notify user after max retries has exceeded', function() {
-            queuePostProcessInterceptor.shouldRetry({
+            queueInterceptor.shouldRetry({
                 "id": 1,
                 "data": {
                     "type": "a",
@@ -121,7 +121,7 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "platformUt
                 "status": 401
             };
 
-            queuePostProcessInterceptor.shouldRetry(job, data);
+            queueInterceptor.shouldRetry(job, data);
 
             scope.$apply();
 
@@ -147,7 +147,7 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "platformUt
 
             orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, originOrgUnits));
 
-            queuePostProcessInterceptor.shouldRetry(job, {});
+            queueInterceptor.shouldRetry(job, {});
             scope.$apply();
 
             expect(dataSyncFailureRepository.add).toHaveBeenCalledWith('someModuleId','somePeriod');

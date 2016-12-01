@@ -159,7 +159,7 @@ require.config({
         "monitors": "app/monitors/monitors",
 
         //Queue
-        "queuePostProcessInterceptor": "app/queue/queue.postprocess.interceptor",
+        "queueInterceptor": "app/queue/queue.interceptor",
 
         //Utils
         "dhisId": "app/utils/dhis.id",

@@ -127,7 +127,7 @@ require.config({
         "logRequestReponseInterceptor": "app/interceptors/log.request.response.interceptor",
 
         //Queue
-        "queuePostProcessInterceptor": "app/queue/queue.postprocess.interceptor",
+        "queueInterceptor": "app/queue/queue.interceptor",
 
         //Utils
         "dhisId": "app/utils/dhis.id",
