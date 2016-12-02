@@ -131,6 +131,9 @@ require.config({
         "chartData": "app/models/chart.data",
         "analyticsData": "app/models/analytics.data",
 
+        //Excel
+        "excelBuilderHelper": "app/excel/excel.builder.helper",
+
         //Factories
         "factories": "app/factories/factories",
         "moduleDataBlockFactory": "app/factories/module.data.block.factory",
