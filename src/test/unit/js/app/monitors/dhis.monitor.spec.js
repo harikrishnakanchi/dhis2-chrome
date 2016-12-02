@@ -210,13 +210,5 @@ define(["dhisMonitor", "utils", "angularMocks", "platformUtils", "mockChrome", "
             httpBackend.flush();
         });
 
-        it('should reset the isMaxTriesForOfflineReached to false when online', function () {
-            httpBackend.expect("HEAD").respond(200, utils.getPromise(q, "ok"));
-            dhisMonitor.start();
-
-            httpBackend.flush();
-            expect(dhisMonitor.maxTriesReachedForNoNetwork()).toBe(false);
-        });
-
     });
 });
