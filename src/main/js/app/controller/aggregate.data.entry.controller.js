@@ -45,7 +45,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                 EMPTY_ROW = [];
 
             var getPeriodInformation = function () {
-                return [[$scope.resourceBundle.yearLabel, EMPTY_CELL, $scope.resourceBundle.monthLabel, EMPTY_CELL, $scope.resourceBundle.weekLabel, EMPTY_CELL]].concat([EMPTY_ROW]);
+                return [[$scope.resourceBundle.yearLabel, EMPTY_CELL, $scope.resourceBundle.monthLabel, EMPTY_CELL, $scope.resourceBundle.weekLabel, EMPTY_CELL]].concat([EMPTY_ROW, EMPTY_ROW]);
             };
 
             var getModuleName = function () {
@@ -99,7 +99,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             };
 
             var buildDataSetBlocks = function () {
-                return _.flatten(_.map($scope.dataSets, buildDataSet));
+                return _.chain($scope.dataSets).reject('isPopulationDataset').map(buildDataSet).flatten().value();
             };
 
             var spreadSheetContent = getPeriodInformation().concat(getModuleName()).concat(buildDataSetBlocks());
@@ -465,24 +465,34 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                             return _.filter(dataSets, { isReferralDataset: false });
                         };
 
-                        var setTotalsDisplayPreferencesforDataSetSections = function () {
-                            _.each($scope.dataSets, function (dataSet) {
+                        var setTotalsDisplayPreferencesforDataSetSections = function (dataSets) {
+                            _.each(dataSets, function (dataSet) {
                                 _.each(dataSet.sections, function (dataSetSection) {
                                     dataSetSection.shouldDisplayRowTotals = dataSetSection.baseColumnConfiguration.length > 1;
                                     dataSetSection.shouldDisplayColumnTotals = (_.filter(dataSetSection.dataElements, {isIncluded: true}).length > 1 && !(dataSetSection.shouldHideTotals));
                                 });
                             });
+                            return dataSets;
                         };
-                        var setDataSets = function (dataSets) {
-                            $scope.dataSets = dataSets;
+                        
+                        var filterOutNonIncludedSectionsAndDataElements = function (dataSets) {
+                            _.forEach(dataSets, function (dataSet) {
+                                dataSet.sections = _.filter(dataSet.sections, 'isIncluded');
+                                _.forEach(dataSet.sections, function (section) {
+                                    section.dataElements = _.filter(section.dataElements, 'isIncluded');
+                                });
+                            });
+                            return dataSets;
                         };
 
                         if (noReferralLocationConfigured) {
                             dataSets = filterOutReferralLocations(dataSets);
                         }
-                        dataSets = translateDatasets(dataSets);
-                        setDataSets(dataSets);
-                        setTotalsDisplayPreferencesforDataSetSections();
+
+                        var transformations = [filterOutNonIncludedSectionsAndDataElements, translateDatasets, setTotalsDisplayPreferencesforDataSetSections];
+                        $scope.dataSets = transformations.reduce(function (dataSets, transformer) {
+                            return transformer(dataSets);
+                        }, dataSets);
                     });
 
                 var loadProjectPromise = orgUnitRepository.getParentProject($scope.selectedModule.id).then(function(orgUnit) {

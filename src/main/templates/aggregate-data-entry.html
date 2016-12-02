@@ -40,7 +40,7 @@
                             </accordion-heading>
                             <div class="exp-coll-group">
                                 <accordion close-others="false">
-                                    <accordion-group ng-repeat="section in dataSet.sections | filter:{ isIncluded: true } | orderBy: 'sortOrder' track by section.id" is-open="isopen[section.id]" ng-form="sectionForm">
+                                    <accordion-group ng-repeat="section in dataSet.sections | orderBy: 'sortOrder' track by section.id" is-open="isopen[section.id]" ng-form="sectionForm">
                                         <div class='alert alert-danger' ng-show='sectionForm.$error.pattern'>
                                             <p>{{resourceBundle.invalidExpression}}</p>
                                         </div>
@@ -68,7 +68,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr ng-if="!dataSet.isReferralDataset || (dataSet.isReferralDataset &amp;&amp; referralLocations[dataElement.formName] !== undefined)" ng-repeat="dataElement in section.dataElements | filter:{ isIncluded: true } track by dataElement.id" ng-form="dataElementForm">
+                                                <tr ng-if="!dataSet.isReferralDataset || (dataSet.isReferralDataset &amp;&amp; referralLocations[dataElement.formName] !== undefined)" ng-repeat="dataElement in section.dataElements track by dataElement.id" ng-form="dataElementForm">
                                                     <td>
                                                         <div>
                                                             <span ng-if="!dataSet.isReferralDataset">
@@ -119,7 +119,7 @@
                             </accordion-heading>
                             <div class="exp-coll-group">
                                 <accordion close-others="false">
-                                    <accordion-group ng-repeat="section in dataSet.sections | filter:{ isIncluded: true } | orderBy: 'sortOrder' track by section.id" is-open="isopen[section.id]" ng-form="sectionForm">
+                                    <accordion-group ng-repeat="section in dataSet.sections | orderBy: 'sortOrder' track by section.id" is-open="isopen[section.id]" ng-form="sectionForm">
                                         <div class='alert alert-danger' ng-show='sectionForm.$error.pattern'>
                                             <p>{{resourceBundle.invalidExpression}}</p>
                                         </div>
