@@ -15,6 +15,7 @@ define(["dhisMonitor", "utils", "angularMocks", "platformUtils", "mockChrome", "
             spyOn(platformUtils, "addListener").and.callFake(mockChrome.addListener);
             spyOn(platformUtils, "getPraxisVersion").and.returnValue("5.1");
             spyOn(platformUtils, 'createAlarm');
+            spyOn(platformUtils, 'clearAlarm');
             spyOn(platformUtils, 'addAlarmListener');
             rootScope.praxisUid = "ade3fab1ab0";
             userPreferenceRepository = new UserPreferenceRepository();
@@ -75,6 +76,11 @@ define(["dhisMonitor", "utils", "angularMocks", "platformUtils", "mockChrome", "
             httpBackend.flush();
             expect(dhisMonitor.isOnline()).toBe(false);
             expect(callback).toHaveBeenCalled();
+        });
+
+        it('should be offline when dhisMonitor.stop is triggered', function () {
+            dhisMonitor.stop();
+            expect(dhisMonitor.isOnline()).toBe(false);
         });
 
         it("should raise offline if offline on startup", function() {

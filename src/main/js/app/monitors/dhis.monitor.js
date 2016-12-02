@@ -89,6 +89,7 @@ define(["properties", "platformUtils", "lodash"], function(properties, platformU
 
         var stop = function() {
             platformUtils.clearAlarm("dhisConnectivityCheckAlarm");
+            isDhisOnline = false;
             platformUtils.sendMessage('dhisOffline');
         };
 
