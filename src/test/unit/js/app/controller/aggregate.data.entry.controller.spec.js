@@ -803,7 +803,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             describe('exportTallySheetToExcel', function () {
-                var spreadSheetContent, mockDataset, originDataset;
+                var spreadSheetContent, mockDataset, originDataset, referralDataset;
 
                 beforeEach(function () {
                     scope.$apply();
@@ -850,13 +850,31 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                         }]
                     };
 
-                    scope.dataSets = [mockDataset, originDataset];
+                    referralDataset = {
+                        name: 'datasetName',
+                        isReferralDataset: true,
+                        sections:[{
+                            name: 'sectionName',
+                            dataElements:[{
+                                id: 'dataElementId',
+                                formName: 'dataElementName'
+                            }]
+                        }]
+                    };
+
+                    scope.dataSets = [mockDataset, originDataset, referralDataset];
 
                     scope.originOrgUnits = [{
                         name: 'originA'
                     },{
                         name: 'originB'
                     }];
+
+                    scope.referralLocations = {
+                        "dataElementName": {
+                            name: "Referral location A"
+                        }
+                    };
 
                     spyOn(ExcelBuilder, 'createWorkBook').and.callFake(function (workBookContent) {
                         spreadSheetContent = _.first(workBookContent);
@@ -896,6 +914,9 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     expect(spreadSheetContent.data).toContain(['originA'], ['originB']);
                 });
 
+                it('should have the referral location names for referral location dataset', function () {
+                    expect(spreadSheetContent.data).toContain(['Referral location A']);
+                });
             });
         });
     });

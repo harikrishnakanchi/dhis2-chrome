@@ -65,21 +65,37 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                 });
             };
 
+            var buildReferralLocations = function (section) {
+                var referralLocations = _.filter(section.dataElements, function (dataElement) {
+                    return !!$scope.referralLocations[dataElement.formName];
+                });
+                return _.map(referralLocations, function (dataElement) {
+                    var referralLocation = $scope.referralLocations[dataElement.formName];
+                    return [referralLocation.name];
+                });
+            };
+
             var buildOrigins = function () {
                 return _.map($scope.originOrgUnits, function (originOrgUnit) {
                     return [originOrgUnit.name];
                 });
             };
 
-            var buildSections = function (dataSet) {
+            var buildSections = function (dataSet, buildSectionContent) {
                 return _.flatten(_.map(dataSet.sections, function (section) {
-                    var sectionContent = dataSet.isOriginDataset ? buildOrigins() : buildDataElements(section);
-                    return buildHeaders(section).concat(sectionContent, [EMPTY_ROW]);
+                    return buildHeaders(section).concat(buildSectionContent(section), [EMPTY_ROW]);
                 }));
             };
 
             var buildDataSet = function (dataSet) {
-                return [[dataSet.name], EMPTY_ROW].concat(buildSections(dataSet), [EMPTY_ROW]);
+                var buildSectionContent = buildDataElements;
+                if (dataSet.isOriginDataset) {
+                    buildSectionContent = buildOrigins;
+                }
+                if (dataSet.isReferralDataset) {
+                    buildSectionContent = buildReferralLocations;
+                }
+                return [[dataSet.name], EMPTY_ROW].concat(buildSections(dataSet, buildSectionContent), [EMPTY_ROW]);
             };
 
             var buildDataSetBlocks = function () {
