@@ -190,6 +190,7 @@ require.config({
         "lockedTableHeader": "app/directives/locked.table.header",
         "descriptionPopup": "app/directives/description.popup"
     },
+    waitSeconds: 0,
     shim: {
         "ng-i18n": {
             deps: ["angular"],

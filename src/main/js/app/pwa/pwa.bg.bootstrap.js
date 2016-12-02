@@ -19,7 +19,8 @@ var document = {
 self.worker = self;
 
 require.config({
-    baseUrl: "../../../js/"
+    baseUrl: "../../../js/",
+    waitSeconds: 0
 });
 
 require(["app/pwa/pwa.bg.config", "app/shared.bg.config"], function() {

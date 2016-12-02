@@ -138,6 +138,7 @@ require.config({
         "dhisUrl": "app/utils/dhis.url",
         "interpolate": "app/utils/interpolate"
     },
+    waitSeconds: 0,
     shim: {
         'angular': {
             exports: 'angular'

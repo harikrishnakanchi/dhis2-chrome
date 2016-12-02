@@ -1,5 +1,6 @@
 require.config({
-    baseUrl: "js/"
+    baseUrl: "js/",
+    waitSeconds: 0
 });
 
 require(["app/pwa/pwa.app.config", "app/shared.app.config"], function() {
