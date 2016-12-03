@@ -803,7 +803,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             describe('exportTallySheetToExcel', function () {
-                var spreadSheetContent, mockDataset, originDataset, referralDataset;
+                var spreadSheetContent, mockDataset, originDataset, referralDataset, columnConfiguration, baseConfiguration;
 
                 beforeEach(function () {
                     scope.$apply();
@@ -815,26 +815,39 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     };
                     spreadSheetContent = undefined;
 
+                    baseConfiguration = [{
+                        name: 'categoryOptionNameX'
+                    },{
+                        name: 'categoryOptionNameY'
+                    }, {
+                        name: 'categoryOptionNameX'
+                    }, {
+                        name: 'categoryOptionNameY'
+                    }];
+
+                    columnConfiguration = [
+                        [{
+                            name: 'categoryOptionNameA'
+                        }, {
+                            name: 'categoryOptionNameB'
+                        }],
+                        [{
+                            name: 'categoryOptionNameX'
+                        },{
+                            name: 'categoryOptionNameY'
+                        }, {
+                            name: 'categoryOptionNameX'
+                        }, {
+                            name: 'categoryOptionNameY'
+                        }]
+                    ];
+
                     mockDataset = {
                         name: 'datasetName',
                         sections:[{
                             name: 'sectionName',
-                            columnConfigurations: [
-                                [{
-                                    name: 'categoryOptionNameA'
-                                }, {
-                                    name: 'categoryOptionNameB'
-                                }],
-                                [{
-                                    name: 'categoryOptionNameX'
-                                },{
-                                    name: 'categoryOptionNameY'
-                                }, {
-                                    name: 'categoryOptionNameX'
-                                }, {
-                                    name: 'categoryOptionNameY'
-                                }]
-                            ],
+                            columnConfigurations: columnConfiguration,
+                            baseColumnConfiguration: baseConfiguration,
                             dataElements:[{
                                 id: 'dataElementId',
                                 name: 'dataElementName'
@@ -898,24 +911,24 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 });
 
                 it('should have dataset information', function () {
-                    expect(spreadSheetContent.data).toContain([mockDataset.name]);
+                    expect(spreadSheetContent.data).toContain([{value: mockDataset.name, colspan: baseConfiguration.length+1},].concat(_.times(baseConfiguration.length, _.constant(''))));
                 });
 
                 it('should have the headers for a dataset section', function () {
-                    expect(spreadSheetContent.data).toContain(['sectionName', 'categoryOptionNameA', 'categoryOptionNameB']);
-                    expect(spreadSheetContent.data).toContain(['', 'categoryOptionNameX', 'categoryOptionNameY', 'categoryOptionNameX', 'categoryOptionNameY']);
+                    expect(spreadSheetContent.data).toContain(['sectionName', {value: 'categoryOptionNameA', colspan: 2},'', {value: 'categoryOptionNameB', colspan: 2},'']);
+                    expect(spreadSheetContent.data).toContain(['', {value: 'categoryOptionNameX', colspan: 1}, {value: 'categoryOptionNameY', colspan: 1}, {value: 'categoryOptionNameX', colspan:1},{value: 'categoryOptionNameY', colspan: 1}]);
                 });
 
                 it('should have the data element name', function () {
-                    expect(spreadSheetContent.data).toContain(['dataElementName']);
+                    expect(spreadSheetContent.data).toContain(['dataElementName', '', '', '', '']);
                 });
 
                 it('should have the origin name under origin dataset section', function () {
-                    expect(spreadSheetContent.data).toContain(['originA'], ['originB']);
+                    expect(spreadSheetContent.data).toContain(['originA', ''], ['originB', '']);
                 });
 
                 it('should have the referral location names for referral location dataset', function () {
-                    expect(spreadSheetContent.data).toContain(['Referral location A']);
+                    expect(spreadSheetContent.data).toContain(['Referral location A', '']);
                 });
             });
         });

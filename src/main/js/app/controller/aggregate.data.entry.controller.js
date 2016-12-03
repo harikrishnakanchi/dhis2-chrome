@@ -52,42 +52,49 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                 return [[$scope.resourceBundle.moduleNameLabel, $scope.selectedModule.name]].concat([EMPTY_ROW]);
             };
 
-            var buildDataElements = function (section) {
+            var buildDataElements = function (section, extraCells) {
                 return _.map(section.dataElements, function (dataElement) {
-                    return [dataElementUtils.getDisplayName(dataElement)];
+                    return [dataElementUtils.getDisplayName(dataElement)].concat(extraCells);
                 });
             };
 
             var buildHeaders = function (section) {
-                return _.map(section.columnConfigurations, function (configuration, index) {
+                return _.map(section.columnConfigurations, function (categoryOptions, index) {
+                    var colspan = (section.baseColumnConfiguration.length / categoryOptions.length) || 1;
                     var initialElement = index === 0 ? [section.name] : [EMPTY_CELL];
-                    return initialElement.concat(_.map(configuration, 'name'));
+                    return initialElement.concat(_.flatten(_.map(categoryOptions, function (categoryOption) {
+                        return [{value: categoryOption.name, colspan: colspan}].concat(_.times(colspan-1, _.constant(EMPTY_CELL)));
+                    })));
                 });
             };
 
-            var buildReferralLocations = function (section) {
+            var buildReferralLocations = function (section, extraCells) {
                 var referralLocations = _.filter(section.dataElements, function (dataElement) {
                     return !!$scope.referralLocations[dataElement.formName];
                 });
                 return _.map(referralLocations, function (dataElement) {
                     var referralLocation = $scope.referralLocations[dataElement.formName];
-                    return [referralLocation.name];
+                    return [referralLocation.name].concat(extraCells);
                 });
             };
 
-            var buildOrigins = function () {
+            var buildOrigins = function (section, extraCells) {
                 return _.map($scope.originOrgUnits, function (originOrgUnit) {
-                    return [originOrgUnit.name];
+                    return [originOrgUnit.name].concat(extraCells);
                 });
             };
 
             var buildSections = function (dataSet, buildSectionContent) {
                 return _.flatten(_.map(dataSet.sections, function (section) {
-                    return buildHeaders(section).concat(buildSectionContent(section), [EMPTY_ROW]);
+                    var width = (section.baseColumnConfiguration && section.baseColumnConfiguration.length) || 1;
+                    var extraCells = _.times(width, _.constant(EMPTY_CELL));
+                    return buildHeaders(section).concat(buildSectionContent(section, extraCells), [EMPTY_ROW]);
                 }));
             };
 
             var buildDataSet = function (dataSet) {
+                var width = _.max(_.map(dataSet.sections, 'baseColumnConfiguration.length')) || 1;
+                var extraCells = _.times((width), _.constant(EMPTY_CELL));
                 var buildSectionContent = buildDataElements;
                 if (dataSet.isOriginDataset) {
                     buildSectionContent = buildOrigins;
@@ -95,7 +102,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                 if (dataSet.isReferralDataset) {
                     buildSectionContent = buildReferralLocations;
                 }
-                return [[dataSet.name], EMPTY_ROW].concat(buildSections(dataSet, buildSectionContent), [EMPTY_ROW]);
+                return [[{value: dataSet.name, colspan: width+1}].concat(extraCells), EMPTY_ROW].concat(buildSections(dataSet, buildSectionContent), [EMPTY_ROW]);
             };
 
             var buildDataSetBlocks = function () {
@@ -106,7 +113,8 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
 
             return [{
                 name: $scope.selectedModule.name,
-                data: spreadSheetContent
+                data: spreadSheetContent,
+                cellStyle: true
             }];
         };
 

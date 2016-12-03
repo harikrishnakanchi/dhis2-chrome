@@ -55,26 +55,45 @@ define(['xlsx', 'lodash'], function (XLSX, _) {
         });
     };
 
-    var createCellObject = function (cellValue) {
-        return {
+    var createCellObject = function (cellValue, cellStyle) {
+        var obj = {
             v: cellValue,
             t: CELL_TYPES[typeof cellValue] || CELL_TYPES.default
         };
+        if (cellStyle) {
+            obj.s = {
+                border: {
+                    left: {style: 'thin', color: {auto: 1}},
+                    top: {style: 'thin', color: {auto: 1}},
+                    bottom: {style: 'thin', color: {auto: 1}},
+                    right: {style: 'thin', color: {auto: 1}}
+                },
+                alignment:{
+                    horizontal: 'center'
+                }
+            };
+        }
+        return obj;
     };
 
-    var createSheetObject = function (sheetData) {
+    var createSheetObject = function (sheetData, cellStyle) {
         var maxRowIndex = 0,
             maxColumnIndex = 0,
             columnWidths = {},
-            sheetObject = {};
+            sheetObject = {},
+            mergeCells = [];
 
         _.each(sheetData, function (row, rowIndex) {
             maxRowIndex = _.max([maxRowIndex, rowIndex]);
             _.each(row, function (cell, columnIndex) {
                 if(_.isNull(cell) || _.isUndefined(cell)) return;
-
                 var cellReference = XLSX.utils.encode_cell({ r: rowIndex, c: columnIndex });
-                sheetObject[cellReference] = createCellObject(cell);
+                if(cell.value && cell.colspan){
+                    var colspan = cell.colspan - 1;
+                    cell = cell.value;
+                    mergeCells.push({s: {r: rowIndex, c: columnIndex}, e:{r: rowIndex, c: (columnIndex+colspan)}});
+                }
+                sheetObject[cellReference] = createCellObject(cell, cellStyle);
                 maxColumnIndex = _.max([maxColumnIndex, columnIndex]);
                 columnWidths[columnIndex] = _.max([columnWidths[columnIndex], cell && cell.length, DEFAULT_COLUMN_WIDTH]);
             });
@@ -82,6 +101,7 @@ define(['xlsx', 'lodash'], function (XLSX, _) {
 
         sheetObject['!ref'] = XLSX.utils.encode_range({ r: 0, c: 0 }, { r: maxRowIndex, c: maxColumnIndex });
         sheetObject['!cols'] = _.map(columnWidths, function(width) { return { wch: width }; });
+        sheetObject['!merges'] = mergeCells;
         return sheetObject;
     };
 
@@ -91,7 +111,7 @@ define(['xlsx', 'lodash'], function (XLSX, _) {
         return {
             SheetNames: _.map(sheets, 'name'),
             Sheets: _.reduce(sheets, function (sheetsObject, sheet) {
-                return _.set(sheetsObject, sheet.name, createSheetObject(sheet.data));
+                return _.set(sheetsObject, sheet.name, createSheetObject(sheet.data, sheet.cellStyle));
             }, {})
         };
     };
