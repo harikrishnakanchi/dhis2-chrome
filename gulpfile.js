@@ -4,7 +4,9 @@ var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
 var shell = require('gulp-shell');
 var http = require('http');
-var ecstatic = require('ecstatic');
+var express = require('express');
+var compress = require('compression');
+var nocache = require('nocache');
 var protractor = require('gulp-protractor').protractor;
 var request = require('request');
 var fs = require('fs');
@@ -74,16 +76,13 @@ gulp.task('update-webdriver', shell.task([
 ]));
 
 gulp.task('serve', ['generate-service-worker', 'watch'], function() {
-    webserver = http.createServer(
-        ecstatic({
-            root: __dirname + '/src/main',
-            gzip: true,
-            cache: 'private',
-            showDir: true
-        })
-    );
-    webserver.listen(8081);
-    return webserver;
+    var app = express();
+
+    app.use(compress());    // gzip
+    app.use(nocache());     // nocache
+
+    app.use('/', express.static(__dirname + '/src/main'));
+    app.listen(8081);
 });
 
 gulp.task('ft', ['update-webdriver', 'serve'], function() {
@@ -148,7 +147,7 @@ gulp.task('download-organisation-units', function(callback) {
 
 gulp.task('download-packaged-data', ['download-metadata', 'download-datasets', 'download-programs', 'download-fieldapp-settings', 'download-organisation-units'], function () {});
 
-gulp.task('generate-service-worker', ['less'], function (callback) {
+gulp.task('generate-service-worker', ['less', 'download-packaged-data'], function (callback) {
     var path = require('path');
     var swPrecache = require('sw-precache');
     var rootDir = 'src/main';
@@ -165,7 +164,8 @@ gulp.task('generate-service-worker', ['less'], function (callback) {
         ],
         stripPrefix: rootDir + '/',
         importScripts: ['js/app/interceptors/fetch.interceptor.js'],
-        templateFilePath: 'service-worker-custom.tmpl'
+        templateFilePath: 'service-worker-custom.tmpl',
+        maximumFileSizeToCacheInBytes: 50 * (1024 * 1024)
     }, callback);
 });
 
