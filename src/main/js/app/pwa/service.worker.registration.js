@@ -21,6 +21,11 @@ if ('serviceWorker' in navigator) {
   // See https://github.com/slightlyoff/ServiceWorker/issues/468
   navigator.serviceWorker.register('./service.worker.js').then(function(reg) {
     // updatefound is fired if service-worker.js changes.
+    if (reg.active) {
+      // Load the app here.
+      loadApp();
+    }
+
     reg.onupdatefound = function() {
       // The updatefound event implies that reg.installing is set; see
       // https://slightlyoff.github.io/ServiceWorker/spec/service_worker/index.html#service-worker-container-updatefound-event
@@ -39,6 +44,9 @@ if ('serviceWorker' in navigator) {
               // At this point, everything has been precached.
               // It's the perfect time to display a "Content is cached for offline use." message.
               console.log('Content is now available offline!');
+
+              // Load the app here.
+              loadApp();
             }
             break;
 
@@ -52,3 +60,13 @@ if ('serviceWorker' in navigator) {
     console.error('Error during service worker registration:', e);
   });
 }
+
+var loadApp = function () {
+  var script = document.createElement('script');
+  script.src = 'js/lib/requirejs/require.js';
+  script.dataset.main = 'js/app/pwa/pwa.app.bootstrap.js';
+  script.onload = function () {};
+  document.head.appendChild(script);
+
+  document.getElementById('serviceworkerloading').style.display = 'none';
+};

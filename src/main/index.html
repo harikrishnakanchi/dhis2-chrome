@@ -7,11 +7,14 @@
     <link rel="stylesheet" type="text/css" href="js/lib/angular/angular-csp.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
     <link rel="stylesheet" type="text/css" href="js/lib/nvd3/nv.d3.min.css">
-    <script src="js/lib/requirejs/require.js" data-main="js/app/pwa/pwa.app.bootstrap.js"></script>
     <script src="js/app/pwa/service.worker.registration.js"></script>
 </head>
 
 <body>
+    <div id="serviceworkerloading" style="margin: 150px auto 0;width: 300px;color: white;text-align: center;font-size: large;">
+        Downloading Praxis...
+    </div>
+
     <a id="top"></a>
     <div id="praxis" name="praxis" ng-csp ng-cloak>
         <div ng-include="'templates/header.html'"></div>
