@@ -5,35 +5,35 @@ define(['lodash'], function (_) {
             EMPTY_CELL = '',
             EMPTY_ROW = [],
             mergedCells = [],
-            R = 0;
+            row = 0;
 
         var generate = function () {
             return {
                 name: name,
                 data: data,
                 merges: mergedCells
-            }
+            };
         };
 
         var createRow = function (values) {
-            var C = 0;
+            var column = 0;
             values = values || EMPTY_ROW;
-            R = R && R + 1;
-            C = C + values.length;
+            row = row && row + 1;
+            column = column + values.length;
             data.push(values);
 
             var addCell = function (cell, options) {
                 cell = cell || EMPTY_CELL;
                 values.push(cell);
-                C = C && C+1;
+                column = column && column+1;
 
                 var addEmptyCells = function (numberOfEmptyCells) {
                     var addEmpty = _.partial(addCell, null, null);
-                    return _.times(numberOfEmptyCells, addEmpty)
+                    return _.times(numberOfEmptyCells, addEmpty);
                 };
 
                 if (options) {
-                    var mergeCell = { s: {r: R, c: C}, e: {r: R, c: C + options.colspan} };
+                    var mergeCell = { s: {r: row, c: column}, e: {r: row, c: column + options.colspan} };
                     mergedCells.push(mergeCell);
                     addEmptyCells(options.colspan - 1);
                 }
