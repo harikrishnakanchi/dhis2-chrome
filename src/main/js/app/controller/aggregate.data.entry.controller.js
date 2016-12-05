@@ -1,4 +1,4 @@
-define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "interpolate", "customAttributes", "dataElementUtils", "excelBuilder"], function(_, dataValuesMapper, orgUnitMapper, moment, properties, interpolate, customAttributes, dataElementUtils, excelBuilder) {
+define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "interpolate", "customAttributes", "dataElementUtils", "excelBuilder", "excelBuilderHelper"], function(_, dataValuesMapper, orgUnitMapper, moment, properties, interpolate, customAttributes, dataElementUtils, excelBuilder, excelBuilderHelper) {
     return function($scope, $routeParams, $q, $hustle, $anchorScroll, $location, $modal, $rootScope, $window, $timeout,
         dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository,
                     translationsService, moduleDataBlockFactory, dataSyncFailureRepository, optionSetRepository, filesystemService) {
@@ -41,60 +41,70 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
         };
 
         var buildSpreadSheetContent = function () {
-            var EMPTY_CELL = '',
-                EMPTY_ROW = [];
+            var EMPTY_CELL = '';
+            var spreadSheet = excelBuilderHelper.createSheet($scope.selectedModule.name);
 
             var getPeriodInformation = function () {
-                return [[$scope.resourceBundle.yearLabel, EMPTY_CELL, $scope.resourceBundle.monthLabel, EMPTY_CELL, $scope.resourceBundle.weekLabel, EMPTY_CELL]].concat([EMPTY_ROW, EMPTY_ROW]);
+                return [$scope.resourceBundle.yearLabel, EMPTY_CELL, $scope.resourceBundle.monthLabel, EMPTY_CELL, $scope.resourceBundle.weekLabel, EMPTY_CELL];
             };
 
             var getModuleName = function () {
-                return [[$scope.resourceBundle.moduleNameLabel, $scope.selectedModule.name]].concat([EMPTY_ROW]);
+                return [$scope.resourceBundle.moduleNameLabel, $scope.selectedModule.name];
             };
 
-            var buildDataElements = function (section, extraCells) {
-                return _.map(section.dataElements, function (dataElement) {
-                    return [dataElementUtils.getDisplayName(dataElement)].concat(extraCells);
+            var buildDataElements = function (section, numberOfExtraCells) {
+                _.forEach(section.dataElements, function (dataElement) {
+                    var dataElementName = dataElementUtils.getDisplayName(dataElement);
+                    var row = spreadSheet.createRow();
+                        row.addCell(dataElementName);
+                        row.addEmptyCells(numberOfExtraCells);
                 });
             };
 
             var buildHeaders = function (section) {
-                return _.map(section.columnConfigurations, function (categoryOptions, index) {
+                _.forEach(section.columnConfigurations, function (categoryOptions, index) {
                     var colspan = (section.baseColumnConfiguration.length / categoryOptions.length) || 1;
-                    var initialElement = index === 0 ? [section.name] : [EMPTY_CELL];
-                    return initialElement.concat(_.flatten(_.map(categoryOptions, function (categoryOption) {
-                        return [{value: categoryOption.name, colspan: colspan}].concat(_.times(colspan-1, _.constant(EMPTY_CELL)));
-                    })));
+                    var row = spreadSheet.createRow();
+                    var initialElement = index === 0 ? section.name : EMPTY_CELL;
+                    row.addCell(initialElement);
+                    _.forEach(categoryOptions, function (categoryOption) {
+                        row.addCell(categoryOption.name, {colspan: colspan});
+                    });
                 });
             };
 
-            var buildReferralLocations = function (section, extraCells) {
+            var buildReferralLocations = function (section, numberOfExtraCells) {
                 var referralLocations = _.filter(section.dataElements, function (dataElement) {
                     return !!$scope.referralLocations[dataElement.formName];
                 });
-                return _.map(referralLocations, function (dataElement) {
+
+                _.forEach(referralLocations, function (dataElement) {
+                    var row = spreadSheet.createRow();
                     var referralLocation = $scope.referralLocations[dataElement.formName];
-                    return [referralLocation.name].concat(extraCells);
+                    row.addCell(referralLocation.name);
+                    row.addEmptyCells(numberOfExtraCells);
                 });
             };
 
-            var buildOrigins = function (section, extraCells) {
-                return _.map($scope.originOrgUnits, function (originOrgUnit) {
-                    return [originOrgUnit.name].concat(extraCells);
+            var buildOrigins = function (section, numberOfExtraCells) {
+                return _.forEach($scope.originOrgUnits, function (originOrgUnit) {
+                    var row = spreadSheet.createRow();
+                    row.addCell(originOrgUnit.name);
+                    row.addEmptyCells(numberOfExtraCells);
                 });
             };
 
             var buildSections = function (dataSet, buildSectionContent) {
-                return _.flatten(_.map(dataSet.sections, function (section) {
-                    var width = (section.baseColumnConfiguration && section.baseColumnConfiguration.length) || 1;
-                    var extraCells = _.times(width, _.constant(EMPTY_CELL));
-                    return buildHeaders(section).concat(buildSectionContent(section, extraCells), [EMPTY_ROW]);
-                }));
+                _.forEach(dataSet.sections, function (section) {
+                    var colspan = (section.baseColumnConfiguration && section.baseColumnConfiguration.length) || 1;
+                    buildHeaders(section);
+                    buildSectionContent(section, colspan);
+                    spreadSheet.createRow();
+                });
             };
 
             var buildDataSet = function (dataSet) {
                 var width = _.max(_.map(dataSet.sections, 'baseColumnConfiguration.length')) || 1;
-                var extraCells = _.times((width), _.constant(EMPTY_CELL));
                 var buildSectionContent = buildDataElements;
                 if (dataSet.isOriginDataset) {
                     buildSectionContent = buildOrigins;
@@ -102,20 +112,20 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                 if (dataSet.isReferralDataset) {
                     buildSectionContent = buildReferralLocations;
                 }
-                return [[{value: dataSet.name, colspan: width+1}].concat(extraCells), EMPTY_ROW].concat(buildSections(dataSet, buildSectionContent), [EMPTY_ROW]);
+                spreadSheet.createRow().addCell(dataSet.name, {colspan: width + 1});
+                spreadSheet.createRow();
+                buildSections(dataSet, buildSectionContent);
+                spreadSheet.createRow();
             };
 
-            var buildDataSetBlocks = function () {
-                return _.chain($scope.dataSets).reject('isPopulationDataset').map(buildDataSet).flatten().value();
-            };
-
-            var spreadSheetContent = getPeriodInformation().concat(getModuleName()).concat(buildDataSetBlocks());
-
-            return [{
-                name: $scope.selectedModule.name,
-                data: spreadSheetContent,
-                cellStyle: true
-            }];
+            spreadSheet.createRow(getPeriodInformation());
+            spreadSheet.createRow();
+            spreadSheet.createRow();
+            spreadSheet.createRow(getModuleName());
+            spreadSheet.createRow();
+            var filteredDataSets = _.reject($scope.dataSets, 'isPopulationDataset');
+            _.forEach(filteredDataSets, buildDataSet);
+            return [spreadSheet.generate()];
         };
 
         $scope.exportTallySheetToExcel = function () {

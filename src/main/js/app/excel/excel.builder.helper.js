@@ -3,44 +3,45 @@ define(['lodash'], function (_) {
         var name = sheetName;
         var data = [],
             EMPTY_CELL = '',
-            EMPTY_ROW = [],
             mergedCells = [],
-            row = 0;
+            row = -1;
 
         var generate = function () {
             return {
                 name: name,
                 data: data,
-                merges: mergedCells
+                merges: mergedCells,
+                cellStyle: true
             };
         };
 
         var createRow = function (values) {
-            var column = 0;
+            var column = -1, EMPTY_ROW = [];
             values = values || EMPTY_ROW;
-            row = row && row + 1;
             column = column + values.length;
-            data.push(values);
+            row = row + 1;
+            data[row] = values;
+
+            var addEmptyCells = function (numberOfEmptyCells) {
+                var addEmpty = _.partial(addCell, null, null);
+                return _.times(numberOfEmptyCells, addEmpty);
+            };
 
             var addCell = function (cell, options) {
                 cell = cell || EMPTY_CELL;
-                values.push(cell);
-                column = column && column+1;
-
-                var addEmptyCells = function (numberOfEmptyCells) {
-                    var addEmpty = _.partial(addCell, null, null);
-                    return _.times(numberOfEmptyCells, addEmpty);
-                };
+                column = column + 1;
+                data[row][column] = cell;
 
                 if (options) {
-                    var mergeCell = { s: {r: row, c: column}, e: {r: row, c: column + options.colspan} };
+                    var mergeCell = {s: {r: row, c: column}, e: {r: row, c: (column + options.colspan - 1)}};
                     mergedCells.push(mergeCell);
                     addEmptyCells(options.colspan - 1);
                 }
             };
 
             return {
-                addCell: addCell
+                addCell: addCell,
+                addEmptyCells: addEmptyCells
             };
         };
 

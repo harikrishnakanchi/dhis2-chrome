@@ -69,7 +69,8 @@ define(['xlsx', 'lodash'], function (XLSX, _) {
                     right: {style: 'thin', color: {auto: 1}}
                 },
                 alignment:{
-                    horizontal: 'center'
+                    horizontal: 'center',
+                    wrapText: true
                 }
             };
         }
@@ -80,19 +81,13 @@ define(['xlsx', 'lodash'], function (XLSX, _) {
         var maxRowIndex = 0,
             maxColumnIndex = 0,
             columnWidths = {},
-            sheetObject = {},
-            mergeCells = [];
+            sheetObject = {};
 
         _.each(sheetData, function (row, rowIndex) {
             maxRowIndex = _.max([maxRowIndex, rowIndex]);
             _.each(row, function (cell, columnIndex) {
                 if(_.isNull(cell) || _.isUndefined(cell)) return;
                 var cellReference = XLSX.utils.encode_cell({ r: rowIndex, c: columnIndex });
-                if(cell.value && cell.colspan){
-                    var colspan = cell.colspan - 1;
-                    cell = cell.value;
-                    mergeCells.push({s: {r: rowIndex, c: columnIndex}, e:{r: rowIndex, c: (columnIndex+colspan)}});
-                }
                 sheetObject[cellReference] = createCellObject(cell, cellStyle);
                 maxColumnIndex = _.max([maxColumnIndex, columnIndex]);
                 columnWidths[columnIndex] = _.max([columnWidths[columnIndex], cell && cell.length, DEFAULT_COLUMN_WIDTH]);
@@ -101,7 +96,6 @@ define(['xlsx', 'lodash'], function (XLSX, _) {
 
         sheetObject['!ref'] = XLSX.utils.encode_range({ r: 0, c: 0 }, { r: maxRowIndex, c: maxColumnIndex });
         sheetObject['!cols'] = _.map(columnWidths, function(width) { return { wch: width }; });
-        sheetObject['!merges'] = mergeCells;
         return sheetObject;
     };
 
@@ -111,7 +105,11 @@ define(['xlsx', 'lodash'], function (XLSX, _) {
         return {
             SheetNames: _.map(sheets, 'name'),
             Sheets: _.reduce(sheets, function (sheetsObject, sheet) {
-                return _.set(sheetsObject, sheet.name, createSheetObject(sheet.data, sheet.cellStyle));
+                var sheetObject = createSheetObject(sheet.data, sheet.cellStyle);
+                if (sheet.merges) {
+                    sheetObject['!merges'] = sheet.merges;
+                }
+                return _.set(sheetsObject, sheet.name, sheetObject);
             }, {})
         };
     };

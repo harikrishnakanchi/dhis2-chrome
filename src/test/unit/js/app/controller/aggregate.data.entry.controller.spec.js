@@ -911,12 +911,12 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 });
 
                 it('should have dataset information', function () {
-                    expect(spreadSheetContent.data).toContain([{value: mockDataset.name, colspan: baseConfiguration.length+1},].concat(_.times(baseConfiguration.length, _.constant(''))));
+                    expect(spreadSheetContent.data).toContain([mockDataset.name].concat(_.times(baseConfiguration.length, _.constant(''))));
                 });
 
                 it('should have the headers for a dataset section', function () {
-                    expect(spreadSheetContent.data).toContain(['sectionName', {value: 'categoryOptionNameA', colspan: 2},'', {value: 'categoryOptionNameB', colspan: 2},'']);
-                    expect(spreadSheetContent.data).toContain(['', {value: 'categoryOptionNameX', colspan: 1}, {value: 'categoryOptionNameY', colspan: 1}, {value: 'categoryOptionNameX', colspan:1},{value: 'categoryOptionNameY', colspan: 1}]);
+                    expect(spreadSheetContent.data).toContain(['sectionName', 'categoryOptionNameA', '', 'categoryOptionNameB', '']);
+                    expect(spreadSheetContent.data).toContain(['', 'categoryOptionNameX', 'categoryOptionNameY', 'categoryOptionNameX', 'categoryOptionNameY']);
                 });
 
                 it('should have the data element name', function () {

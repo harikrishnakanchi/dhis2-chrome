@@ -55,7 +55,7 @@ define(['excelBuilderHelper'], function (excelBuilderHelper) {
             var row = sheetObject.createRow();
             row.addCell(4, {colspan: 2});
             generateSheet();
-            expect(sheetResult.merges).toContain({s: {r: 0, c: 0}, e: {r: 0, c: 2}});
+            expect(sheetResult.merges).toContain({s: {r: 0, c: 0}, e: {r: 0, c: 1}});
         });
 
     });
