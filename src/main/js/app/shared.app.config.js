@@ -134,6 +134,7 @@ require.config({
         //Excel
         "excelBuilderHelper": "app/excel/excel.builder.helper",
         "excelBuilder": "app/excel/excel.builder",
+        "excelStyles": "app/excel/excel.styles",
 
         //Factories
         "factories": "app/factories/factories",
