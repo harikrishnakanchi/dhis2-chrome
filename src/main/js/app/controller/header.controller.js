@@ -109,6 +109,19 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
             return $rootScope.remainingJobs + ' ' + $scope.resourceBundle[resourceBundleKey];
         };
 
+        $scope.networkStatus = function () {
+            var networkStatus;
+            if ($scope.isDhisOnline && $scope.poorConnection) {
+                networkStatus = 'poorConnectivity';
+            } else if ($scope.isDhisOnline) {
+                networkStatus = 'online';
+            }
+            else {
+                networkStatus = 'offline';
+            }
+            return $scope.resourceBundle[networkStatus];
+        };
+
         var init = function() {
             checkConnectionQuality();
         };

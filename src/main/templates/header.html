@@ -40,6 +40,7 @@
                             </li>
                             <li>
                                 <span class="glyphicon dhis-status glyphicon-cloud"
+                                      title="{{ networkStatus() }}"
                                       ng-class="{
                                         'dhis-online':isDhisOnline && !poorConnection,
                                         'dhis-poor-connection': poorConnection,
