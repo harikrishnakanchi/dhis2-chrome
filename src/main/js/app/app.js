@@ -24,6 +24,12 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
 
             app.factory('queueInterceptor', ['$log', 'ngI18nResourceBundle', 'dataRepository','dataSyncFailureRepository', 'hustleMonitor', queueInterceptor]);
 
+            var authenticate = {
+                auth: ['$q', '$rootScope', function ($q, $rootScope) {
+                    return $rootScope.isLoggedIn ? $q.when('User authenticated') : $q.reject('User not logged in');
+                }]
+            };
+
             app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider', '$hustleProvider', '$compileProvider', '$provide', '$tooltipProvider',
                 function($routeProvider, $indexedDBProvider, $httpProvider, $hustleProvider, $compileProvider, $provide, $tooltipProvider) {
                     $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|chrome-extension):/);
@@ -32,23 +38,29 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                         templateUrl: 'templates/init.html'
                     }).
                     when('/dashboard', {
-                        templateUrl: 'templates/dashboard.html'
+                        templateUrl: 'templates/dashboard.html',
+                        controller: 'dashboardController',
+                        resolve: authenticate
                     }).
                     when('/selectProjectPreference', {
                         templateUrl: 'templates/selectProjectPreference.html',
-                        controller: 'selectProjectPreferenceController'
+                        controller: 'selectProjectPreferenceController',
+                        resolve: authenticate
                     }).
                     when('/reports/:orgUnit?', {
                         templateUrl: 'templates/reports.html',
-                        controller: 'reportsController'
+                        controller: 'reportsController',
+                        resolve: authenticate
                     }).
                     when('/projectReport/', {
                         templateUrl: 'templates/project-report.html',
-                        controller: 'projectReportController'
+                        controller: 'projectReportController',
+                        resolve: authenticate
                     }).
                     when('/opUnitReport/:opUnit?', {
                         templateUrl: 'templates/opunit-report.html',
-                        controller: 'opUnitReportController'
+                        controller: 'opUnitReportController',
+                        resolve: authenticate
                     }).
                     when('/login', {
                         templateUrl: 'templates/login.html',
@@ -56,35 +68,43 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     }).
                     when('/orgUnits', {
                         templateUrl: 'templates/orgunits.html',
-                        controller: 'orgUnitContoller'
+                        controller: 'orgUnitContoller',
+                        resolve: authenticate
                     }).
                     when('/notifications', {
                         templateUrl: 'templates/notifications.html',
-                        controller: 'notificationsController'
+                        controller: 'notificationsController',
+                        resolve: authenticate
                     }).
                     when('/productKeyPage', {
                         templateUrl: 'templates/product-key.html',
-                        controller: 'productKeyController'
+                        controller: 'productKeyController',
+                        resolve: authenticate
                     }).
                     when('/aggregate-data-entry/:module?/:week?', {
                         templateUrl: 'templates/aggregate-data-entry.html',
-                        controller: 'aggregateDataEntryController'
+                        controller: 'aggregateDataEntryController',
+                        resolve: authenticate
                     }).
                     when('/line-list-summary/:module/:filterBy?', {
                         templateUrl: 'templates/line-list-summary.html',
-                        controller: 'lineListSummaryController'
+                        controller: 'lineListSummaryController',
+                        resolve: authenticate
                     }).
                     when('/line-list-data-entry/:module/new', {
                         templateUrl: 'templates/line-list-data-entry.html',
-                        controller: 'lineListDataEntryController'
+                        controller: 'lineListDataEntryController',
+                        resolve: authenticate
                     }).
                     when('/line-list-data-entry/:module/:eventId?', {
                         templateUrl: 'templates/line-list-data-entry.html',
-                        controller: 'lineListDataEntryController'
+                        controller: 'lineListDataEntryController',
+                        resolve: authenticate
                     }).
                     when('/data-approval/:module?/:week?', {
                         templateUrl: 'templates/data-approval.html',
-                        controller: 'dataApprovalController'
+                        controller: 'dataApprovalController',
+                        resolve: authenticate
                     }).
                     otherwise({
                         redirectTo: '/dashboard'
@@ -138,7 +158,8 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
 
                     $hustle.registerInterceptor(queueInterceptor);
 
-                    $rootScope.$on('$locationChangeStart', function(e, newUrl, oldUrl) {
+                    $rootScope.$on('$routeChangeError', function (event, newRoute, oldRoute, message) {
+                        console.log(message);
                         if (authenticationUtils.shouldRedirectToLogin($rootScope, $location)) {
                             $location.path("/login");
                         }
