@@ -31,7 +31,7 @@
                         <ul class="nav navbar-nav" ng-class="{'navbar-right': layoutDirection.direction != 'rtl'}">
                             <li class="sync-status" ng-if="remainingJobs > 0">
                                 <span>
-                                    <i class="fa fa-refresh fa-spin" ng-if="isDhisOnline"></i>
+                                    <i class="fa fa-refresh fa-spin" ng-if="isDhisOnline" title="{{ resourceBundle.connectedWithProcessingRequests }}"></i>
                                     <i class="fa fa-warning" ng-if="!isDhisOnline" title="{{ resourceBundle.notConnectedWithPendingRequests }}"></i>
                                 </span>
                             </li>

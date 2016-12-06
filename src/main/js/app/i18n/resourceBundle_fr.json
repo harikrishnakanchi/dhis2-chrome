@@ -221,6 +221,7 @@
     "successNotification": "Réussite",
     "errorNotification": "Erreur",
     "notConnectedWithPendingRequests": "DECONNECTE - DEMANDES EN ATTENTE",
+    "connectedWithProcessingRequests": "DEMANDE DE TRAITEMENT",
     "online": "EN LIGNE",
     "offline": "HORS LIGNE",
     "poorConnectivity": "CONNECTIVITÉ FAIBLE",

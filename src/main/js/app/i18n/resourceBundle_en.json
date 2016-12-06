@@ -221,6 +221,7 @@
     "successNotification": "Success",
     "errorNotification": "Error",
     "notConnectedWithPendingRequests": "OFFLINE - PENDING REQUESTS",
+    "connectedWithProcessingRequests": "PROCESSING REQUESTS",
     "online": "ONLINE",
     "offline": "OFFLINE",
     "poorConnectivity": "POOR CONNECTIVITY",

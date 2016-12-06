@@ -221,6 +221,7 @@
     "successNotification": "نجاح",
     "errorNotification": "خطأ",
     "notConnectedWithPendingRequests": "طلبات معلقة - لا يوجد اتصال",
+    "connectedWithProcessingRequests": "معالجة طلبات",
     "online": "على الانترنت",
     "offline": "OFFLINE",
     "poorConnectivity": "ضعف الاتصال",
