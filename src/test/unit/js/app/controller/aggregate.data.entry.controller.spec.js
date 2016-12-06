@@ -1,9 +1,9 @@
 define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop",
     "dataRepository", "approvalDataRepository", "orgUnitRepository", "excludedDataElementsRepository", "dataSetRepository", "programRepository", "referralLocationsRepository",
-    "translationsService", "moduleDataBlockFactory", "dataSyncFailureRepository", "optionSetRepository", "customAttributes", "filesystemService", "excelBuilder"],
+    "translationsService", "moduleDataBlockFactory", "dataSyncFailureRepository", "optionSetRepository", "customAttributes", "filesystemService", "excelBuilder", "excelBuilderHelper"],
     function(AggregateDataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, timecop,
              DataRepository, ApprovalDataRepository, OrgUnitRepository, ExcludedDataElementsRepository, DatasetRepository, ProgramRepository, ReferralLocationsRepository,
-             TranslationsService, ModuleDataBlockFactory, DataSyncFailureRepository, OptionSetRepository, customAttributes, FilesystemService, ExcelBuilder) {
+             TranslationsService, ModuleDataBlockFactory, DataSyncFailureRepository, OptionSetRepository, customAttributes, FilesystemService, ExcelBuilder, excelBuilderHelper) {
         describe("aggregateDataEntryController ", function() {
             var scope, routeParams, q, location, anchorScroll, aggregateDataEntryController, rootScope, parentProject, fakeModal,
                 window, hustle, timeout, origin1, origin2, mockModuleDataBlock, selectedPeriod,
@@ -803,7 +803,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             describe('exportTallySheetToExcel', function () {
-                var spreadSheetContent, mockDataset, originDataset, referralDataset, columnConfiguration, baseConfiguration;
+                var mockDataset, originDataset, referralDataset, columnConfiguration, baseConfiguration, mockSheet, mockRow;
 
                 beforeEach(function () {
                     scope.$apply();
@@ -813,7 +813,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                         monthLabel: 'month',
                         moduleNameLabel: 'module name'
                     };
-                    spreadSheetContent = undefined;
 
                     baseConfiguration = [{
                         name: 'categoryOptionNameX'
@@ -889,10 +888,19 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                         }
                     };
 
-                    spyOn(ExcelBuilder, 'createWorkBook').and.callFake(function (workBookContent) {
-                        spreadSheetContent = _.first(workBookContent);
-                        return new Blob();
-                    });
+                    spyOn(ExcelBuilder, 'createWorkBook').and.returnValue(new Blob());
+
+                    mockRow = {
+                        addCell: jasmine.createSpy('addCell').and.returnValue(),
+                        addEmptyCells: jasmine.createSpy('addEmptyCells').and.returnValue()
+                    };
+
+                    mockSheet = {
+                        createRow: jasmine.createSpy('createRow').and.returnValue(mockRow),
+                        generate: jasmine.createSpy('generate').and.returnValue({})
+                    };
+
+                    spyOn(excelBuilderHelper, 'createSheet').and.returnValue(mockSheet);
 
                     scope.exportTallySheetToExcel();
                 });
@@ -903,32 +911,36 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 });
 
                 it('should have the period information', function () {
-                    expect(spreadSheetContent.data).toContain(['year', '', 'month', '', 'week', '']);
+                    expect(mockSheet.createRow).toHaveBeenCalledWith(['year', '', 'month', '', 'week', '']);
                 });
 
                 it('should have the module information', function () {
-                    expect(spreadSheetContent.data).toContain(['module name', 'Mod1']);
+                    expect(mockRow.addCell).toHaveBeenCalledWith('Mod1', jasmine.any(Object));
                 });
 
                 it('should have dataset information', function () {
-                    expect(spreadSheetContent.data).toContain([mockDataset.name].concat(_.times(baseConfiguration.length, _.constant(''))));
+                    expect(mockRow.addCell).toHaveBeenCalledWith(mockDataset.name, jasmine.any(Object));
                 });
 
                 it('should have the headers for a dataset section', function () {
-                    expect(spreadSheetContent.data).toContain(['sectionName', 'categoryOptionNameA', '', 'categoryOptionNameB', '']);
-                    expect(spreadSheetContent.data).toContain(['', 'categoryOptionNameX', 'categoryOptionNameY', 'categoryOptionNameX', 'categoryOptionNameY']);
+                    expect(mockRow.addCell).toHaveBeenCalledWith('sectionName', jasmine.any(Object));
+                    expect(mockRow.addCell).toHaveBeenCalledWith('categoryOptionNameA', jasmine.any(Object));
+                    expect(mockRow.addCell).toHaveBeenCalledWith('categoryOptionNameB', jasmine.any(Object));
+                    expect(mockRow.addCell).toHaveBeenCalledWith('categoryOptionNameX', jasmine.any(Object));
+                    expect(mockRow.addCell).toHaveBeenCalledWith('categoryOptionNameY', jasmine.any(Object));
                 });
 
                 it('should have the data element name', function () {
-                    expect(spreadSheetContent.data).toContain(['dataElementName', '', '', '', '']);
+                    expect(mockRow.addCell).toHaveBeenCalledWith('dataElementName', jasmine.any(Object));
                 });
 
                 it('should have the origin name under origin dataset section', function () {
-                    expect(spreadSheetContent.data).toContain(['originA', ''], ['originB', '']);
+                    expect(mockRow.addCell).toHaveBeenCalledWith('originA', jasmine.any(Object));
+                    expect(mockRow.addCell).toHaveBeenCalledWith('originB', jasmine.any(Object));
                 });
 
                 it('should have the referral location names for referral location dataset', function () {
-                    expect(spreadSheetContent.data).toContain(['Referral location A', '']);
+                    expect(mockRow.addCell).toHaveBeenCalledWith('Referral location A', jasmine.any(Object));
                 });
             });
         });

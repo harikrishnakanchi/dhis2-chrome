@@ -1,4 +1,4 @@
-define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "interpolate", "customAttributes", "dataElementUtils", "excelBuilder", "excelBuilderHelper"], function(_, dataValuesMapper, orgUnitMapper, moment, properties, interpolate, customAttributes, dataElementUtils, excelBuilder, excelBuilderHelper) {
+define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "interpolate", "customAttributes", "dataElementUtils", "excelBuilder", "excelBuilderHelper", "excelStyles"], function(_, dataValuesMapper, orgUnitMapper, moment, properties, interpolate, customAttributes, dataElementUtils, excelBuilder, excelBuilderHelper, excelStyles) {
     return function($scope, $routeParams, $q, $hustle, $anchorScroll, $location, $modal, $rootScope, $window, $timeout,
         dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository,
                     translationsService, moduleDataBlockFactory, dataSyncFailureRepository, optionSetRepository, filesystemService) {
@@ -45,35 +45,43 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             var spreadSheet = excelBuilderHelper.createSheet($scope.selectedModule.name);
 
             var getPeriodInformation = function () {
-                return [$scope.resourceBundle.yearLabel, EMPTY_CELL, $scope.resourceBundle.monthLabel, EMPTY_CELL, $scope.resourceBundle.weekLabel, EMPTY_CELL];
+                var row = [$scope.resourceBundle.yearLabel, EMPTY_CELL, $scope.resourceBundle.monthLabel, EMPTY_CELL, $scope.resourceBundle.weekLabel, EMPTY_CELL];
+                spreadSheet.createRow(row);
+                spreadSheet.createRow();
+                spreadSheet.createRow();
             };
 
             var getModuleName = function () {
-                return [$scope.resourceBundle.moduleNameLabel, $scope.selectedModule.name];
+                var style = excelStyles.generateStyle(excelStyles.BOLD);
+                spreadSheet.createRow().addCell($scope.selectedModule.name, {style: style});
+                spreadSheet.createRow();
             };
 
             var buildDataElements = function (section, numberOfExtraCells) {
+                var style = excelStyles.generateStyle(excelStyles.LEFT_ALIGNMENT);
                 _.forEach(section.dataElements, function (dataElement) {
                     var dataElementName = dataElementUtils.getDisplayName(dataElement);
                     var row = spreadSheet.createRow();
-                        row.addCell(dataElementName);
+                        row.addCell(dataElementName, {style: style});
                         row.addEmptyCells(numberOfExtraCells);
                 });
             };
 
             var buildHeaders = function (section) {
+                var style = excelStyles.generateStyle(excelStyles.BOLD);
                 _.forEach(section.columnConfigurations, function (categoryOptions, index) {
                     var colspan = (section.baseColumnConfiguration.length / categoryOptions.length) || 1;
                     var row = spreadSheet.createRow();
                     var initialElement = index === 0 ? section.name : EMPTY_CELL;
-                    row.addCell(initialElement);
+                    row.addCell(initialElement, {style: style});
                     _.forEach(categoryOptions, function (categoryOption) {
-                        row.addCell(categoryOption.name, {colspan: colspan});
+                        row.addCell(categoryOption.name, {colspan: colspan, style: style});
                     });
                 });
             };
 
             var buildReferralLocations = function (section, numberOfExtraCells) {
+                var style = excelStyles.generateStyle(excelStyles.LEFT_ALIGNMENT);
                 var referralLocations = _.filter(section.dataElements, function (dataElement) {
                     return !!$scope.referralLocations[dataElement.formName];
                 });
@@ -81,15 +89,17 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                 _.forEach(referralLocations, function (dataElement) {
                     var row = spreadSheet.createRow();
                     var referralLocation = $scope.referralLocations[dataElement.formName];
-                    row.addCell(referralLocation.name);
+                    row.addCell(referralLocation.name, {style: style});
                     row.addEmptyCells(numberOfExtraCells);
                 });
             };
 
             var buildOrigins = function (section, numberOfExtraCells) {
-                return _.forEach($scope.originOrgUnits, function (originOrgUnit) {
+                var style = excelStyles.generateStyle(excelStyles.LEFT_ALIGNMENT);
+                var sortedOrigins = _.sortBy($scope.originOrgUnits, 'name');
+                return _.forEach(sortedOrigins, function (originOrgUnit) {
                     var row = spreadSheet.createRow();
-                    row.addCell(originOrgUnit.name);
+                    row.addCell(originOrgUnit.name, {style: style});
                     row.addEmptyCells(numberOfExtraCells);
                 });
             };
@@ -105,6 +115,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
 
             var buildDataSet = function (dataSet) {
                 var width = _.max(_.map(dataSet.sections, 'baseColumnConfiguration.length')) || 1;
+                var style = excelStyles.generateStyle(excelStyles.BOLD);
                 var buildSectionContent = buildDataElements;
                 if (dataSet.isOriginDataset) {
                     buildSectionContent = buildOrigins;
@@ -112,19 +123,18 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                 if (dataSet.isReferralDataset) {
                     buildSectionContent = buildReferralLocations;
                 }
-                spreadSheet.createRow().addCell(dataSet.name, {colspan: width + 1});
+                spreadSheet.createRow().addCell(dataSet.name, {colspan: width + 1, style: style});
                 spreadSheet.createRow();
                 buildSections(dataSet, buildSectionContent);
                 spreadSheet.createRow();
             };
 
-            spreadSheet.createRow(getPeriodInformation());
-            spreadSheet.createRow();
-            spreadSheet.createRow();
-            spreadSheet.createRow(getModuleName());
-            spreadSheet.createRow();
-            var filteredDataSets = _.reject($scope.dataSets, 'isPopulationDataset');
-            _.forEach(filteredDataSets, buildDataSet);
+            getPeriodInformation();
+            getModuleName();
+            var nonPopulationDataSets = _.reject($scope.dataSets, 'isPopulationDataset');
+            var originDataSetsAndRemainingDatasets = _.partition(nonPopulationDataSets, 'isOriginDataset');
+            _.forEach(originDataSetsAndRemainingDatasets[1], buildDataSet);
+            _.forEach(originDataSetsAndRemainingDatasets[0], buildDataSet);
             return [spreadSheet.generate()];
         };
 

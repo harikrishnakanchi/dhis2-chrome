@@ -82,7 +82,7 @@ define(['xlsx', 'lodash'], function (XLSX, _) {
                 var cellReference = XLSX.utils.encode_cell({ r: rowIndex, c: columnIndex });
                 sheetObject[cellReference] = createCellObject(cell);
                 maxColumnIndex = _.max([maxColumnIndex, columnIndex]);
-                columnWidths[columnIndex] = _.max([columnWidths[columnIndex], cell && cell.length, DEFAULT_COLUMN_WIDTH]);
+                columnWidths[columnIndex] = _.max([columnWidths[columnIndex], sheetObject[cellReference].v.length, DEFAULT_COLUMN_WIDTH]);
             });
         });
 

@@ -1,4 +1,4 @@
-define(['lodash'], function (_) {
+define(['lodash', 'excelStyles'], function (_, excelStyles) {
     var Sheet = function (sheetName) {
         var name = sheetName;
         var data = [],
@@ -18,26 +18,31 @@ define(['lodash'], function (_) {
         var createRow = function (values) {
             var column = -1, EMPTY_ROW = [];
             values = values || EMPTY_ROW;
-            column = column + values.length;
             row = row + 1;
-            data[row] = values;
+            data[row] = [];
 
             var addEmptyCells = function (numberOfEmptyCells) {
                 var addEmpty = _.partial(addCell, null, null);
                 return _.times(numberOfEmptyCells, addEmpty);
             };
 
-            var addCell = function (cell, options) {
-                cell = cell || EMPTY_CELL;
+            var addCell = function (cellValue, options) {
+                cellValue = cellValue || EMPTY_CELL;
                 column = column + 1;
-                data[row][column] = cell;
+                var DEFAULT_STYLE = excelStyles.generateStyle([excelStyles.BORDERED_CELL, excelStyles.CENTER_ALIGNMENT]);
+                var cellStyle = Object.assign({}, DEFAULT_STYLE, options && options.style);
+                data[row][column] = {value: cellValue, style: cellStyle};
 
                 if (options) {
-                    var mergeCell = {s: {r: row, c: column}, e: {r: row, c: (column + options.colspan - 1)}};
-                    mergedCells.push(mergeCell);
-                    addEmptyCells(options.colspan - 1);
+                    if (options.colspan) {
+                        var mergeCell = {s: {r: row, c: column}, e: {r: row, c: (column + options.colspan - 1)}};
+                        mergedCells.push(mergeCell);
+                        addEmptyCells(options.colspan - 1);
+                    }
                 }
             };
+
+            _.forEach(values, addCell);
 
             return {
                 addCell: addCell,
@@ -50,6 +55,7 @@ define(['lodash'], function (_) {
             generate: generate
         };
     };
+
     var createSheet = function (sheetName) {
         return new Sheet(sheetName);
     };
