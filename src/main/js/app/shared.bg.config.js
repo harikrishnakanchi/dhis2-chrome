@@ -25,7 +25,6 @@ require.config({
         "eventService": "app/service/event.service",
         "services": "app/service/bg.services",
         "orgUnitGroupService": "app/service/orgunit.group.service",
-        "patientOriginService": "app/service/patient.origin.service",
         "reportService": "app/service/report.service",
         "dataStoreService": "app/service/datastore.service",
 
