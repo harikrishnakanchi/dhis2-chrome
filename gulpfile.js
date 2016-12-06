@@ -87,6 +87,9 @@ gulp.task('update-webdriver', shell.task([
 ]));
 
 gulp.task('serve', ['generate-service-worker', 'watch'], function() {
+
+    gulp.start('download-packaged-data');
+
     var app = express();
 
     app.use(compress());    // gzip
@@ -158,7 +161,7 @@ gulp.task('download-organisation-units', function(callback) {
 
 gulp.task('download-packaged-data', ['download-metadata', 'download-datasets', 'download-programs', 'download-fieldapp-settings', 'download-organisation-units'], function () {});
 
-gulp.task('generate-service-worker', ['less', 'download-packaged-data'], function (callback) {
+gulp.task('generate-service-worker', ['less'], function (callback) {
     var path = require('path');
     var swPrecache = require('sw-precache');
     var rootDir = 'src/main';
