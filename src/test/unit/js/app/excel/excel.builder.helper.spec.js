@@ -58,5 +58,12 @@ define(['excelBuilderHelper'], function (excelBuilderHelper) {
             expect(sheetResult.merges).toContain({s: {r: 0, c: 0}, e: {r: 0, c: 1}});
         });
 
+        it('should add n empty cells to a row', function () {
+            var row = sheetObject.createRow();
+            row.addEmptyCells(3);
+            generateSheet();
+            expect(sheetResult.data).toContain(['', '', '']);
+        });
+
     });
 });

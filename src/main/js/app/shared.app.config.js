@@ -133,6 +133,7 @@ require.config({
 
         //Excel
         "excelBuilderHelper": "app/excel/excel.builder.helper",
+        "excelBuilder": "app/excel/excel.builder",
 
         //Factories
         "factories": "app/factories/factories",
@@ -176,7 +177,6 @@ require.config({
         "dataURItoBlob": "app/utils/data.uri.to.blob",
         "interpolate": "app/utils/interpolate",
         "xlsxLoader": "app/utils/xlsx.loader",
-        "excelBuilder": "app/utils/excel.builder",
         "dataElementUtils": "app/utils/data.element.utils",
 
         //Helpers
