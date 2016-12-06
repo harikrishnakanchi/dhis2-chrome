@@ -55,29 +55,21 @@ define(['xlsx', 'lodash'], function (XLSX, _) {
         });
     };
 
-    var createCellObject = function (cellValue, cellStyle) {
+    var createCellObject = function (cell) {
+        var cellValue = _.isPlainObject(cell) ? cell.value : cell;
+        var type = CELL_TYPES[typeof cellValue] || CELL_TYPES.default;
         var obj = {
             v: cellValue,
-            t: CELL_TYPES[typeof cellValue] || CELL_TYPES.default
+            t: type
         };
-        if (cellStyle) {
-            obj.s = {
-                border: {
-                    left: {style: 'thin', color: {auto: 1}},
-                    top: {style: 'thin', color: {auto: 1}},
-                    bottom: {style: 'thin', color: {auto: 1}},
-                    right: {style: 'thin', color: {auto: 1}}
-                },
-                alignment:{
-                    horizontal: 'center',
-                    wrapText: true
-                }
-            };
+
+        if (_.isPlainObject(cell)) {
+            _.set(obj, 's', cell.style);
         }
         return obj;
     };
 
-    var createSheetObject = function (sheetData, cellStyle) {
+    var createSheetObject = function (sheetData) {
         var maxRowIndex = 0,
             maxColumnIndex = 0,
             columnWidths = {},
@@ -88,7 +80,7 @@ define(['xlsx', 'lodash'], function (XLSX, _) {
             _.each(row, function (cell, columnIndex) {
                 if(_.isNull(cell) || _.isUndefined(cell)) return;
                 var cellReference = XLSX.utils.encode_cell({ r: rowIndex, c: columnIndex });
-                sheetObject[cellReference] = createCellObject(cell, cellStyle);
+                sheetObject[cellReference] = createCellObject(cell);
                 maxColumnIndex = _.max([maxColumnIndex, columnIndex]);
                 columnWidths[columnIndex] = _.max([columnWidths[columnIndex], cell && cell.length, DEFAULT_COLUMN_WIDTH]);
             });
@@ -105,7 +97,7 @@ define(['xlsx', 'lodash'], function (XLSX, _) {
         return {
             SheetNames: _.map(sheets, 'name'),
             Sheets: _.reduce(sheets, function (sheetsObject, sheet) {
-                var sheetObject = createSheetObject(sheet.data, sheet.cellStyle);
+                var sheetObject = createSheetObject(sheet.data);
                 if (sheet.merges) {
                     sheetObject['!merges'] = sheet.merges;
                 }

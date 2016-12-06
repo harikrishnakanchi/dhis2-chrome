@@ -66,6 +66,13 @@ define(['excelBuilder', 'xlsx'], function (excelBuilder, XLSX) {
                 expect(workBookData.Sheets[sheetA.name].B5).toBeUndefined();
             });
 
+            it('should set styling to the cell if provided', function () {
+                var mockStyle = {alignment: {horizontal: 'center'}};
+                mockData[0].data.push([{value: 1, style: mockStyle}]);
+                excelBuilder.createWorkBook(mockData);
+                expect(workBookData.Sheets[sheetA.name].A6).toEqual({v: 1, t: 'n', s: mockStyle});
+            });
+
             it('should set the range for the sheet', function () {
                 excelBuilder.createWorkBook(mockData);
                 expect(workBookData.Sheets[sheetA.name]['!ref']).toEqual('A1:B5');
