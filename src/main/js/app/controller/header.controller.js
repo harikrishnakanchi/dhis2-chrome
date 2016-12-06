@@ -119,7 +119,7 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
             else {
                 networkStatus = 'offline';
             }
-            return $scope.resourceBundle[networkStatus];
+            return $scope.resourceBundle && $scope.resourceBundle[networkStatus];
         };
 
         var init = function() {
