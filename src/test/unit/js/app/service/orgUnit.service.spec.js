@@ -267,5 +267,18 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
 
             expect(actualResult).toEqual(expectedOrgUnits);
         });
+
+        it("should return empty organisationUnits data if local file does not exist", function() {
+            httpBackend.expectGET("data/organisationUnits.json").respond(404);
+
+            var actualResult;
+            orgUnitService.loadFromFile().then(function(result) {
+                actualResult = result;
+            });
+            httpBackend.flush();
+
+            expect(actualResult).toEqual([]);
+        });
+
     });
 });

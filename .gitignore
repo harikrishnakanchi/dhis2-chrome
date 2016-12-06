@@ -10,3 +10,4 @@ npm-debug.log
 *.iml
 src/main/service.worker.js
 !src/main/js/lib/custom
+src/main/data

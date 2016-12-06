@@ -21,6 +21,8 @@ define(["dhisUrl", "lodash"], function(dhisUrl, _) {
         this.loadFromFile = function() {
             return $http.get("data/programs.json").then(function(response) {
                 return response.data.programs;
+            }).catch(function () {
+                return [];
             });
         };
 

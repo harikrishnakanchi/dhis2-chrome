@@ -72,6 +72,18 @@ define(["programService", "angularMocks", "properties", "utils"], function(Progr
             expect(actualResult).toEqual(expectedProgramData);
         });
 
+        it("should load empty programs data if local file does not exist", function() {
+            httpBackend.expectGET("data/programs.json").respond(404);
+
+            var actualResult;
+            programService.loadFromFile().then(function(result) {
+                actualResult = result;
+            });
+            httpBackend.flush();
+
+            expect(actualResult).toEqual([]);
+        });
+
         describe('assignOrgUnitToProgram', function () {
             it('should assign the org unit to the program', function () {
                 var programId = 'someProgramId',

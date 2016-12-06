@@ -54,6 +54,8 @@ define(["dhisUrl", "httpUtils", "lodash"], function(dhisUrl, httpUtils, _) {
         this.loadFromFile = function () {
             return $http.get('data/organisationUnits.json').then(function (response) {
               return response.data.organisationUnits;
+            }).catch(function () {
+                return [];
             });
         };
     };

@@ -17,6 +17,8 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
         var loadSettingsFromFile = function() {
             return $http.get("data/systemSettings.json").then(function(response) {
                 return response.data;
+            }).catch(function () {
+                return {};
             });
         };
 

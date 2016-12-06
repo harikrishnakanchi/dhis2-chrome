@@ -32,7 +32,18 @@ var supportEmail = argv.supportEmail || "";
 var exportTranslations = require('./tasks/export.translations');
 var importTranslations = require('./tasks/import.translations');
 
+var ensureDirectoryExistence = function(filePath) {
+    var dirname = path.dirname(filePath);
+    if (fs.existsSync(dirname)) {
+        return true;
+    }
+    ensureDirectoryExistence(dirname);
+    fs.mkdirSync(dirname);
+};
+
 var download = function (url, outputFile, onDone) {
+    ensureDirectoryExistence(outputFile);
+
     var options = {
         url: url,
         headers: {

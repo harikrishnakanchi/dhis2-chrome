@@ -85,6 +85,18 @@ define(["systemSettingService", "angularMocks", "utils", "dhisUrl"], function(Sy
             expect(actualResult).toEqual(expectedSystemSettings);
         });
 
+        it("should return empty system settings if local file does not exist", function() {
+            httpBackend.expectGET("data/systemSettings.json").respond(404);
+
+            var actualResult;
+            service.loadFromFile().then(function(result) {
+                actualResult = result;
+            });
+            httpBackend.flush();
+
+            expect(actualResult).toEqual([]);
+        });
+
         it("should get project settings", function() {
             var projectSettingsFromDhis = {
                 "projectSettings_prj1": {
