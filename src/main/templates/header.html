@@ -29,10 +29,10 @@
                                 </span>
                         </p>
                         <ul class="nav navbar-nav" ng-class="{'navbar-right': layoutDirection.direction != 'rtl'}">
-                            <li class="sync-status" ng-if="remainingJobs > 0">
+                            <li class="sync-status" ng-if="msgInQueue">
                                 <span>
-                                    <i class="fa fa-refresh fa-spin" ng-if="isDhisOnline" title="{{ resourceBundle.connectedWithProcessingRequests }}"></i>
-                                    <i class="fa fa-warning" ng-if="!isDhisOnline" title="{{ resourceBundle.notConnectedWithPendingRequests }}"></i>
+                                    <i class="fa fa-refresh fa-spin" ng-if="isQueueProcessing" title="{{ resourceBundle.connectedWithProcessingRequests }}"></i>
+                                    <i class="fa fa-warning" ng-if="!isQueueProcessing" title="{{ resourceBundle.notConnectedWithPendingRequests }}"></i>
                                 </span>
                             </li>
                             <li class="sync-status" ng-if="remainingJobs > 0">

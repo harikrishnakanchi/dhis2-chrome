@@ -46,15 +46,10 @@ define(["properties", "platformUtils", "interpolate", "moment", "lodash"], funct
         };
 
         return {
-            onSuccess: function(job) {
-                hustleMonitor.checkHustleQueueCount();
-            },
-            onFailure: function(job, failureMessage) {
-                hustleMonitor.checkHustleQueueCount();
-            },
-            onPublish: function(job) {
-                hustleMonitor.checkHustleQueueCount();
-            },
+            onSuccess: hustleMonitor.checkHustleQueueCount,
+            onFailure: hustleMonitor.checkHustleQueueCount,
+            onPublish: hustleMonitor.checkHustleQueueCount,
+            onReserve: hustleMonitor.checkHustleQueueCount,
             shouldRetry: function(job, data) {
                 notifyUser(job, data);
 

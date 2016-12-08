@@ -1,8 +1,8 @@
-define(["queueInterceptor", "angularMocks", "properties", "platformUtils", "utils", "dataRepository", "approvalDataRepository", "orgUnitRepository", "dataSyncFailureRepository"],
-    function(QueueInterceptor, mocks, properties, platformUtils, utils, DataRepository, ApprovalDataRepository, OrgUnitRepository, DataSyncFailureRepository) {
+define(["queueInterceptor", "angularMocks", "properties", "platformUtils", "utils", "dataRepository", "approvalDataRepository", "orgUnitRepository", "dataSyncFailureRepository", "hustleMonitor"],
+    function(QueueInterceptor, mocks, properties, platformUtils, utils, DataRepository, ApprovalDataRepository, OrgUnitRepository, DataSyncFailureRepository, HustleMonitor) {
     describe('queueInterceptor', function() {
 
-        var queueInterceptor, q, rootScope, ngI18nResourceBundle, scope, dataRepository, approvalDataRepository, orgUnitRepository, dataSyncFailureRepository;
+        var queueInterceptor, q, rootScope, ngI18nResourceBundle, scope, dataRepository, approvalDataRepository, orgUnitRepository, dataSyncFailureRepository, hustleMonitor;
 
         beforeEach(mocks.inject(function($q, $rootScope, $log) {
             q = $q;
@@ -19,6 +19,9 @@ define(["queueInterceptor", "angularMocks", "properties", "platformUtils", "util
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, []));
 
+            hustleMonitor = new HustleMonitor();
+            spyOn(hustleMonitor, 'checkHustleQueueCount').and.returnValue(utils.getPromise(q, []));
+
             spyOn(platformUtils, "sendMessage");
             spyOn(platformUtils, "createNotification");
 
@@ -33,7 +36,7 @@ define(["queueInterceptor", "angularMocks", "properties", "platformUtils", "util
                 }))
             };
 
-            queueInterceptor = new QueueInterceptor($log, ngI18nResourceBundle, dataRepository, dataSyncFailureRepository);
+            queueInterceptor = new QueueInterceptor($log, ngI18nResourceBundle, dataRepository, dataSyncFailureRepository, hustleMonitor);
         }));
 
         it('should return true for retry if number of releases is less than max retries', function() {

@@ -165,6 +165,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                         $timeout(function() {
                             $rootScope.remainingJobs = data.count + data.reservedCount;
                             $rootScope.msgInQueue = $rootScope.remainingJobs > 0;
+                            $rootScope.isQueueProcessing = data.reservedCount > 0;
                         });
                     });
 
