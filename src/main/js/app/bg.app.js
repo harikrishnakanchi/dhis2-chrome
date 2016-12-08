@@ -37,7 +37,14 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     $httpProvider.interceptors.push('cleanupPayloadInterceptor');
                     $httpProvider.interceptors.push('handleTimeoutInterceptor');
                     $httpProvider.interceptors.push('logRequestReponseInterceptor');
-                    $hustleProvider.init("hustle", 1, ["dataValues"]);
+
+                    var jobComparator = function (itemToBeCompared, itemComparedWith) {
+                        var typeEquals = _.isEqual(itemComparedWith.type, itemToBeCompared.type);
+                        var dataEquals = _.isEqual(itemComparedWith.data, itemToBeCompared.data);
+                        return typeEquals && dataEquals;
+                    };
+
+                    $hustleProvider.init("hustle", 1, ["dataValues"], jobComparator);
                 }
             ]);
 

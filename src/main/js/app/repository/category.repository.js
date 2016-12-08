@@ -20,7 +20,7 @@ define(['customAttributes', 'lodash'], function (customAttributes, _) {
             return _this.getAllCategoryOptions().then(function (categoryOptions) {
                 var indexedCategoryOptions = _.indexBy(categoryOptions, 'id');
 
-                return _.each(collection, function (item) {
+                return _.each(_.compact(collection), function (item) {
                     item.categoryOptions = _.map(item.categoryOptions, function (categoryOption) {
                         return indexedCategoryOptions[categoryOption.id];
                     });
