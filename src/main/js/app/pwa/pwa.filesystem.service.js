@@ -6,8 +6,14 @@ define(['fileSaver'], function (saveAs) {
        };
 
        var writeFile = function (fileName, contents, options) {
-           var fileNameWithExtension = [fileName, options.extension].join('.');
-           saveAs(contents, fileNameWithExtension);
+           if (options && options.extension) {
+               fileName = [fileName, options.extension].join('.');
+           }
+           saveAs(contents, fileName);
+
+           return {
+               name: 'Downloads Folder'
+           };
        };
 
        var fakeFunction = function () {
@@ -17,7 +23,7 @@ define(['fileSaver'], function (saveAs) {
        return {
            "FILE_TYPE_OPTIONS": FILE_TYPE_OPTIONS,
            "promptAndWriteFile": writeFile,
-           "writeFile": fakeFunction,
+           "writeFile": writeFile,
            "readFile": fakeFunction
        };
    };
