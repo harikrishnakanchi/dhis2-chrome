@@ -35,7 +35,9 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|chrome-extension):/);
                     $routeProvider.
                     when('/', {
-                        templateUrl: 'templates/init.html'
+                        templateUrl: 'templates/init.html',
+                        resolve : authenticate
+
                     }).
                     when('/dashboard', {
                         templateUrl: 'templates/dashboard.html',
@@ -64,7 +66,12 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     }).
                     when('/login', {
                         templateUrl: 'templates/login.html',
-                        controller: 'loginController'
+                        controller: 'loginController',
+                        resolve: {
+                            auth: ['$rootScope', '$q', function ($rootScope, $q) {
+                                return $rootScope.isLoggedIn ? $q.reject() : $q.when();
+                            }]
+                        }
                     }).
                     when('/orgUnits', {
                         templateUrl: 'templates/orgunits.html',
@@ -78,8 +85,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     }).
                     when('/productKeyPage', {
                         templateUrl: 'templates/product-key.html',
-                        controller: 'productKeyController',
-                        resolve: authenticate
+                        controller: 'productKeyController'
                     }).
                     when('/aggregate-data-entry/:module?/:week?', {
                         templateUrl: 'templates/aggregate-data-entry.html',
@@ -162,6 +168,9 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                         console.log(message);
                         if (authenticationUtils.shouldRedirectToLogin($rootScope, $location)) {
                             $location.path("/login");
+                        }
+                        else {
+                           $location.path(newRoute.originalPath);
                         }
                     });
 

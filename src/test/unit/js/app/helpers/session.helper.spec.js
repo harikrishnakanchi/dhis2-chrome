@@ -1,12 +1,13 @@
 define(["sessionHelper", "angularMocks", "utils", "userPreferenceRepository", "orgUnitRepository", "moment", "timecop"],
     function(SessionHelper, mocks, utils, UserPreferenceRepository, OrgUnitRepository, moment, timecop) {
         describe("session helper", function() {
-            var rootScope, q, userPreferenceRepository, user, orgUnitRepository,
-                currentTime;
+            var rootScope, q, location, userPreferenceRepository, user, orgUnitRepository,
+                currentTime, sessionHelper;
 
-            beforeEach(mocks.inject(function($rootScope, $q) {
+            beforeEach(mocks.inject(function($rootScope, $q, $location) {
                 rootScope = $rootScope;
                 q = $q;
+                location = $location;
 
                 rootScope.hasRoles = jasmine.createSpy("hasRoles").and.returnValue(true);
 
@@ -32,7 +33,7 @@ define(["sessionHelper", "angularMocks", "utils", "userPreferenceRepository", "o
                     }]
                 };
 
-                sessionHelper = new SessionHelper(rootScope, q, userPreferenceRepository, orgUnitRepository);
+                sessionHelper = new SessionHelper(rootScope, q, userPreferenceRepository, orgUnitRepository, location);
 
                 currentTime = moment().toISOString();
                 Timecop.install();
