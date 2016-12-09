@@ -336,5 +336,11 @@
     "geographicOriginCheckboxLabel": "Afficher origine géographique pour l'utilisateur de saisie de données",
     "updated": "Actualisé",
     "help": "Aidez?",
-    "exportTallySheetButton": "Feuille de relevé d'exportation"
+    "exportTallySheetButton": "Feuille de relevé d'exportation",
+    "fileSystem": {
+        "successNotification": {
+            "title": "File Saved Successfully",
+            "message": "The file \"{{fileName}}\" has been saved successfully."
+        }
+    }
 }

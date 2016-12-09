@@ -336,5 +336,11 @@
     "geographicOriginCheckboxLabel": "عرض الأصل الجغرافي للمستخدم إدخال البيانات",
     "updated": "تحديث",
     "help": "مساعدة?",
-    "exportTallySheetButton": "ورقة تصدير تالي"
+    "exportTallySheetButton": "ورقة تصدير تالي",
+    "fileSystem": {
+        "successNotification": {
+            "title": "File Saved Successfully",
+            "message": "The file \"{{fileName}}\" has been saved successfully."
+        }
+    }
 }

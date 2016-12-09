@@ -1,5 +1,5 @@
 define(['lodash', 'platformUtils'], function(_, platformUtils) {
-    return function($q) {
+    return function($rootScope, $q, $modal) {
         var FILE_TYPE_OPTIONS = {
             XLSX: {
                 accepts: [{

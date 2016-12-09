@@ -336,5 +336,11 @@
     "geographicOriginCheckboxLabel": "Display Geographic Origin for Data Entry User",
     "updated": "Updated",
     "help": "Help?",
-    "exportTallySheetButton": "Export Tally Sheet"
+    "exportTallySheetButton": "Export Tally Sheet",
+    "fileSystem": {
+        "successNotification": {
+            "title": "File Saved Successfully",
+            "message": "The file \"{{fileName}}\" has been saved successfully."
+        }
+    }
 }
