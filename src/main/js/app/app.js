@@ -30,8 +30,17 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                 }]
             };
 
-            app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider', '$hustleProvider', '$compileProvider', '$provide', '$tooltipProvider',
-                function($routeProvider, $indexedDBProvider, $httpProvider, $hustleProvider, $compileProvider, $provide, $tooltipProvider) {
+            app.constant('USER_ROLES', {
+                'DATA_ENTRY': 'Data entry user',
+                'OBSERVER': 'Observer',
+                'PROJECT_LEVEL_APPROVER': 'Project Level Approver',
+                'COORDINATION_LEVEL_APPROVER': 'Coordination Level Approver',
+                'PROJECT_ADMIN': 'Projectadmin',
+                'SUPER_ADMIN': 'Superadmin'
+            });
+
+            app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider', '$hustleProvider', '$compileProvider', '$provide', '$tooltipProvider', 'USER_ROLES',
+                function($routeProvider, $indexedDBProvider, $httpProvider, $hustleProvider, $compileProvider, $provide, $tooltipProvider, USER_ROLES) {
                     $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|chrome-extension):/);
                     $routeProvider.
                     when('/', {
@@ -42,27 +51,42 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     when('/dashboard', {
                         templateUrl: 'templates/dashboard.html',
                         controller: 'dashboardController',
-                        resolve: authenticate
+                        resolve: authenticate,
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
+                        }
                     }).
                     when('/selectProjectPreference', {
                         templateUrl: 'templates/selectProjectPreference.html',
                         controller: 'selectProjectPreferenceController',
-                        resolve: authenticate
+                        resolve: authenticate,
+                        data: {
+                            allowedRoles: [USER_ROLES.PROJECT_ADMIN]
+                        }
                     }).
                     when('/reports/:orgUnit?', {
                         templateUrl: 'templates/reports.html',
                         controller: 'reportsController',
-                        resolve: authenticate
+                        resolve: authenticate,
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
+                        }
                     }).
                     when('/projectReport/', {
                         templateUrl: 'templates/project-report.html',
                         controller: 'projectReportController',
-                        resolve: authenticate
+                        resolve: authenticate,
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
+                        }
                     }).
                     when('/opUnitReport/:opUnit?', {
                         templateUrl: 'templates/opunit-report.html',
                         controller: 'opUnitReportController',
-                        resolve: authenticate
+                        resolve: authenticate,
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
+                        }
                     }).
                     when('/login', {
                         templateUrl: 'templates/login.html',
@@ -71,46 +95,75 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                             auth: ['$rootScope', '$q', function ($rootScope, $q) {
                                 return $rootScope.isLoggedIn ? $q.reject() : $q.when();
                             }]
+                        },
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER,
+                                USER_ROLES.COORDINATION_LEVEL_APPROVER,USER_ROLES.PROJECT_ADMIN, USER_ROLES.SUPER_ADMIN]
                         }
                     }).
                     when('/orgUnits', {
                         templateUrl: 'templates/orgunits.html',
                         controller: 'orgUnitContoller',
-                        resolve: authenticate
+                        resolve: authenticate,
+                        data: {
+                            allowedRoles: [USER_ROLES.PROJECT_ADMIN, USER_ROLES.SUPER_ADMIN]
+                        }
                     }).
                     when('/notifications', {
                         templateUrl: 'templates/notifications.html',
                         controller: 'notificationsController',
-                        resolve: authenticate
+                        resolve: authenticate,
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
+                        }
                     }).
                     when('/productKeyPage', {
                         templateUrl: 'templates/product-key.html',
-                        controller: 'productKeyController'
+                        controller: 'productKeyController',
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER,
+                                USER_ROLES.COORDINATION_LEVEL_APPROVER,USER_ROLES.PROJECT_ADMIN, USER_ROLES.SUPER_ADMIN]
+                        }
                     }).
                     when('/aggregate-data-entry/:module?/:week?', {
                         templateUrl: 'templates/aggregate-data-entry.html',
                         controller: 'aggregateDataEntryController',
-                        resolve: authenticate
+                        resolve: authenticate,
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
+                        }
                     }).
                     when('/line-list-summary/:module/:filterBy?', {
                         templateUrl: 'templates/line-list-summary.html',
                         controller: 'lineListSummaryController',
-                        resolve: authenticate
+                        resolve: authenticate,
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
+                        }
                     }).
                     when('/line-list-data-entry/:module/new', {
                         templateUrl: 'templates/line-list-data-entry.html',
                         controller: 'lineListDataEntryController',
-                        resolve: authenticate
+                        resolve: authenticate,
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY]
+                        }
                     }).
                     when('/line-list-data-entry/:module/:eventId?', {
                         templateUrl: 'templates/line-list-data-entry.html',
                         controller: 'lineListDataEntryController',
-                        resolve: authenticate
+                        resolve: authenticate,
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY]
+                        }
                     }).
                     when('/data-approval/:module?/:week?', {
                         templateUrl: 'templates/data-approval.html',
                         controller: 'dataApprovalController',
-                        resolve: authenticate
+                        resolve: authenticate,
+                        data: {
+                            allowedRoles: [USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
+                        }
                     }).
                     otherwise({
                         redirectTo: '/dashboard'
@@ -165,12 +218,21 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     $hustle.registerInterceptor(queueInterceptor);
 
                     $rootScope.$on('$routeChangeError', function (event, newRoute, oldRoute, message) {
-                        console.log(message);
                         if (authenticationUtils.shouldRedirectToLogin($rootScope, $location)) {
                             $location.path("/login");
                         }
                         else {
                            $location.path(newRoute.originalPath);
+                        }
+                    });
+
+                    $rootScope.$on('$routeChangeStart', function (event, newRoute) {
+                        var authorizedRoles = newRoute.data.allowedRoles;
+                        var isAllowed = _.any($rootScope.currentUser.userCredentials.userRoles, function (userRole) {
+                            return _.contains(authorizedRoles, userRole.name);
+                        });
+                        if (!isAllowed) {
+                            event.preventDefault();
                         }
                     });
 
