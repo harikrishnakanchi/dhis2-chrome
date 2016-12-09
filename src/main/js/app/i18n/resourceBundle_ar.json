@@ -173,6 +173,7 @@
     "dumpLogsErrorMessage": "خطأ في تصدير السجلات: {{error}}",
     "createCloneSuccessMessage": "تم بنجاح انشاء استنساخ في {{directory}}",
     "createCloneErrorMessage": "خطأ في انشاء استنساخ: {{error}}",
+    "defaultDownloadLocationMessage": "your Downloads directory",
     "loadCloneErrorMessage": "خطأ في تحميل الاستنساخ: {{error}}",
     "loadCloneConfirmationMessage": "تحذير: استيراد نسخة تطبيق حذف كافة البيانات الموجودة لا يتم تحميلها إلى DHIS2. سوف يتم تسجيل الخروج من الدورة الحالية بعد الاستيراد. هذا الإجراء لا رجعة فيه.",
     "createCloneConfirmationMessage": "تحذير: تصدير نسخة التطبيق إنشاء نسخة من الطلب الحالي على جهاز الكمبيوتر الخاص بك. ليتم استخدامها لاستيراد تطبيق فقط",

@@ -173,6 +173,7 @@
     "dumpLogsErrorMessage": "Error exporting logs: {{error}}",
     "createCloneSuccessMessage": "Clone created successfully at {{directory}}",
     "createCloneErrorMessage": "Error creating clone: {{error}}",
+    "defaultDownloadLocationMessage": "your Downloads directory",
     "loadCloneErrorMessage": "Error loading clone: {{error}}",
     "loadCloneConfirmationMessage": "WARNING: Importing application copy will delete all existing data not uploaded to DHIS2. You will be logged out of current session after import. THIS ACTION IS IRREVERSIBLE.",
     "createCloneConfirmationMessage": "WARNING: Exporting application copy will create a copy of the current application on your computer. To be used for importing application ONLY",

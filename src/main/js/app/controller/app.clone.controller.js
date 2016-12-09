@@ -22,8 +22,9 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
             };
 
             var successCallback = function(directory) {
+                var directoryName = directory ? directory.name : $scope.resourceBundle.defaultDownloadLocationMessage;
                 var notificationMessages = {
-                    "notificationMessage": interpolate($scope.resourceBundle.dumpLogsSuccessMessage, { directory: directory.name }),
+                    "notificationMessage": interpolate($scope.resourceBundle.dumpLogsSuccessMessage, { directory: directoryName }),
                     "notificationTitle": $scope.resourceBundle.successNotification
                 };
                 showNotification(notificationMessages);
@@ -45,8 +46,9 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
             };
 
             var successCallback = function(directory) {
+                var directoryName = directory ? directory.name : $scope.resourceBundle.defaultDownloadLocationMessage;
                 var notificationMessages = {
-                    "notificationMessage": interpolate($scope.resourceBundle.createCloneSuccessMessage, { directory: directory.name }),
+                    "notificationMessage": interpolate($scope.resourceBundle.createCloneSuccessMessage, { directory: directoryName }),
                     "notificationTitle": $scope.resourceBundle.successNotification
                 };
                 showNotification(notificationMessages);
