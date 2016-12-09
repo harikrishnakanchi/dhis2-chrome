@@ -1,29 +1,22 @@
-define([], function () {
+define(['fileSaver'], function (saveAs) {
    return function () {
        var FILE_TYPE_OPTIONS = {
-           XLSX: {
-               accepts: [{
-                   description: 'Microsoft Excel 2007-2013 XML (.xlsx)',
-                   extensions: ['xlsx']
-               }],
-               acceptsAllTypes: false
-           },
-           PNG: {
-               accepts: [{
-                   description: 'PNG File (.png)',
-                   mimeTypes: ['image/png'],
-                   extensions: ['png']
-               }],
-               acceptsAllTypes: false
-           }
+           XLSX: { extension: 'xlsx' },
+           PNG: { extension: 'png' }
        };
+
+       var writeFile = function (fileName, contents, options) {
+           var fileNameWithExtension = [fileName, options.extension].join('.');
+           saveAs(contents, fileNameWithExtension);
+       };
+
        var fakeFunction = function () {
 
        };
 
        return {
            "FILE_TYPE_OPTIONS": FILE_TYPE_OPTIONS,
-           "promptAndWriteFile": fakeFunction,
+           "promptAndWriteFile": writeFile,
            "writeFile": fakeFunction,
            "readFile": fakeFunction
        };
