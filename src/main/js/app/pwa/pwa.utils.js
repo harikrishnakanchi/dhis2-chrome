@@ -30,7 +30,7 @@ define(['properties', 'lodash'], function(properties, _) {
         self.worker.postMessage(payload);
     };
 
-    var createNotification = function(title, message) {
+    var createNotification = function(title, message, callback) {
         var requestPermission = (Notification.requestPermission && Notification.requestPermission()) || Promise.resolve("granted");
         requestPermission.then(function(permission) {
             if (permission === "granted") {
@@ -40,6 +40,7 @@ define(['properties', 'lodash'], function(properties, _) {
                 };
                 var notification = new Notification(title, options);
                 notification.addEventListener('click', function () {
+                    if(callback) callback();
                     notification.close();
                 });
             }
