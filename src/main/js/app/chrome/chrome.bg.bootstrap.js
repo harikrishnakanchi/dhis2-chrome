@@ -2,6 +2,8 @@ require.config({
     baseUrl: "js/"
 });
 
+self.basePath = "./";
+
 require(["app/chrome/chrome.bg.config", "app/shared.bg.config"], function(config) {
     require(["app/bg.app"], function(app) {
         require(["properties", "platformUtils"], function(properties, platformUtils) {

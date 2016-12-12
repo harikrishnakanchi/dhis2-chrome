@@ -50,7 +50,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
 
             app.value('ngI18nConfig', {
                 supportedLocales: ['en', 'fr', 'ar'],
-                basePath: "/js/app/i18n"
+                basePath: self.basePath + "js/app/i18n"
             });
 
             app.run(['consumerRegistry', 'dhisMonitor', 'hustleMonitor', 'queueInterceptor', '$hustle', '$log', '$rootScope', 'systemSettingRepository',

@@ -27,7 +27,7 @@ define(['lodash'], function(_) {
     var createNotification = function (title, message, callBack) {
         var options = {
             "type": "basic",
-            "iconUrl": "/img/logo.png",
+            "iconUrl": self.basePath + "img/logo.png",
             "title": title,
             "message": message
         };

@@ -3,6 +3,8 @@ require.config({
     waitSeconds: 0
 });
 
+self.basePath = "./";
+
 require(["app/pwa/pwa.app.config", "app/shared.app.config"], function() {
     require(["app/app", "platformUtils"], function(app, platformUtils) {
         var initializeForeground = function () {

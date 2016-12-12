@@ -17,6 +17,7 @@ var document = {
     }
 };
 self.worker = self;
+self.basePath = "../../../";
 
 require.config({
     baseUrl: "../../../js/",

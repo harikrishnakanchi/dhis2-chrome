@@ -35,7 +35,7 @@ define(['properties', 'lodash'], function(properties, _) {
         requestPermission.then(function(permission) {
             if (permission === "granted") {
                 var options = {
-                    "icon": "/img/logo.png",
+                    "icon": self.basePath + "img/logo.png",
                     "body": message
                 };
                 var notification = new Notification(title, options);

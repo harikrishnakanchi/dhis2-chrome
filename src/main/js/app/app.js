@@ -205,7 +205,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
             ]);
             app.value('ngI18nConfig', {
                 supportedLocales: ['en', 'fr', 'ar'],
-                basePath: "js/app/i18n"
+                basePath: self.basePath + "js/app/i18n"
             });
 
             app.run(['dhisMonitor', 'hustleMonitor', 'queueInterceptor', '$rootScope', '$location', '$hustle', '$document', '$timeout', 'initializationRoutine',
