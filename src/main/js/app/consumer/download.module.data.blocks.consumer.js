@@ -2,21 +2,15 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
     return function (dataService, approvalService, datasetRepository, userPreferenceRepository, changeLogRepository, orgUnitRepository,
                      moduleDataBlockFactory, moduleDataBlockMerger, eventService, $q) {
 
+        var CHANGE_LOG_PREFIX = 'dataValues';
+
         var getAggregateDataSetIds = function(allDataSets) {
             var aggregateDataSets = _.filter(allDataSets, { isLineListService: false });
             return _.pluck(aggregateDataSets, 'id');
         };
 
-        var getLastUpdatedTime = function(projectId) {
-            return changeLogRepository.get("dataValues:" + projectId);
-        };
-
-        var updateLastUpdatedTime = function(projectId) {
-            return changeLogRepository.upsert("dataValues:" + projectId, moment().toISOString());
-        };
-
-        var getPeriodRangeToDownload = function(projectLastUpdatedTimestamp) {
-            var numberOfWeeks = projectLastUpdatedTimestamp ? properties.projectDataSync.numWeeksToSync : properties.projectDataSync.numWeeksToSyncOnFirstLogIn;
+        var getPeriodRangeToDownload = function(lastUpdatedTimestamp) {
+            var numberOfWeeks = lastUpdatedTimestamp ? properties.projectDataSync.numWeeksToSync : properties.projectDataSync.numWeeksToSyncOnFirstLogIn;
             return dateUtils.getPeriodRange(numberOfWeeks);
         };
 
@@ -24,6 +18,23 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
             return moduleDataBlockFactory.createForModule(data.module.id, data.periodRange).then(function(moduleDataBlocks) {
                 return _.merge({ moduleDataBlocks: moduleDataBlocks }, data);
             });
+        };
+
+        var getLastUpdatedTimeForModule = function(data) {
+            var changeLogKey = [CHANGE_LOG_PREFIX, data.projectId, data.module.id].join(':');
+
+            return changeLogRepository.get(changeLogKey).then(function (lastUpdatedTime) {
+                return _.merge({
+                    lastUpdatedTimestamp: lastUpdatedTime,
+                    periodRange: getPeriodRangeToDownload(lastUpdatedTime)
+                }, data);
+            });
+        };
+
+        var updateLastUpdatedTime = function(data) {
+            var changeLogKey = [CHANGE_LOG_PREFIX, data.projectId, data.module.id].join(':');
+
+            return changeLogRepository.upsert(changeLogKey, moment().toISOString());
         };
 
         var getOriginsForModule = function(data) {
@@ -110,56 +121,41 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
 
                 return moduleDataBlockMerger.mergeAndSaveToLocalDatabase(moduleDataBlock, dhisDataValues, dhisCompletion, dhisApproval, dhisEvents, dhisEventIds);
             });
-            return $q.all(mergePromises);
+            return $q.all(mergePromises).then(function () { return data; });
         };
 
         var recursivelyDownloadMergeAndSaveModules = function(options) {
             if (_.isEmpty(options.modules)) {
-                var allModulesSyncedSuccessfully = !options.atLeastOneModuleHasFailed;
-                return $q.when(allModulesSyncedSuccessfully);
+                return $q.when();
             }
 
-            var onSuccess = function() {
+            var onSuccessOrFailure = function() {
                 return recursivelyDownloadMergeAndSaveModules(options);
             };
 
-            var onFailure = function() {
-                options.atLeastOneModuleHasFailed = true;
-                return recursivelyDownloadMergeAndSaveModules(options);
-            };
-
-            return getModuleDataBlocks({
+            return getLastUpdatedTimeForModule({
                 module: options.modules.pop(),
-                periodRange: options.periodRange,
-                lastUpdatedTimestamp: options.lastUpdatedTimestamp
+                projectId: options.projectId
             })
+                .then(getModuleDataBlocks)
                 .then(getOriginsForModule)
                 .then(getDataSetsForModuleAndOrigins)
                 .then(getModuleDataFromDhis)
                 .then(getIndexedCompletionsFromDhis)
                 .then(getIndexedApprovalsFromDhis)
                 .then(mergeAndSaveModuleDataBlocks)
-                .then(onSuccess, onFailure);
+                .then(updateLastUpdatedTime)
+                .then(onSuccessOrFailure, onSuccessOrFailure);
         };
 
         var downloadModuleDataForProject = function(projectId) {
-            return getLastUpdatedTime(projectId).then(function(projectLastUpdatedTimestamp) {
-                var periodRange = getPeriodRangeToDownload(projectLastUpdatedTimestamp);
-
-                return orgUnitRepository.getAllModulesInOrgUnits([projectId])
-                    .then(function (allModules) {
-                        return recursivelyDownloadMergeAndSaveModules({
-                            modules: allModules,
-                            periodRange: periodRange,
-                            lastUpdatedTimestamp: projectLastUpdatedTimestamp
-                        });
-                    })
-                    .then(function(allModulesSyncedSuccessfully) {
-                        if(allModulesSyncedSuccessfully) {
-                            return updateLastUpdatedTime(projectId);
-                        }
+            return orgUnitRepository.getAllModulesInOrgUnits([projectId])
+                .then(function (allModules) {
+                    return recursivelyDownloadMergeAndSaveModules({
+                        modules: allModules,
+                        projectId: projectId
                     });
-            });
+                });
         };
 
         var recursivelyLoopThroughProjects = function(projectIds) {

@@ -271,8 +271,15 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', "d
                 expect(moduleDataBlockFactory.createForModule).toHaveBeenCalledWith(mockModuleB.id, periodRange);
             });
 
-            it('should update the change log after merging all data', function() {
-                var changeLogKey = 'dataValues:' + mockProjectId,
+            it('should retrieve the change log for each module', function() {
+                var changeLogKey = ['dataValues', mockProjectId, mockModule.id].join(':');
+
+                runConsumer();
+                expect(changeLogRepository.get).toHaveBeenCalledWith(changeLogKey);
+            });
+
+            it('should update the change log for each module after merging all data', function() {
+                var changeLogKey = ['dataValues', mockProjectId, mockModule.id].join(':'),
                     currentTime = '2016-05-21T00:00:00.000Z';
 
                 Timecop.install();
