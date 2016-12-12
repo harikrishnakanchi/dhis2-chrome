@@ -24,16 +24,28 @@ define(['lodash'], function(_) {
         });
     };
 
-    var createNotification = function(title, message) {
+    var createNotification = function (title, message, callBack) {
         var options = {
             "type": "basic",
             "iconUrl": "/img/logo.png",
             "title": title,
             "message": message
         };
-        chrome.notifications.create(_.random(1000000).toString(), options, function(notificationId) {
+        var notificationId = _.random(1000000).toString();
+        chrome.notifications.create(notificationId, options, function (notificationId) {
             return notificationId;
         });
+
+        if (callBack) {
+            var registerNotificationCallBack = function (registeredNotificationId, callBack) {
+                return function (notificationId) {
+                    if ((notificationId == registeredNotificationId) && callBack) {
+                        callBack();
+                    }
+                };
+            };
+            chrome.notifications.onClicked.addListener(registerNotificationCallBack(notificationId, callBack));
+        }
     };
 
     var getPraxisVersion = function () {
