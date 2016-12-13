@@ -70,7 +70,7 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
                 scope.$apply();
 
                 expect(indexeddbUtils.backupEntireDB).toHaveBeenCalled();
-                expect(filesystemService.writeFile).toHaveBeenCalledWith('praxis_idb_20140530-124354.prx', jasmine.any(Blob));
+                expect(filesystemService.writeFile).toHaveBeenCalledWith('praxis_idb_20140530-124354.msf', jasmine.any(Blob));
             });
 
             it("should fail if cloning entire indexedDb fails", function() {
@@ -89,7 +89,7 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
                 scope.$apply();
 
                 expect(indexeddbUtils.backupEntireDB).toHaveBeenCalled();
-                expect(filesystemService.writeFile).toHaveBeenCalledWith('praxis_idb_20140530-124354.prx', jasmine.any(Blob));
+                expect(filesystemService.writeFile).toHaveBeenCalledWith('praxis_idb_20140530-124354.msf', jasmine.any(Blob));
             });
 
             it("should load clone to indexed db from selected file", function() {

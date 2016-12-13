@@ -1,4 +1,4 @@
-define(['lodash', 'overrides'], function(_, overrides) {
+define(['lodash', 'overrides', 'platformConfig'], function(_, overrides, platformConfig) {
     var url = 'http://localhost:8080';
     var properties = {
         metadata: {
@@ -37,10 +37,7 @@ define(['lodash', 'overrides'], function(_, overrides) {
             url: url
         },
         praxis: {
-            version: '10.0',
-            dbName: 'praxis',
-            dbForLogs: 'praxisLogs',
-            fileExtension: 'prx'
+            version: '10.0'
         },
         queue: {
             maxretries: 5,
@@ -75,5 +72,5 @@ define(['lodash', 'overrides'], function(_, overrides) {
         weeksToDisplayStatusInDashboard: 12
     };
 
-    return _.merge(properties, overrides);
+    return _.merge(properties, overrides, platformConfig);
 });
