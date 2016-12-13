@@ -136,7 +136,8 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
             return backupCallback().then(function(data) {
                 $rootScope.stopLoading();
                 var zippedData = zipUtils.zipData(folderName, fileNamePrefix, fileNameExtn, data);
-                return filesystemService.writeFile(fileNamePrefix + moment().format("YYYYMMDD-HHmmss") + ".msf", zippedData);
+                var fileName = fileNamePrefix + moment().format("YYYYMMDD-HHmmss") + "." + properties.praxis.fileExtension;
+                return filesystemService.writeFile(fileName, zippedData);
             }).finally($rootScope.stopLoading);
         };
 
