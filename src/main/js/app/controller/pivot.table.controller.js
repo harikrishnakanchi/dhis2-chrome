@@ -20,7 +20,7 @@ define(["lodash", "dateUtils", "moment", "excelBuilder"], function(_, dateUtils,
         $scope.exportToExcel = function () {
             var formattedDate = moment($scope.updatedTime, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA),
                 updatedTimeDetails = $scope.updatedTime ? '[updated ' + formattedDate + ']' : moment().format("DD-MMM-YYYY"),
-                fileName = [$scope.table.serviceCode, $scope.table.title, updatedTimeDetails, 'xlsx'].join('.');
+                fileName = [$scope.table.serviceCode, $scope.table.title, updatedTimeDetails].join('.');
 
             var spreadSheetContent = [{
                 name: $scope.table.title,

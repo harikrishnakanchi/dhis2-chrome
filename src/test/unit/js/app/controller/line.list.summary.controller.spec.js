@@ -574,7 +574,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                     });
 
                     it('should prompt user to export data values into Excel', function () {
-                        var expectedFilename = scope.selectedModuleName + '.summary.' + currentTime.format('DD-MMM-YYYY') + '.xlsx';
+                        var expectedFilename = scope.selectedModuleName + '.summary.' + currentTime.format('DD-MMM-YYYY');
                         expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.XLSX);
                     });
 

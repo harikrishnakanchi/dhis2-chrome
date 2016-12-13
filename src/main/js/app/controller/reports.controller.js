@@ -90,7 +90,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 else {
                     lastUpdatedTimeDetails = moment().format("DD-MMM-YYYY");
                 }
-                return [chart.serviceCode, chart.title, lastUpdatedTimeDetails, 'png'].join('.');
+                return [chart.serviceCode, chart.title, lastUpdatedTimeDetails].join('.');
             };
 
             SVGUtils.svgAsPngUri(svgElement, {}, function(uri) {

@@ -276,7 +276,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             });
 
             it('should prompt user to save chart as PNG with suggested name', function () {
-                var expectedFileName = [mockChart.serviceCode, mockChart.title, currentTime.format(DATETIME_FORMAT), 'png'].join('.');
+                var expectedFileName = [mockChart.serviceCode, mockChart.title, currentTime.format(DATETIME_FORMAT)].join('.');
                 expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFileName, dataURItoBlob(mockDataUri), filesystemService.FILE_TYPE_OPTIONS.PNG);
             });
         });

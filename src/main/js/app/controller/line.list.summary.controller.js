@@ -376,7 +376,7 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
                 name: $scope.selectedModuleName,
                 data: [buildHeaders()].concat(eventsToBeExported)
             }];
-            var fileName = [$scope.selectedModuleName, 'summary', moment().format('DD-MMM-YYYY'), 'xlsx'].join('.');
+            var fileName = [$scope.selectedModuleName, 'summary', moment().format('DD-MMM-YYYY')].join('.');
             return filesystemService.promptAndWriteFile(fileName, excelBuilder.createWorkBook(workBookContent), filesystemService.FILE_TYPE_OPTIONS.XLSX);
         };
 
