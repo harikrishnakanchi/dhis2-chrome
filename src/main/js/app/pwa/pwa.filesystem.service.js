@@ -31,15 +31,24 @@ define(['fileSaver', 'interpolate'], function (saveAs, interpolate) {
            saveAs(contents, fileName);
        };
 
-       var fakeFunction = function () {
-
+       var readFile = function (file) {
+           var deferred = $q.defer();
+           var reader = new FileReader();
+           reader.onerror = function (err) {
+               deferred.reject(err);
+           };
+           reader.onloadend = function (data) {
+               deferred.resolve(data);
+           };
+           reader.readAsArrayBuffer(file);
+           return deferred.promise;
        };
 
        return {
            "FILE_TYPE_OPTIONS": FILE_TYPE_OPTIONS,
            "promptAndWriteFile": writeFileAndNotify,
            "writeFile": writeFile,
-           "readFile": fakeFunction
+           "readFile": readFile
        };
    };
 });

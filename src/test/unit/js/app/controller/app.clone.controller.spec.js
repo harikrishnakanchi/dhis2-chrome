@@ -94,6 +94,8 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
             });
 
             it("should load clone to indexed db from selected file", function() {
+                var onImportSelectCallback, mockElement;
+
                 spyOn(filesystemService, "readFile").and.returnValue(utils.getPromise(q, {
                     "target": {
                         "result": "{}"
@@ -104,7 +106,19 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
                     "name": "blah"
                 }]);
 
+                mockElement = document.createElement('input');
+                mockElement.addEventListener = function (event, callback) {
+                    onImportSelectCallback = callback;
+                };
+                spyOn(document, 'getElementById').and.returnValue(mockElement);
+
                 scope.loadClone();
+                scope.$apply();
+                onImportSelectCallback({
+                    target: {
+                        files: ['someFile']
+                    }
+                });
                 scope.$apply();
                 timeout.flush();
 

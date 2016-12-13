@@ -103,30 +103,16 @@ define(['lodash', 'platformUtils'], function(_, platformUtils) {
             return deferred.promise;
         };
 
-        var readFile = function(extensions) {
+        var readFile = function(file) {
             var deferred = $q.defer();
-            var errorHandler = function(err) {
+            var reader = new FileReader();
+            reader.onerror = function (err) {
                 deferred.reject(err);
             };
-
-            var entryType = {
-                "type": 'openFile',
-                "accepts": [{
-                    "extensions": extensions
-                }]
+            reader.onloadend = function (data) {
+                deferred.resolve(data);
             };
-
-            chrome.fileSystem.chooseEntry(entryType, function(readOnlyEntry) {
-                readOnlyEntry.file(function(file) {
-                    var reader = new FileReader();
-                    reader.onerror = errorHandler;
-                    reader.onloadend = function(data) {
-                        deferred.resolve(data);
-                    };
-                    reader.readAsArrayBuffer(file);
-                });
-            });
-
+            reader.readAsArrayBuffer(file);
             return deferred.promise;
         };
 

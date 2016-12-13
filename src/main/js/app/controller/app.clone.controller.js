@@ -118,8 +118,17 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
                 "confirmationMessage": $scope.resourceBundle.loadCloneConfirmationMessage
             };
 
+            var onImportFileSelect = function (e) {
+                if (e.target.files) {
+                    var file = e.target.files[0];
+                    filesystemService.readFile(file).then(successCallback, errorCallback);
+                }
+            };
+
             showModal(function() {
-                filesystemService.readFile(["msf"]).then(successCallback, errorCallback);
+                var importClone = document.getElementById('importClone');
+                importClone.addEventListener('change', onImportFileSelect);
+                importClone.click();
             }, modalMessages);
         };
 
