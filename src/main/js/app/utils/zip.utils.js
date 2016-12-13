@@ -1,6 +1,6 @@
 define(["JSZip", "lodash"], function(JSZip, _) {
-    var zip = new JSZip();
     var zipData = function(folderName, fileNamePrefix, fileNameExtn, data) {
+        var zip = new JSZip();
         var keys = _.keys(data);
         _.forEach(keys, function(key) {
             var fileName = fileNamePrefix + key + fileNameExtn;
@@ -20,6 +20,7 @@ define(["JSZip", "lodash"], function(JSZip, _) {
     };
 
     var readZipFile = function(file) {
+        var zip = new JSZip();
         var zipObject = zip.load(file);
         return zipObject.files;
     };
