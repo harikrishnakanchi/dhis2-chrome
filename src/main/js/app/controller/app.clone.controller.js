@@ -30,7 +30,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
                 showNotification(notificationMessages);
             };
 
-            createZip("logs", "logs_dump_", ".logs", _.partial(indexedDBLogger.exportLogs, "msfLogs"))
+            createZip("logs", "logs_dump_", ".logs", _.partial(indexedDBLogger.exportLogs, properties.praxis.dbForLogs))
                 .then(successCallback, errorCallback);
         };
 
@@ -106,7 +106,6 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
                     indexeddbUtils.restore(result)
                         .then(function() {
                             sessionHelper.logout();
-                            $location.path("/login");
                         }, errorCallback)
                         .finally($rootScope.stopLoading);
                 }, 1000);

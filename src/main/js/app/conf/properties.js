@@ -37,7 +37,9 @@ define(['lodash', 'overrides'], function(_, overrides) {
             url: url
         },
         praxis: {
-            version: '10.0'
+            version: '10.0',
+            dbName: 'praxis',
+            dbForLogs: 'praxisLogs'
         },
         queue: {
             maxretries: 5,

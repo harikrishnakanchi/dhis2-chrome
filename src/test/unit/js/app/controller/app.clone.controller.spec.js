@@ -36,7 +36,6 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
                 spyOn(indexeddbUtils, "backupEntireDB").and.returnValue(utils.getPromise(q, idbDump));
                 spyOn(indexeddbUtils, "restore").and.returnValue(utils.getPromise(q, {}));
                 spyOn(sessionHelper, "logout").and.returnValue(utils.getPromise(q, {}));
-                spyOn(location, "path").and.returnValue(utils.getPromise(q, {}));
                 spyOn(fakeModal, 'open').and.returnValue({
                     result: utils.getPromise(q, {})
                 });
@@ -125,7 +124,6 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
                 expect(filesystemService.readFile).toHaveBeenCalled();
                 expect(indexeddbUtils.restore).toHaveBeenCalled();
                 expect(sessionHelper.logout).toHaveBeenCalled();
-                expect(location.path).toHaveBeenCalledWith('/login');
             });
 
             it("should dump logs to a file", function() {

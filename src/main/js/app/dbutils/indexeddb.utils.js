@@ -1,9 +1,8 @@
 define(["lodash", "migrations", "dateUtils", "properties", "moment"], function(_, migrations, dateUtils, properties, moment) {
-    return function(db, $q, programEventRepository) {
+    return function(db, $q) {
         var hustleDBVersion = 5001;
-        var msfLogsDBVersion = 5001;
         var CHUNK_SIZE = 5000;
-        var MSF = "msf";
+        var PraxisDB = properties.praxis.dbName;
         var HUSTLE = "hustle";
 
         var backupByPeriod = function(storeName) {
@@ -42,7 +41,7 @@ define(["lodash", "migrations", "dateUtils", "properties", "moment"], function(_
             var backupPromises = _.map(storeNames, function(name) {
                 var callback;
                 if (!_.contains(_.keys(storesToSkipSpecificData), name)) {
-                    callback = (_.contains(backupByPeriodStores, name)) && (dbName === MSF) ? backupByPeriod : backupAll;
+                    callback = (_.contains(backupByPeriodStores, name)) && (dbName === PraxisDB) ? backupByPeriod : backupAll;
                 }
                 else {
                     var storeToSkip = storesToSkipSpecificData[name];
@@ -79,8 +78,8 @@ define(["lodash", "migrations", "dateUtils", "properties", "moment"], function(_
         };
 
         var backupEntireDB = function() {
-            var backupMsf = function() {
-                return backupDB(MSF);
+            var backupPraxis = function() {
+                return backupDB(PraxisDB);
             };
 
             var backupHustle = function() {
@@ -88,34 +87,24 @@ define(["lodash", "migrations", "dateUtils", "properties", "moment"], function(_
                 return backupDB(HUSTLE);
             };
 
-            var msfData, hustleData;
-            return backupMsf().then(function(data) {
-                msfData = _.reduce(data, function(result, value, key) {
+            var praxisData, hustleData;
+            return backupPraxis().then(function(data) {
+                praxisData = _.reduce(data, function(result, value, key) {
                     var valueChunks = _.chunk(value, CHUNK_SIZE);
                     _.each(valueChunks, function(chunk, index) {
-                        result[MSF + "__" + key + "__" + index] = encodeBase64(chunk);
+                        result[PraxisDB + "__" + key + "__" + index] = encodeBase64(chunk);
                     });
                     return result;
                 }, {});
                 return data;
             }).then(backupHustle).then(function(data) {
                 hustleData = data;
-                db.switchDB(MSF, migrations.length);
+                db.switchDB(PraxisDB, migrations.length);
                 return data;
             }).then(function() {
-                return _.merge(msfData, {
+                return _.merge(praxisData, {
                     "hustle": encodeBase64(hustleData)
                 });
-            });
-        };
-
-        var backupLogs = function() {
-            db.switchDB("msfLogs", msfLogsDBVersion);
-            return backupDB().then(function(logsData) {
-                db.switchDB(MSF, migrations.length);
-                return {
-                    "msfLogs": logsData
-                };
             });
         };
 
@@ -144,7 +133,7 @@ define(["lodash", "migrations", "dateUtils", "properties", "moment"], function(_
                 return result;
             };
 
-            var restoreMsf = function(data) {
+            var restorePraxis = function(data) {
                 var parseBackupDataByStore = function (backUpData, existingStoreNames) {
                     var backupDataByStore = {};
                     _.each(backUpData, function(val, key) {
@@ -172,9 +161,9 @@ define(["lodash", "migrations", "dateUtils", "properties", "moment"], function(_
             };
 
             backupData = decodeData(backupData);
-            return restoreMsf(backupData).then(function() {
+            return restorePraxis(backupData).then(function() {
                 return restoreHustle(backupData.hustle).then(function() {
-                    return db.switchDB(MSF, migrations.length);
+                    return db.switchDB(PraxisDB, migrations.length);
                 });
             });
         };
@@ -190,8 +179,7 @@ define(["lodash", "migrations", "dateUtils", "properties", "moment"], function(_
         return {
             "backupEntireDB": backupEntireDB,
             "backupStores": backupStores,
-            "restore": restore,
-            "backupLogs": backupLogs
+            "restore": restore
         };
     };
 });

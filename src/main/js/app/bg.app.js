@@ -18,7 +18,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                 function($indexedDBProvider, $httpProvider, $hustleProvider, $provide) {
                     $provide.decorator('$log', ['$delegate',
                         function(loggerDelegate) {
-                            indexedDBLogger.configure("msfLogs", loggerDelegate);
+                            indexedDBLogger.configure(properties.praxis.dbForLogs, loggerDelegate);
                             return loggerDelegate;
                         }
                     ]);
@@ -32,7 +32,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         return $delegate;
                     });
 
-                    $indexedDBProvider.connection('msf');
+                    $indexedDBProvider.connection(properties.praxis.dbName);
                     $httpProvider.interceptors.push('configureRequestInterceptor');
                     $httpProvider.interceptors.push('cleanupPayloadInterceptor');
                     $httpProvider.interceptors.push('handleTimeoutInterceptor');

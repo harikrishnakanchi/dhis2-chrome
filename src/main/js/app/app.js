@@ -174,7 +174,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
 
                     $provide.decorator('$log', ['$delegate',
                         function(loggerDelegate) {
-                            indexedDBLogger.configure("msfLogs", loggerDelegate);
+                            indexedDBLogger.configure(properties.praxis.dbForLogs, loggerDelegate);
                             return loggerDelegate;
                         }
                     ]);
@@ -188,7 +188,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                         return $delegate;
                     });
 
-                    $indexedDBProvider.connection('msf')
+                    $indexedDBProvider.connection(properties.praxis.dbName)
                         .upgradeDatabase(migrations.length, function(event, db, tx) {
                             migrator.run(event.oldVersion, db, tx, migrations);
                         });
