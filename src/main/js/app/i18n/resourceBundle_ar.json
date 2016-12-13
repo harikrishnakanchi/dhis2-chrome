@@ -341,8 +341,8 @@
     "exportTallySheetButton": "ورقة تصدير تالي",
     "fileSystem": {
         "successNotification": {
-            "title": "File Saved Successfully",
-            "message": "The file \"{{fileName}}\" has been saved successfully."
+            "title": "ملف المحفوظة بنجاح",
+            "message": "الملف \"{{fileName}}\" تم حفظ بنجاح."
         }
     }
 }

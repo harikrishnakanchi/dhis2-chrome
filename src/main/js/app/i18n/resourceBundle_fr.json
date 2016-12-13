@@ -341,8 +341,8 @@
     "exportTallySheetButton": "Feuille de relevé d'exportation",
     "fileSystem": {
         "successNotification": {
-            "title": "File Saved Successfully",
-            "message": "The file \"{{fileName}}\" has been saved successfully."
+            "title": "Fichier enregistré avec succès",
+            "message": "Le fichier \"{{fileName}}\" A été enregistré avec succès."
         }
     }
 }
