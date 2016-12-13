@@ -4,6 +4,8 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
             isopen: false
         };
 
+        $scope.fileExtension = "." + properties.praxis.fileExtension;
+
         $scope.toggleDropdown = function($event) {
             $event.preventDefault();
             $event.stopPropagation();
@@ -136,7 +138,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
             return backupCallback().then(function(data) {
                 $rootScope.stopLoading();
                 var zippedData = zipUtils.zipData(folderName, fileNamePrefix, fileNameExtn, data);
-                var fileName = fileNamePrefix + moment().format("YYYYMMDD-HHmmss") + "." + properties.praxis.fileExtension;
+                var fileName = fileNamePrefix + moment().format("YYYYMMDD-HHmmss") + $scope.fileExtension;
                 return filesystemService.writeFile(fileName, zippedData);
             }).finally($rootScope.stopLoading);
         };
