@@ -65,7 +65,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
             };
 
             showModal(function() {
-                createZip("dhis_idb", "dhis_idb_", ".clone", indexeddbUtils.backupEntireDB).then(successCallback, errorCallback);
+                createZip("praxis_idb", "praxis_idb_", ".clone", indexeddbUtils.backupEntireDB).then(successCallback, errorCallback);
             }, modalMessages);
         };
 
