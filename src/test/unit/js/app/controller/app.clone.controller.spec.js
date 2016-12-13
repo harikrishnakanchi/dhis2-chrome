@@ -150,7 +150,7 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
 
                 expect(indexedDBLogger.exportLogs).toHaveBeenCalled();
                 expect(new Blob()).toEqual(jasmine.any(Blob));
-                expect(filesystemService.writeFile).toHaveBeenCalledWith('logs_dump_20140530-124354.prx', jasmine.any(Blob));
+                expect(filesystemService.writeFile).toHaveBeenCalledWith('logs_dump_20140530-124354.logs', jasmine.any(Blob));
             });
         });
     });

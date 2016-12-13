@@ -33,7 +33,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
                 showNotification(notificationMessages);
             };
 
-            createZip("logs", "logs_dump_", ".logs", _.partial(indexedDBLogger.exportLogs, properties.praxis.dbForLogs))
+            createZip("logs", "logs_dump_", ".logs", ".logs", _.partial(indexedDBLogger.exportLogs, properties.praxis.dbForLogs))
                 .then(successCallback, errorCallback);
         };
 
@@ -65,7 +65,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
             };
 
             showModal(function() {
-                createZip("praxis_idb", "praxis_idb_", ".clone", indexeddbUtils.backupEntireDB).then(successCallback, errorCallback);
+                createZip("praxis_idb", "praxis_idb_", ".clone", $scope.fileExtension, indexeddbUtils.backupEntireDB).then(successCallback, errorCallback);
             }, modalMessages);
         };
 
@@ -135,12 +135,12 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
             }, modalMessages);
         };
 
-        var createZip = function(folderName, fileNamePrefix, fileNameExtn, backupCallback) {
+        var createZip = function(folderName, fileNamePrefix, fileNameExtn, zipFileExtension, backupCallback) {
             $rootScope.startLoading();
             return backupCallback().then(function(data) {
                 $rootScope.stopLoading();
                 var zippedData = zipUtils.zipData(folderName, fileNamePrefix, fileNameExtn, data);
-                var fileName = fileNamePrefix + moment().format("YYYYMMDD-HHmmss") + $scope.fileExtension;
+                var fileName = fileNamePrefix + moment().format("YYYYMMDD-HHmmss") + zipFileExtension;
                 return filesystemService.writeFile(fileName, zippedData);
             }).finally($rootScope.stopLoading);
         };
