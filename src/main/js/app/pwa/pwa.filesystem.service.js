@@ -34,24 +34,25 @@ define(['fileSaver', 'interpolate'], function (saveAs, interpolate) {
        var readFile = function () {
            var deferred = $q.defer();
 
-           var prepareImportFileDomElement = function () {
-               var createImportFileElement = function () {
+           var prepareOpenFileDomElement = function () {
+               var createOpenFileElement = function () {
                    var domElement = document.createElement('input');
-                   domElement.id = 'importClone';
+                   domElement.id = 'openFile';
                    domElement.accept = '.msf';
                    domElement.type='file';
+                   domElement.style.visibility = "hidden";
                    return domElement;
                };
-               var importAppCloneElement = createImportFileElement();
-               angular.element(document.body).append(importAppCloneElement);
-               importAppCloneElement.addEventListener('change', onImportFileSelect);
-               importAppCloneElement.click();
-               return importAppCloneElement;
+               var openFileDomElement = createOpenFileElement();
+               angular.element(document.body).append(openFileDomElement);
+               openFileDomElement.addEventListener('change', onImportFileSelect);
+               openFileDomElement.click();
+               return openFileDomElement;
            };
 
-           var importAppCloneElement = prepareImportFileDomElement();
+           var openFileDomElement = prepareOpenFileDomElement();
            var onImportFileSelect = function (e) {
-               importAppCloneElement.remove();
+               openFileDomElement.remove();
                if(e.target.files)
                {
                    var file = e.target.files[0];
