@@ -1,9 +1,9 @@
- define(["notificationsController", "angularMocks", "utils", "userPreferenceRepository", "chartRepository", "orgUnitRepository", "translationsService"], function(NotificationsController, mocks, utils, UserPreferenceRepository, ChartRepository, OrgUnitRepository, TranslationService) {
+ define(["notificationsController", "angularMocks", "utils", "userPreferenceRepository", "chartRepository", "orgUnitRepository", "translationsService", "pivotTableRepository", "systemSettingRepository"], function(NotificationsController, mocks, utils, UserPreferenceRepository, ChartRepository, OrgUnitRepository, TranslationService, PivotTableRepository, SystemSettingRepository) {
 
      describe("notifications controller", function() {
 
          var notificationsController, userPreferenceRepository, chartRepository, orgUnitRepository,
-             userModules, charts, chartData, rootScope, expectedValues, translationService, dataElementId, dataElementName;
+             userModules, notificationReports, chartData, rootScope, expectedValues, translationService, pivotTableRepository, systemSettingRepository, dataElementId, dataElementName, q;
 
          beforeEach(mocks.inject(function($rootScope, $q) {
              rootScope = $rootScope;
@@ -48,10 +48,8 @@
 
              chartRepository = new ChartRepository();
              spyOn(chartRepository, "getAllChartsForNotifications").and.returnValue(utils.getPromise(q, []));
-             spyOn(chartRepository, "getDataForChart");
-
-             chartRepository.getDataForChart.and.callFake(function(chartName, orgUnit) {
-                 if (chartName === 'chart1')
+             spyOn(chartRepository, "getDataForChart").and.callFake(function(chartName, orgUnit) {
+                 if (chartName === 'ReportName')
                      return utils.getPromise(q, chartData);
              });
 
@@ -59,16 +57,22 @@
              spyOn(translationService, 'getTranslationForProperty').and.callFake(function (objectId, property, defaultValue) {
                  return defaultValue;
              });
+
+             pivotTableRepository = new PivotTableRepository();
+             spyOn(pivotTableRepository, 'getPivotTablesForNotifications').and.returnValue(utils.getPromise(q, []));
+
+             systemSettingRepository = new SystemSettingRepository();
+             spyOn(systemSettingRepository, 'getStandardDeviationValue').and.returnValue(utils.getPromise(q, undefined));
          }));
 
          var initiateNotificationController = function () {
-             notificationsController = new NotificationsController(scope, q, rootScope, userPreferenceRepository, chartRepository, orgUnitRepository, translationService);
+             notificationsController = new NotificationsController(scope, q, rootScope, userPreferenceRepository, chartRepository, orgUnitRepository, translationService, pivotTableRepository, systemSettingRepository);
              scope.$apply();
          };
 
-         var getChart = function (options) {
+         var getReport = function (options) {
              return [_.merge({
-               name: "chart1",
+               name: "ReportName",
                title: "Title1",
                dataset: "ds1",
                columns: [{
@@ -101,24 +105,32 @@
 
          it("should get all charts and generate notifications", function() {
              expectedValues = getExpectedValues();
-             charts = getChart();
+             notificationReports = getReport();
 
-             chartRepository.getAllChartsForNotifications.and.returnValue(utils.getPromise(q, charts));
+             chartRepository.getAllChartsForNotifications.and.returnValue(utils.getPromise(q, notificationReports));
              initiateNotificationController();
              expect(scope.weeks).toEqual(["2015W25"]);
              expect(scope.allDataElementValues).toEqual(expectedValues);
+         });
+         
+         it('should get all pivotTables', function () {
+             notificationReports = getReport();
+             pivotTableRepository.getPivotTablesForNotifications.and.returnValue(utils.getPromise(q, notificationReports));
+             initiateNotificationController();
+             expect(pivotTableRepository.getPivotTablesForNotifications).toHaveBeenCalled();
+             expect(chartRepository.getAllChartsForNotifications).not.toHaveBeenCalled();
          });
 
          it("should assign description of data element if it is present in chart", function () {
              expectedValues = getExpectedValues({dataElementDescription: 'some description'});
 
-             charts = getChart({columns: [ {
+             notificationReports = getReport({columns: [ {
                  items: [ {
                      description: "some description"
                  }]
              }]});
 
-             chartRepository.getAllChartsForNotifications.and.returnValue(utils.getPromise(q, charts));
+             chartRepository.getAllChartsForNotifications.and.returnValue(utils.getPromise(q, notificationReports));
 
              initiateNotificationController();
 
@@ -134,9 +146,9 @@
                  dataElementId: dataElementId
              });
 
-             charts = getChart();
+             notificationReports = getReport();
 
-             chartRepository.getAllChartsForNotifications.and.returnValue(utils.getPromise(q, charts));
+             chartRepository.getAllChartsForNotifications.and.returnValue(utils.getPromise(q, notificationReports));
              translationService.getTranslationForProperty.and.returnValue(translatedDataElementName);
              initiateNotificationController();
 

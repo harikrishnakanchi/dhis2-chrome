@@ -1,7 +1,7 @@
 define(["lodash"], function(_) {
-    return function($scope, $q, $rootScope, userPreferenceRepository, chartRepository, orgUnitRepository, translationService) {
+    return function($scope, $q, $rootScope, userPreferenceRepository, chartRepository, orgUnitRepository, translationService, pivotTableRepository, systemSettingRepository) {
 
-        var allCharts;
+        var notificationReports, standardDeviationValue;
         $scope.allDataElementValues = [];
         $scope.weeks = [];
         $scope.noNotificationsForAnyModule = true;
@@ -23,9 +23,15 @@ define(["lodash"], function(_) {
             });
         };
 
-        var getAllCharts = function() {
-            return chartRepository.getAllChartsForNotifications().then(function(charts) {
-                allCharts = charts;
+        var getNotificationReports = function () {
+            return pivotTableRepository.getPivotTablesForNotifications().then(function (pivotTables) {
+                if (pivotTables.length) {
+                    notificationReports = pivotTables;
+                } else {
+                    return chartRepository.getAllChartsForNotifications().then(function (charts) {
+                        notificationReports = charts;
+                    });
+                }
             });
         };
 
@@ -60,7 +66,7 @@ define(["lodash"], function(_) {
             var avgSquareDiff = findAverage(squareDiffs);
 
             var stdDev = Math.sqrt(avgSquareDiff);
-            return stdDev * 1.25;
+            return stdDev * standardDeviationValue;
         };
 
         var getWeeklyData = function(dataElementData) {
@@ -154,10 +160,16 @@ define(["lodash"], function(_) {
             });
         };
 
-        var getChartData = function(userModules) {
+        var getStandardDeviationValue = function () {
+            return systemSettingRepository.getStandardDeviationValue().then(function (value) {
+                standardDeviationValue = value;
+            });
+        };
+
+        var getReportData = function(userModules) {
             var chartDataPromises = [];
             _.forEach(userModules, function(module) {
-                _.forEach(allCharts, function(chart) {
+                _.forEach(notificationReports, function(chart) {
                     var chartDataPromise = loadChartData(chart, module.id).then(function(chartData) {
                         getDataElementValues(chart, chartData, module);
                     });
@@ -169,10 +181,11 @@ define(["lodash"], function(_) {
 
         var init = function() {
             $scope.startLoading();
-            return getAllCharts()
+            return getStandardDeviationValue()
+                .then(getNotificationReports)
                 .then(getUserModules)
                 .then(orgUnitRepository.enrichWithParent)
-                .then(getChartData)
+                .then(getReportData)
                 .then($scope.stopLoading);
         };
 
