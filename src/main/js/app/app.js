@@ -75,7 +75,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                             allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
                         }
                     }).
-                    when('/projectReport/', {
+                    when('/projectReport', {
                         templateUrl: 'templates/project-report.html',
                         controller: 'projectReportController',
                         resolve: routeResolver,
