@@ -77,6 +77,18 @@ define(["pivotTableRepository", "pivotTable", "pivotTableData", "categoryReposit
 
                 expect(categoryRepository.enrichWithCategoryOptions).toHaveBeenCalled();
             });
+
+            it('should get all pivot tables for notifications', function () {
+                var allPivotTables = [{
+                    name: 'PivotTable1 Notifications'
+                }, {
+                    name: 'PivotTable2'
+                }];
+                mockStore.getAll.and.returnValue(utils.getPromise(q, allPivotTables));
+                pivotTableRepository.getPivotTablesForNotifications().then(function (pivotTables) {
+                    expect(pivotTables).toEqual(_.first(allPivotTables));
+                });
+            });
         });
 
         describe('getPivotTableData', function () {

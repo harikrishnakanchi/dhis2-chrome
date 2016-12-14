@@ -36,6 +36,15 @@ define(["lodash", "pivotTable", "pivotTableData"], function(_, PivotTableModel, 
             });
         };
 
+        this.getPivotTablesForNotifications = function () {
+            var store = db.objectStore(PIVOT_TABLE_STORE_NAME);
+            return store.getAll().then(function (allPivotTables) {
+                return _.filter(allPivotTables, function (pivotTable) {
+                    return _.endsWith(pivotTable.name, 'Notifications');
+                });
+            });
+        };
+
         this.getPivotTableData = function (pivotTableDefinition, orgUnitId) {
             var store = db.objectStore(PIVOT_TABLE_DATA_STORE_NAME);
             return store.find([pivotTableDefinition.id, orgUnitId]).then(function (pivotTableData) {
