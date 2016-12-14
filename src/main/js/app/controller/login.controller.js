@@ -126,10 +126,6 @@ define(["md5", "properties", "lodash", "interpolate"], function(md5, properties,
                 $location.path("/dashboard");
         };
 
-        var refreshTranslations = function() {
-            systemSettingRepository.getLocale().then($rootScope.setLocale);
-        };
-
         $scope.login = function() {
             var loginUsername = $scope.username.toLowerCase();
             loadUserData(loginUsername)
@@ -137,7 +133,6 @@ define(["md5", "properties", "lodash", "interpolate"], function(md5, properties,
                 .then(authenticateUser)
                 .then(login)
                 .then(startProjectDataSync)
-                .then(refreshTranslations)
                 .then(redirect);
         };
 
