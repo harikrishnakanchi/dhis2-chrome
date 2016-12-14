@@ -20,7 +20,8 @@ define(["systemSettingService", "angularMocks", "utils", "dhisUrl"], function(Sy
                     "moduleTemplates": {
                         "ds1": {}
                     },
-                    "anotherSetting": "foo"
+                    "anotherSetting": "foo",
+                    "standardDeviationValue": "someValue"
                 },
                 "versionCompatibilityInfo": {
                     "compatiblePraxisVersions": [
@@ -38,7 +39,7 @@ define(["systemSettingService", "angularMocks", "utils", "dhisUrl"], function(Sy
             });
             httpBackend.flush();
 
-            expectedSystemSettings = [{
+            var expectedSystemSettings = [{
                 "key": "moduleTemplates",
                 "value": {
                     "ds1": {}
@@ -46,6 +47,9 @@ define(["systemSettingService", "angularMocks", "utils", "dhisUrl"], function(Sy
             }, {
                 "key": "anotherSetting",
                 "value": "foo"
+            }, {
+                "key": "standardDeviationValue",
+                "value": "someValue"
             }, {
                 "key": "compatiblePraxisVersions",
                 "value":["5.0", "6.0"]

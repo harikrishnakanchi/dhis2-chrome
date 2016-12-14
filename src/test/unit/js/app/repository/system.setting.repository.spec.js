@@ -85,5 +85,36 @@ define(["systemSettingRepository", "angularMocks", "utils", "dhisId"], function(
             expect(actualResult).toEqual("ade3fab1ab0");
         });
 
+        it("should get standard deviation value", function() {
+
+            mockStore.find.and.returnValue(utils.getPromise(q, {
+                key: 'standardDeviationValue',
+                value: '2.34'
+            }));
+
+            var actualResult;
+            repo.getStandardDeviationValue().then(function(data) {
+                actualResult = data;
+            });
+            scope.$apply();
+
+            expect(mockStore.find).toHaveBeenCalledWith('standardDeviationValue');
+            expect(actualResult).toEqual(2.34);
+        });
+
+        it("should get default value if standard deviation value is undefined", function() {
+
+            mockStore.find.and.returnValue(utils.getPromise(q, undefined));
+
+            var actualResult;
+            repo.getStandardDeviationValue().then(function(data) {
+                actualResult = data;
+            });
+            scope.$apply();
+
+            expect(mockStore.find).toHaveBeenCalledWith('standardDeviationValue');
+            expect(actualResult).toEqual(1.25);
+        });
+
     });
 });
