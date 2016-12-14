@@ -24,12 +24,6 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
 
             app.factory('queueInterceptor', ['$log', 'ngI18nResourceBundle', 'dataRepository','dataSyncFailureRepository', 'hustleMonitor', queueInterceptor]);
 
-            var routeResolver = {
-                authenticate: ['$q', '$rootScope', function ($q, $rootScope) {
-                    return $rootScope.isLoggedIn ? $q.when('User authenticated') : $q.reject('User not logged in');
-                }]
-            };
-
             app.constant('USER_ROLES', {
                 'DATA_ENTRY': 'Data entry user',
                 'OBSERVER': 'Observer',
@@ -45,7 +39,6 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     $routeProvider.
                     when('/', {
                         templateUrl: 'templates/init.html',
-                        resolve : routeResolver,
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER,
                                 USER_ROLES.COORDINATION_LEVEL_APPROVER,USER_ROLES.PROJECT_ADMIN, USER_ROLES.SUPER_ADMIN]
@@ -54,7 +47,6 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     when('/dashboard', {
                         templateUrl: 'templates/dashboard.html',
                         controller: 'dashboardController',
-                        resolve: routeResolver,
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
                         }
@@ -62,7 +54,6 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     when('/selectProjectPreference', {
                         templateUrl: 'templates/selectProjectPreference.html',
                         controller: 'selectProjectPreferenceController',
-                        resolve: routeResolver,
                         data: {
                             allowedRoles: [USER_ROLES.PROJECT_ADMIN]
                         }
@@ -70,7 +61,6 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     when('/reports/:orgUnit?', {
                         templateUrl: 'templates/reports.html',
                         controller: 'reportsController',
-                        resolve: routeResolver,
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
                         }
@@ -78,7 +68,6 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     when('/projectReport', {
                         templateUrl: 'templates/project-report.html',
                         controller: 'projectReportController',
-                        resolve: routeResolver,
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
                         }
@@ -86,7 +75,6 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     when('/opUnitReport/:opUnit?', {
                         templateUrl: 'templates/opunit-report.html',
                         controller: 'opUnitReportController',
-                        resolve: routeResolver,
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
                         }
@@ -94,11 +82,6 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     when('/login', {
                         templateUrl: 'templates/login.html',
                         controller: 'loginController',
-                        resolve: {
-                            auth: ['$rootScope', '$q', function ($rootScope, $q) {
-                                return $rootScope.isLoggedIn ? $q.reject() : $q.when();
-                            }]
-                        },
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER,
                                 USER_ROLES.COORDINATION_LEVEL_APPROVER,USER_ROLES.PROJECT_ADMIN, USER_ROLES.SUPER_ADMIN]
@@ -107,7 +90,6 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     when('/orgUnits', {
                         templateUrl: 'templates/orgunits.html',
                         controller: 'orgUnitContoller',
-                        resolve: routeResolver,
                         data: {
                             allowedRoles: [USER_ROLES.PROJECT_ADMIN, USER_ROLES.SUPER_ADMIN]
                         }
@@ -115,7 +97,6 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     when('/notifications', {
                         templateUrl: 'templates/notifications.html',
                         controller: 'notificationsController',
-                        resolve: routeResolver,
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
                         }
@@ -131,7 +112,6 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     when('/aggregate-data-entry/:module?/:week?', {
                         templateUrl: 'templates/aggregate-data-entry.html',
                         controller: 'aggregateDataEntryController',
-                        resolve: routeResolver,
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
                         }
@@ -139,7 +119,6 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     when('/line-list-summary/:module/:filterBy?', {
                         templateUrl: 'templates/line-list-summary.html',
                         controller: 'lineListSummaryController',
-                        resolve: routeResolver,
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
                         }
@@ -147,7 +126,6 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     when('/line-list-data-entry/:module/new', {
                         templateUrl: 'templates/line-list-data-entry.html',
                         controller: 'lineListDataEntryController',
-                        resolve: routeResolver,
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY]
                         }
@@ -155,7 +133,6 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     when('/line-list-data-entry/:module/:eventId?', {
                         templateUrl: 'templates/line-list-data-entry.html',
                         controller: 'lineListDataEntryController',
-                        resolve: routeResolver,
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY]
                         }
@@ -163,7 +140,6 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     when('/data-approval/:module?/:week?', {
                         templateUrl: 'templates/data-approval.html',
                         controller: 'dataApprovalController',
-                        resolve: routeResolver,
                         data: {
                             allowedRoles: [USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
                         }
@@ -220,22 +196,26 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
 
                     $hustle.registerInterceptor(queueInterceptor);
 
-                    $rootScope.$on('$routeChangeError', function (event, newRoute, oldRoute, message) {
-                        if (authenticationUtils.shouldRedirectToLogin($rootScope, $location)) {
-                            $location.path("/login");
-                        }
-                        else {
-                           $location.path(newRoute.originalPath);
-                        }
-                    });
-
                     $rootScope.$on('$routeChangeStart', function (event, newRoute) {
-                        var loggedInUserRoles = $rootScope.currentUser ? $rootScope.currentUser.userCredentials.userRoles : [];
-                        var authorizedRoles = newRoute.data && newRoute.data.allowedRoles;
-                        var isAllowed = _.any(loggedInUserRoles, function (userRole) {
-                            return _.contains(authorizedRoles, userRole.name);
-                        });
-                        if ($rootScope.isLoggedIn && !isAllowed) {
+
+                        var accessingSecurePagesWhileNotLoggedIn = !$rootScope.isLoggedIn &&
+                            !_.includes(['/', '/login', '/productKeyPage'], newRoute.originalPath);
+
+
+                        var accessingLoginPageWhileLoggedIn = $rootScope.isLoggedIn && newRoute.originalPath == '/login';
+
+
+                        var loggedInUserRoles = $rootScope.currentUser ? $rootScope.currentUser.userCredentials.userRoles : [],
+                            authorizedRoles = newRoute.data && newRoute.data.allowedRoles,
+                            userIsAllowedToViewRoute = _.any(loggedInUserRoles, function (userRole) {
+                                return _.contains(authorizedRoles, userRole.name);
+                            });
+                        var userIsNotAuthorised = $rootScope.isLoggedIn && !userIsAllowedToViewRoute;
+
+
+                        if (userIsNotAuthorised ||
+                            accessingSecurePagesWhileNotLoggedIn ||
+                            accessingLoginPageWhileLoggedIn) {
                             event.preventDefault();
                         }
                     });
