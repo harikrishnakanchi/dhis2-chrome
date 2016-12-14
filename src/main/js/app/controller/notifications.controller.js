@@ -36,7 +36,7 @@ define(["lodash"], function(_) {
         };
 
         var loadChartData = function(chart, moduleId) {
-            return chartRepository.getDataForChart(chart.name, moduleId).then(function(chartData) {
+            return chartRepository.getDataForChart(chart.id, moduleId).then(function(chartData) {
                 if (chartData) {
                     var periods = chartData.metaData.pe;
                     $scope.weeks = _.slice(periods, periods.length - 5, periods.length - 1);

@@ -48,10 +48,8 @@
 
              chartRepository = new ChartRepository();
              spyOn(chartRepository, "getAllChartsForNotifications").and.returnValue(utils.getPromise(q, []));
-             spyOn(chartRepository, "getDataForChart").and.callFake(function(chartName, orgUnit) {
-                 if (chartName === 'ReportName')
-                     return utils.getPromise(q, chartData);
-             });
+
+             spyOn(chartRepository, "getDataForChart").and.returnValue(utils.getPromise(q, chartData));
 
              translationService = new TranslationService();
              spyOn(translationService, 'getTranslationForProperty').and.callFake(function (objectId, property, defaultValue) {

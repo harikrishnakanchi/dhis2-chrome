@@ -45,9 +45,9 @@ define(['chart', 'chartData', 'lodash'], function(Chart, ChartData, _) {
             });
         };
 
-        this.getDataForChart = function(chartName, orgUnitId) {
+        this.getDataForChart = function(chartId, orgUnitId) {
             var store = db.objectStore(CHART_DATA_STORE_NAME);
-            return store.find([chartName, orgUnitId]).then(function (chartData) {
+            return store.find([chartId, orgUnitId]).then(function (chartData) {
                 return !!chartData && chartData.data;
             });
         };
