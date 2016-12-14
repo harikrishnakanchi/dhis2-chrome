@@ -1,7 +1,7 @@
-define(["loginController", "angularMocks", "utils", "sessionHelper", "userPreferenceRepository", "orgUnitRepository", "systemSettingRepository", "userRepository", "platformUtils", "checkVersionCompatibility", "translationsService"],
-    function (LoginController, mocks, utils, SessionHelper, UserPreferenceRepository, OrgUnitRepository, SystemSettingRepository, UserRepository, platformUtils, CheckVersionCompatibility, TranslationsService) {
+define(["loginController", "angularMocks", "utils", "sessionHelper", "userPreferenceRepository", "orgUnitRepository", "systemSettingRepository", "userRepository", "platformUtils", "checkVersionCompatibility"],
+    function (LoginController, mocks, utils, SessionHelper, UserPreferenceRepository, OrgUnitRepository, SystemSettingRepository, UserRepository, platformUtils, CheckVersionCompatibility) {
     describe("login controller", function () {
-        var rootScope, loginController, scope, location, q, fakeUserStore, fakeUserCredentialsStore, fakeUserStoreSpy, sessionHelper, hustle, userPreferenceRepository, systemSettingRepository, userRepository, orgUnitRepository, checkVersionCompatibility, translationsService;
+        var rootScope, loginController, scope, location, q, fakeUserStore, fakeUserCredentialsStore, fakeUserStoreSpy, sessionHelper, hustle, userPreferenceRepository, systemSettingRepository, userRepository, orgUnitRepository, checkVersionCompatibility;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function ($rootScope, $location, $q, $hustle) {
@@ -55,9 +55,6 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             spyOn(systemSettingRepository, "get").and.returnValue(utils.getPromise(q, ["5.1", "6.0"]));
             spyOn(systemSettingRepository, "getLocale").and.returnValue(utils.getPromise(q, "en"));
 
-            translationsService = new TranslationsService();
-            spyOn(translationsService, "setLocale");
-
             spyOn(platformUtils, "getPraxisVersion").and.returnValue("5.1");
 
             orgUnitRepository = new OrgUnitRepository();
@@ -66,7 +63,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             spyOn(hustle, "publishOnce").and.returnValue(utils.getPromise(q, {}));
 
             checkVersionCompatibility = CheckVersionCompatibility(systemSettingRepository);
-            loginController = new LoginController(rootScope, scope, location, q, sessionHelper, hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility, translationsService);
+            loginController = new LoginController(rootScope, scope, location, q, sessionHelper, hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility);
         }));
 
         it("should set invalid access as true when their is project level product key and there is no common org unit", function () {

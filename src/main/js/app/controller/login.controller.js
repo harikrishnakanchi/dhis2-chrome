@@ -1,5 +1,5 @@
 define(["md5", "properties", "lodash", "interpolate"], function(md5, properties, _, interpolate) {
-    return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility, translationsService) {
+    return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility) {
         var loadUserData = function(loginUsername) {
             var existingUserProjects = userPreferenceRepository.getCurrentUsersProjectIds();
             var previousUser = userPreferenceRepository.getCurrentUsersUsername().then(function (username) {
