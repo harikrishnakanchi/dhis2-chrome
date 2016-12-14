@@ -1,12 +1,18 @@
 define(["loginController", "angularMocks", "utils", "sessionHelper", "userPreferenceRepository", "orgUnitRepository", "systemSettingRepository", "userRepository", "platformUtils", "checkVersionCompatibility"],
     function (LoginController, mocks, utils, SessionHelper, UserPreferenceRepository, OrgUnitRepository, SystemSettingRepository, UserRepository, platformUtils, CheckVersionCompatibility) {
     describe("login controller", function () {
-        var rootScope, loginController, scope, location, q, fakeUserStore, fakeUserCredentialsStore, fakeUserStoreSpy, sessionHelper, hustle, userPreferenceRepository, systemSettingRepository, userRepository, orgUnitRepository, checkVersionCompatibility;
+        var rootScope, window, loginController, scope, location, q, fakeUserStore, sessionHelper, hustle, userPreferenceRepository, systemSettingRepository, userRepository, orgUnitRepository, checkVersionCompatibility, initializeController;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function ($rootScope, $location, $q, $hustle) {
             scope = $rootScope.$new();
-            rootScope = $rootScope;
+            window = {
+                sessionStorage: {
+                    setItem: jasmine.createSpy('setItem'),
+                    getItem: jasmine.createSpy('getItem'),
+                    clear: jasmine.createSpy('clear')
+                }
+            };
             location = $location;
             hustle = $hustle;
             q = $q;
@@ -63,10 +69,13 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             spyOn(hustle, "publishOnce").and.returnValue(utils.getPromise(q, {}));
 
             checkVersionCompatibility = CheckVersionCompatibility(systemSettingRepository);
-            loginController = new LoginController(rootScope, scope, location, q, sessionHelper, hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility);
+            initializeController = function () {
+                loginController = new LoginController(rootScope, scope, location, q, sessionHelper, hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility, window);
+            };
         }));
 
         it("should set invalid access as true when their is project level product key and there is no common org unit", function () {
+            initializeController();
             scope.username = "superadmin";
             scope.password = "msfsuperadmin";
 
@@ -80,6 +89,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should set invalid access as false when their is project level product key and there is common org unit", function () {
+            initializeController();
             scope.username = "superadmin";
             scope.password = "msfsuperadmin";
 
@@ -93,6 +103,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should set invalid access as true when their is country level product key and there is no common org unit for coordinator level approver", function () {
+            initializeController();
             scope.username = "project_user";
             scope.password = "msfuser";
 
@@ -119,6 +130,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should set invalid access as false when their is country level product key and there is common org unit", function () {
+            initializeController();
             scope.username = "superadmin";
             scope.password = "msfsuperadmin";
             orgUnitRepository.get.and.returnValue(utils.getPromise(q, {"parent": {"id": 123}}));
@@ -132,6 +144,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should set invalid access as true when their is country level product key and there is no common org unit", function () {
+            initializeController();
             scope.username = "superadmin";
             scope.password = "msfsuperadmin";
             orgUnitRepository.get.and.returnValue(utils.getPromise(q, {"parent": {"id": 12}}));
@@ -145,6 +158,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should login super admin user with valid credentials and redirect to orgUnits", function () {
+            initializeController();
             scope.username = "superadmin";
             scope.password = "msfsuperadmin";
 
@@ -158,6 +172,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should not login super admin user with invalid password", function () {
+            initializeController();
             scope.username = "superadmin";
             scope.password = "password1234";
 
@@ -170,6 +185,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should login project admin user with valid credentials and redirect to orgunits", function () {
+            initializeController();
             scope.username = "projectadmin";
             scope.password = "password";
 
@@ -191,6 +207,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should not login msfadmin user with invalid password", function () {
+            initializeController();
             scope.username = "projectadmin";
             scope.password = "password1234";
 
@@ -203,6 +220,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should login project user with valid credentials and redirect to dashboard", function () {
+            initializeController();
             scope.username = "someProjectUser";
             scope.password = "msfuser";
 
@@ -221,6 +239,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should not login project user with invalid password", function () {
+            initializeController();
             scope.username = "someProjectUser";
             scope.password = "msfuser1234";
 
@@ -233,6 +252,8 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should not login user with invalid username", function () {
+            initializeController();
+
             fakeUserStore = {
                 "find": function () {
                     return utils.getPromise(q, undefined);
@@ -251,6 +272,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should start sync project data if the current user's projects are different from previous user's projects", function () {
+            initializeController();
             var previousOrgUnits = ['id1', 'id2', 'id3', 'id4'];
             var currentOrgUnits = ['id5'];
 
@@ -287,6 +309,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should start sync project data if the currentUser and previousUsers are admin and non-admin users", function () {
+            initializeController();
             userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['id5']));
 
             scope.username = "ss153";
@@ -337,25 +360,41 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             }, 'dataValues');
         });
 
-        it("should refresh translations after login", function () {
-            scope.username = "projectadmin";
-            scope.password = "password";
+        describe('User Session', function () {
+            it('should redirect the user to last accessed route if session data exists', function () {
+                window.sessionStorage.getItem.and.callFake(function(param) {
+                    if(param == 'lastRoute') return 'someRoute';
+                    if(param == 'sessionInfo') return '{ "some": "data" }';
+                });
 
-            userRepository.getUserCredentials.and.returnValue(utils.getPromise(q, {
-                "username": "projectadmin",
-                "password": "5f4dcc3b5aa765d61d8327deb882cf99",
-                "userRoles": [{
-                    "name": "Projectadmin"
-                }]
-            }));
+                initializeController();
+                scope.$apply();
 
-            rootScope.hasRoles.and.returnValue(true);
-            rootScope.setLocale = jasmine.createSpy('setLocale');
+                expect(sessionHelper.login).toHaveBeenCalled();
+                expect(location.path).toHaveBeenCalledWith('someRoute');
+            });
 
-            scope.login();
-            scope.$apply();
+            it('should clear session data and not redirect the user if session data is invalid', function () {
+                window.sessionStorage.getItem.and.callFake(function(param) {
+                    if(param == 'lastRoute') return 'someRoute';
+                    if(param == 'sessionInfo') return '{ some invalid json ';
+                });
 
-            expect(rootScope.setLocale).toHaveBeenCalledWith("en");
+                initializeController();
+                scope.$apply();
+
+                expect(window.sessionStorage.clear).toHaveBeenCalled();
+                expect(scope.showLoginForm).toBeTruthy();
+            });
+
+            it('should show the login form if there is no session data', function () {
+                window.sessionStorage.getItem.and.returnValue(null);
+
+                initializeController();
+                scope.$apply();
+
+                expect(scope.showLoginForm).toBeTruthy();
+            });
         });
     });
 });

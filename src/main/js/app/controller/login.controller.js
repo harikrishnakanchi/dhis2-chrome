@@ -1,5 +1,5 @@
 define(["md5", "properties", "lodash", "interpolate"], function(md5, properties, _, interpolate) {
-    return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility) {
+    return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility, $window) {
         var loadUserData = function(loginUsername) {
             var existingUserProjects = userPreferenceRepository.getCurrentUsersProjectIds();
             var previousUser = userPreferenceRepository.getCurrentUsersUsername().then(function (username) {
@@ -126,11 +126,18 @@ define(["md5", "properties", "lodash", "interpolate"], function(md5, properties,
                 $location.path("/dashboard");
         };
 
+        var persistUserSession = function (data) {
+            // Store the user data in sessionStorage to retain session in subsequent reloads.
+            $window.sessionStorage.setItem('sessionInfo', JSON.stringify(data));
+            return data;
+        };
+
         $scope.login = function() {
             var loginUsername = $scope.username.toLowerCase();
             loadUserData(loginUsername)
                 .then(verifyProductKeyInstance)
                 .then(authenticateUser)
+                .then(persistUserSession)
                 .then(login)
                 .then(startProjectDataSync)
                 .then(redirect);
@@ -143,9 +150,34 @@ define(["md5", "properties", "lodash", "interpolate"], function(md5, properties,
             }
         });
 
+        var redirectIfSessionExists = function () {
+            try {
+                var lastRoute = $window.sessionStorage.getItem('lastRoute'),
+                    userSessionData = JSON.parse($window.sessionStorage.getItem('sessionInfo'));
+
+                if (lastRoute && userSessionData) {
+                    login(userSessionData).then(function () {
+                        // Set the productKeyLevel on $rootScope.
+                        systemSettingRepository.getProductKeyLevel();
+
+                        // Redirect to the last route on page reload.
+                        $location.path(lastRoute);
+                    });
+                } else {
+                    $scope.showLoginForm = true;
+                }
+            } catch (e) {
+                // Invalid session data, Log the user out
+                $window.sessionStorage.clear();
+                $scope.showLoginForm = true;
+            }
+        };
+
         var init = function() {
             $scope.compatibilityInfo = {};
             checkVersionCompatibility($scope.compatibilityInfo);
+
+            redirectIfSessionExists();
         };
 
         init();

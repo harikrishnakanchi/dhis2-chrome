@@ -187,14 +187,21 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                 basePath: self.basePath + "js/app/i18n"
             });
 
-            app.run(['dhisMonitor', 'hustleMonitor', 'queueInterceptor', '$rootScope', '$location', '$hustle', '$document', '$timeout', 'initializationRoutine',
-                function(dhisMonitor, hustleMonitor, queueInterceptor, $rootScope, $location, $hustle, $document, $timeout, InitializationRoutine) {
+            app.run(['dhisMonitor', 'hustleMonitor', 'queueInterceptor', '$rootScope', '$location', '$hustle', '$document', '$timeout', '$window', 'initializationRoutine',
+                function(dhisMonitor, hustleMonitor, queueInterceptor, $rootScope, $location, $hustle, $document, $timeout, $window, InitializationRoutine) {
 
                     $document.on('keydown', function(e) {
                         disableBackspaceKey(e);
                     });
 
                     $hustle.registerInterceptor(queueInterceptor);
+
+                    $rootScope.$on('$routeChangeSuccess', function () {
+                        if($location.path() != '/login') {
+                            // Persist last route which has to be retained on page reload.
+                            $window.sessionStorage.setItem('lastRoute', $location.path());
+                        }
+                    });
 
                     $rootScope.$on('$routeChangeStart', function (event, newRoute) {
 

@@ -1,4 +1,4 @@
-<div class="login-form {{ layoutDirection.direction }}">
+<div class="login-form {{ layoutDirection.direction }}" ng-show="showLoginForm">
     <form name="loginForm" role="form" ng-submit="login()" class="form-horizontal">
         <p class='alert alert-danger' ng-show='invalidCredentials' id="loginFailedMsg">{{ resourceBundle.loginFailed }}</p>
         <p class='alert alert-danger' ng-show='invalidAccess' id="invalidAccessMsg">{{ resourceBundle.invalidAccess }}</p>
