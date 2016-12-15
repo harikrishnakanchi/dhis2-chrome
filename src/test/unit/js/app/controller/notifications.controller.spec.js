@@ -3,7 +3,7 @@
      describe("notifications controller", function() {
 
          var notificationsController, userPreferenceRepository, chartRepository, orgUnitRepository,
-             userModules, notificationReports, chartData, rootScope, expectedValues, translationService, pivotTableRepository, systemSettingRepository, dataElementId, dataElementName, q;
+             userModules, notificationReports, chartData, pivotTableData, rootScope, expectedValues, translationService, pivotTableRepository, systemSettingRepository, dataElementId, dataElementName, q, scope, dataElementDescription, translatedDataElementName, translatedDataElementDescription;
 
          beforeEach(mocks.inject(function($rootScope, $q) {
              rootScope = $rootScope;
@@ -19,6 +19,9 @@
              }];
              dataElementId = 'dataElementId';
              dataElementName = 'dataElementName';
+             translatedDataElementName = "translatedDataElementName";
+             dataElementDescription = 'description';
+             translatedDataElementDescription = 'translated description';
 
              chartData = {
                  "metaData": {
@@ -32,6 +35,19 @@
                  "rows": [
                      [dataElementId, "2015W26", "24.0"]
                  ]
+             };
+
+             pivotTableData = {
+                 rows: [
+                     {periodDimension: true, name: 'weekA'},
+                     {periodDimension: true, name: 'weekB'}
+                 ],
+
+                 columns: [
+                     [{dataDimension: true, name: 'someDataElementA', id: dataElementId, description: dataElementDescription}]
+                 ],
+                 getDataValue: jasmine.createSpy('getDataValue').and.returnValue("24.0"),
+                 getDisplayName: jasmine.createSpy('getDisplayName').and.returnValue(dataElementName)
              };
 
              rootScope.startLoading = jasmine.createSpy('startLoading');
@@ -53,14 +69,21 @@
 
              translationService = new TranslationService();
              spyOn(translationService, 'getTranslationForProperty').and.callFake(function (objectId, property, defaultValue) {
+                 if (property === 'description') {
+                     return translatedDataElementDescription;
+                 }
+                 else if (property === 'name') {
+                     return translatedDataElementName;
+                 }
                  return defaultValue;
              });
 
              pivotTableRepository = new PivotTableRepository();
              spyOn(pivotTableRepository, 'getPivotTablesForNotifications').and.returnValue(utils.getPromise(q, []));
+             spyOn(pivotTableRepository, 'getPivotTableData').and.returnValue(utils.getPromise(q, pivotTableData));
 
              systemSettingRepository = new SystemSettingRepository();
-             spyOn(systemSettingRepository, 'getStandardDeviationValue').and.returnValue(utils.getPromise(q, undefined));
+             spyOn(systemSettingRepository, 'getStandardDeviationValue').and.returnValue(utils.getPromise(q, 1.25));
          }));
 
          var initiateNotificationController = function () {
@@ -87,14 +110,14 @@
              return [_.merge({
                  "moduleName": 'op1 - mod1',
                  "dataElementId": dataElementId,
-                 "dataElementName": dataElementName,
-                 "dataElementDescription": '',
+                 "dataElementName": translatedDataElementName,
+                 "dataElementDescription": translatedDataElementDescription,
                  "weeklyData": {
-                     "2015W25": {
-                         "value": '-',
-                         "standardDeviation": undefined,
-                         "mean": undefined,
-                         "max": undefined
+                     "weekA": {
+                         "value": 24,
+                         "standardDeviation": 0,
+                         "mean": 24,
+                         "max": 24
                      }
                  },
                  "showInNotifications": false
@@ -107,7 +130,7 @@
 
              chartRepository.getAllChartsForNotifications.and.returnValue(utils.getPromise(q, notificationReports));
              initiateNotificationController();
-             expect(scope.weeks).toEqual(["2015W25"]);
+             expect(scope.weeks[0].name).toEqual("weekA");
              expect(scope.allDataElementValues).toEqual(expectedValues);
          });
          
@@ -119,39 +142,24 @@
              expect(chartRepository.getAllChartsForNotifications).not.toHaveBeenCalled();
          });
 
-         it("should assign description of data element if it is present in chart", function () {
-             expectedValues = getExpectedValues({dataElementDescription: 'some description'});
-
-             notificationReports = getReport({columns: [ {
-                 items: [ {
-                     description: "some description"
-                 }]
-             }]});
-
-             chartRepository.getAllChartsForNotifications.and.returnValue(utils.getPromise(q, notificationReports));
-
-             initiateNotificationController();
-
-             expect(scope.weeks).toEqual(["2015W25"]);
-             expect(scope.allDataElementValues).toEqual(expectedValues);
-         });
-
-         it('should translate data element names', function () {
-             var translatedDataElementName = "translatedDataElementName";
+         it('should translate data element names and descriptions', function () {
+             translatedDataElementName = "translatedDataElementName";
              var dataElementId = "dataElementId";
              expectedValues = getExpectedValues({
                  dataElementName: translatedDataElementName,
-                 dataElementId: dataElementId
+                 dataElementId: dataElementId,
+                 dataElementDescription: translatedDataElementDescription
              });
 
              notificationReports = getReport();
 
              chartRepository.getAllChartsForNotifications.and.returnValue(utils.getPromise(q, notificationReports));
-             translationService.getTranslationForProperty.and.returnValue(translatedDataElementName);
+             pivotTableRepository.getPivotTableData.and.returnValue(utils.getPromise(q, pivotTableData));
              initiateNotificationController();
 
              expect(scope.allDataElementValues).toEqual(expectedValues);
              expect(translationService.getTranslationForProperty).toHaveBeenCalledWith(dataElementId, 'name', dataElementName);
+             expect(translationService.getTranslationForProperty).toHaveBeenCalledWith(dataElementId, 'description', dataElementDescription);
          });
      });
  });

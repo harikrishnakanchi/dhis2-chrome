@@ -35,12 +35,12 @@ define(["lodash"], function(_) {
             });
         };
 
-        var loadReportData = function(report, moduleId) {
-            return chartRepository.getDataForChart(report.id, moduleId).then(function(reportData) {
-                if (reportData) {
-                    var periods = reportData.metaData.pe;
+        var loadReportData = function (report, moduleId) {
+            return pivotTableRepository.getPivotTableData(report, moduleId).then(function (pivotTableData) {
+                if (pivotTableData) {
+                    var periods = _.filter(pivotTableData.rows, 'periodDimension');
                     $scope.weeks = _.slice(periods, periods.length - 5, periods.length - 1);
-                    return reportData;
+                    return pivotTableData;
                 }
             });
         };
@@ -69,30 +69,16 @@ define(["lodash"], function(_) {
             return stdDev * standardDeviationValue;
         };
 
-        var getWeeklyData = function(dataElementData) {
+        var getWeeklyData = function(periods, dataElement, reportData) {
 
-            var getDataForCalculation = function(week) {
-                var allData = [];
-                dataElementData = _.sortBy(dataElementData, "1");
+            var getDataForCalculation = [];
 
-                var dataUptoGivenWeek = _.dropRightWhile(dataElementData, function(deData) {
-                    return deData[1] !== week;
-                });
+            return _.reduce(periods, function(result, row) {
+                var dataValueForWeek = reportData.getDataValue(row, dataElement);
+                dataValueForWeek = _.isNumber(dataValueForWeek) ? parseInt(dataValueForWeek) : dataValueForWeek;
 
-                _.each(dataUptoGivenWeek, function(datum) {
-                    allData.push(parseInt(datum[2]));
-                });
-
-                return allData;
-            };
-
-            return _.reduce($scope.weeks, function(result, week) {
-                var dataForWeek = _.find(dataElementData, function(data) {
-                    return data[1] === week;
-                });
-
-                if (!dataForWeek) {
-                    result[week] = {
+                if (_.isUndefined(dataValueForWeek)) {
+                    result[row.name] = {
                         "value": "-",
                         "standardDeviation": undefined,
                         "mean": undefined,
@@ -101,12 +87,11 @@ define(["lodash"], function(_) {
                     return result;
                 }
 
-                var dataForCalculation = getDataForCalculation(week);
-                var standardDeviation = _.round(calculateStandardDeviation(dataForCalculation));
-                var mean = _.round(findAverage(dataForCalculation));
-
-                result[week] = {
-                    "value": parseInt(dataForWeek[2]),
+                getDataForCalculation.push(dataValueForWeek);
+                var standardDeviation = _.round(calculateStandardDeviation(getDataForCalculation));
+                var mean = _.round(findAverage(getDataForCalculation));
+                result[row.name] = {
+                    "value": parseInt(dataValueForWeek),
                     "standardDeviation": standardDeviation,
                     "mean": mean,
                     "max": _.round(mean + standardDeviation)
@@ -117,20 +102,16 @@ define(["lodash"], function(_) {
         };
 
         var getDataElementValues = function(report, reportData, module) {
-            if (_.isEmpty(reportData) || _.isEmpty(reportData.rows)) {
+            if (_.isEmpty(reportData) || (_.isEmpty(reportData.rows) && _.isEmpty(reportData.columns))) {
                 return;
             }
 
-            var dataElementIds = _.chain(reportData.rows).reduce(function(result, row) {
-                result.push(row[0]);
-                return result;
-            }, []).uniq().value();
+            var dataElements = _.reduce(reportData.columns, function (result, column) {
+                return _.first(column).dataDimension ? result.concat(column) : result;
+            }, []);
 
-            _.forEach(dataElementIds, function(dataElementId) {
-                var dataElementRows = _.filter(reportData.rows, function(row) {
-                    return row[0] === dataElementId;
-                });
-                var weeklyData = getWeeklyData(dataElementRows);
+            _.forEach(dataElements, function(dataElement) {
+                var weeklyData = getWeeklyData($scope.weeks, dataElement, reportData);
                 var showInNotifications = false;
 
                 _.each(weeklyData, function(dataForWeek) {
@@ -138,21 +119,13 @@ define(["lodash"], function(_) {
                         showInNotifications = showInNotifications || true;
                         $scope.noNotificationsForAnyModule = false;
                     }
-
                 });
-
-                var dataElement;
-                if(report.columns) {
-                    dataElement = _.find(report.columns[0].items, function (item) {
-                        return item.id == dataElementId;
-                    });
-                }
 
                 $scope.allDataElementValues.push({
                     "moduleName": module.parent.name + " - " + module.name,
-                    "dataElementId": dataElementId,
-                    "dataElementName": translationService.getTranslationForProperty(dataElementId, 'name', reportData.metaData.names[dataElementId]),
-                    "dataElementDescription": (dataElement && dataElement.description) ? dataElement.description : '',
+                    "dataElementId": dataElement.id,
+                    "dataElementName": translationService.getTranslationForProperty(dataElement.id, 'name', reportData.getDisplayName(dataElement)),
+                    "dataElementDescription": translationService.getTranslationForProperty(dataElement.id, 'description', dataElement.description),
                     "weeklyData": weeklyData,
                     "showInNotifications": showInNotifications
                 });
