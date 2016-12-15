@@ -35,12 +35,12 @@ define(["lodash"], function(_) {
             });
         };
 
-        var loadChartData = function(chart, moduleId) {
-            return chartRepository.getDataForChart(chart.id, moduleId).then(function(chartData) {
-                if (chartData) {
-                    var periods = chartData.metaData.pe;
+        var loadReportData = function(report, moduleId) {
+            return chartRepository.getDataForChart(report.id, moduleId).then(function(reportData) {
+                if (reportData) {
+                    var periods = reportData.metaData.pe;
                     $scope.weeks = _.slice(periods, periods.length - 5, periods.length - 1);
-                    return chartData;
+                    return reportData;
                 }
             });
         };
@@ -116,18 +116,18 @@ define(["lodash"], function(_) {
             }, {});
         };
 
-        var getDataElementValues = function(chart, chartData, module) {
-            if (_.isEmpty(chartData) || _.isEmpty(chartData.rows)) {
+        var getDataElementValues = function(report, reportData, module) {
+            if (_.isEmpty(reportData) || _.isEmpty(reportData.rows)) {
                 return;
             }
 
-            var dataElementIds = _.chain(chartData.rows).reduce(function(result, row) {
+            var dataElementIds = _.chain(reportData.rows).reduce(function(result, row) {
                 result.push(row[0]);
                 return result;
             }, []).uniq().value();
 
             _.forEach(dataElementIds, function(dataElementId) {
-                var dataElementRows = _.filter(chartData.rows, function(row) {
+                var dataElementRows = _.filter(reportData.rows, function(row) {
                     return row[0] === dataElementId;
                 });
                 var weeklyData = getWeeklyData(dataElementRows);
@@ -142,8 +142,8 @@ define(["lodash"], function(_) {
                 });
 
                 var dataElement;
-                if(chart.columns) {
-                    dataElement = _.find(chart.columns[0].items, function (item) {
+                if(report.columns) {
+                    dataElement = _.find(report.columns[0].items, function (item) {
                         return item.id == dataElementId;
                     });
                 }
@@ -151,7 +151,7 @@ define(["lodash"], function(_) {
                 $scope.allDataElementValues.push({
                     "moduleName": module.parent.name + " - " + module.name,
                     "dataElementId": dataElementId,
-                    "dataElementName": translationService.getTranslationForProperty(dataElementId, 'name', chartData.metaData.names[dataElementId]),
+                    "dataElementName": translationService.getTranslationForProperty(dataElementId, 'name', reportData.metaData.names[dataElementId]),
                     "dataElementDescription": (dataElement && dataElement.description) ? dataElement.description : '',
                     "weeklyData": weeklyData,
                     "showInNotifications": showInNotifications
@@ -167,16 +167,16 @@ define(["lodash"], function(_) {
         };
 
         var getReportData = function(userModules) {
-            var chartDataPromises = [];
+            var reportDataPromises = [];
             _.forEach(userModules, function(module) {
-                _.forEach(notificationReports, function(chart) {
-                    var chartDataPromise = loadChartData(chart, module.id).then(function(chartData) {
-                        getDataElementValues(chart, chartData, module);
+                _.forEach(notificationReports, function(report) {
+                    var reportDataPromise = loadReportData(report, module.id).then(function(reportData) {
+                        getDataElementValues(report, reportData, module);
                     });
-                    chartDataPromises.push(chartDataPromise);
+                    reportDataPromises.push(reportDataPromise);
                 });
             });
-            return $q.all(chartDataPromises);
+            return $q.all(reportDataPromises);
         };
 
         var init = function() {
