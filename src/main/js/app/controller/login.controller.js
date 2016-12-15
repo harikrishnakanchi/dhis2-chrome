@@ -1,5 +1,5 @@
 define(["md5", "properties", "lodash", "interpolate"], function(md5, properties, _, interpolate) {
-    return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility, $window) {
+    return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility, storageService) {
         var loadUserData = function(loginUsername) {
             var existingUserProjects = userPreferenceRepository.getCurrentUsersProjectIds();
             var previousUser = userPreferenceRepository.getCurrentUsersUsername().then(function (username) {
@@ -128,7 +128,7 @@ define(["md5", "properties", "lodash", "interpolate"], function(md5, properties,
 
         var persistUserSession = function (data) {
             // Store the user data in sessionStorage to retain session in subsequent reloads.
-            $window.sessionStorage.setItem('sessionInfo', JSON.stringify(data));
+            storageService.setItem('sessionInfo', data);
             return data;
         };
 
@@ -151,25 +151,20 @@ define(["md5", "properties", "lodash", "interpolate"], function(md5, properties,
         });
 
         var redirectIfSessionExists = function () {
-            try {
-                var lastRoute = $window.sessionStorage.getItem('lastRoute'),
-                    userSessionData = JSON.parse($window.sessionStorage.getItem('sessionInfo'));
+            var lastRoute = storageService.getItem('lastRoute'),
+                userSessionData = storageService.getItem('sessionInfo');
 
-                if (lastRoute && userSessionData) {
-                    login(userSessionData).then(function () {
-                        // Set the productKeyLevel on $rootScope.
-                        systemSettingRepository.getProductKeyLevel();
+            if (lastRoute && userSessionData) {
+                login(userSessionData).then(function () {
+                    // Set the productKeyLevel on $rootScope.
+                    systemSettingRepository.getProductKeyLevel();
 
-                        // Redirect to the last route on page reload.
-                        $location.path(lastRoute);
-                    });
-                } else {
-                    $scope.showLoginForm = true;
-                }
-            } catch (e) {
-                // Invalid session data, Log the user out
-                $window.sessionStorage.clear();
+                    // Redirect to the last route on page reload.
+                    $location.path(lastRoute);
+                });
+            } else {
                 $scope.showLoginForm = true;
+                storageService.clear();
             }
         };
 

@@ -1,18 +1,11 @@
-define(["loginController", "angularMocks", "utils", "sessionHelper", "userPreferenceRepository", "orgUnitRepository", "systemSettingRepository", "userRepository", "platformUtils", "checkVersionCompatibility"],
-    function (LoginController, mocks, utils, SessionHelper, UserPreferenceRepository, OrgUnitRepository, SystemSettingRepository, UserRepository, platformUtils, CheckVersionCompatibility) {
+define(["loginController", "angularMocks", "utils", "sessionHelper", "userPreferenceRepository", "orgUnitRepository", "systemSettingRepository", "userRepository", "platformUtils", "checkVersionCompatibility", "storageService"],
+    function (LoginController, mocks, utils, SessionHelper, UserPreferenceRepository, OrgUnitRepository, SystemSettingRepository, UserRepository, platformUtils, CheckVersionCompatibility, StorageService) {
     describe("login controller", function () {
-        var rootScope, window, loginController, scope, location, q, fakeUserStore, sessionHelper, hustle, userPreferenceRepository, systemSettingRepository, userRepository, orgUnitRepository, checkVersionCompatibility, initializeController;
+        var rootScope, storageService, loginController, scope, location, q, fakeUserStore, sessionHelper, hustle, userPreferenceRepository, systemSettingRepository, userRepository, orgUnitRepository, checkVersionCompatibility, initializeController;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function ($rootScope, $location, $q, $hustle) {
             scope = $rootScope.$new();
-            window = {
-                sessionStorage: {
-                    setItem: jasmine.createSpy('setItem'),
-                    getItem: jasmine.createSpy('getItem'),
-                    clear: jasmine.createSpy('clear')
-                }
-            };
             location = $location;
             hustle = $hustle;
             q = $q;
@@ -25,6 +18,11 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             };
 
             spyOn(location, 'path');
+
+            storageService = new StorageService();
+            spyOn(storageService, 'setItem');
+            spyOn(storageService, 'getItem');
+            spyOn(storageService, 'clear');
 
             userRepository = new UserRepository();
             spyOn(userRepository, "getUser").and.returnValue(utils.getPromise(q, {
@@ -70,7 +68,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
 
             checkVersionCompatibility = CheckVersionCompatibility(systemSettingRepository);
             initializeController = function () {
-                loginController = new LoginController(rootScope, scope, location, q, sessionHelper, hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility, window);
+                loginController = new LoginController(rootScope, scope, location, q, sessionHelper, hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility, storageService);
             };
         }));
 
@@ -361,10 +359,47 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         describe('User Session', function () {
+            it('should persist the session info in sessionStorage when a user logs in for the first time', function () {
+                initializeController();
+                scope.username = "superadmin";
+                scope.password = "msfsuperadmin";
+
+                var user = {
+                    userCredentials: {
+                        username: 'current username',
+                        userRoles: []
+                    }
+                };
+                var previousUser = {
+                    userCredentials: {
+                        username: 'previous username',
+                        userRoles: []
+                    }
+                };
+                userRepository.getUser.and.returnValues(utils.getPromise(q, user), utils.getPromise(q, previousUser));
+
+                var existingUserProjects = ['someUserProjectId'];
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, existingUserProjects));
+
+                var currentUserCredentials = {
+                    "username": "current user",
+                    "password": "7536ad6ce98b48f23a1bf8f74f53da83",
+                    "userRoles": [{
+                        "name": "Superadmin"
+                    }]
+                };
+                userRepository.getUserCredentials.and.returnValue(utils.getPromise(q, currentUserCredentials));
+
+                scope.login();
+                scope.$apply();
+
+                expect(storageService.setItem).toHaveBeenCalledWith('sessionInfo', [user, currentUserCredentials, existingUserProjects, previousUser]);
+            });
+
             it('should redirect the user to last accessed route if session data exists', function () {
-                window.sessionStorage.getItem.and.callFake(function(param) {
+                storageService.getItem.and.callFake(function(param) {
                     if(param == 'lastRoute') return 'someRoute';
-                    if(param == 'sessionInfo') return '{ "some": "data" }';
+                    if(param == 'sessionInfo') return { some: 'data' };
                 });
 
                 initializeController();
@@ -374,26 +409,14 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
                 expect(location.path).toHaveBeenCalledWith('someRoute');
             });
 
-            it('should clear session data and not redirect the user if session data is invalid', function () {
-                window.sessionStorage.getItem.and.callFake(function(param) {
-                    if(param == 'lastRoute') return 'someRoute';
-                    if(param == 'sessionInfo') return '{ some invalid json ';
-                });
-
-                initializeController();
-                scope.$apply();
-
-                expect(window.sessionStorage.clear).toHaveBeenCalled();
-                expect(scope.showLoginForm).toBeTruthy();
-            });
-
             it('should show the login form if there is no session data', function () {
-                window.sessionStorage.getItem.and.returnValue(null);
+                storageService.getItem.and.returnValue(null);
 
                 initializeController();
                 scope.$apply();
 
                 expect(scope.showLoginForm).toBeTruthy();
+                expect(storageService.clear).toHaveBeenCalled();
             });
         });
     });
