@@ -35,7 +35,7 @@ define(['reportsController', 'moduleWeekSelectorController', 'headerController',
             app.controller('downloadDataController', ['$scope', '$hustle', '$q', '$rootScope', '$timeout', downloadDataController]);
             app.controller('selectLanguageController', ['$scope', '$rootScope', selectLanguageController]);
             app.controller('referralLocationsController', ['$scope', '$hustle', '$modal', 'referralLocationsRepository', 'dataSetRepository', 'translationsService', referralLocationsController]);
-            app.controller('notificationsController', ['$scope', '$q', '$rootScope', 'userPreferenceRepository', 'chartRepository', 'orgUnitRepository', 'translationsService', 'pivotTableRepository', 'systemSettingRepository', notificationsController]);
+            app.controller('notificationsController', ['$scope', '$q', '$rootScope', 'userPreferenceRepository', 'orgUnitRepository', 'translationsService', 'pivotTableRepository', 'systemSettingRepository', notificationsController]);
             app.controller('selectProjectPreferenceController', ['$rootScope', '$scope', '$hustle', '$location', 'orgUnitRepository', 'userPreferenceRepository', 'systemSettingRepository', selectProjectPreferenceController]);
             app.controller('projectReportController', ['$rootScope', '$q', '$scope', 'orgUnitRepository','pivotTableRepository', 'changeLogRepository', 'translationsService', 'orgUnitGroupSetRepository', 'filesystemService', 'pivotTableExportBuilder', projectReportController]);
             app.controller('headerController', ['$q', '$scope', '$location', '$rootScope', '$hustle', '$timeout', '$indexedDB', 'sessionHelper', 'orgUnitRepository', 'systemSettingRepository', 'dhisMonitor', headerController]);

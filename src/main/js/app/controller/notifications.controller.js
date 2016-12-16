@@ -1,5 +1,5 @@
 define(["lodash"], function(_) {
-    return function($scope, $q, $rootScope, userPreferenceRepository, chartRepository, orgUnitRepository, translationService, pivotTableRepository, systemSettingRepository) {
+    return function($scope, $q, $rootScope, userPreferenceRepository, orgUnitRepository, translationService, pivotTableRepository, systemSettingRepository) {
 
         var notificationReports, standardDeviationValue;
         $scope.allDataElementValues = [];
@@ -25,13 +25,7 @@ define(["lodash"], function(_) {
 
         var getNotificationReports = function () {
             return pivotTableRepository.getPivotTablesForNotifications().then(function (pivotTables) {
-                if (pivotTables.length) {
                     notificationReports = pivotTables;
-                } else {
-                    return chartRepository.getAllChartsForNotifications().then(function (charts) {
-                        notificationReports = charts;
-                    });
-                }
             });
         };
 
