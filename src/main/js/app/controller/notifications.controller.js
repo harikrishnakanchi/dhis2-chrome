@@ -38,8 +38,6 @@ define(["lodash"], function(_) {
         var loadReportData = function (report, moduleId) {
             return pivotTableRepository.getPivotTableData(report, moduleId).then(function (pivotTableData) {
                 if (pivotTableData) {
-                    var periods = _.filter(pivotTableData.rows, 'periodDimension');
-                    $scope.weeks = _.slice(periods, periods.length - 5, periods.length - 1);
                     return pivotTableData;
                 }
             });
@@ -106,9 +104,22 @@ define(["lodash"], function(_) {
                 return;
             }
 
-            var dataElements = _.reduce(reportData.columns, function (result, column) {
-                return _.first(column).dataDimension ? result.concat(column) : result;
-            }, []);
+            var getFromRows = function (dimension) {
+                var rows = _.filter(reportData.rows, dimension);
+                return rows.length ? rows : null;
+            };
+
+            var getFromColumns = function (dimension) {
+                var columns = _.reduce(reportData.columns, function (result, column) {
+                    return _.first(column)[dimension] ? result.concat(column) : result;
+                }, []);
+                return columns.length ? columns : null;
+            };
+
+            var periods = getFromRows('periodDimension') || getFromColumns('periodDimension');
+            var dataElements = getFromRows('dataDimension') || getFromColumns('dataDimension');
+
+            $scope.weeks = _.slice(periods, periods.length - 5, periods.length - 1);
 
             _.forEach(dataElements, function(dataElement) {
                 var weeklyData = getWeeklyData($scope.weeks, dataElement, reportData);
