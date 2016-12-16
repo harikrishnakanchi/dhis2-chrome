@@ -55,7 +55,7 @@ define(["indexeddbUtils", "angularMocks", "utils", "lodash"], function(Indexeddb
             var objectStore1 = db.objectStore("dataValues");
             var expectedBackup = getExpectedBackupResult(stores);
 
-            indexeddbUtils.backupStores("msf", stores).then(function(actualBackup) {
+            indexeddbUtils.backupStores("praxis", stores).then(function(actualBackup) {
                 expect(actualBackup).toEqual(expectedBackup);
             });
 
@@ -74,10 +74,10 @@ define(["indexeddbUtils", "angularMocks", "utils", "lodash"], function(Indexeddb
             var store = db.objectStore("dataElements");
             store.getAll.and.returnValue(utils.getPromise(q, getResultInChunks(5001)));
             var expectedBackup = {
-                "msf__store1__0": encodeBase64(getResultInChunks(5000)),
-                "msf__store1__1": encodeBase64(getResultInChunks(1)),
-                "msf__store2__0": encodeBase64(getResultInChunks(5000)),
-                "msf__store2__1": encodeBase64(getResultInChunks(1)),
+                "praxis__store1__0": encodeBase64(getResultInChunks(5000)),
+                "praxis__store1__1": encodeBase64(getResultInChunks(1)),
+                "praxis__store2__0": encodeBase64(getResultInChunks(5000)),
+                "praxis__store2__1": encodeBase64(getResultInChunks(1)),
                 "hustle": encodeBase64({
                     "store1": getResultInChunks(5001),
                     "store2": getResultInChunks(5001)
@@ -96,8 +96,8 @@ define(["indexeddbUtils", "angularMocks", "utils", "lodash"], function(Indexeddb
 
         it("should create a back up of the entire db", function() {
             var expectedBackup = {
-                "msf__store1__0": encodeBase64(allResult),
-                "msf__store2__0": encodeBase64(allResult),
+                "praxis__store1__0": encodeBase64(allResult),
+                "praxis__store2__0": encodeBase64(allResult),
                 "hustle": encodeBase64({
                     "store1": allResult,
                     "store2": allResult
@@ -122,10 +122,10 @@ define(["indexeddbUtils", "angularMocks", "utils", "lodash"], function(Indexeddb
             var hustleStore1 = db.objectStore("hustleStore1");
 
             var backupData = {
-                "msf__store1__0": encodeBase64([{
+                "praxis__store1__0": encodeBase64([{
                     "id": "identity"
                 }]),
-                "msf__store2__0": encodeBase64([{
+                "praxis__store2__0": encodeBase64([{
                     "id": "identity2"
                 }]),
                 "hustle": encodeBase64({
@@ -158,13 +158,13 @@ define(["indexeddbUtils", "angularMocks", "utils", "lodash"], function(Indexeddb
             var hustleStore1 = db.objectStore("hustleStore1");
 
             var backupData = {
-                "msf__store1__0": encodeBase64([{
+                "praxis__store1__0": encodeBase64([{
                     "id": "identity"
                 }]),
-                "msf__store2__0": encodeBase64([{
+                "praxis__store2__0": encodeBase64([{
                     "id": "identity2"
                 }]),
-                "msf__store3__0": encodeBase64([{
+                "praxis__store3__0": encodeBase64([{
                     "id": "identity3"
                 }]),
                 "hustle": encodeBase64({
