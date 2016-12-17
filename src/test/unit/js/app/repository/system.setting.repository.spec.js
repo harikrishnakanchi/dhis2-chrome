@@ -88,7 +88,7 @@ define(["systemSettingRepository", "angularMocks", "utils", "dhisId"], function(
         it("should get standard deviation value", function() {
 
             mockStore.find.and.returnValue(utils.getPromise(q, {
-                key: 'standardDeviationValue',
+                key: 'notificationSettingValue',
                 value: '2.34'
             }));
 
@@ -98,7 +98,7 @@ define(["systemSettingRepository", "angularMocks", "utils", "dhisId"], function(
             });
             scope.$apply();
 
-            expect(mockStore.find).toHaveBeenCalledWith('standardDeviationValue');
+            expect(mockStore.find).toHaveBeenCalledWith('notificationSettingValue');
             expect(actualResult).toEqual(2.34);
         });
 
@@ -112,7 +112,7 @@ define(["systemSettingRepository", "angularMocks", "utils", "dhisId"], function(
             });
             scope.$apply();
 
-            expect(mockStore.find).toHaveBeenCalledWith('standardDeviationValue');
+            expect(mockStore.find).toHaveBeenCalledWith('notificationSettingValue');
             expect(actualResult).toEqual(1.25);
         });
 

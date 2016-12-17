@@ -128,8 +128,8 @@ define(["lodash", "cipherUtils", "properties", "dhisId"], function(_, cipherUtil
             return get(praxisUidKey).then(returnPraxisUid, createPraxisUid);
         };
 
-        var getStandardDeviationValue = function () {
-            return get('standardDeviationValue').then(function (standardDeviationValue) {
+        var getNotificationSettingValue = function () {
+            return get('notificationSettingValue').then(function (standardDeviationValue) {
                 return parseFloat(standardDeviationValue);
             }, function () {
                 return 1.25;
@@ -150,7 +150,7 @@ define(["lodash", "cipherUtils", "properties", "dhisId"], function(_, cipherUtil
             "getAllowedOrgUnits": getAllowedOrgUnits,
             "getProductKeyLevel": getProductKeyLevel,
             "getPraxisUid": getPraxisUid,
-            "getStandardDeviationValue": getStandardDeviationValue
+            "getStandardDeviationValue": getNotificationSettingValue
         };
     };
 });

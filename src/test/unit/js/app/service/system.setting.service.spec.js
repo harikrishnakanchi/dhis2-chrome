@@ -16,22 +16,24 @@ define(["systemSettingService", "angularMocks", "utils", "dhisUrl"], function(Sy
 
         it("should get system settings", function() {
             var systemSettingsFromDhis = {
-                "fieldAppSettings": {
-                    "moduleTemplates": {
-                        "ds1": {}
+                fieldAppSettings: {
+                    moduleTemplates: {
+                        'ds1': {}
                     },
-                    "anotherSetting": "foo",
-                    "standardDeviationValue": "someValue"
+                    anotherSetting: "foo"
                 },
-                "versionCompatibilityInfo": {
-                    "compatiblePraxisVersions": [
-                        "5.0",
-                        "6.0"
+                versionCompatibilityInfo: {
+                    compatiblePraxisVersions: [
+                        '5.0',
+                        '6.0'
                     ]
+                },
+                "notificationSetting": {
+                    notificationSetting: '1.5'
                 }
             };
 
-            httpBackend.expectGET(dhisUrl.systemSettings + "?key=fieldAppSettings,versionCompatibilityInfo").respond(200, systemSettingsFromDhis);
+            httpBackend.expectGET(dhisUrl.systemSettings + "?key=fieldAppSettings,versionCompatibilityInfo,notificationSetting").respond(200, systemSettingsFromDhis);
 
             var actualResult;
             service.getSystemSettings().then(function(result) {
@@ -48,12 +50,12 @@ define(["systemSettingService", "angularMocks", "utils", "dhisUrl"], function(Sy
                 "key": "anotherSetting",
                 "value": "foo"
             }, {
-                "key": "standardDeviationValue",
-                "value": "someValue"
-            }, {
                 "key": "compatiblePraxisVersions",
                 "value":["5.0", "6.0"]
-            }];
+            }, {
+                "key": "notificationSetting",
+                "value": "1.5"
+            },];
 
             expect(actualResult).toEqual(expectedSystemSettings);
         });

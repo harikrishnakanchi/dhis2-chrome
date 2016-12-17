@@ -68,7 +68,7 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
         };
 
         this.getSystemSettings = function() {
-            return getSettings("fieldAppSettings,versionCompatibilityInfo").then(transformFieldAppSettings);
+            return getSettings("fieldAppSettings,versionCompatibilityInfo,notificationSetting").then(transformFieldAppSettings);
         };
 
         this.getProjectSettings = function(projectIds) {
