@@ -130,7 +130,7 @@ define(["lodash", "cipherUtils", "properties", "dhisId"], function(_, cipherUtil
 
         var getNotificationSettingValue = function () {
             return get('notificationSettingValue').then(function (standardDeviationValue) {
-                return parseFloat(standardDeviationValue);
+                return _.isNaN(parseFloat(standardDeviationValue)) ? 1.25 : parseFloat(standardDeviationValue);
             }, function () {
                 return 1.25;
             });
