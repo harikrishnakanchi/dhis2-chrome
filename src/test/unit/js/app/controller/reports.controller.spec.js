@@ -222,6 +222,16 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                 expect(pivotTableRepository.getPivotTableData).toHaveBeenCalledTimes(1);
             });
 
+            it('should not get the notification pivotTableData', function () {
+                var notificationPivotTable = {
+                    serviceCode: 'someDataSetServiceCode',
+                    name: 'Something - Notifications'
+                };
+                pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [notificationPivotTable]));
+                scope.$apply();
+                expect(pivotTableRepository.getPivotTableData).not.toHaveBeenCalled();
+            });
+
             it('should translate the pivot tables', function () {
                 scope.$apply();
                 expect(translationsService.translatePivotTableData).toHaveBeenCalledWith([pivotTableData]);

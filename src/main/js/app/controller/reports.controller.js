@@ -106,6 +106,12 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             });
         };
 
+        var rejectNotificationReports = function (reportsForCurrentModule) {
+            return _.reject(reportsForCurrentModule, function (report) {
+                return _.endsWith(report.name, 'Notifications');
+            });
+        };
+
         var loadChartsWithData = function() {
             var filterOutNotificationCharts = function (charts) {
                 return _.reject(charts, function(chart) {
@@ -240,6 +246,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
         var loadPivotTablesWithData = function() {
             return pivotTableRepository.getAll()
                 .then(filterReportsForCurrentModule)
+                .then(rejectNotificationReports)
                 .then(getPivotTableData)
                 .then(translationsService.translatePivotTableData)
                 .then(function(pivotTables) {
