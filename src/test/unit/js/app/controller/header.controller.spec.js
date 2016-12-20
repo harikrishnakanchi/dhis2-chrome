@@ -1,7 +1,7 @@
 define(["headerController", "angularMocks", "utils", "sessionHelper", "platformUtils", "orgUnitRepository", "systemSettingRepository", "dhisMonitor"],
     function(HeaderController, mocks, utils, SessionHelper, platformUtils, OrgUnitRepository, SystemSettingRepository, DhisMonitor) {
         describe("headerController", function() {
-            var rootScope, headerController, scope, q, timeout, db,
+            var rootScope, headerController, scope, q, timeout, fakeModal, dhisMonitor,
                 translationStore, location, sessionHelper, orgUnitRepository, hustle, systemSettingRepository;
 
             beforeEach(module('hustle'));
@@ -12,8 +12,28 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
                 hustle = $hustle;
                 timeout = $timeout;
 
+                scope.resourceBundle = {
+                    jobRemaining: 'task remaining',
+                    jobsRemaining: 'tasks remaining',
+                    uninstall: {
+                        title: 'Uninstall Praxis',
+                        successMessage: "Uninstalled successfully"
+                    }
+                };
+
+                fakeModal = {
+                    close: function() {
+                        this.result.confirmCallBack();
+                    },
+                    dismiss: function(type) {
+                        this.result.cancelCallback(type);
+                    },
+                    open: function(object) {}
+                };
+
                 spyOn(platformUtils, "sendMessage");
                 spyOn(platformUtils, "addListener");
+                spyOn(platformUtils, "uninstall").and.returnValue(utils.getPromise(q, undefined));
 
                 sessionHelper = new SessionHelper();
                 orgUnitRepository = new OrgUnitRepository();
@@ -29,22 +49,6 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
                 spyOn(systemSettingRepository, "isProductKeySet").and.returnValue(utils.getPromise(q, true));
                 spyOn(systemSettingRepository, "isKeyGeneratedFromProd").and.returnValue(utils.getPromise(q, true));
 
-                var queryBuilder = function() {
-                    this.$index = function() {
-                        return this;
-                    };
-                    this.$eq = function(v) {
-                        return this;
-                    };
-                    this.compile = function() {
-                        return "blah";
-                    };
-                    return this;
-                };
-                db = {
-                    "objectStore": function() {},
-                    "queryBuilder": queryBuilder
-                };
                 location = $location;
 
                 var getMockStore = function(data) {
@@ -66,13 +70,10 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
                 spyOn(sessionHelper, "login").and.returnValue(utils.getPromise(q, {}));
 
                 spyOn(translationStore, "each").and.returnValue(utils.getPromise(q, {}));
-                spyOn(db, 'objectStore').and.callFake(function(storeName) {
-                    return translationStore;
-                });
 
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
-                headerController = new HeaderController(q, scope, location, rootScope, hustle, timeout, db, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor);
+                headerController = new HeaderController(q, scope, location, rootScope, hustle, timeout, fakeModal, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor);
             }));
 
             it("should logout user", function() {
@@ -162,13 +163,6 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
             });
 
             describe('getRemainingTasks', function () {
-                beforeEach(function () {
-                    rootScope.resourceBundle = {
-                        jobRemaining: 'task remaining',
-                        jobsRemaining: 'tasks remaining'
-                    };
-                });
-
                 it('should return correct phrase based on the remaining tasks', function () {
                     rootScope.remainingJobs = 1;
                     expect(scope.getRemainingJobs()).toEqual('1 task remaining');
@@ -178,5 +172,34 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
                 });
             });
 
+            describe('Uninstall praxis', function () {
+                beforeEach(function () {
+                    spyOn(document, 'getElementById').and.returnValue(document.createElement('div'));
+                });
+
+                it('should ask the user for confirmation before uninstalling', function () {
+                    spyOn(fakeModal, 'open').and.returnValue({
+                        result: utils.getPromise(q, {})
+                    });
+
+                    scope.uninstallPraxis();
+                    scope.$apply();
+
+                    expect(fakeModal.open).toHaveBeenCalled();
+                    expect(platformUtils.uninstall).toHaveBeenCalled();
+                });
+
+                it('should not uninstall praxis if user clicks cancel', function () {
+                    spyOn(fakeModal, 'open').and.returnValue({
+                        result: utils.getRejectedPromise(q, {})
+                    });
+
+                    scope.uninstallPraxis();
+                    scope.$apply();
+
+                    expect(fakeModal.open).toHaveBeenCalled();
+                    expect(platformUtils.uninstall).not.toHaveBeenCalled();
+                });
+            });
         });
     });

@@ -1,5 +1,5 @@
 define(["lodash", "platformUtils", "customAttributes", "properties", "interpolate"], function(_, platformUtils, customAttributes, properties, interpolate) {
-    return function($q, $scope, $location, $rootScope, $hustle, $timeout, db, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor) {
+    return function($q, $scope, $location, $rootScope, $hustle, $timeout, $modal, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor) {
         $scope.projects = [];
 
         $scope.canChangeProject = function(hasUserLoggedIn, isCoordinationApprover) {
@@ -120,6 +120,36 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
                 networkStatus = 'offline';
             }
             return $scope.resourceBundle && $scope.resourceBundle[networkStatus];
+        };
+
+        $scope.uninstallPraxis = function () {
+            var modalMessages = {
+                "ok": $scope.resourceBundle.uninstall.okMessage,
+                "title": $scope.resourceBundle.uninstall.title,
+                "confirmationMessage": $scope.resourceBundle.uninstall.confirmationMessage
+            };
+
+            showModal(function () {
+                platformUtils.uninstall().then(function () {
+                    document.getElementById('serviceworkerloading').style.display = 'block';
+                    document.getElementById('serviceworkerloading').innerHTML = $scope.resourceBundle.uninstall.successMessage;
+                    document.getElementById('praxis').style.display = 'none';
+                });
+
+            }, modalMessages);
+        };
+
+        var showModal = function(okCallback, messages) {
+            var scope = $rootScope.$new();
+            scope.modalMessages = messages;
+
+            var modalInstance = $modal.open({
+                templateUrl: 'templates/confirm-dialog.html',
+                controller: 'confirmDialogController',
+                scope: scope
+            });
+
+            return modalInstance.result.then(okCallback);
         };
 
         var init = function() {

@@ -344,5 +344,11 @@
             "title": "Fichier enregistré avec succès",
             "message": "Le fichier \"{{fileName}}\" A été enregistré avec succès."
         }
+    },
+    "uninstall": {
+        "title": "Désinstaller Praxis",
+        "okMessage": "OUI, je souhaite désinstaller Praxis",
+        "confirmationMessage": "AVERTISSEMENT: Ceci effacera toutes les données existantes et désinstallera l'application. CETTE ACTION EST IRRÉVERSIBLE.",
+        "successMessage": "Praxis est désinstallé. Fermez la fenêtre du navigateur."
     }
 }
