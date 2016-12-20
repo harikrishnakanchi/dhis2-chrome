@@ -113,7 +113,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                         templateUrl: 'templates/aggregate-data-entry.html',
                         controller: 'aggregateDataEntryController',
                         data: {
-                            allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
+                            allowedRoles: [USER_ROLES.DATA_ENTRY]
                         }
                     }).
                     when('/line-list-summary/:module/:filterBy?', {
@@ -141,7 +141,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                         templateUrl: 'templates/data-approval.html',
                         controller: 'dataApprovalController',
                         data: {
-                            allowedRoles: [USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
+                            allowedRoles: [USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER, USER_ROLES.OBSERVER]
                         }
                     }).
                     otherwise({
