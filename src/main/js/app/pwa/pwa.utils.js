@@ -1,4 +1,4 @@
-define(['properties', 'lodash'], function(properties, _) {
+define(['properties', 'platformConfig', 'lodash', 'indexedDBLogger'], function(properties, pwaConfig, _, indexedDBLogger) {
     var messageListeners = {};
     var alarms = {};
     var alarmListeners = {};
@@ -98,6 +98,68 @@ define(['properties', 'lodash'], function(properties, _) {
         executeEventListener(event.data);
     };
 
+    var uninstall = function (injector) {
+        var clearCacheStorage = function () {
+            return window.caches.keys().then(function(keys) {
+                return Promise.all(_.map(keys, function (key) {
+                    return window.caches.delete(key);
+                }));
+            });
+        };
+
+        var unregisterServiceWorker = function() {
+            return navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                return Promise.all(_.map(registrations, function (registration) {
+                    return registration.unregister();
+                }));
+            });
+        };
+
+        var terminateWebWorker = function () {
+            self.worker.terminate();
+        };
+
+        var clearIndexedDB = function () {
+            var deleteIDBDatabase = function (databaseName) {
+                return new Promise(function (resolve, reject) {
+                    var DBDeleteRequest = window.indexedDB.deleteDatabase(databaseName);
+                    DBDeleteRequest.onerror = reject;
+                    DBDeleteRequest.onsuccess = resolve;
+                    DBDeleteRequest.onblocked = function(event) {
+                        console.log('onblocked: ', event, databaseName);
+                    };
+                });
+            };
+
+            var closeAllDatabaseConnections = function () {
+                var getAngularService = angular.element(document.getElementById('praxis')).injector().get;
+
+                indexedDBLogger.closeDB();
+
+                var praxisDB = getAngularService('$indexedDB');
+                praxisDB.closeDB();
+
+                var hustle = getAngularService('$hustle');
+                hustle.wipe();
+            };
+
+            closeAllDatabaseConnections();
+
+            var databaseNames = ['hustle', pwaConfig.praxis.dbName, pwaConfig.praxis.dbForLogs];
+            return Promise.all(_.map(databaseNames, deleteIDBDatabase));
+        };
+
+        var clearSessionStorage = function () {
+            window.sessionStorage.clear();
+        };
+
+        return clearCacheStorage()
+            .then(unregisterServiceWorker)
+            .then(terminateWebWorker)
+            .then(clearIndexedDB)
+            .then(clearSessionStorage);
+    };
+
     var init = function () {
         self.worker.addEventListener("message", messageEventHandler);
     };
@@ -111,6 +173,7 @@ define(['properties', 'lodash'], function(properties, _) {
         init: _.once(init),
         createAlarm: createAlarm,
         addAlarmListener: addAlarmListener,
-        clearAlarm: clearAlarm
+        clearAlarm: clearAlarm,
+        uninstall: uninstall
     };
 });

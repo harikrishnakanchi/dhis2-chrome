@@ -75,6 +75,10 @@ define(['lodash'], function(_) {
         chrome.alarms.clear(alarmName);
     };
 
+    var uninstall = function () {
+        chrome.management.uninstallSelf();
+    };
+
     return {
         addListener: addListener,
         sendMessage: sendMessage,
@@ -84,6 +88,7 @@ define(['lodash'], function(_) {
         init: _.once(init),
         createAlarm: createAlarm,
         addAlarmListener: addAlarmListener,
-        clearAlarm: clearAlarm
+        clearAlarm: clearAlarm,
+        uninstall: uninstall
     };
 });
