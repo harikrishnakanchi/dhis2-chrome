@@ -130,10 +130,12 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
             };
 
             showModal(function () {
+                $scope.startLoading();
                 platformUtils.uninstall().then(function () {
                     document.getElementById('serviceworkerloading').style.display = 'block';
                     document.getElementById('serviceworkerloading').innerHTML = $scope.resourceBundle.uninstall.successMessage;
                     document.getElementById('praxis').style.display = 'none';
+                    $scope.stopLoading();
                 });
 
             }, modalMessages);

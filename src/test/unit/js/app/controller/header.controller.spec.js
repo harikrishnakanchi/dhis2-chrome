@@ -21,6 +21,9 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
                     }
                 };
 
+                scope.startLoading = jasmine.createSpy('startLoading');
+                scope.stopLoading = jasmine.createSpy('stopLoading');
+
                 fakeModal = {
                     close: function() {
                         this.result.confirmCallBack();
