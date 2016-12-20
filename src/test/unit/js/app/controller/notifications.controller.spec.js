@@ -1,9 +1,10 @@
- define(["notificationsController", "angularMocks", "utils", "userPreferenceRepository", "orgUnitRepository", "translationsService", "pivotTableRepository", "systemSettingRepository"], function(NotificationsController, mocks, utils, UserPreferenceRepository, OrgUnitRepository, TranslationService, PivotTableRepository, SystemSettingRepository) {
+ define(["notificationsController", "angularMocks", "utils", "userPreferenceRepository", "orgUnitRepository", "translationsService", "pivotTableRepository", "chartRepository", "systemSettingRepository"],
+     function(NotificationsController, mocks, utils, UserPreferenceRepository, OrgUnitRepository, TranslationService, PivotTableRepository, ChartRepository, SystemSettingRepository) {
 
      describe("notifications controller", function() {
 
          var notificationsController, userPreferenceRepository, orgUnitRepository,
-             userModules, notificationReports, pivotTableData, rootScope, expectedValues, translationService, pivotTableRepository, systemSettingRepository, dataElementId, dataElementName, q, scope, dataElementDescription, translatedDataElementName, translatedDataElementDescription;
+             userModules, notificationReports, pivotTableData, rootScope, expectedValues, translationService, pivotTableRepository, chartRepository, systemSettingRepository, dataElementId, dataElementName, q, scope, dataElementDescription, translatedDataElementName, translatedDataElementDescription;
 
          beforeEach(mocks.inject(function($rootScope, $q) {
              rootScope = $rootScope;
@@ -63,12 +64,15 @@
              spyOn(pivotTableRepository, 'getPivotTablesForNotifications').and.returnValue(utils.getPromise(q, []));
              spyOn(pivotTableRepository, 'getPivotTableData').and.returnValue(utils.getPromise(q, pivotTableData));
 
+             chartRepository = new ChartRepository();
+             spyOn(chartRepository, 'getAllChartsForNotifications').and.returnValue(utils.getPromise(q, []));
+
              systemSettingRepository = new SystemSettingRepository();
              spyOn(systemSettingRepository, 'getStandardDeviationValue').and.returnValue(utils.getPromise(q, 1.25));
          }));
 
          var initiateNotificationController = function () {
-             notificationsController = new NotificationsController(scope, q, rootScope, userPreferenceRepository, orgUnitRepository, translationService, pivotTableRepository, systemSettingRepository);
+             notificationsController = new NotificationsController(scope, q, rootScope, userPreferenceRepository, orgUnitRepository, translationService, pivotTableRepository, chartRepository, systemSettingRepository);
              scope.$apply();
          };
 
@@ -110,6 +114,14 @@
              pivotTableRepository.getPivotTablesForNotifications.and.returnValue(utils.getPromise(q, notificationReports));
              initiateNotificationController();
              expect(pivotTableRepository.getPivotTablesForNotifications).toHaveBeenCalled();
+         });
+
+         it('should get all charts if pivotTables are not present', function () {
+             pivotTableRepository.getPivotTablesForNotifications.and.returnValue(utils.getPromise(q, []));
+             notificationReports = getReport();
+             chartRepository.getAllChartsForNotifications.and.returnValue(utils.getPromise(q, notificationReports));
+             initiateNotificationController();
+             expect(chartRepository.getAllChartsForNotifications).toHaveBeenCalled();
          });
 
          it('should translate data element names and descriptions', function () {

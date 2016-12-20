@@ -1,5 +1,6 @@
 define(["lodash"], function(_) {
-    return function($scope, $q, $rootScope, userPreferenceRepository, orgUnitRepository, translationService, pivotTableRepository, systemSettingRepository) {
+    return function($scope, $q, $rootScope, userPreferenceRepository, orgUnitRepository, translationService, pivotTableRepository, chartRepository, systemSettingRepository) {
+        //TODO remove backward compatibility code one month after 10.0 release
 
         var notificationReports, standardDeviationValue;
         $scope.allDataElementValues = [];
@@ -26,13 +27,21 @@ define(["lodash"], function(_) {
         var getNotificationReports = function () {
             return pivotTableRepository.getPivotTablesForNotifications().then(function (pivotTables) {
                     notificationReports = pivotTables;
+                if (pivotTables.length === 0) {
+                    return chartRepository.getAllChartsForNotifications().then(function (charts) {
+                        notificationReports = charts;
+                    });
+                }
             });
         };
 
         var loadReportData = function (report, moduleId) {
-            return pivotTableRepository.getPivotTableData(report, moduleId).then(function (pivotTableData) {
-                if (pivotTableData) {
-                    return pivotTableData;
+            return pivotTableRepository.getPivotTableData(report, moduleId, true).then(function (pivotTableData) {
+                if (pivotTableData) { return pivotTableData; }
+                else {
+                    return chartRepository.getChartData(report, moduleId).then(function (chartData) {
+                        if (chartData) { return chartData; }
+                    });
                 }
             });
         };
@@ -94,7 +103,7 @@ define(["lodash"], function(_) {
         };
 
         var getDataElementValues = function(report, reportData, module) {
-            if (_.isEmpty(reportData) || (_.isEmpty(reportData.rows) && _.isEmpty(reportData.columns))) {
+            if (_.isEmpty(reportData) || (_.isEmpty(reportData.rows) && _.isEmpty(reportData.columns) && _.isEmpty(reportData.categories) && _.isEmpty(reportData.series))) {
                 return;
             }
 
@@ -110,8 +119,18 @@ define(["lodash"], function(_) {
                 return columns.length ? columns : null;
             };
 
-            var periods = getFromRows('periodDimension') || getFromColumns('periodDimension');
-            var dataElements = getFromRows('dataDimension') || getFromColumns('dataDimension');
+            var getFromCategories = function (dimension) {
+                var categories = _.filter(reportData.categories, dimension);
+                return categories.length ? categories : null;
+            };
+
+            var getFromSeries = function (dimension) {
+                var series = _.filter(reportData.series, dimension);
+                return series.length ? series : null;
+            };
+
+            var periods = getFromRows('periodDimension') || getFromColumns('periodDimension') || getFromCategories('periodDimension') || getFromSeries('periodDimension');
+            var dataElements = getFromRows('dataDimension') || getFromColumns('dataDimension') || getFromCategories('dataDimension') || getFromSeries('dataDimension');
 
             $scope.weeks = _.uniq(_.union($scope.weeks, _.slice(periods, periods.length - 5, periods.length - 1)), 'name');
 

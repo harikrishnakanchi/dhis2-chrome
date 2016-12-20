@@ -115,7 +115,7 @@ define(["pivotTableRepository", "pivotTable", "pivotTableData", "categoryReposit
 
                 scope.$apply();
                 expect(mockStore.find).toHaveBeenCalledWith([pivotTableDefinition.id, orgUnitId]);
-                expect(PivotTableData.create).toHaveBeenCalledWith(pivotTableDefinition, mockPivotTableData.data);
+                expect(PivotTableData.create).toHaveBeenCalledWith(pivotTableDefinition, mockPivotTableData.data, undefined);
             });
 
             it('should return null if the pivotTableData does not exist', function () {

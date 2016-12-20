@@ -45,10 +45,10 @@ define(["lodash", "pivotTable", "pivotTableData"], function(_, PivotTableModel, 
             });
         };
 
-        this.getPivotTableData = function (pivotTableDefinition, orgUnitId) {
+        this.getPivotTableData = function (pivotTableDefinition, orgUnitId, shouldNotExcludeEmptyDataValues) {
             var store = db.objectStore(PIVOT_TABLE_DATA_STORE_NAME);
             return store.find([pivotTableDefinition.id, orgUnitId]).then(function (pivotTableData) {
-                return pivotTableData && PivotTableData.create(pivotTableDefinition, pivotTableData.data);
+                return pivotTableData && PivotTableData.create(pivotTableDefinition, pivotTableData.data, shouldNotExcludeEmptyDataValues);
             });
         };
     };
