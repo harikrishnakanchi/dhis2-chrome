@@ -113,7 +113,7 @@ define(["lodash"], function(_) {
             var periods = getFromRows('periodDimension') || getFromColumns('periodDimension');
             var dataElements = getFromRows('dataDimension') || getFromColumns('dataDimension');
 
-            $scope.weeks = _.slice(periods, periods.length - 5, periods.length - 1);
+            $scope.weeks = _.uniq(_.union($scope.weeks, _.slice(periods, periods.length - 5, periods.length - 1)), 'name');
 
             _.forEach(dataElements, function(dataElement) {
                 var weeklyData = getWeeklyData($scope.weeks, dataElement, reportData);
