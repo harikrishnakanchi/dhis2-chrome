@@ -1,6 +1,10 @@
 define(["lodash", "Q", "moment", "properties"], function(_, Q, moment, properties) {
 
-    var logStoreName = 'logs';
+    var db, logStoreName = 'logs';
+
+    var closeDB = function () {
+        db.close();
+    };
 
     var getLogDb = function(dbName) {
         var d = Q.defer();
@@ -20,6 +24,7 @@ define(["lodash", "Q", "moment", "properties"], function(_, Q, moment, propertie
         };
 
         request.onsuccess = function(e) {
+            db = request.result;
             d.resolve(e.target.result);
         };
 
@@ -157,6 +162,7 @@ define(["lodash", "Q", "moment", "properties"], function(_, Q, moment, propertie
 
     return {
         "configure": configure,
-        "exportLogs": exportLogs
+        "exportLogs": exportLogs,
+        "closeDB": closeDB
     };
 });
