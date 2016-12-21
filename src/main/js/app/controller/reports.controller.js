@@ -113,12 +113,6 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
         };
 
         var loadChartsWithData = function() {
-            var filterOutNotificationCharts = function (charts) {
-                return _.reject(charts, function(chart) {
-                    return _.endsWith(chart.name, "Notifications");
-                });
-            };
-
             var getChartData = function(charts) {
                 var promises = _.map(charts, function(chart) {
                     return chartRepository.getChartData(chart, $scope.orgUnit.id);
@@ -161,7 +155,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
 
             return chartRepository.getAll()
                 .then(filterReportsForCurrentModule)
-                .then(filterOutNotificationCharts)
+                .then(rejectNotificationReports)
                 .then(getChartData)
                 .then(translationsService.translateChartData)
                 .then(transformForNVD3)
