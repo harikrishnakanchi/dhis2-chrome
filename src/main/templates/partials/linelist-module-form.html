@@ -64,11 +64,11 @@
                                             </div>
                                             <div collapse="getCollapsed(section.id)" class="collapse-body data-element-with-options-header">
                                                 <ul>
-                                                    <li ng-repeat="de in section.dataElementsWithOptions" ng-init="de.dataElement.isDataElementExpanded = false">
+                                                    <li ng-repeat="de in section.programStageDataElements" ng-init="de.dataElement.isDataElementExpanded = false">
                                                         <div class="collapse-head">
-                                                            <div class="data-element-with-options" ng-click="de.dataElement.isDataElementExpanded = !de.dataElement.isDataElementExpanded">
-                                                            <span class="glyphicon"
-                                                                  ng-class="{'glyphicon-chevron-right':!de.dataElement.isDataElementExpanded, 'glyphicon-chevron-down':de.dataElement.isDataElementExpanded}" aria-hidden="true"></span>  {{ getDisplayName(de.dataElement) }}
+                                                            <div class="data-element-with-options" ng-click="(section.dataElementsWithOptions | contains:de) && (de.dataElement.isDataElementExpanded = !de.dataElement.isDataElementExpanded)">
+                                                            <span ng-if="section.dataElementsWithOptions | contains:de" class="glyphicon" ng-class="{'glyphicon-chevron-right':!de.dataElement.isDataElementExpanded, 'glyphicon-chevron-down':de.dataElement.isDataElementExpanded}" aria-hidden="true"></span>
+                                                                {{ getDisplayName(de.dataElement) }}
                                                                 <span ng-class="{'required': de.compulsory}"></span>
                                                                 <a class="description-popup-icon grey"
                                                                    description-popup
@@ -93,27 +93,6 @@
                                                                   </span>
                                                                 </li>
                                                             </ul>
-                                                        </div>
-
-                                                    </li>
-                                                    <li ng-repeat="de in section.dataElementsWithoutOptions">
-                                                        <div class = "description-popup">
-                                                        <label>
-                                                            <input type="checkbox"
-                                                                   ng-disabled="de.compulsory || isDisabled==true"
-                                                                   ng-model="de.dataElement.isIncluded">
-                                                            <label ng-class="{'required': de.compulsory}" dp-title="{{ getDisplayName(de.dataElement) }}">
-                                                                {{ getDisplayName(de.dataElement) }}
-                                                            </label>
-                                                            <a class="description-popup-icon grey"
-                                                               description-popup
-                                                               dp-title="{{ getDisplayName(de.dataElement) }}"
-                                                               dp-desc="{{ de.dataElement.description }}"
-                                                            >
-                                                                <i class="fa fa-info-circle"
-                                                                   tooltip-placement="top"></i>
-                                                            </a>
-                                                        </label>
                                                         </div>
                                                     </li>
                                                 </ul>
