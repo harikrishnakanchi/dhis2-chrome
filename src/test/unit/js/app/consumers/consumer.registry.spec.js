@@ -24,22 +24,22 @@ define(["consumerRegistry", "angularMocks", "hustleModule", "utils", "properties
             expect(hustle.registerConsumer).toHaveBeenCalledWith(dataValueConsumer.run, "dataValues", properties.queue.delay, properties.queue.retryDelayConfig);
         });
 
-        it("should stop all consumers", function() {
+        it("should stop consumer", function() {
             spyOn(hustle, "registerConsumer").and.returnValue(utils.getPromise(q, consumer));
 
             consumerRegistry.register();
             scope.$apply();
-            consumerRegistry.stopAllConsumers();
+            consumerRegistry.stopConsumer();
 
             expect(consumer.stop).toHaveBeenCalled();
         });
 
-        it("should start all consumers", function() {
+        it("should start consumer", function() {
             spyOn(hustle, "registerConsumer").and.returnValue(utils.getPromise(q, consumer));
 
             consumerRegistry.register();
             scope.$apply();
-            consumerRegistry.startAllConsumers();
+            consumerRegistry.startConsumer();
 
             expect(consumer.start).toHaveBeenCalled();
         });

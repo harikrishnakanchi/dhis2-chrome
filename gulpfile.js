@@ -111,7 +111,7 @@ gulp.task('ft', ['update-webdriver', 'serve'], function() {
 
 gulp.task('lint', function() {
     return gulp.src(['./src/main/js/app/**/*.js', './src/test/**/js/app/**/*.js'])
-        .pipe(jshint())
+        .pipe(jshint({expr: true}))
         .pipe(jshint.reporter(stylish))
         .pipe(jshint.reporter('fail'));
 });

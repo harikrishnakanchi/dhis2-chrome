@@ -84,12 +84,12 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
 
                     var startConsumers = function() {
                         $log.info("Starting all hustle consumers");
-                        consumerRegistry.startAllConsumers();
+                        consumerRegistry.startConsumer();
                     };
 
                     var stopConsumers = function() {
                         $log.info("Stopping all hustle consumers");
-                        consumerRegistry.stopAllConsumers();
+                        consumerRegistry.stopConsumer();
                     };
 
                     var checkOnlineStatusAndSync = function() {
