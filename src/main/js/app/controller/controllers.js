@@ -2,13 +2,14 @@ define(['reportsController', 'moduleWeekSelectorController', 'headerController',
         'lineListModuleController', 'projectController', 'countryController', 'confirmDialogController', 'projectUserController',
         'aggregateDataEntryController', 'lineListDataEntryController', 'patientOriginController', 'productKeyController',
         'lineListSummaryController', 'dataApprovalController', 'dashboardController', 'lineListOfflineApprovalController', 'appCloneController', 'downloadDataController', 'notificationDialogController', 'selectLanguageController',
-        'referralLocationsController', 'notificationsController', 'selectProjectPreferenceController', 'projectReportController', 'footerController', 'exportRawDataController', 'alertDialogController', 'opUnitReportController'
+        'referralLocationsController', 'notificationsController', 'selectProjectPreferenceController', 'projectReportController', 'footerController', 'exportRawDataController', 'alertDialogController', 'opUnitReportController',
+        'downloadMetadataController'
     ],
     function(reportsController, moduleWeekSelectorController, headerController, orgUnitContoller, loginController, opUnitController, aggregateModuleController,
         lineListModuleController, projectController, countryController, confirmDialogController, projectUserController,
         aggregateDataEntryController, lineListDataEntryController, patientOriginController, productKeyController,
         lineListSummaryController, dataApprovalController, dashboardController, lineListOfflineApprovalController, appCloneController, downloadDataController, notificationDialogController, selectLanguageController,
-        referralLocationsController, notificationsController, selectProjectPreferenceController, projectReportController, footerController, exportRawDataController, alertDialogController, opUnitReportController) {
+        referralLocationsController, notificationsController, selectProjectPreferenceController, projectReportController, footerController, exportRawDataController, alertDialogController, opUnitReportController, downloadMetadataController) {
 
         var init = function(app) {
             app.controller('reportsController', ['$rootScope', '$scope', '$q', '$routeParams', 'dataSetRepository', 'programRepository', 'orgUnitRepository', 'chartRepository', 'pivotTableRepository', 'translationsService', 'filesystemService','changeLogRepository', reportsController]);
@@ -43,6 +44,7 @@ define(['reportsController', 'moduleWeekSelectorController', 'headerController',
             app.controller('exportRawDataController', ['$scope', '$q', 'dataSetRepository', 'excludedDataElementsRepository', 'orgUnitRepository', 'referralLocationsRepository', 'moduleDataBlockFactory', 'filesystemService', 'translationsService', 'programRepository', 'programEventRepository', 'excludedLineListOptionsRepository', exportRawDataController]);
             app.controller('alertDialogController', ['$scope', '$modalInstance', alertDialogController]);
             app.controller('opUnitReportController', ['$rootScope', '$q', '$scope', '$routeParams', 'orgUnitRepository','changeLogRepository','pivotTableRepository', 'filesystemService', 'translationsService', 'pivotTableExportBuilder', opUnitReportController]);
+            app.controller('downloadMetadataController', ['$scope', '$location', 'metadataDownloader', 'changeLogRepository','packagedDataImporter', downloadMetadataController]);
         };
         return {
             init: init

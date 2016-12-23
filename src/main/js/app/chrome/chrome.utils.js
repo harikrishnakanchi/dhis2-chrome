@@ -89,6 +89,7 @@ define(['lodash'], function(_) {
         createAlarm: createAlarm,
         addAlarmListener: addAlarmListener,
         clearAlarm: clearAlarm,
-        uninstall: uninstall
+        uninstall: uninstall,
+        platform: 'chrome'
     };
 });

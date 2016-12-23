@@ -80,6 +80,7 @@ require.config({
         "footerController": "app/controller/footer.controller",
         "exportRawDataController": "app/controller/export.raw.data.controller",
         "opUnitReportController": "app/controller/opunit.report.controller",
+        "downloadMetadataController": "app/controller/download.metadata.controller",
 
         //Services
         "services": "app/service/services",
