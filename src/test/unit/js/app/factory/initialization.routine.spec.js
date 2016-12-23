@@ -65,25 +65,6 @@ define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter'
                 });
             });
 
-            describe('redirectIfProductKeyNotSet', function () {
-                it("should redirect to login page if product key is set", function () {
-                    initializationRoutine.run();
-
-                    rootScope.$apply();
-
-                    expect(location.path).toHaveBeenCalledWith('/login');
-                });
-
-                it("should redirect to product key page if product key is not set", function () {
-                    systemSettingRepository.isProductKeySet.and.returnValue(utils.getPromise(q, false));
-                    initializationRoutine.run();
-
-                    rootScope.$apply();
-
-                    expect(location.path).toHaveBeenCalledWith('/productKeyPage');
-                });
-            });
-
             describe('hasRoles', function () {
                 beforeEach(function () {
                     rootScope.currentUser = {
@@ -116,14 +97,6 @@ define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter'
                     var allowedRoles = ['Data entry user', 'Project Level Approver'];
                     expect(rootScope.hasRoles(allowedRoles)).toBeTruthy();
                 });
-            });
-
-            it("should import metadata triggering db migrations in the process", function () {
-                initializationRoutine.run();
-
-                rootScope.$apply();
-
-                expect(packagedDataImporter.run).toHaveBeenCalled();
             });
 
             it('should initialize platformUtils', function () {

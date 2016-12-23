@@ -24,21 +24,8 @@ define(['lodash', 'platformUtils'], function (_, platformUtils) {
             $rootScope.loading = false;
         };
 
-        var redirectIfProductKeyNotSet = function() {
-            return systemSettingRepository.isProductKeySet().then(function(productKeyIsSet) {
-                if (productKeyIsSet) {
-                    platformUtils.sendMessage('dbReady');
-                    $location.path('/login');
-                } else {
-                    $location.path('/productKeyPage');
-                }
-            });
-        };
-
         var run = function () {
             systemSettingRepository.getLocale().then($rootScope.setLocale);
-            packagedDataImporter.run();
-            systemSettingRepository.loadProductKey().finally(redirectIfProductKeyNotSet);
             platformUtils.init();
         };
 

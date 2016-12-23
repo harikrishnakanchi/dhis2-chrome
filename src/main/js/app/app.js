@@ -34,6 +34,35 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                 'SUPER_ADMIN': 'Superadmin'
             });
 
+            var routeResolver = ['$q', '$rootScope', '$location', 'systemSettingRepository', 'changeLogRepository',
+                function ($q, $rootScope, $location, systemSettingRepository, changeLogRepository) {
+
+                    var checkProductKey = function () {
+                        return systemSettingRepository.isProductKeySet().then(function (productKeySet) {
+                            return productKeySet ? $q.when() : $q.reject('noProductKey');
+                        });
+                    };
+
+                    var checkMetadata = function () {
+                        return changeLogRepository.get("metaData").then(function (metadataLastUpdated) {
+                            if (metadataLastUpdated) {
+                                platformUtils.sendMessage('dbReady');
+                                return $q.when();
+                            } else {
+                                return $q.reject('noMetadata');
+                            }
+                        });
+                    };
+
+                    var checkSession = function () {
+                        return $rootScope.isLoggedIn || (!$rootScope.isLoggedIn && $location.path() == '/login')? $q.when() : $q.reject('noSession');
+                    };
+
+                    return checkProductKey()
+                        .then(checkMetadata)
+                        .then(checkSession);
+                }];
+
             app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider', '$hustleProvider', '$compileProvider', '$provide', '$tooltipProvider', 'USER_ROLES',
                 function($routeProvider, $indexedDBProvider, $httpProvider, $hustleProvider, $compileProvider, $provide, $tooltipProvider, USER_ROLES) {
                     $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|chrome-extension):/);
@@ -41,11 +70,27 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     $httpProvider.interceptors.push('configureRequestInterceptor');
 
                     $routeProvider.
-                    when('/', {
-                        templateUrl: 'templates/init.html',
+                    when('/downloadingMetadata', {
+                        templateUrl: 'templates/downloading-metadata.html',
+                        controller: 'downloadMetadataController',
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER,
                                 USER_ROLES.COORDINATION_LEVEL_APPROVER,USER_ROLES.PROJECT_ADMIN, USER_ROLES.SUPER_ADMIN]
+                        },
+                        resolve: {
+                            routeResolver: ['$q', 'systemSettingRepository', 'changeLogRepository', function ($q, systemSettingRepository, changeLogRepository) {
+                                var checkMetadata = function () {
+                                    return changeLogRepository.get("metaData").then(function (metadataLastUpdated) {
+                                        return metadataLastUpdated ? $q.reject('noMetadata'): $q.when();
+                                    });
+                                };
+                                var checkProductKey = function () {
+                                    return systemSettingRepository.isProductKeySet().then(function (productKeySet) {
+                                        return productKeySet ? $q.when() : $q.reject('noProductKey');
+                                    });
+                                };
+                                return checkProductKey().then(checkMetadata);
+                            }]
                         }
                     }).
                     when('/dashboard', {
@@ -53,35 +98,40 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                         controller: 'dashboardController',
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
-                        }
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
                     when('/selectProjectPreference', {
                         templateUrl: 'templates/selectProjectPreference.html',
                         controller: 'selectProjectPreferenceController',
                         data: {
                             allowedRoles: [USER_ROLES.PROJECT_ADMIN]
-                        }
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
                     when('/reports/:orgUnit?', {
                         templateUrl: 'templates/reports.html',
                         controller: 'reportsController',
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
-                        }
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
                     when('/projectReport', {
                         templateUrl: 'templates/project-report.html',
                         controller: 'projectReportController',
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
-                        }
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
                     when('/opUnitReport/:opUnit?', {
                         templateUrl: 'templates/opunit-report.html',
                         controller: 'opUnitReportController',
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
-                        }
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
                     when('/login', {
                         templateUrl: 'templates/login.html',
@@ -89,21 +139,24 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER,
                                 USER_ROLES.COORDINATION_LEVEL_APPROVER,USER_ROLES.PROJECT_ADMIN, USER_ROLES.SUPER_ADMIN]
-                        }
+                        },
+                        resolve: { routeResolver: routeResolver }
                     }).
                     when('/orgUnits', {
                         templateUrl: 'templates/orgunits.html',
                         controller: 'orgUnitContoller',
                         data: {
                             allowedRoles: [USER_ROLES.PROJECT_ADMIN, USER_ROLES.SUPER_ADMIN]
-                        }
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
                     when('/notifications', {
                         templateUrl: 'templates/notifications.html',
                         controller: 'notificationsController',
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
-                        }
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
                     when('/productKeyPage', {
                         templateUrl: 'templates/product-key.html',
@@ -118,35 +171,40 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                         controller: 'aggregateDataEntryController',
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY]
-                        }
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
                     when('/line-list-summary/:module/:filterBy?', {
                         templateUrl: 'templates/line-list-summary.html',
                         controller: 'lineListSummaryController',
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
-                        }
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
                     when('/line-list-data-entry/:module/new', {
                         templateUrl: 'templates/line-list-data-entry.html',
                         controller: 'lineListDataEntryController',
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY]
-                        }
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
                     when('/line-list-data-entry/:module/:eventId?', {
                         templateUrl: 'templates/line-list-data-entry.html',
                         controller: 'lineListDataEntryController',
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY]
-                        }
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
                     when('/data-approval/:module?/:week?', {
                         templateUrl: 'templates/data-approval.html',
                         controller: 'dataApprovalController',
                         data: {
                             allowedRoles: [USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER, USER_ROLES.OBSERVER]
-                        }
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
                     otherwise({
                         redirectTo: '/login'
@@ -207,14 +265,23 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                         }
                     });
 
+                    $rootScope.$on('$routeChangeError', function (event, currentRoute, previousRoute, rejection) {
+                        var routes = {
+                            noProductKey: '/productKeyPage',
+                            noMetadata: '/downloadingMetadata',
+                            noSession: '/login'
+                        };
+                        var routeToRedirect = routes[rejection];
+                        var routeToAccess = currentRoute.originalPath;
+                        if(routeToAccess == routeToRedirect){
+                            event.preventDefault();
+                            $location.path(previousRoute.originalPath);
+                            return;
+                        }
+                        $location.path(routeToRedirect);
+                    });
+
                     $rootScope.$on('$routeChangeStart', function (event, newRoute) {
-
-                        var accessingSecurePagesWhileNotLoggedIn = !$rootScope.isLoggedIn &&
-                            !_.includes(['/', '/login', '/productKeyPage'], newRoute.originalPath);
-
-
-                        var accessingLoginPageWhileLoggedIn = $rootScope.isLoggedIn && newRoute.originalPath == '/login';
-
 
                         var loggedInUserRoles = $rootScope.currentUser ? $rootScope.currentUser.userCredentials.userRoles : [],
                             authorizedRoles = newRoute.data && newRoute.data.allowedRoles,
@@ -224,9 +291,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                         var userIsNotAuthorised = $rootScope.isLoggedIn && !userIsAllowedToViewRoute;
 
 
-                        if (userIsNotAuthorised ||
-                            accessingSecurePagesWhileNotLoggedIn ||
-                            accessingLoginPageWhileLoggedIn) {
+                        if (userIsNotAuthorised) {
                             event.preventDefault();
                         }
                     });
