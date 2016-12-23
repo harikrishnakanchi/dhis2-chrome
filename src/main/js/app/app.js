@@ -1,10 +1,10 @@
-define(["angular", "Q", "services", "directives", "dbutils", "controllers", "repositories", "factories", "migrator", "migrations", "properties", "queueInterceptor", "monitors", "helpers", "indexedDBLogger", "transformers", "platformUtils",
+define(["angular", "Q", "services", "directives", "dbutils", "controllers", "repositories", "factories", "migrator", "migrations", "properties", "queueInterceptor", "configureRequestInterceptor", "monitors", "helpers", "indexedDBLogger", "transformers", "platformUtils",
         "angular-route", "ng-i18n", "angular-indexedDB", "hustleModule", "angular-ui-tabs", "angular-ui-accordion", "angular-ui-collapse", "angular-ui-transition", "angular-ui-weekselector",
         "angular-treeview", "angular-ui-modal", "angular-multiselect", "angular-ui-notin", "angular-ui-equals", "angular-ui-dropdown", "angular-filter", "angucomplete-alt", "angular-nvd3", "angular-ui-tooltip",
         "angular-ui-bindHtml", "angular-ui-position", "angular-sanitize"
 
     ],
-    function(angular, Q, services, directives, dbutils, controllers, repositories, factories, migrator, migrations, properties, queueInterceptor, monitors, helpers, indexedDBLogger, transformers, platformUtils) {
+    function(angular, Q, services, directives, dbutils, controllers, repositories, factories, migrator, migrations, properties, queueInterceptor, configureRequestInterceptor, monitors, helpers, indexedDBLogger, transformers, platformUtils) {
         var init = function() {
             var app = angular.module('PRAXIS', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs", "ui.bootstrap.transition", "ui.bootstrap.collapse",
                 "ui.bootstrap.accordion", "ui.weekselector", "angularTreeview", "ui.bootstrap.modal", "ui.bootstrap.dropdown",
@@ -23,6 +23,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
             transformers.init(app);
 
             app.factory('queueInterceptor', ['$log', 'ngI18nResourceBundle', 'dataRepository','dataSyncFailureRepository', 'hustleMonitor', queueInterceptor]);
+            app.factory('configureRequestInterceptor', ['$rootScope', 'systemSettingRepository', configureRequestInterceptor]);
 
             app.constant('USER_ROLES', {
                 'DATA_ENTRY': 'Data entry user',
@@ -36,6 +37,9 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
             app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider', '$hustleProvider', '$compileProvider', '$provide', '$tooltipProvider', 'USER_ROLES',
                 function($routeProvider, $indexedDBProvider, $httpProvider, $hustleProvider, $compileProvider, $provide, $tooltipProvider, USER_ROLES) {
                     $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|chrome-extension):/);
+
+                    $httpProvider.interceptors.push('configureRequestInterceptor');
+
                     $routeProvider.
                     when('/', {
                         templateUrl: 'templates/init.html',

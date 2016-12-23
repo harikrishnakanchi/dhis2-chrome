@@ -95,6 +95,7 @@ require.config({
         "orgUnitGroupService": "app/service/orgunit.group.service",
         "historyService": "app/service/history.service",
         "storageService": "app/service/storage.service",
+        "metadataDownloader": "app/service/metadata.downloader",
 
         //Repositories
         "repositories": "app/repository/repositories",
@@ -164,8 +165,9 @@ require.config({
         "hustleMonitor": "app/monitors/hustle.monitor",
         "monitors": "app/monitors/monitors",
 
-        //Queue
+        //Interceptors
         "queueInterceptor": "app/queue/queue.interceptor",
+        "configureRequestInterceptor": "app/interceptors/configure.request.interceptor",
 
         //Utils
         "dhisId": "app/utils/dhis.id",
