@@ -88,8 +88,6 @@ gulp.task('update-webdriver', shell.task([
 
 gulp.task('serve', ['generate-service-worker', 'watch'], function() {
 
-    gulp.start('download-packaged-data');
-
     var app = express();
 
     app.use(compress());    // gzip
@@ -170,7 +168,6 @@ gulp.task('generate-service-worker', ['less'], function (callback) {
         staticFileGlobs: [
             rootDir + '/css/*.css',
             rootDir + '/fonts/*',
-            rootDir + '/data/*',
             rootDir + '/img/*',
             rootDir + '/js/**/*/!(chrome.*.js)',
             rootDir + '/templates/**/*',
