@@ -1,10 +1,22 @@
 <div class="login-form {{ layoutDirection.direction }}">
 
-    <h4>Downloading data...</h4>
-
-    <div class="progress progress-striped active" ng-if="showProgressBar">
-        <div class="progress-bar progress-bar-primary" role="progressbar" style="width: {{ progress.percent }}%">
+    <div class="progress" ng-class="!maxRetriesExceeded ? 'active progress-striped' : 'stop'" ng-if="showProgressBar">
+        <div class="progress-bar progress-bar-primary"  role="progressbar" style="width: {{ progress.percent }}%">
             <span>{{ progress.percent }}% Complete</span>
+        </div>
+    </div>
+
+    <h4 ng-if="!maxRetriesExceeded">Downloading data...</h4>
+
+    <div ng-if="maxRetriesExceeded">
+        <div>
+            <ul>Download cannot be completed.
+                This can be for the following reasons.
+                <li>There is no internet available.</li>
+                <li>If it fails after repeated retries. Contact {{ supportEmail }} to know more</li>
+                Click the retry button when internet is available ..
+            </ul>
+            <button class="btn btn-primary retry-metadata-download" ng-click="downloadAndUpsertMetadata()"><b>Retry </b></button>
         </div>
     </div>
 

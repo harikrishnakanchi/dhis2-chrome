@@ -26,6 +26,8 @@ define(['platformUtils', 'moment', 'properties'], function (platformUtils, momen
             return metadataDownloader.run().then(success, failure, notify);
         };
 
+        $scope.supportEmail = properties.support_email;
+
         var initializeBackgroundAndRedirect = function () {
             platformUtils.sendMessage("dbReady");
             $location.path('/login');
