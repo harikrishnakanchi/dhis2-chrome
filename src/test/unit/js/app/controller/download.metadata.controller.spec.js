@@ -1,5 +1,5 @@
-define(['angularMocks', 'utils', 'platformUtils', 'downloadMetadataController', 'metadataDownloader', 'changeLogRepository', 'packagedDataImporter'],
-    function (mocks, utils, platformUtils, DownloadMetadataController, MetadataDownloader, ChangeLogRepository, PackagedDataImporter) {
+define(['angularMocks', 'utils','properties', 'platformUtils', 'downloadMetadataController', 'metadataDownloader', 'changeLogRepository', 'packagedDataImporter'],
+    function (mocks, utils, properties, platformUtils, DownloadMetadataController, MetadataDownloader, ChangeLogRepository, PackagedDataImporter) {
         describe('DownloadMetadataController', function () {
             var q, rootScope, scope, location, downloadMetadataController, metadataDownloader, changeLogRepository, packagedDataImporter, initializeController;
 
@@ -25,7 +25,7 @@ define(['angularMocks', 'utils', 'platformUtils', 'downloadMetadataController', 
                 Timecop.freeze(new Date('2016-12-23T11:05:29.002Z'));
 
                 initializeController = function () {
-                    downloadMetadataController = new DownloadMetadataController(scope, location, metadataDownloader, changeLogRepository, packagedDataImporter);
+                    downloadMetadataController = new DownloadMetadataController(scope, q, location, metadataDownloader, changeLogRepository, packagedDataImporter);
                 };
             }));
 
@@ -71,13 +71,34 @@ define(['angularMocks', 'utils', 'platformUtils', 'downloadMetadataController', 
                     expect(changeLogRepository.upsert).toHaveBeenCalledWith('metaData', '2016-12-23T11:05:29.002Z');
                 });
 
-                it('should not upsert the metadata changelog if download fails', function () {
-                    metadataDownloader.run.and.returnValue(utils.getRejectedPromise(q));
+                describe('Metadata download failure', function () {
 
-                    initializeController();
-                    scope.$apply();
+                    it('should retry metadata download', function () {
+                        var count = 0;
+                        metadataDownloader.run.and.callFake(function () {
+                            count++;
+                            return count == 1 ? utils.getRejectedPromise(q) : utils.getPromise(q);
+                        });
 
-                    expect(changeLogRepository.upsert).not.toHaveBeenCalled();
+                        initializeController();
+                        scope.$apply();
+
+                        expect(metadataDownloader.run).toHaveBeenCalledTimes(2);
+                    });
+
+                    it('should not retry metadata download more than the given retries', function () {
+                        var count = 0;
+                        metadataDownloader.run.and.callFake(function () {
+                            count++;
+                            return count < 8 ? utils.getRejectedPromise(q) : utils.getPromise(q);
+                        });
+
+                        initializeController();
+                        scope.$apply();
+
+                        expect(metadataDownloader.run).toHaveBeenCalledTimes(properties.metaDataRetryLimit);
+                        expect(changeLogRepository.upsert).not.toHaveBeenCalled();
+                    });
                 });
             });
         });

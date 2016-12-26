@@ -72,7 +72,8 @@ define(['lodash', 'overrides', 'platformConfig'], function(_, overrides, platfor
         messageTimeout: 5000,
         devMode: true,
         weeksForAutoApprove: 8,
-        weeksToDisplayStatusInDashboard: 12
+        weeksToDisplayStatusInDashboard: 12,
+        metaDataRetryLimit: 5
     };
 
     return _.merge(properties, overrides, platformConfig);
