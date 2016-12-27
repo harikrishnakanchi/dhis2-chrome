@@ -103,7 +103,7 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
         this.getUpdatedPivotTables = function(lastUpdatedTime) {
             var requiredFields = 'id,name,sortOrder,relativePeriods,' +
                                  'categoryDimensions[dataElementCategory,categoryOptions[:identifiable]],' +
-                                 'dataDimensionItems[dataElement[id,name,formName,description],indicator[id,name,shortName,description],programIndicator[id,name,shortName,description]],' +
+                                 'dataDimensionItems[dataElement[id,name,formName,description],indicator[id,name,shortName,description,attributeValues[:identifiable,value,attribute[:identifiable]]],programIndicator[id,name,shortName,description]],' +
                                  'columns[dimension,items[id,name]],' +
                                  'rows[dimension,items[id,name]],' +
                                  'filters[dimension,items[id]]';
