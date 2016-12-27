@@ -69,6 +69,10 @@ define(['angularMocks', 'utils','properties', 'platformUtils', 'downloadMetadata
                     scope.$apply();
 
                     expect(changeLogRepository.upsert).toHaveBeenCalledWith('metaData', '2016-12-23T11:05:29.002Z');
+                    expect(changeLogRepository.upsert).toHaveBeenCalledWith('orgUnits', '2016-12-23T11:05:29.002Z');
+                    expect(changeLogRepository.upsert).toHaveBeenCalledWith('orgUnitGroups', '2016-12-23T11:05:29.002Z');
+                    expect(changeLogRepository.upsert).toHaveBeenCalledWith('datasets', '2016-12-23T11:05:29.002Z');
+                    expect(changeLogRepository.upsert).toHaveBeenCalledWith('programs', '2016-12-23T11:05:29.002Z');
                 });
 
                 describe('Metadata download failure', function () {

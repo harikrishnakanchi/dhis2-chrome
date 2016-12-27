@@ -28,16 +28,24 @@ define(['platformUtils', 'moment', 'properties'], function (platformUtils, momen
 
         $scope.supportEmail = properties.support_email;
 
+        var upsertChangeLog = function () {
+            var updated = moment().toISOString();
+            var promises = [];
+            promises.push(changeLogRepository.upsert('metaData', updated));
+            promises.push(changeLogRepository.upsert('orgUnits', updated));
+            promises.push(changeLogRepository.upsert('orgUnitGroups', updated));
+            promises.push(changeLogRepository.upsert('datasets', updated));
+            promises.push(changeLogRepository.upsert('programs', updated));
+            return $q.all(promises);
+        };
+
         var initializeBackgroundAndRedirect = function () {
             platformUtils.sendMessage("dbReady");
             $location.path('/login');
         };
 
         $scope.downloadAndUpsertMetadata = function () {
-            return downloadMetadata().then(function () {
-                changeLogRepository.upsert('metaData', moment().toISOString())
-                    .then(initializeBackgroundAndRedirect);
-            });
+            return downloadMetadata().then(upsertChangeLog).then(initializeBackgroundAndRedirect);
         };
 
         var init = function () {
