@@ -6,7 +6,7 @@
             colspan="{{ baseColumnConfiguration.length / columnConfiguration.length}}">
             <div ng-class="{ 'header-cell-with-weeks' : table.monthlyReport }">
                 <span>{{ table.getDisplayName(column) }}</span>
-                <p ng-if="column.periodDimension && table.monthlyReport" class="small weeks">{{ getNumberOfWeeksLabel(column.id) }}</p>
+                <p ng-if="column.periodDimension && table.monthlyReport && !table.hideWeeks" class="small weeks">{{ getNumberOfWeeksLabel(column.id) }}</p>
             </div>
         </th>
     </tr>
