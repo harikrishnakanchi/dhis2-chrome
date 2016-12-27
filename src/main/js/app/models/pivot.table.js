@@ -1,4 +1,4 @@
-define(['lodash'], function (_) {
+define(['lodash', 'customAttributes'], function (_, customAttributes) {
     // TODO: [#2144] remove 'FieldApp' from regular expression and decrement the indices if capture group is removed.
     var FIELD_APP_SERVICE_CODE_REGEX = /\[(Praxis|FieldApp) - (.*)]/;
     var FIELD_APP_TITLE_REGEX = /^\[(Praxis|FieldApp) - ([a-zA-Z0-9()><]+)\]([0-9\s]*)([a-zA-Z0-9-\s)><(&\/\\=%\+']+)/;
@@ -29,6 +29,7 @@ define(['lodash'], function (_) {
 
         this.title = parseTitle(this.name);
         this.displayPosition = parseDisplayPosition(this.name);
+        this.hideWeeks = hideWeeks(this.dataDimensionItems);
     };
 
     var parseTitle = function(pivotTableName) {
@@ -49,6 +50,17 @@ define(['lodash'], function (_) {
     var parseServiceCode = function (pivotTableName) {
         var matches = FIELD_APP_SERVICE_CODE_REGEX.exec(pivotTableName);
         return matches && matches[SERVICE_CODE_INDEX];
+    };
+
+    var hideWeeks = function (dataDimensionItems) {
+        return _.any(dataDimensionItems, function (dataDimensionItem) {
+            if (dataDimensionItem.programIndicator) {
+                return true;
+            } else if (dataDimensionItem.indicator) {
+                return customAttributes.getBooleanAttributeValue(dataDimensionItem.indicator.attributeValues, customAttributes.HAS_PROGRAM_INDICATOR);
+            }
+            return false;
+        });
     };
 
     PivotTable.create = function () {
