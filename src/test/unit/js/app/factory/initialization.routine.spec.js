@@ -20,7 +20,7 @@ define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter'
 
                 systemSettingRepository = new SystemSettingRepository(undefined, q);
                 spyOn(systemSettingRepository, 'getLocale').and.returnValue(utils.getPromise(q, 'SOME_LOCALE'));
-                spyOn(systemSettingRepository, 'isProductKeySet').and.returnValue(utils.getPromise(q, true));
+                spyOn(systemSettingRepository, 'loadProductKey').and.returnValue(utils.getPromise(q, {}));
 
                 initializationRoutine = InitializationRoutine(rootScope, location, systemSettingRepository, translationsService, packagedDataImporter);
             }));
@@ -105,6 +105,14 @@ define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter'
                 rootScope.$apply();
 
                 expect(platformUtils.init).toHaveBeenCalled();
+            });
+
+            it('should load the product key', function () {
+                initializationRoutine.run();
+
+                rootScope.$apply();
+
+                expect(systemSettingRepository.loadProductKey).toHaveBeenCalled();
             });
         });
     });

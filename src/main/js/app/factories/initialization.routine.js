@@ -26,6 +26,7 @@ define(['lodash', 'platformUtils'], function (_, platformUtils) {
 
         var run = function () {
             systemSettingRepository.getLocale().then($rootScope.setLocale);
+            systemSettingRepository.loadProductKey();
             platformUtils.init();
         };
 
