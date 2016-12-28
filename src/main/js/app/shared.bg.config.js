@@ -135,7 +135,8 @@ require.config({
         "cipherUtils": "app/utils/cipher.utils",
         "httpUtils": "app/utils/http.utils",
         "dhisUrl": "app/utils/dhis.url",
-        "interpolate": "app/utils/interpolate"
+        "interpolate": "app/utils/interpolate",
+        "pagingUtils": "app/utils/paging.utils"
     },
     waitSeconds: 0,
     shim: {

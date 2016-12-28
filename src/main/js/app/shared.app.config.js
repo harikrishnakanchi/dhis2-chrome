@@ -182,6 +182,7 @@ require.config({
         "interpolate": "app/utils/interpolate",
         "xlsxLoader": "app/utils/xlsx.loader",
         "dataElementUtils": "app/utils/data.element.utils",
+        "pagingUtils": "app/utils/paging.utils",
 
         //Helpers
         "helpers": "app/helpers/helpers",
