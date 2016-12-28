@@ -11,5 +11,10 @@ define(["properties", "lodash"], function(properties, _) {
 
             return $q.all(upsertPromises);
         };
+
+        this.upsertMetadataForEntity = function (data, type) {
+            var store = db.objectStore(type);
+            return store.upsert(data);
+        };
     };
 });
