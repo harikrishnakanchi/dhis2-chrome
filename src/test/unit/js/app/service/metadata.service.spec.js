@@ -60,9 +60,9 @@ define(["metadataService", "properties", "angularMocks", "moment"], function(Met
             };
 
             var filterString = "assumeTrue=false&" +
-                               "categories=true&categoryCombos=true&categoryOptionCombos=true&categoryOptions=true&dataElementGroups=true&dataElements=true&" +
+                               "categories=true&categoryCombos=true&categoryOptionCombos=true&categoryOptions=true&dataElementGroups=true&dataElements=true&indicators=true&" +
                                "lastUpdated="+lastUpdated+"&" +
-                               "optionSets=true&organisationUnitGroupSets=true&sections=true&translations=true&users=true";
+                               "optionSets=true&organisationUnitGroupSets=true&programIndicators=true&sections=true&translations=true&users=true";
             httpBackend.expectGET(properties.dhis.url + "/api/metadata.json?" + filterString).respond(200, metadata);
 
             var actualMetadata;
@@ -84,8 +84,8 @@ define(["metadataService", "properties", "angularMocks", "moment"], function(Met
 
             var filterString = "assumeTrue=false&" +
                               "categories=true&categoryCombos=true&categoryOptionCombos=true&categoryOptions=true&dataElementGroups=true&" +
-                              "dataElements=true&optionSets=true&organisationUnitGroupSets=true&" +
-                              "sections=true&translations=true&users=true";
+                              "dataElements=true&indicators=true&optionSets=true&organisationUnitGroupSets=true&" +
+                              "programIndicators=true&sections=true&translations=true&users=true";
             httpBackend.expectGET(properties.dhis.url + "/api/metadata.json?" + filterString).respond(200, metadata);
 
             var actualMetadata;

@@ -11,6 +11,8 @@ define(['lodash', 'overrides', 'platformConfig'], function(_, overrides, platfor
                 'categoryOptionCombos',
                 'categoryOptions',
                 'dataElements',
+                'indicators',
+                'programIndicators',
                 'sections',
                 'users',
                 'optionSets',
