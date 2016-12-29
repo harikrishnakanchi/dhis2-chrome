@@ -2,6 +2,26 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
     describe('metaDataDownloader', function () {
         var http, q, httpBackend, rootScope, metadataDownloader, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository;
 
+        var expectMetadataDownload = function (options) {
+            options = options || {};
+            httpBackend.expectGET(/.*categories.*/).respond(200, options);
+            httpBackend.expectGET(/.*categoryCombos.*/).respond(200, options);
+            httpBackend.expectGET(/.*categoryOptionCombos.*/).respond(200, options);
+            httpBackend.expectGET(/.*categoryOptions.*/).respond(200, options);
+            httpBackend.expectGET(/.*dataElementGroups.*/).respond(200, options);
+            httpBackend.expectGET(/.*dataElements.*/).respond(200, options);
+            httpBackend.expectGET(/.*optionSets.*/).respond(200, options);
+            httpBackend.expectGET(/.*organisationUnitGroupSets.*/).respond(200, options);
+            httpBackend.expectGET(/.*sections.*/).respond(200, options);
+            httpBackend.expectGET(/.*translations.*/).respond(200, options);
+            httpBackend.expectGET(/.*users.*/).respond(200, options);
+            httpBackend.expectGET(/.*organisationUnitGroups.*/).respond(200, options);
+            httpBackend.expectGET(/.*dataSets.*/).respond(200, options);
+            httpBackend.expectGET(/.*programs.*/).respond(200, options);
+            httpBackend.expectGET(/.*systemSettings.*/).respond(200, options);
+            httpBackend.expectGET(/.*organisationUnits.*/).respond(200, options);
+        };
+
         beforeEach(mocks.inject(function ($injector) {
             http = $injector.get('$http');
             q = $injector.get('$q');
@@ -16,6 +36,7 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
 
             metadataRepository = new MetadataRepository();
             spyOn(metadataRepository,'upsertMetadata').and.returnValue(utils.getPromise(q, {some: 'data'}));
+            spyOn(metadataRepository, 'upsertMetadataForEntity').and.returnValue(utils.getPromise(q, {}));
 
             orgUnitGroupRepository = new OrgUnitGroupRepository();
             spyOn(orgUnitGroupRepository,'upsertDhisDownloadedData').and.returnValue(utils.getPromise(q, {}));
@@ -44,14 +65,7 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
             changeLogRepository.get.and.returnValue(utils.getPromise(q, null));
             metadataDownloader.run();
 
-            httpBackend.expectGET('http://localhost:8080/api/metadata?assumeTrue=false&categories=true&categoryCombos=true&categoryOptionCombos=true&' +
-                'categoryOptions=true&dataElementGroups=true&dataElements=true&optionSets=true&organisationUnitGroupSets=true&organisationUnitGroups=true&sections=true&' +
-                'translations=true&users=true').respond(200, {});
-            httpBackend.expectGET(/.*dataSets.*/).respond(200, {});
-            httpBackend.expectGET(/.*programs.*/).respond(200, {});
-            httpBackend.expectGET(/.*systemSettings.*/).respond(200, {});
-            httpBackend.expectGET(/.*organisationUnits.*/).respond(200, {});
-
+            expectMetadataDownload();
             httpBackend.flush();
         });
 
@@ -66,31 +80,20 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
 
             var metadataPayload = {
                 data: {
-                    organisationUnits: 'someData'
+                    someEntity: 'someData'
                 }
             };
 
-            httpBackend.expectGET(/.*metadata.*/).respond(200, metadataPayload);
-            httpBackend.expectGET(/.*dataSets.*/).respond(200, {});
-            httpBackend.expectGET(/.*programs.*/).respond(200, {});
-            httpBackend.expectGET(/.*systemSettings.*/).respond(200, {});
-            httpBackend.expectGET(/.*organisationUnits.*/).respond(200, {});
-
+            expectMetadataDownload(metadataPayload);
             httpBackend.flush();
-            expect(metadataRepository.upsertMetadata).toHaveBeenCalledWith(metadataPayload);
-            expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(metadataPayload.organisationUnits);
+            expect(metadataRepository.upsertMetadataForEntity).toHaveBeenCalledTimes(11);
         });
 
         it('should update changeLog with the lastUpdated after metadata has been downloaded and upserted successfully', function () {
             changeLogRepository.get.and.returnValue(utils.getPromise(q, null));
             metadataDownloader.run();
 
-            httpBackend.expectGET(/.*metadata.*/).respond(200, {});
-            httpBackend.expectGET(/.*dataSets.*/).respond(200, {});
-            httpBackend.expectGET(/.*programs.*/).respond(200, {});
-            httpBackend.expectGET(/.*systemSettings.*/).respond(200, {});
-            httpBackend.expectGET(/.*organisationUnits.*/).respond(200, {});
-
+            expectMetadataDownload();
             httpBackend.flush();
             expect(changeLogRepository.upsert).toHaveBeenCalled();
         });
@@ -99,27 +102,15 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
             changeLogRepository.get.and.returnValue(utils.getPromise(q, null));
             metadataDownloader.run();
 
-            httpBackend.expectGET(/.*metadata.*/).respond(200, {});
-            httpBackend.expectGET(/.*dataSets.*/).respond(200, {});
-            httpBackend.expectGET(/.*programs.*/).respond(200, {});
-            httpBackend.expectGET(/.*systemSettings.*/).respond(200, {});
-            httpBackend.expectGET(/.*organisationUnits.*/).respond(200, {});
-
+            expectMetadataDownload();
             httpBackend.flush();
             expect(changeLogRepository.clear).toHaveBeenCalled();
         });
 
         it('should not clear temp changeLogs if data is not downloaded', function () {
-            changeLogRepository.get.and.returnValue(utils.getPromise(q, null));
+            changeLogRepository.get.and.returnValue(utils.getRejectedPromise(q, null));
             metadataDownloader.run();
 
-            httpBackend.expectGET(/.*metadata.*/).respond(200, {});
-            httpBackend.expectGET(/.*dataSets.*/).respond(200, {});
-            httpBackend.expectGET(/.*programs.*/).respond(200, {});
-            httpBackend.expectGET(/.*systemSettings.*/).respond(200, {});
-            httpBackend.expectGET(/.*organisationUnits.*/).respond(500, {});
-
-            httpBackend.flush();
             expect(changeLogRepository.clear).not.toHaveBeenCalled();
         });
     });
