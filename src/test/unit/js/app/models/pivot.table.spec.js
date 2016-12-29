@@ -146,43 +146,5 @@ define(['pivotTable'], function(PivotTable) {
                expect(pivotTable.displayPosition).toBeNull();
            });
        });
-
-       describe('hideWeeks', function () {
-            it('should return true if an indicator uses programIndicator internally', function () {
-                config = {
-                    dataDimensionItems: [{
-                        indicator: {
-                            attributeValues: [{
-                                value: 'true',
-                                attribute: {
-                                    code: 'hasProgramIndicator'
-                                }
-                            }]
-                        }
-                    }, {
-                            dataElement: {
-                                attributeValues: [{
-                                    value: 'true',
-                                    attribute: {
-                                        code: 'hasProgramIndicator'
-                                    }
-                                }]
-                            }
-                        }]
-                };
-                pivotTable = PivotTable.create(config);
-                expect(pivotTable.hideWeeks).toBe(true);
-            });
-
-           it('should return true if dataDimensionItem contains atleast one programIndicator', function () {
-               config = {
-                   dataDimensionItems: [{
-                       programIndicator: 'someProgramIndicator'
-                   }]
-               };
-               pivotTable = PivotTable.create(config);
-               expect(pivotTable.hideWeeks).toBe(true);
-           });
-       });
    });
 });
