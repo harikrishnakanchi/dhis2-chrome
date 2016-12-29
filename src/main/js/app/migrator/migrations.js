@@ -29,6 +29,11 @@ define(['dateUtils', 'lodash'], function(dateUtils, _) {
         create_data_store(syncable_types, db);
     };
 
+    var add_indicator_and_program_indicator_stores = function(db, tx) {
+        create_data_store(["indicators", "programIndicators"], db);
+    };
+
+
     var add_system_settings_store = function(db, tx) {
         create_store_with_key("systemSettings", "key", db);
     };
@@ -502,6 +507,7 @@ define(['dateUtils', 'lodash'], function(dateUtils, _) {
         migrate_organisation_unit_data_set_association,
         delete_indices_for_chart_data_and_pivot_table_data,
         migrate_chart_and_pivot_table_keys_from_names_to_ids,
-        delete_keys_chart_and_reports_from_changelog
+        delete_keys_chart_and_reports_from_changelog,
+        add_indicator_and_program_indicator_stores
     ];
 });

@@ -60,6 +60,24 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
                 return metadataRepository.upsertMetadataForEntity(response, 'dataElements');
             }
         }, {
+            name: 'indicators',
+            url: dhisUrl.indicators,
+            params: {
+                fields: ':all,!href,!displayName,!publicAccess,!externalAccess,!displayShortName,!access,!userGroupAccesses,attributeValues[value,attribute[id,code,name]]'
+            },
+            upsertFn: function (response) {
+                return metadataRepository.upsertMetadataForEntity(response, 'indicators');
+            }
+        }, {
+            name: 'programIndicators',
+            url: dhisUrl.programIndicators,
+            params: {
+                fields: ':all,!href,!displayName,!displayInForm,!publicAccess,!access,!userGroupAccesses,attributeValues[value,attribute[id,code,name]]'
+            },
+            upsertFn: function (response) {
+                return metadataRepository.upsertMetadataForEntity(response, 'programIndicators');
+            }
+        }, {
             name: 'optionSets',
             url: dhisUrl.optionSets,
             params: {

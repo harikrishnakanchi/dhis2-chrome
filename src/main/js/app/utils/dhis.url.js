@@ -31,6 +31,8 @@ define(["properties"], function(properties) {
         "categoryOptions": with_host("/api/categoryOptions.json"),
         "dataElementGroups": with_host("/api/dataElementGroups.json"),
         "dataElements": with_host("/api/dataElements.json"),
+        "indicators": with_host("/api/indicators.json"),
+        "programIndicators": with_host("/api/programIndicators.json"),
         "optionSets": with_host("/api/optionSets.json"),
         "organisationUnitGroupSets": with_host("/api/organisationUnitGroupSets.json"),
         "sections": with_host("/api/sections.json"),
