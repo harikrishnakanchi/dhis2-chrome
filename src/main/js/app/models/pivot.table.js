@@ -26,6 +26,7 @@ define(['lodash'], function (_) {
         this.opUnitReport = this.serviceCode == 'OpUnitReport';
         this.monthlyReport = isMonthlyReport(config.relativePeriods);
         this.weeklyReport = !this.monthlyReport;
+        this.hideWeeks = hideWeeks(this.dataDimensionItems);
 
         this.title = parseTitle(this.name);
         this.displayPosition = parseDisplayPosition(this.name);
@@ -49,6 +50,21 @@ define(['lodash'], function (_) {
     var parseServiceCode = function (pivotTableName) {
         var matches = FIELD_APP_SERVICE_CODE_REGEX.exec(pivotTableName);
         return matches && matches[SERVICE_CODE_INDEX];
+    };
+
+    var hideWeeks = function (dataDimensionItems) {
+        return _.any(dataDimensionItems, function (dataDimensionItem) {
+            if (dataDimensionItem.indicator && dataDimensionItem.indicator.numerator) {
+                return dataDimensionItem.indicator.numerator.includes('I{');
+            }
+            if (dataDimensionItem.indicator && dataDimensionItem.indicator.denominator) {
+                return dataDimensionItem.indicator.denominator.includes('I{');
+            }
+            if (dataDimensionItem.programIndicator) {
+                return true;
+            }
+            return false;
+        });
     };
 
     PivotTable.create = function () {

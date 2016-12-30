@@ -146,5 +146,70 @@ define(['pivotTable'], function(PivotTable) {
                expect(pivotTable.displayPosition).toBeNull();
            });
        });
+
+       describe('hideWeeks', function () {
+           it('should return true if an indicator numerator is using program indicator', function () {
+               config = {
+                   dataDimensionItems: [{
+                       indicator: {
+                           id: 'someIndicator',
+                           numerator: '#{someDataElementId}+I{someIndicatorId}+#{someOtherDataElementId}'
+                       }
+                   }]
+               };
+               pivotTable = PivotTable.create(config);
+               expect(pivotTable.hideWeeks).toBe(true);
+           });
+
+           it('should return false if an indicator numerator is not using program indicator', function () {
+               config = {
+                   dataDimensionItems: [{
+                       indicator: {
+                           id: 'someIndicator',
+                           numerator: '#{someDataElementId}+#{someOtherDataElementId}'
+                       }
+                   }]
+               };
+               pivotTable = PivotTable.create(config);
+               expect(pivotTable.hideWeeks).toBe(false);
+           });
+
+           it('should return true if an indicator denominator is using program indicator', function () {
+               config = {
+                   dataDimensionItems: [{
+                       indicator: {
+                           id: 'someIndicator',
+                           denominator: '#{someDataElementId}+I{someIndicatorId}+#{someOtherDataElementId}'
+                       }
+                   }]
+               };
+               pivotTable = PivotTable.create(config);
+               expect(pivotTable.hideWeeks).toBe(true);
+           });
+
+           it('should return false if an indicator denominator is using program indicator', function () {
+               config = {
+                   dataDimensionItems: [{
+                       indicator: {
+                           id: 'someIndicator',
+                           denominator: '#{someDataElementId}+#{someIndicatorId}+#{someOtherDataElementId}'
+                       }
+                   }]
+               };
+               pivotTable = PivotTable.create(config);
+               expect(pivotTable.hideWeeks).toBe(false);
+           });
+
+           it('should return true if data dimension contains atleast one program indicator', function () {
+               config = {
+                   dataDimensionItems: [{
+                       programIndicator: 'someProgramIndicator'
+                   }]
+               };
+               pivotTable = PivotTable.create(config);
+               expect(pivotTable.hideWeeks).toBe(true);
+           });
+
+       });
    });
 });

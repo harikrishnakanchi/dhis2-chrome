@@ -10,7 +10,7 @@
             <div ng-class="{ 'header-cell-with-weeks' : table.monthlyReport }">
                 <span class="name">
                     {{ table.getDisplayName(column) }}
-                    <p ng-if="column.periodDimension && table.monthlyReport" class="small weeks">{{ getNumberOfWeeksLabel(column.id) }}</p>
+                    <p ng-if="column.periodDimension && table.monthlyReport && !table.hideWeeks" class="small weeks">{{ getNumberOfWeeksLabel(column.id) }}</p>
                 </span>
                 <span class="icon" ng-class="{ 'text-danger': column.sorted }" ng-if="column.sortable">
                     <i class="fa" ng-class="table.sortAscending ? 'fa-sort-asc' : 'fa-sort-desc'"></i>
