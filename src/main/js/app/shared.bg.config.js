@@ -50,6 +50,8 @@ require.config({
         "dataElementRepository": "app/repository/data.element.repository",
         "excludedLineListOptionsRepository": "app/repository/excluded.line.list.options.repository",
         "categoryRepository": "app/repository/category.repository",
+        "indicatorRepository": "app/repository/indicator.repository",
+        "programIndicatorRepository": "app/repository/program.indicator.repository",
 
         //Models
         "chart": "app/models/chart",

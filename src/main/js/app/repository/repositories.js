@@ -1,12 +1,13 @@
 define(["dataRepository", "dataSetRepository", "userPreferenceRepository", "orgUnitRepository", "systemSettingRepository", "patientOriginRepository",
         "userRepository", "approvalDataRepository", "programRepository", "programEventRepository", "dataElementRepository", "excludedDataElementsRepository",
-        "orgUnitGroupRepository", "changeLogRepository", "metadataRepository", "orgUnitGroupSetRepository", "optionSetRepository", "chartRepository", "referralLocationsRepository", "pivotTableRepository",
-        "dataSyncFailureRepository", "excludedLineListOptionsRepository", "categoryRepository"
-    ],
+        "orgUnitGroupRepository", "changeLogRepository", "metadataRepository", "orgUnitGroupSetRepository", "optionSetRepository", "chartRepository",
+        "referralLocationsRepository", "pivotTableRepository","dataSyncFailureRepository", "excludedLineListOptionsRepository", "categoryRepository",
+        "indicatorRepository", "programIndicatorRepository"],
     function(dataRepository, dataSetRepository, userPreferenceRepository, orgUnitRepository, systemSettingRepository, patientOriginRepository,
         userRepository, approvalDataRepository, programRepository, programEventRepository, dataElementRepository, excludedDataElementsRepository,
         orgUnitGroupRepository, changeLogRepository, metadataRepository, orgUnitGroupSetRepository, optionSetRepository, chartRepository,
-        referralLocationsRepository, pivotTableRepository, dataSyncFailureRepository, excludedLineListOptionsRepository, categoryRepository) {
+        referralLocationsRepository, pivotTableRepository, dataSyncFailureRepository, excludedLineListOptionsRepository, categoryRepository,
+        indicatorRepository, programIndicatorRepository) {
         var init = function(app) {
             app.service('dataRepository', ['$q', '$indexedDB', dataRepository]);
             app.service('approvalDataRepository', ['$indexedDB', '$q', approvalDataRepository]);
@@ -31,6 +32,8 @@ define(["dataRepository", "dataSetRepository", "userPreferenceRepository", "orgU
             app.service('dataSyncFailureRepository', ['$indexedDB', dataSyncFailureRepository]);
             app.service('excludedLineListOptionsRepository', ['$indexedDB', excludedLineListOptionsRepository]);
             app.service('categoryRepository', ['$indexedDB', '$q', categoryRepository]);
+            app.service('indicatorRepository', ['$indexedDB', indicatorRepository]);
+            app.service('programIndicatorRepository', ['$indexedDB', programIndicatorRepository]);
         };
         return {
             init: init
