@@ -25,7 +25,7 @@ define(['dateUtils', 'lodash'], function (dateUtils, _) {
                 });
 
                 _.each(mainColumns, function (column) {
-                    if(pivotTableData.monthlyReport && column.periodDimension) {
+                    if(pivotTableData.monthlyReport && column.periodDimension && !pivotTableData.hideWeeks) {
                         cells.push(pivotTableData.getDisplayName(column) + ' ' + getNumberOfWeeksLabel(column.id));
                     } else {
                         cells.push(pivotTableData.getDisplayName(column));
