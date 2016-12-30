@@ -1,6 +1,7 @@
-define(["chartRepository", "chart", "chartData", "categoryRepository", "angularMocks", "utils", "lodash"], function(ChartRepository, Chart, ChartData, CategoryRepository, mocks, utils, _) {
+define(["chartRepository", "chart", "chartData", "categoryRepository", "dataElementRepository", "indicatorRepository", "programIndicatorRepository", "angularMocks", "utils", "lodash"],
+    function(ChartRepository, Chart, ChartData, CategoryRepository, DataElementRepository, IndicatorRepository, ProgramIndicatorRepository, mocks, utils, _) {
     describe('Chart Repository', function() {
-        var mockStore, chartRepository, q, mockDB, scope, categoryRepository;
+        var mockStore, chartRepository, q, mockDB, scope, categoryRepository, dataElementRepository, indicatorRepository, programIndicatorRepository;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             mockDB = utils.getMockDB($q);
@@ -12,8 +13,16 @@ define(["chartRepository", "chart", "chartData", "categoryRepository", "angularM
             categoryRepository = new CategoryRepository();
             spyOn(categoryRepository, 'enrichWithCategoryOptions').and.callFake(function (arg) { return utils.getPromise(q, arg); });
 
+            dataElementRepository = new DataElementRepository(mockDB.db);
+            spyOn(dataElementRepository, 'enrichWithDataElementsDetails');
 
-            chartRepository = new ChartRepository(mockDB.db, q, categoryRepository);
+            indicatorRepository = new IndicatorRepository(mockDB.db);
+            spyOn(indicatorRepository, 'enrichWithIndicatorDetails');
+
+            programIndicatorRepository = new ProgramIndicatorRepository(mockDB.db);
+            spyOn(programIndicatorRepository, 'enrichWithProgramIndicatorDetails');
+
+            chartRepository = new ChartRepository(mockDB.db, q, categoryRepository, dataElementRepository, indicatorRepository, programIndicatorRepository);
         }));
 
         describe('getAll', function() {
@@ -47,6 +56,26 @@ define(["chartRepository", "chart", "chartData", "categoryRepository", "angularM
                 scope.$apply();
 
                 expect(categoryRepository.enrichWithCategoryOptions).toHaveBeenCalled();
+            });
+
+            it('should enrich chart definition data dimensions', function () {
+                var allCharts = [{
+                    'id': 'chartId',
+                    'dataDimensionItems': [{
+                        dataElement: 'someDataElement'
+                    }, {
+                        indicator: 'someIndicator'
+                    }, {
+                        programIndicator: 'someProgramIndicator'
+                    }]
+                }];
+                mockStore.getAll.and.returnValue(utils.getPromise(q, allCharts));
+
+                chartRepository.getAll();
+                scope.$apply();
+                expect(dataElementRepository.enrichWithDataElementsDetails).toHaveBeenCalledWith(['someDataElement']);
+                expect(indicatorRepository.enrichWithIndicatorDetails).toHaveBeenCalledWith(['someIndicator']);
+                expect(programIndicatorRepository.enrichWithProgramIndicatorDetails).toHaveBeenCalledWith(['someProgramIndicator']);
             });
         });
 
@@ -117,13 +146,13 @@ define(["chartRepository", "chart", "chartData", "categoryRepository", "angularM
                 "id": "1"
             }];
 
-            mockStore.getAll.and.returnValue(utils.getPromise(q, allCharts));
+            spyOn(chartRepository,'getAll').and.returnValue(utils.getPromise(q, allCharts));
 
             chartRepository.getAllChartsForNotifications().then(function(result) {
                 expect(result).toEqual([allCharts[1], allCharts[2]]);
             });
             scope.$apply();
-            expect(mockStore.getAll).toHaveBeenCalled();
+            expect(chartRepository.getAll).toHaveBeenCalled();
         });
 
         it('should remove all charts by id', function() {
