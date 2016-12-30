@@ -63,5 +63,34 @@ define(["dataElementRepository", "angularMocks", "utils", "customAttributes"], f
             });
         });
 
+        describe('enrichDataElements', function () {
+            it('should enrich the data element', function () {
+                var dataElement = {
+                    id: 'someDataElementId'
+                };
+                var dataElements = [{
+                    id: 'someDataElementId',
+                    name: 'someName',
+                    formName: 'formName',
+                    description: 'someDescription',
+                    someOtherFields: 'someOtherFields'
+                }];
+
+                spyOn(dataElementRepository, 'findAll').and.returnValue(utils.getPromise(q, dataElements));
+
+                var expectedDataElements = {
+                    id: 'someDataElementId',
+                    name: 'someName',
+                    formName: 'formName',
+                    description: 'someDescription'
+                };
+                dataElementRepository.enrichWithDataElementsDetails([dataElement]).then(function (enrichedDataElements) {
+                    expect(dataElementRepository.findAll).toHaveBeenCalledWith([dataElement.id]);
+                    expect(dataElement).toEqual(expectedDataElements);
+                });
+                scope.$apply();
+            });
+        });
+
     });
 });

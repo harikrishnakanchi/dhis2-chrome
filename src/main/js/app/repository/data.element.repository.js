@@ -19,5 +19,14 @@ define(["lodash", "customAttributes"], function (_, customAttributes) {
                 return _.map(dataElements, transformDataElement);
             });
         };
+
+        this.enrichWithDataElementsDetails = function (dataElements) {
+             return this.findAll(_.map(dataElements,'id')).then(function (dataElementsFromStore) {
+                 var indexedDataElements = _.indexBy(dataElementsFromStore, 'id');
+                 return _.map(dataElements, function (dataElement) {
+                     return _.merge(dataElement, _.pick(indexedDataElements[dataElement.id], ['name', 'formName', 'description']));
+                 });
+             });
+        };
     };
 });
