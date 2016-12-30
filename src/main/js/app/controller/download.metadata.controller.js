@@ -1,8 +1,9 @@
 define(['platformUtils', 'moment', 'properties'], function (platformUtils, moment, properties) {
     return function ($scope, $q, $location, metadataDownloader, changeLogRepository, packagedDataImporter) {
-        var retries = 0;
+        var retries = 0, updated;
 
         var downloadMetadata = function () {
+            updated = moment().toISOString();
             var success = function () {
                 console.log('Metadata download complete');
             };
@@ -29,7 +30,6 @@ define(['platformUtils', 'moment', 'properties'], function (platformUtils, momen
         $scope.supportEmail = properties.support_email;
 
         var upsertChangeLog = function () {
-            var updated = moment().toISOString();
             var promises = [];
             promises.push(changeLogRepository.upsert('metaData', updated));
             promises.push(changeLogRepository.upsert('orgUnits', updated));

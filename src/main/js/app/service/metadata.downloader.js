@@ -2,7 +2,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
     return function ($http, $q, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository) {
 
         var TEMP_CHANGE_LOG_PREFIX = 'temp:',
-            MAX_PAGE_REQUESTS = 500;
+            MAX_PAGE_REQUESTS = 500, updated;
 
         var entities = [{
             name: 'categories',
@@ -185,6 +185,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
         };
 
         var downloadAndUpsert = function (entity) {
+            updated = moment().toISOString();
             var upsertFn = entity.upsertFn || function () {};
             var downloadFn = function (queryParams) {
                 return $http.get(entity.url, { params: queryParams} ).then(function(response) {
@@ -200,7 +201,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
         };
 
         var upsertChangeLog = function (entity) {
-            return changeLogRepository.upsert(TEMP_CHANGE_LOG_PREFIX + entity, moment().toISOString());
+            return changeLogRepository.upsert(TEMP_CHANGE_LOG_PREFIX + entity, updated);
         };
 
         var downloadEntityIfNotExists = function (entity) {
