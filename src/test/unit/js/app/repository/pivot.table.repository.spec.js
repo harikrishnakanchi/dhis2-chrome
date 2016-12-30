@@ -1,6 +1,7 @@
-define(["pivotTableRepository", "pivotTable", "pivotTableData", "categoryRepository", "angularMocks", "utils", "lodash"], function(PivotTableRepository, PivotTable, PivotTableData, CategoryRepository, mocks, utils, _) {
+define(["pivotTableRepository", "pivotTable", "pivotTableData", "categoryRepository", "dataElementRepository", "indicatorRepository", "programIndicatorRepository", "angularMocks", "utils", "lodash"],
+    function(PivotTableRepository, PivotTable, PivotTableData, CategoryRepository, DataElementRepository, IndicatorRepository, ProgramIndicatorRepository, mocks, utils, _) {
     describe('Pivot Table Repository', function() {
-        var mockStore, pivotTableRepository, categoryRepository, q, mockDB;
+        var mockStore, pivotTableRepository, categoryRepository, dataElementRepository, indicatorRepository, programIndicatorRepository, q, mockDB;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             mockDB = utils.getMockDB($q);
@@ -11,9 +12,17 @@ define(["pivotTableRepository", "pivotTable", "pivotTableData", "categoryReposit
             categoryRepository = new CategoryRepository();
             spyOn(categoryRepository, 'enrichWithCategoryOptions').and.callFake(function (arg) { return utils.getPromise(q, arg); });
 
-            spyOn(PivotTableData, 'create').and.returnValue({});
+            dataElementRepository = new DataElementRepository(mockDB.db);
+            spyOn(dataElementRepository, 'enrichWithDataElementsDetails');
 
-            pivotTableRepository = new PivotTableRepository(mockDB.db, q, categoryRepository);
+            indicatorRepository = new IndicatorRepository(mockDB.db);
+            spyOn(indicatorRepository, 'enrichWithIndicatorDetails');
+
+            programIndicatorRepository = new ProgramIndicatorRepository(mockDB.db);
+            spyOn(programIndicatorRepository, 'enrichWithProgramIndicatorDetails');
+
+            spyOn(PivotTableData, 'create').and.returnValue({});
+            pivotTableRepository = new PivotTableRepository(mockDB.db, q, categoryRepository, dataElementRepository, indicatorRepository, programIndicatorRepository);
         }));
 
         it('should upsert the pivot tables', function() {
@@ -76,6 +85,26 @@ define(["pivotTableRepository", "pivotTable", "pivotTableData", "categoryReposit
                 scope.$apply();
 
                 expect(categoryRepository.enrichWithCategoryOptions).toHaveBeenCalled();
+            });
+
+            it('should enrich pivot table definitions with the data dimension details', function () {
+                var allPivotTables = [{
+                    'id': 'pivotTable1',
+                    'dataDimensionItems': [{
+                        dataElement: 'someDataElement'
+                    }, {
+                        indicator: 'someIndicator'
+                    }, {
+                        programIndicator: 'someProgramIndicator'
+                    }]
+                }];
+                mockStore.getAll.and.returnValue(utils.getPromise(q, allPivotTables));
+
+                pivotTableRepository.getAll();
+                scope.$apply();
+                expect(dataElementRepository.enrichWithDataElementsDetails).toHaveBeenCalledWith(['someDataElement']);
+                expect(indicatorRepository.enrichWithIndicatorDetails).toHaveBeenCalledWith(['someIndicator']);
+                expect(programIndicatorRepository.enrichWithProgramIndicatorDetails).toHaveBeenCalledWith(['someProgramIndicator']);
             });
 
             it('should get all pivot tables for notifications', function () {

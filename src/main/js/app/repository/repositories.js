@@ -27,7 +27,7 @@ define(["dataRepository", "dataSetRepository", "userPreferenceRepository", "orgU
             app.service('chartRepository', ['$indexedDB', '$q', 'categoryRepository', chartRepository]);
             app.service('referralLocationsRepository', ['$indexedDB', '$q', 'dataSetRepository', referralLocationsRepository]);
             app.service('excludedDataElementsRepository', ['$indexedDB', '$q', excludedDataElementsRepository]);
-            app.service('pivotTableRepository', ['$indexedDB', '$q', 'categoryRepository', pivotTableRepository]);
+            app.service('pivotTableRepository', ['$indexedDB', '$q', 'categoryRepository','dataElementRepository', 'indicatorRepository', 'programIndicatorRepository', pivotTableRepository]);
             app.service('dataSyncFailureRepository', ['$indexedDB', dataSyncFailureRepository]);
             app.service('excludedLineListOptionsRepository', ['$indexedDB', excludedLineListOptionsRepository]);
             app.service('categoryRepository', ['$indexedDB', '$q', categoryRepository]);
