@@ -113,7 +113,7 @@ define(["pivotTableRepository", "pivotTable", "pivotTableData", "categoryReposit
                 }, {
                     name: 'PivotTable2'
                 }];
-                mockStore.getAll.and.returnValue(utils.getPromise(q, allPivotTables));
+                spyOn(pivotTableRepository, 'getAll').and.returnValue(utils.getPromise(q, allPivotTables));
                 pivotTableRepository.getPivotTablesForNotifications().then(function (pivotTables) {
                     expect(pivotTables).toEqual(_.first(allPivotTables));
                 });
