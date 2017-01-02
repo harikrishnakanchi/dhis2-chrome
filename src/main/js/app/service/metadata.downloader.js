@@ -153,7 +153,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
             name: 'systemSettings',
             url: dhisUrl.systemSettings,
             params: {
-                key: 'fieldAppSettings,versionCompatibilityInfo'
+                key: 'fieldAppSettings,versionCompatibilityInfo,notificationSetting'
             },
             upsertFn: function (response) {
                 var accumulator = [];
