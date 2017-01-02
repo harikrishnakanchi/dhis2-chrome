@@ -299,9 +299,11 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'da
 
             var excludeLineListDataElementsOptions = function () {
                 return _.map($scope.summaryDataElements, function (dataElement) {
-                    dataElement.optionSet.options = _.reject(dataElement.optionSet.options, function (option) {
-                        return _.contains(_.get($scope.indexedExcludedLineListOptions[dataElement.id], 'excludedOptionIds'), option.id);
-                    });
+                    if (dataElement.optionSet && dataElement.optionSet.options) {
+                        dataElement.optionSet.options = _.reject(dataElement.optionSet.options, function (option) {
+                            return _.contains(_.get($scope.indexedExcludedLineListOptions[dataElement.id], 'excludedOptionIds'), option.id);
+                        });
+                    }
                     return dataElement;
                 });
             };
