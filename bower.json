@@ -15,7 +15,7 @@
         "ng-i18n": "https://github.com/gertn/ng-i18n.git#v0.2.1",
         "lodash": "~3",
         "angularjs-directives": "https://github.com/DWB-eHealth/angularjs-directives.git#v0.3.0",
-        "moment": "2.9.0",
+        "moment": "2.17.1",
         "js-md5": "1.1.0",
         "angularjs-hustle": "https://github.com/DWB-eHealth/angularjs-hustle.git#9631e73",
         "angular-sanitize": "~1",
