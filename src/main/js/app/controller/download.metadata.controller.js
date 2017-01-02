@@ -39,13 +39,12 @@ define(['platformUtils', 'moment', 'properties'], function (platformUtils, momen
             return $q.all(promises);
         };
 
-        var initializeBackgroundAndRedirect = function () {
-            platformUtils.sendMessage("dbReady");
+        var redirectToLogin = function () {
             $location.path('/login');
         };
 
         $scope.downloadAndUpsertMetadata = function () {
-            return downloadMetadata().then(upsertChangeLog).then(initializeBackgroundAndRedirect);
+            return downloadMetadata().then(upsertChangeLog).then(redirectToLogin);
         };
 
         var init = function () {
@@ -55,7 +54,7 @@ define(['platformUtils', 'moment', 'properties'], function (platformUtils, momen
                     return $scope.downloadAndUpsertMetadata();
                 case 'chrome':
                     return packagedDataImporter.run()
-                        .then(initializeBackgroundAndRedirect);
+                        .then(redirectToLogin);
                 default:
                     return;
             }

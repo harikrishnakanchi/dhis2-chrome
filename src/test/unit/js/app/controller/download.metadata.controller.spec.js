@@ -46,8 +46,7 @@ define(['angularMocks', 'utils','properties', 'platformUtils', 'downloadMetadata
                     expect(packagedDataImporter.run).toHaveBeenCalled();
                 });
 
-                it('should send dbReady message to background and redirect to login after data import is complete', function () {
-                    expect(platformUtils.sendMessage).toHaveBeenCalledWith('dbReady');
+                it('should redirect to login after data import is complete', function () {
                     expect(location.path).toHaveBeenCalledWith('/login');
                 });
             });
