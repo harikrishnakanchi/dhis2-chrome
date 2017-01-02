@@ -26,18 +26,14 @@ require.config({
 
 require(["app/pwa/pwa.bg.config", "app/shared.bg.config"], function() {
     require(["app/bg.app"], function(app) {
-        require(["platformUtils"], function(platformUtils) {
-            var bootstrapData;
+        require(["platformUtils", "lodash"], function(platformUtils, _) {
             var onDbReady = function() {
-                if (!bootstrapData) {
-                    console.log("dB ready");
-                    app.bootstrap(app.init()).then(function(data) {
-                        bootstrapData = data;
-                    });
-                }
+                app.bootstrap(app.init()).then(function () {
+                    console.log("DB Ready");
+                });
             };
             platformUtils.init();
-            platformUtils.addListener("dbReady", onDbReady);
+            platformUtils.addListener("dbReady", _.once(onDbReady));
             platformUtils.sendMessage("backgroundReady");
         });
     });
