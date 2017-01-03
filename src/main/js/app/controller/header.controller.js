@@ -11,6 +11,10 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
             return re.test($location.path());
         };
 
+        $scope.metadataDownloading = function () {
+            return $location.path() == '/downloadingMetadata';
+        };
+
         $scope.hasSelectedProject = function() {
             return !!$rootScope.currentUser.selectedProject;
         };

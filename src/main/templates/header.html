@@ -38,7 +38,7 @@
                             <li class="sync-status" ng-if="remainingJobs > 0">
                                 <span class="badge">{{ getRemainingJobs() }}</span>
                             </li>
-                            <li>
+                            <li ng-hide="metadataDownloading()">
                                 <span class="glyphicon dhis-status glyphicon-cloud"
                                       title="{{ networkStatus() }}"
                                       ng-class="{
