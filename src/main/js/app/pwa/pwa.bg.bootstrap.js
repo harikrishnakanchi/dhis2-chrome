@@ -28,9 +28,8 @@ require(["app/pwa/pwa.bg.config", "app/shared.bg.config"], function() {
     require(["app/bg.app"], function(app) {
         require(["platformUtils", "lodash"], function(platformUtils, _) {
             var onDbReady = function() {
-                app.bootstrap(app.init()).then(function () {
-                    console.log("DB Ready");
-                });
+                console.log("DB Ready");
+                app.bootstrap(app.init());
             };
             platformUtils.init();
             platformUtils.addListener("dbReady", _.once(onDbReady));
