@@ -109,7 +109,7 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
         };
 
         $scope.getRemainingJobs = function () {
-            var resourceBundleKey = $rootScope.remainingJobs == 1 ? 'jobRemaining' : 'jobsRemaining';
+            var resourceBundleKey = $rootScope.remainingJobs == 1 ? 'job' : 'jobs';
             return $rootScope.remainingJobs + ' ' + $scope.resourceBundle[resourceBundleKey];
         };
 
