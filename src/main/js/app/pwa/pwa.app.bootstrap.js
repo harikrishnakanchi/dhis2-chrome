@@ -3,7 +3,8 @@ require.config({
 });
 
 require(["app/pwa/pwa.app.config", "app/shared.app.config"], function() {
-    require(["app/app", "chromeUtils"], function(app, chromeUtils) {
+    require(["app/app", "chromeUtils", "moment"], function(app, chromeUtils, moment) {
+        window.moment = moment;
         var initializeForeground = function () {
             app.bootstrap(app.init());
         };
