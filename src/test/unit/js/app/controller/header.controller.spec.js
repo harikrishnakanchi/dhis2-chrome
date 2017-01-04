@@ -13,8 +13,8 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
                 timeout = $timeout;
 
                 scope.resourceBundle = {
-                    jobRemaining: 'task remaining',
-                    jobsRemaining: 'tasks remaining',
+                    job: 'task remaining',
+                    jobs: 'tasks remaining',
                     uninstall: {
                         title: 'Uninstall Praxis',
                         successMessage: "Uninstalled successfully"
