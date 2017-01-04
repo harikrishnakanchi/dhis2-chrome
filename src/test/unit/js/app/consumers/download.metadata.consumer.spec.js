@@ -6,7 +6,7 @@ define(["downloadMetadataConsumer", "metadataService", "metadataRepository", "ch
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
             scope = $rootScope.$new();
-            thisMoment = moment("2014-01-01T");
+            thisMoment = moment("2014-01-01");
 
             Timecop.install();
             Timecop.freeze(thisMoment.toDate());

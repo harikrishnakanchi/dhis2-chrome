@@ -7,7 +7,7 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
             q = $injector.get('$q');
             httpBackend = $injector.get('$httpBackend');
 
-            currentMomentInTime = moment("2014-01-01T");
+            currentMomentInTime = moment("2014-01-01");
             Timecop.install();
             Timecop.freeze(currentMomentInTime);
 

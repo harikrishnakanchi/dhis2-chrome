@@ -6,7 +6,8 @@ require.config({
 self.basePath = "./";
 
 require(["app/pwa/pwa.app.config", "app/shared.app.config"], function() {
-    require(["app/app", "platformUtils"], function(app, platformUtils) {
+    require(["app/app", "platformUtils", "moment"], function(app, platformUtils, moment) {
+        window.moment = moment;
         var initializeForeground = function () {
             app.bootstrap(app.init());
         };

@@ -5,7 +5,8 @@ require.config({
 self.basePath = "./";
 
 require(["app/chrome/chrome.app.config", "app/shared.app.config"], function(config) {
-    require(["app/app", "platformUtils"], function(app, platformUtils) {
+    require(["app/app", "platformUtils", "moment"], function(app, platformUtils, moment) {
+        window.moment = moment;
         app.bootstrap(app.init());
 
         window.addEventListener('online', function () {
