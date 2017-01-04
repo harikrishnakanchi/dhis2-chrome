@@ -30,429 +30,409 @@
                 <div class="alert alert-danger">{{resourceBundle.noDataForApproval}}</div>
             </div>
         </div>
-
-            <div ng-if="showForm()">
-            <accordion close-others="false">
-                <div class="data-set-acc-wrapper">
-                    <accordion-group ng-repeat="dataSet in associatedDataSets | filter:{ isOriginDataset: false }" ng-init="dataSet.open=true" is-open="dataSet.open">
-                        <accordion-heading>
-                            <span>{{dataSet.name}}</span>
-                            <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': dataSet.open, 'glyphicon-chevron-right': !dataSet.open}"></i>
-                            <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': dataSet.open, 'glyphicon-chevron-left': !dataSet.open}"></i>
-                        </accordion-heading>
-                        <div class="filter">
-                            <label>{{resourceBundle.filterBy}}</label>
-                            <div>
-                                <label for="genderCheckbox">{{resourceBundle.gender}}</label>
-                                <input type="checkbox" ng-model="isGenderFilterApplied" id="genderCheckbox" ng-class="layoutDirection.direction == 'rtl' ? 'pull-right' : 'pull-left'" />
-                            </div>
-                            <div>
-                                <label for="ageCheckbox">{{resourceBundle.age}}</label>
-                                <input type="checkbox" ng-model="isAgeFilterApplied" id="ageCheckbox" ng-class="layoutDirection.direction == 'rtl' ? 'pull-right' : 'pull-left'" />
-                            </div>
+        <accordion close-others="false">
+            <div class="data-set-acc-wrapper" ng-if="showForm()">
+                <accordion-group ng-repeat="dataSet in associatedDataSets | filter:{ isOriginDataset: false, isReferralDataset: false }" ng-init="dataSet.open=true" is-open="dataSet.open">
+                    <accordion-heading>
+                        <span>{{dataSet.name}}</span>
+                        <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': dataSet.open, 'glyphicon-chevron-right': !dataSet.open}"></i>
+                        <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': dataSet.open, 'glyphicon-chevron-left': !dataSet.open}"></i>
+                    </accordion-heading>
+                    <div class="filter">
+                        <label>{{resourceBundle.filterBy}}</label>
+                        <div>
+                            <label for="genderCheckbox">{{resourceBundle.gender}}</label>
+                            <input type="checkbox" ng-model="isGenderFilterApplied" id="genderCheckbox" ng-class="layoutDirection.direction == 'rtl' ? 'pull-right' : 'pull-left'" />
                         </div>
-                        <div class="exp-coll-group" ng-if="!isGenderFilterApplied &amp;&amp; !isAgeFilterApplied">
-                            <accordion close-others="false">
-                                <div ng-repeat="programStage in program.programStages" class="data-set-acc-wrapper">
-                                    <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
-                                        <div ng-repeat="psde in section.programStageDataElements" ng-if="canShowDataElement(psde.dataElement.optionSet.id, psde.dataElement.id)">
-                                            <div class="spacing-div-accordian" class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) && psde.dataElement.isIncluded">
-                                                <accordion-group is-open="status.open">
-                                                    <accordion-heading>
-                                                         <div class="description-popup">
-                                                            {{ getDisplayName(psde.dataElement) }}
-                                                             <a class="description-popup-icon"
-                                                                description-popup
-                                                                dp-title="{{ getDisplayName(psde.dataElement) }}"
-                                                                dp-desc="{{psde.dataElement.description}}"
-                                                                >
-                                                                  <i class="fa fa-info-circle" tooltip-placement="top"></i>
-                                                             </a>
-                                                             <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-                                                             <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
-                                                         </div>
-                                                    </accordion-heading>
-                                                    <table locked-table-header class="table table-bordered">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>{{resourceBundle.optionName}}</th>
-                                                                <th>{{resourceBundle.numberOfEvents}}</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]"
-                                                            ng-if="getTotalCount(psde.dataElement.id, isGenderFilterApplied, isAgeFilterApplied, option.id) != 0">
-                                                            <td>{{option.name}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.id)}}</td>
-                                                        </tr>
-                                                    </table>
-                                                </accordion-group>
-                                            </div>
+                        <div>
+                            <label for="ageCheckbox">{{resourceBundle.age}}</label>
+                            <input type="checkbox" ng-model="isAgeFilterApplied" id="ageCheckbox" ng-class="layoutDirection.direction == 'rtl' ? 'pull-right' : 'pull-left'" />
+                        </div>
+                    </div>
+                    <div class="exp-coll-group" ng-if="!isGenderFilterApplied &amp;&amp; !isAgeFilterApplied">
+                        <accordion close-others="false">
+                            <div ng-repeat="programStage in program.programStages" class="data-set-acc-wrapper">
+                                <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
+                                    <div ng-repeat="psde in section.programStageDataElements" ng-if="canShowDataElement(psde.dataElement.optionSet.id, psde.dataElement.id)">
+                                        <div class="spacing-div-accordian" class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) && psde.dataElement.isIncluded">
+                                            <accordion-group is-open="status.open">
+                                                <accordion-heading>
+                                                    <div class="description-popup">
+                                                        {{ getDisplayName(psde.dataElement) }}
+                                                        <a class="description-popup-icon"
+                                                           description-popup
+                                                           dp-title="{{ getDisplayName(psde.dataElement) }}"
+                                                           dp-desc="{{psde.dataElement.description}}"
+                                                        >
+                                                            <i class="fa fa-info-circle" tooltip-placement="top"></i>
+                                                        </a>
+                                                        <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                                        <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
+                                                    </div>
+                                                </accordion-heading>
+                                                <table locked-table-header class="table table-bordered">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>{{resourceBundle.optionName}}</th>
+                                                        <th>{{resourceBundle.numberOfEvents}}</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]"
+                                                        ng-if="getTotalCount(psde.dataElement.id, isGenderFilterApplied, isAgeFilterApplied, option.id) != 0">
+                                                        <td>{{option.name}}</td>
+                                                        <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.id)}}</td>
+                                                    </tr>
+                                                </table>
+                                            </accordion-group>
                                         </div>
                                     </div>
                                 </div>
-                            </accordion>
-                            <div class="offlineProcedure" ng-if="shouldShowProceduresInOfflineSummary()">
-                                <accordion close-others="false">
-                                    <accordion-group>
-                                        <accordion-heading>
-                                            <div class="description-popup">
-                                                {{resourceBundle.proceduresPerformed}}
-                                                <a class="description-popup-icon"
-                                                   description-popup
-                                                   dp-title="{{resourceBundle.proceduresPerformed}}"
-                                                   dp-multiple-descriptions="proceduresPerformed"
-                                                   >
-                                                    <i class="fa fa-info-circle" tooltip-placement="top"></i>
-                                                </a>
-                                                <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-                                                <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
-                                            </div>
-                                        </accordion-heading>
-                                        <table locked-table-header class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>{{resourceBundle.optionName}}</th>
-                                                    <th>{{resourceBundle.numberOfEvents}}</th>
-                                                </tr>
-                                            </thead>
-                                            <tr ng-repeat="pdv in procedureOptions"
-                                                ng-if="getTotalProcedureCount(isGenderFilterApplied, isAgeFilterApplied, pdv.id) != 0">
-                                                <td>{{optionMapping[pdv.id]}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id)}}</td>
-                                            </tr>
-                                        </table>
-                                    </accordion-group>
-                                </accordion>
                             </div>
-                        </div>
-                        <div class="exp-coll-group" ng-if="isGenderFilterApplied &amp;&amp; !isAgeFilterApplied">
+                        </accordion>
+                        <div class="offlineProcedure" ng-if="shouldShowProceduresInOfflineSummary()">
                             <accordion close-others="false">
-                                <div ng-repeat="programStage in program.programStages">
-                                    <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
-                                        <div ng-repeat="psde in section.programStageDataElements" ng-if="canShowDataElement(psde.dataElement.optionSet.id, psde.dataElement.id)">
-                                            <div class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) && psde.dataElement.isIncluded">
-                                                <accordion-group is-open="status.open">
-                                                    <accordion-heading>
-                                                        <div class="description-popup">
-                                                            {{ getDisplayName(psde.dataElement) }}
-                                                            <a class="description-popup-icon"
-                                                               description-popup
-                                                               dp-title="{{ getDisplayName(psde.dataElement) }}"
-                                                               dp-desc="{{psde.dataElement.description}}"
-                                                               >
-                                                                <i class="fa fa-info-circle" tooltip-placement="top"></i>
-                                                            </a>
-                                                            <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-                                                            <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
-                                                        </div>
-                                                    </accordion-heading>
-                                                    <table locked-table-header class="table table-bordered">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>{{resourceBundle.optionName}}</th>
-                                                                <th ng-repeat="genderOption in genderOptions"> {{genderOption.name}}
-                                                                </th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]"
-                                                            ng-if="getTotalCount(psde.dataElement.id, isGenderFilterApplied, isAgeFilterApplied, option.id, genderOptions) != 0">
-                                                            <td>{{option.name}}</td>
-                                                            <td ng-repeat="genderOption in genderOptions">{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.id, genderOption.id)}}</td>
-                                                        </tr>
-                                                    </table>
-                                                </accordion-group>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </accordion>
-                            <div class="offlineProcedure" ng-if="shouldShowProceduresInOfflineSummary()">
-                                <accordion close-others="false">
-                                    <accordion-group is-open="status.open">
-                                        <accordion-heading>
-                                            <div class="description-popup">
-                                                {{resourceBundle.proceduresPerformed}}
-                                                <a class="description-popup-icon"
-                                                   description-popup
-                                                   dp-title="{{resourceBundle.proceduresPerformed}}"
-                                                   dp-multiple-descriptions="proceduresPerformed"
-                                                   >
-                                                    <i class="fa fa-info-circle" tooltip-placement="top"></i>
-                                                </a>
-                                                <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-                                                <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
-                                            </div>
-                                        </accordion-heading>
-                                        <table locked-table-header class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>{{resourceBundle.optionName}}</th>
-                                                    <th ng-repeat="genderOption in genderOptions"> {{genderOption.name}}
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tr ng-repeat="pdv in procedureOptions"
-                                                ng-if="getTotalProcedureCount(isGenderFilterApplied, isAgeFilterApplied, pdv.id, genderOptions) != 0">
-                                                <td>{{optionMapping[pdv.id]}}</td>
-                                                <td ng-repeat="genderOption in genderOptions">{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id, genderOption.id)}}</td>
-                                            </tr>
-                                        </table>
-                                    </accordion-group>
-                                </accordion>
-                            </div>
-                        </div>
-                        <div class="exp-coll-group" ng-if="isAgeFilterApplied &amp;&amp; !isGenderFilterApplied">
-                            <accordion close-others="false">
-                                <div ng-repeat="programStage in program.programStages">
-                                    <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
-                                        <div ng-repeat="psde in section.programStageDataElements" ng-if="canShowDataElement(psde.dataElement.optionSet.id, psde.dataElement.id)">
-                                            <div class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) && psde.dataElement.isIncluded">
-                                                <accordion-group is-open="status.open">
-                                                    <accordion-heading>
-                                                        <div class="description-popup">
-                                                            {{ getDisplayName(psde.dataElement) }}
-                                                            <a class="description-popup-icon"
-                                                               description-popup
-                                                               dp-title="{{ getDisplayName(psde.dataElement) }}"
-                                                               dp-desc="{{psde.dataElement.description}}">
-                                                                <i class="fa fa-info-circle" tooltip-placement="top"></i>
-                                                            </a>
-                                                            <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-                                                            <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
-                                                        </div>
-                                                    </accordion-heading>
-                                                    <table locked-table-header class="table table-bordered">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>{{resourceBundle.optionName}}</th>
-                                                                <th>{{resourceBundle.lessThanFive}}</th>
-                                                                <th>{{resourceBundle.fiveToFourtenn}}</th>
-                                                                <th>{{resourceBundle.greaterThanFifteen}}</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]"
-                                                            ng-if="getTotalCount(psde.dataElement.id, isGenderFilterApplied, isAgeFilterApplied, option.code, undefined, [0,9999]) != 0">
-                                                            <td>{{option.name}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [0,5])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [4,15])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [14, 9999])}}</td>
-                                                        </tr>
-                                                    </table>
-                                                </accordion-group>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </accordion>
-                            <div class="offlineProcedure" ng-if="shouldShowProceduresInOfflineSummary()">
-                                <accordion close-others="false">
-                                    <accordion-group is-open="status.open">
-                                        <accordion-heading>
-                                            <div class="description-popup">
-                                                {{resourceBundle.proceduresPerformed}}
-                                                <a class="description-popup-icon"
-                                                   description-popup
-                                                   dp-title="{{resourceBundle.proceduresPerformed}}"
-                                                   dp-multiple-descriptions="proceduresPerformed"
-                                                >
-                                                    <i class="fa fa-info-circle" tooltip-placement="top"></i>
-                                                </a>
-                                                <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-                                                <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
-                                            </div>
-                                        </accordion-heading>
-                                        <table locked-table-header class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>{{resourceBundle.optionName}}</th>
-                                                    <th>{{resourceBundle.lessThanFive}}</th>
-                                                    <th>{{resourceBundle.fiveToFourtenn}}</th>
-                                                    <th>{{resourceBundle.greaterThanFifteen}}</th>
-                                                </tr>
-                                            </thead>
-                                            <tr ng-repeat="pdv in procedureOptions"
-                                                ng-if="getTotalProcedureCount(isGenderFilterApplied, isAgeFilterApplied, pdv.id, undefined, [0,9999]) != 0">
-                                                <td>{{optionMapping[pdv.id]}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id, undefined,[0,5])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id, undefined,[4,15])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id, undefined,[14, 9999])}}</td>
-                                            </tr>
-                                        </table>
-                                    </accordion-group>
-                                </accordion>
-                            </div>
-                        </div>
-                        <div class="exp-coll-group" ng-if="isAgeFilterApplied &amp;&amp; isGenderFilterApplied">
-                            <accordion close-others="false">
-                                <div ng-repeat="programStage in program.programStages">
-                                    <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
-                                        <div ng-repeat="psde in section.programStageDataElements" ng-if="canShowDataElement(psde.dataElement.optionSet.id, psde.dataElement.id)">
-                                            <div class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) && psde.dataElement.isIncluded">
-                                                <accordion-group is-open="status.open">
-                                                    <accordion-heading>
-                                                        <div class="description-popup">
-                                                            {{ getDisplayName(psde.dataElement) }}
-                                                            <a class="description-popup-icon"
-                                                               description-popup
-                                                               dp-title="{{ getDisplayName(psde.dataElement) }}"
-                                                               dp-desc="{{psde.dataElement.description}}">
-                                                                <i class="fa fa-info-circle" tooltip-placement="top"></i>
-                                                            </a>
-                                                            <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-                                                            <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
-                                                        </div>
-                                                    </accordion-heading>
-                                                    <table locked-table-header class="table table-bordered">
-                                                        <thead>
-                                                            <tr>
-                                                                <th rowspan="2">{{resourceBundle.optionName}}</th>
-                                                                <th colspan="3" ng-repeat="genderOption in genderOptions"> {{genderOption.name}}
-                                                                </th>
-                                                            </tr>
-                                                            <tr>
-                                                                <th ng-repeat-start="genderOption in genderOptions">{{resourceBundle.lessThanFive}}</th>
-                                                                <th>{{resourceBundle.fiveToFourtenn}}</th>
-                                                                <th ng-repeat-end>{{resourceBundle.greaterThanFifteen}}</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]"
-                                                            ng-if="getTotalCount(psde.dataElement.id, isGenderFilterApplied, isAgeFilterApplied, option.code, genderOptions, [0,9999]) != 0">
-                                                            <td>{{option.name}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [0,5])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [4,15])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [14, 9999])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[1].id, [0,5])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[1].id, [4,15])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[1].id, [14, 9999])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[2].id, [0,5])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[2].id, [4,15])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[2].id, [14, 9999])}}</td>
-                                                        </tr>
-                                                    </table>
-                                                </accordion-group>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </accordion>
-                            <div class="offlineProcedure" ng-if="shouldShowProceduresInOfflineSummary()">
-                                <accordion close-others="false">
-                                    <accordion-group is-open="status.open">
-                                        <accordion-heading>
-                                            <div class="description-popup">
-                                                {{resourceBundle.proceduresPerformed}}
-                                                <a class="description-popup-icon"
-                                                   description-popup
-                                                   dp-title="{{resourceBundle.proceduresPerformed}}"
-                                                   dp-multiple-descriptions="proceduresPerformed"
-                                                >
-                                                    <i class="fa fa-info-circle" tooltip-placement="top"></i>
-                                                </a>
-                                                <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-                                                <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
-                                            </div>
-                                        </accordion-heading>
-                                        <table locked-table-header class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th rowspan="2">{{resourceBundle.optionName}}</th>
-                                                    <th colspan="3" ng-repeat="genderOption in genderOptions"> {{genderOption.name}}
-                                                    </th>
-                                                </tr>
-                                                <tr>
-                                                    <th ng-repeat-start="genderOption in genderOptions">{{resourceBundle.lessThanFive}}</th>
-                                                    <th>{{resourceBundle.fiveToFourtenn}}</th>
-                                                    <th ng-repeat-end>{{resourceBundle.greaterThanFifteen}}</th>
-                                                </tr>
-                                            </thead>
-                                            <tr ng-repeat="pdv in procedureOptions"
-                                                ng-if="getTotalProcedureCount(isGenderFilterApplied, isAgeFilterApplied, pdv.id, genderOptions, [0,9999]) != 0">
-                                                <td>{{optionMapping[pdv.id]}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[0].id, [0,5])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[0].id, [4,15])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[0].id, [14, 9999])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[1].id, [0,5])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[1].id, [4,15])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[1].id, [14, 9999])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[2].id, [0,5])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[2].id, [4,15])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[2].id, [14, 9999])}}</td>
-                                            </tr>
-                                        </table>
-                                    </accordion-group>
-                                </accordion>
-                            </div>
-                        </div>
-                    </accordion-group>
-                </div>
-                <div class="data-set-acc-wrapper">
-                    <accordion-group ng-repeat="dataSet in associatedDataSets | filter:{ isOriginDataset: true }" ng-init="dataSet.open=true" is-open="dataSet.open">
-                        <accordion-heading>
-                            <span>{{ dataSet.name }}</span>
-                            <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': dataSet.open, 'glyphicon-chevron-right': !dataSet.open}"></i>
-                            <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': dataSet.open, 'glyphicon-chevron-left': !dataSet.open}"></i>
-                        </accordion-heading>
-                        <div class="exp-coll-group">
-                            <accordion close-others="false">
-                                <accordion-group is-open="origins.open">
+                                <accordion-group>
                                     <accordion-heading>
-                                        <span>{{resourceBundle.originsCountTitle}}</span>
-                                        <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': origins.open, 'glyphicon-chevron-right': !origins.open}"></i>
-                                        <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': origins.open, 'glyphicon-chevron-left': !origins.open}"></i>
+                                        <div class="description-popup">
+                                            {{resourceBundle.proceduresPerformed}}
+                                            <a class="description-popup-icon"
+                                               description-popup
+                                               dp-title="{{resourceBundle.proceduresPerformed}}"
+                                               dp-multiple-descriptions="proceduresPerformed"
+                                            >
+                                                <i class="fa fa-info-circle" tooltip-placement="top"></i>
+                                            </a>
+                                            <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                            <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
+                                        </div>
                                     </accordion-heading>
                                     <table locked-table-header class="table table-bordered">
                                         <thead>
-                                            <tr>
-                                                <th> {{resourceBundle.originName}} </th>
-                                                <th> {{resourceBundle.countLabel}} </th>
-                                            </tr>
+                                        <tr>
+                                            <th>{{resourceBundle.optionName}}</th>
+                                            <th>{{resourceBundle.numberOfEvents}}</th>
+                                        </tr>
                                         </thead>
-                                        <tr ng-repeat="(originId, originName) in originMap">
-                                            <td>{{originName}}</td>
-                                            <td>{{originEvents[originId].length || 0}}</td>
+                                        <tr ng-repeat="pdv in procedureOptions"
+                                            ng-if="getTotalProcedureCount(isGenderFilterApplied, isAgeFilterApplied, pdv.id) != 0">
+                                            <td>{{optionMapping[pdv.id]}}</td>
+                                            <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id)}}</td>
                                         </tr>
                                     </table>
                                 </accordion-group>
                             </accordion>
                         </div>
-                    </accordion-group>
-                </div>
-            </accordion>
-            <div class="offlineProcedure" ng-if="shouldShowReferrals">
-                <accordion close-others="false">
-                    <div class="data-set-acc-wrapper">
-                        <accordion-group is-open="status.open">
-                            <accordion-heading>
-                                <span>{{ resourceBundle.referralLocationLabel }}</span>
-                                <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-                                <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
-                            </accordion-heading>
-                            <table locked-table-header class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>{{resourceBundle.locationLabel}}</th>
-                                        <th>{{resourceBundle.countLabel}}</th>
-                                    </tr>
-                                </thead>
-                                <tr ng-repeat="name in locationNames">
-                                    <td>{{name}}</td>
-                                    <td>{{getReferralCount(name)}}</td>
-                                </tr>
-                            </table>
-                        </accordion-group>
                     </div>
-                </accordion>
+                    <div class="exp-coll-group" ng-if="isGenderFilterApplied &amp;&amp; !isAgeFilterApplied">
+                        <accordion close-others="false">
+                            <div ng-repeat="programStage in program.programStages">
+                                <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
+                                    <div ng-repeat="psde in section.programStageDataElements" ng-if="canShowDataElement(psde.dataElement.optionSet.id, psde.dataElement.id)">
+                                        <div class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) && psde.dataElement.isIncluded">
+                                            <accordion-group is-open="status.open">
+                                                <accordion-heading>
+                                                    <div class="description-popup">
+                                                        {{ getDisplayName(psde.dataElement) }}
+                                                        <a class="description-popup-icon"
+                                                           description-popup
+                                                           dp-title="{{ getDisplayName(psde.dataElement) }}"
+                                                           dp-desc="{{psde.dataElement.description}}"
+                                                        >
+                                                            <i class="fa fa-info-circle" tooltip-placement="top"></i>
+                                                        </a>
+                                                        <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                                        <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
+                                                    </div>
+                                                </accordion-heading>
+                                                <table locked-table-header class="table table-bordered">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>{{resourceBundle.optionName}}</th>
+                                                        <th ng-repeat="genderOption in genderOptions"> {{genderOption.name}}
+                                                        </th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]"
+                                                        ng-if="getTotalCount(psde.dataElement.id, isGenderFilterApplied, isAgeFilterApplied, option.id, genderOptions) != 0">
+                                                        <td>{{option.name}}</td>
+                                                        <td ng-repeat="genderOption in genderOptions">{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.id, genderOption.id)}}</td>
+                                                    </tr>
+                                                </table>
+                                            </accordion-group>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </accordion>
+                        <div class="offlineProcedure" ng-if="shouldShowProceduresInOfflineSummary()">
+                            <accordion close-others="false">
+                                <accordion-group is-open="status.open">
+                                    <accordion-heading>
+                                        <div class="description-popup">
+                                            {{resourceBundle.proceduresPerformed}}
+                                            <a class="description-popup-icon"
+                                               description-popup
+                                               dp-title="{{resourceBundle.proceduresPerformed}}"
+                                               dp-multiple-descriptions="proceduresPerformed"
+                                            >
+                                                <i class="fa fa-info-circle" tooltip-placement="top"></i>
+                                            </a>
+                                            <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                            <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
+                                        </div>
+                                    </accordion-heading>
+                                    <table locked-table-header class="table table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <th>{{resourceBundle.optionName}}</th>
+                                            <th ng-repeat="genderOption in genderOptions"> {{genderOption.name}}
+                                            </th>
+                                        </tr>
+                                        </thead>
+                                        <tr ng-repeat="pdv in procedureOptions"
+                                            ng-if="getTotalProcedureCount(isGenderFilterApplied, isAgeFilterApplied, pdv.id, genderOptions) != 0">
+                                            <td>{{optionMapping[pdv.id]}}</td>
+                                            <td ng-repeat="genderOption in genderOptions">{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id, genderOption.id)}}</td>
+                                        </tr>
+                                    </table>
+                                </accordion-group>
+                            </accordion>
+                        </div>
+                    </div>
+                    <div class="exp-coll-group" ng-if="isAgeFilterApplied &amp;&amp; !isGenderFilterApplied">
+                        <accordion close-others="false">
+                            <div ng-repeat="programStage in program.programStages">
+                                <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
+                                    <div ng-repeat="psde in section.programStageDataElements" ng-if="canShowDataElement(psde.dataElement.optionSet.id, psde.dataElement.id)">
+                                        <div class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) && psde.dataElement.isIncluded">
+                                            <accordion-group is-open="status.open">
+                                                <accordion-heading>
+                                                    <div class="description-popup">
+                                                        {{ getDisplayName(psde.dataElement) }}
+                                                        <a class="description-popup-icon"
+                                                           description-popup
+                                                           dp-title="{{ getDisplayName(psde.dataElement) }}"
+                                                           dp-desc="{{psde.dataElement.description}}">
+                                                            <i class="fa fa-info-circle" tooltip-placement="top"></i>
+                                                        </a>
+                                                        <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                                        <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
+                                                    </div>
+                                                </accordion-heading>
+                                                <table locked-table-header class="table table-bordered">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>{{resourceBundle.optionName}}</th>
+                                                        <th>{{resourceBundle.lessThanFive}}</th>
+                                                        <th>{{resourceBundle.fiveToFourtenn}}</th>
+                                                        <th>{{resourceBundle.greaterThanFifteen}}</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]"
+                                                        ng-if="getTotalCount(psde.dataElement.id, isGenderFilterApplied, isAgeFilterApplied, option.code, undefined, [0,9999]) != 0">
+                                                        <td>{{option.name}}</td>
+                                                        <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [0,5])}}</td>
+                                                        <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [4,15])}}</td>
+                                                        <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [14, 9999])}}</td>
+                                                    </tr>
+                                                </table>
+                                            </accordion-group>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </accordion>
+                        <div class="offlineProcedure" ng-if="shouldShowProceduresInOfflineSummary()">
+                            <accordion close-others="false">
+                                <accordion-group is-open="status.open">
+                                    <accordion-heading>
+                                        <div class="description-popup">
+                                            {{resourceBundle.proceduresPerformed}}
+                                            <a class="description-popup-icon"
+                                               description-popup
+                                               dp-title="{{resourceBundle.proceduresPerformed}}"
+                                               dp-multiple-descriptions="proceduresPerformed"
+                                            >
+                                                <i class="fa fa-info-circle" tooltip-placement="top"></i>
+                                            </a>
+                                            <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                            <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
+                                        </div>
+                                    </accordion-heading>
+                                    <table locked-table-header class="table table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <th>{{resourceBundle.optionName}}</th>
+                                            <th>{{resourceBundle.lessThanFive}}</th>
+                                            <th>{{resourceBundle.fiveToFourtenn}}</th>
+                                            <th>{{resourceBundle.greaterThanFifteen}}</th>
+                                        </tr>
+                                        </thead>
+                                        <tr ng-repeat="pdv in procedureOptions"
+                                            ng-if="getTotalProcedureCount(isGenderFilterApplied, isAgeFilterApplied, pdv.id, undefined, [0,9999]) != 0">
+                                            <td>{{optionMapping[pdv.id]}}</td>
+                                            <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id, undefined,[0,5])}}</td>
+                                            <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id, undefined,[4,15])}}</td>
+                                            <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id, undefined,[14, 9999])}}</td>
+                                        </tr>
+                                    </table>
+                                </accordion-group>
+                            </accordion>
+                        </div>
+                    </div>
+                    <div class="exp-coll-group" ng-if="isAgeFilterApplied &amp;&amp; isGenderFilterApplied">
+                        <accordion close-others="false">
+                            <div ng-repeat="programStage in program.programStages">
+                                <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
+                                    <div ng-repeat="psde in section.programStageDataElements" ng-if="canShowDataElement(psde.dataElement.optionSet.id, psde.dataElement.id)">
+                                        <div class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) && psde.dataElement.isIncluded">
+                                            <accordion-group is-open="status.open">
+                                                <accordion-heading>
+                                                    <div class="description-popup">
+                                                        {{ getDisplayName(psde.dataElement) }}
+                                                        <a class="description-popup-icon"
+                                                           description-popup
+                                                           dp-title="{{ getDisplayName(psde.dataElement) }}"
+                                                           dp-desc="{{psde.dataElement.description}}">
+                                                            <i class="fa fa-info-circle" tooltip-placement="top"></i>
+                                                        </a>
+                                                        <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                                        <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
+                                                    </div>
+                                                </accordion-heading>
+                                                <table locked-table-header class="table table-bordered">
+                                                    <thead>
+                                                    <tr>
+                                                        <th rowspan="2">{{resourceBundle.optionName}}</th>
+                                                        <th colspan="3" ng-repeat="genderOption in genderOptions"> {{genderOption.name}}
+                                                        </th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th ng-repeat-start="genderOption in genderOptions">{{resourceBundle.lessThanFive}}</th>
+                                                        <th>{{resourceBundle.fiveToFourtenn}}</th>
+                                                        <th ng-repeat-end>{{resourceBundle.greaterThanFifteen}}</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]"
+                                                        ng-if="getTotalCount(psde.dataElement.id, isGenderFilterApplied, isAgeFilterApplied, option.code, genderOptions, [0,9999]) != 0">
+                                                        <td>{{option.name}}</td>
+                                                        <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [0,5])}}</td>
+                                                        <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [4,15])}}</td>
+                                                        <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [14, 9999])}}</td>
+                                                        <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[1].id, [0,5])}}</td>
+                                                        <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[1].id, [4,15])}}</td>
+                                                        <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[1].id, [14, 9999])}}</td>
+                                                        <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[2].id, [0,5])}}</td>
+                                                        <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[2].id, [4,15])}}</td>
+                                                        <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[2].id, [14, 9999])}}</td>
+                                                    </tr>
+                                                </table>
+                                            </accordion-group>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </accordion>
+                        <div class="offlineProcedure" ng-if="shouldShowProceduresInOfflineSummary()">
+                            <accordion close-others="false">
+                                <accordion-group is-open="status.open">
+                                    <accordion-heading>
+                                        <div class="description-popup">
+                                            {{resourceBundle.proceduresPerformed}}
+                                            <a class="description-popup-icon"
+                                               description-popup
+                                               dp-title="{{resourceBundle.proceduresPerformed}}"
+                                               dp-multiple-descriptions="proceduresPerformed"
+                                            >
+                                                <i class="fa fa-info-circle" tooltip-placement="top"></i>
+                                            </a>
+                                            <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                            <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-left': !status.open}"></i>
+                                        </div>
+                                    </accordion-heading>
+                                    <table locked-table-header class="table table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <th rowspan="2">{{resourceBundle.optionName}}</th>
+                                            <th colspan="3" ng-repeat="genderOption in genderOptions"> {{genderOption.name}}
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th ng-repeat-start="genderOption in genderOptions">{{resourceBundle.lessThanFive}}</th>
+                                            <th>{{resourceBundle.fiveToFourtenn}}</th>
+                                            <th ng-repeat-end>{{resourceBundle.greaterThanFifteen}}</th>
+                                        </tr>
+                                        </thead>
+                                        <tr ng-repeat="pdv in procedureOptions"
+                                            ng-if="getTotalProcedureCount(isGenderFilterApplied, isAgeFilterApplied, pdv.id, genderOptions, [0,9999]) != 0">
+                                            <td>{{optionMapping[pdv.id]}}</td>
+                                            <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[0].id, [0,5])}}</td>
+                                            <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[0].id, [4,15])}}</td>
+                                            <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[0].id, [14, 9999])}}</td>
+                                            <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[1].id, [0,5])}}</td>
+                                            <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[1].id, [4,15])}}</td>
+                                            <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[1].id, [14, 9999])}}</td>
+                                            <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[2].id, [0,5])}}</td>
+                                            <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[2].id, [4,15])}}</td>
+                                            <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[2].id, [14, 9999])}}</td>
+                                        </tr>
+                                    </table>
+                                </accordion-group>
+                            </accordion>
+                        </div>
+                    </div>
+                </accordion-group>
+                <accordion-group ng-repeat="dataSet in dataSets | filter: {isReferralDataset: true} track by dataSet.id">
+                    <accordion-heading>
+                        <span>{{ dataSet.name }}</span>
+                        <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-right': !isDatasetOpen[dataSet.id]}"></i>
+                        <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-left': !isDatasetOpen[dataSet.id]}"></i>
+                    </accordion-heading>
+                    <table locked-table-header class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>{{resourceBundle.locationLabel}}</th>
+                            <th>{{resourceBundle.countLabel}}</th>
+                        </tr>
+                        </thead>
+                        <tr ng-repeat="name in locationNames">
+                            <td>{{name}}</td>
+                            <td>{{getReferralCount(name)}}</td>
+                        </tr>
+                    </table>
+                    <div class="exp-coll-group"></div>
+                </accordion-group>
+                <accordion-group ng-repeat="dataSet in associatedDataSets | filter:{ isOriginDataset: true }" ng-init="dataSet.open=true" is-open="dataSet.open">
+                    <accordion-heading>
+                        <span>{{ dataSet.name }}</span>
+                        <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': dataSet.open, 'glyphicon-chevron-right': !dataSet.open}"></i>
+                        <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': dataSet.open, 'glyphicon-chevron-left': !dataSet.open}"></i>
+                    </accordion-heading>
+                    <div class="exp-coll-group">
+                        <accordion close-others="false">
+                            <accordion-group is-open="origins.open">
+                                <accordion-heading>
+                                    <span>{{resourceBundle.originsCountTitle}}</span>
+                                    <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': origins.open, 'glyphicon-chevron-right': !origins.open}"></i>
+                                    <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': origins.open, 'glyphicon-chevron-left': !origins.open}"></i>
+                                </accordion-heading>
+                                <table locked-table-header class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th> {{resourceBundle.originName}} </th>
+                                        <th> {{resourceBundle.countLabel}} </th>
+                                    </tr>
+                                    </thead>
+                                    <tr ng-repeat="(originId, originName) in originMap">
+                                        <td>{{originName}}</td>
+                                        <td>{{originEvents[originId].length || 0}}</td>
+                                    </tr>
+                                </table>
+                            </accordion-group>
+                        </accordion>
+                    </div>
+                </accordion-group>
             </div>
-            <div>
-                <div ng-if="hasRoles(['Project Level Approver'])">
-                    <input ng-if="!syncError || moduleDataBlock.awaitingActionAtCoordinationLevelApprover" type="button" class="btn btn-primary" ng-click="firstLevelApproval()" ng-disabled="!moduleDataBlock.active || isCompleted" value="{{resourceBundle.approveBtnValue}}" />
-                    <input ng-if="syncError && moduleDataBlock.awaitingActionAtProjectLevelApprover" type="button" class="btn btn-primary" ng-click="firstLevelApproval()" value="{{resourceBundle.reApproveBtnValue}}" />
-                </div>
-                <div ng-if="hasRoles(['Coordination Level Approver'])">
-                    <input ng-if="!syncError && (isSubmitted && (!(moduleDataBlock.awaitingActionAtDataEntryLevel || moduleDataBlock.awaitingActionAtProjectLevelApprover) || !moduleDataBlock.active))" type="button" class="btn btn-primary" ng-click="secondLevelApproval()" ng-disabled="!moduleDataBlock.active || isApproved" value="{{resourceBundle.approveBtnValue}}" />
-                    <input ng-if="syncError && moduleDataBlock.awaitingActionAtCoordinationLevelApprover" type="button" class="btn btn-primary" ng-click="secondLevelApproval()" value="{{resourceBundle.reApproveBtnValue}}" />
-                </div>
-            </div>
-        </div>
+        </accordion>
     </section>
 </div>
