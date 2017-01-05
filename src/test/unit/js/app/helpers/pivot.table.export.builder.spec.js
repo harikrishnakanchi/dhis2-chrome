@@ -123,6 +123,26 @@ define(['pivotTableExportBuilder', 'angularMocks', 'dateUtils'], function (Pivot
                     expect(exportContent).toContain(expectedRowA);
                     expect(exportContent).toContain(expectedRowB);
                 });
+
+                it('should get the configured referral location name for referral location pivot table', function () {
+                    pivotTableData.columns = [
+                        [outerColumnA]
+                    ];
+                    pivotTableData.rows = [{
+                        name: 'referralA',
+                        dataDimension: true
+                    }];
+                    pivotTableData.referralLocationReport = true;
+                    var referralLocations = {
+                        "referralA": {
+                            name: 'someName'
+                        }
+                    };
+                    exportContent = exportBuilder.build(pivotTableData, referralLocations);
+
+                    var expectedRow = ["someName", mockValue];
+                    expect(exportContent).toContain(expectedRow);
+                });
             });
         });
    });

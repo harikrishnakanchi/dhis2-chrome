@@ -27,7 +27,7 @@ define(["lodash", "dateUtils", "moment", "excelBuilder"], function(_, dateUtils,
                 data: [
                     getLastUpdatedTimeContent(),
                     EMPTY_ROW
-                ].concat(pivotTableExportBuilder.build($scope.table))
+                ].concat(pivotTableExportBuilder.build($scope.table, $scope.referralLocations))
             }];
 
             filesystemService.promptAndWriteFile(fileName, excelBuilder.createWorkBook(spreadSheetContent), filesystemService.FILE_TYPE_OPTIONS.XLSX);
