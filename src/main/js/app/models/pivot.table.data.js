@@ -3,6 +3,7 @@ define(['analyticsData', 'lodash'], function(AnalyticsData, _) {
     var PivotTableData = function(definition, data, shouldNotExcludeEmptyDataValues) {
         this.title = definition.title;
         this.serviceCode = definition.serviceCode;
+        this.referralLocationReport = definition.referralLocationReport;
         this.displayPosition = definition.displayPosition;
         this.weeklyReport = definition.weeklyReport;
         this.monthlyReport = definition.monthlyReport;

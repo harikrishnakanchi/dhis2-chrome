@@ -12,7 +12,8 @@ define(['pivotTableData', 'analyticsData'], function(PivotTableData, AnalyticsDa
                 sortAscending: 'sortAscendingBooleanValue',
                 sortDescending: 'sortDescendingBooleanValue',
                 sortable: 'sortableBooleanValue',
-                hideWeeks: true
+                hideWeeks: true,
+                referralLocationReport: true
             };
             data = 'mockPivotTableData';
             mockAnalyticsData = {
@@ -41,6 +42,7 @@ define(['pivotTableData', 'analyticsData'], function(PivotTableData, AnalyticsDa
                 expect(pivotTableData.sortDescending).toEqual(definition.sortDescending);
                 expect(pivotTableData.sortable).toEqual(definition.sortable);
                 expect(pivotTableData.hideWeeks).toEqual(definition.hideWeeks);
+                expect(pivotTableData.referralLocationReport).toEqual(definition.referralLocationReport);
             });
         });
 

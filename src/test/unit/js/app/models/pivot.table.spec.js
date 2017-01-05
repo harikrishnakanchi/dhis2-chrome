@@ -94,6 +94,18 @@ define(['pivotTable'], function(PivotTable) {
            });
        });
 
+       describe('referralLocationReport', function() {
+           it('should return true if pivot table service code contains Referral location', function() {
+               pivotTable = PivotTable.create({ name: '[FieldApp - ReferralLocation] # Name' });
+               expect(pivotTable.referralLocationReport).toBeTruthy();
+           });
+
+           it('should return false if pivot table name does not contain ReferralLocation', function() {
+               pivotTable = PivotTable.create({ name: 'some malformed pivot table name' });
+               expect(pivotTable.referralLocationReport).toBeFalsy();
+           });
+       });
+
        describe('monthlyReport', function() {
            it('should return true if relativePeriods contains Months', function () {
                pivotTable = PivotTable.create({ relativePeriods: { last12Months: true } });

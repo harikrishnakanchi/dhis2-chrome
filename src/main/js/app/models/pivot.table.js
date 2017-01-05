@@ -23,6 +23,7 @@ define(['lodash'], function (_) {
         this.serviceCode = parseServiceCode(this.name);
         this.projectReport = this.serviceCode == 'ProjectReport';
         this.geographicOriginReport = this.serviceCode == 'GeographicOrigin';
+        this.referralLocationReport = this.serviceCode == 'ReferralLocation';
         this.opUnitReport = this.serviceCode == 'OpUnitReport';
         this.monthlyReport = isMonthlyReport(config.relativePeriods);
         this.weeklyReport = !this.monthlyReport;
