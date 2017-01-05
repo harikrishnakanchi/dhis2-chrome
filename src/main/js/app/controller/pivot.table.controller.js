@@ -8,10 +8,6 @@ define(["lodash", "dateUtils", "moment", "excelBuilder"], function(_, dateUtils,
 
         var EMPTY_ROW = [];
 
-        var escapeString = function (string) {
-            return '"' + string + '"';
-        };
-
         var getLastUpdatedTimeContent = function () {
             var formattedTime = moment($scope.updatedTime, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
             return ['Updated', formattedTime];

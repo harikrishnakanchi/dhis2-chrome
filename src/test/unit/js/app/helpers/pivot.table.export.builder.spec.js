@@ -22,12 +22,7 @@ define(['pivotTableExportBuilder', 'angularMocks', 'dateUtils'], function (Pivot
         }));
 
         describe('build', function () {
-            var exportContent, pivotTableData, outerColumnA, innerColumnA1, innerColumnA2, rowA, rowB, mockValue,
-                DELIMITER = ',';
-
-            var escapeString = function (string) {
-                return '"' + string + '"';
-            };
+            var exportContent, pivotTableData, outerColumnA, innerColumnA1, innerColumnA2, rowA, rowB, mockValue;
 
             beforeEach(function () {
                 outerColumnA = {
