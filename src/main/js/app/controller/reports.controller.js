@@ -1,5 +1,5 @@
 define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURItoBlob"], function(d3, _, moment, customAttributes, SVGUtils, dataURItoBlob) {
-    return function($rootScope, $scope, $q, $routeParams, datasetRepository, programRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService, changeLogRepository) {
+    return function($rootScope, $scope, $q, $routeParams, datasetRepository, programRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService, changeLogRepository, referralLocationsRepository) {
 
         var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
         var REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY hh[.]mm A";
@@ -248,6 +248,12 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 });
         };
 
+        var loadReferralLocationForModule = function () {
+            return referralLocationsRepository.get($scope.orgUnit.parent.id).then(function (referralLocations) {
+                $scope.referralLocations = referralLocations;
+            });
+        };
+
         var loadLastUpdatedForChartsAndReports = function () {
             var formatlastUpdatedTime = function (date) {
                 return date ? moment(date).format(REPORTS_LAST_UPDATED_TIME_FORMAT) : undefined;
@@ -276,6 +282,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 .then(loadServicesForOrgUnit)
                 .then(loadChartsWithData)
                 .then(loadPivotTablesWithData)
+                .then(loadReferralLocationForModule)
                 .then(loadLastUpdatedForChartsAndReports)
                 .finally(function() {
                     $scope.selectedService = _.find($scope.services, function (service) {

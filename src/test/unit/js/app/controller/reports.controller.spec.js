@@ -1,9 +1,9 @@
-define(["angularMocks", "utils", "moment", "timecop", "reportsController", "dataSetRepository", "programRepository", "orgUnitRepository", "chartRepository", "pivotTableRepository", "translationsService", "changeLogRepository", "customAttributes", "filesystemService", "saveSvgAsPng", "dataURItoBlob", "lodash"],
-    function(mocks, utils, moment, timecop, ReportsController, DatasetRepository, ProgramRepository, OrgUnitRepository, ChartRepository, PivotTableRepository, TranslationsService, ChangeLogRepository, customAttributes, FilesystemService, SVGUtils, dataURItoBlob, _) {
+define(["angularMocks", "utils", "moment", "timecop", "reportsController", "dataSetRepository", "programRepository", "orgUnitRepository", "chartRepository", "pivotTableRepository", "referralLocationsRepository", "translationsService", "changeLogRepository", "customAttributes", "filesystemService", "saveSvgAsPng", "dataURItoBlob", "lodash"],
+    function(mocks, utils, moment, timecop, ReportsController, DatasetRepository, ProgramRepository, OrgUnitRepository, ChartRepository, PivotTableRepository, ReferralLocationsRepository, TranslationsService, ChangeLogRepository, customAttributes, FilesystemService, SVGUtils, dataURItoBlob, _) {
     describe("reportsController", function() {
         var scope, q, rootScope, routeParams,
-            mockModule, mockDataSet, mockProgram, mockProject, mockOrigin,
-            reportsController, datasetRepository, programRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, changeLogRepository, filesystemService;
+            mockModule, mockDataSet, mockProgram, mockProject, mockOrigin, mockReferralLocations,
+            reportsController, datasetRepository, programRepository, orgUnitRepository, chartRepository, pivotTableRepository, referralLocationsRepository, translationsService, changeLogRepository, filesystemService;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             rootScope = $rootScope;
@@ -32,6 +32,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             mockProject = {
                 id: 'someProjectId'
             };
+            mockReferralLocations = [{"referralNameA": {name: 'someLocation'}}, {"referralNameB": {name: 'someOtherLocation'}}];
             routeParams = {
                 orgUnit: mockModule.id
             };
@@ -39,6 +40,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
 
             scope.startLoading = jasmine.createSpy('startLoading');
             scope.stopLoading = jasmine.createSpy('stopLoading');
+            scope.orgUnit = {id: 'someId', parent: {id: 'someOrgUnitId'}};
 
             rootScope.currentUser = {
                 selectedProject: mockProject
@@ -77,7 +79,10 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             spyOn(translationsService, 'translatePivotTableData').and.callFake(function (object) { return object; });
             spyOn(translationsService, 'translateChartData').and.callFake(function (object) { return object; });
 
-            reportsController = new ReportsController(rootScope, scope, q, routeParams, datasetRepository, programRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService, changeLogRepository);
+            referralLocationsRepository = new ReferralLocationsRepository();
+            spyOn(referralLocationsRepository, 'get').and.returnValue(utils.getPromise(q, mockReferralLocations));
+
+            reportsController = new ReportsController(rootScope, scope, q, routeParams, datasetRepository, programRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService, changeLogRepository, referralLocationsRepository);
         }));
 
         it('should set the orgunit display name for modules', function() {
@@ -289,6 +294,12 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                 var expectedFileName = [mockChart.serviceCode, mockChart.title, currentTime.format(DATETIME_FORMAT)].join('.');
                 expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFileName, dataURItoBlob(mockDataUri), filesystemService.FILE_TYPE_OPTIONS.PNG);
             });
+        });
+
+        it('should get the referral locations for the module and set it on scope', function () {
+            scope.$apply();
+            expect(referralLocationsRepository.get).toHaveBeenCalledWith(scope.orgUnit.parent.id);
+            expect(scope.referralLocations).toEqual(mockReferralLocations);
         });
 
         describe('Updated date and time for charts and reports', function () {
