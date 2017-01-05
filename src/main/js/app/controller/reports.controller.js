@@ -171,7 +171,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
 
                 return datasetRepository.findAllForOrgUnits(modulesAndOrigins).then(function(dataSets) {
                     var filteredDataSets = _.reject(dataSets, function(ds) {
-                        return ds.isPopulationDataset || ds.isReferralDataset || ds.isLineListService;
+                        return ds.isPopulationDataset || ds.isLineListService;
                     });
                     
                     var translatedDataSets = translationsService.translate(filteredDataSets);

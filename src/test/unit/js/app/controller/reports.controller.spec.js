@@ -129,9 +129,6 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                     id: 'populationDataSet',
                     isPopulationDataset: true
                 }, {
-                    id: 'referralDataSet',
-                    isReferralDataset: true
-                }, {
                     id: 'lineListDataSet',
                     isLineListService: true
                 }];

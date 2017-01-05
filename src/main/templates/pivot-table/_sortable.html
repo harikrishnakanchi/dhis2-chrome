@@ -20,7 +20,7 @@
     </tr>
 
     </thead>
-    <tbody>
+    <tbody ng-if="!table.referralLocationReport">
     <tr ng-repeat="row in table.rows">
        <td>
            <a ng-if="row.dataDimension"
@@ -34,6 +34,17 @@
             <span ng-if="!row.dataDimension">
                 {{  table.getDisplayName(row)  }}
             </span>
+       </td>
+        <td ng-repeat="column in baseColumnConfiguration" ng-class="{ 'info' : column.sorted }">
+            <span ng-class="{ 'font-bold': column.sorted }">{{ table.getDataValue(row, column) }}</span>
+        </td>
+    </tr>
+    </tbody>
+
+    <tbody ng-if="table.referralLocationReport">
+    <tr ng-repeat="row in table.rows">
+       <td>
+            <span>{{  referralLocations[table.getDisplayName(row)].name  }}</span>
        </td>
         <td ng-repeat="column in baseColumnConfiguration" ng-class="{ 'info' : column.sorted }">
             <span ng-class="{ 'font-bold': column.sorted }">{{ table.getDataValue(row, column) }}</span>
