@@ -253,7 +253,8 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
         });
 
         describe('Excel Export', function () {
-            var spreadSheetContent;
+            var spreadSheetContent,
+                LAST_UPDATED_TIME_FORMAT = "D MMMM YYYY hh[.]mm A";
 
             beforeEach(function () {
                 scope.$apply();
@@ -268,7 +269,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             it('should prompt the user to save the Excel file with suggested filename', function () {
                 scope.exportToExcel();
 
-                var expectedFilename = 'Aweil - SS153.ProjectReport.[updated 28 October 2015 06.13 PM].xlsx';
+                var expectedFilename = 'Aweil - SS153.ProjectReport.[updated ' + moment(lastUpdatedTime).format(LAST_UPDATED_TIME_FORMAT) + '].xlsx';
                 expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.XLSX);
             });
 
@@ -280,7 +281,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
 
             it('should contain project last downloaded time information', function () {
                 scope.exportToExcel();
-                expect(spreadSheetContent.data).toContain(['Updated', '28 October 2015 06.13 PM']);
+                expect(spreadSheetContent.data).toContain(['Updated', moment(lastUpdatedTime).format(LAST_UPDATED_TIME_FORMAT)]);
             });
 
             it('should contain the title of each table', function () {
