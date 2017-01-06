@@ -1,11 +1,11 @@
-define(['storageService', 'angularMocks', 'timecop', 'sjcl'], function (StorageService, mocks, timecop, sjcl) {
-    describe('HistoryService', function () {
+define(['storageService', 'angularMocks', 'timecop', 'sjcl', 'moment'], function (StorageService, mocks, timecop, sjcl, moment) {
+    describe('StorageService', function () {
         var storageService, window;
 
-        beforeEach(mocks.inject(function ($window) {
+        beforeEach(mocks.inject(function () {
 
             Timecop.install();
-            Timecop.freeze(new Date("2016-12-15T06:42:00.175Z"));
+            Timecop.freeze(moment('2017-01-06'));
 
             window = {
                 sessionStorage: {
@@ -33,12 +33,12 @@ define(['storageService', 'angularMocks', 'timecop', 'sjcl'], function (StorageS
             storageService.setItem('someKey', {some: 'value'});
 
             expect(sjcl.encrypt).toHaveBeenCalledWith(
-                'cc863e67ef04be6c629674388bdae7dd48fba292801e038e46a7859679384836',
+                'e6165fd188a97403dee18391a974d94141f43f4d203f9a43f1473512d1ae1b28',
                 '{"some":"value"}'
             );
 
             expect(window.sessionStorage.setItem).toHaveBeenCalledWith(
-                'cc863e67ef04be6c629674388bdae7dd48fba292801e038e46a7859679384836',
+                'e6165fd188a97403dee18391a974d94141f43f4d203f9a43f1473512d1ae1b28',
                 btoa('some encrypted string')
             );
         });
@@ -61,11 +61,11 @@ define(['storageService', 'angularMocks', 'timecop', 'sjcl'], function (StorageS
                 var item = storageService.getItem('someKey');
 
                 expect(window.sessionStorage.getItem).toHaveBeenCalledWith(
-                    'cc863e67ef04be6c629674388bdae7dd48fba292801e038e46a7859679384836'
+                    'e6165fd188a97403dee18391a974d94141f43f4d203f9a43f1473512d1ae1b28'
                 );
 
                 expect(sjcl.decrypt).toHaveBeenCalledWith(
-                    'cc863e67ef04be6c629674388bdae7dd48fba292801e038e46a7859679384836',
+                    'e6165fd188a97403dee18391a974d94141f43f4d203f9a43f1473512d1ae1b28',
                     atob(someValue)
                 );
 
@@ -91,7 +91,7 @@ define(['storageService', 'angularMocks', 'timecop', 'sjcl'], function (StorageS
             storageService.removeItem('someKey');
 
             expect(window.sessionStorage.removeItem).toHaveBeenCalledWith(
-                'cc863e67ef04be6c629674388bdae7dd48fba292801e038e46a7859679384836'
+                'e6165fd188a97403dee18391a974d94141f43f4d203f9a43f1473512d1ae1b28'
             );
         });
     });

@@ -1,7 +1,7 @@
 define(['sjcl', 'moment'], function (sjcl, moment) {
     return function ($window) {
         var generateHashedKey = function (key) {
-            key += moment().startOf('day').valueOf();
+            key += moment().format('YYYY-MM-DD');
 
             var bitArray = sjcl.hash.sha256.hash(key);
             return sjcl.codec.hex.fromBits(bitArray);
