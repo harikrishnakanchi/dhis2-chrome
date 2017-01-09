@@ -208,7 +208,44 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
 
             expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith("ou1");
             expect(originOrgunitCreator.create.calls.count()).toEqual(modules.length);
-            expect(originOrgunitCreator.create).toHaveBeenCalledWith(modules[0], patientOrigin);
+            expect(originOrgunitCreator.create).toHaveBeenCalledWith(modules[0], patientOrigin, false);
+        });
+
+        it("should create new orgunits with geographic origin dataSet under child modules if associate to geographic origin dataSet flag is set to true for that module", function() {
+            var modules = [{
+                "id": "p1",
+                "name": "p1",
+                "openingDate": "2014-02-02"
+            }];
+
+            var origins = [{
+                "id": "someOriginId",
+                "dataSets": [{
+                    "id": "someDataSetId"
+                }]
+            }];
+
+            orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, origins));
+            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
+
+            patientOriginController = new PatientOriginController(scope, hustle, q, patientOriginRepository, orgUnitRepository, datasetRepository, programRepository, originOrgunitCreator, orgUnitGroupHelper);
+
+            var patientOrigin = {
+                "name": "Origin1",
+                "longitude": 100,
+                "latitude": 80
+            };
+
+            scope.patientOrigin = patientOrigin;
+            scope.orgUnit = {
+                "id": "ou1"
+            };
+
+            scope.$apply();
+            scope.save();
+            scope.$apply();
+
+            expect(originOrgunitCreator.create).toHaveBeenCalledWith(modules[0], patientOrigin, true);
         });
 
         it("should associate datasets and programs to the newly created origin org units for line list module", function() {

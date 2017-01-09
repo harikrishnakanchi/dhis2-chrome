@@ -83,7 +83,8 @@ define(["lodash", "moment", "dhisId","interpolate", "orgUnitMapper", "customAttr
 
                 var createOrgUnits = function (module) {
                     return orgUnitRepository.findAllByParent(module.id).then(function (siblingOriginOrgUnits) {
-                        return originOrgunitCreator.create(module, $scope.patientOrigin).then(function (originOrgUnits) {
+                        var isOriginDataSetAssociated = !_.isEmpty(_.get(_.first(siblingOriginOrgUnits), 'dataSets'));
+                        return originOrgunitCreator.create(module, $scope.patientOrigin, isOriginDataSetAssociated).then(function (originOrgUnits) {
                             orgUnitsForGroups = isLinelistService(module) ? orgUnitsForGroups.concat(originOrgUnits) : orgUnitsForGroups.concat(module);
                             if (isLinelistService(module)) {
                                 return publishMessage(originOrgUnits, "upsertOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, {orgUnit: _.uniq(_.pluck(originOrgUnits, "name")).toString()})).then(function () {
