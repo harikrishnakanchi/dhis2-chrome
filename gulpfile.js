@@ -176,6 +176,7 @@ gulp.task('generate-service-worker', ['less'], function (callback) {
         stripPrefix: rootDir + '/',
         importScripts: ['js/app/interceptors/fetch.interceptor.js'],
         templateFilePath: 'service-worker-custom.tmpl',
+        skipWaiting: false,
         maximumFileSizeToCacheInBytes: 50 * (1024 * 1024)
     }, callback);
 });
