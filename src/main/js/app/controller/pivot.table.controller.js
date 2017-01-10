@@ -21,7 +21,7 @@ define(["lodash", "dateUtils", "moment", "excelBuilder"], function(_, dateUtils,
             var spreadSheetContent = [{
                 name: $scope.table.title,
                 data: [
-                    getLastUpdatedTimeContent(),
+                    $scope.updatedTime ? getLastUpdatedTimeContent() : EMPTY_ROW,
                     EMPTY_ROW
                 ].concat(pivotTableExportBuilder.build($scope.table, $scope.referralLocations))
             }];
