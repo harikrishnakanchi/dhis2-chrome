@@ -24,6 +24,7 @@ if ('serviceWorker' in navigator) {
     if (reg.active) {
       // Load the app here.
       loadApp();
+      addMainCss();
     }
 
     reg.onupdatefound = function() {
@@ -47,11 +48,19 @@ if ('serviceWorker' in navigator) {
 
               // Load the app here.
               loadApp();
+              addMainCss();
             }
             break;
 
           case 'redundant':
-            console.error('The installing service worker became redundant.');
+              var failCount = window.sessionStorage.getItem("serviceWorkerFailCount") || 0;
+              window.sessionStorage.setItem("serviceWorkerFailCount", parseInt(failCount) + 1);
+              if (failCount < 2) {
+                location.reload();
+              }
+              else {
+                showPraxisDownloadError();
+              }
             break;
         }
       };
@@ -61,6 +70,14 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+var addMainCss = function () {
+  var link = document.createElement('link');
+  link.href = 'css/main.css';
+  link.rel = 'stylesheet';
+  link.type = 'text/css';
+  document.head.appendChild(link);
+};
+
 var loadApp = function () {
   var script = document.createElement('script');
   script.src = 'js/lib/requirejs/require.js';
@@ -68,5 +85,10 @@ var loadApp = function () {
   script.onload = function () {};
   document.head.appendChild(script);
 
-  document.getElementById('serviceworkerloading').style.display = 'none';
+  document.getElementById('loadingPraxis').style.display = 'none';
+};
+
+var showPraxisDownloadError = function () {
+  document.getElementById('loadingPraxisMsg').style.display = 'none';
+  document.getElementById('loadingPraxisError').style.display = 'block';
 };

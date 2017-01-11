@@ -5,14 +5,25 @@
     <title>PRAXIS</title>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
     <link rel="stylesheet" type="text/css" href="js/lib/angular/angular-csp.css">
-    <link rel="stylesheet" type="text/css" href="css/main.css">
     <link rel="stylesheet" type="text/css" href="js/lib/nvd3/nv.d3.min.css">
     <script src="js/app/pwa/service.worker.registration.js"></script>
 </head>
 
 <body>
-    <div id="serviceworkerloading" style="margin: 150px auto 0;width: 300px;color: white;text-align: center;font-size: large;">
-        Downloading Praxis...
+
+    <div id="loadingPraxis" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size: 14px;position: fixed;padding: 0;margin: 0;top: 0;left: 0;width: 100%;height: 100%;background: #ffffff;">
+        <div style="margin: 100px auto 3px;width: 506px;">
+            <img src="img/icon.png" style="display: block; margin: auto"/>
+            <br><br>
+            <div id="loadingPraxisMsg" style="text-align: center;"><img src="img/ajax-loader.gif"/> Downloading Praxis...</div>
+            <div id="loadingPraxisError" style="background-color: #f2dede;color: #a94442;padding: 15px;margin-bottom: 20px;border: 1px solid transparent;border-radius: 4px;line-height: 1.4;font-size: 15px;display: none">
+                Download is interrupted because of poor or no Internet connectivity.
+                Retry when Internet connection is available. If it fails after repeated retries, contact supportEmail for assistance.
+                <br/>
+                <br/>
+                <button onclick="location.reload()" style="color: #fff;background-color: #428bca;border-color: #357ebd;text-align: center;border-radius: 4px;border: 4px solid transparent;font-size: 14px;font-weight: bold;cursor: pointer">Reload</button>
+            </div>
+        </div>
     </div>
 
     <a id="top"></a>
