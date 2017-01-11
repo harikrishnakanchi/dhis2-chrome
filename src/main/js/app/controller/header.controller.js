@@ -137,6 +137,9 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
                 $scope.startLoading();
                 platformUtils.uninstall().then(function () {
                     document.getElementById('loadingPraxis').style.display = 'block';
+                    document.getElementById('loadingPraxis').style.color = 'white';
+                    document.getElementById('loadingPraxis').style.margin = '150px 550px 0';
+                    document.getElementById('loadingPraxis').style.fontWeight = 'bold';
                     document.getElementById('loadingPraxis').innerHTML = $scope.resourceBundle.uninstall.successMessage;
                     document.getElementById('praxis').style.display = 'none';
                     $scope.stopLoading();
