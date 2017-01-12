@@ -1,8 +1,7 @@
 (function (global) {
-
-    var addMainCss = function () {
+    var addCss = function (href) {
         var link = document.createElement('link');
-        link.href = 'css/main.css';
+        link.href = href;
         link.rel = 'stylesheet';
         link.type = 'text/css';
         document.head.appendChild(link);
@@ -20,7 +19,8 @@
 
     var loadApp = function () {
         addRequireJsTag();
-        addMainCss();
+        addCss('css/main.css');
+        addCss('js/lib/nvd3/nv.d3.min.css');
     };
 
     var showPraxisDownloadError = function () {
