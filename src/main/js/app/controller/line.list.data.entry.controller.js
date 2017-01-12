@@ -1,5 +1,5 @@
 define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUtils", "customAttributes"], function(_, moment, dhisId, dateUtils, properties, dataElementUtils, customAttributes) {
-    return function($scope, $rootScope, $routeParams, $location, $anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService) {
+    return function($scope, $rootScope, $routeParams, $route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService) {
 
         var resetForm = function() {
             $scope.form = $scope.form || {};
@@ -108,11 +108,6 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
             });
         };
 
-        var scrollToTop = function(eventId) {
-            $location.hash('top');
-            $anchorScroll();
-        };
-
         $scope.save = function(addAnother) {
 
             var dataValuesAndEventDate = getDataValuesAndEventDate();
@@ -130,9 +125,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
 
             programEventRepository.upsert($scope.event).then(function() {
                 if (addAnother) {
-                    resetForm();
-                    setEventMinAndMaxDate();
-                    scrollToTop(eventId);
+                    $route.reload();
                 } else {
                     historyService.back({
                         'messageType': 'success',

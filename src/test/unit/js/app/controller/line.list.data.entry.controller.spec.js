@@ -4,15 +4,17 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
              ExcludedDataElementsRepository, ProgramRepository, TranslationsService, HistoryService, ExcludedLineListOptionsRepository, customAttributes) {
         describe("lineListDataEntryController ", function() {
 
-            var scope, lineListDataEntryController, q, routeparams, location, programEventRepository, mockStore, allEvents, optionSets, originOrgUnits, mockModule, mockProgram, optionSetRepository, optionSetMapping, orgUnitRepository, excludedDataElementsRepository, programRepository, anchorScroll, translationsService, historyService,excludedLineListOptionsRepository;
+            var scope, lineListDataEntryController, q, routeParams, rootScope, programEventRepository, originOrgUnits, mockModule, mockProgram, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, route, translationsService, historyService,excludedLineListOptionsRepository;
 
             beforeEach(module('hustle'));
-            beforeEach(mocks.inject(function($rootScope, $q, $location, $anchorScroll) {
+            beforeEach(mocks.inject(function($rootScope, $q) {
                 scope = $rootScope.$new();
                 rootScope = $rootScope;
-                anchorScroll = $anchorScroll;
                 q = $q;
-                location = $location;
+
+                route = {
+                    reload: jasmine.createSpy('reload')
+                };
 
                 scope.resourceBundle = {};
 
@@ -34,8 +36,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     }]
                 };
 
-                spyOn(location, "hash");
-
                 programEventRepository = new ProgramEventRepository();
                 spyOn(programEventRepository, "upsert").and.returnValue(utils.getPromise(q, []));
                 spyOn(programEventRepository, "findEventById").and.returnValue(utils.getPromise(q, [ev]));
@@ -47,7 +47,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 optionSetRepository = new OptionSetRepository();
                 spyOn(optionSetRepository, "getOptionSetMapping").and.returnValue(utils.getPromise(q, optionSetMapping));
 
-                historyService = new HistoryService(location);
+                historyService = new HistoryService();
                 spyOn(historyService, "back");
 
                 mockModule = {
@@ -138,7 +138,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 Timecop.install();
                 Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
 
-                lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
+                lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
                 scope.$apply();
             }));
 
@@ -204,7 +204,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     optionSetRepository.getOptionSetMapping.and.returnValue(utils.getPromise(q, optionSetMapping));
                     translationsService.translateOptionSetMap.and.returnValue(optionSetMapping.optionSetMap);
 
-                    var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
+                    var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
                     scope.$apply();
 
                     expect(scope.dataValues).toEqual({
@@ -259,7 +259,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                     it('should set dataElementOptions to scope', function () {
                         excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, undefined));
-                        var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
+                        var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
                         scope.$apply();
 
                         var expectedDataElementOptions = {
@@ -292,7 +292,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                             }]
                         };
                         excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, excludedOptions));
-                        lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
+                        lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
 
                         scope.$apply();
                         var expectedDataElementOptions = {
@@ -348,7 +348,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                         programEventRepository.findEventById.and.returnValue(utils.getPromise(q, [ev]));
 
                         excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, excludedOptions));
-                        lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
+                        lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
 
                         scope.$apply();
 
@@ -378,7 +378,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                             }]
                         };
                         excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, excludedOptions));
-                        var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
+                        var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
 
                         scope.$apply();
                         var expectedDataElementOptions = {
@@ -470,10 +470,10 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 scope.save(true);
 
-                expect(historyService.back).not.toHaveBeenCalled();
-                expect(location.hash).toHaveBeenCalled();
-
                 scope.$apply();
+
+                expect(historyService.back).not.toHaveBeenCalled();
+                expect(route.reload).toHaveBeenCalled();
             });
 
             it("should update event details", function() {
