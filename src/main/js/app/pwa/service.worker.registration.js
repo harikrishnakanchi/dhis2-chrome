@@ -31,9 +31,9 @@
     var registerServiceWorker = function () {
         var retryServiceWorkerDownload = function () {
             var failCount = window.sessionStorage.getItem("serviceWorkerFailCount") || 0;
-            failCount = parseInt(failCount) + 1;
-            window.sessionStorage.setItem("serviceWorkerFailCount", failCount);
-            if (failCount < 3) {
+            if (failCount < 3 && global.navigator.onLine) {
+                failCount = parseInt(failCount) + 1;
+                window.sessionStorage.setItem("serviceWorkerFailCount", failCount);
                 console.log("Retrying serviceWorker install for ", failCount);
                 registerServiceWorker();
             }
@@ -72,6 +72,7 @@
                     };
                 }).catch(function (e) {
                 console.error('Error during service worker registration:', e);
+                retryServiceWorkerDownload();
             });
         }
         else {
