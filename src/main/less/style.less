@@ -536,9 +536,12 @@ body {
     }
     .locked-table-header {
         .fixed-header-table-div {
+            &::-webkit-scrollbar{
+                display:none;
+            }
             position: fixed;
             will-change: top;
-            overflow-x: hidden;
+            overflow-x: auto;
             top: 0;
         }
         table {
