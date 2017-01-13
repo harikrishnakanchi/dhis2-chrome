@@ -190,26 +190,6 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                     });
             };
 
-            $scope.changeCollapsed = function(sectionId) {
-                $scope.collapseSection[sectionId] = !$scope.collapseSection[sectionId];
-            };
-
-            $scope.getCollapsed = function(sectionId) {
-                return $scope.collapseSection[sectionId];
-            };
-
-            $scope.getSection = function(selectedDataSet, sectionId) {
-                return _.find(selectedDataSet.sections, {
-                    "id": sectionId
-                });
-            };
-
-            $scope.getDataElement = function(section, dataElementId) {
-                return _.find(section.dataElements, {
-                    "id": dataElementId
-                });
-            };
-
             $scope.closeForm = function() {
                 $scope.$parent.closeNewForm($scope.orgUnit);
             };

@@ -909,26 +909,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 expect(scope.isDisabled).toEqual(true);
             });
 
-            it("should change collapsed", function() {
-
-                scope.collapseSection = {
-                    "sectionId": true
-                };
-
-                scope.changeCollapsed("sectionId");
-                scope.$apply();
-
-                expect(scope.collapseSection.sectionId).toEqual(false);
-            });
-
-            it("should get collapsed for a section", function() {
-                scope.collapseSection = {
-                    "sectionId": true
-                };
-
-                expect(scope.getCollapsed("sectionId")).toEqual(true);
-            });
-
             it("should create patient origin org units", function()  {
                 scope.module = {
                     "id": "mod1",
