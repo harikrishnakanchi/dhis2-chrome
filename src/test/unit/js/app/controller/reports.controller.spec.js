@@ -50,7 +50,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             spyOn(datasetRepository, 'findAllForOrgUnits').and.returnValue(utils.getPromise(q, [mockDataSet]));
 
             programRepository = new ProgramRepository();
-            spyOn(programRepository, 'getProgramForOrgUnit').and.returnValue(utils.getPromise(q, [mockProgram]));
+            spyOn(programRepository, 'getProgramForOrgUnit').and.returnValue(utils.getPromise(q, mockProgram));
 
             chartRepository = new ChartRepository();
             spyOn(chartRepository, 'getAll').and.returnValue(utils.getPromise(q, []));
@@ -314,6 +314,53 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                 expect(scope.updatedForWeeklyPivotTable).toBeDefined();
                 expect(scope.updatedForMonthlyChart).toBeDefined();
                 expect(scope.updatedForMonthlyPivotTable).toBeDefined();
+            });
+        });
+
+        describe('SelectedService', function () {
+            var mockDataSet, mockProgram, chartA, chartB, chartDataA, chartDataB;
+
+            beforeEach(function () {
+                mockDataSet = {
+                    id: 'someDataSetId',
+                    serviceCode: 'serviceCodeA'
+                };
+
+                mockProgram = {
+                    id: 'someProgramId',
+                    serviceCode: 'serviceCodeB'
+                };
+
+                datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [mockDataSet]));
+                programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, mockProgram));
+
+                chartA = {
+                    serviceCode: 'serviceCodeA'
+                };
+                chartB = {
+                    serviceCode: 'serviceCodeB'
+                };
+
+                chartDataA = {
+                    isDataAvailable: true,
+                    serviceCode: 'serviceCodeA',
+                    categories: ['someCategory']
+                };
+
+                chartDataB = {
+                    isDataAvailable: true,
+                    serviceCode: 'serviceCodeB',
+                    categories: ['someCategory']
+                };
+
+                chartRepository.getAll.and.returnValue(utils.getPromise(q, [chartA, chartB]));
+                chartRepository.getChartData.and.returnValues(utils.getPromise(q, chartDataA), utils.getPromise(q, chartDataB));
+            });
+
+            it('should select the first service from the alphabetically sorted services which has at least one chart or report', function () {
+                scope.$apply();
+
+                expect(scope.selectedService).toEqual(scope.services[0]);
             });
         });
     });

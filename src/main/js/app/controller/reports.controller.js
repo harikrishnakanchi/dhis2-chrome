@@ -272,6 +272,31 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             });
         };
 
+        var countAvailableChartsAndReportsForServices = function () {
+            var countByService = function (items) {
+                return _.chain(items)
+                    .groupBy('serviceCode')
+                    .mapValues(_.property('length'))
+                    .value();
+            };
+
+            var chartCountByService = countByService($scope.charts);
+            var pivotTableCountByService = countByService($scope.pivotTables);
+
+            _.each($scope.services, function (service) {
+                service.areReportsAvailable = _.gt(_.add(
+                        _.get(chartCountByService, service.serviceCode, 0),
+                        _.get(pivotTableCountByService, service.serviceCode, 0)
+                ), 0);
+            });
+        };
+
+        var selectFirstServiceWithReports = function () {
+            $scope.selectedService = _.find($scope.services, function (service) {
+                return !service.isOriginDataset && !service.isReferralDataset && service.areReportsAvailable;
+            });
+        };
+
         var init = function() {
             $scope.startLoading();
 
@@ -284,12 +309,9 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 .then(loadPivotTablesWithData)
                 .then(loadReferralLocationForModule)
                 .then(loadLastUpdatedForChartsAndReports)
-                .finally(function() {
-                    $scope.selectedService = _.find($scope.services, function (service) {
-                        return !service.isOriginDataset;
-                    });
-                    $scope.stopLoading();
-                });
+                .then(countAvailableChartsAndReportsForServices)
+                .then(selectFirstServiceWithReports)
+                .finally($scope.stopLoading);
         };
 
         init();
