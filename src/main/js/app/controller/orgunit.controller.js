@@ -8,7 +8,7 @@ define(["toTree", "lodash", "moment", "properties", "customAttributes"], functio
             'Operational Center': 'templates/partials/oc-form.html',
             'Country': 'templates/partials/country-form.html',
             'Project': 'templates/partials/project-form.html',
-            'Module': 'templates/partials/module-form.html',
+            'Module': 'templates/partials/aggregate-module-form.html',
             'LineListModule': 'templates/partials/linelist-module-form.html',
             'Operation Unit': 'templates/partials/op-unit-form.html',
             'User': 'templates/partials/project-user-form.html',

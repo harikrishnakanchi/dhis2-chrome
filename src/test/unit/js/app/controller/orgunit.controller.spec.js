@@ -332,7 +332,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             scope.openInViewMode('Module');
             timeout.flush();
 
-            expect(scope.templateUrl).toEqual('templates/partials/module-form.html');
+            expect(scope.templateUrl).toEqual('templates/partials/aggregate-module-form.html');
             expect(scope.isNewMode).toEqual(false);
         });
 
