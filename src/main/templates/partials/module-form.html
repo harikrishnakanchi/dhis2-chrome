@@ -80,6 +80,10 @@
                                         </div>
                                         <div collapse="!isExpanded[section.id]" class="collapse-body">
                                             <ul>
+                                                <li>
+                                                    <a href="" ng-click="toggleSelect(section)" ng-if="section.isIncluded"> {{resourceBundle.unselectAll}} </a>
+                                                    <a href="" ng-click="toggleSelect(section)" ng-if="!section.isIncluded"> {{resourceBundle.selectAll}} </a>
+                                                </li>
                                                 <li ng-repeat="subSection in section.subSections">
                                                     <div class="collapse-head">
                                                         <h5 ng-click="isSubSectionExpanded[section.id][subSection.name] = !isSubSectionExpanded[section.id][subSection.name]">
@@ -89,6 +93,10 @@
                                                     </div>
                                                     <div collapse="!isSubSectionExpanded[section.id][subSection.name]" class="collapse-body">
                                                         <ul>
+                                                            <li>
+                                                                <a href="" ng-click="toggleSelectSubSection(subSection, section)" ng-if="subSection.isIncluded"> {{resourceBundle.unselectAll}} </a>
+                                                                <a href="" ng-click="toggleSelectSubSection(subSection, section)" ng-if="!subSection.isIncluded"> {{resourceBundle.selectAll}} </a>
+                                                            </li>
                                                             <li ng-repeat="element in subSection.dataElements">
                                                                 <div class="checkbox">
                                                                 <label>

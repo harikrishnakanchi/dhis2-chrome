@@ -351,5 +351,7 @@
         "okMessage": "YES, I want to uninstall Praxis",
         "confirmationMessage": "WARNING: This will erase all the existing data and uninstall the application. Any data not synced to DHIS will be lost. THIS ACTION IS IRREVERSIBLE.",
         "successMessage": "Praxis is uninstalled. Please close the browser window."
-    }
+    },
+    "selectAll": "Select All",
+    "unselectAll": "Unselect All"
 }

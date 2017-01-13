@@ -351,5 +351,7 @@
         "okMessage": "OUI, je souhaite désinstaller Praxis",
         "confirmationMessage": "AVERTISSEMENT: Ceci effacera toutes les données existantes et désinstallera l'application. Toutes les données non synchronisées avec DHIS seront perdues. CETTE ACTION EST IRRÉVERSIBLE.",
         "successMessage": "Praxis est désinstallé. Fermez la fenêtre du navigateur."
-    }
+    },
+    "selectAll": "Sélectionner Tout",
+    "unselectAll": "Tout Déselectionner"
 }
