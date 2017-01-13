@@ -43,7 +43,7 @@ define(['lodash', 'overrides', 'platformConfig'], function(_, overrides, platfor
             fileExtension: 'prx'
         },
         queue: {
-            maxretries: 5,
+            maxretries: 3,
             delay: 100,
             skipRetryMessages: [],
             maxNumberOfTimesItemCanBeRescued: 5,
@@ -52,9 +52,7 @@ define(['lodash', 'overrides', 'platformConfig'], function(_, overrides, platfor
             retryDelayConfig: {
                 0: 10000,
                 1: 10000,
-                2: 10000,
-                3: 10000,
-                4: 10000
+                2: 10000
             }
         },
         eventsSync: {
