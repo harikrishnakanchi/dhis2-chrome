@@ -389,15 +389,6 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                 });
             };
 
-            $scope.changeDataElementSelection = function(section) {
-                _.each(section.dataElements, function(dataElement) {
-                    dataElement.isIncluded = section.isIncluded || dataElement.isMandatory;
-                });
-                _.each(section.subSections, function(subSection) {
-                    subSection.isIncluded = section.isIncluded;
-                });
-            };
-
             $scope.changeDataElementSelectionInSubSection = function(subSection, section) {
                 _.each(subSection.dataElements, function(dataElement) {
                     dataElement.isIncluded = subSection.isIncluded || dataElement.isMandatory;
@@ -418,6 +409,24 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                 section.isIncluded = !_.any(section.dataElements, {
                     "isIncluded": false
                 });
+            };
+
+            $scope.toggleSelect = function (section) {
+                section.isIncluded = !section.isIncluded;
+                _.each(section.dataElements, function(dataElement) {
+                    dataElement.isIncluded = section.isIncluded;
+                });
+                _.each(section.subSections, function(subSection) {
+                    subSection.isIncluded = section.isIncluded;
+                });
+            };
+
+            $scope.toggleSelectSubSection = function (subSection, section) {
+                subSection.isIncluded = !subSection.isIncluded;
+                _.each(subSection.dataElements, function(dataElement) {
+                    dataElement.isIncluded = subSection.isIncluded || dataElement.isMandatory;
+                });
+                $scope.changeSectionSelection(section);
             };
 
             var setSelectedTemplate = function(datasetId) {

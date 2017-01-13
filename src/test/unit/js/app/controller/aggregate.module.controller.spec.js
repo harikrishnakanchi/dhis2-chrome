@@ -704,6 +704,60 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 });
             });
 
+            describe('isIncluded flag of section', function () {
+                var createSection = function (options) {
+                    return _.merge({
+                        'id': "sec1",
+                        "dataElements": [{
+                            'id': "test1",
+                            'isIncluded': false,
+                        }, {
+                            'id': "test2",
+                            'isIncluded': false,
+                        }],
+                    }, options);
+                };
+
+                it("should set the isIncluded to true in section if all the data elements under it are selected", function () {
+                    var section = createSection({
+                        dataElements: [{
+                            id: 'test1',
+                            isIncluded: true
+                        }, {
+                            id: "test2",
+                            isIncluded: true
+                        }]
+                    });
+
+                    scope.changeSectionSelection(section);
+                    expect(section.isIncluded).toBeTruthy();
+                });
+
+                it("should set isIncluded to false for the section if at least one of the data elements under it is de-selected", function () {
+                    var section = createSection({
+                        "dataElements": [{
+                            'id': "test1",
+                            'isIncluded': true
+                        }, {
+                            'id': "test2",
+                            'isIncluded': false
+                        }]
+                    });
+
+                    scope.changeSectionSelection(section);
+                    expect(section.isIncluded).toBeFalsy();
+                });
+
+                it("should select/de-select all data elements if the section containing it is toggled", function () {
+                    var section = createSection();
+                    scope.toggleSelect(section);
+
+                    expect(section.dataElements[0].isIncluded).toBeTruthy();
+                    expect(section.dataElements[1].isIncluded).toBeTruthy();
+                    expect(section.isIncluded).toBeTruthy();
+                });
+            });
+
             it("should return false if datasets for modules are selected", function() {
                 scope.$apply();
                 scope.associatedDatasets = [{
@@ -722,148 +776,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.associatedDatasets = [];
 
                 expect(scope.areDatasetsSelected()).toEqual(false);
-            });
-
-            it("should de-select all data elements except mandatory elements if the section containing it is de-selected", function() {
-                var section = {
-                    'id': "sec1",
-                    "dataElements": [{
-                        'id': "test1",
-                        'isMandatory': true
-                    }, {
-                        'id': "test2",
-                        'isIncluded': false,
-                        'isMandatory': false
-                    }, {
-                        'id': "test3",
-                        'isIncluded': false,
-                        'isMandatory': false
-                    }],
-                    isIncluded: false
-                };
-
-                var expectedSection = {
-                    id: 'sec1',
-                    dataElements: [{
-                        id: 'test1',
-                        'isMandatory': true,
-                        'isIncluded': true
-                    }, {
-                        id: 'test2',
-                        'isIncluded': false,
-                        'isMandatory': false
-                    }, {
-                        id: 'test3',
-                        'isIncluded': false,
-                        'isMandatory': false
-                    }],
-                    isIncluded: false
-                };
-
-                scope.changeDataElementSelection(section);
-                expect(section).toEqual(expectedSection);
-            });
-
-            it("should de-select the section if all data elements under it are de-selected", function() {
-                var section = {
-                    'id': "sec1",
-                    "dataElements": [{
-                        'id': "test1",
-                        'isIncluded': false
-                    }, {
-                        'id': "test2",
-                        'isIncluded': false
-                    }, {
-                        'id': "test3",
-                        'isIncluded': false
-                    }]
-                };
-
-                var expectedSection = {
-                    id: 'sec1',
-                    dataElements: [{
-                        'id': "test1",
-                        'isIncluded': false
-                    }, {
-                        'id': "test2",
-                        'isIncluded': false
-                    }, {
-                        'id': "test3",
-                        'isIncluded': false
-                    }],
-                    isIncluded: false
-                };
-
-                scope.changeSectionSelection(section);
-                expect(section).toEqual(expectedSection);
-            });
-
-            it("should de-select the section if even one of the data elements under it are de-selected", function() {
-                var section = {
-                    'id': "sec1",
-                    "dataElements": [{
-                        'id': "test1",
-                        'isIncluded': true
-                    }, {
-                        'id': "test2",
-                        'isIncluded': true
-                    }, {
-                        'id': "test3",
-                        'isIncluded': false
-                    }]
-                };
-
-                var expectedSection = {
-                    id: 'sec1',
-                    dataElements: [{
-                        'id': "test1",
-                        'isIncluded': true
-                    }, {
-                        'id': "test2",
-                        'isIncluded': true
-                    }, {
-                        'id': "test3",
-                        'isIncluded': false
-                    }],
-                    isIncluded: false
-                };
-
-                scope.changeSectionSelection(section);
-                expect(section).toEqual(expectedSection);
-            });
-
-            it("should select the section if all the data elements under it are selected", function() {
-                var section = {
-                    'id': "sec1",
-                    "dataElements": [{
-                        'id': "test1",
-                        'isIncluded': true
-                    }, {
-                        'id': "test2",
-                        'isIncluded': true
-                    }, {
-                        'id': "test3",
-                        'isIncluded': true
-                    }]
-                };
-
-                var expectedSection = {
-                    id: 'sec1',
-                    dataElements: [{
-                        'id': "test1",
-                        'isIncluded': true
-                    }, {
-                        'id': "test2",
-                        'isIncluded': true
-                    }, {
-                        'id': "test3",
-                        'isIncluded': true
-                    }],
-                    isIncluded: true
-                };
-
-                scope.changeSectionSelection(section);
-                expect(section).toEqual(expectedSection);
             });
 
             it("should select a dataset", function() {
@@ -1373,36 +1285,23 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 expect(section.isIncluded).toBe(false);
             });
 
-            it("should de-select all subSections if the section containing it is de-selected", function() {
+            it("should select/de-select all subSections if the section containing it is toggled", function() {
                 var section = {
                     'id': "sec1",
                     "subSections": [{
-                        'name': "test1"
+                        'name': "test1",
+                        'isIncluded': true
                     }, {
-                        'name': "test2"
-                    }, {
-                        'name': "test3"
+                        'name': "test2",
+                        'isIncluded': false
                     }],
                     isIncluded: false
                 };
 
-                var expectedSection = {
-                    id: 'sec1',
-                    subSections: [{
-                        name: 'test1',
-                        isIncluded: false
-                    }, {
-                        name: 'test2',
-                        isIncluded: false
-                    }, {
-                        name: 'test3',
-                        isIncluded: false
-                    }],
-                    isIncluded: false
-                };
-
-                scope.changeDataElementSelection(section);
-                expect(section).toEqual(expectedSection);
+                scope.toggleSelect(section);
+                expect(section.subSections[0].isIncluded).toBeTruthy();
+                expect(section.subSections[1].isIncluded).toBeTruthy();
+                expect(section.isIncluded).toBeTruthy();
             });
 
             describe('associateReferralLocation', function () {
