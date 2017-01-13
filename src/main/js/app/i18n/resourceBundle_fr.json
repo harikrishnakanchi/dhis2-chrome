@@ -175,7 +175,6 @@
     "createCloneSuccessMessage": "Copie créée avec succès",
     "createCloneErrorMessage": "Erreur de création de la copie, {{error}}",
     "downloadsDirectory": " vers {{directory}}",
-    "defaultDownloadLocationMessage": "your Downloads directory",
     "loadCloneErrorMessage": "Erreur de chargement de la copie, {{error}}",
     "loadCloneConfirmationMessage": "ATTENTION, l'importation de la copie de l'application supprimera toutes les données non téléchargées vers DHIS2. Vous serez déconnecté de la session en cours après l'importation. CETTE ACTION EST IRREVERSIBLE",
     "createCloneConfirmationMessage": "ATTENTION, l'exportation d'une copie de l'application va créer une copie de l'application en cours sur votre ordinateur. A utiliser UNIQUEMENT en cas d'absence totale d'internet pour communiquer l'ensemble des données de l'utilisateur connecté.",
