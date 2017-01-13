@@ -85,13 +85,20 @@
                                                         </div>
                                                         <div collapse="!de.dataElement.isDataElementExpanded" class="collapse-body" ng-class="{'disabled': !de.dataElement.isIncluded}">
                                                             <ul>
+                                                                <li class="data-element-options">
+                                                                    <a href="" ng-click="unSelectAll(de)" ng-if="allOptionsSelected(de)"> {{resourceBundle.unselectAll}} </a>
+                                                                    <a href="" ng-click="selectAll(de)" ng-if="!allOptionsSelected(de)"> {{resourceBundle.selectAll}} </a>
+                                                                </li>
+                                                                <li ng-show="!areTwoOptionsSelected(de)" class="data-element-options">
+                                                                    <span class="errortxt">{{resourceBundle.atleastTwoOptionsMustBeSelected}}</span>
+                                                                </li>
                                                                 <li ng-repeat="option in de.dataElement.optionSet.options" class="data-element-options">
-                                                                  <span>
+                                                                  <div class="checkbox">
                                                                     <input type="checkbox" ng-model="option.isSelected"
                                                                            ng-change="onOptionSelectionChange(de.dataElement.optionSet, option)">
                                                                         {{ option.name}}
-                                                                  </span>
-                                                                </li>
+                                                                  </div>
+                                                                  </li>
                                                             </ul>
                                                         </div>
                                                     </li>

@@ -416,7 +416,21 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
             };
 
             $scope.shouldDisableSaveOrUpdateButton = function() {
-                return _.isEmpty($scope.program.name);
+                var allDataElementsWithOptions = _.chain($scope.enrichedProgram.programStages)
+                    .map('programStageSections')
+                    .flatten()
+                    .map('dataElementsWithOptions')
+                    .flatten()
+                    .map('dataElement')
+                    .value();
+                var optionNotSelected = _.any(allDataElementsWithOptions, function (dataElement) {
+                    return _.filter(dataElement.optionSet.options, "isSelected").length < 2;
+                });
+                return _.isEmpty($scope.program.name) || optionNotSelected;
+            };
+
+            $scope.areTwoOptionsSelected = function (dataElement) {
+                return dataElement.dataElement.optionSet && _.filter(dataElement.dataElement.optionSet.options, {isSelected: true}).length >= 2;
             };
 
             $scope.onOptionSelectionChange = function (optionSet, option) {
@@ -433,6 +447,22 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
 
             $scope.stopPropagation = function (event) {
                 event.stopPropagation();
+            };
+
+            $scope.unSelectAll = function (dataElement) {
+                _.each(dataElement.dataElement.optionSet.options, function (option) {
+                    option.isSelected = false;
+                });
+            };
+
+            $scope.selectAll = function (dataElement) {
+                _.each(dataElement.dataElement.optionSet.options, function (option) {
+                    option.isSelected = true;
+                });
+            };
+
+            $scope.allOptionsSelected = function (dataElement) {
+                return !_.any(dataElement.dataElement.optionSet && dataElement.dataElement.optionSet.options, {"isSelected": false});
             };
 
             init();
