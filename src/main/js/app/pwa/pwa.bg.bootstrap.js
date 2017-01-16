@@ -17,26 +17,23 @@ var document = {
     }
 };
 self.worker = self;
+self.basePath = "../../../";
 
 require.config({
-    baseUrl: "../../../js/"
+    baseUrl: "../../../js/",
+    waitSeconds: 0
 });
 
 require(["app/pwa/pwa.bg.config", "app/shared.bg.config"], function() {
     require(["app/bg.app"], function(app) {
-        require(["chromeUtils"], function(chromeUtils) {
-            var bootstrapData;
+        require(["platformUtils", "lodash"], function(platformUtils, _) {
             var onDbReady = function() {
-                if (!bootstrapData) {
-                    console.log("dB ready");
-                    app.bootstrap(app.init()).then(function(data) {
-                        bootstrapData = data;
-                    });
-                }
+                console.log("DB Ready");
+                app.bootstrap(app.init());
             };
-            chromeUtils.init();
-            chromeUtils.addListener("dbReady", onDbReady);
-            self.worker.postMessage("backgroundReady");
+            platformUtils.init();
+            platformUtils.addListener("dbReady", _.once(onDbReady));
+            platformUtils.sendMessage("backgroundReady");
         });
     });
 });

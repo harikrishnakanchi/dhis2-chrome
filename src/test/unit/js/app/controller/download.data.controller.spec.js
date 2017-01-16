@@ -1,5 +1,5 @@
-define(["downloadDataController", "angularMocks", "utils", "lodash", "chromeUtils"],
-    function(DownloadDataController, mocks, utils, _, chromeUtils) {
+define(["downloadDataController", "angularMocks", "utils", "lodash", "platformUtils"],
+    function(DownloadDataController, mocks, utils, _, platformUtils) {
         describe("downloadDataController", function() {
             var q, rootScope, hustle, downloadDataController, timeout, scope;
 
@@ -16,7 +16,7 @@ define(["downloadDataController", "angularMocks", "utils", "lodash", "chromeUtil
                 scope.locale = 'someLocale';
 
                 spyOn(hustle, "publishOnce").and.returnValue(utils.getPromise(q, {}));
-                spyOn(chromeUtils, "createNotification").and.returnValue(utils.getPromise(q, {}));
+                spyOn(platformUtils, "createNotification").and.returnValue(utils.getPromise(q, {}));
 
                 rootScope.hasRoles = function(args) {
                     if (args[0] === "Projectadmin")
@@ -45,7 +45,7 @@ define(["downloadDataController", "angularMocks", "utils", "lodash", "chromeUtil
                 expect(hustle.publishOnce.calls.count()).toEqual(2);
                 expect(hustle.publishOnce.calls.argsFor(0)).toEqual([getHustleMessage("downloadMetadata"), "dataValues"]);
                 expect(hustle.publishOnce.calls.argsFor(1)).toEqual([getHustleMessage("downloadProjectData"), "dataValues"]);
-                expect(chromeUtils.createNotification).toHaveBeenCalled();
+                expect(platformUtils.createNotification).toHaveBeenCalled();
             });
         });
     });

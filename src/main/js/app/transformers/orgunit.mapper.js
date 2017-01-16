@@ -1,160 +1,49 @@
-define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, moment, CustomAttributes) {
+define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, moment, customAttributes) {
     var buildProjectAttributeValues = function(orgUnit) {
-        var attributeValues = [{
-            "created": moment().toISOString(),
-            "lastUpdated": moment().toISOString(),
-            "attribute": {
-                "code": "Type",
-                "name": "Type"
-            },
-            value: "Project"
-        }];
-        attributeValues.push({
-            "created": moment().toISOString(),
-            "lastUpdated": moment().toISOString(),
-            "attribute": {
-                "code": "prjCon",
-                "name": "Context"
-            },
-            "value": orgUnit.context ? (orgUnit.context.originalObject ? orgUnit.context.originalObject.englishName : orgUnit.context.englishName) : orgUnit.context
-        }, {
-            "created": moment().toISOString(),
-            "lastUpdated": moment().toISOString(),
-            "attribute": {
-                "code": "prjLoc",
-                "name": "Location"
-            },
-            "value": orgUnit.location
-        }, {
-            "created": moment().toISOString(),
-            "lastUpdated": moment().toISOString(),
-            "attribute": {
-                "code": "prjPopType",
-                "name": "Type of population"
-            },
-            "value": orgUnit.populationType ? (orgUnit.populationType.originalObject ? orgUnit.populationType.originalObject.englishName : orgUnit.populationType.englishName) : orgUnit.populationType
-        }, {
-            "created": moment().toISOString(),
-            "lastUpdated": moment().toISOString(),
-            "attribute": {
-                "code": "projCode",
-                "name": "Project Code"
-            },
-            "value": orgUnit.projectCode
-        }, {
-            "created": moment().toISOString(),
-            "lastUpdated": moment().toISOString(),
-            "attribute": {
-                "code": "reasonForIntervention",
-                "name": "Reason For Intervention"
-            },
-            "value": orgUnit.reasonForIntervention ? (orgUnit.reasonForIntervention.originalObject ? orgUnit.reasonForIntervention.originalObject.englishName : orgUnit.reasonForIntervention.englishName) : orgUnit.reasonForIntervention
-        }, {
-            "created": moment().toISOString(),
-            "lastUpdated": moment().toISOString(),
-            "attribute": {
-                "code": "modeOfOperation",
-                "name": "Mode Of Operation"
-            },
-            "value": orgUnit.modeOfOperation ? (orgUnit.modeOfOperation.originalObject ? orgUnit.modeOfOperation.originalObject.englishName : orgUnit.modeOfOperation.englishName) : orgUnit.modeOfOperation
-        }, {
-            "created": moment().toISOString(),
-            "lastUpdated": moment().toISOString(),
-            "attribute": {
-                "code": "modelOfManagement",
-                "name": "Model Of Management"
-            },
-            "value": orgUnit.modelOfManagement ? (orgUnit.modelOfManagement.originalObject ? orgUnit.modelOfManagement.originalObject.englishName : orgUnit.modelOfManagement.englishName) : orgUnit.modelOfManagement
-        }, {
-            "created": moment().toISOString(),
-            "lastUpdated": moment().toISOString(),
-            "attribute": {
-                "code": "autoApprove",
-                "name": "Auto Approve"
-            },
-            "value": orgUnit.autoApprove
-        }, {
-            "created": moment().toISOString(),
-            "lastUpdated": moment().toISOString(),
-            "attribute": {
-                "code": "isNewDataModel",
-                "name": "Is New Data Model"
-            },
-            "value": "true"
-        }, {
-            "created": moment().toISOString(),
-            "lastUpdated": moment().toISOString(),
-            "attribute": {
-                "code": "projectType",
-                "name": "Project Type"
-            },
-            "value": orgUnit.projectType ? (orgUnit.projectType.originalObject ? orgUnit.projectType.originalObject.englishName : orgUnit.projectType.englishName) : orgUnit.projectType
-        }, {
-            "created": moment().toISOString(),
-            "lastUpdated": moment().toISOString(),
-            "attribute": {
-                "code": "estimatedTargetPopulation",
-                "name": "Estimated target population"
-            },
-            "value": orgUnit.estimatedTargetPopulation ? orgUnit.estimatedTargetPopulation.toString() : ""
-        }, {
-            "created": moment().toISOString(),
-            "lastUpdated": moment().toISOString(),
-            "attribute": {
-                "code": "estPopulationLessThan1Year",
-                "name": "Est. population less than 1 year"
-            },
-            "value": orgUnit.estPopulationLessThan1Year ? orgUnit.estPopulationLessThan1Year.toString() : ""
-        }, {
-            "created": moment().toISOString(),
-            "lastUpdated": moment().toISOString(),
-            "attribute": {
-                "code": "estPopulationBetween1And5Years",
-                "name": "Est. population between 1 and 5 years"
-            },
-            "value": orgUnit.estPopulationBetween1And5Years ? orgUnit.estPopulationBetween1And5Years.toString() : ""
-        }, {
-            "created": moment().toISOString(),
-            "lastUpdated": moment().toISOString(),
-            "attribute": {
-                "code": "estPopulationOfWomenOfChildBearingAge",
-                "name": "Est. population of women of child bearing age"
-            },
-            "value": orgUnit.estPopulationOfWomenOfChildBearingAge ? orgUnit.estPopulationOfWomenOfChildBearingAge.toString() : ""
-        });
+        var attributeValues = [];
+        var projectContext = orgUnit.context ? (orgUnit.context.originalObject ? orgUnit.context.originalObject.englishName : orgUnit.context.englishName) : orgUnit.context;
+        var populationType = orgUnit.populationType ? (orgUnit.populationType.originalObject ? orgUnit.populationType.originalObject.englishName : orgUnit.populationType.englishName) : orgUnit.populationType;
+        var reasonForIntervention = orgUnit.reasonForIntervention ? (orgUnit.reasonForIntervention.originalObject ? orgUnit.reasonForIntervention.originalObject.englishName : orgUnit.reasonForIntervention.englishName) : orgUnit.reasonForIntervention;
+        var modeOfOperation = orgUnit.modeOfOperation ? (orgUnit.modeOfOperation.originalObject ? orgUnit.modeOfOperation.originalObject.englishName : orgUnit.modeOfOperation.englishName) : orgUnit.modeOfOperation;
+        var modelOfManagement = orgUnit.modelOfManagement ? (orgUnit.modelOfManagement.originalObject ? orgUnit.modelOfManagement.originalObject.englishName : orgUnit.modelOfManagement.englishName) : orgUnit.modelOfManagement;
+        var projectType = orgUnit.projectType ? (orgUnit.projectType.originalObject ? orgUnit.projectType.originalObject.englishName : orgUnit.projectType.englishName) : orgUnit.projectType;
+        var estimatedTargetPopulation = orgUnit.estimatedTargetPopulation ? orgUnit.estimatedTargetPopulation.toString() : "";
+        var estimatedPopulationLessThan1Year = orgUnit.estPopulationLessThan1Year ? orgUnit.estPopulationLessThan1Year.toString() : "";
+        var estPopulationBetween1And5Years = orgUnit.estPopulationBetween1And5Years ? orgUnit.estPopulationBetween1And5Years.toString() : "";
+        var estimatedPopulationOfWomenOfChildBearingAge = orgUnit.estPopulationOfWomenOfChildBearingAge ? orgUnit.estPopulationOfWomenOfChildBearingAge.toString() : "";
+
+        attributeValues.push(customAttributes.createAttribute(customAttributes.TYPE, "Project"),
+            customAttributes.createAttribute(customAttributes.PROJECT_CONTEXT_CODE, projectContext),
+            customAttributes.createAttribute(customAttributes.PROJECT_LOCATION_CODE, orgUnit.location),
+            customAttributes.createAttribute(customAttributes.PROJECT_POPULATION_TYPE_CODE, populationType),
+            customAttributes.createAttribute(customAttributes.PROJECT_CODE, orgUnit.projectCode),
+            customAttributes.createAttribute(customAttributes.REASON_FOR_INTERVENTION_CODE, reasonForIntervention),
+            customAttributes.createAttribute(customAttributes.MODE_OF_OPERATION_CODE, modeOfOperation),
+            customAttributes.createAttribute(customAttributes.MODEL_OF_MANAGEMENT_CODE, modelOfManagement),
+            customAttributes.createAttribute(customAttributes.AUTO_APPROVE, orgUnit.autoApprove),
+            customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true"),
+            customAttributes.createAttribute(customAttributes.PROJECT_TYPE_CODE, projectType),
+            customAttributes.createAttribute(customAttributes.ESTIMATED_TARGET_POPULATION_CODE, estimatedTargetPopulation),
+            customAttributes.createAttribute(customAttributes.EST_POPULATION_LESS_THAN_1_YEAR_CODE, estimatedPopulationLessThan1Year),
+            customAttributes.createAttribute(customAttributes.EST_POPULATION_BETWEEN_1_AND_5_YEARS_CODE, estPopulationBetween1And5Years),
+            customAttributes.createAttribute(customAttributes.EST_POPULATION_OF_WOMEN_OF_CHILD_BEARING_AGE_CODE, estimatedPopulationOfWomenOfChildBearingAge));
 
         if (orgUnit.endDate)
-            attributeValues.push({
-                "created": moment().toISOString(),
-                "lastUpdated": moment().toISOString(),
-                "attribute": {
-                    "code": "prjEndDate",
-                    "name": "End date"
-                },
-                "value": moment(orgUnit.endDate).format("YYYY-MM-DD")
-            });
+            attributeValues.push(customAttributes.createAttribute(customAttributes.PROJECT_END_DATE_CODE, moment(orgUnit.endDate).format("YYYY-MM-DD")));
 
-        return CustomAttributes.cleanAttributeValues(attributeValues);
+        return customAttributes.cleanAttributeValues(attributeValues);
     };
 
     this.disable = function(orgUnits) {
-        var attributeValue = {
-            "created": moment().toISOString(),
-            "lastUpdated": moment().toISOString(),
-            'attribute': {
-                "code": "isDisabled",
-                "name": "Is Disabled"
-            },
-            value: "true"
-        };
+        var isDisabledAttr = customAttributes.createAttribute(customAttributes.DISABLED_CODE, "true");
 
         var disableOrgUnit = function(orgUnit) {
             orgUnit.attributeValues = _.reject(orgUnit.attributeValues, {
                 "attribute": {
-                    "code": "isDisabled"
+                    "code": customAttributes.DISABLED_CODE
                 }
             });
-            orgUnit.attributeValues.push(attributeValue);
+            orgUnit.attributeValues.push(isDisabledAttr);
             return orgUnit;
         };
 
@@ -182,53 +71,43 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
         return projectOrgUnit;
     };
 
-    this.getAttributeValue = function(dhisProject, code) {
-        var attribute = _.find(dhisProject.attributeValues, {
-            'attribute': {
-                'code': code
-            }
-        });
-
-        return attribute ? attribute.value : undefined;
-    };
-
-
     this.mapToProject = function(dhisProject, allContexts, allPopTypes, reasonForIntervention, modeOfOperation, modelOfManagement, allProjectTypes) {
 
         var getTranslatedName = function (allOptions, code) {
-            var value = self.getAttributeValue(dhisProject, code);
+            var value = customAttributes.getAttributeValue(dhisProject.attributeValues, code);
             var result = _.filter(allOptions, function (option) {
                 return option.englishName == value;
             });
             return result[0] ? result[0] : undefined;
         };
 
-        var endDate = self.getAttributeValue(dhisProject, "prjEndDate");
-        var autoApprove = self.getAttributeValue(dhisProject, "autoApprove");
+        var endDate = customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.PROJECT_END_DATE_CODE);
+        var autoApprove = customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.AUTO_APPROVE);
         return {
             'name': dhisProject.name,
             'openingDate': moment(dhisProject.openingDate).toDate(),
             'endDate': endDate ? moment(endDate).toDate() : undefined,
 
-            'location': self.getAttributeValue(dhisProject, "prjLoc"),
-            'projectCode': self.getAttributeValue(dhisProject, "projCode"),
+            'location': customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.PROJECT_LOCATION_CODE),
+            'projectCode': customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.PROJECT_CODE),
 
-            'context': getTranslatedName(allContexts, "prjCon"),
-            'populationType': getTranslatedName(allPopTypes, "prjPopType"),
-            'projectType': getTranslatedName(allProjectTypes, "projectType"),
-            'reasonForIntervention': getTranslatedName(reasonForIntervention, "reasonForIntervention"),
-            'modeOfOperation': getTranslatedName(modeOfOperation, "modeOfOperation"),
-            'modelOfManagement': getTranslatedName(modelOfManagement, "modelOfManagement"),
+            'context': getTranslatedName(allContexts, customAttributes.PROJECT_CONTEXT_CODE),
+            'populationType': getTranslatedName(allPopTypes, customAttributes.PROJECT_POPULATION_TYPE_CODE),
+            'projectType': getTranslatedName(allProjectTypes, customAttributes.PROJECT_TYPE_CODE),
+            'reasonForIntervention': getTranslatedName(reasonForIntervention, customAttributes.REASON_FOR_INTERVENTION_CODE),
+            'modeOfOperation': getTranslatedName(modeOfOperation, customAttributes.MODE_OF_OPERATION_CODE),
+            'modelOfManagement': getTranslatedName(modelOfManagement, customAttributes.MODEL_OF_MANAGEMENT_CODE),
 
-            'estimatedTargetPopulation': parseInt(self.getAttributeValue(dhisProject, "estimatedTargetPopulation")),
-            'estPopulationLessThan1Year': parseInt(self.getAttributeValue(dhisProject, "estPopulationLessThan1Year")),
-            'estPopulationBetween1And5Years': parseInt(self.getAttributeValue(dhisProject, "estPopulationBetween1And5Years")),
-            'estPopulationOfWomenOfChildBearingAge': parseInt(self.getAttributeValue(dhisProject, "estPopulationOfWomenOfChildBearingAge")),
+            'estimatedTargetPopulation': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.ESTIMATED_TARGET_POPULATION_CODE)),
+            'estPopulationLessThan1Year': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.EST_POPULATION_LESS_THAN_1_YEAR_CODE)),
+            'estPopulationBetween1And5Years': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.EST_POPULATION_BETWEEN_1_AND_5_YEARS_CODE)),
+            'estPopulationOfWomenOfChildBearingAge': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.EST_POPULATION_OF_WOMEN_OF_CHILD_BEARING_AGE_CODE)),
             'autoApprove': autoApprove === undefined ? "false" : autoApprove
         };
     };
 
     this.mapToModule = function(module, moduleId, moduleLevel) {
+        var isLineList = module.serviceType === "Linelist" ? "true" : "false";
         return {
             name: module.name,
             shortName: module.name,
@@ -236,31 +115,9 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             id: moduleId || dhisId.get(module.name + module.parent.id),
             level: moduleLevel || parseInt(module.parent.level) + 1,
             openingDate: moment.utc(module.openingDate).format('YYYY-MM-DD'),
-            attributeValues: [{
-                created: moment().toISOString(),
-                lastUpdated: moment().toISOString(),
-                attribute: {
-                    "code": "Type",
-                    "name": "Type"
-                },
-                value: "Module"
-            }, {
-                created: moment().toISOString(),
-                lastUpdated: moment().toISOString(),
-                attribute: {
-                    "code": "isLineListService",
-                    "name": "Is Linelist Service"
-                },
-                value: module.serviceType === "Linelist" ? "true" : "false"
-            }, {
-                created: moment().toISOString(),
-                lastUpdated: moment().toISOString(),
-                attribute: {
-                    "code": "isNewDataModel",
-                    "name": "Is New Data Model"
-                },
-                value: "true"
-            }],
+            attributeValues: [customAttributes.createAttribute(customAttributes.TYPE, "Module"),
+                customAttributes.createAttribute(customAttributes.LINE_LIST_ATTRIBUTE_CODE, isLineList),
+                customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true")],
             parent: {
                 name: module.parent.name,
                 id: module.parent.id
@@ -269,12 +126,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
     };
 
     var isOfType = function(orgUnit, type) {
-        return _.any(orgUnit.attributeValues, {
-            attribute: {
-                code: "type"
-            },
-            value: type
-        });
+        return customAttributes.getAttributeValue(orgUnit.attributeValues, customAttributes.TYPE) === type;
     };
 
     this.filterModules = function(orgUnits) {
@@ -308,32 +160,15 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
                     "id": dhisId.get(patientOrigin.name + parent.id),
                     "level": 7,
                     "openingDate": parent.openingDate,
-                    "attributeValues": [{
-                        "attribute": {
-                            "code": "Type",
-                            "name": "Type"
-                        },
-                        "value": "Patient Origin"
-                    }, {
-                        "attribute": {
-                            "code": "isNewDataModel",
-                            "name": "Is New Data Model"
-                        },
-                        "value": "true"
-                    }],
+                    "attributeValues": [customAttributes.createAttribute(customAttributes.TYPE, "Patient Origin"),
+                        customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true")],
                     "parent": {
                         "id": parent.id
                     }
                 };
 
                 if (patientOrigin.isDisabled === true) {
-                    var isDisabledAttr = {
-                        "attribute": {
-                            "code": "isDisabled",
-                        },
-                        "value": "true"
-                    };
-                    patientOriginPayload.attributeValues.push(isDisabledAttr);
+                    patientOriginPayload.attributeValues.push(customAttributes.createAttribute(customAttributes.DISABLED_CODE, "true"));
                 }
 
                 if (!_.isUndefined(patientOrigin.longitude) && !_.isUndefined(patientOrigin.latitude)) {

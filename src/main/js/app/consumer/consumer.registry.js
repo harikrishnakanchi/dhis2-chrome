@@ -1,27 +1,23 @@
 define(["properties"], function(properties) {
     return function($hustle, $q, $log, dispatcher) {
-        var allConsumers = [];
+        var consumer;
 
         this.register = function() {
-            $log.info("Registering allconsumers");
-            return $q.all([$hustle.registerConsumer(dispatcher.run, "dataValues", properties.queue.delay, properties.queue.retryDelayConfig)]).then(function(data) {
-                allConsumers = data;
-                $log.info("registered allconsumers");
+            $log.info("Registering consumer");
+            return $q.when($hustle.registerConsumer(dispatcher.run, "dataValues", properties.queue.delay, properties.queue.retryDelayConfig)).then(function(data) {
+                consumer = data;
+                $log.info("registered consumer");
             });
         };
 
-        this.startAllConsumers = function() {
-            for (var index in allConsumers) {
-                allConsumers[index].start();
-            }
-            $log.info("started allconsumers");
+        this.startConsumer = function() {
+            consumer && consumer.start();
+            $log.info("started consumer");
         };
 
-        this.stopAllConsumers = function() {
-            for (var index in allConsumers) {
-                allConsumers[index].stop();
-            }
-            $log.info("stopped allconsumers");
+        this.stopConsumer = function() {
+            consumer && consumer.stop();
+            $log.info("stopped consumer");
         };
     };
 });

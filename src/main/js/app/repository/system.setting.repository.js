@@ -128,6 +128,14 @@ define(["lodash", "cipherUtils", "properties", "dhisId"], function(_, cipherUtil
             return get(praxisUidKey).then(returnPraxisUid, createPraxisUid);
         };
 
+        var getNotificationSettingValue = function () {
+            return get('notificationSettingValue').then(function (standardDeviationValue) {
+                return _.isNaN(parseFloat(standardDeviationValue)) ? 1.25 : parseFloat(standardDeviationValue);
+            }, function () {
+                return 1.25;
+            });
+        };
+
         return {
             "upsert": upsert,
             "upsertProductKey": upsertProductKey,
@@ -141,7 +149,8 @@ define(["lodash", "cipherUtils", "properties", "dhisId"], function(_, cipherUtil
             "loadProductKey": loadProductKey,
             "getAllowedOrgUnits": getAllowedOrgUnits,
             "getProductKeyLevel": getProductKeyLevel,
-            "getPraxisUid": getPraxisUid
+            "getPraxisUid": getPraxisUid,
+            "getStandardDeviationValue": getNotificationSettingValue
         };
     };
 });

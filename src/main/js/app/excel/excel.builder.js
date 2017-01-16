@@ -55,11 +55,18 @@ define(['xlsx', 'lodash'], function (XLSX, _) {
         });
     };
 
-    var createCellObject = function (cellValue) {
-        return {
+    var createCellObject = function (cell) {
+        var cellValue = _.isPlainObject(cell) ? cell.value : cell;
+        var type = CELL_TYPES[typeof cellValue] || CELL_TYPES.default;
+        var obj = {
             v: cellValue,
-            t: CELL_TYPES[typeof cellValue] || CELL_TYPES.default
+            t: type
         };
+
+        if (_.isPlainObject(cell)) {
+            _.set(obj, 's', cell.style);
+        }
+        return obj;
     };
 
     var createSheetObject = function (sheetData) {
@@ -72,11 +79,10 @@ define(['xlsx', 'lodash'], function (XLSX, _) {
             maxRowIndex = _.max([maxRowIndex, rowIndex]);
             _.each(row, function (cell, columnIndex) {
                 if(_.isNull(cell) || _.isUndefined(cell)) return;
-
                 var cellReference = XLSX.utils.encode_cell({ r: rowIndex, c: columnIndex });
                 sheetObject[cellReference] = createCellObject(cell);
                 maxColumnIndex = _.max([maxColumnIndex, columnIndex]);
-                columnWidths[columnIndex] = _.max([columnWidths[columnIndex], cell && cell.length, DEFAULT_COLUMN_WIDTH]);
+                columnWidths[columnIndex] = _.max([columnWidths[columnIndex], sheetObject[cellReference].v.length, DEFAULT_COLUMN_WIDTH]);
             });
         });
 
@@ -91,7 +97,11 @@ define(['xlsx', 'lodash'], function (XLSX, _) {
         return {
             SheetNames: _.map(sheets, 'name'),
             Sheets: _.reduce(sheets, function (sheetsObject, sheet) {
-                return _.set(sheetsObject, sheet.name, createSheetObject(sheet.data));
+                var sheetObject = createSheetObject(sheet.data);
+                if (sheet.merges) {
+                    sheetObject['!merges'] = sheet.merges;
+                }
+                return _.set(sheetsObject, sheet.name, sheetObject);
             }, {})
         };
     };

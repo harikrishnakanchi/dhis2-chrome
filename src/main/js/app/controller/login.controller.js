@@ -1,5 +1,5 @@
 define(["md5", "properties", "lodash", "interpolate"], function(md5, properties, _, interpolate) {
-    return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility, translationsService) {
+    return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility, storageService) {
         var loadUserData = function(loginUsername) {
             var existingUserProjects = userPreferenceRepository.getCurrentUsersProjectIds();
             var previousUser = userPreferenceRepository.getCurrentUsersUsername().then(function (username) {
@@ -126,8 +126,10 @@ define(["md5", "properties", "lodash", "interpolate"], function(md5, properties,
                 $location.path("/dashboard");
         };
 
-        var refreshTranslations = function() {
-            systemSettingRepository.getLocale().then($rootScope.setLocale);
+        var persistUserSession = function (data) {
+            // Store the user data in sessionStorage to retain session in subsequent reloads.
+            storageService.setItem('sessionInfo', data);
+            return data;
         };
 
         $scope.login = function() {
@@ -135,9 +137,9 @@ define(["md5", "properties", "lodash", "interpolate"], function(md5, properties,
             loadUserData(loginUsername)
                 .then(verifyProductKeyInstance)
                 .then(authenticateUser)
+                .then(persistUserSession)
                 .then(login)
                 .then(startProjectDataSync)
-                .then(refreshTranslations)
                 .then(redirect);
         };
 
@@ -148,9 +150,29 @@ define(["md5", "properties", "lodash", "interpolate"], function(md5, properties,
             }
         });
 
+        var redirectIfSessionExists = function () {
+            var lastRoute = storageService.getItem('lastRoute'),
+                userSessionData = storageService.getItem('sessionInfo');
+
+            if (lastRoute && userSessionData) {
+                login(userSessionData).then(function () {
+                    // Set the productKeyLevel on $rootScope.
+                    systemSettingRepository.getProductKeyLevel();
+
+                    // Redirect to the last route on page reload.
+                    $location.path(lastRoute);
+                });
+            } else {
+                $scope.showLoginForm = true;
+                storageService.clear();
+            }
+        };
+
         var init = function() {
             $scope.compatibilityInfo = {};
             checkVersionCompatibility($scope.compatibilityInfo);
+
+            redirectIfSessionExists();
         };
 
         init();

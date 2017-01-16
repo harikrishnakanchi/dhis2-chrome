@@ -1,4 +1,4 @@
-define(["programRepository", "dataElementRepository", "angularMocks", "utils", "customAttributes", "timecop", "moment", "lodash"], function(ProgramRepository, DataElementRepository, mocks, utils, CustomAttributes, timecop, moment, _) {
+define(["programRepository", "dataElementRepository", "angularMocks", "utils", "customAttributes", "timecop", "moment", "lodash"], function(ProgramRepository, DataElementRepository, mocks, utils, customAttributes, timecop, moment, _) {
     describe("programRepository", function() {
         var scope, q,
             programRepository, dataElementRepository, mockStore,
@@ -8,8 +8,8 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
             q = $q;
             scope = $rootScope;
 
-            spyOn(CustomAttributes, 'getAttributeValue');
-            spyOn(CustomAttributes, 'getBooleanAttributeValue').and.returnValue(true);
+            spyOn(customAttributes, 'getAttributeValue');
+            spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(true);
 
             var mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
@@ -55,7 +55,7 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
         describe('getProgramForOrgUnit', function () {
             beforeEach(function () {
                 mockStore.find.and.returnValue(utils.getPromise(q, mockProgram));
-                CustomAttributes.getAttributeValue.and.returnValue('someServiceCode');
+                customAttributes.getAttributeValue.and.returnValue('someServiceCode');
             });
 
             it("should get Programs for OrgUnit", function() {
@@ -101,7 +101,7 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
 
         describe('get', function () {
             beforeEach(function () {
-                CustomAttributes.getAttributeValue.and.returnValue('someServiceCode');
+                customAttributes.getAttributeValue.and.returnValue('someServiceCode');
                 mockStore.find.and.returnValue(utils.getPromise(q, mockProgram));
                 dataElementRepository.get.and.returnValue(utils.getPromise(q, mockDataElementA));
             });
@@ -143,8 +143,8 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
 
         describe('getAll', function () {
             it('should parse the service code of the programs', function () {
-                CustomAttributes.getAttributeValue.and.returnValue('someServiceCode');
-                CustomAttributes.getBooleanAttributeValue.and.returnValue(true);
+                customAttributes.getAttributeValue.and.returnValue('someServiceCode');
+                customAttributes.getBooleanAttributeValue.and.returnValue(true);
 
                 var allPrograms = [{
                     id: 'someProgramId'
@@ -159,7 +159,7 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
             });
 
             it('should filter out old data model programs', function() {
-                CustomAttributes.getBooleanAttributeValue.and.returnValue(false);
+                customAttributes.getBooleanAttributeValue.and.returnValue(false);
                 mockStore.getAll.and.returnValue(utils.getPromise(q, [mockProgram]));
 
                 programRepository.getAll().then(function(programs) {
@@ -175,7 +175,7 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
             beforeEach(function () {
                 mockStore.each.and.returnValue(utils.getPromise(q, [mockProgram]));
 
-                CustomAttributes.getAttributeValue.and.returnValue('someServiceCode');
+                customAttributes.getAttributeValue.and.returnValue('someServiceCode');
             });
 
             it('should find all programs', function() {

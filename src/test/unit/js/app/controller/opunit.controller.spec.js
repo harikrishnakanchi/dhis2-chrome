@@ -1,4 +1,5 @@
-define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "timecop", "moment", "dhisId", "orgUnitRepository", "patientOriginRepository", "orgUnitGroupSetRepository"], function(OpUnitController, mocks, utils, OrgUnitGroupHelper, timecop, moment, dhisId, OrgUnitRepository, PatientOriginRepository, OrgUnitGroupSetRepository) {
+define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "timecop", "moment", "dhisId", "orgUnitRepository", "patientOriginRepository", "orgUnitGroupSetRepository", "customAttributes"],
+    function(OpUnitController, mocks, utils, OrgUnitGroupHelper, timecop, moment, dhisId, OrgUnitRepository, PatientOriginRepository, OrgUnitGroupSetRepository, customAttributes) {
     describe('opUnitController', function() {
         var scope, db, q, hustle, fakeModal,
             opUnitController,
@@ -18,17 +19,8 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 parent: {
                     id: 'someParentId'
                 },
-                attributeValues: [{
-                    attribute: {
-                        code: 'opUnitType'
-                    },
-                    value: 'Hospital'
-                }, {
-                    attribute: {
-                        code: 'hospitalUnitCode'
-                    },
-                    value: 'B1'
-                }]
+                attributeValues: [createMockAttribute('opUnitType', 'Hospital'),
+                    createMockAttribute('hospitalUnitCode', 'B1')]
             };
             scope.isNewMode = true;
             scope.locale = 'en';
@@ -98,6 +90,21 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             Timecop.uninstall();
         });
 
+        var createMockAttribute = function (code, value, name) {
+            var attribute = {
+                "created": "2014-10-29T12:43:54.972Z",
+                "lastUpdated": "2014-10-29T12:43:54.972Z",
+                "attribute": {
+                    "code": code
+                },
+                "value": value
+            };
+            if (name) {
+                attribute.attribute.name = name;
+            }
+            return attribute;
+        };
+
         it("should save operation unit", function() {
             var opUnit = {
                 "name": "OpUnit1",
@@ -118,35 +125,11 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "shortName": "OpUnit1",
                 "level": 5,
                 "parent": _.pick(scope.orgUnit, ['id', 'name']),
-                "attributeValues": [{
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "opUnitType"
-                    },
-                    "value": "Hospital"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "Type"
-                    },
-                    "value": "Operation Unit"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "hospitalUnitCode"
-                    },
-                    "value": "Unit Code - A"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": 'isNewDataModel'
-                    },
-                    "value": 'true'
-                }]
+                "attributeValues": [createMockAttribute ('opUnitType', 'Hospital'),
+                    createMockAttribute ('Type', 'Operation Unit'),
+                    createMockAttribute ('hospitalUnitCode', 'Unit Code - A'),
+                    createMockAttribute ('isNewDataModel', 'true')
+                ]
             };
 
             scope.save(opUnit);
@@ -216,35 +199,11 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "shortName": "OpUnit1",
                 "level": 5,
                 "parent": _.pick(scope.orgUnit, ['id', 'name']),
-                "attributeValues": [{
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "opUnitType"
-                    },
-                    "value": "Hospital"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "Type"
-                    },
-                    "value": "Operation Unit"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "hospitalUnitCode"
-                    },
-                    "value": "Unit Code - A"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": 'isNewDataModel'
-                    },
-                    "value": 'true'
-                }],
+                "attributeValues": [createMockAttribute('opUnitType', 'Hospital'),
+                    createMockAttribute('Type', 'Operation Unit'),
+                    createMockAttribute('hospitalUnitCode', 'Unit Code - A'),
+                    createMockAttribute('isNewDataModel', 'true')
+                ],
                 "coordinates": "[25,50]",
                 "featureType": "POINT"
             };
@@ -281,28 +240,10 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "shortName": "OpUnit1",
                 "level": 5,
                 "parent": _.pick(scope.orgUnit, ['id', 'name']),
-                "attributeValues": [{
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "opUnitType"
-                    },
-                    "value": "Health Center"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "Type"
-                    },
-                    "value": "Operation Unit"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": 'isNewDataModel'
-                    },
-                    "value": 'true'
-                }]
+                "attributeValues": [createMockAttribute('opUnitType', 'Health Center'),
+                    createMockAttribute('Type', 'Operation Unit'),
+                    createMockAttribute('isNewDataModel', 'true')
+                ]
             };
 
             scope.save(opUnit);
@@ -324,22 +265,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     "id": "parent"
                 },
                 "coordinates": "[29,-45]",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "opUnitType"
-                    },
-                    "value": "Health Center"
-                }, {
-                    "attribute": {
-                        "id": "a1fa2777924"
-                    },
-                    "value": "Operation Unit"
-                }, {
-                    "attribute": {
-                        "code": "hospitalUnitCode"
-                    },
-                    "value": "Unit Code - B1"
-                }]
+                "attributeValues": []
             };
 
             var patientOrigins = {
@@ -352,6 +278,14 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     "originName": "Unknown"
                 }]
             };
+
+            spyOn(customAttributes, 'getAttributeValue').and.callFake(function (attributeValues, code) {
+                var fakeAttributeValues = {
+                    opUnitType: 'Health Center',
+                    hospitalUnitCode: 'Unit Code - B1'
+                };
+                return fakeAttributeValues[code];
+            });
 
             var expectedPatientOrigins = {
                 "orgUnit": "opunitid",
@@ -381,25 +315,11 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "parent": {
                     "id": "parent"
                 },
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "opUnitType"
-                    },
-                    "value": "Health Center"
-                }, {
-                    "attribute": {
-                        "code": "isDisabled"
-                    },
-                    "value": "true"
-                }, {
-                    "attribute": {
-                        "code": "hospitalUnitCode"
-                    },
-                    "value": "Unit Code - B1"
-                }]
+                "attributeValues": []
             };
             scope.isNewMode = false;
 
+            spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(true);
             scope.$apply();
             expect(scope.isDisabled).toBeTruthy();
         });
@@ -429,15 +349,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             var expectedOrgUnits = [{
                 "name": "mod1",
                 "id": "mod1",
-                "attributeValues": [{
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "isDisabled",
-                        "name": "Is Disabled"
-                    },
-                    "value": "true"
-                }],
+                "attributeValues": [createMockAttribute('isDisabled', 'true')],
                 "parent": {
                     "id": "opunit1",
                 }
@@ -445,15 +357,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "name": "opunit1",
                 "id": "opunit1",
                 "datasets": [],
-                "attributeValues": [{
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "isDisabled",
-                        "name": "Is Disabled"
-                    },
-                    "value": "true"
-                }],
+                "attributeValues": [createMockAttribute('isDisabled', 'true')],
                 "parent": {
                     "id": "parent"
                 }
@@ -509,35 +413,11 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     "name": "Parent",
                     "id": "ParentId"
                 },
-                "attributeValues": [{
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "opUnitType"
-                    },
-                    "value": "Hospital"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "Type"
-                    },
-                    "value": "Operation Unit"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "hospitalUnitCode"
-                    },
-                    "value": "Unit Code - A"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": 'isNewDataModel'
-                    },
-                    "value": 'true'
-                }]
+                "attributeValues": [createMockAttribute('opUnitType', 'Hospital'),
+                    createMockAttribute('Type', 'Operation Unit'),
+                    createMockAttribute('hospitalUnitCode', 'Unit Code - A'),
+                    createMockAttribute('isNewDataModel', 'true')
+                ]
             };
 
             var modulesUnderOpunit = [{
@@ -597,35 +477,11 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "shortName": "OpUnit1",
                 "level": 5,
                 "parent": scope.orgUnit.parent,
-                "attributeValues": [{
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "opUnitType"
-                    },
-                    "value": "Hospital"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "Type"
-                    },
-                    "value": "Operation Unit"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "hospitalUnitCode"
-                    },
-                    "value": "Unit Code - A"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": 'isNewDataModel'
-                    },
-                    "value": 'true'
-                }],
+                "attributeValues": [createMockAttribute('opUnitType', 'Hospital'),
+                    createMockAttribute('Type', 'Operation Unit'),
+                    createMockAttribute('hospitalUnitCode', 'Unit Code - A'),
+                    createMockAttribute('isNewDataModel', 'true')
+                ],
                 "coordinates": "[25,50]",
                 "featureType": "POINT"
             };
@@ -691,12 +547,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "id": "aggMod1"
             }, {
                 "id": "lineMod1",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isLineListService",
-                    },
-                    "value": "true"
-                }]
+                "attributeValues": [createMockAttribute('isLineListService', 'true')]
             }];
 
             var originOrgUnits = [{
@@ -744,46 +595,22 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             var origins = [{
                 "id": "o1",
                 "name": "origin1",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isDisabled"
-                    },
-                    "value": "false"
-                }]
+                "attributeValues": [createMockAttribute('isDisabled', 'false')]
             }, {
                 "id": "o3",
                 "name": "origin1",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isSomething"
-                    },
-                    "value": "false"
-                }]
+                "attributeValues": [createMockAttribute('isSomething', 'false')]
             }];
 
             var expectedOrgUnitUpsert = [{
                 "id": "o1",
                 "name": "origin1",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isDisabled"
-                    },
-                    "value": "true"
-                }]
+                "attributeValues": [createMockAttribute('isDisabled', 'true')]
             }, {
                 "id": "o3",
                 "name": "origin1",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isSomething"
-                    },
-                    "value": "false"
-                }, {
-                    "attribute": {
-                        "code": "isDisabled"
-                    },
-                    "value": "true"
-                }]
+                "attributeValues": [createMockAttribute('isSomething', 'false'),
+                    createMockAttribute('isDisabled', 'true')]
 
             }];
 
@@ -836,23 +663,13 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             var origins = [{
                 "id": "o1",
                 "name": "origin1",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isDisabled"
-                    },
-                    "value": "true"
-                }]
+                "attributeValues": [createMockAttribute('isDisabled', 'true')]
             }];
 
             var expectedOrgUnitUpsert = [{
                 "id": "o1",
                 "name": "origin1",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isDisabled"
-                    },
-                    "value": "false"
-                }]
+                "attributeValues": [createMockAttribute('isDisabled', 'false')]
             }];
 
             var expectedPatientOriginUpsert = {

@@ -1,4 +1,4 @@
-define(["moment", "lodash", "properties", "dateUtils", "customAttributes"], function(moment, _, properties, dateUtils, CustomAttributes) {
+define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, properties, dateUtils) {
     return function(db, $q, dataElementRepository) {
         this.upsert = function(events) {
 

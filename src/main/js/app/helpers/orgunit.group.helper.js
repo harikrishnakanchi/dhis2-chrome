@@ -1,4 +1,4 @@
-define([], function() {
+define(['customAttributes'], function(customAttributes) {
     return function($hustle, $q, $scope, orgUnitRepository, orgUnitGroupRepository) {
         this.createOrgUnitGroups = function(orgUnits, isUpdateProject) {
             var orgUnitGroups;
@@ -11,7 +11,7 @@ define([], function() {
             var identifyGroupsToModify = function() {
                 var getNewGroupAssociations = function() {
                     var findGroupByAttrValue = function(attribute) {
-                        var attrValue = attribute.attribute.code === "hospitalUnitCode" ? "Unit Code - " + attribute.value : attribute.value;
+                        var attrValue = attribute.attribute.code === customAttributes.HOSPITAL_UNIT_CODE ? "Unit Code - " + attribute.value : attribute.value;
                         return _.find(orgUnitGroups, "name", attrValue);
                     };
 

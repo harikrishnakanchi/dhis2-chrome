@@ -70,6 +70,18 @@ define(['pivotTable'], function(PivotTable) {
            });
        });
 
+       describe('opUnitReport', function() {
+           it('should return true if pivot table name contains OpUnitReport', function() {
+               pivotTable = PivotTable.create({ name: '[Praxis - OpUnitReport] # Name' });
+               expect(pivotTable.opUnitReport).toBeTruthy();
+           });
+
+           it('should return false if pivot table name does not contain OpUnitReport', function() {
+               pivotTable = PivotTable.create({ name: 'some malformed pivot table name' });
+               expect(pivotTable.opUnitReport).toBeFalsy();
+           });
+       });
+
        describe('geographicOriginReport', function() {
            it('should return true if pivot table name contains GeographicOrigin', function() {
                pivotTable = PivotTable.create({ name: '[FieldApp - GeographicOrigin] # Name' });
@@ -79,6 +91,18 @@ define(['pivotTable'], function(PivotTable) {
            it('should return false if pivot table name does not contain GeographicOrigin', function() {
                pivotTable = PivotTable.create({ name: 'some malformed pivot table name' });
                expect(pivotTable.geographicOriginReport).toBeFalsy();
+           });
+       });
+
+       describe('referralLocationReport', function() {
+           it('should return true if pivot table service code contains Referral location', function() {
+               pivotTable = PivotTable.create({ name: '[FieldApp - ReferralLocation] # Name' });
+               expect(pivotTable.referralLocationReport).toBeTruthy();
+           });
+
+           it('should return false if pivot table name does not contain ReferralLocation', function() {
+               pivotTable = PivotTable.create({ name: 'some malformed pivot table name' });
+               expect(pivotTable.referralLocationReport).toBeFalsy();
            });
        });
 
@@ -133,6 +157,71 @@ define(['pivotTable'], function(PivotTable) {
                pivotTable = PivotTable.create({ name: 'some malformed pivot table name' });
                expect(pivotTable.displayPosition).toBeNull();
            });
+       });
+
+       describe('hideWeeks', function () {
+           it('should return true if an indicator numerator is using program indicator', function () {
+               config = {
+                   dataDimensionItems: [{
+                       indicator: {
+                           id: 'someIndicator',
+                           numerator: '#{someDataElementId}+I{someIndicatorId}+#{someOtherDataElementId}'
+                       }
+                   }]
+               };
+               pivotTable = PivotTable.create(config);
+               expect(pivotTable.hideWeeks).toBe(true);
+           });
+
+           it('should return false if an indicator numerator is not using program indicator', function () {
+               config = {
+                   dataDimensionItems: [{
+                       indicator: {
+                           id: 'someIndicator',
+                           numerator: '#{someDataElementId}+#{someOtherDataElementId}'
+                       }
+                   }]
+               };
+               pivotTable = PivotTable.create(config);
+               expect(pivotTable.hideWeeks).toBe(false);
+           });
+
+           it('should return true if an indicator denominator is using program indicator', function () {
+               config = {
+                   dataDimensionItems: [{
+                       indicator: {
+                           id: 'someIndicator',
+                           denominator: '#{someDataElementId}+I{someIndicatorId}+#{someOtherDataElementId}'
+                       }
+                   }]
+               };
+               pivotTable = PivotTable.create(config);
+               expect(pivotTable.hideWeeks).toBe(true);
+           });
+
+           it('should return false if an indicator denominator is using program indicator', function () {
+               config = {
+                   dataDimensionItems: [{
+                       indicator: {
+                           id: 'someIndicator',
+                           denominator: '#{someDataElementId}+#{someIndicatorId}+#{someOtherDataElementId}'
+                       }
+                   }]
+               };
+               pivotTable = PivotTable.create(config);
+               expect(pivotTable.hideWeeks).toBe(false);
+           });
+
+           it('should return true if data dimension contains atleast one program indicator', function () {
+               config = {
+                   dataDimensionItems: [{
+                       programIndicator: 'someProgramIndicator'
+                   }]
+               };
+               pivotTable = PivotTable.create(config);
+               expect(pivotTable.hideWeeks).toBe(true);
+           });
+
        });
    });
 });

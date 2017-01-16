@@ -1,4 +1,4 @@
-define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment, properties) {
+define(["toTree", "lodash", "moment", "properties", "customAttributes"], function(toTree, _, moment, properties, customAttributes) {
     return function($scope, $q, $location, $timeout, $anchorScroll, $rootScope, orgUnitRepository) {
 
         var userIsProjectAdmin,
@@ -8,7 +8,7 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
             'Operational Center': 'templates/partials/oc-form.html',
             'Country': 'templates/partials/country-form.html',
             'Project': 'templates/partials/project-form.html',
-            'Module': 'templates/partials/module-form.html',
+            'Module': 'templates/partials/aggregate-module-form.html',
             'LineListModule': 'templates/partials/linelist-module-form.html',
             'Operation Unit': 'templates/partials/op-unit-form.html',
             'User': 'templates/partials/project-user-form.html',
@@ -130,24 +130,13 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
         };
 
         $scope.getOrgUnitType = function(orgUnit) {
-            var isLineListService = function() {
-                var attr = _.find(orgUnit.attributeValues, {
-                    "attribute": {
-                        "code": "isLineListService"
-                    }
-                });
-                return attr && attr.value == "true";
-            };
+            var isLineListService = customAttributes.getBooleanAttributeValue(orgUnit.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE);
 
             if (!_.isEmpty(orgUnit)) {
-                var type = _.find(orgUnit.attributeValues, {
-                    "attribute": {
-                        "code": "Type"
-                    }
-                }).value;
+                var type = customAttributes.getAttributeValue(orgUnit.attributeValues, customAttributes.TYPE);
 
                 if (type == "Module") {
-                    type = isLineListService() ? "LineListModule" : "Module";
+                    type = isLineListService ? "LineListModule" : "Module";
                 }
                 return type;
             }

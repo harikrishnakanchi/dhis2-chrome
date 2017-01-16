@@ -1,9 +1,9 @@
-define(["moment", "properties", "lodash", "chromeUtils"], function(moment, properties, _, chromeUtils) {
+define(["moment", "properties", "lodash", "platformUtils"], function(moment, properties, _, platformUtils) {
     return function($scope, $hustle, $q, $rootScope, $timeout) {
         $scope.syncNow = function() {
 
             var onSuccess = function(response) {
-                chromeUtils.createNotification($scope.resourceBundle.downloadDataFromDhis, $scope.resourceBundle.syncScheduled);
+                platformUtils.createNotification($scope.resourceBundle.downloadDataFromDhis, $scope.resourceBundle.syncScheduled);
             };
 
             var downloadMetadata = $hustle.publishOnce({

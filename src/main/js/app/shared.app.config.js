@@ -21,7 +21,7 @@ require.config({
         "sjcl": "lib/sjcl/sjcl",
         "saveSvgAsPng": "lib/save-svg-as-png/saveSvgAsPng",
         "angular-sanitize": "lib/angular-sanitize/angular-sanitize.min",
-        "xlsx": "lib/js-xlsx/xlsx",
+        "xlsx": "lib/js-xlsx-style/xlsx",
 
         //3rd party angular modules
         "angular-indexedDB": "lib/angular-indexedDB/indexeddb",
@@ -79,6 +79,8 @@ require.config({
         "headerController": "app/controller/header.controller",
         "footerController": "app/controller/footer.controller",
         "exportRawDataController": "app/controller/export.raw.data.controller",
+        "opUnitReportController": "app/controller/opunit.report.controller",
+        "downloadMetadataController": "app/controller/download.metadata.controller",
 
         //Services
         "services": "app/service/services",
@@ -93,6 +95,8 @@ require.config({
         "eventService": "app/service/event.service",
         "orgUnitGroupService": "app/service/orgunit.group.service",
         "historyService": "app/service/history.service",
+        "storageService": "app/service/storage.service",
+        "metadataDownloader": "app/service/metadata.downloader",
 
         //Repositories
         "repositories": "app/repository/repositories",
@@ -120,6 +124,7 @@ require.config({
         "dataSyncFailureRepository": "app/repository/data.sync.failure.repository",
         "excludedLineListOptionsRepository": "app/repository/excluded.line.list.options.repository",
         "categoryRepository": "app/repository/category.repository",
+        "programIndicatorRepository": "app/repository/program.indicator.repository",
 
         //Models
         "chart": "app/models/chart",
@@ -129,6 +134,11 @@ require.config({
         "pivotTableData": "app/models/pivot.table.data",
         "chartData": "app/models/chart.data",
         "analyticsData": "app/models/analytics.data",
+
+        //Excel
+        "excelBuilderHelper": "app/excel/excel.builder.helper",
+        "excelBuilder": "app/excel/excel.builder",
+        "excelStyles": "app/excel/excel.styles",
 
         //Factories
         "factories": "app/factories/factories",
@@ -157,8 +167,9 @@ require.config({
         "hustleMonitor": "app/monitors/hustle.monitor",
         "monitors": "app/monitors/monitors",
 
-        //Queue
-        "queuePostProcessInterceptor": "app/queue/queue.postprocess.interceptor",
+        //Interceptors
+        "queueInterceptor": "app/queue/queue.interceptor",
+        "configureRequestInterceptor": "app/interceptors/configure.request.interceptor",
 
         //Utils
         "dhisId": "app/utils/dhis.id",
@@ -168,13 +179,11 @@ require.config({
         "dhisUrl": "app/utils/dhis.url",
         "zipUtils": "app/utils/zip.utils",
         "cipherUtils": "app/utils/cipher.utils",
-        "appSettingsUtils": "app/utils/app.settings.utils",
-        "authenticationUtils": "app/utils/authentication.utils",
         "dataURItoBlob": "app/utils/data.uri.to.blob",
         "interpolate": "app/utils/interpolate",
         "xlsxLoader": "app/utils/xlsx.loader",
-        "excelBuilder": "app/utils/excel.builder",
         "dataElementUtils": "app/utils/data.element.utils",
+        "pagingUtils": "app/utils/paging.utils",
 
         //Helpers
         "helpers": "app/helpers/helpers",
@@ -190,6 +199,7 @@ require.config({
         "lockedTableHeader": "app/directives/locked.table.header",
         "descriptionPopup": "app/directives/description.popup"
     },
+    waitSeconds: 0,
     shim: {
         "ng-i18n": {
             deps: ["angular"],

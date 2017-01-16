@@ -19,10 +19,15 @@ define(["dhisUrl", "moment", "properties"], function(dhisUrl, moment, properties
 
         this.loadMetadataFromFile = function(lastUpdatedTime) {
             return $http.get("data/metadata.json").then(function(response) {
-                var metaData = response.data;
-                if (lastUpdatedTime && moment(lastUpdatedTime).isAfter(metaData.created))
-                    return;
-                return metaData;
+                return response.data;
+            }).catch(function () {
+                return {
+                    created: '2014-03-23T09:02:49.870+0000',
+                    dataSets: [],
+                    organisationUnitGroups: [],
+                    organisationUnits: [],
+                    programs: []
+                };
             });
         };
     };

@@ -1,10 +1,10 @@
-define(["angular", "Q", "services", "directives", "dbutils", "controllers", "repositories", "factories", "migrator", "migrations", "properties", "queuePostProcessInterceptor", "monitors", "helpers", "indexedDBLogger", "authenticationUtils", "transformers",
+define(["angular", "Q", "services", "directives", "dbutils", "controllers", "repositories", "factories", "migrator", "migrations", "properties", "queueInterceptor", "configureRequestInterceptor", "monitors", "helpers", "indexedDBLogger", "transformers", "platformUtils",
         "angular-route", "ng-i18n", "angular-indexedDB", "hustleModule", "angular-ui-tabs", "angular-ui-accordion", "angular-ui-collapse", "angular-ui-transition", "angular-ui-weekselector",
         "angular-treeview", "angular-ui-modal", "angular-multiselect", "angular-ui-notin", "angular-ui-equals", "angular-ui-dropdown", "angular-filter", "angucomplete-alt", "angular-nvd3", "angular-ui-tooltip",
         "angular-ui-bindHtml", "angular-ui-position", "angular-sanitize"
 
     ],
-    function(angular, Q, services, directives, dbutils, controllers, repositories, factories, migrator, migrations, properties, queuePostProcessInterceptor, monitors, helpers, indexedDBLogger, authenticationUtils, transformers) {
+    function(angular, Q, services, directives, dbutils, controllers, repositories, factories, migrator, migrations, properties, queueInterceptor, configureRequestInterceptor, monitors, helpers, indexedDBLogger, transformers, platformUtils) {
         var init = function() {
             var app = angular.module('PRAXIS', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs", "ui.bootstrap.transition", "ui.bootstrap.collapse",
                 "ui.bootstrap.accordion", "ui.weekselector", "angularTreeview", "ui.bootstrap.modal", "ui.bootstrap.dropdown",
@@ -22,73 +22,197 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
             directives.init(app);
             transformers.init(app);
 
-            app.factory('queuePostProcessInterceptor', ['$log', 'ngI18nResourceBundle', queuePostProcessInterceptor]);
+            app.factory('queueInterceptor', ['$log', 'ngI18nResourceBundle', 'dataRepository','dataSyncFailureRepository', 'hustleMonitor', queueInterceptor]);
+            app.factory('configureRequestInterceptor', ['$rootScope', 'systemSettingRepository', configureRequestInterceptor]);
 
-            app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider', '$hustleProvider', '$compileProvider', '$provide', '$tooltipProvider',
-                function($routeProvider, $indexedDBProvider, $httpProvider, $hustleProvider, $compileProvider, $provide, $tooltipProvider) {
+            app.constant('USER_ROLES', {
+                'DATA_ENTRY': 'Data entry user',
+                'OBSERVER': 'Observer',
+                'PROJECT_LEVEL_APPROVER': 'Project Level Approver',
+                'COORDINATION_LEVEL_APPROVER': 'Coordination Level Approver',
+                'PROJECT_ADMIN': 'Projectadmin',
+                'SUPER_ADMIN': 'Superadmin'
+            });
+
+            var routeResolver = ['$q', '$rootScope', '$location', 'systemSettingRepository', 'changeLogRepository',
+                function ($q, $rootScope, $location, systemSettingRepository, changeLogRepository) {
+
+                    var checkProductKey = function () {
+                        return systemSettingRepository.isProductKeySet().then(function (productKeySet) {
+                            return productKeySet ? $q.when() : $q.reject('noProductKey');
+                        });
+                    };
+
+                    var checkMetadata = function () {
+                        return changeLogRepository.get("metaData").then(function (metadataLastUpdated) {
+                            if (metadataLastUpdated) {
+                                platformUtils.sendMessage('dbReady');
+                                return $q.when();
+                            } else {
+                                return $q.reject('noMetadata');
+                            }
+                        });
+                    };
+
+                    var checkSession = function () {
+                        return $rootScope.isLoggedIn || (!$rootScope.isLoggedIn && $location.path() == '/login')? $q.when() : $q.reject('noSession');
+                    };
+
+                    return checkProductKey()
+                        .then(checkMetadata)
+                        .then(checkSession);
+                }];
+
+            app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider', '$hustleProvider', '$compileProvider', '$provide', '$tooltipProvider', 'USER_ROLES',
+                function($routeProvider, $indexedDBProvider, $httpProvider, $hustleProvider, $compileProvider, $provide, $tooltipProvider, USER_ROLES) {
                     $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|chrome-extension):/);
+
+                    $httpProvider.interceptors.push('configureRequestInterceptor');
+
                     $routeProvider.
-                    when('/', {
-                        templateUrl: 'templates/init.html'
+                    when('/downloadingMetadata', {
+                        templateUrl: 'templates/downloading-metadata.html',
+                        controller: 'downloadMetadataController',
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER,
+                                USER_ROLES.COORDINATION_LEVEL_APPROVER,USER_ROLES.PROJECT_ADMIN, USER_ROLES.SUPER_ADMIN]
+                        },
+                        resolve: {
+                            routeResolver: ['$q', 'systemSettingRepository', 'changeLogRepository', function ($q, systemSettingRepository, changeLogRepository) {
+                                var checkMetadata = function () {
+                                    return changeLogRepository.get("metaData").then(function (metadataLastUpdated) {
+                                        return metadataLastUpdated ? $q.reject('noMetadata'): $q.when();
+                                    });
+                                };
+                                var checkProductKey = function () {
+                                    return systemSettingRepository.isProductKeySet().then(function (productKeySet) {
+                                        return productKeySet ? $q.when() : $q.reject('noProductKey');
+                                    });
+                                };
+                                return checkProductKey().then(checkMetadata);
+                            }]
+                        }
                     }).
                     when('/dashboard', {
-                        templateUrl: 'templates/dashboard.html'
+                        templateUrl: 'templates/dashboard.html',
+                        controller: 'dashboardController',
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
                     when('/selectProjectPreference', {
                         templateUrl: 'templates/selectProjectPreference.html',
-                        controller: 'selectProjectPreferenceController'
+                        controller: 'selectProjectPreferenceController',
+                        data: {
+                            allowedRoles: [USER_ROLES.PROJECT_ADMIN]
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
                     when('/reports/:orgUnit?', {
                         templateUrl: 'templates/reports.html',
-                        controller: 'reportsController'
+                        controller: 'reportsController',
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
-                    when('/projectReport/', {
+                    when('/projectReport', {
                         templateUrl: 'templates/project-report.html',
-                        controller: 'projectReportController'
+                        controller: 'projectReportController',
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
+                        },
+                        resolve: {routeResolver: routeResolver}
+                    }).
+                    when('/opUnitReport/:opUnit?', {
+                        templateUrl: 'templates/opunit-report.html',
+                        controller: 'opUnitReportController',
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
                     when('/login', {
                         templateUrl: 'templates/login.html',
-                        controller: 'loginController'
+                        controller: 'loginController',
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER,
+                                USER_ROLES.COORDINATION_LEVEL_APPROVER,USER_ROLES.PROJECT_ADMIN, USER_ROLES.SUPER_ADMIN]
+                        },
+                        resolve: { routeResolver: routeResolver }
                     }).
                     when('/orgUnits', {
                         templateUrl: 'templates/orgunits.html',
-                        controller: 'orgUnitContoller'
+                        controller: 'orgUnitContoller',
+                        data: {
+                            allowedRoles: [USER_ROLES.PROJECT_ADMIN, USER_ROLES.SUPER_ADMIN]
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
                     when('/notifications', {
                         templateUrl: 'templates/notifications.html',
-                        controller: 'notificationsController'
+                        controller: 'notificationsController',
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
                     when('/productKeyPage', {
                         templateUrl: 'templates/product-key.html',
-                        controller: 'productKeyController'
+                        controller: 'productKeyController',
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER,
+                                USER_ROLES.COORDINATION_LEVEL_APPROVER,USER_ROLES.PROJECT_ADMIN, USER_ROLES.SUPER_ADMIN]
+                        }
                     }).
                     when('/aggregate-data-entry/:module?/:week?', {
                         templateUrl: 'templates/aggregate-data-entry.html',
-                        controller: 'aggregateDataEntryController'
+                        controller: 'aggregateDataEntryController',
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY]
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
                     when('/line-list-summary/:module/:filterBy?', {
                         templateUrl: 'templates/line-list-summary.html',
-                        controller: 'lineListSummaryController'
+                        controller: 'lineListSummaryController',
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER]
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
                     when('/line-list-data-entry/:module/new', {
                         templateUrl: 'templates/line-list-data-entry.html',
-                        controller: 'lineListDataEntryController'
+                        controller: 'lineListDataEntryController',
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY]
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
                     when('/line-list-data-entry/:module/:eventId?', {
                         templateUrl: 'templates/line-list-data-entry.html',
-                        controller: 'lineListDataEntryController'
+                        controller: 'lineListDataEntryController',
+                        data: {
+                            allowedRoles: [USER_ROLES.DATA_ENTRY]
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
                     when('/data-approval/:module?/:week?', {
                         templateUrl: 'templates/data-approval.html',
-                        controller: 'dataApprovalController'
+                        controller: 'dataApprovalController',
+                        data: {
+                            allowedRoles: [USER_ROLES.PROJECT_LEVEL_APPROVER, USER_ROLES.COORDINATION_LEVEL_APPROVER, USER_ROLES.OBSERVER]
+                        },
+                        resolve: {routeResolver: routeResolver}
                     }).
                     otherwise({
-                        redirectTo: '/dashboard'
+                        redirectTo: '/login'
                     });
 
                     $provide.decorator('$log', ['$delegate',
                         function(loggerDelegate) {
-                            indexedDBLogger.configure("msfLogs", loggerDelegate);
+                            indexedDBLogger.configure(properties.praxis.dbForLogs, loggerDelegate);
                             return loggerDelegate;
                         }
                     ]);
@@ -102,7 +226,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                         return $delegate;
                     });
 
-                    $indexedDBProvider.connection('msf')
+                    $indexedDBProvider.connection(properties.praxis.dbName)
                         .upgradeDatabase(migrations.length, function(event, db, tx) {
                             migrator.run(event.oldVersion, db, tx, migrations);
                         });
@@ -122,44 +246,78 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
             ]);
             app.value('ngI18nConfig', {
                 supportedLocales: ['en', 'fr', 'ar'],
-                basePath: "js/app/i18n"
+                basePath: self.basePath + "js/app/i18n"
             });
 
-            app.run(['dhisMonitor', 'hustleMonitor', 'queuePostProcessInterceptor', '$rootScope', '$location', '$hustle', '$document', 'initializationRoutine',
-                function(dhisMonitor, hustleMonitor, queuePostProcessInterceptor, $rootScope, $location, $hustle, $document, InitializationRoutine) {
+            app.run(['dhisMonitor', 'hustleMonitor', 'queueInterceptor', '$rootScope', '$location', '$hustle', '$document', '$timeout', 'storageService', 'initializationRoutine',
+                function(dhisMonitor, hustleMonitor, queueInterceptor, $rootScope, $location, $hustle, $document, $timeout, storageService, InitializationRoutine) {
 
                     $document.on('keydown', function(e) {
                         disableBackspaceKey(e);
                     });
 
-                    $hustle.registerInterceptor(queuePostProcessInterceptor);
+                    $hustle.registerInterceptor(queueInterceptor);
 
-                    $rootScope.$on('$locationChangeStart', function(e, newUrl, oldUrl) {
-                        if (authenticationUtils.shouldRedirectToLogin($rootScope, $location)) {
-                            $location.path("/login");
+                    $rootScope.$on('$routeChangeSuccess', function () {
+                        if($location.path() != '/login') {
+                            // Persist last route which has to be retained on page reload.
+                            storageService.setItem('lastRoute', $location.path());
                         }
                     });
 
-                    dhisMonitor.online(function() {
+                    $rootScope.$on('$routeChangeError', function (event, currentRoute, previousRoute, rejection) {
+                        var routes = {
+                            noProductKey: '/productKeyPage',
+                            noMetadata: '/downloadingMetadata',
+                            noSession: '/login'
+                        };
+                        var routeToRedirect = routes[rejection];
+                        var routeToAccess = currentRoute.originalPath;
+                        if(routeToAccess == routeToRedirect){
+                            event.preventDefault();
+                            $location.path(previousRoute.originalPath);
+                            return;
+                        }
+                        $location.path(routeToRedirect);
+                    });
+
+                    $rootScope.$on('$routeChangeStart', function (event, newRoute) {
+
+                        var loggedInUserRoles = $rootScope.currentUser ? $rootScope.currentUser.userCredentials.userRoles : [],
+                            authorizedRoles = newRoute.data && newRoute.data.allowedRoles,
+                            userIsAllowedToViewRoute = _.any(loggedInUserRoles, function (userRole) {
+                                return _.contains(authorizedRoles, userRole.name);
+                            });
+                        var userIsNotAuthorised = $rootScope.isLoggedIn && !userIsAllowedToViewRoute;
+
+
+                        if (userIsNotAuthorised) {
+                            event.preventDefault();
+                        }
+                    });
+
+                    var onlineListener = function() {
                         $rootScope.$apply(function() {
                             $rootScope.isDhisOnline = true;
                         });
-                    });
-                    dhisMonitor.offline(function() {
+                    };
+
+                    var offlineListener = function() {
                         $rootScope.$apply(function() {
                             $rootScope.isDhisOnline = false;
                         });
-                    });
+                    };
 
-                    hustleMonitor.msgInSyncQueue(function() {
-                        $rootScope.$apply(function() {
-                            $rootScope.msgInQueue = true;
-                        });
-                    });
+                    dhisMonitor.online(onlineListener);
+                    dhisMonitor.offline(offlineListener);
 
-                    hustleMonitor.noMsgInSyncQueue(function() {
-                        $rootScope.$apply(function() {
-                            $rootScope.msgInQueue = false;
+                    platformUtils.addListener("timeoutOccurred", dhisMonitor.onTimeoutOccurred);
+
+                    hustleMonitor.onSyncQueueChange(function(data) {
+                        $timeout(function() {
+                            $rootScope.remainingJobs = data.count + data.reservedCount;
+                            $rootScope.msgInQueue = $rootScope.remainingJobs > 0;
+                            $rootScope.isQueueProcessing = data.reservedCount > 0;
                         });
                     });
 

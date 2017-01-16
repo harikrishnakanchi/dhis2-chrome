@@ -1,12 +1,11 @@
-define(["loginController", "angularMocks", "utils", "sessionHelper", "userPreferenceRepository", "orgUnitRepository", "systemSettingRepository", "userRepository", "chromeUtils", "checkVersionCompatibility", "translationsService"],
-    function (LoginController, mocks, utils, SessionHelper, UserPreferenceRepository, OrgUnitRepository, SystemSettingRepository, UserRepository, chromeUtils, CheckVersionCompatibility, TranslationsService) {
+define(["loginController", "angularMocks", "utils", "sessionHelper", "userPreferenceRepository", "orgUnitRepository", "systemSettingRepository", "userRepository", "platformUtils", "checkVersionCompatibility", "storageService"],
+    function (LoginController, mocks, utils, SessionHelper, UserPreferenceRepository, OrgUnitRepository, SystemSettingRepository, UserRepository, platformUtils, CheckVersionCompatibility, StorageService) {
     describe("login controller", function () {
-        var rootScope, loginController, scope, location, q, fakeUserStore, fakeUserCredentialsStore, fakeUserStoreSpy, sessionHelper, hustle, userPreferenceRepository, systemSettingRepository, userRepository, orgUnitRepository, checkVersionCompatibility, translationsService;
+        var rootScope, storageService, loginController, scope, location, q, fakeUserStore, sessionHelper, hustle, userPreferenceRepository, systemSettingRepository, userRepository, orgUnitRepository, checkVersionCompatibility, initializeController;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function ($rootScope, $location, $q, $hustle) {
             scope = $rootScope.$new();
-            rootScope = $rootScope;
             location = $location;
             hustle = $hustle;
             q = $q;
@@ -19,6 +18,11 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             };
 
             spyOn(location, 'path');
+
+            storageService = new StorageService();
+            spyOn(storageService, 'setItem');
+            spyOn(storageService, 'getItem');
+            spyOn(storageService, 'clear');
 
             userRepository = new UserRepository();
             spyOn(userRepository, "getUser").and.returnValue(utils.getPromise(q, {
@@ -55,10 +59,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             spyOn(systemSettingRepository, "get").and.returnValue(utils.getPromise(q, ["5.1", "6.0"]));
             spyOn(systemSettingRepository, "getLocale").and.returnValue(utils.getPromise(q, "en"));
 
-            translationsService = new TranslationsService();
-            spyOn(translationsService, "setLocale");
-
-            spyOn(chromeUtils, "getPraxisVersion").and.returnValue("5.1");
+            spyOn(platformUtils, "getPraxisVersion").and.returnValue("5.1");
 
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, {}));
@@ -66,10 +67,13 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             spyOn(hustle, "publishOnce").and.returnValue(utils.getPromise(q, {}));
 
             checkVersionCompatibility = CheckVersionCompatibility(systemSettingRepository);
-            loginController = new LoginController(rootScope, scope, location, q, sessionHelper, hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility, translationsService);
+            initializeController = function () {
+                loginController = new LoginController(rootScope, scope, location, q, sessionHelper, hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility, storageService);
+            };
         }));
 
         it("should set invalid access as true when their is project level product key and there is no common org unit", function () {
+            initializeController();
             scope.username = "superadmin";
             scope.password = "msfsuperadmin";
 
@@ -83,6 +87,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should set invalid access as false when their is project level product key and there is common org unit", function () {
+            initializeController();
             scope.username = "superadmin";
             scope.password = "msfsuperadmin";
 
@@ -96,6 +101,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should set invalid access as true when their is country level product key and there is no common org unit for coordinator level approver", function () {
+            initializeController();
             scope.username = "project_user";
             scope.password = "msfuser";
 
@@ -122,6 +128,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should set invalid access as false when their is country level product key and there is common org unit", function () {
+            initializeController();
             scope.username = "superadmin";
             scope.password = "msfsuperadmin";
             orgUnitRepository.get.and.returnValue(utils.getPromise(q, {"parent": {"id": 123}}));
@@ -135,6 +142,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should set invalid access as true when their is country level product key and there is no common org unit", function () {
+            initializeController();
             scope.username = "superadmin";
             scope.password = "msfsuperadmin";
             orgUnitRepository.get.and.returnValue(utils.getPromise(q, {"parent": {"id": 12}}));
@@ -148,6 +156,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should login super admin user with valid credentials and redirect to orgUnits", function () {
+            initializeController();
             scope.username = "superadmin";
             scope.password = "msfsuperadmin";
 
@@ -161,6 +170,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should not login super admin user with invalid password", function () {
+            initializeController();
             scope.username = "superadmin";
             scope.password = "password1234";
 
@@ -173,6 +183,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should login project admin user with valid credentials and redirect to orgunits", function () {
+            initializeController();
             scope.username = "projectadmin";
             scope.password = "password";
 
@@ -194,6 +205,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should not login msfadmin user with invalid password", function () {
+            initializeController();
             scope.username = "projectadmin";
             scope.password = "password1234";
 
@@ -206,6 +218,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should login project user with valid credentials and redirect to dashboard", function () {
+            initializeController();
             scope.username = "someProjectUser";
             scope.password = "msfuser";
 
@@ -224,6 +237,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should not login project user with invalid password", function () {
+            initializeController();
             scope.username = "someProjectUser";
             scope.password = "msfuser1234";
 
@@ -236,6 +250,8 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should not login user with invalid username", function () {
+            initializeController();
+
             fakeUserStore = {
                 "find": function () {
                     return utils.getPromise(q, undefined);
@@ -254,6 +270,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should start sync project data if the current user's projects are different from previous user's projects", function () {
+            initializeController();
             var previousOrgUnits = ['id1', 'id2', 'id3', 'id4'];
             var currentOrgUnits = ['id5'];
 
@@ -290,6 +307,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         });
 
         it("should start sync project data if the currentUser and previousUsers are admin and non-admin users", function () {
+            initializeController();
             userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['id5']));
 
             scope.username = "ss153";
@@ -340,25 +358,66 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             }, 'dataValues');
         });
 
-        it("should refresh translations after login", function () {
-            scope.username = "projectadmin";
-            scope.password = "password";
+        describe('User Session', function () {
+            it('should persist the session info in sessionStorage when a user logs in for the first time', function () {
+                initializeController();
+                scope.username = "superadmin";
+                scope.password = "msfsuperadmin";
 
-            userRepository.getUserCredentials.and.returnValue(utils.getPromise(q, {
-                "username": "projectadmin",
-                "password": "5f4dcc3b5aa765d61d8327deb882cf99",
-                "userRoles": [{
-                    "name": "Projectadmin"
-                }]
-            }));
+                var user = {
+                    userCredentials: {
+                        username: 'current username',
+                        userRoles: []
+                    }
+                };
+                var previousUser = {
+                    userCredentials: {
+                        username: 'previous username',
+                        userRoles: []
+                    }
+                };
+                userRepository.getUser.and.returnValues(utils.getPromise(q, user), utils.getPromise(q, previousUser));
 
-            rootScope.hasRoles.and.returnValue(true);
-            rootScope.setLocale = jasmine.createSpy('setLocale');
+                var existingUserProjects = ['someUserProjectId'];
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, existingUserProjects));
 
-            scope.login();
-            scope.$apply();
+                var currentUserCredentials = {
+                    "username": "current user",
+                    "password": "7536ad6ce98b48f23a1bf8f74f53da83",
+                    "userRoles": [{
+                        "name": "Superadmin"
+                    }]
+                };
+                userRepository.getUserCredentials.and.returnValue(utils.getPromise(q, currentUserCredentials));
 
-            expect(rootScope.setLocale).toHaveBeenCalledWith("en");
+                scope.login();
+                scope.$apply();
+
+                expect(storageService.setItem).toHaveBeenCalledWith('sessionInfo', [user, currentUserCredentials, existingUserProjects, previousUser]);
+            });
+
+            it('should redirect the user to last accessed route if session data exists', function () {
+                storageService.getItem.and.callFake(function(param) {
+                    if(param == 'lastRoute') return 'someRoute';
+                    if(param == 'sessionInfo') return { some: 'data' };
+                });
+
+                initializeController();
+                scope.$apply();
+
+                expect(sessionHelper.login).toHaveBeenCalled();
+                expect(location.path).toHaveBeenCalledWith('someRoute');
+            });
+
+            it('should show the login form if there is no session data', function () {
+                storageService.getItem.and.returnValue(null);
+
+                initializeController();
+                scope.$apply();
+
+                expect(scope.showLoginForm).toBeTruthy();
+                expect(storageService.clear).toHaveBeenCalled();
+            });
         });
     });
 });

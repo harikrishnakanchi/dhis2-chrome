@@ -92,16 +92,14 @@ define(["countryController", "angularMocks", "utils", "moment", "timecop", "dhis
                     'created': '2014-10-29T12:43:54.972Z',
                     'lastUpdated': '2014-10-29T12:43:54.972Z',
                     'attribute': {
-                        'code': 'Type',
-                        'name': 'Type'
+                        'code': 'Type'
                     },
                     'value': "Country"
                 }, {
                     'created': '2014-10-29T12:43:54.972Z',
                     'lastUpdated': '2014-10-29T12:43:54.972Z',
                     'attribute': {
-                        'code': 'isNewDataModel',
-                        'name': 'Is New Data Model'
+                        'code': 'isNewDataModel'
                     },
                     'value': 'true'
                 }]

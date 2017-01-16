@@ -1,4 +1,4 @@
-define(['lodash', 'overrides'], function(_, overrides) {
+define(['lodash', 'overrides', 'platformConfig'], function(_, overrides, platformConfig) {
     var url = 'http://localhost:8080';
     var properties = {
         metadata: {
@@ -11,6 +11,8 @@ define(['lodash', 'overrides'], function(_, overrides) {
                 'categoryOptionCombos',
                 'categoryOptions',
                 'dataElements',
+                'indicators',
+                'programIndicators',
                 'sections',
                 'users',
                 'optionSets',
@@ -36,19 +38,22 @@ define(['lodash', 'overrides'], function(_, overrides) {
         dhis: {
             url: url
         },
+        praxis: {
+            version: '10.0',
+            fileExtension: 'prx'
+        },
         queue: {
-            maxretries: 5,
+            maxretries: 3,
             delay: 100,
             skipRetryMessages: [],
+            maxNumberOfTimesItemCanBeRescued: 5,
+            minTimeInSecToIncrementItemRescuedCount: 60,
             httpGetRetryDelay: 10000,
             retryDelayConfig: {
                 0: 10000,
                 1: 10000,
-                2: 10000,
-                3: 10000,
-                4: 10000
-            },
-            checkMsgcountDelayInMinutes: 1
+                2: 10000
+            }
         },
         eventsSync: {
             maximumNumberOfEventsToSync: 10000,
@@ -67,8 +72,9 @@ define(['lodash', 'overrides'], function(_, overrides) {
         messageTimeout: 5000,
         devMode: true,
         weeksForAutoApprove: 8,
-        weeksToDisplayStatusInDashboard: 12
+        weeksToDisplayStatusInDashboard: 12,
+        metaDataRetryLimit: 5
     };
 
-    return _.merge(properties, overrides);
+    return _.merge(properties, overrides, platformConfig);
 });

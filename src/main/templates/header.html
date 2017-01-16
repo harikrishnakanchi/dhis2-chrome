@@ -13,17 +13,35 @@
                     <div class="nav navbar-nav" ng-class="{'navbar-right': layoutDirection.direction != 'rtl'}">
                         <p class="text-right login-message">
                                 <span ng-show="isLoggedIn">
-                                    <strong>{{currentUser.userCredentials.username}}</strong> |
-                                    <a ng-click="logout()" href="#/login"
+                                     <strong>{{currentUser.userCredentials.username}}</strong> |
+                                </span>
+                                <span>
+                                    <a href="" description-popup
+                                       dp-title="{{ resourceBundle.help }}"
+                                       dp-desc="{{ getSupportEmailMessage() }}"
+                                    >
+                                    {{ resourceBundle.help }}
+                                    </a>
+                                </span>
+                                <span ng-show="isLoggedIn">
+                                    | <a href="" ng-click="logout()"
                                        tabindex="-1">{{ resourceBundle.logoutLabel }}</a>
                                 </span>
                         </p>
                         <ul class="nav navbar-nav" ng-class="{'navbar-right': layoutDirection.direction != 'rtl'}">
-                            <li>
-                                    <span class="glyphicon dhis-status"
-                                          ng-class="{'glyphicon-cloud':!msgInQueue, 'glyphicon-cloud-upload':msgInQueue, 'dhis-online':isDhisOnline &amp;&amp; !poorConnection, 'dhis-poor-connection': poorConnection, 'dhis-offline':!isDhisOnline}"
-                                          ng-attr-title="{{isDhisOnline &amp;&amp; !msgInQueue &amp;&amp; resourceBundle.connectedNoPendingRequests || isDhisOnline &amp;&amp; msgInQueue &amp;&amp; resourceBundle.connectedWithPendingRequests
-                                        || !isDhisOnline &amp;&amp; !msgInQueue &amp;&amp; resourceBundle.notConnectedNoPendingRequests || !isDhisOnline &amp;&amp; msgInQueue &amp;&amp; resourceBundle.notConnectedWithPendingRequests}}"></span>
+                            <li class="sync-status" ng-if="remainingJobs >= 0">
+                                <span class="badge dhis-online" ng-if="isDhisOnline && !poorConnection && remainingJobs > 0" title="{{ resourceBundle.online + getRemainingJobs() + resourceBundle.jobsInProgress }}">{{ getRemainingJobs() }}</span>
+                                <span class="badge dhis-online" ng-if="isDhisOnline && !poorConnection && remainingJobs == 0" title="{{ resourceBundle.online  + resourceBundle.noPendingRequest }}">{{ getRemainingJobs() }}</span>
+                                <span class="badge dhis-poor-connection" ng-if="poorConnection && remainingJobs > 0" title="{{ resourceBundle.poorConnection  + getRemainingJobs() + resourceBundle.pendingRequests }}">{{ getRemainingJobs() }}</span>
+                                <span class="badge dhis-poor-connection" ng-if="poorConnection && remainingJobs == 0" title="{{ resourceBundle.poorConnection  + resourceBundle.noPendingRequest }}">{{ getRemainingJobs() }}</span>
+                                <span class="badge dhis-offline" ng-if="!isDhisOnline && !poorConnection && remainingJobs > 0" title="{{ resourceBundle.offline  + getRemainingJobs() + resourceBundle.pendingRequests }}">{{ getRemainingJobs() }}</span>
+                                <span class="badge dhis-offline" ng-if="!isDhisOnline && !poorConnection && remainingJobs == 0" title="{{ resourceBundle.offline  + resourceBundle.noPendingRequest }}">{{ getRemainingJobs() }}</span>
+                            </li>
+                            <li ng-hide="metadataDownloading()">
+                                <span class="glyphicon dhis-status"
+                                      title="{{ networkStatus() }}"
+                                      >
+                                </span>
                             </li>
                             <li>
                                 <div dropdown>
@@ -41,10 +59,15 @@
                                         <li class="dropdown-submenu"
                                             ng-class="{'pull-left': layoutDirection.direction != 'rtl'}"
                                             ng-include="'templates/partials/clone.html'"></li>
+                                        <li class="clearfix"></li>
+                                        <li class="divider"></li>
+                                        <li><a href="" ng-click="uninstallPraxis()">{{ resourceBundle.uninstall.title }}</a></li>
                                     </ul>
                                     <ul class="dropdown-menu" role="menu" ng-if="!isLoggedIn">
                                         <li><a href="" ng-click="gotoProductKeyPage()" tabindex="-1">{{
                                             resourceBundle.updateProductKeyMenuLabel }}</a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="" ng-click="uninstallPraxis()">{{ resourceBundle.uninstall.title }}</a></li>
                                     </ul>
                                 </div>
                             </li>
@@ -97,7 +120,7 @@
                     </li>
                 </ul>
             </li>
-            <li role="presentation" ng-class="{ active: isActive('\/reports') || isActive('\/projectReport')}"
+            <li role="presentation" ng-class="{ active: isActive('\/reports') || isActive('\/projectReport') || isActive('\/opUnitReport') }"
                 class="dropdown praxis-dropdown-menu"
                 ng-if="hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver', 'Data entry user']) &amp;&amp; allUserModules.length > 0"
                 dropdown>
@@ -119,6 +142,10 @@
                             <li ng-repeat="module in opUnitWithModule.modules | orderBy:'name'">
                                 <a class="submenu-item" ng-href="#/reports/{{ module.id }}" tabindex="-1">{{ module.name
                                     }}</a>
+                            </li>
+                            <li class="divider"></li>
+                            <li>
+                                <a class="submenu-item" href="#/opUnitReport/{{ opUnitWithModule.opUnitId }}">{{ opUnitWithModule.opUnitName }} {{ resourceBundle.reportLabel }}</a>
                             </li>
                         </ul>
                     </li>

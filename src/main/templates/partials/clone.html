@@ -4,7 +4,9 @@
 </a>
 <ul ng-controller="appCloneController" class="dropdown-menu" role="menu">
     <li><a href="" ng-click="createClone()">{{resourceBundle.createCloneLabel}}</a></li>
-    <li><a href="" ng-click="loadClone()">{{resourceBundle.loadCloneLabel}}</a></li>
+    <li><a href="" ng-click="loadClone()">{{resourceBundle.loadCloneLabel}}</a>
+        <input type="file" id="importClone" accept="{{fileExtension}}" ng-show="false">
+    </li>
     <li class="divider"></li>
     <li><a href="" ng-click="dumpLogs()">{{resourceBundle.dumpLogsLabel}}</a></li>
 </ul>

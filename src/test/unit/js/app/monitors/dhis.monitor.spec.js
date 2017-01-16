@@ -1,4 +1,4 @@
-define(["dhisMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome", "userPreferenceRepository", "properties", "timecop"], function(DhisMonitor, utils, mocks, chromeUtils, MockChrome, UserPreferenceRepository, properties, timecop) {
+define(["dhisMonitor", "utils", "angularMocks", "platformUtils", "mockChrome", "userPreferenceRepository", "properties", "timecop"], function(DhisMonitor, utils, mocks, platformUtils, MockChrome, UserPreferenceRepository, properties, timecop) {
     describe("dhis.monitor", function() {
         var q, log, http, httpBackend, rootScope, timeout, userPreferenceRepository, dhisMonitor, currentTime, favIconUrl;
         var callbacks = {};
@@ -11,11 +11,12 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome", "us
             http = $injector.get('$http');
             httpBackend = $injector.get('$httpBackend');
             mockChrome = new MockChrome();
-            spyOn(chromeUtils, "sendMessage").and.callFake(mockChrome.sendMessage);
-            spyOn(chromeUtils, "addListener").and.callFake(mockChrome.addListener);
-            spyOn(chromeUtils, "getPraxisVersion").and.returnValue("5.1");
-            spyOn(chromeUtils, 'createAlarm');
-            spyOn(chromeUtils, 'addAlarmListener');
+            spyOn(platformUtils, "sendMessage").and.callFake(mockChrome.sendMessage);
+            spyOn(platformUtils, "addListener").and.callFake(mockChrome.addListener);
+            spyOn(platformUtils, "getPraxisVersion").and.returnValue("5.1");
+            spyOn(platformUtils, 'createAlarm');
+            spyOn(platformUtils, 'clearAlarm');
+            spyOn(platformUtils, 'addAlarmListener');
             rootScope.praxisUid = "ade3fab1ab0";
             userPreferenceRepository = new UserPreferenceRepository();
             var userPreferences = {
@@ -77,6 +78,11 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome", "us
             expect(callback).toHaveBeenCalled();
         });
 
+        it('should be offline when dhisMonitor.stop is triggered', function () {
+            dhisMonitor.stop();
+            expect(dhisMonitor.isOnline()).toBe(false);
+        });
+
         it("should raise offline if offline on startup", function() {
             var onlineCallback = jasmine.createSpy();
             var offlineCallback = jasmine.createSpy();
@@ -119,11 +125,13 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome", "us
         });
 
         it("should set hasPoorConnectivity to true on timeout", function() {
+            mockChrome.addListener('timeoutOccurred', dhisMonitor.onTimeoutOccurred);
             mockChrome.sendMessage("timeoutOccurred");
             expect(dhisMonitor.hasPoorConnectivity()).toBe(true);
         });
 
         it("should reset hasPoorConnectivity to false if the timeoutOccurred event does not re-occur after some time", function() {
+            mockChrome.addListener('timeoutOccurred', dhisMonitor.onTimeoutOccurred);
             mockChrome.sendMessage("timeoutOccurred");
             expect(dhisMonitor.hasPoorConnectivity()).toBe(true);
 

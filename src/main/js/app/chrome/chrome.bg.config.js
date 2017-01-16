@@ -1,7 +1,8 @@
 require.config({
     paths: {
         //Utils
-        "chromeUtils": "app/chrome/chrome.utils"
+        "platformUtils": "app/chrome/chrome.utils",
+        "platformConfig": "app/chrome/chrome.properties"
     }
 });
 console.log("Config is complete");

@@ -169,10 +169,11 @@
     "createCloneLabel": "تطبيق التصدير",
     "loadCloneLabel": "نسخة طلب الاستيراد",
     "dumpLogsLabel": "تصدير السجل",
-    "dumpLogsSuccessMessage": "السجلات المصدرة بنجاح في {{directory}}",
+    "dumpLogsSuccessMessage": "السجلات المصدرة بنجاح",
     "dumpLogsErrorMessage": "خطأ في تصدير السجلات: {{error}}",
-    "createCloneSuccessMessage": "تم بنجاح انشاء استنساخ في {{directory}}",
+    "createCloneSuccessMessage": "تم بنجاح انشاء استنساخ",
     "createCloneErrorMessage": "خطأ في انشاء استنساخ: {{error}}",
+    "downloadsDirectory": " في {{directory}}",
     "loadCloneErrorMessage": "خطأ في تحميل الاستنساخ: {{error}}",
     "loadCloneConfirmationMessage": "تحذير: استيراد نسخة تطبيق حذف كافة البيانات الموجودة لا يتم تحميلها إلى DHIS2. سوف يتم تسجيل الخروج من الدورة الحالية بعد الاستيراد. هذا الإجراء لا رجعة فيه.",
     "createCloneConfirmationMessage": "تحذير: تصدير نسخة التطبيق إنشاء نسخة من الطلب الحالي على جهاز الكمبيوتر الخاص بك. ليتم استخدامها لاستيراد تطبيق فقط",
@@ -220,10 +221,15 @@
     "emailValidation": "هذا البريد الالكتروني غير صحيح",
     "successNotification": "نجاح",
     "errorNotification": "خطأ",
-    "connectedNoPendingRequests": "اون لاين - لا طلبات معلقة",
-    "connectedWithPendingRequests": "طلبات معلقة - أون لاين",
-    "notConnectedNoPendingRequests": "لا طلبات معلقة - لا يوجد اتصال",
-    "notConnectedWithPendingRequests": "طلبات معلقة - لا يوجد اتصال",
+    "pendingRequests": " ريثما",
+    "jobsInProgress": " في تَقَدم",
+    "noPendingRequest": "مزامنة كاملة",
+    "online": " على الانترنت",
+    "offline": "OFFLINE ",
+    "poorConnectivity": "ضعف الاتصال",
+    "poorConnection": "الشبكه ضعيفه - ",
+    "jobs": "البعثات",
+    "job": "مهمة",
     "menu": "قائمة",
     "projectTypeLabel": "نوع المشروع",
     "gender": "جنس",
@@ -246,6 +252,7 @@
     "noCasesFound": "لم يتم العثور على حالات",
     "noCasesToSummarize": "لا يوجد حالات مقدمة للتلخيص",
     "reportsLabel": "تقارير",
+    "reportLabel": "تقرير",
     "observerDataLabel": "البيانات المجمعة",
     "warTemplateLabel": "حرب",
     "emergencyTemplateLabel": "حالة طوارئ",
@@ -329,5 +336,22 @@
     "praxisDownloadMessage": "One of the reasons might be because Praxis downloads only last 52 weeks of data. Any data collected before 52 weeks will not be available on this page. However this data is available for use in the reports and chart sections.",
     "contactSupport": "Contact {{supportEmail}} for any questions.",
     "referralLocationCheckboxLabel": "عرض موقع إشارة للمستخدم إدخال البيانات",
-    "geographicOriginCheckboxLabel": "عرض الأصل الجغرافي للمستخدم إدخال البيانات"
+    "geographicOriginCheckboxLabel": "عرض الأصل الجغرافي للمستخدم إدخال البيانات",
+    "updated": "تحديث",
+    "help": "مساعدة?",
+    "exportTallySheetButton": "ورقة تصدير تالي",
+    "fileSystem": {
+        "successNotification": {
+            "title": "ملف المحفوظة بنجاح",
+            "message": "الملف \"{{fileName}}\" تم حفظ بنجاح."
+        }
+    },
+    "uninstall": {
+        "title": " الغاء التثبيت",
+        "okMessage": " نعم، أريد أن إلغاء",
+        "confirmationMessage": "تحذير: هذا وسوف يمحو كافة البيانات الموجودة وإلغاء تثبيت التطبيق. سيتم فقدان جميع البيانات غير متزامنة مع DHIS. هذا الإجراء لا رجعة فيه.",
+        "successMessage": "يتم إلغاء تثبيت التطبيق العملي. الرجاء إغلاق نافذة المتصفح."
+    },
+    "selectAll": "اختر الكل",
+    "unselectAll": "إلغاء تحديد الكل"
 }

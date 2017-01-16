@@ -10,7 +10,7 @@
             <div ng-class="{ 'header-cell-with-weeks' : table.monthlyReport }">
                 <span class="name">
                     {{ table.getDisplayName(column) }}
-                    <p ng-if="column.periodDimension && table.monthlyReport" class="small weeks">{{ getNumberOfWeeksLabel(column.id) }}</p>
+                    <p ng-if="column.periodDimension && table.monthlyReport && !table.hideWeeks" class="small weeks">{{ getNumberOfWeeksLabel(column.id) }}</p>
                 </span>
                 <span class="icon" ng-class="{ 'text-danger': column.sorted }" ng-if="column.sortable">
                     <i class="fa" ng-class="table.sortAscending ? 'fa-sort-asc' : 'fa-sort-desc'"></i>
@@ -20,7 +20,7 @@
     </tr>
 
     </thead>
-    <tbody>
+    <tbody ng-if="!table.referralLocationReport">
     <tr ng-repeat="row in table.rows">
        <td>
            <a ng-if="row.dataDimension"
@@ -34,6 +34,17 @@
             <span ng-if="!row.dataDimension">
                 {{  table.getDisplayName(row)  }}
             </span>
+       </td>
+        <td ng-repeat="column in baseColumnConfiguration" ng-class="{ 'info' : column.sorted }">
+            <span ng-class="{ 'font-bold': column.sorted }">{{ table.getDataValue(row, column) }}</span>
+        </td>
+    </tr>
+    </tbody>
+
+    <tbody ng-if="table.referralLocationReport">
+    <tr ng-repeat="row in table.rows">
+       <td>
+            <span>{{  getDisplayNameForReferralLocations(row)  }}</span>
        </td>
         <td ng-repeat="column in baseColumnConfiguration" ng-class="{ 'info' : column.sorted }">
             <span ng-class="{ 'font-bold': column.sorted }">{{ table.getDataValue(row, column) }}</span>

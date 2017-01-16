@@ -69,6 +69,18 @@ define(["dataSetService", "angularMocks", "properties"], function(DatasetService
             expect(actualResult).toEqual(expectedDataSets);
         });
 
+        it("should load empty dataset data if local file does not exist", function() {
+            httpBackend.expectGET("data/dataSets.json").respond(404);
+
+            var actualResult;
+            datasetService.loadFromFile().then(function(result) {
+                actualResult = result;
+            });
+            httpBackend.flush();
+
+            expect(actualResult).toEqual([]);
+        });
+
         it('should remove orgunit from dataset', function() {
             var datasetId = 'datasetId';
             var orgUnitId = 'orgUnitId';

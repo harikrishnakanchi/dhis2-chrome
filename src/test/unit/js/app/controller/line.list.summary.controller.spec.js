@@ -1,9 +1,9 @@
 define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment", "interpolate", "programRepository", "programEventRepository", "excludedDataElementsRepository",
         "orgUnitRepository", "approvalDataRepository", "referralLocationsRepository", "dataSyncFailureRepository", "translationsService", "filesystemService", "historyService",
-        "excelBuilder"],
+        "excelBuilder", "customAttributes"],
     function(LineListSummaryController, mocks, utils, timecop, moment, interpolate, ProgramRepository, ProgramEventRepository, ExcludedDataElementsRepository,
              OrgUnitRepository, ApprovalDataRepository, ReferralLocationsRepository, DataSyncFailureRepository, TranslationsService, FilesystemService, HistoryService,
-             excelBuilder) {
+             excelBuilder, customAttributes) {
         describe("lineListSummaryController ", function() {
             var scope, q, hustle, timeout, fakeModal, anchorScroll, location, routeParams, window, currentTime,
                 lineListSummaryController,
@@ -124,13 +124,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                         "name": "Haiti",
                         "id": "id1"
                     },
-                    "attributeValues": [{
-                        "attribute": {
-                            "code": "autoApprove",
-                            "name": "Auto Approve"
-                        },
-                        "value": "true"
-                    }]
+                    "attributeValues": []
                 };
 
                 originOrgUnits = [{
@@ -212,6 +206,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
             };
 
             it("should set projectIsAutoApproved on scope on init", function() {
+                spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(true);
                 scope.$apply();
                 expect(scope.projectIsAutoApproved).toEqual(true);
             });
@@ -579,7 +574,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                     });
 
                     it('should prompt user to export data values into Excel', function () {
-                        var expectedFilename = scope.selectedModuleName + '.summary.' + currentTime.format('DD-MMM-YYYY') + '.xlsx';
+                        var expectedFilename = scope.selectedModuleName + '.summary.' + currentTime.format('DD-MMM-YYYY');
                         expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.XLSX);
                     });
 

@@ -9,7 +9,7 @@
                     <tr>
                         <th>{{ resourceBundle.dataElement }}</th>
                         <th ng-repeat="week in weeks">
-                            {{week}}
+                            {{week.name}}
                         </th>
                     </tr>
                 </thead>
@@ -24,8 +24,8 @@
                             {{ dataElementValue.dataElementName }}
                             </a>
                         </td>
-                        <td ng-class="{'red-cell': (dataElementValue.weeklyData[week]['value'] > dataElementValue.weeklyData[week]['max']) }" ng-repeat="week in weeks">
-                            {{dataElementValue.weeklyData[week]['value']}}
+                        <td ng-class="{'red-cell': (dataElementValue.weeklyData[week.name]['value'] > dataElementValue.weeklyData[week.name]['max']) }" ng-repeat="week in weeks">
+                            {{dataElementValue.weeklyData[week.name]['value']}}
                         </td>
                     </tr>
                 </tbody>

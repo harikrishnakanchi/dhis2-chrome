@@ -14,7 +14,7 @@ define(['dateUtils', 'lodash'], function (dateUtils, _) {
                    (firstItem.periodDimension && $rootScope.resourceBundle.label.period);
         };
 
-        this.build = function (pivotTableData) {
+        this.build = function (pivotTableData, referralLocations) {
             var mainColumns = _.first(pivotTableData.columns),
                 subColumns = _.slice(pivotTableData.columns, 1);
 
@@ -25,7 +25,7 @@ define(['dateUtils', 'lodash'], function (dateUtils, _) {
                 });
 
                 _.each(mainColumns, function (column) {
-                    if(pivotTableData.monthlyReport && column.periodDimension) {
+                    if(pivotTableData.monthlyReport && column.periodDimension && !pivotTableData.hideWeeks) {
                         cells.push(pivotTableData.getDisplayName(column) + ' ' + getNumberOfWeeksLabel(column.id));
                     } else {
                         cells.push(pivotTableData.getDisplayName(column));
@@ -37,10 +37,16 @@ define(['dateUtils', 'lodash'], function (dateUtils, _) {
             var buildRows = function () {
                 var buildRowsForSubColumns = function (subColumns, rowSpecifiers) {
                     if(_.isEmpty(subColumns)) {
-                        var cells = _.map(rowSpecifiers, function (rowSpecifier) {
-                            return pivotTableData.getDisplayName(rowSpecifier);
-                        });
-
+                        var cells;
+                        if(pivotTableData.referralLocationReport){
+                            cells = _.map(rowSpecifiers, function (rowSpecifier) {
+                                return referralLocations[pivotTableData.getDisplayName(rowSpecifier)].name;
+                            });
+                        } else {
+                            cells = _.map(rowSpecifiers, function (rowSpecifier) {
+                                return pivotTableData.getDisplayName(rowSpecifier);
+                            });
+                        }
                         _.each(mainColumns, function (column) {
                             var combinedRow = _.reduce(rowSpecifiers, _.merge, {});
                             var value = pivotTableData.getDataValue(combinedRow, column);

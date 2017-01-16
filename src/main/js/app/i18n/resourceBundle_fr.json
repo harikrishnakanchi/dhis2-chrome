@@ -170,10 +170,11 @@
     "createCloneLabel": "Exporter l'application",
     "loadCloneLabel": "Importer l'application",
     "dumpLogsLabel": "Export des Logs",
-    "dumpLogsSuccessMessage": "Export des Logs réussi vers {{directory}}",
+    "dumpLogsSuccessMessage": "Export des Logs réussi",
     "dumpLogsErrorMessage": "Erreur d'exportation des logs {{error}}",
-    "createCloneSuccessMessage": "Copie créée avec succès vers {{directory}}",
+    "createCloneSuccessMessage": "Copie créée avec succès",
     "createCloneErrorMessage": "Erreur de création de la copie, {{error}}",
+    "downloadsDirectory": " vers {{directory}}",
     "loadCloneErrorMessage": "Erreur de chargement de la copie, {{error}}",
     "loadCloneConfirmationMessage": "ATTENTION, l'importation de la copie de l'application supprimera toutes les données non téléchargées vers DHIS2. Vous serez déconnecté de la session en cours après l'importation. CETTE ACTION EST IRREVERSIBLE",
     "createCloneConfirmationMessage": "ATTENTION, l'exportation d'une copie de l'application va créer une copie de l'application en cours sur votre ordinateur. A utiliser UNIQUEMENT en cas d'absence totale d'internet pour communiquer l'ensemble des données de l'utilisateur connecté.",
@@ -220,10 +221,15 @@
     "emailValidation": "Email invalide",
     "successNotification": "Réussite",
     "errorNotification": "Erreur",
-    "connectedNoPendingRequests": "CONNECTE - AUCUNE DEMANDE EN ATTENTE",
-    "connectedWithPendingRequests": "CONNECTE - DEMANDES EN ATTENTE",
-    "notConnectedNoPendingRequests": "DECONNECTE - AUCUNE DEMANDE EN ATTENTE",
-    "notConnectedWithPendingRequests": "DECONNECTE - DEMANDES EN ATTENTE",
+    "pendingRequests": " En Attendant",
+    "jobsInProgress": " En cours",
+    "noPendingRequest": " Synchronisation Terminée",
+    "poorConnection": "FAIBLE CONNEXION - ",
+    "online": "EN LIGNE - ",
+    "offline": "HORS LIGNE - ",
+    "poorConnectivity": "CONNECTIVITÉ FAIBLE",
+    "jobs": "Les Tâches",
+    "job": "Tâche",
     "menu": "Menu",
     "projectTypeLabel": "Type de Projet",
     "gender": "Genre",
@@ -246,6 +252,7 @@
     "noCasesFound": "Pas de Cas trouvés",
     "noCasesToSummarize": "Pas de Cas envoyés",
     "reportsLabel": "Rapports",
+    "reportLabel": "Rapport",
     "observerDataLabel": "Données aggrégées",
     "warTemplateLabel": "Guerre",
     "emergencyTemplateLabel": "Urgence",
@@ -328,6 +335,23 @@
     "linelistDataNotAvailableMessage": "Il n’y a pas de synthèse des données pour cette semaine.",
     "praxisDownloadMessage": "Une des raisons peut être que Praxis ne télécharge que les 52 dernières semaines de données. Toute donnée collectée avant ces 52 semaines ne sera pas disponible sur cette page. Cependant, ces données sont disponibles dans la section des rapports et graphiques.",
     "contactSupport": "Contactez {{supportEmail}} pour toute question",
-    "referralLocationCheckboxLabel": "Afficher l'emplacement de référence pour l'utilisateur de saisie de données",
-    "geographicOriginCheckboxLabel": "Afficher origine géographique pour l'utilisateur de saisie de données"
+    "referralLocationCheckboxLabel": "Afficher les lieux de références pour l’opérateur de saisie",
+    "geographicOriginCheckboxLabel": "Afficher les origines géographiques pour l’opérateur de saisie",
+    "updated": "Actualisé",
+    "help": "Aidez?",
+    "exportTallySheetButton": "Feuille de relevé d'exportation",
+    "fileSystem": {
+        "successNotification": {
+            "title": "Fichier enregistré avec succès",
+            "message": "Le fichier \"{{fileName}}\" A été enregistré avec succès."
+        }
+    },
+    "uninstall": {
+        "title": "Désinstaller Praxis",
+        "okMessage": "OUI, je souhaite désinstaller Praxis",
+        "confirmationMessage": "AVERTISSEMENT: Ceci effacera toutes les données existantes et désinstallera l'application. Toutes les données non synchronisées avec DHIS seront perdues. CETTE ACTION EST IRRÉVERSIBLE.",
+        "successMessage": "Praxis est désinstallé. Fermez la fenêtre du navigateur."
+    },
+    "selectAll": "Sélectionner Tout",
+    "unselectAll": "Tout Déselectionner"
 }

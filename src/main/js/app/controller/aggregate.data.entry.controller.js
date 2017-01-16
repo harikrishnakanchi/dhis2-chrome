@@ -1,6 +1,7 @@
-define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "interpolate", "customAttributes", "dataElementUtils"], function(_, dataValuesMapper, orgUnitMapper, moment, properties, interpolate, CustomAttributes, dataElementUtils) {
+define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "interpolate", "customAttributes", "dataElementUtils", "excelBuilder", "excelBuilderHelper", "excelStyles"], function(_, dataValuesMapper, orgUnitMapper, moment, properties, interpolate, customAttributes, dataElementUtils, excelBuilder, excelBuilderHelper, excelStyles) {
     return function($scope, $routeParams, $q, $hustle, $anchorScroll, $location, $modal, $rootScope, $window, $timeout,
-        dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository, optionSetRepository) {
+        dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository,
+                    translationsService, moduleDataBlockFactory, dataSyncFailureRepository, optionSetRepository, filesystemService) {
 
         var currentPeriod, currentPeriodAndOrgUnit;
         var noReferralLocationConfigured = false;
@@ -37,6 +38,109 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                     $window.print();
                 }, 0);
             }, 0);
+        };
+
+        var buildSpreadSheetContent = function () {
+            var EMPTY_CELL = '';
+            var spreadSheet = excelBuilderHelper.createSheet($scope.selectedModule.name);
+
+            var getPeriodInformation = function () {
+                var row = [$scope.resourceBundle.yearLabel, EMPTY_CELL, $scope.resourceBundle.monthLabel, EMPTY_CELL, $scope.resourceBundle.weekLabel, EMPTY_CELL];
+                spreadSheet.createRow(row);
+                spreadSheet.createRow();
+                spreadSheet.createRow();
+            };
+
+            var getModuleName = function () {
+                var style = excelStyles.generateStyle(excelStyles.BOLD);
+                spreadSheet.createRow().addCell($scope.selectedModule.name, {style: style});
+                spreadSheet.createRow();
+            };
+
+            var buildDataElements = function (section, numberOfExtraCells) {
+                var style = excelStyles.generateStyle(excelStyles.LEFT_ALIGNMENT);
+                _.forEach(section.dataElements, function (dataElement) {
+                    var dataElementName = dataElementUtils.getDisplayName(dataElement);
+                    var row = spreadSheet.createRow();
+                        row.addCell(dataElementName, {style: style});
+                        row.addEmptyCells(numberOfExtraCells);
+                });
+            };
+
+            var buildHeaders = function (section) {
+                var style = excelStyles.generateStyle(excelStyles.BOLD);
+                _.forEach(section.columnConfigurations, function (categoryOptions, index) {
+                    var colspan = (section.baseColumnConfiguration.length / categoryOptions.length) || 1;
+                    var row = spreadSheet.createRow();
+                    var initialElement = index === 0 ? section.name : EMPTY_CELL;
+                    row.addCell(initialElement, {style: style});
+                    _.forEach(categoryOptions, function (categoryOption) {
+                        row.addCell(categoryOption.name, {colspan: colspan, style: style});
+                    });
+                });
+            };
+
+            var buildReferralLocations = function (section, numberOfExtraCells) {
+                var style = excelStyles.generateStyle(excelStyles.LEFT_ALIGNMENT);
+                var referralLocations = _.filter(section.dataElements, function (dataElement) {
+                    return !!$scope.referralLocations[dataElement.formName];
+                });
+
+                _.forEach(referralLocations, function (dataElement) {
+                    var row = spreadSheet.createRow();
+                    var referralLocation = $scope.referralLocations[dataElement.formName];
+                    row.addCell(referralLocation.name, {style: style});
+                    row.addEmptyCells(numberOfExtraCells);
+                });
+            };
+
+            var buildOrigins = function (section, numberOfExtraCells) {
+                var style = excelStyles.generateStyle(excelStyles.LEFT_ALIGNMENT);
+                var sortedOrigins = _.sortBy($scope.originOrgUnits, 'name');
+                return _.forEach(sortedOrigins, function (originOrgUnit) {
+                    var row = spreadSheet.createRow();
+                    row.addCell(originOrgUnit.name, {style: style});
+                    row.addEmptyCells(numberOfExtraCells);
+                });
+            };
+
+            var buildSections = function (dataSet, buildSectionContent) {
+                _.forEach(dataSet.sections, function (section) {
+                    var colspan = (section.baseColumnConfiguration && section.baseColumnConfiguration.length) || 1;
+                    buildHeaders(section);
+                    buildSectionContent(section, colspan);
+                    spreadSheet.createRow();
+                });
+            };
+
+            var buildDataSet = function (dataSet) {
+                var width = _.max(_.map(dataSet.sections, 'baseColumnConfiguration.length')) || 1;
+                var style = excelStyles.generateStyle(excelStyles.BOLD);
+                var buildSectionContent = buildDataElements;
+                if (dataSet.isOriginDataset) {
+                    buildSectionContent = buildOrigins;
+                }
+                if (dataSet.isReferralDataset) {
+                    buildSectionContent = buildReferralLocations;
+                }
+                spreadSheet.createRow().addCell(dataSet.name, {colspan: width + 1, style: style});
+                spreadSheet.createRow();
+                buildSections(dataSet, buildSectionContent);
+                spreadSheet.createRow();
+            };
+
+            getPeriodInformation();
+            getModuleName();
+            var nonPopulationDataSets = _.reject($scope.dataSets, 'isPopulationDataset');
+            var originDataSetsAndRemainingDatasets = _.partition(nonPopulationDataSets, 'isOriginDataset');
+            _.forEach(originDataSetsAndRemainingDatasets[1], buildDataSet);
+            _.forEach(originDataSetsAndRemainingDatasets[0], buildDataSet);
+            return [spreadSheet.generate()];
+        };
+
+        $scope.exportTallySheetToExcel = function () {
+            var filename = [$scope.selectedModule.name, 'export'].join('.');
+            return filesystemService.promptAndWriteFile(filename, excelBuilder.createWorkBook(buildSpreadSheetContent()), filesystemService.FILE_TYPE_OPTIONS.XLSX);
         };
 
         var confirmAndProceed = function(okCallback, message, doNotConfirm) {
@@ -365,7 +469,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             };
             
             var loadPopulationOptionSet = function () {
-                optionSetRepository.getOptionSetByCode(CustomAttributes.PRAXIS_POPULATION_DATA_ELEMENTS).then(function (populationOptionSet) {
+                optionSetRepository.getOptionSetByCode(customAttributes.PRAXIS_POPULATION_DATA_ELEMENTS).then(function (populationOptionSet) {
                     $scope.populationDataCodes = _.map(populationOptionSet.options, 'code');
                 });
             };
@@ -389,33 +493,38 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                             return _.filter(dataSets, { isReferralDataset: false });
                         };
 
-                        var setTotalsDisplayPreferencesforDataSetSections = function () {
-                            _.each($scope.dataSets, function (dataSet) {
+                        var setTotalsDisplayPreferencesforDataSetSections = function (dataSets) {
+                            _.each(dataSets, function (dataSet) {
                                 _.each(dataSet.sections, function (dataSetSection) {
                                     dataSetSection.shouldDisplayRowTotals = dataSetSection.baseColumnConfiguration.length > 1;
                                     dataSetSection.shouldDisplayColumnTotals = (_.filter(dataSetSection.dataElements, {isIncluded: true}).length > 1 && !(dataSetSection.shouldHideTotals));
                                 });
                             });
+                            return dataSets;
                         };
-                        var setDataSets = function (dataSets) {
-                            $scope.dataSets = dataSets;
+                        
+                        var filterOutNonIncludedSectionsAndDataElements = function (dataSets) {
+                            _.forEach(dataSets, function (dataSet) {
+                                dataSet.sections = _.filter(dataSet.sections, 'isIncluded');
+                                _.forEach(dataSet.sections, function (section) {
+                                    section.dataElements = _.filter(section.dataElements, 'isIncluded');
+                                });
+                            });
+                            return dataSets;
                         };
 
                         if (noReferralLocationConfigured) {
                             dataSets = filterOutReferralLocations(dataSets);
                         }
-                        dataSets = translateDatasets(dataSets);
-                        setDataSets(dataSets);
-                        setTotalsDisplayPreferencesforDataSetSections();
+
+                        var transformations = [filterOutNonIncludedSectionsAndDataElements, translateDatasets, setTotalsDisplayPreferencesforDataSetSections];
+                        $scope.dataSets = transformations.reduce(function (dataSets, transformer) {
+                            return transformer(dataSets);
+                        }, dataSets);
                     });
 
                 var loadProjectPromise = orgUnitRepository.getParentProject($scope.selectedModule.id).then(function(orgUnit) {
-                    $scope.projectIsAutoApproved = _.any(orgUnit.attributeValues, {
-                        'attribute': {
-                            'code': "autoApprove"
-                        },
-                        "value": "true"
-                    });
+                    $scope.projectIsAutoApproved = customAttributes.getBooleanAttributeValue(orgUnit.attributeValues, customAttributes.AUTO_APPROVE);
                     $scope.projectPopulationDetails = extractPopulationDetails(orgUnit.attributeValues, $scope.populationDataCodes);
                 });
 

@@ -1,32 +1,8 @@
-define(['dhisUrl', 'dateUtils', 'properties', 'moment', 'lodash'], function(dhisUrl, dateUtils, properties, moment, _) {
+define(['dhisUrl', 'dateUtils', 'properties', 'moment', 'lodash', 'pagingUtils'], function(dhisUrl, dateUtils, properties, moment, _, pagingUtils) {
     return function($http, $q) {
         var MAX_NUMBER_OF_EVENTS = properties.eventsSync.maximumNumberOfEventsToSync,
             EVENT_ID_PAGE_SIZE = properties.eventsSync.pageSize.eventIds,
-            EVENT_DATA_PAGE_SIZE = properties.eventsSync.pageSize.eventData,
-            DEFAULT_PAGE_REQUESTS_MAX_LIMIT = 99;
-
-        var recursivelyDownloadPagedEvents = function(queryParams, maximumPageRequests, eventsResponses) {
-            queryParams.totalPages = true;
-            queryParams.page = queryParams.page || 1;
-            eventsResponses = eventsResponses || [];
-            maximumPageRequests = maximumPageRequests || DEFAULT_PAGE_REQUESTS_MAX_LIMIT;
-
-            return $http.get(dhisUrl.events, { params: queryParams }).then(function(response) {
-                var eventsResponse = response.data.events || [],
-                    totalPages = (response.data.pager && response.data.pager.pageCount) || 0,
-                    lastPageReached = queryParams.page >= totalPages,
-                    pageLimitReached = queryParams.page >= maximumPageRequests;
-
-                eventsResponses.push(eventsResponse);
-
-                if(lastPageReached || pageLimitReached || _.isEmpty(eventsResponse)) {
-                    return $q.when(_.flatten(eventsResponses));
-                } else {
-                    queryParams.page++;
-                    return recursivelyDownloadPagedEvents(queryParams, maximumPageRequests, eventsResponses);
-                }
-            });
-        };
+            EVENT_DATA_PAGE_SIZE = properties.eventsSync.pageSize.eventData;
 
         this.getEvents = function(orgUnitId, periodRange, lastUpdated) {
             var formatEventDates = function (events) {
@@ -40,7 +16,7 @@ define(['dhisUrl', 'dateUtils', 'properties', 'moment', 'lodash'], function(dhis
                 endDate = moment(_.last(periodRange), 'GGGG[W]WW').endOf('isoWeek').format('YYYY-MM-DD'),
                 maximumPageRequests = MAX_NUMBER_OF_EVENTS / EVENT_DATA_PAGE_SIZE;
 
-            return recursivelyDownloadPagedEvents({
+            var queryParams = {
                 startDate: startDate,
                 endDate: endDate,
                 orgUnit: orgUnitId,
@@ -48,7 +24,9 @@ define(['dhisUrl', 'dateUtils', 'properties', 'moment', 'lodash'], function(dhis
                 fields: ":all,dataValues[value,dataElement,providedElsewhere,storedBy]",
                 lastUpdated: lastUpdated,
                 pageSize: EVENT_DATA_PAGE_SIZE
-            }, maximumPageRequests).then(formatEventDates);
+            };
+
+            return pagingUtils.paginateRequest(getEvents, queryParams, maximumPageRequests, []).then(formatEventDates);
         };
 
         this.getEventIds = function(orgUnitId, periodRange) {
@@ -56,14 +34,16 @@ define(['dhisUrl', 'dateUtils', 'properties', 'moment', 'lodash'], function(dhis
                 endDate = moment(_.last(periodRange), 'GGGG[W]WW').endOf('isoWeek').format('YYYY-MM-DD'),
                 maximumPageRequests = MAX_NUMBER_OF_EVENTS / EVENT_ID_PAGE_SIZE;
 
-            return recursivelyDownloadPagedEvents({
+            var queryParams = {
                 startDate: startDate,
                 endDate: endDate,
                 orgUnit: orgUnitId,
                 ouMode: "DESCENDANTS",
                 fields: "event",
                 pageSize: EVENT_ID_PAGE_SIZE
-            }, maximumPageRequests).then(function(events) {
+            };
+
+            return pagingUtils.paginateRequest(getEvents, queryParams, maximumPageRequests, []).then(function(events) {
                 return _.pluck(events, 'event');
             });
         };
@@ -98,6 +78,15 @@ define(['dhisUrl', 'dateUtils', 'properties', 'moment', 'lodash'], function(dhis
                 }
             };
             return $http.delete(dhisUrl.events + "/" + eventId).then(onSuccess, onError);
+        };
+
+        var getEvents = function (queryParams) {
+            return $http.get(dhisUrl.events, { params: queryParams }).then(function (response) {
+                return {
+                    pager: response.data.pager,
+                    data: response.data.events
+                };
+            });
         };
     };
 });

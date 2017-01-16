@@ -144,7 +144,7 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
 
                 var expectedQueryParams = encodeURI('fields=id,name,title,relativePeriods,type,' +
                                                     'categoryDimensions[dataElementCategory,categoryOptions[:identifiable]],' +
-                                                    'dataDimensionItems[dataElement[id,name,formName,description],indicator[id,name,shortName,description],programIndicator[id,name,shortName,description]],' +
+                                                    'dataDimensionItems[dataElement,indicator,programIndicator],' +
                                                     'columns[dimension,items[id,name]],' +
                                                     'rows[dimension,items[id,name]],' +
                                                     'filters[dimension,items[id]]');
@@ -230,7 +230,7 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
 
                 var expectedQueryParams = encodeURI('fields=id,name,sortOrder,relativePeriods,' +
                                                     'categoryDimensions[dataElementCategory,categoryOptions[:identifiable]],' +
-                                                    'dataDimensionItems[dataElement[id,name,formName,description],indicator[id,name,shortName,description],programIndicator[id,name,shortName,description]],' +
+                                                    'dataDimensionItems[dataElement,indicator,programIndicator],' +
                                                     'columns[dimension,items[id,name]],' +
                                                     'rows[dimension,items[id,name]],' +
                                                     'filters[dimension,items[id]]');

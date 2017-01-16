@@ -1,12 +1,13 @@
-define(["sessionHelper", "angularMocks", "utils", "userPreferenceRepository", "orgUnitRepository", "moment", "timecop"],
-    function(SessionHelper, mocks, utils, UserPreferenceRepository, OrgUnitRepository, moment, timecop) {
+define(["sessionHelper", "angularMocks", "utils", "userPreferenceRepository", "orgUnitRepository", "moment", "storageService"],
+    function(SessionHelper, mocks, utils, UserPreferenceRepository, OrgUnitRepository, moment, StorageService) {
         describe("session helper", function() {
-            var rootScope, q, userPreferenceRepository, user, orgUnitRepository,
-                currentTime;
+            var rootScope, q, location, userPreferenceRepository, user, orgUnitRepository,
+                currentTime, sessionHelper, storageService;
 
-            beforeEach(mocks.inject(function($rootScope, $q) {
+            beforeEach(mocks.inject(function($rootScope, $q, $location) {
                 rootScope = $rootScope;
                 q = $q;
+                location = $location;
 
                 rootScope.hasRoles = jasmine.createSpy("hasRoles").and.returnValue(true);
 
@@ -16,6 +17,9 @@ define(["sessionHelper", "angularMocks", "utils", "userPreferenceRepository", "o
 
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, []));
+
+                storageService = new StorageService();
+                spyOn(storageService, 'clear');
 
                 user = {
                     "id": "xYRvx4y7Gm9",
@@ -32,7 +36,7 @@ define(["sessionHelper", "angularMocks", "utils", "userPreferenceRepository", "o
                     }]
                 };
 
-                sessionHelper = new SessionHelper(rootScope, q, userPreferenceRepository, orgUnitRepository);
+                sessionHelper = new SessionHelper(rootScope, q, userPreferenceRepository, orgUnitRepository, location, storageService);
 
                 currentTime = moment().toISOString();
                 Timecop.install();
@@ -44,7 +48,7 @@ define(["sessionHelper", "angularMocks", "utils", "userPreferenceRepository", "o
                 Timecop.uninstall();
             });
 
-            it("should logout user, save user preferences and invalidate session", function() {
+            it("should logout user, save user preferences, clear sessionStorage and invalidate session", function() {
                 rootScope.locale = "en";
                 rootScope.currentUser = {
                     "userCredentials": user.userCredentials,
@@ -59,6 +63,7 @@ define(["sessionHelper", "angularMocks", "utils", "userPreferenceRepository", "o
                 expect(userPreferenceRepository.save).toHaveBeenCalled();
                 expect(rootScope.currentUser).toBeUndefined();
                 expect(rootScope.isLoggedIn).toBeFalsy();
+                expect(storageService.clear).toHaveBeenCalled();
             });
 
             it("should login user and load session with default locale 'en' if user is logging in for first time", function() {

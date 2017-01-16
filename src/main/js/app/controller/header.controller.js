@@ -1,5 +1,5 @@
-define(["lodash", "chromeUtils"], function(_, chromeUtils) {
-    return function($q, $scope, $location, $rootScope, $hustle, $timeout, db, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor) {
+define(["lodash", "platformUtils", "customAttributes", "properties", "interpolate"], function(_, platformUtils, customAttributes, properties, interpolate) {
+    return function($q, $scope, $location, $rootScope, $hustle, $timeout, $modal, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor) {
         $scope.projects = [];
 
         $scope.canChangeProject = function(hasUserLoggedIn, isCoordinationApprover) {
@@ -11,12 +11,20 @@ define(["lodash", "chromeUtils"], function(_, chromeUtils) {
             return re.test($location.path());
         };
 
+        $scope.metadataDownloading = function () {
+            return $location.path() == '/downloadingMetadata';
+        };
+
         $scope.hasSelectedProject = function() {
             return !!$rootScope.currentUser.selectedProject;
         };
 
         $scope.showTestLogo = function() {
             return !systemSettingRepository.isKeyGeneratedFromProd();
+        };
+
+        $scope.getSupportEmailMessage = function () {
+            return interpolate(_.get($scope.resourceBundle, 'contactSupport'), {supportEmail: properties.support_email});
         };
 
         var loadProjects = function() {
@@ -37,12 +45,7 @@ define(["lodash", "chromeUtils"], function(_, chromeUtils) {
                         return {
                             "id": module.id,
                             "displayName": module.parent.name + ' - ' + module.name,
-                            "isLineListService": _.any(module.attributeValues, {
-                                "attribute": {
-                                    "code": "isLineListService"
-                                },
-                                "value": "true"
-                            })
+                            "isLineListService": customAttributes.getBooleanAttributeValue(module.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE)
                         };
                     });
                 });
@@ -53,6 +56,7 @@ define(["lodash", "chromeUtils"], function(_, chromeUtils) {
             return orgUnitRepository.getAllModulesInOrgUnits(opUnit.id, "Module").then(function(modules) {
                 return {
                     'opUnitName': opUnit.name,
+                    'opUnitId': opUnit.id,
                     'modules': modules
                 };
             });
@@ -99,9 +103,62 @@ define(["lodash", "chromeUtils"], function(_, chromeUtils) {
         };
 
         $scope.versionNumber = function () {
-            var praxisVersion = chromeUtils.getPraxisVersion();
+            var praxisVersion = platformUtils.getPraxisVersion();
             if (!praxisVersion) return '';
             return praxisVersion;
+        };
+
+        $scope.getRemainingJobs = function () {
+            var resourceBundleKey = $rootScope.remainingJobs == 1 ? 'job' : 'jobs';
+            return $rootScope.remainingJobs + ' ' + $scope.resourceBundle[resourceBundleKey];
+        };
+
+        $scope.networkStatus = function () {
+            var networkStatus;
+            if ($scope.isDhisOnline && $scope.poorConnection) {
+                networkStatus = 'poorConnectivity';
+            } else if ($scope.isDhisOnline) {
+                networkStatus = 'online';
+            }
+            else {
+                networkStatus = 'offline';
+            }
+            return $scope.resourceBundle && $scope.resourceBundle[networkStatus];
+        };
+
+        $scope.uninstallPraxis = function () {
+            var modalMessages = {
+                "ok": $scope.resourceBundle.uninstall.okMessage,
+                "title": $scope.resourceBundle.uninstall.title,
+                "confirmationMessage": $scope.resourceBundle.uninstall.confirmationMessage
+            };
+
+            showModal(function () {
+                $scope.startLoading();
+                platformUtils.uninstall().then(function () {
+                    document.getElementById('loadingPraxis').style.display = 'block';
+                    document.getElementById('loadingPraxis').style.color = 'white';
+                    document.getElementById('loadingPraxis').style.margin = '150px 550px 0';
+                    document.getElementById('loadingPraxis').style.fontWeight = 'bold';
+                    document.getElementById('loadingPraxis').innerHTML = $scope.resourceBundle.uninstall.successMessage;
+                    document.getElementById('praxis').style.display = 'none';
+                    $scope.stopLoading();
+                });
+
+            }, modalMessages);
+        };
+
+        var showModal = function(okCallback, messages) {
+            var scope = $rootScope.$new();
+            scope.modalMessages = messages;
+
+            var modalInstance = $modal.open({
+                templateUrl: 'templates/confirm-dialog.html',
+                controller: 'confirmDialogController',
+                scope: scope
+            });
+
+            return modalInstance.result.then(okCallback);
         };
 
         var init = function() {

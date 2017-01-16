@@ -1,4 +1,4 @@
-define(["dataElementRepository", "angularMocks", "utils", "customAttributes"], function(DataElementRepository, mocks, utils, CustomAttributes) {
+define(["dataElementRepository", "angularMocks", "utils", "customAttributes"], function(DataElementRepository, mocks, utils, customAttributes) {
     describe("data element repository", function() {
         var mockDb, mockStore, dataElementRepository, scope, q, mockAttributeValue;
 
@@ -10,8 +10,8 @@ define(["dataElementRepository", "angularMocks", "utils", "customAttributes"], f
             mockStore = mockDb.objectStore;
 
             mockAttributeValue = 'mockAttributeValue';
-            spyOn(CustomAttributes, 'getAttributeValue').and.returnValue(mockAttributeValue);
-            spyOn(CustomAttributes, 'getBooleanAttributeValue').and.returnValue(mockAttributeValue);
+            spyOn(customAttributes, 'getAttributeValue').and.returnValue(mockAttributeValue);
+            spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(mockAttributeValue);
 
             dataElementRepository = new DataElementRepository(mockDb.db);
         }));
@@ -39,7 +39,7 @@ define(["dataElementRepository", "angularMocks", "utils", "customAttributes"], f
                 });
 
                 scope.$apply();
-                expect(CustomAttributes.getAttributeValue).toHaveBeenCalledWith(mockDataElement.attributeValues, CustomAttributes.LINE_LIST_OFFLINE_SUMMARY_CODE);
+                expect(customAttributes.getAttributeValue).toHaveBeenCalledWith(mockDataElement.attributeValues, customAttributes.LINE_LIST_OFFLINE_SUMMARY_CODE);
             });
 
             it('should add showInEventSummary custom attribute to DataElement', function () {
@@ -48,7 +48,7 @@ define(["dataElementRepository", "angularMocks", "utils", "customAttributes"], f
                 });
 
                 scope.$apply();
-                expect(CustomAttributes.getBooleanAttributeValue).toHaveBeenCalledWith(mockDataElement.attributeValues, CustomAttributes.SHOW_IN_EVENT_SUMMARY_CODE);
+                expect(customAttributes.getBooleanAttributeValue).toHaveBeenCalledWith(mockDataElement.attributeValues, customAttributes.SHOW_IN_EVENT_SUMMARY_CODE);
             });
 
         });
@@ -60,6 +60,35 @@ define(["dataElementRepository", "angularMocks", "utils", "customAttributes"], f
                 dataElementRepository.findAll(dataElementIds);
 
                 expect(mockStore.each).toHaveBeenCalled();
+            });
+        });
+
+        describe('enrichDataElements', function () {
+            it('should enrich the data element', function () {
+                var dataElement = {
+                    id: 'someDataElementId'
+                };
+                var dataElements = [{
+                    id: 'someDataElementId',
+                    name: 'someName',
+                    formName: 'formName',
+                    description: 'someDescription',
+                    someOtherFields: 'someOtherFields'
+                }];
+
+                spyOn(dataElementRepository, 'findAll').and.returnValue(utils.getPromise(q, dataElements));
+
+                var expectedDataElements = {
+                    id: 'someDataElementId',
+                    name: 'someName',
+                    formName: 'formName',
+                    description: 'someDescription'
+                };
+                dataElementRepository.enrichWithDataElementsDetails([dataElement]).then(function (enrichedDataElements) {
+                    expect(dataElementRepository.findAll).toHaveBeenCalledWith([dataElement.id]);
+                    expect(dataElement).toEqual(expectedDataElements);
+                });
+                scope.$apply();
             });
         });
 

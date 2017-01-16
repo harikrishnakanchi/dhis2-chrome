@@ -1,5 +1,5 @@
 define(["moment"], function(moment) {
-    return function($rootScope, $q ,userPreferenceRepository, orgUnitRepository, $hustle) {
+    return function($rootScope, $q ,userPreferenceRepository, orgUnitRepository, $location, storageService) {
         var saveSessionState = function() {
             var userPreferences = {
                 "username": $rootScope.currentUser.userCredentials.username,
@@ -12,9 +12,12 @@ define(["moment"], function(moment) {
         };
 
         var logout = function() {
+            storageService.clear();
+
             return saveSessionState().then(function() {
                 $rootScope.isLoggedIn = false;
                 $rootScope.currentUser = undefined;
+                $location.path('/login');
             });
         };
 

@@ -1,10 +1,10 @@
-define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(ModuleDataBlock, CustomAttributes, moment, timecop) {
+define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(ModuleDataBlock, customAttributes, moment, timecop) {
     describe('ModuleDataBlock', function () {
         var moduleDataBlock, orgUnit, period, aggregateDataValues, lineListEvents, approvalData, someMomentInTime, isLineListService, failedToSyncData;
 
         beforeEach(function() {
             isLineListService = false;
-            spyOn(CustomAttributes, 'getBooleanAttributeValue').and.callFake(function() {
+            spyOn(customAttributes, 'getBooleanAttributeValue').and.callFake(function() {
                 return isLineListService;
             });
             orgUnit = {
@@ -72,11 +72,11 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                 orgUnit = {
                     attributeValues: 'someAttributeValue'
                 };
-                CustomAttributes.getBooleanAttributeValue.and.returnValue('lineListServiceAttributeValue');
+                customAttributes.getBooleanAttributeValue.and.returnValue('lineListServiceAttributeValue');
 
                 moduleDataBlock = createModuleDataBlock();
 
-                expect(CustomAttributes.getBooleanAttributeValue).toHaveBeenCalledWith(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
+                expect(customAttributes.getBooleanAttributeValue).toHaveBeenCalledWith(orgUnit.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE);
                 expect(moduleDataBlock.lineListService).toEqual('lineListServiceAttributeValue');
             });
         });

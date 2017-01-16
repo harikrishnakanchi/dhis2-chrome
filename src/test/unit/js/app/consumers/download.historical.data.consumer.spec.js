@@ -1,7 +1,7 @@
 define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties', 'moment', 'downloadHistoricalDataConsumer', 'dataService',
         'userPreferenceRepository', 'orgUnitRepository', 'dataSetRepository', 'changeLogRepository', 'dataRepository', 'programEventRepository','eventService','customAttributes'],
     function (utils, timecop, mocks, _, dateUtils, properties, moment, DownloadHistoricalDataConsumer, DataService, UserPreferenceRepository,
-              OrgUnitRepository, DatasetRepository, ChangeLogRepository, DataRepository, ProgramEventRepository, EventService, CustomAttributes) {
+              OrgUnitRepository, DatasetRepository, ChangeLogRepository, DataRepository, ProgramEventRepository, EventService, customAttributes) {
         describe('DownloadHistoricalDataConsumer', function () {
             var scope, q, downloadHistoricalDataConsumer, dataService, eventService, userPreferenceRepository, orgUnitRepository,
                 datasetRepository, dataRepository, changeLogRepository, programEventRepository,
@@ -128,7 +128,7 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                     var dataSetIds;
 
                     beforeEach(function () {
-                        spyOn(CustomAttributes, 'getBooleanAttributeValue').and.returnValue(false);
+                        spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(false);
                         dataService.downloadData.and.returnValue(utils.getPromise(q, mockPayload));
                         dataSetIds = _.map(mockDataSets, 'id');
 
@@ -162,7 +162,7 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
 
                 describe('LineList modules', function () {
                     beforeEach(function() {
-                        spyOn(CustomAttributes, 'getBooleanAttributeValue').and.returnValue(true);
+                        spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(true);
                         eventService.getEvents.and.returnValue(utils.getPromise(q, mockPayload));
 
                         downloadHistoricalDataConsumer.run();

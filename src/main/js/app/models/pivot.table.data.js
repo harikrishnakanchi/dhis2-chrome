@@ -1,19 +1,21 @@
 define(['analyticsData', 'lodash'], function(AnalyticsData, _) {
 
-    var PivotTableData = function(definition, data) {
+    var PivotTableData = function(definition, data, shouldNotExcludeEmptyDataValues) {
         this.title = definition.title;
         this.serviceCode = definition.serviceCode;
+        this.referralLocationReport = definition.referralLocationReport;
         this.displayPosition = definition.displayPosition;
         this.weeklyReport = definition.weeklyReport;
         this.monthlyReport = definition.monthlyReport;
         this.sortAscending = definition.sortAscending;
         this.sortDescending = definition.sortDescending;
         this.sortable = definition.sortable;
+        this.hideWeeks = definition.hideWeeks;
 
         var analyticsData = AnalyticsData.create(definition, data);
 
-        this.rows = mapRows(analyticsData);
-        this.columns = mapColumns(analyticsData, definition);
+        this.rows = mapRows(analyticsData, shouldNotExcludeEmptyDataValues);
+        this.columns = mapColumns(analyticsData, definition, shouldNotExcludeEmptyDataValues);
         this.columnConfigurations = getCartesianProductOfColumns(this.columns);
         this.isDataAvailable = analyticsData.isDataAvailable;
         this.getDataValue = analyticsData.getDataValue;
@@ -27,15 +29,21 @@ define(['analyticsData', 'lodash'], function(AnalyticsData, _) {
         });
     };
 
-    var mapRows = function (analyticsData) {
+    var mapRows = function (analyticsData, shouldNotExcludeEmptyDataValues) {
         var firstRow = _.first(analyticsData.rows);
-        return _.map(filterItemsWithDataValues(firstRow, analyticsData), function (row, index) {
+        var data = firstRow;
+        if (!shouldNotExcludeEmptyDataValues) {
+            data = filterItemsWithDataValues(firstRow, analyticsData);
+        }
+        return _.map(data, function (row, index) {
             return _.set(row, 'rowNumber', index + 1);
         });
     };
 
-    var mapColumns = function (analyticsData, definition) {
-        var mappedColumns = _.map(analyticsData.columns, function (column) {
+    var mapColumns = function (analyticsData, definition, shouldNotExcludeEmptyDataValues) {
+        var mappedColumns = analyticsData.columns;
+        if (!shouldNotExcludeEmptyDataValues)
+            mappedColumns = _.map(mappedColumns, function (column) {
             return filterItemsWithDataValues(column, analyticsData);
         });
         return _.reject(mappedColumns, function (column) {

@@ -1,4 +1,4 @@
-define(["projectUserController", "angularMocks", "utils", "dhisId"], function(ProjectUserController, mocks, utils, dhisId) {
+define(["projectUserController", "angularMocks", "utils", "dhisId", "customAttributes"], function(ProjectUserController, mocks, utils, dhisId, customAttributes) {
     describe("projectUserControllerspec", function() {
         var scope, projectUserController, q, userRepository, hustle, fakeModal, timeout;
 
@@ -12,17 +12,7 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
             scope.orgUnit = {
                 "name": "Proj 1",
                 "id": "someId",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "projCode"
-                    },
-                    "value": "PRJ"
-                }, {
-                    "attribute": {
-                        "code": "Type"
-                    },
-                    "value": "Project"
-                }]
+                "attributeValues": []
             };
 
             scope.locale = "en";
@@ -50,6 +40,13 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
             spyOn(userRepository, "getAllUsernames").and.returnValue(utils.getPromise(q, {}));
             spyOn(userRepository, "getAllProjectUsers").and.returnValue(utils.getPromise(q, {}));
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+            spyOn(customAttributes, "getAttributeValue").and.callFake(function (attributeValues, code) {
+                var fakeAttributeValues = {
+                    Type: 'Project',
+                    projCode: 'PRJ'
+                };
+                return fakeAttributeValues[code];
+            });
             projectUserController = new ProjectUserController(scope, hustle, timeout, fakeModal, userRepository);
         }));
 
@@ -133,7 +130,7 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
                 'userCredentials': {
                     'username': 'foobar',
                     'userRoles': [{
-                        "name": 'Data Entry User',
+                        "name": 'Data entry user',
                         "id": 'Role1Id'
                     }, {
                         "name": 'Project Level Approver',
@@ -144,9 +141,6 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
                 'userCredentials': {
                     'username': 'blah',
                     'userRoles': [{
-                        "name": 'Data Entry User',
-                        "id": 'Role1Id'
-                    }, {
                         "name": 'Coordination Level Approver',
                         "id": 'Role3Id'
                     }]
@@ -154,11 +148,11 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
             }];
 
             var expectedUsers = [{
-                'roles': 'Data Entry User, Project Level Approver',
+                'roles': 'Data entry user, Project Level Approver',
                 'userCredentials': {
                     'username': 'foobar',
                     'userRoles': [{
-                        "name": 'Data Entry User',
+                        "name": 'Data entry user',
                         "id": 'Role1Id'
                     }, {
                         "name": 'Project Level Approver',

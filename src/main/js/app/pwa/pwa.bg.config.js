@@ -1,7 +1,8 @@
 require.config({
     paths: {
         //Utils
-        "chromeUtils": "app/pwa/pwa.utils"
+        "platformUtils": "app/pwa/pwa.utils",
+        "platformConfig": "app/pwa/pwa.properties"
     }
 });
 console.log("Config is complete");

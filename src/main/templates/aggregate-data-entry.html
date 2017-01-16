@@ -27,11 +27,12 @@
 
             <form name="forms.dataentryForm" id="dataentry" ng-if="hasRoles(['Data entry user', 'Observer']) && (isDataAvailable || isDataEntryAllowed)">
                 <div ng-class="layoutDirection.direction == 'rtl' ? 'text-left' : 'text-right'">
+                    <button class="btn btn-sm btn-primary printTallySheetBtn" ng-click="exportTallySheetToExcel()" ng-show="selectedModule">{{resourceBundle.exportTallySheetButton}}</button>
                     <button class="btn btn-sm btn-primary printTallySheetBtn" ng-click="printWindow()" ng-show="selectedModule">{{resourceBundle.printTallySheetBtnValue}}</button>
                 </div>
                 <accordion close-others="false">
                     <div class="data-set-acc-wrapper">
-                        <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: false, isPopulationDataset: false } | orderBy: 'name' track by dataSet.id" is-open="getDatasetState(dataSet.id, $first)[dataSet.id]">
+                        <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: false, isPopulationDataset: false, isReferralDataset: false } | orderBy: 'name' track by dataSet.id" is-open="getDatasetState(dataSet.id, $first)[dataSet.id]">
                             <accordion-heading>
                                 <span>{{ dataSet.name }}</span>
                                 <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-right': !isDatasetOpen[dataSet.id]}"></i>
@@ -39,7 +40,7 @@
                             </accordion-heading>
                             <div class="exp-coll-group">
                                 <accordion close-others="false">
-                                    <accordion-group ng-repeat="section in dataSet.sections | filter:{ isIncluded: true } | orderBy: 'sortOrder' track by section.id" is-open="isopen[section.id]" ng-form="sectionForm">
+                                    <accordion-group ng-repeat="section in dataSet.sections | orderBy: 'sortOrder' track by section.id" is-open="isopen[section.id]" ng-form="sectionForm">
                                         <div class='alert alert-danger' ng-show='sectionForm.$error.pattern'>
                                             <p>{{resourceBundle.invalidExpression}}</p>
                                         </div>
@@ -67,10 +68,10 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr ng-if="!dataSet.isReferralDataset || (dataSet.isReferralDataset &amp;&amp; referralLocations[dataElement.formName] !== undefined)" ng-repeat="dataElement in section.dataElements | filter:{ isIncluded: true } track by dataElement.id" ng-form="dataElementForm">
+                                                <tr ng-repeat="dataElement in section.dataElements track by dataElement.id" ng-form="dataElementForm">
                                                     <td>
                                                         <div>
-                                                            <span ng-if="!dataSet.isReferralDataset">
+                                                            <span>
                                                                 <a description-popup
                                                                    class="changeColor"
                                                                    dp-title="{{ getDisplayName(dataElement) }}"
@@ -79,7 +80,6 @@
                                                                 {{ getDisplayName(dataElement) }}
                                                                 </a>
                                                             </span>
-                                                            <span ng-if="dataSet.isReferralDataset"> {{ referralLocations[dataElement.formName].name }} </span>
                                                         </div>
                                                     </td>
                                                     <td ng-repeat="column in section.baseColumnConfiguration">
@@ -110,6 +110,76 @@
                                 </accordion>
                             </div>
                         </accordion-group>
+                        <accordion-group ng-repeat="dataSet in dataSets | filter: {isReferralDataset: true} track by dataSet.id" is-open="getDatasetState(dataSet.id, false)[dataSet.id]">
+                            <accordion-heading>
+                                <span>{{ dataSet.name }}</span>
+                                <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-right': !isDatasetOpen[dataSet.id]}"></i>
+                                <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-left': !isDatasetOpen[dataSet.id]}"></i>
+                            </accordion-heading>
+                            <div class="exp-coll-group">
+                                <accordion close-others="false">
+                                    <accordion-group ng-repeat="section in dataSet.sections | orderBy: 'sortOrder' track by section.id" is-open="isopen[section.id]" ng-form="sectionForm">
+                                        <div class='alert alert-danger' ng-show='sectionForm.$error.pattern'>
+                                            <p>{{resourceBundle.invalidExpression}}</p>
+                                        </div>
+                                        <accordion-heading>
+                                            <span>{{ section.name}}</span>
+                                            <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isopen[section.id], 'glyphicon-chevron-right': !isopen[section.id]}"></i>
+                                            <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isopen[section.id], 'glyphicon-chevron-left': !isopen[section.id]}"></i>
+                                        </accordion-heading>
+                                        <table locked-table-header class="table table-bordered" ng-if="isDatasetOpen[dataSet.id] || printingTallySheet">
+                                            <thead>
+                                            <tr ng-repeat="columnConfiguration in section.columnConfigurations">
+                                                <th class="display-print" ng-if="$first">
+                                                    <span>{{ section.name }}</span>
+                                                </th>
+                                                <th class="display-print" ng-if="!$first">
+                                                </th>
+                                                <th ng-repeat="column in columnConfiguration" colspan="{{ section.baseColumnConfiguration.length / columnConfiguration.length}}">
+                                                    <span>{{column.name}}</span>
+                                                </th>
+                                                <th ng-hide="$last" class="last-column">
+                                                </th>
+                                                <th ng-show="$last && section.shouldDisplayRowTotals" class="last-column">
+                                                    {{ resourceBundle.totalLabel }}
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr ng-if="(dataSet.isReferralDataset &amp;&amp; referralLocations[dataElement.formName] !== undefined)" ng-repeat="dataElement in section.dataElements track by dataElement.id" ng-form="dataElementForm">
+                                                <td>
+                                                    <div>
+                                                        <span ng-if="dataSet.isReferralDataset"> {{ referralLocations[dataElement.formName].name }} </span>
+                                                    </div>
+                                                </td>
+                                                <td ng-repeat="column in section.baseColumnConfiguration">
+                                                    <ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
+                                                        <input type="text" name="datavalue" id="datafield_{{$index}}" class="form-control input-sm"
+                                                               ng-pattern="validDataValuePattern"
+                                                               ng-model="safeGet(dataValues, dataElement.id, column.categoryOptionComboId, selectedModule.id)['value']"
+                                                               ng-focus="restoreExpression(selectedModule.id, dataElement.id, column.categoryOptionComboId)"
+                                                               ng-blur="evaluateExpression(selectedModule.id, dataElement.id, column.categoryOptionComboId)"
+                                                               ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed" />
+                                                    </ng-form>
+                                                </td>
+                                                <td class="last-column" ng-if="section.shouldDisplayRowTotals">{{sum(dataValues[selectedModule.id][dataElement.id], dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
+                                            </tr>
+                                            <tr class="hide-from-print" ng-if="section.shouldDisplayColumnTotals">
+                                                <td>
+                                                    <span> {{ resourceBundle.totalLabel }}</span>
+                                                </td>
+                                                <td ng-repeat="column in section.baseColumnConfiguration">
+                                                    {{columnSum(dataValues[selectedModule.id], section , column.categoryOptionComboId, dataSet.isReferralDataset)}}
+                                                </td>
+                                                <td class="last-column" ng-if="section.shouldDisplayRowTotals "> {{totalSum(section)}}
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </accordion-group>
+                                </accordion>
+                            </div>
+                        </accordion-group>
                         <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: true }  track by dataSet.id" is-open="getDatasetState(dataSet.id, false)[dataSet.id]">
                             <accordion-heading>
                                 <span>{{ dataSet.name}}</span>
@@ -118,7 +188,7 @@
                             </accordion-heading>
                             <div class="exp-coll-group">
                                 <accordion close-others="false">
-                                    <accordion-group ng-repeat="section in dataSet.sections | filter:{ isIncluded: true } | orderBy: 'sortOrder' track by section.id" is-open="isopen[section.id]" ng-form="sectionForm">
+                                    <accordion-group ng-repeat="section in dataSet.sections | orderBy: 'sortOrder' track by section.id" is-open="isopen[section.id]" ng-form="sectionForm">
                                         <div class='alert alert-danger' ng-show='sectionForm.$error.pattern'>
                                             <p>{{resourceBundle.invalidExpression}}</p>
                                         </div>

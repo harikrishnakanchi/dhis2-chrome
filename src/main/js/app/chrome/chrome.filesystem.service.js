@@ -1,5 +1,5 @@
-define(['lodash', 'chromeUtils'], function(_, chromeUtils) {
-    return function($q) {
+define(['lodash', 'platformUtils'], function(_, platformUtils) {
+    return function($rootScope, $q, $modal) {
         var FILE_TYPE_OPTIONS = {
             XLSX: {
                 accepts: [{
@@ -34,7 +34,7 @@ define(['lodash', 'chromeUtils'], function(_, chromeUtils) {
 
         var promptAndWriteFile = function(fileName, contents, options) {
 
-            if(chromeUtils.getOS() == 'win')
+            if(platformUtils.getOS() == 'win')
                 fileName = replaceSpecialCharsInFileName(fileName);
 
             var deferred = $q.defer(),
@@ -103,30 +103,16 @@ define(['lodash', 'chromeUtils'], function(_, chromeUtils) {
             return deferred.promise;
         };
 
-        var readFile = function(extensions) {
+        var readFile = function(file) {
             var deferred = $q.defer();
-            var errorHandler = function(err) {
+            var reader = new FileReader();
+            reader.onerror = function (err) {
                 deferred.reject(err);
             };
-
-            var entryType = {
-                "type": 'openFile',
-                "accepts": [{
-                    "extensions": extensions
-                }]
+            reader.onloadend = function (data) {
+                deferred.resolve(data);
             };
-
-            chrome.fileSystem.chooseEntry(entryType, function(readOnlyEntry) {
-                readOnlyEntry.file(function(file) {
-                    var reader = new FileReader();
-                    reader.onerror = errorHandler;
-                    reader.onloadend = function(data) {
-                        deferred.resolve(data);
-                    };
-                    reader.readAsArrayBuffer(file);
-                });
-            });
-
+            reader.readAsArrayBuffer(file);
             return deferred.promise;
         };
 

@@ -32,24 +32,22 @@ define(["metadataService", "properties", "angularMocks", "moment"], function(Met
             expect(actualMetadata).toEqual(metadataInFile);
         });
 
-        it("should not get metadata from local file if import has already happened before", function() {
-            var lastWeek = moment().subtract(1, 'weeks').toISOString();
-            var lastUpdated = moment().subtract(1, 'days').toISOString();
-
-            var metadataInFile = {
-                "users": [],
-                "created": lastWeek
-            };
-
-            httpBackend.expectGET("data/metadata.json").respond(200, metadataInFile);
+        it("should return empty metadata if local file does not exist", function() {
+            httpBackend.expectGET("data/metadata.json").respond(404);
 
             var actualMetadata;
-            metadataService.loadMetadataFromFile(lastUpdated).then(function(data) {
+            metadataService.loadMetadataFromFile().then(function(data) {
                 actualMetadata = data;
             });
 
             httpBackend.flush();
-            expect(actualMetadata).toBeUndefined();
+            expect(actualMetadata).toEqual({
+                created: '2014-03-23T09:02:49.870+0000',
+                dataSets: [],
+                organisationUnitGroups: [],
+                organisationUnits: [],
+                programs: []
+            });
         });
 
         it("should get metadata from DHIS based on last updated date specified", function() {
@@ -62,9 +60,9 @@ define(["metadataService", "properties", "angularMocks", "moment"], function(Met
             };
 
             var filterString = "assumeTrue=false&" +
-                               "categories=true&categoryCombos=true&categoryOptionCombos=true&categoryOptions=true&dataElementGroups=true&dataElements=true&" +
+                               "categories=true&categoryCombos=true&categoryOptionCombos=true&categoryOptions=true&dataElementGroups=true&dataElements=true&indicators=true&" +
                                "lastUpdated="+lastUpdated+"&" +
-                               "optionSets=true&organisationUnitGroupSets=true&sections=true&translations=true&users=true";
+                               "optionSets=true&organisationUnitGroupSets=true&programIndicators=true&sections=true&translations=true&users=true";
             httpBackend.expectGET(properties.dhis.url + "/api/metadata.json?" + filterString).respond(200, metadata);
 
             var actualMetadata;
@@ -86,8 +84,8 @@ define(["metadataService", "properties", "angularMocks", "moment"], function(Met
 
             var filterString = "assumeTrue=false&" +
                               "categories=true&categoryCombos=true&categoryOptionCombos=true&categoryOptions=true&dataElementGroups=true&" +
-                              "dataElements=true&optionSets=true&organisationUnitGroupSets=true&" +
-                              "sections=true&translations=true&users=true";
+                              "dataElements=true&indicators=true&optionSets=true&organisationUnitGroupSets=true&" +
+                              "programIndicators=true&sections=true&translations=true&users=true";
             httpBackend.expectGET(properties.dhis.url + "/api/metadata.json?" + filterString).respond(200, metadata);
 
             var actualMetadata;

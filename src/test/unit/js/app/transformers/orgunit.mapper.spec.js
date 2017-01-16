@@ -1,4 +1,4 @@
-define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], function(orgUnitMapper, mocks, moment, timecop, dhisId) {
+define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customAttributes"], function(orgUnitMapper, mocks, moment, timecop, dhisId, customAttributes) {
     describe("orgUnitMapper", function() {
         beforeEach(function() {
             Timecop.install();
@@ -10,231 +10,129 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
             Timecop.uninstall();
         });
 
-        it("should convert project from DHIS to project for view", function() {
-            var dhisProject = {
-                "id": "aa4acf9115a",
-                "name": "Org1",
-                "level": 3,
-                "shortName": "Org1",
-                "openingDate": "2010-01-01",
-                "parent": {
-                    "name": "name1",
-                    "id": "id1"
-                },
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "prjCon",
-                        "name": "Context"
-                    },
-                    "value": "val2"
-                }, {
-                    "attribute": {
-                        "code": "prjLoc",
-                        "name": "Location"
-                    },
-                    "value": "val3"
-                }, {
-                    "attribute": {
-                        "code": "prjPopType",
-                        "name": "Type of population"
-                    },
-                    "value": "val5"
-                }, {
-                    "attribute": {
-                        "code": "prjEndDate",
-                        "name": "End date"
-                    },
-                    "value": "2011-01-01"
-                }, {
-                    "attribute": {
-                        "code": "projCode",
-                        "name": "Project Code"
-                    },
-                    "value": "RU118"
-                }, {
-                    "attribute": {
-                        "code": "reasonForIntervention",
-                        "name": "Reason For Intervention"
-                    },
-                    "value": "Armed Conflict"
-                }, {
-                    "attribute": {
-                        "code": "modeOfOperation",
-                        "name": "Mode Of Operation"
-                    },
-                    "value": "Direct Operation"
-                }, {
-                    "attribute": {
-                        "code": "modelOfManagement",
-                        "name": "Model Of Management"
-                    },
-                    "value": "Collaboration"
-                }, {
-                    "attribute": {
-                        "code": "autoApprove",
-                        "name": "Auto Approve"
-                    },
-                    "value": "true"
-                }, {
-                    "attribute": {
-                        "code": "projectType",
-                        "name": "Project Type"
-                    },
-                    "value": "Some Type"
-                }, {
-                    "attribute": {
-                        "code": "estimatedTargetPopulation",
-                        "name": "Estimated target population"
-                    },
-                    "value": "1000"
-                }, {
-                    "attribute": {
-                        "code": "estPopulationLessThan1Year",
-                        "name": "Est. population less than 1 year",
-                    },
-                    "value": "11"
-                }, {
-                    "attribute": {
-                        "code": "estPopulationBetween1And5Years",
-                        "name": "Est. population between 1 and 5 years"
-                    },
-                    "value": "12"
-                }, {
-                    "attribute": {
-                        "code": "estPopulationOfWomenOfChildBearingAge",
-                        "name": "Est. population of women of child bearing age"
-                    },
-                    "value": "13"
-                }]
-            };
+        describe('mapToProject', function () {
+            it("should convert project from DHIS to project for view", function() {
+                var dhisProject = {
+                    "id": "aa4acf9115a",
+                    "name": "Org1",
+                    "level": 3,
+                    "attributeValues": []
+                };
 
-            var allContexts = [{
-                "id": "a16b4a97ce4",
-                "name": "val2",
-                "englishName": "val2"
-            }];
-            var allPopTypes = [{
-                "id": "a35778ed565",
-                "name": "val5",
-                "englishName": "val5"
-            }, {
-                "id": "a48f665185e",
-                "name": "val6",
-                "englishName": "val6",
-            }];
-            var reasonForIntervention = [{
-                "id": "a8014cfca5c",
-                "name": "Armed Conflict",
-                "englishName": "Armed Conflict"
-            }];
-            var modeOfOperation = [{
-                "id": "a560238bc90",
-                "name": "Direct Operation",
-                "englishName": "Direct Operation"
-            }];
-            var modelOfManagement = [{
-                "id": "a11a7a5d55a",
-                "name": "Collaboration",
-                "englishName": "Collaboration"
-            }];
-            var allProjectTypes = [{
-                "id": "a11a7aty65a",
-                "name": "Some Type",
-                "englishName": "Some Type"
-            }];
+                var allContexts = [{
+                    "id": "a16b4a97ce4",
+                    "name": "val2",
+                    "englishName": "val2"
+                }];
+                var allPopTypes = [{
+                    "id": "a35778ed565",
+                    "name": "val5",
+                    "englishName": "val5"
+                }, {
+                    "id": "a48f665185e",
+                    "name": "val6",
+                    "englishName": "val6",
+                }];
+                var reasonForIntervention = [{
+                    "id": "a8014cfca5c",
+                    "name": "Armed Conflict",
+                    "englishName": "Armed Conflict"
+                }];
+                var modeOfOperation = [{
+                    "id": "a560238bc90",
+                    "name": "Direct Operation",
+                    "englishName": "Direct Operation"
+                }];
+                var modelOfManagement = [{
+                    "id": "a11a7a5d55a",
+                    "name": "Collaboration",
+                    "englishName": "Collaboration"
+                }];
+                var allProjectTypes = [{
+                    "id": "a11a7aty65a",
+                    "name": "Some Type",
+                    "englishName": "Some Type"
+                }];
 
-            var result = orgUnitMapper.mapToProject(dhisProject, allContexts, allPopTypes, reasonForIntervention, modeOfOperation, modelOfManagement, allProjectTypes);
+                spyOn(customAttributes, 'getAttributeValue').and.callFake(function (attributeValues, code) {
+                    var fakeAttributeValues = {
+                        prjEndDate: '2011-01-01',
+                        autoApprove: 'true',
+                        prjLoc: 'val3',
+                        projCode: 'RU118',
+                        estimatedTargetPopulation: 1000,
+                        estPopulationLessThan1Year: 11,
+                        estPopulationBetween1And5Years: 12,
+                        estPopulationOfWomenOfChildBearingAge: 13,
+                        prjCon: 'val2',
+                        prjPopType: 'val5',
+                        projectType: 'Some Type',
+                        reasonForIntervention: 'Armed Conflict',
+                        'modeOfOperation': 'Direct Operation',
+                        'modelOfManagement': 'Collaboration'
+                    };
+                    return fakeAttributeValues[code];
+                });
+                var result = orgUnitMapper.mapToProject(dhisProject, allContexts, allPopTypes, reasonForIntervention, modeOfOperation, modelOfManagement, allProjectTypes);
 
-            var expectedResult = {
-                name:'Org1',
-                openingDate: moment(dhisProject.openingDate).toDate(),
-                context: {
-                    id: 'a16b4a97ce4',
-                    name: 'val2',
-                    englishName: 'val2'
-                },
-                location: 'val3',
-                populationType: {
-                    id: 'a35778ed565',
-                    name: 'val5',
-                    englishName: 'val5'
-                },
-                endDate: moment("2011-01-01").toDate(),
-                projectCode: 'RU118',
-                projectType: {
-                    id: 'a11a7aty65a',
-                    name: 'Some Type',
-                    englishName: 'Some Type'
-                },
-                reasonForIntervention: {
-                    id: 'a8014cfca5c',
-                    name: 'Armed Conflict',
-                    englishName: 'Armed Conflict'
-                },
-                modeOfOperation: {
-                    id: 'a560238bc90',
-                    name: 'Direct Operation',
-                    englishName: 'Direct Operation'
-                },
-                modelOfManagement: {
-                    id: 'a11a7a5d55a',
-                    name: 'Collaboration',
-                    englishName: 'Collaboration'
-                },
-                estimatedTargetPopulation: 1000,
-                estPopulationLessThan1Year: 11,
-                estPopulationBetween1And5Years: 12,
-                estPopulationOfWomenOfChildBearingAge: 13,
-                autoApprove: 'true'
-            };
+                var expectedResult = {
+                    name:'Org1',
+                    openingDate: moment(dhisProject.openingDate).toDate(),
+                    context: {
+                        id: 'a16b4a97ce4',
+                        name: 'val2',
+                        englishName: 'val2'
+                    },
+                    location: 'val3',
+                    populationType: {
+                        id: 'a35778ed565',
+                        name: 'val5',
+                        englishName: 'val5'
+                    },
+                    endDate: moment("2011-01-01").toDate(),
+                    projectCode: 'RU118',
+                    projectType: {
+                        id: 'a11a7aty65a',
+                        name: 'Some Type',
+                        englishName: 'Some Type'
+                    },
+                    reasonForIntervention: {
+                        id: 'a8014cfca5c',
+                        name: 'Armed Conflict',
+                        englishName: 'Armed Conflict'
+                    },
+                    modeOfOperation: {
+                        id: 'a560238bc90',
+                        name: 'Direct Operation',
+                        englishName: 'Direct Operation'
+                    },
+                    modelOfManagement: {
+                        id: 'a11a7a5d55a',
+                        name: 'Collaboration',
+                        englishName: 'Collaboration'
+                    },
+                    estimatedTargetPopulation: 1000,
+                    estPopulationLessThan1Year: 11,
+                    estPopulationBetween1And5Years: 12,
+                    estPopulationOfWomenOfChildBearingAge: 13,
+                    autoApprove: 'true'
+                };
 
-            expect(result).toEqual(expectedResult);
+                expect(result).toEqual(expectedResult);
+            });
+
+            it("should set autoApprove to false if the attribute does not exist in dhis", function() {
+                var dhisProject = {
+                    "id": "aa4acf9115a",
+                    "name": "Org1",
+                    "level": 3
+                };
+
+                var result = orgUnitMapper.mapToProject(dhisProject);
+
+                expect(result.autoApprove).toEqual('false');
+            });
         });
-
-        it("should set autoApprove to false if the attribute does not exist in dhis", function() {
-            var dhisProject = {
-                "id": "aa4acf9115a",
-                "name": "Org1",
-                "level": 3,
-                "shortName": "Org1",
-                "openingDate": "2010-01-01",
-                "parent": {
-                    "name": "name1",
-                    "id": "id1"
-                },
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "projCode",
-                        "name": "Project Code"
-                    },
-                    "value": "RU118"
-                }]
-            };
-
-            var result = orgUnitMapper.mapToProject(dhisProject);
-
-            var expectedResult = {
-                "name": dhisProject.name,
-                "openingDate": moment(dhisProject.openingDate).toDate(),
-                "context": undefined,
-                "location": undefined,
-                "populationType": undefined,
-                "endDate": undefined,
-                "projectCode": "RU118",
-                "projectType": undefined,
-                "reasonForIntervention": undefined,
-                "modeOfOperation": undefined,
-                "modelOfManagement": undefined,
-                "estimatedTargetPopulation": NaN,
-                "estPopulationLessThan1Year": NaN,
-                "estPopulationBetween1And5Years": NaN,
-                "estPopulationOfWomenOfChildBearingAge": NaN,
-                "autoApprove": "false"
-            };
-
-            expect(result).toEqual(expectedResult);
-        });
-
         it("should transform orgUnit to contain attributes as per DHIS", function() {
             var orgUnit = {
                 "name": "Org1",
@@ -299,128 +197,112 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "Type",
-                        "name": "Type"
+                        "code": "Type"
                     },
                     "value": "Project"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "prjCon",
-                        "name": "Context"
+                        "code": "prjCon"
                     },
                     "value": "val2"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "prjLoc",
-                        "name": "Location"
+                        "code": "prjLoc"
                     },
                     "value": "val3"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "prjPopType",
-                        "name": "Type of population"
+                        "code": "prjPopType"
                     },
                     "value": "val6"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "projCode",
-                        "name": "Project Code"
+                        "code": "projCode"
                     },
                     "value": "AB001"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "reasonForIntervention",
-                        "name": "Reason For Intervention"
+                        "code": "reasonForIntervention"
                     },
                     "value": "Armed Conflict"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "modeOfOperation",
-                        "name": "Mode Of Operation"
+                        "code": "modeOfOperation"
                     },
                     "value": "Direct Operation"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "modelOfManagement",
-                        "name": "Model Of Management"
+                        "code": "modelOfManagement"
                     },
                     "value": "Collaboration"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "autoApprove",
-                        "name": "Auto Approve"
+                        "code": "autoApprove"
                     },
                     "value": "true"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
+                        "code": "isNewDataModel"
                     },
                     "value": "true"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "projectType",
-                        "name": "Project Type"
+                        "code": "projectType"
                     },
                     "value": "Some Type"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "estimatedTargetPopulation",
-                        "name": "Estimated target population"
+                        "code": "estimatedTargetPopulation"
                     },
                     "value": "1000"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "estPopulationLessThan1Year",
-                        "name": "Est. population less than 1 year",
+                        "code": "estPopulationLessThan1Year"
                     },
                     "value": "11"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "estPopulationBetween1And5Years",
-                        "name": "Est. population between 1 and 5 years"
+                        "code": "estPopulationBetween1And5Years"
                     },
                     "value": "12"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "estPopulationOfWomenOfChildBearingAge",
-                        "name": "Est. population of women of child bearing age"
+                        "code": "estPopulationOfWomenOfChildBearingAge"
                     },
                     "value": "13"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "prjEndDate",
-                        "name": "End date"
+                        "code": "prjEndDate"
                     },
                     "value": "2011-01-01"
                 }]
@@ -466,24 +348,21 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "created": moment().toISOString(),
                     "lastUpdated": moment().toISOString(),
                     "attribute": {
-                        "code": "Type",
-                        "name": "Type"
+                        "code": "Type"
                     },
                     "value": "Module"
                 }, {
                     "created": moment().toISOString(),
                     "lastUpdated": moment().toISOString(),
                     "attribute": {
-                        "code": "isLineListService",
-                        "name": "Is Linelist Service"
+                        "code": "isLineListService"
                     },
                     "value": "false"
                 }, {
                     "created": moment().toISOString(),
                     "lastUpdated": moment().toISOString(),
                     "attribute": {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
+                        "code": "isNewDataModel"
                     },
                     "value": "true"
                 }],
@@ -529,24 +408,21 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "created": moment().toISOString(),
                     "lastUpdated": moment().toISOString(),
                     "attribute": {
-                        "code": "Type",
-                        "name": "Type"
+                        "code": "Type"
                     },
                     "value": "Module"
                 }, {
                     "created": moment().toISOString(),
                     "lastUpdated": moment().toISOString(),
                     "attribute": {
-                        "code": "isLineListService",
-                        "name": "Is Linelist Service"
+                        "code": "isLineListService"
                     },
                     "value": "false"
                 }, {
                     "created": moment().toISOString(),
                     "lastUpdated": moment().toISOString(),
                     "attribute": {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
+                        "code": "isNewDataModel"
                     },
                     "value": "true"
                 }],
@@ -563,7 +439,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "id": "id1",
                 "attributeValues": [{
                     "attribute": {
-                        "code": "type"
+                        "code": "Type"
                     },
                     "value": "Project"
                 }]
@@ -573,7 +449,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "name": "Module1",
                 "attributeValues": [{
                     "attribute": {
-                        "code": "type"
+                        "code": "Type"
                     },
                     "value": "Module"
                 }],
@@ -588,7 +464,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "id": "opunit1",
                 "attributeValues": [{
                     "attribute": {
-                        "code": "type"
+                        "code": "Type"
                     },
                     "value": "Operation Unit"
                 }],
@@ -602,7 +478,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "name": "Module2",
                 "attributeValues": [{
                     "attribute": {
-                        "code": "type"
+                        "code": "Type"
                     },
                     "value": "Module"
                 }],
@@ -631,8 +507,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "isDisabled",
-                        "name": "Is Disabled"
+                        "code": "isDisabled"
                     },
                     "value": "false"
                 }],
@@ -644,8 +519,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "isDisabled",
-                        "name": "Is Disabled"
+                        "code": "isDisabled"
                     },
                     "value": "true"
                 }],
@@ -670,8 +544,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "isDisabled",
-                        "name": "Is Disabled"
+                        "code": "isDisabled"
                     },
                     "value": "true"
                 }],
@@ -681,8 +554,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "isDisabled",
-                        "name": "Is Disabled"
+                        "code": "isDisabled"
                     },
                     "value": "true"
                 }],
@@ -749,128 +621,112 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "Type",
-                        "name": "Type"
+                        "code": "Type"
                     },
                     "value": "Project"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "prjCon",
-                        "name": "Context"
+                        "code": "prjCon"
                     },
                     "value": "val2"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "prjLoc",
-                        "name": "Location"
+                        "code": "prjLoc"
                     },
                     "value": "val3"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "prjPopType",
-                        "name": "Type of population"
+                        "code": "prjPopType"
                     },
                     "value": "val6"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "projCode",
-                        "name": "Project Code"
+                        "code": "projCode"
                     },
                     "value": "AB001"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "reasonForIntervention",
-                        "name": "Reason For Intervention"
+                        "code": "reasonForIntervention"
                     },
                     "value": "Armed Conflict"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "modeOfOperation",
-                        "name": "Mode Of Operation"
+                        "code": "modeOfOperation"
                     },
                     "value": "Direct Operation"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "modelOfManagement",
-                        "name": "Model Of Management"
+                        "code": "modelOfManagement"
                     },
                     "value": "Collaboration"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "autoApprove",
-                        "name": "Auto Approve"
+                        "code": "autoApprove"
                     },
                     "value": "true"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
+                        "code": "isNewDataModel"
                     },
                     "value": "true"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "projectType",
-                        "name": "Project Type"
+                        "code": "projectType"
                     },
                     "value": "Some Type"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "estimatedTargetPopulation",
-                        "name": "Estimated target population"
+                        "code": "estimatedTargetPopulation"
                     },
                     "value": "1000"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "estPopulationLessThan1Year",
-                        "name": "Est. population less than 1 year",
+                        "code": "estPopulationLessThan1Year"
                     },
                     "value": "11"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "estPopulationBetween1And5Years",
-                        "name": "Est. population between 1 and 5 years"
+                        "code": "estPopulationBetween1And5Years"
                     },
                     "value": "12"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "estPopulationOfWomenOfChildBearingAge",
-                        "name": "Est. population of women of child bearing age"
+                        "code": "estPopulationOfWomenOfChildBearingAge"
                     },
                     "value": "13"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "prjEndDate",
-                        "name": "End date"
+                        "code": "prjEndDate"
                     },
                     "value": "2011-01-01"
                 }]
@@ -881,184 +737,242 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
             expect(projectToBeSaved).toEqual(expectedSavedProject);
         });
 
-        it("should create patient origin orgunit payload", function() {
-            spyOn(dhisId, "get").and.callFake(function(name) {
-                return name;
+        describe('createPatientOriginPayload', function () {
+
+            beforeEach(function () {
+                spyOn(dhisId, "get").and.callFake(function(name) {
+                    return name;
+                });
             });
 
-            var parents = [{
-                "id": "p1",
-                "name": "p1",
-                "openingDate": "2014-02-02"
-            }, {
-                "id": "p2",
-                "name": "p2",
-                "openingDate": "2015-02-02"
-            }];
+            it("should return the created patient origin payload", function() {
+                var parents = [{
+                    "id": "p1",
+                    "name": "p1",
+                    "openingDate": "2014-02-02"
+                }, {
+                    "id": "p2",
+                    "name": "p2",
+                    "openingDate": "2015-02-02"
+                }];
 
-            var patientOrigins = [{
-                "name": "Origin1",
-                "latitude": 23.21,
-                "longitude": 32.12
-            }, {
-                "name": "Origin2",
-                "latitude": 43.96,
-                "longitude": 84.142
-            }, {
-                "name": "Unknown"
-            }];
+                var patientOrigins = [{
+                    "name": "Origin1",
+                    "latitude": 23.21,
+                    "longitude": 32.12
+                }, {
+                    "name": "Origin2",
+                    "latitude": 43.96,
+                    "longitude": 84.142
+                }, {
+                    "name": "Unknown"
+                }];
 
-            var expectedPayload = [{
-                "name": patientOrigins[0].name,
-                "shortName": patientOrigins[0].name,
-                "displayName": patientOrigins[0].name,
-                "id": dhisId.get(patientOrigins[0].name + "p1"),
-                "level": 7,
-                "openingDate": "2014-02-02",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "Type",
-                        "name": "Type"
+                var expectedPayload = [{
+                    "name": patientOrigins[0].name,
+                    "shortName": patientOrigins[0].name,
+                    "displayName": patientOrigins[0].name,
+                    "id": dhisId.get(patientOrigins[0].name + "p1"),
+                    "level": 7,
+                    "openingDate": "2014-02-02",
+                    "attributeValues": [{
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "Type"
+                        },
+                        "value": "Patient Origin"
+                    }, {
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "isNewDataModel"
+                        },
+                        "value": "true"
+                    }],
+                    "parent": {
+                        "id": "p1"
                     },
-                    "value": "Patient Origin"
+                    "coordinates": "[" + patientOrigins[0].longitude + "," + patientOrigins[0].latitude + "]",
+                    "featureType": "POINT"
                 }, {
-                    "attribute": {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
+                    "name": patientOrigins[0].name,
+                    "shortName": patientOrigins[0].name,
+                    "displayName": patientOrigins[0].name,
+                    "id": dhisId.get(patientOrigins[0].name + "p2"),
+                    "level": 7,
+                    "openingDate": "2015-02-02",
+                    "attributeValues": [{
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "Type"
+                        },
+                        "value": "Patient Origin"
+                    }, {
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "isNewDataModel"
+                        },
+                        "value": "true"
+                    }],
+                    "parent": {
+                        "id": "p2"
                     },
-                    "value": "true"
-                }],
-                "parent": {
-                    "id": "p1"
-                },
-                "coordinates": "[" + patientOrigins[0].longitude + "," + patientOrigins[0].latitude + "]",
-                "featureType": "POINT"
-            }, {
-                "name": patientOrigins[0].name,
-                "shortName": patientOrigins[0].name,
-                "displayName": patientOrigins[0].name,
-                "id": dhisId.get(patientOrigins[0].name + "p2"),
-                "level": 7,
-                "openingDate": "2015-02-02",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "Type",
-                        "name": "Type"
-                    },
-                    "value": "Patient Origin"
+                    "coordinates": "[" + patientOrigins[0].longitude + "," + patientOrigins[0].latitude + "]",
+                    "featureType": "POINT"
                 }, {
-                    "attribute": {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
+                    "name": patientOrigins[1].name,
+                    "shortName": patientOrigins[1].name,
+                    "displayName": patientOrigins[1].name,
+                    "id": dhisId.get(patientOrigins[1].name + "p1"),
+                    "level": 7,
+                    "openingDate": "2014-02-02",
+                    "attributeValues": [{
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "Type"
+                        },
+                        "value": "Patient Origin"
+                    }, {
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "isNewDataModel"
+                        },
+                        "value": "true"
+                    }],
+                    "parent": {
+                        "id": "p1"
                     },
-                    "value": "true"
-                }],
-                "parent": {
-                    "id": "p2"
-                },
-                "coordinates": "[" + patientOrigins[0].longitude + "," + patientOrigins[0].latitude + "]",
-                "featureType": "POINT"
-            }, {
-                "name": patientOrigins[1].name,
-                "shortName": patientOrigins[1].name,
-                "displayName": patientOrigins[1].name,
-                "id": dhisId.get(patientOrigins[1].name + "p1"),
-                "level": 7,
-                "openingDate": "2014-02-02",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "Type",
-                        "name": "Type"
-                    },
-                    "value": "Patient Origin"
+                    "coordinates": "[" + patientOrigins[1].longitude + "," + patientOrigins[1].latitude + "]",
+                    "featureType": "POINT"
                 }, {
-                    "attribute": {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
+                    "name": patientOrigins[1].name,
+                    "shortName": patientOrigins[1].name,
+                    "displayName": patientOrigins[1].name,
+                    "id": dhisId.get(patientOrigins[1].name + "p2"),
+                    "level": 7,
+                    "openingDate": "2015-02-02",
+                    "attributeValues": [{
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "Type"
+                        },
+                        "value": "Patient Origin"
+                    }, {
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "isNewDataModel"
+                        },
+                        "value": "true"
+                    }],
+                    "parent": {
+                        "id": "p2"
                     },
-                    "value": "true"
-                }],
-                "parent": {
-                    "id": "p1"
-                },
-                "coordinates": "[" + patientOrigins[1].longitude + "," + patientOrigins[1].latitude + "]",
-                "featureType": "POINT"
-            }, {
-                "name": patientOrigins[1].name,
-                "shortName": patientOrigins[1].name,
-                "displayName": patientOrigins[1].name,
-                "id": dhisId.get(patientOrigins[1].name + "p2"),
-                "level": 7,
-                "openingDate": "2015-02-02",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "Type",
-                        "name": "Type"
-                    },
-                    "value": "Patient Origin"
+                    "coordinates": "[" + patientOrigins[1].longitude + "," + patientOrigins[1].latitude + "]",
+                    "featureType": "POINT"
                 }, {
-                    "attribute": {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
-                    },
-                    "value": "true"
-                }],
-                "parent": {
-                    "id": "p2"
-                },
-                "coordinates": "[" + patientOrigins[1].longitude + "," + patientOrigins[1].latitude + "]",
-                "featureType": "POINT"
-            }, {
-                "name": patientOrigins[2].name,
-                "shortName": patientOrigins[2].name,
-                "displayName": patientOrigins[2].name,
-                "id": dhisId.get(patientOrigins[2].name + "p1"),
-                "level": 7,
-                "openingDate": "2014-02-02",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "Type",
-                        "name": "Type"
-                    },
-                    "value": "Patient Origin"
+                    "name": patientOrigins[2].name,
+                    "shortName": patientOrigins[2].name,
+                    "displayName": patientOrigins[2].name,
+                    "id": dhisId.get(patientOrigins[2].name + "p1"),
+                    "level": 7,
+                    "openingDate": "2014-02-02",
+                    "attributeValues": [{
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "Type"
+                        },
+                        "value": "Patient Origin"
+                    }, {
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "isNewDataModel"
+                        },
+                        "value": "true"
+                    }],
+                    "parent": {
+                        "id": "p1"
+                    }
                 }, {
-                    "attribute": {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
-                    },
-                    "value": "true"
-                }],
-                "parent": {
-                    "id": "p1"
-                }
-            }, {
-                "name": patientOrigins[2].name,
-                "shortName": patientOrigins[2].name,
-                "displayName": patientOrigins[2].name,
-                "id": dhisId.get(patientOrigins[2].name + "p2"),
-                "level": 7,
-                "openingDate": "2015-02-02",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "Type",
-                        "name": "Type"
-                    },
-                    "value": "Patient Origin"
-                }, {
-                    "attribute": {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
-                    },
-                    "value": "true"
-                }],
-                "parent": {
-                    "id": "p2"
-                }
-            }];
+                    "name": patientOrigins[2].name,
+                    "shortName": patientOrigins[2].name,
+                    "displayName": patientOrigins[2].name,
+                    "id": dhisId.get(patientOrigins[2].name + "p2"),
+                    "level": 7,
+                    "openingDate": "2015-02-02",
+                    "attributeValues": [{
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "Type"
+                        },
+                        "value": "Patient Origin"
+                    }, {
+                        "created": "2014-10-29T12:43:54.972Z",
+                        "lastUpdated": "2014-10-29T12:43:54.972Z",
+                        "attribute": {
+                            "code": "isNewDataModel"
+                        },
+                        "value": "true"
+                    }],
+                    "parent": {
+                        "id": "p2"
+                    }
+                }];
 
-            var actualPayload = orgUnitMapper.createPatientOriginPayload(patientOrigins, parents);
+                var actualPayload = orgUnitMapper.createPatientOriginPayload(patientOrigins, parents);
 
-            expect(actualPayload).toEqual(expectedPayload);
+                expect(actualPayload).toEqual(expectedPayload);
+            });
+
+            it("should return the disabled patient origin payload for disabled patient origin", function() {
+                var parents = [{
+                    "id": "p1",
+                    "name": "p1",
+                    "openingDate": "2014-02-02"
+                }];
+
+                var patientOrigins = [{
+                    "name": "Origin1",
+                    "latitude": 23.21,
+                    "longitude": 32.12,
+                    "isDisabled": true
+                }];
+
+                var expectedAttributeValues = [{
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "Type"
+                    },
+                    "value": "Patient Origin"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": "true"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "isDisabled"
+                    },
+                    "value": "true"
+                }];
+                var actualPayload = orgUnitMapper.createPatientOriginPayload(patientOrigins, parents);
+
+                expect(actualPayload[0].attributeValues).toEqual(expectedAttributeValues);
+            });
         });
     });
 });

@@ -220,16 +220,13 @@ body {
         padding: 8px 0px;
     }
     .dhis-online {
-        color: green;
-        font-size: large;
+        background-color: green;
     }
     .dhis-poor-connection {
-        color: @brand-warning;
-        font-size: large;
+        background-color: @brand-warning;
     }
     .dhis-offline {
-        color: red;
-        font-size: large;
+        background-color: red;
     }
     .info-error-section {
         padding: 15px 0;
@@ -404,7 +401,7 @@ body {
                     float: right;
                 }
             }
-            border-bottom: 1px #ddd solid;
+            border-bottom: 2px #000 solid;
         }
         .disabled-button {
             color: #a0a0a0;
@@ -412,11 +409,11 @@ body {
         }
     }
     .header-with-opunit {
-        background-color: #ddd;
+        background-color: #3D9282;
         font-weight: bold;
         font-size: 14px;
         padding: 9px 5px 9px 5px;
-        color: black;
+        color: #ffffff;
         margin-top: 5px;
         margin-bottom: 0px;
     }
@@ -532,7 +529,6 @@ body {
         }
         span.icon {
             display: block;
-            padding-top: 5px;
         }
     }
     table.sortable {
@@ -540,9 +536,12 @@ body {
     }
     .locked-table-header {
         .fixed-header-table-div {
+            &::-webkit-scrollbar{
+                display:none;
+            }
             position: fixed;
             will-change: top;
-            overflow-x: hidden;
+            overflow-x: auto;
             top: 0;
         }
         table {
@@ -869,6 +868,10 @@ body {
             border: 1px solid #ccc;
             padding: 10px;
             width: 100%;
+            .checkbox {
+                min-height: auto;
+                padding-top: 0px;
+            }
             .collapse-head {
                 position: relative;
                 margin-bottom: 5px;
@@ -904,10 +907,14 @@ body {
                     padding: 5px 0 0 0;
                 }
                 li.data-element-options {
-                    padding: 2px 0;
-                    span {
-                        font-size: 12px;
+                    .checkbox {
+                        input[type="checkbox"] {
+                            margin-top: 2px
+                        }
                     }
+                    padding: 2px 0;
+                    font-size: 12px;
+
                 }
             }
             .collapse-body {
@@ -932,7 +939,6 @@ body {
                 }
                 input[type="checkbox"] {
                     position: absolute;
-                    right: 0;
                 }
             }
             .grey {
@@ -1363,6 +1369,11 @@ li.dropdown-submenu {
     .navbar-nav > li {
         float: right;
     }
+
+    .login-message {
+        text-align: left;
+    }
+
     .hamburger-menu {
         padding-left: 0;
         padding-right: 12px;
@@ -1373,6 +1384,11 @@ li.dropdown-submenu {
                 text-align: right;
             }
         }
+    }
+
+    .sync-status {
+        padding-left: 8px;
+        padding-right: 0;
     }
 
     &.product-key-form {
@@ -1394,6 +1410,11 @@ header .hamburger-menu {
     i {
         margin-left: 0;
     }
+}
+
+header .sync-status {
+    padding-top: 6px;
+    padding-right: 8px
 }
 
 .linelistSummary {
@@ -1470,4 +1491,15 @@ header .hamburger-menu {
         }
         cursor: pointer;
     }
+}
+
+.stop {
+    .progress-bar {
+        background-color: @brand-danger;
+    }
+}
+
+.metadata-download {
+    margin: 30px auto;
+    width: 550px;
 }

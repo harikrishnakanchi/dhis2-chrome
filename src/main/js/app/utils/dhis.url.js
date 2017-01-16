@@ -24,6 +24,18 @@ define(["properties"], function(properties) {
         "charts": with_host("/api/charts"),
         "pivotTables": with_host("/api/reportTables"),
         "analytics": with_host("/api/analytics"),
-        "dataStore": with_host("/api/dataStore")
+        "dataStore": with_host("/api/dataStore"),
+        "categories": with_host("/api/categories.json"),
+        "categoryCombos": with_host("/api/categoryCombos.json"),
+        "categoryOptionCombos": with_host("/api/categoryOptionCombos.json"),
+        "categoryOptions": with_host("/api/categoryOptions.json"),
+        "dataElementGroups": with_host("/api/dataElementGroups.json"),
+        "dataElements": with_host("/api/dataElements.json"),
+        "indicators": with_host("/api/indicators.json"),
+        "programIndicators": with_host("/api/programIndicators.json"),
+        "optionSets": with_host("/api/optionSets.json"),
+        "organisationUnitGroupSets": with_host("/api/organisationUnitGroupSets.json"),
+        "sections": with_host("/api/sections.json"),
+        "organisationUnitGroups": with_host("/api/organisationUnitGroups.json")
     };
 });

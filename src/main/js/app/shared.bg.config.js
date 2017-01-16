@@ -25,7 +25,6 @@ require.config({
         "eventService": "app/service/event.service",
         "services": "app/service/bg.services",
         "orgUnitGroupService": "app/service/orgunit.group.service",
-        "patientOriginService": "app/service/patient.origin.service",
         "reportService": "app/service/report.service",
         "dataStoreService": "app/service/datastore.service",
 
@@ -51,6 +50,8 @@ require.config({
         "dataElementRepository": "app/repository/data.element.repository",
         "excludedLineListOptionsRepository": "app/repository/excluded.line.list.options.repository",
         "categoryRepository": "app/repository/category.repository",
+        "indicatorRepository": "app/repository/indicator.repository",
+        "programIndicatorRepository": "app/repository/program.indicator.repository",
 
         //Models
         "chart": "app/models/chart",
@@ -127,7 +128,7 @@ require.config({
         "logRequestReponseInterceptor": "app/interceptors/log.request.response.interceptor",
 
         //Queue
-        "queuePostProcessInterceptor": "app/queue/queue.postprocess.interceptor",
+        "queueInterceptor": "app/queue/queue.interceptor",
 
         //Utils
         "dhisId": "app/utils/dhis.id",
@@ -137,8 +138,9 @@ require.config({
         "httpUtils": "app/utils/http.utils",
         "dhisUrl": "app/utils/dhis.url",
         "interpolate": "app/utils/interpolate",
-        "appSettingsUtils": "app/utils/app.settings.utils"
+        "pagingUtils": "app/utils/paging.utils"
     },
+    waitSeconds: 0,
     shim: {
         'angular': {
             exports: 'angular'

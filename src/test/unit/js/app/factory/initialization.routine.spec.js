@@ -1,5 +1,5 @@
-define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter', 'systemSettingRepository', 'translationsService', 'chromeUtils'],
-    function (mocks, utils, InitializationRoutine, PackagedDataImporter, SystemSettingRepository, TranslationsService, chromeUtils) {
+define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter', 'systemSettingRepository', 'translationsService', 'platformUtils'],
+    function (mocks, utils, InitializationRoutine, PackagedDataImporter, SystemSettingRepository, TranslationsService, platformUtils) {
         var initializationRoutine, packagedDataImporter, q, location, rootScope, systemSettingRepository, translationsService;
 
         describe("InitializationRoutine", function () {
@@ -9,8 +9,8 @@ define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter'
                 location = $location;
 
                 spyOn(location, 'path');
-                spyOn(chromeUtils, 'sendMessage');
-                spyOn(chromeUtils, 'init');
+                spyOn(platformUtils, 'sendMessage');
+                spyOn(platformUtils, 'init');
 
                 packagedDataImporter = new PackagedDataImporter();
                 spyOn(packagedDataImporter, 'run').and.returnValue(utils.getPromise(q, {}));
@@ -20,7 +20,7 @@ define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter'
 
                 systemSettingRepository = new SystemSettingRepository(undefined, q);
                 spyOn(systemSettingRepository, 'getLocale').and.returnValue(utils.getPromise(q, 'SOME_LOCALE'));
-                spyOn(systemSettingRepository, 'isProductKeySet').and.returnValue(utils.getPromise(q, true));
+                spyOn(systemSettingRepository, 'loadProductKey').and.returnValue(utils.getPromise(q, {}));
 
                 initializationRoutine = InitializationRoutine(rootScope, location, systemSettingRepository, translationsService, packagedDataImporter);
             }));
@@ -65,25 +65,6 @@ define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter'
                 });
             });
 
-            describe('redirectIfProductKeyNotSet', function () {
-                it("should redirect to login page if product key is set", function () {
-                    initializationRoutine.run();
-
-                    rootScope.$apply();
-
-                    expect(location.path).toHaveBeenCalledWith('/login');
-                });
-
-                it("should redirect to product key page if product key is not set", function () {
-                    systemSettingRepository.isProductKeySet.and.returnValue(utils.getPromise(q, false));
-                    initializationRoutine.run();
-
-                    rootScope.$apply();
-
-                    expect(location.path).toHaveBeenCalledWith('/productKeyPage');
-                });
-            });
-
             describe('hasRoles', function () {
                 beforeEach(function () {
                     rootScope.currentUser = {
@@ -118,20 +99,20 @@ define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter'
                 });
             });
 
-            it("should import metadata triggering db migrations in the process", function () {
+            it('should initialize platformUtils', function () {
                 initializationRoutine.run();
 
                 rootScope.$apply();
 
-                expect(packagedDataImporter.run).toHaveBeenCalled();
+                expect(platformUtils.init).toHaveBeenCalled();
             });
 
-            it('should initialize chromeUtils', function () {
+            it('should load the product key', function () {
                 initializationRoutine.run();
 
                 rootScope.$apply();
 
-                expect(chromeUtils.init).toHaveBeenCalled();
+                expect(systemSettingRepository.loadProductKey).toHaveBeenCalled();
             });
         });
     });

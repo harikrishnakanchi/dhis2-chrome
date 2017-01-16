@@ -1,5 +1,5 @@
-define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "queuePostProcessInterceptor", "monitors", "logRequestReponseInterceptor", "indexedDBLogger", "chromeUtils", "factories", "angular-indexedDB", "ng-i18n"],
-    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, queuePostProcessInterceptor, monitors, logRequestReponseInterceptor, indexedDBLogger, chromeUtils, factories) {
+define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "queueInterceptor", "monitors", "logRequestReponseInterceptor", "indexedDBLogger", "platformUtils", "factories", "angular-indexedDB", "ng-i18n"],
+    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, queueInterceptor, monitors, logRequestReponseInterceptor, indexedDBLogger, platformUtils, factories) {
         var init = function() {
             var app = angular.module('PRAXIS', ["xc.indexedDB", "hustle", "ngI18n"]);
             services.init(app);
@@ -12,13 +12,13 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
             app.factory('cleanupPayloadInterceptor', [cleanupPayloadInterceptor]);
             app.factory('handleTimeoutInterceptor', ['$q', '$injector', '$timeout', handleTimeoutInterceptor]);
             app.factory('logRequestReponseInterceptor', ['$log', '$q', logRequestReponseInterceptor]);
-            app.factory('queuePostProcessInterceptor', ['$log', 'ngI18nResourceBundle', 'dataRepository','dataSyncFailureRepository', queuePostProcessInterceptor]);
+            app.factory('queueInterceptor', ['$log', 'ngI18nResourceBundle', 'dataRepository','dataSyncFailureRepository', 'hustleMonitor', queueInterceptor]);
 
             app.config(['$indexedDBProvider', '$httpProvider', '$hustleProvider', '$provide',
                 function($indexedDBProvider, $httpProvider, $hustleProvider, $provide) {
                     $provide.decorator('$log', ['$delegate',
                         function(loggerDelegate) {
-                            indexedDBLogger.configure("msfLogs", loggerDelegate);
+                            indexedDBLogger.configure(properties.praxis.dbForLogs, loggerDelegate);
                             return loggerDelegate;
                         }
                     ]);
@@ -32,7 +32,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         return $delegate;
                     });
 
-                    $indexedDBProvider.connection('msf');
+                    $indexedDBProvider.connection(properties.praxis.dbName);
                     $httpProvider.interceptors.push('configureRequestInterceptor');
                     $httpProvider.interceptors.push('cleanupPayloadInterceptor');
                     $httpProvider.interceptors.push('handleTimeoutInterceptor');
@@ -50,14 +50,14 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
 
             app.value('ngI18nConfig', {
                 supportedLocales: ['en', 'fr', 'ar'],
-                basePath: "/js/app/i18n"
+                basePath: self.basePath + "js/app/i18n"
             });
 
-            app.run(['consumerRegistry', 'dhisMonitor', 'hustleMonitor', 'queuePostProcessInterceptor', '$hustle', '$log', '$rootScope', 'systemSettingRepository',
+            app.run(['consumerRegistry', 'dhisMonitor', 'hustleMonitor', 'queueInterceptor', '$hustle', '$log', '$rootScope', 'systemSettingRepository',
 
-                function(consumerRegistry, dhisMonitor, hustleMonitor, queuePostProcessInterceptor, $hustle, $log, $rootScope, systemSettingRepository) {
+                function(consumerRegistry, dhisMonitor, hustleMonitor, queueInterceptor, $hustle, $log, $rootScope, systemSettingRepository) {
 
-                    $hustle.registerInterceptor(queuePostProcessInterceptor);
+                    $hustle.registerInterceptor(queueInterceptor);
 
                     var metadataSync = function() {
                         if (!dhisMonitor.isOnline())
@@ -65,7 +65,8 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
 
                         $hustle.publishOnce({
                             "type": "downloadMetadata",
-                            "data": []
+                            "data": [],
+                            "locale": "en"
                         }, "dataValues");
 
                     };
@@ -76,20 +77,24 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
 
                         $hustle.publishOnce({
                             "type": "downloadProjectData",
-                            "data": []
+                            "data": [],
+                            "locale": "en"
                         }, "dataValues");
                     };
 
-                    var checkOnlineStatusAndSync = function() {
-                        dhisMonitor.online(function() {
-                            $log.info("Starting all hustle consumers");
-                            consumerRegistry.startAllConsumers();
-                        });
+                    var startConsumers = function() {
+                        $log.info("Starting all hustle consumers");
+                        consumerRegistry.startConsumer();
+                    };
 
-                        dhisMonitor.offline(function() {
-                            $log.info("Stopping all hustle consumers");
-                            consumerRegistry.stopAllConsumers();
-                        });
+                    var stopConsumers = function() {
+                        $log.info("Stopping all hustle consumers");
+                        consumerRegistry.stopConsumer();
+                    };
+
+                    var checkOnlineStatusAndSync = function() {
+                        dhisMonitor.online(startConsumers);
+                        dhisMonitor.offline(stopConsumers);
 
                         dhisMonitor.start()
                             .then(metadataSync)
@@ -97,20 +102,16 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     };
 
                     var setupAlarms = function() {
-                        chromeUtils.createAlarm('metadataSyncAlarm', {
+                        platformUtils.createAlarm('metadataSyncAlarm', {
                             periodInMinutes: properties.metadata.sync.intervalInMinutes
                         });
-                        chromeUtils.addAlarmListener("metadataSyncAlarm", metadataSync);
 
-                        chromeUtils.createAlarm('projectDataSyncAlarm', {
+                        platformUtils.createAlarm('projectDataSyncAlarm', {
                             periodInMinutes: properties.projectDataSync.intervalInMinutes
                         });
-                        chromeUtils.addAlarmListener("projectDataSyncAlarm", projectDataSync);
                     };
 
-                    hustleMonitor.start();
-
-                    chromeUtils.addListener("productKeyDecrypted", function() {
+                    platformUtils.addListener("productKeyDecrypted", function() {
                         systemSettingRepository.loadProductKey().then(function() {
                             setupAlarms();
                             consumerRegistry.register()
@@ -118,15 +119,23 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         });
                     });
 
-                    chromeUtils.addListener("productKeyExpired", function() {
+                    platformUtils.addListener("productKeyExpired", function() {
                         dhisMonitor.stop();
                     });
+
+                    platformUtils.addListener('online', dhisMonitor.start);
+                    platformUtils.addListener('offline', dhisMonitor.stop);
+
+                    platformUtils.addAlarmListener("metadataSyncAlarm", metadataSync);
+                    platformUtils.addAlarmListener("projectDataSyncAlarm", projectDataSync);
+                    platformUtils.addAlarmListener("dhisConnectivityCheckAlarm", dhisMonitor.checkNow);
 
                     systemSettingRepository.isProductKeySet()
                         .then(systemSettingRepository.loadProductKey)
                         .then(function() {
                             setupAlarms();
-                            $hustle.cleanupAbandonedItems()
+                            $hustle.rescueReservedItems(properties.queue.maxNumberOfTimesItemCanBeRescued,
+                                properties.queue.minTimeInSecToIncrementItemRescuedCount)
                                 .then(consumerRegistry.register)
                                 .then(checkOnlineStatusAndSync);
                         });

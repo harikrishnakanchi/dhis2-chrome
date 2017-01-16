@@ -1,5 +1,5 @@
-define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransformer", "dataElementUtils"],
-    function(_, orgUnitMapper, moment, interpolate, systemSettingsTransformer, dataElementUtils) {
+define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransformer", "dataElementUtils", "customAttributes"],
+    function(_, orgUnitMapper, moment, interpolate, systemSettingsTransformer, dataElementUtils, customAttributes) {
         return function($scope, $rootScope, $hustle, orgUnitRepository, datasetRepository, systemSettingRepository, excludedDataElementsRepository, db, $location, $q, $modal,
             orgUnitGroupHelper, originOrgunitCreator, translationsService) {
 
@@ -132,12 +132,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                 };
 
                 var setDisabled = function() {
-                    var isDisabled = _.find($scope.module.attributeValues, {
-                        "attribute": {
-                            "code": "isDisabled"
-                        }
-                    });
-                    $scope.isDisabled = isDisabled && isDisabled.value === "true" ? true : false;
+                    $scope.isDisabled = customAttributes.getBooleanAttributeValue($scope.module.attributeValues, customAttributes.DISABLED_CODE);
                 };
 
                 var getAllAggregateDatasets = function() {
@@ -193,26 +188,6 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                     .then(function () {
                         $rootScope.stopLoading();
                     });
-            };
-
-            $scope.changeCollapsed = function(sectionId) {
-                $scope.collapseSection[sectionId] = !$scope.collapseSection[sectionId];
-            };
-
-            $scope.getCollapsed = function(sectionId) {
-                return $scope.collapseSection[sectionId];
-            };
-
-            $scope.getSection = function(selectedDataSet, sectionId) {
-                return _.find(selectedDataSet.sections, {
-                    "id": sectionId
-                });
-            };
-
-            $scope.getDataElement = function(section, dataElementId) {
-                return _.find(section.dataElements, {
-                    "id": dataElementId
-                });
             };
 
             $scope.closeForm = function() {
@@ -394,15 +369,6 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                 });
             };
 
-            $scope.changeDataElementSelection = function(section) {
-                _.each(section.dataElements, function(dataElement) {
-                    dataElement.isIncluded = section.isIncluded || dataElement.isMandatory;
-                });
-                _.each(section.subSections, function(subSection) {
-                    subSection.isIncluded = section.isIncluded;
-                });
-            };
-
             $scope.changeDataElementSelectionInSubSection = function(subSection, section) {
                 _.each(subSection.dataElements, function(dataElement) {
                     dataElement.isIncluded = subSection.isIncluded || dataElement.isMandatory;
@@ -423,6 +389,26 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                 section.isIncluded = !_.any(section.dataElements, {
                     "isIncluded": false
                 });
+            };
+
+            $scope.toggleSelect = function (section) {
+                $scope.form.$setDirty();
+                section.isIncluded = !section.isIncluded;
+                _.each(section.dataElements, function(dataElement) {
+                    dataElement.isIncluded = section.isIncluded;
+                });
+                _.each(section.subSections, function(subSection) {
+                    subSection.isIncluded = section.isIncluded;
+                });
+            };
+
+            $scope.toggleSelectSubSection = function (subSection, section) {
+                $scope.form.$setDirty();
+                subSection.isIncluded = !subSection.isIncluded;
+                _.each(subSection.dataElements, function(dataElement) {
+                    dataElement.isIncluded = subSection.isIncluded || dataElement.isMandatory;
+                });
+                $scope.changeSectionSelection(section);
             };
 
             var setSelectedTemplate = function(datasetId) {

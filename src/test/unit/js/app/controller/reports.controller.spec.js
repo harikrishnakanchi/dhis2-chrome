@@ -1,9 +1,9 @@
-define(["angularMocks", "utils", "moment", "timecop", "reportsController", "dataSetRepository", "programRepository", "orgUnitRepository", "chartRepository", "pivotTableRepository", "translationsService", "changeLogRepository", "customAttributes", "filesystemService", "saveSvgAsPng", "dataURItoBlob", "lodash"],
-    function(mocks, utils, moment, timecop, ReportsController, DatasetRepository, ProgramRepository, OrgUnitRepository, ChartRepository, PivotTableRepository, TranslationsService, ChangeLogRepository, CustomAttributes, FilesystemService, SVGUtils, dataURItoBlob, _) {
+define(["angularMocks", "utils", "moment", "timecop", "reportsController", "dataSetRepository", "programRepository", "orgUnitRepository", "chartRepository", "pivotTableRepository", "referralLocationsRepository", "translationsService", "changeLogRepository", "customAttributes", "filesystemService", "saveSvgAsPng", "dataURItoBlob", "lodash"],
+    function(mocks, utils, moment, timecop, ReportsController, DatasetRepository, ProgramRepository, OrgUnitRepository, ChartRepository, PivotTableRepository, ReferralLocationsRepository, TranslationsService, ChangeLogRepository, customAttributes, FilesystemService, SVGUtils, dataURItoBlob, _) {
     describe("reportsController", function() {
         var scope, q, rootScope, routeParams,
-            mockModule, mockDataSet, mockProgram, mockProject, mockOrigin,
-            reportsController, datasetRepository, programRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, changeLogRepository, filesystemService;
+            mockModule, mockDataSet, mockProgram, mockProject, mockOrigin, mockReferralLocations,
+            reportsController, datasetRepository, programRepository, orgUnitRepository, chartRepository, pivotTableRepository, referralLocationsRepository, translationsService, changeLogRepository, filesystemService;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             rootScope = $rootScope;
@@ -32,6 +32,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             mockProject = {
                 id: 'someProjectId'
             };
+            mockReferralLocations = [{"referralNameA": {name: 'someLocation'}}, {"referralNameB": {name: 'someOtherLocation'}}];
             routeParams = {
                 orgUnit: mockModule.id
             };
@@ -39,6 +40,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
 
             scope.startLoading = jasmine.createSpy('startLoading');
             scope.stopLoading = jasmine.createSpy('stopLoading');
+            scope.orgUnit = {id: 'someId', parent: {id: 'someOrgUnitId'}};
 
             rootScope.currentUser = {
                 selectedProject: mockProject
@@ -48,7 +50,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             spyOn(datasetRepository, 'findAllForOrgUnits').and.returnValue(utils.getPromise(q, [mockDataSet]));
 
             programRepository = new ProgramRepository();
-            spyOn(programRepository, 'getProgramForOrgUnit').and.returnValue(utils.getPromise(q, [mockProgram]));
+            spyOn(programRepository, 'getProgramForOrgUnit').and.returnValue(utils.getPromise(q, mockProgram));
 
             chartRepository = new ChartRepository();
             spyOn(chartRepository, 'getAll').and.returnValue(utils.getPromise(q, []));
@@ -70,14 +72,17 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             filesystemService = new FilesystemService();
             spyOn(filesystemService, 'promptAndWriteFile').and.returnValue(utils.getPromise(q, {}));
 
-            spyOn(CustomAttributes, 'getBooleanAttributeValue').and.returnValue(false);
+            spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(false);
 
             translationsService = new TranslationsService();
             spyOn(translationsService, 'translate').and.callFake(function (object) { return object; });
             spyOn(translationsService, 'translatePivotTableData').and.callFake(function (object) { return object; });
             spyOn(translationsService, 'translateChartData').and.callFake(function (object) { return object; });
 
-            reportsController = new ReportsController(rootScope, scope, q, routeParams, datasetRepository, programRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService, changeLogRepository);
+            referralLocationsRepository = new ReferralLocationsRepository();
+            spyOn(referralLocationsRepository, 'get').and.returnValue(utils.getPromise(q, mockReferralLocations));
+
+            reportsController = new ReportsController(rootScope, scope, q, routeParams, datasetRepository, programRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService, changeLogRepository, referralLocationsRepository);
         }));
 
         it('should set the orgunit display name for modules', function() {
@@ -86,10 +91,10 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
         });
 
         it('should set the flag whether current orgUnit is a linelist module', function() {
-            CustomAttributes.getBooleanAttributeValue.and.returnValue('someBooleanValue');
+            customAttributes.getBooleanAttributeValue.and.returnValue('someBooleanValue');
             scope.$apply();
 
-            expect(CustomAttributes.getBooleanAttributeValue).toHaveBeenCalledWith(mockModule.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
+            expect(customAttributes.getBooleanAttributeValue).toHaveBeenCalledWith(mockModule.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE);
             expect(scope.orgUnit.lineListService).toEqual('someBooleanValue');
         });
 
@@ -123,9 +128,6 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                 var excludedDataSets = [{
                     id: 'populationDataSet',
                     isPopulationDataset: true
-                }, {
-                    id: 'referralDataSet',
-                    isReferralDataset: true
                 }, {
                     id: 'lineListDataSet',
                     isLineListService: true
@@ -222,6 +224,16 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                 expect(pivotTableRepository.getPivotTableData).toHaveBeenCalledTimes(1);
             });
 
+            it('should not get the notification pivotTableData', function () {
+                var notificationPivotTable = {
+                    serviceCode: 'someDataSetServiceCode',
+                    name: 'Something - Notifications'
+                };
+                pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [notificationPivotTable]));
+                scope.$apply();
+                expect(pivotTableRepository.getPivotTableData).not.toHaveBeenCalled();
+            });
+
             it('should translate the pivot tables', function () {
                 scope.$apply();
                 expect(translationsService.translatePivotTableData).toHaveBeenCalledWith([pivotTableData]);
@@ -276,9 +288,15 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             });
 
             it('should prompt user to save chart as PNG with suggested name', function () {
-                var expectedFileName = [mockChart.serviceCode, mockChart.title, currentTime.format(DATETIME_FORMAT), 'png'].join('.');
+                var expectedFileName = [mockChart.serviceCode, mockChart.title, currentTime.format(DATETIME_FORMAT)].join('.');
                 expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFileName, dataURItoBlob(mockDataUri), filesystemService.FILE_TYPE_OPTIONS.PNG);
             });
+        });
+
+        it('should get the referral locations for the module and set it on scope', function () {
+            scope.$apply();
+            expect(referralLocationsRepository.get).toHaveBeenCalledWith(scope.orgUnit.parent.id);
+            expect(scope.referralLocations).toEqual(mockReferralLocations);
         });
 
         describe('Updated date and time for charts and reports', function () {
@@ -296,6 +314,53 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                 expect(scope.updatedForWeeklyPivotTable).toBeDefined();
                 expect(scope.updatedForMonthlyChart).toBeDefined();
                 expect(scope.updatedForMonthlyPivotTable).toBeDefined();
+            });
+        });
+
+        describe('SelectedService', function () {
+            var mockDataSet, mockProgram, chartA, chartB, chartDataA, chartDataB;
+
+            beforeEach(function () {
+                mockDataSet = {
+                    id: 'someDataSetId',
+                    serviceCode: 'serviceCodeA'
+                };
+
+                mockProgram = {
+                    id: 'someProgramId',
+                    serviceCode: 'serviceCodeB'
+                };
+
+                datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [mockDataSet]));
+                programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, mockProgram));
+
+                chartA = {
+                    serviceCode: 'serviceCodeA'
+                };
+                chartB = {
+                    serviceCode: 'serviceCodeB'
+                };
+
+                chartDataA = {
+                    isDataAvailable: true,
+                    serviceCode: 'serviceCodeA',
+                    categories: ['someCategory']
+                };
+
+                chartDataB = {
+                    isDataAvailable: true,
+                    serviceCode: 'serviceCodeB',
+                    categories: ['someCategory']
+                };
+
+                chartRepository.getAll.and.returnValue(utils.getPromise(q, [chartA, chartB]));
+                chartRepository.getChartData.and.returnValues(utils.getPromise(q, chartDataA), utils.getPromise(q, chartDataB));
+            });
+
+            it('should select the first service from the alphabetically sorted services which has at least one chart or report', function () {
+                scope.$apply();
+
+                expect(scope.selectedService).toEqual(scope.services[0]);
             });
         });
     });

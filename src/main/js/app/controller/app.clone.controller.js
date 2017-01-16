@@ -4,6 +4,8 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
             isopen: false
         };
 
+        $scope.fileExtension = "." + properties.praxis.fileExtension;
+
         $scope.toggleDropdown = function($event) {
             $event.preventDefault();
             $event.stopPropagation();
@@ -22,14 +24,16 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
             };
 
             var successCallback = function(directory) {
+                var downloadsDirectory = directory ? interpolate($scope.resourceBundle.downloadsDirectory, { directory: directory.name }): '';
+                var notificationMessage = $scope.resourceBundle.dumpLogsSuccessMessage + downloadsDirectory;
                 var notificationMessages = {
-                    "notificationMessage": interpolate($scope.resourceBundle.dumpLogsSuccessMessage, { directory: directory.name }),
+                    "notificationMessage": notificationMessage,
                     "notificationTitle": $scope.resourceBundle.successNotification
                 };
                 showNotification(notificationMessages);
             };
 
-            createZip("logs", "logs_dump_", ".logs", _.partial(indexedDBLogger.exportLogs, "msfLogs"))
+            createZip("logs", "logs_dump_", ".logs", ".logs", _.partial(indexedDBLogger.exportLogs, properties.praxis.dbForLogs))
                 .then(successCallback, errorCallback);
         };
 
@@ -45,8 +49,10 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
             };
 
             var successCallback = function(directory) {
+                var downloadsDirectory = directory ? interpolate($scope.resourceBundle.downloadsDirectory, { directory: directory.name }): '';
+                var notificationMessage = $scope.resourceBundle.createCloneSuccessMessage + downloadsDirectory;
                 var notificationMessages = {
-                    "notificationMessage": interpolate($scope.resourceBundle.createCloneSuccessMessage, { directory: directory.name }),
+                    "notificationMessage": notificationMessage,
                     "notificationTitle": $scope.resourceBundle.successNotification
                 };
                 showNotification(notificationMessages);
@@ -59,7 +65,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
             };
 
             showModal(function() {
-                createZip("dhis_idb", "dhis_idb_", ".clone", indexeddbUtils.backupEntireDB).then(successCallback, errorCallback);
+                createZip("praxis_idb", "praxis_idb_", ".clone", $scope.fileExtension, indexeddbUtils.backupEntireDB).then(successCallback, errorCallback);
             }, modalMessages);
         };
 
@@ -104,7 +110,6 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
                     indexeddbUtils.restore(result)
                         .then(function() {
                             sessionHelper.logout();
-                            $location.path("/login");
                         }, errorCallback)
                         .finally($rootScope.stopLoading);
                 }, 1000);
@@ -116,23 +121,33 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils", "interp
                 "confirmationMessage": $scope.resourceBundle.loadCloneConfirmationMessage
             };
 
+            var onImportFileSelect = function (e) {
+                if (e.target.files) {
+                    var file = e.target.files[0];
+                    filesystemService.readFile(file).then(successCallback, errorCallback);
+                }
+            };
+
             showModal(function() {
-                filesystemService.readFile(["msf"]).then(successCallback, errorCallback);
+                var importClone = document.getElementById('importClone');
+                importClone.addEventListener('change', onImportFileSelect);
+                importClone.click();
             }, modalMessages);
         };
 
-        var createZip = function(folderName, fileNamePrefix, fileNameExtn, backupCallback) {
+        var createZip = function(folderName, fileNamePrefix, fileNameExtn, zipFileExtension, backupCallback) {
             $rootScope.startLoading();
             return backupCallback().then(function(data) {
                 $rootScope.stopLoading();
                 var zippedData = zipUtils.zipData(folderName, fileNamePrefix, fileNameExtn, data);
-                return filesystemService.writeFile(fileNamePrefix + moment().format("YYYYMMDD-HHmmss") + ".msf", zippedData);
+                var fileName = fileNamePrefix + moment().format("YYYYMMDD-HHmmss") + zipFileExtension;
+                return filesystemService.writeFile(fileName, zippedData);
             }).finally($rootScope.stopLoading);
         };
 
         var showNotification = function(message) {
-            $scope.description = message.notificationMessage;
-            $scope.title = message.notificationTitle;
+            $scope.notificationMessage = message.notificationMessage;
+            $scope.notificationTitle = message.notificationTitle;
             var modalInstance = $modal.open({
                 templateUrl: 'templates/notification-dialog.html',
                 controller: 'notificationDialogController',

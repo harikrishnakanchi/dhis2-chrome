@@ -1,5 +1,5 @@
-define(['customAttributes'], function(CustomAttributes) {
-    describe('CustomAttributes', function() {
+define(['customAttributes', 'moment'], function(customAttributes, moment) {
+    describe('customAttributes', function() {
         var attributeValues;
 
         var mockAttributeValue = function (attributeCode, value) {
@@ -16,29 +16,35 @@ define(['customAttributes'], function(CustomAttributes) {
 
             it('should return true if the corresponding attribute value is true', function() {
                 attributeValues = [mockAttributeValue('attributeCode', 'true')];
-                expect(CustomAttributes.getBooleanAttributeValue(attributeValues, 'attributeCode')).toEqual(true);
+                expect(customAttributes.getBooleanAttributeValue(attributeValues, 'attributeCode')).toEqual(true);
             });
 
             it('should return false if there is no corresponding attribute value', function() {
                 attributeValues = [];
-                expect(CustomAttributes.getBooleanAttributeValue(attributeValues, 'attributeCode')).toEqual(false);
+                expect(customAttributes.getBooleanAttributeValue(attributeValues, 'attributeCode')).toEqual(false);
             });
 
             it('should return false if the corresponding attribute value is not true', function() {
                 attributeValues = [mockAttributeValue('attributeCode', 'invalidValue')];
-                expect(CustomAttributes.getBooleanAttributeValue(attributeValues, 'attributeCode')).toEqual(false);
+                expect(customAttributes.getBooleanAttributeValue(attributeValues, 'attributeCode')).toEqual(false);
             });
         });
 
         describe('getAttributeValue', function() {
             it('should return corresponding attribute value', function() {
                 attributeValues = [mockAttributeValue('attributeCode', 'validValue')];
-                expect(CustomAttributes.getAttributeValue(attributeValues, 'attributeCode')).toEqual("validValue");
+                expect(customAttributes.getAttributeValue(attributeValues, 'attributeCode')).toEqual("validValue");
             });
 
-            it('should return undefined if corresponding attribute value does not exist', function() {
+            it('should return undefined if corresponding attribute value does not exist and no default value given', function() {
                 attributeValues = [];
-                expect(CustomAttributes.getAttributeValue(attributeValues, 'attributeCode')).toBeUndefined();
+                expect(customAttributes.getAttributeValue(attributeValues, 'attributeCode')).toBeUndefined();
+            });
+
+            it('should return the default value if the corresponding attribute value does not exist', function () {
+                var defaultValue = 10, expectedValue = 10;
+                attributeValues = [];
+                expect(customAttributes.getAttributeValue(attributeValues, 'attributeCode', defaultValue)).toBe(expectedValue);
             });
         });
 
@@ -50,13 +56,43 @@ define(['customAttributes'], function(CustomAttributes) {
                     mockAttributeValue('attributeCode', NaN),
                     mockAttributeValue('attributeCode', '')
                 ];
-                expect(CustomAttributes.cleanAttributeValues(attributeValues)).toEqual([]);
+                expect(customAttributes.cleanAttributeValues(attributeValues)).toEqual([]);
             });
 
             it('should keep attribute values whose value is valid', function () {
                 attributeValues = [mockAttributeValue('attributeCode', 'someValue')];
-                expect(CustomAttributes.cleanAttributeValues(attributeValues)).toEqual(attributeValues);
+                expect(customAttributes.cleanAttributeValues(attributeValues)).toEqual(attributeValues);
             });
         });
+
+        describe('createAttribute', function () {
+            beforeEach(function () {
+                var currentTime = '2016-11-27';
+                Timecop.install();
+                Timecop.freeze(new Date(currentTime));
+            });
+
+            afterEach(function () {
+                Timecop.returnToPresent();
+                Timecop.uninstall();
+            });
+
+            it('should create and return the new attribute', function () {
+                var attributeCode = 'someType';
+                var value = 'someValue';
+
+                var actualAttribute = customAttributes.createAttribute(attributeCode, value);
+                var expectedAttribute = {
+                    "created": moment().toISOString(),
+                    "lastUpdated": moment().toISOString(),
+                    "attribute": {
+                        "code": attributeCode
+                    },
+                    "value": value
+                };
+                expect(expectedAttribute).toEqual(actualAttribute);
+            });
+        });
+
     });
 });

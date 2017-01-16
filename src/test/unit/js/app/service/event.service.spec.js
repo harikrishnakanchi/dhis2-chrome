@@ -116,30 +116,6 @@ define(['eventService', 'angularMocks', 'properties', 'moment', 'lodash'], funct
                 eventService.getEvents(orgUnitId, periodRange);
                 httpBackend.flush();
             });
-
-            it('should not make more than the configured number of recursive requests', function() {
-                var mockResponse = { pager: { pageCount: 99 }, events: ['mockEvent'] },
-                    numberOfRequests = 0;
-
-                httpBackend.whenGET(/.*/).respond(function () {
-                    numberOfRequests++;
-                    return [200, mockResponse];
-                });
-
-                eventService.getEvents(orgUnitId, periodRange);
-                httpBackend.flush();
-
-                expect(numberOfRequests).toEqual(properties.eventsSync.maximumNumberOfEventsToSync / properties.eventsSync.pageSize.eventData);
-            });
-
-            it('should not make any further requests if events response is empty', function() {
-                var mockResponse = { pager: { pageCount: 99 }, events: [] };
-
-                httpBackend.expectGET(/.*&page=1.*/).respond(200, mockResponse);
-
-                eventService.getEvents(orgUnitId, periodRange);
-                httpBackend.flush();
-            });
         });
 
         describe('getEventIds', function() {
@@ -216,30 +192,6 @@ define(['eventService', 'angularMocks', 'properties', 'moment', 'lodash'], funct
                 };
                 httpBackend.expectGET(/.*&page=1.*/).respond(200, mockResponses.page1);
                 httpBackend.expectGET(/.*&page=2.*/).respond(200, mockResponses.page2);
-
-                eventService.getEventIds(orgUnitId, periodRange);
-                httpBackend.flush();
-            });
-
-            it('should not make more than the configured number of recursive requests', function() {
-                var mockResponse = { pager: { pageCount: 99 }, events: ['mockEvent'] },
-                    numberOfRequests = 0;
-
-                httpBackend.whenGET(/.*/).respond(function () {
-                    numberOfRequests++;
-                    return [200, mockResponse];
-                });
-
-                eventService.getEventIds(orgUnitId, periodRange);
-                httpBackend.flush();
-
-                expect(numberOfRequests).toEqual(properties.eventsSync.maximumNumberOfEventsToSync / properties.eventsSync.pageSize.eventIds);
-            });
-
-            it('should not make any further requests if events response is empty', function() {
-                var mockResponse = { pager: { pageCount: 99 }, events: [] };
-
-                httpBackend.expectGET(/.*&page=1.*/).respond(200, mockResponse);
 
                 eventService.getEventIds(orgUnitId, periodRange);
                 httpBackend.flush();

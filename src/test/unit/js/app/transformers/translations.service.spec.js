@@ -244,6 +244,15 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                 expect(columnConfigurationItem.name).toEqual('someFrenchNameC');
             });
 
+            it('should not translate the rows of referralLocationReport', function () {
+                mockPivotTableData.referralLocationReport = true;
+                var translatedObject = translationsService.translatePivotTableData([mockPivotTableData]);
+                expect(translatedObject).toEqual([mockPivotTableData]);
+                expect(rowItem.name).toEqual('someEnglishNameA');
+                expect(columnItem.name).toEqual('someFrenchNameB');
+                expect(columnConfigurationItem.name).toEqual('someFrenchNameC');
+            });
+
             describe('row or column is a period dimension', function () {
                 beforeEach(function () {
                     rootScope.resourceBundle = {

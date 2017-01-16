@@ -1,4 +1,4 @@
-<div class="login-form {{ layoutDirection.direction }}">
+<div class="login-form {{ layoutDirection.direction }}" ng-show="showLoginForm">
     <form name="loginForm" role="form" ng-submit="login()" class="form-horizontal">
         <p class='alert alert-danger' ng-show='invalidCredentials' id="loginFailedMsg">{{ resourceBundle.loginFailed }}</p>
         <p class='alert alert-danger' ng-show='invalidAccess' id="invalidAccessMsg">{{ resourceBundle.invalidAccess }}</p>
@@ -13,7 +13,7 @@
         <div class="well">
             <div class="form-group">
                 <label for="username">{{ resourceBundle.usernameLabel }}</label>
-                <input type="text" class="form-control" id="username" ng-model="username" placeholder="{{ resourceBundle.usernameLabel }}" autofocus required ng-disabled="compatibilityInfo.incompatibleVersion">
+                <input type="text" class="form-control" id="username" ng-model="username" placeholder="{{ resourceBundle.usernameLabel }}" autocomplete="off" autofocus required ng-disabled="compatibilityInfo.incompatibleVersion">
             </div>
             <div class="form-group">
                 <label for="password">{{ resourceBundle.passwordLabel }}</label>

@@ -1,5 +1,5 @@
-define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTransformer", "dataElementUtils"],
-    function(_, orgUnitMapper, moment, interpolate, systemSettingsTransformer, dataElementUtils) {
+define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTransformer", "dataElementUtils", "customAttributes"],
+    function(_, orgUnitMapper, moment, interpolate, systemSettingsTransformer, dataElementUtils, customAttributes) {
         return function($scope, $rootScope, $hustle, orgUnitRepository, excludedDataElementsRepository, $q, $modal,
             programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService, excludedLineListOptionsRepository) {
 
@@ -164,12 +164,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
                     if (!_.isEmpty($scope.enrichedProgram))
                         resetCollapse();
 
-                    var isDisabled = _.find($scope.module.attributeValues, {
-                        "attribute": {
-                            "code": "isDisabled"
-                        }
-                    });
-                    $scope.isDisabled = isDisabled && isDisabled.value === "true" ? true : false;
+                    $scope.isDisabled = customAttributes.getBooleanAttributeValue($scope.module.attributeValues, customAttributes.DISABLED_CODE);
                     $scope.updateDisabled = $scope.isDisabled;
                 };
 
@@ -346,11 +341,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
                         referralDatasetId = _.find(allDatasets, "isReferralDataset").id;
                         populationDatasetId = _.find(allDatasets, "isPopulationDataset").id;
 
-                        var summaryDatasetId = _.find($scope.program.attributeValues, {
-                            "attribute": {
-                                "code": "associatedDataSet"
-                            }
-                        }).value;
+                        var summaryDatasetId = customAttributes.getAttributeValue($scope.program.attributeValues, customAttributes.ASSOCIATED_DATA_SET_CODE);
 
                         var datasetIds = _.flattenDeep([summaryDatasetId, originDatasetIds]);
 
@@ -425,7 +416,21 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
             };
 
             $scope.shouldDisableSaveOrUpdateButton = function() {
-                return _.isEmpty($scope.program.name);
+                var allDataElementsWithOptions = _.chain($scope.enrichedProgram.programStages)
+                    .map('programStageSections')
+                    .flatten()
+                    .map('dataElementsWithOptions')
+                    .flatten()
+                    .map('dataElement')
+                    .value();
+                var optionNotSelected = _.any(allDataElementsWithOptions, function (dataElement) {
+                    return _.filter(dataElement.optionSet.options, "isSelected").length < 2;
+                });
+                return _.isEmpty($scope.program.name) || optionNotSelected;
+            };
+
+            $scope.areTwoOptionsSelected = function (dataElement) {
+                return dataElement.dataElement.optionSet && _.filter(dataElement.dataElement.optionSet.options, {isSelected: true}).length >= 2;
             };
 
             $scope.onOptionSelectionChange = function (optionSet, option) {
@@ -442,6 +447,24 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
 
             $scope.stopPropagation = function (event) {
                 event.stopPropagation();
+            };
+
+            $scope.unSelectAll = function (dataElement) {
+                $scope.form.$setDirty();
+                _.each(dataElement.dataElement.optionSet.options, function (option) {
+                    option.isSelected = false;
+                });
+            };
+
+            $scope.selectAll = function (dataElement) {
+                $scope.form.$setDirty();
+                _.each(dataElement.dataElement.optionSet.options, function (option) {
+                    option.isSelected = true;
+                });
+            };
+
+            $scope.allOptionsSelected = function (dataElement) {
+                return !_.any(dataElement.dataElement.optionSet && dataElement.dataElement.optionSet.options, {"isSelected": false});
             };
 
             init();

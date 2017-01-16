@@ -169,10 +169,11 @@
     "createCloneLabel": "Export application",
     "loadCloneLabel": "Import application copy",
     "dumpLogsLabel": "Export Logs",
-    "dumpLogsSuccessMessage": "Exported logs successfully at {{directory}}",
+    "dumpLogsSuccessMessage": "Exported logs successfully",
     "dumpLogsErrorMessage": "Error exporting logs: {{error}}",
-    "createCloneSuccessMessage": "Clone created successfully at {{directory}}",
+    "createCloneSuccessMessage": "Clone created successfully",
     "createCloneErrorMessage": "Error creating clone: {{error}}",
+    "downloadsDirectory": " at {{directory}}",
     "loadCloneErrorMessage": "Error loading clone: {{error}}",
     "loadCloneConfirmationMessage": "WARNING: Importing application copy will delete all existing data not uploaded to DHIS2. You will be logged out of current session after import. THIS ACTION IS IRREVERSIBLE.",
     "createCloneConfirmationMessage": "WARNING: Exporting application copy will create a copy of the current application on your computer. To be used for importing application ONLY",
@@ -220,10 +221,15 @@
     "emailValidation": "This is not a valid Email.",
     "successNotification": "Success",
     "errorNotification": "Error",
-    "connectedNoPendingRequests": "ONLINE - NO PENDING REQUESTS",
-    "connectedWithPendingRequests": "ONLINE - PENDING REQUESTS",
-    "notConnectedNoPendingRequests": "OFFLINE - NO PENDING REQUESTS",
-    "notConnectedWithPendingRequests": "OFFLINE - PENDING REQUESTS",
+    "pendingRequests": " Pending",
+    "jobsInProgress": " in Progress",
+    "noPendingRequest": "Sync Complete",
+    "online": "ONLINE - ",
+    "offline": "OFFLINE - ",
+    "poorConnection": "POOR CONNECTION - ",
+    "poorConnectivity": "POOR CONNECTIVITY",
+    "jobs": "Jobs",
+    "job": "Job",
     "menu": "Menu",
     "projectTypeLabel": "Project Type",
     "gender": "Gender",
@@ -246,6 +252,7 @@
     "noCasesFound": "No Cases Found",
     "noCasesToSummarize": "No Submitted cases to Summarize",
     "reportsLabel": "Reports",
+    "reportLabel": "Report",
     "observerDataLabel": "Aggregated Data",
     "warTemplateLabel": "War",
     "emergencyTemplateLabel": "Emergency",
@@ -329,5 +336,22 @@
     "praxisDownloadMessage": "One of the reasons might be because Praxis downloads only last 52 weeks of data. Any data collected before 52 weeks will not be available on this page. However this data is available for use in the reports and chart sections.",
     "contactSupport": "Contact {{supportEmail}} for any questions.",
     "referralLocationCheckboxLabel": "Display Referral Location for Data Entry User",
-    "geographicOriginCheckboxLabel": "Display Geographic Origin for Data Entry User"
+    "geographicOriginCheckboxLabel": "Display Geographic Origin for Data Entry User",
+    "updated": "Updated",
+    "help": "Help?",
+    "exportTallySheetButton": "Export Tally Sheet",
+    "fileSystem": {
+        "successNotification": {
+            "title": "File Saved Successfully",
+            "message": "The file \"{{fileName}}\" has been saved successfully."
+        }
+    },
+    "uninstall": {
+        "title": "Uninstall Praxis",
+        "okMessage": "YES, I want to uninstall Praxis",
+        "confirmationMessage": "WARNING: This will erase all the existing data and uninstall the application. Any data not synced to DHIS will be lost. THIS ACTION IS IRREVERSIBLE.",
+        "successMessage": "Praxis is uninstalled. Please close the browser window."
+    },
+    "selectAll": "Select All",
+    "unselectAll": "Unselect All"
 }

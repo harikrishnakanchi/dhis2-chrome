@@ -1,9 +1,14 @@
-define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "excludedDataElementsRepository", "dataSetRepository", "programRepository", "referralLocationsRepository", "translationsService", "moduleDataBlockFactory", "dataSyncFailureRepository", "optionSetRepository", "customAttributes"],
-    function(AggregateDataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, ExcludedDataElementsRepository, DatasetRepository, ProgramRepository, ReferralLocationsRepository, TranslationsService, ModuleDataBlockFactory, DataSyncFailureRepository, OptionSetRepository, CustomAttributes) {
+define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop",
+    "dataRepository", "approvalDataRepository", "orgUnitRepository", "excludedDataElementsRepository", "dataSetRepository", "programRepository", "referralLocationsRepository",
+    "translationsService", "moduleDataBlockFactory", "dataSyncFailureRepository", "optionSetRepository", "customAttributes", "filesystemService", "excelBuilder", "excelBuilderHelper"],
+    function(AggregateDataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, timecop,
+             DataRepository, ApprovalDataRepository, OrgUnitRepository, ExcludedDataElementsRepository, DatasetRepository, ProgramRepository, ReferralLocationsRepository,
+             TranslationsService, ModuleDataBlockFactory, DataSyncFailureRepository, OptionSetRepository, customAttributes, FilesystemService, ExcelBuilder, excelBuilderHelper) {
         describe("aggregateDataEntryController ", function() {
             var scope, routeParams, q, location, anchorScroll, aggregateDataEntryController, rootScope, parentProject, fakeModal,
                 window, hustle, timeout, origin1, origin2, mockModuleDataBlock, selectedPeriod,
-                dataRepository, approvalDataRepository, programRepository, orgUnitRepository, datasetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository, optionSetRepository;
+                dataRepository, approvalDataRepository, programRepository, orgUnitRepository, datasetRepository, referralLocationsRepository,
+                excludedDataElementsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository, optionSetRepository, filesystemService;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $anchorScroll, $location, $window, $timeout) {
@@ -148,14 +153,20 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 optionSetRepository = new OptionSetRepository();
                 spyOn(optionSetRepository, 'getOptionSetByCode').and.returnValue(utils.getPromise(q, mockOptionSet));
 
-                aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, anchorScroll, location, fakeModal, rootScope, window, timeout, dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService, moduleDataBlockFactory, dataSyncFailureRepository, optionSetRepository);
+                filesystemService = new FilesystemService();
+                spyOn(filesystemService, 'promptAndWriteFile').and.returnValue(utils.getPromise(q, {}));
+
+                aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, anchorScroll, location, fakeModal, rootScope, window, timeout,
+                    dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository,
+                    translationsService, moduleDataBlockFactory, dataSyncFailureRepository, optionSetRepository, filesystemService);
 
                 scope.forms.dataentryForm = { $setPristine: function() {} };
                 spyOn(scope.forms.dataentryForm, '$setPristine');
                 scope.dataentryForm = { $dirty: function() {} };
                 spyOn(scope.dataentryForm, '$dirty');
 
-
+                spyOn(customAttributes, 'getAttributeValue').and.returnValue('');
+                spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(false);
                 scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
             }));
 
@@ -591,22 +602,10 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it("should display the correct submit option for auto approved projects", function() {
+                customAttributes.getBooleanAttributeValue.and.returnValue(true);
                 orgUnitRepository.getParentProject.and.returnValue(utils.getPromise(q, {
                     "id": "proj1",
-                    "attributeValues": [{
-                        'attribute': {
-                            'code': 'autoApprove',
-                            'name': 'Auto Approve',
-                            'id': 'e65afaec61d'
-                        },
-                        'value': 'true'
-                    }, {
-                        'attribute': {
-                            'code': 'Type',
-                            'name': 'Type',
-                        },
-                        'value': 'Project'
-                    }]
+                    "attributeValues": []
                 }));
 
                 scope.$apply();
@@ -646,7 +645,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
 
                 scope.$apply();
 
-                expect(optionSetRepository.getOptionSetByCode).toHaveBeenCalledWith(CustomAttributes.PRAXIS_POPULATION_DATA_ELEMENTS);
+                expect(optionSetRepository.getOptionSetByCode).toHaveBeenCalledWith(customAttributes.PRAXIS_POPULATION_DATA_ELEMENTS);
 
                 expect(scope.projectPopulationDetails).toEqual({
                     "estimatedTargetPopulation": '1000',
@@ -801,6 +800,148 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.$apply();
 
                 expect(scope.isApproved).toBeTruthy();
+            });
+
+            describe('exportTallySheetToExcel', function () {
+                var mockDataset, originDataset, referralDataset, columnConfiguration, baseConfiguration, mockSheet, mockRow;
+
+                beforeEach(function () {
+                    scope.$apply();
+                    scope.resourceBundle = {
+                        yearLabel: 'year',
+                        weekLabel: 'week',
+                        monthLabel: 'month',
+                        moduleNameLabel: 'module name'
+                    };
+
+                    baseConfiguration = [{
+                        name: 'categoryOptionNameX'
+                    },{
+                        name: 'categoryOptionNameY'
+                    }, {
+                        name: 'categoryOptionNameX'
+                    }, {
+                        name: 'categoryOptionNameY'
+                    }];
+
+                    columnConfiguration = [
+                        [{
+                            name: 'categoryOptionNameA'
+                        }, {
+                            name: 'categoryOptionNameB'
+                        }],
+                        [{
+                            name: 'categoryOptionNameX'
+                        },{
+                            name: 'categoryOptionNameY'
+                        }, {
+                            name: 'categoryOptionNameX'
+                        }, {
+                            name: 'categoryOptionNameY'
+                        }]
+                    ];
+
+                    mockDataset = {
+                        name: 'datasetName',
+                        sections:[{
+                            name: 'sectionName',
+                            columnConfigurations: columnConfiguration,
+                            baseColumnConfiguration: baseConfiguration,
+                            dataElements:[{
+                                id: 'dataElementId',
+                                name: 'dataElementName'
+                            }]
+                        }]
+                    };
+
+                    originDataset = {
+                        name: 'datasetName',
+                        isOriginDataset: true,
+                        sections:[{
+                            name: 'sectionName'
+                        }]
+                    };
+
+                    referralDataset = {
+                        name: 'datasetName',
+                        isReferralDataset: true,
+                        sections:[{
+                            name: 'sectionName',
+                            dataElements:[{
+                                id: 'dataElementId',
+                                formName: 'dataElementName'
+                            }]
+                        }]
+                    };
+
+                    scope.dataSets = [mockDataset, originDataset, referralDataset];
+
+                    scope.originOrgUnits = [{
+                        name: 'originA'
+                    },{
+                        name: 'originB'
+                    }];
+
+                    scope.referralLocations = {
+                        "dataElementName": {
+                            name: "Referral location A"
+                        }
+                    };
+
+                    spyOn(ExcelBuilder, 'createWorkBook').and.returnValue(new Blob());
+
+                    mockRow = {
+                        addCell: jasmine.createSpy('addCell').and.returnValue(),
+                        addEmptyCells: jasmine.createSpy('addEmptyCells').and.returnValue()
+                    };
+
+                    mockSheet = {
+                        createRow: jasmine.createSpy('createRow').and.returnValue(mockRow),
+                        generate: jasmine.createSpy('generate').and.returnValue({})
+                    };
+
+                    spyOn(excelBuilderHelper, 'createSheet').and.returnValue(mockSheet);
+
+                    scope.exportTallySheetToExcel();
+                });
+
+                it('should prompt the user to save excel with the suggested name', function () {
+                    var expectedFilename = 'Mod1.export';
+                    expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.XLSX);
+                });
+
+                it('should have the period information', function () {
+                    expect(mockSheet.createRow).toHaveBeenCalledWith(['year', '', 'month', '', 'week', '']);
+                });
+
+                it('should have the module information', function () {
+                    expect(mockRow.addCell).toHaveBeenCalledWith('Mod1', jasmine.any(Object));
+                });
+
+                it('should have dataset information', function () {
+                    expect(mockRow.addCell).toHaveBeenCalledWith(mockDataset.name, jasmine.any(Object));
+                });
+
+                it('should have the headers for a dataset section', function () {
+                    expect(mockRow.addCell).toHaveBeenCalledWith('sectionName', jasmine.any(Object));
+                    expect(mockRow.addCell).toHaveBeenCalledWith('categoryOptionNameA', jasmine.any(Object));
+                    expect(mockRow.addCell).toHaveBeenCalledWith('categoryOptionNameB', jasmine.any(Object));
+                    expect(mockRow.addCell).toHaveBeenCalledWith('categoryOptionNameX', jasmine.any(Object));
+                    expect(mockRow.addCell).toHaveBeenCalledWith('categoryOptionNameY', jasmine.any(Object));
+                });
+
+                it('should have the data element name', function () {
+                    expect(mockRow.addCell).toHaveBeenCalledWith('dataElementName', jasmine.any(Object));
+                });
+
+                it('should have the origin name under origin dataset section', function () {
+                    expect(mockRow.addCell).toHaveBeenCalledWith('originA', jasmine.any(Object));
+                    expect(mockRow.addCell).toHaveBeenCalledWith('originB', jasmine.any(Object));
+                });
+
+                it('should have the referral location names for referral location dataset', function () {
+                    expect(mockRow.addCell).toHaveBeenCalledWith('Referral location A', jasmine.any(Object));
+                });
             });
         });
     });

@@ -2,20 +2,17 @@ require.config({
     baseUrl: "js/"
 });
 
+self.basePath = "./";
+
 require(["app/chrome/chrome.bg.config", "app/shared.bg.config"], function(config) {
     require(["app/bg.app"], function(app) {
-        require(["properties"], function(properties) {
-            var bootstrapData;
-            var onDbReady = function(request, sender, sendResponse) {
-                if (!bootstrapData && request === "dbReady") {
-                    console.log("dB ready");
-                    app.bootstrap(app.init()).then(function(data) {
-                        bootstrapData = data;
-                    });
-                }
+        require(["platformUtils", "lodash"], function(platformUtils, _) {
+            var onDbReady = function() {
+                console.log("DB Ready");
+                app.bootstrap(app.init());
             };
 
-            chrome.runtime.onMessage.addListener(onDbReady);
+            platformUtils.addListener('dbReady', _.once(onDbReady));
             chrome.app.runtime.onLaunched.addListener(function(launchData) {
                 chrome.app.window.create('../../chrome.app.html', {
                     id: 'PRAXIS',

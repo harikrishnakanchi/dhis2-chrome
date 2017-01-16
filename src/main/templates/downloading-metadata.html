@@ -1,0 +1,20 @@
+<div class="metadata-download {{ layoutDirection.direction }}">
+
+    <div class="progress progress-striped" ng-class="!maxRetriesExceeded ? 'active' : 'stop'" ng-if="showProgressBar">
+        <div class="progress-bar progress-bar-primary"  role="progressbar" style="width: {{ progress.percent }}%">
+            <span>{{ progress.percent }}% Complete</span>
+        </div>
+    </div>
+
+    <h4 ng-if="!maxRetriesExceeded">Downloading data&hellip;</h4>
+
+    <div ng-if="maxRetriesExceeded">
+        <div class="alert alert-danger">
+            Download is interrupted because of poor or no Internet connectivity. <br>
+            Retry when Internet connection is available. If it fails after repeated retries, contact {{ supportEmail }} for assistance.
+            <br><br>
+            <button class="btn btn-primary" ng-click="downloadAndUpsertMetadata()"><b>Retry</b></button>
+        </div>
+    </div>
+
+</div>

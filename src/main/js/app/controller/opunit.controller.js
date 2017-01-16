@@ -1,4 +1,4 @@
-define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAttributes"], function(_, dhisId, moment, interpolate, orgUnitMapper, CustomAttributes) {
+define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAttributes"], function(_, dhisId, moment, interpolate, orgUnitMapper, customAttributes) {
     return function($scope, $q, $hustle, orgUnitRepository, orgUnitGroupHelper, db, $location, $modal, patientOriginRepository, orgUnitGroupSetRepository) {
         $scope.isDisabled = false;
         $scope.showOpUnitCode = false;
@@ -41,37 +41,12 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
             hospitalUnitCode = type === "Hospital" ? hospitalUnitCode : {
                 "name": ""
             };
-            var attributes = [{
-                "created": moment().toISOString(),
-                "lastUpdated": moment().toISOString(),
-                "attribute": {
-                    "code": "opUnitType"
-                },
-                "value": opUnitType.title || opUnitType.name
-            }, {
-                "created": moment().toISOString(),
-                "lastUpdated": moment().toISOString(),
-                "attribute": {
-                    "code": "Type"
-                },
-                "value": "Operation Unit"
-            }, {
-                "created": moment().toISOString(),
-                "lastUpdated": moment().toISOString(),
-                "attribute": {
-                    "code": "hospitalUnitCode"
-                },
-                "value": hospitalUnitCode.title || hospitalUnitCode.name
-            }, {
-                "created": moment().toISOString(),
-                "lastUpdated": moment().toISOString(),
-                "attribute": {
-                    "code": "isNewDataModel"
-                },
-                "value": "true"
-            }];
+            var attributes = [customAttributes.createAttribute(customAttributes.OPERATION_UNIT_TYPE_CODE, opUnitType.title || opUnitType.name),
+                customAttributes.createAttribute(customAttributes.TYPE, "Operation Unit"),
+                customAttributes.createAttribute(customAttributes.HOSPITAL_UNIT_CODE, hospitalUnitCode.title || hospitalUnitCode.name),
+                customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true")];
 
-            return CustomAttributes.cleanAttributeValues(attributes);
+            return customAttributes.cleanAttributeValues(attributes);
         };
 
         var publishMessage = function(data, action, desc) {
@@ -157,12 +132,7 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
                     return;
 
                 var partitionedModules = _.partition(modules, function(module) {
-                    return _.any(module.attributeValues, {
-                        "attribute": {
-                            "code": "isLineListService"
-                        },
-                        "value": "true"
-                    });
+                    return customAttributes.getBooleanAttributeValue(module.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE);
                 });
 
                 var aggregateModules = partitionedModules[1];
@@ -204,12 +174,7 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
                 }
             });
             if (_.isEmpty(attr)) {
-                attr.push({
-                    "attribute": {
-                        "code": "isDisabled"
-                    },
-                    "value": 'false'
-                });
+                attr.push(customAttributes.createAttribute(customAttributes.DISABLED_CODE, 'false'));
             }
 
             attr[0].value = attr[0].value === 'true' ? 'false' : 'true';
@@ -345,10 +310,10 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
                         name: $scope.orgUnit.name,
                         openingDate: $scope.orgUnit.openingDate,
                         type: _.find($scope.opUnitTypes, {
-                            name: CustomAttributes.getAttributeValue($scope.orgUnit.attributeValues, CustomAttributes.OPERATION_UNIT_TYPE_CODE)
+                            name: customAttributes.getAttributeValue($scope.orgUnit.attributeValues, customAttributes.OPERATION_UNIT_TYPE_CODE)
                         }),
                         hospitalUnitCode: _.find($scope.hospitalUnitCodes, {
-                            name: CustomAttributes.getAttributeValue($scope.orgUnit.attributeValues, CustomAttributes.HOSPITAL_UNIT_CODE)
+                            name: customAttributes.getAttributeValue($scope.orgUnit.attributeValues, customAttributes.HOSPITAL_UNIT_CODE)
                         })
                     };
 
@@ -357,7 +322,7 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
                         $scope.opUnit.latitude = parseFloat(coordinates[1]);
                     }
 
-                    $scope.isDisabled = CustomAttributes.getBooleanAttributeValue($scope.orgUnit.attributeValues, CustomAttributes.DISABLED_CODE);
+                    $scope.isDisabled = customAttributes.getBooleanAttributeValue($scope.orgUnit.attributeValues, customAttributes.DISABLED_CODE);
 
                     patientOriginRepository.get($scope.orgUnit.id).then(setOriginDetails);
                 }

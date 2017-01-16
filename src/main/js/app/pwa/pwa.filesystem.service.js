@@ -1,31 +1,54 @@
-define([], function () {
-   return function () {
+define(['fileSaver', 'interpolate'], function (saveAs, interpolate) {
+   return function ($rootScope, $q, $modal) {
        var FILE_TYPE_OPTIONS = {
-           XLSX: {
-               accepts: [{
-                   description: 'Microsoft Excel 2007-2013 XML (.xlsx)',
-                   extensions: ['xlsx']
-               }],
-               acceptsAllTypes: false
-           },
-           PNG: {
-               accepts: [{
-                   description: 'PNG File (.png)',
-                   mimeTypes: ['image/png'],
-                   extensions: ['png']
-               }],
-               acceptsAllTypes: false
-           }
+           XLSX: { extension: 'xlsx' },
+           PNG: { extension: 'png' }
        };
-       var fakeFunction = function () {
 
+       var notify = function (fileName) {
+           var scope = $rootScope.$new();
+           scope.notificationTitle = scope.resourceBundle.fileSystem.successNotification.title;
+           scope.notificationMessage = interpolate(scope.resourceBundle.fileSystem.successNotification.message, { fileName: fileName });
+
+           var modalInstance = $modal.open({
+               templateUrl: 'templates/notification-dialog.html',
+               controller: 'notificationDialogController',
+               scope: scope
+           });
+
+           return modalInstance.result;
+       };
+
+       var writeFileAndNotify = function (fileName, contents, options) {
+           var fileNameWithExtension = [fileName, options.extension].join('.');
+           var saveFile = saveAs(contents, fileNameWithExtension);
+           saveFile.onwriteend = function () {
+               notify(fileNameWithExtension);
+           };
+       };
+
+       var writeFile = function (fileName, contents) {
+           saveAs(contents, fileName);
+       };
+
+       var readFile = function (file) {
+           var deferred = $q.defer();
+           var reader = new FileReader();
+           reader.onerror = function (err) {
+               deferred.reject(err);
+           };
+           reader.onloadend = function (data) {
+               deferred.resolve(data);
+           };
+           reader.readAsArrayBuffer(file);
+           return deferred.promise;
        };
 
        return {
            "FILE_TYPE_OPTIONS": FILE_TYPE_OPTIONS,
-           "promptAndWriteFile": fakeFunction,
-           "writeFile": fakeFunction,
-           "readFile": fakeFunction
+           "promptAndWriteFile": writeFileAndNotify,
+           "writeFile": writeFile,
+           "readFile": readFile
        };
    };
 });

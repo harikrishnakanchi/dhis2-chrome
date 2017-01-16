@@ -4,7 +4,7 @@ define([], function() {
             scope: {
                 title: '@dpTitle',
                 description: '@?dpDesc',
-                data: '=?dpData'
+                multipleItemDescriptions: '=?dpMultipleDescriptions'
             },
             link: function(scope, element) {
                 angular.element(element).bind('click', function(event) {

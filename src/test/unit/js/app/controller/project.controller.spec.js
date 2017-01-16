@@ -1,4 +1,4 @@
-define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUnitMapper", "timecop", "orgUnitGroupHelper", "properties", "approvalDataRepository", "orgUnitGroupSetRepository", "translationsService"], function(ProjectController, mocks, utils, _, moment, orgUnitMapper, timecop, OrgUnitGroupHelper, properties, ApprovalDataRepository, OrgUnitGroupSetRepository, TranslationsService) {
+define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUnitMapper", "timecop", "orgUnitGroupHelper", "properties", "approvalDataRepository", "orgUnitGroupSetRepository", "translationsService", "customAttributes"], function(ProjectController, mocks, utils, _, moment, orgUnitMapper, timecop, OrgUnitGroupHelper, properties, ApprovalDataRepository, OrgUnitGroupSetRepository, TranslationsService, customAttributes) {
     describe("project controller tests", function() {
         var scope, q, userRepository, parent, fakeModal, orgUnitRepo, hustle, rootScope, approvalDataRepository, orgUnitGroupSetRepository, orgUnitGroupSets, translationsService;
 
@@ -164,6 +164,8 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                     }];
                 }
             });
+
+            spyOn(customAttributes, 'getAttributeValue').and.returnValue(undefined);
             projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository, translationsService);
         }));
 
@@ -324,100 +326,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 "name": "anyname",
                 "openingDate": "2010-01-01",
                 'level': 3,
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "prjCon",
-                        "name": "Context",
-                        "id": "Gy8V8WeGgYs"
-                    },
-                    "value": "Post-conflict"
-                }, {
-                    "attribute": {
-                        "code": "prjLoc",
-                        "name": "Location",
-                        "id": "CaQPMk01JB8"
-                    },
-                    "value": "val3"
-                }, {
-                    "attribute": {
-                        "code": "prjEndDate",
-                        "name": "End date",
-                        "id": "ZbUuOnEmVs5"
-                    },
-                    "value": "2011-01-01"
-                }, {
-                    "attribute": {
-                        "code": "prjPopType",
-                        "name": "Type of population",
-                        "id": "Byx9QE6IvXB"
-                    },
-                    "value": "Most-at-risk Population"
-                }, {
-                    "attribute": {
-                        "code": "projCode",
-                        "name": "Project Code",
-                        "id": "fa5e00d5cd2"
-                    },
-                    "value": "RU118"
-                }, {
-                    "attribute": {
-                        "code": 'reasonForIntervention',
-                        "name": 'Reason For Intervention',
-                        "id": 'e7af7f29053'
-                    },
-                    "value": 'Natural Disaster'
-                }, {
-                    "attribute": {
-                        "code": 'modeOfOperation',
-                        "name": 'Mode Of Operation',
-                        "id": 'a048b89d331'
-                    },
-                    "value": 'Direct operation'
-                }, {
-                    "attribute": {
-                        "code": 'modelOfManagement',
-                        "name": 'Model Of Management',
-                        "id": 'd2c3e7993f6'
-                    },
-                    "value": 'Collaboration'
-                }, {
-                    "attribute": {
-                        "code": "autoApprove",
-                        "name": "Auto Approve",
-                        "id": "e65afaec61d"
-                    },
-                    "value": "true"
-                }, {
-                    "attribute": {
-                        "code": "projectType",
-                        "name": "Project Type"
-                    },
-                    "value": "Some Type"
-                }, {
-                    "attribute": {
-                        "code": "estimatedTargetPopulation",
-                        "name": "Estimated target population"
-                    },
-                    "value": "1000"
-                }, {
-                    "attribute": {
-                        "code": "estPopulationLessThan1Year",
-                        "name": "Est. population less than 1 year",
-                    },
-                    "value": "11"
-                }, {
-                    "attribute": {
-                        "code": "estPopulationBetween1And5Years",
-                        "name": "Est. population between 1 and 5 years"
-                    },
-                    "value": "12"
-                }, {
-                    "attribute": {
-                        "code": "estPopulationOfWomenOfChildBearingAge",
-                        "name": "Est. population of women of child bearing age"
-                    },
-                    "value": "13"
-                }]
+                "attributeValues": []
             };
             var expectedNewOrgUnit = {
                 'name': scope.orgUnit.name,
@@ -465,6 +374,25 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             scope.orgUnit.parent = {
                 "id": "parentId"
             };
+            customAttributes.getAttributeValue.and.callFake(function (attributeValues, code) {
+                var fakeAttributeValues = {
+                    prjEndDate: '2011-01-01',
+                    autoApprove: 'true',
+                    prjLoc: 'val3',
+                    projCode: 'RU118',
+                    prjCon: 'Post-conflict',
+                    prjPopType: 'Most-at-risk Population',
+                    projectType: 'Some Type',
+                    reasonForIntervention: 'Natural Disaster',
+                    modeOfOperation: 'Direct operation',
+                    modelOfManagement: 'Collaboration',
+                    estimatedTargetPopulation: '1000',
+                    estPopulationLessThan1Year: '11',
+                    estPopulationBetween1And5Years: '12',
+                    estPopulationOfWomenOfChildBearingAge: '13'
+                };
+                return fakeAttributeValues[code];
+            });
             projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository, translationsService);
             scope.$apply();
 
@@ -475,13 +403,9 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             var project1 = {
                 "id": "Kabul1",
                 "name": "Kabul-AF101",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "projCode"
-                    },
-                    "value": "AF101"
-                }]
+                "attributeValues": []
             };
+            customAttributes.getAttributeValue.and.returnValue('AF101');
 
             orgUnitRepo.getAllProjects.and.returnValue(utils.getPromise(q, [project1]));
 

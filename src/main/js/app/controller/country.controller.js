@@ -1,4 +1,4 @@
-define(["lodash", "dhisId", "moment","interpolate", "orgUnitMapper"], function(_, dhisId, moment, interpolate, orgUnitMapper) {
+define(["lodash", "dhisId", "moment","interpolate", "orgUnitMapper", "customAttributes"], function(_, dhisId, moment, interpolate, orgUnitMapper, customAttributes) {
     return function($scope, $hustle, orgUnitRepository, $q, $location, $timeout, $anchorScroll) {
         $scope.openOpeningDate = function($event) {
             $event.preventDefault();
@@ -14,23 +14,8 @@ define(["lodash", "dhisId", "moment","interpolate", "orgUnitMapper"], function(_
                 'shortName': orgUnit.name,
                 'openingDate': moment(orgUnit.openingDate).format("YYYY-MM-DD"),
                 'parent': _.pick(parentOrgUnit, "name", "id"),
-                'attributeValues': [{
-                    'created': moment().toISOString(),
-                    'lastUpdated': moment().toISOString(),
-                    'attribute': {
-                        "code": "Type",
-                        "name": "Type"
-                    },
-                    'value': "Country"
-                }, {
-                    'created': moment().toISOString(),
-                    'lastUpdated': moment().toISOString(),
-                    'attribute': {
-                        "code": "isNewDataModel",
-                        "name": "Is New Data Model"
-                    },
-                    'value': "true"
-                }]
+                'attributeValues': [customAttributes.createAttribute(customAttributes.TYPE, "Country"),
+                    customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true")]
             };
 
             var onSuccess = function(data) {

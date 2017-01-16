@@ -1,9 +1,8 @@
-define(["lodash", "properties", "appSettingsUtils"], function(_, properties, appSettingsUtils) {
+define(['lodash'], function(_) {
     var registerMessageCallback = function(messageName, callback) {
-        return function(request, sender, sendResponse) {
-            if (request === messageName)
-                callback();
-
+        return function(message) {
+            if (message.name === messageName)
+                callback(message.data);
         };
     };
 
@@ -18,42 +17,35 @@ define(["lodash", "properties", "appSettingsUtils"], function(_, properties, app
         chrome.runtime.onMessage.addListener(registerMessageCallback(message, callback));
     };
 
-    var sendMessage = function(message) {
-        chrome.runtime.sendMessage(message);
-    };
-
-    var setAuthHeader = function(value) {
-        return appSettingsUtils.upsert("authHeader", {
-            "authHeader": value
+    var sendMessage = function(messageName, data) {
+        chrome.runtime.sendMessage({
+            name: messageName,
+            data: data
         });
     };
 
-    var getAuthHeader = function(callback) {
-        var doCallback = function(storedObject) {
-            if (storedObject === null && properties.devMode) {
-                callback({
-                    "authHeader": "Basic c2VydmljZS5hY2NvdW50OiFBQkNEMTIzNA=="
-                });
-                return;
-            }
-            if (storedObject === null)
-                callback();
-            else
-                callback(storedObject.value.value);
-        };
-        appSettingsUtils.get("authHeader").then(doCallback);
-    };
-
-    var createNotification = function(title, message) {
+    var createNotification = function (title, message, callBack) {
         var options = {
             "type": "basic",
-            "iconUrl": "/img/logo.png",
+            "iconUrl": self.basePath + "img/logo.png",
             "title": title,
             "message": message
         };
-        chrome.notifications.create(_.random(1000000).toString(), options, function(notificationId) {
+        var notificationId = _.random(1000000).toString();
+        chrome.notifications.create(notificationId, options, function (notificationId) {
             return notificationId;
         });
+
+        if (callBack) {
+            var registerNotificationCallBack = function (registeredNotificationId, callBack) {
+                return function (notificationId) {
+                    if ((notificationId == registeredNotificationId) && callBack) {
+                        callBack();
+                    }
+                };
+            };
+            chrome.notifications.onClicked.addListener(registerNotificationCallBack(notificationId, callBack));
+        }
     };
 
     var getPraxisVersion = function () {
@@ -83,17 +75,21 @@ define(["lodash", "properties", "appSettingsUtils"], function(_, properties, app
         chrome.alarms.clear(alarmName);
     };
 
+    var uninstall = function () {
+        chrome.management.uninstallSelf();
+    };
+
     return {
         addListener: addListener,
         sendMessage: sendMessage,
-        setAuthHeader: setAuthHeader,
-        getAuthHeader: getAuthHeader,
         createNotification: createNotification,
         getPraxisVersion: getPraxisVersion,
         getOS: getOS,
         init: _.once(init),
         createAlarm: createAlarm,
         addAlarmListener: addAlarmListener,
-        clearAlarm: clearAlarm
+        clearAlarm: clearAlarm,
+        uninstall: uninstall,
+        platform: 'chrome'
     };
 });

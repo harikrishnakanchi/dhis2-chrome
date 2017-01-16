@@ -36,7 +36,6 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
                 spyOn(indexeddbUtils, "backupEntireDB").and.returnValue(utils.getPromise(q, idbDump));
                 spyOn(indexeddbUtils, "restore").and.returnValue(utils.getPromise(q, {}));
                 spyOn(sessionHelper, "logout").and.returnValue(utils.getPromise(q, {}));
-                spyOn(location, "path").and.returnValue(utils.getPromise(q, {}));
                 spyOn(fakeModal, 'open').and.returnValue({
                     result: utils.getPromise(q, {})
                 });
@@ -71,7 +70,7 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
                 scope.$apply();
 
                 expect(indexeddbUtils.backupEntireDB).toHaveBeenCalled();
-                expect(filesystemService.writeFile).toHaveBeenCalledWith('dhis_idb_20140530-124354.msf', jasmine.any(Blob));
+                expect(filesystemService.writeFile).toHaveBeenCalledWith('praxis_idb_20140530-124354.prx', jasmine.any(Blob));
             });
 
             it("should fail if cloning entire indexedDb fails", function() {
@@ -90,10 +89,12 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
                 scope.$apply();
 
                 expect(indexeddbUtils.backupEntireDB).toHaveBeenCalled();
-                expect(filesystemService.writeFile).toHaveBeenCalledWith('dhis_idb_20140530-124354.msf', jasmine.any(Blob));
+                expect(filesystemService.writeFile).toHaveBeenCalledWith('praxis_idb_20140530-124354.prx', jasmine.any(Blob));
             });
 
             it("should load clone to indexed db from selected file", function() {
+                var onImportSelectCallback, mockElement;
+
                 spyOn(filesystemService, "readFile").and.returnValue(utils.getPromise(q, {
                     "target": {
                         "result": "{}"
@@ -104,14 +105,25 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
                     "name": "blah"
                 }]);
 
+                mockElement = document.createElement('input');
+                mockElement.addEventListener = function (event, callback) {
+                    onImportSelectCallback = callback;
+                };
+                spyOn(document, 'getElementById').and.returnValue(mockElement);
+
                 scope.loadClone();
+                scope.$apply();
+                onImportSelectCallback({
+                    target: {
+                        files: ['someFile']
+                    }
+                });
                 scope.$apply();
                 timeout.flush();
 
                 expect(filesystemService.readFile).toHaveBeenCalled();
                 expect(indexeddbUtils.restore).toHaveBeenCalled();
                 expect(sessionHelper.logout).toHaveBeenCalled();
-                expect(location.path).toHaveBeenCalledWith('/login');
             });
 
             it("should dump logs to a file", function() {
@@ -138,7 +150,7 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
 
                 expect(indexedDBLogger.exportLogs).toHaveBeenCalled();
                 expect(new Blob()).toEqual(jasmine.any(Blob));
-                expect(filesystemService.writeFile).toHaveBeenCalledWith('logs_dump_20140530-124354.msf', jasmine.any(Blob));
+                expect(filesystemService.writeFile).toHaveBeenCalledWith('logs_dump_20140530-124354.logs', jasmine.any(Blob));
             });
         });
     });

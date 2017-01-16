@@ -1,5 +1,5 @@
 define(['chart', 'chartData', 'lodash'], function(Chart, ChartData, _) {
-    return function(db, $q, categoryRepository) {
+    return function(db, $q, categoryRepository, dataElementRepository, indicatorRepository, programIndicatorRepository) {
         var CHART_STORE_NAME = 'chartDefinitions';
         var CHART_DATA_STORE_NAME = 'chartData';
 
@@ -19,8 +19,7 @@ define(['chart', 'chartData', 'lodash'], function(Chart, ChartData, _) {
         };
 
         this.getAllChartsForNotifications = function() {
-            var store = db.objectStore(CHART_STORE_NAME);
-            return store.getAll().then(function(charts) {
+            return this.getAll().then(function(charts) {
                 return _.filter(charts, function(chart) {
                     return _.endsWith(chart.name, "Notifications");
                 });
@@ -38,16 +37,22 @@ define(['chart', 'chartData', 'lodash'], function(Chart, ChartData, _) {
             var store = db.objectStore(CHART_STORE_NAME);
 
             return store.getAll().then(function (charts) {
-                var categoryDimensions = _.flatten(_.map(charts, 'categoryDimensions'));
+                var categoryDimensions = _.flatten(_.map(charts, 'categoryDimensions')),
+                    dataElements = _.compact(_.map(_.flatten(_.map(charts, 'dataDimensionItems')), 'dataElement')),
+                    indicators = _.compact(_.map(_.flatten(_.map(charts, 'dataDimensionItems')), 'indicator')),
+                    programIndicators = _.compact(_.map(_.flatten(_.map(charts, 'dataDimensionItems')), 'programIndicator'));
 
-                return categoryRepository.enrichWithCategoryOptions(categoryDimensions)
+                return $q.all([categoryRepository.enrichWithCategoryOptions(categoryDimensions),
+                        dataElementRepository.enrichWithDataElementsDetails(dataElements),
+                        indicatorRepository.enrichWithIndicatorDetails(indicators),
+                        programIndicatorRepository.enrichWithProgramIndicatorDetails(programIndicators)])
                     .then(_.partial(_.map, charts, Chart.create));
             });
         };
 
-        this.getDataForChart = function(chartName, orgUnitId) {
+        this.getDataForChart = function(chartId, orgUnitId) {
             var store = db.objectStore(CHART_DATA_STORE_NAME);
-            return store.find([chartName, orgUnitId]).then(function (chartData) {
+            return store.find([chartId, orgUnitId]).then(function (chartData) {
                 return !!chartData && chartData.data;
             });
         };

@@ -1,4 +1,4 @@
-define(["lodash", "moment", "dhisId","interpolate", "orgUnitMapper"], function(_, moment, dhisId, interpolate, orgUnitMapper) {
+define(["lodash", "moment", "dhisId","interpolate", "orgUnitMapper", "customAttributes"], function(_, moment, dhisId, interpolate, orgUnitMapper, customAttributes) {
     return function($scope, $hustle, $q, patientOriginRepository, orgUnitRepository, datasetRepository, programRepository, originOrgunitCreator, orgUnitGroupHelper) {
         var patientOrigins = [];
         var oldName = "";
@@ -72,18 +72,8 @@ define(["lodash", "moment", "dhisId","interpolate", "orgUnitMapper"], function(_
                     });
                 };
 
-                var getBooleanAttributeValue = function(attributeValues, attributeCode) {
-                    var attr = _.find(attributeValues, {
-                        "attribute": {
-                            "code": attributeCode
-                        }
-                    });
-
-                    return attr && attr.value === 'true';
-                };
-
                 var isLinelistService = function(orgUnit) {
-                    return getBooleanAttributeValue(orgUnit.attributeValues, "isLineListService");
+                    return customAttributes.getBooleanAttributeValue(orgUnit.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE);
                 };
 
                 var createOrgUnitGroups = function() {
@@ -93,7 +83,8 @@ define(["lodash", "moment", "dhisId","interpolate", "orgUnitMapper"], function(_
 
                 var createOrgUnits = function (module) {
                     return orgUnitRepository.findAllByParent(module.id).then(function (siblingOriginOrgUnits) {
-                        return originOrgunitCreator.create(module, $scope.patientOrigin).then(function (originOrgUnits) {
+                        var isOriginDataSetAssociated = !_.isEmpty(_.get(_.first(siblingOriginOrgUnits), 'dataSets'));
+                        return originOrgunitCreator.create(module, $scope.patientOrigin, isOriginDataSetAssociated).then(function (originOrgUnits) {
                             orgUnitsForGroups = isLinelistService(module) ? orgUnitsForGroups.concat(originOrgUnits) : orgUnitsForGroups.concat(module);
                             if (isLinelistService(module)) {
                                 return publishMessage(originOrgUnits, "upsertOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, {orgUnit: _.uniq(_.pluck(originOrgUnits, "name")).toString()})).then(function () {

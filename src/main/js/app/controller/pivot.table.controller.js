@@ -8,10 +8,6 @@ define(["lodash", "dateUtils", "moment", "excelBuilder"], function(_, dateUtils,
 
         var EMPTY_ROW = [];
 
-        var escapeString = function (string) {
-            return '"' + string + '"';
-        };
-
         var getLastUpdatedTimeContent = function () {
             var formattedTime = moment($scope.updatedTime, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
             return ['Updated', formattedTime];
@@ -20,14 +16,14 @@ define(["lodash", "dateUtils", "moment", "excelBuilder"], function(_, dateUtils,
         $scope.exportToExcel = function () {
             var formattedDate = moment($scope.updatedTime, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA),
                 updatedTimeDetails = $scope.updatedTime ? '[updated ' + formattedDate + ']' : moment().format("DD-MMM-YYYY"),
-                fileName = [$scope.table.serviceCode, $scope.table.title, updatedTimeDetails, 'xlsx'].join('.');
+                fileName = [$scope.table.serviceCode, $scope.table.title, updatedTimeDetails].join('.');
 
             var spreadSheetContent = [{
                 name: $scope.table.title,
                 data: [
-                    getLastUpdatedTimeContent(),
+                    $scope.updatedTime ? getLastUpdatedTimeContent() : EMPTY_ROW,
                     EMPTY_ROW
-                ].concat(pivotTableExportBuilder.build($scope.table))
+                ].concat(pivotTableExportBuilder.build($scope.table, $scope.referralLocations))
             }];
 
             filesystemService.promptAndWriteFile(fileName, excelBuilder.createWorkBook(spreadSheetContent), filesystemService.FILE_TYPE_OPTIONS.XLSX);
@@ -64,6 +60,13 @@ define(["lodash", "dateUtils", "moment", "excelBuilder"], function(_, dateUtils,
 
         $scope.getNumberOfWeeksLabel = function (month) {
             return '[' + dateUtils.getNumberOfISOWeeksInMonth(month) + ' ' + $scope.resourceBundle.weeksLabel + ']';
+        };
+
+        $scope.getDisplayNameForReferralLocations = function (pivotTableRow) {
+            var referralLocation = _.find(_.keys($scope.referralLocations), function (referralLocationName) {
+                return _.contains(pivotTableRow.name, referralLocationName);
+            });
+            return $scope.referralLocations[referralLocation].name;
         };
 
         if ($scope.table) {

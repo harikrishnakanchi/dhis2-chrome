@@ -1,7 +1,8 @@
 require.config({
     paths: {
         //Utils
-        "chromeUtils": "app/chrome/chrome.utils",
-        "filesystemService": "app/chrome/chrome.filesystem.service"
+        "platformUtils": "app/chrome/chrome.utils",
+        "filesystemService": "app/chrome/chrome.filesystem.service",
+        "platformConfig": "app/chrome/chrome.properties"
     }
 });

@@ -17,6 +17,8 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
         var loadSettingsFromFile = function() {
             return $http.get("data/systemSettings.json").then(function(response) {
                 return response.data;
+            }).catch(function () {
+                return {};
             });
         };
 
@@ -66,7 +68,7 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
         };
 
         this.getSystemSettings = function() {
-            return getSettings("fieldAppSettings,versionCompatibilityInfo").then(transformFieldAppSettings);
+            return getSettings("fieldAppSettings,versionCompatibilityInfo,notificationSetting").then(transformFieldAppSettings);
         };
 
         this.getProjectSettings = function(projectIds) {

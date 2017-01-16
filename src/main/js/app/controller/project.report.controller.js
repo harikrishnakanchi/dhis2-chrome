@@ -8,10 +8,6 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper", "excelBuilder"], funct
         var buildSpreadSheetContent = function () {
             var EMPTY_ROW = [];
 
-            var escapeString = function (string) {
-                return '"' + string + '"';
-            };
-
             var getLastUpdatedTimeDetails = function () {
                 var formattedTime = moment($scope.lastUpdatedTimeForProjectReport, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
                 return ['Updated', formattedTime];

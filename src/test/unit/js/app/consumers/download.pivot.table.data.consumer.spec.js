@@ -3,15 +3,20 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
         describe('Download Pivot Table Data Consumer', function() {
             var downloadPivotTableDataConsumer,
                 reportService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository,
-                scope, q, currentTime, mockProjectId, mockModule, mockDataSet, mockProgram, mockPivotTable;
+                scope, q, currentTime, mockProjectId, mockOpUnitId, mockModule, mockDataSet, mockProgram, mockPivotTable, mockOpUnit;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
                 scope = $rootScope;
                 q = $q;
 
                 mockProjectId = 'mockProjectId';
+                mockOpUnitId = 'mockOpunitId';
                 mockModule = {
                     'id': 'someModuleId'
+                };
+
+                mockOpUnit = {
+                    id: mockOpUnitId
                 };
 
                 mockDataSet = {
@@ -37,6 +42,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, 'findAllByParent').and.returnValue(utils.getPromise(q, []));
                 spyOn(orgUnitRepository, 'getAllModulesInOrgUnits').and.returnValue(utils.getPromise(q, [mockModule]));
+                spyOn(orgUnitRepository, 'getAllOpUnitsInOrgUnits').and.returnValue(utils.getPromise(q, [mockOpUnit]));
 
                 datasetRepository = new DatasetRepository();
                 spyOn(datasetRepository, 'findAllForOrgUnits').and.returnValue(utils.getPromise(q, [mockDataSet]));
@@ -314,6 +320,28 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 scope.$apply();
 
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(mockProjectReport, mockProjectId);
+            });
+
+            describe('opUnitReports', function () {
+                it('should get all opunit ids for specified project', function () {
+                    downloadPivotTableDataConsumer.run();
+                    scope.$apply();
+
+                    expect(orgUnitRepository.getAllOpUnitsInOrgUnits).toHaveBeenCalledWith([mockProjectId]);
+                });
+
+                it('should download opUnit reports for the project', function () {
+                    var mockOpUnitReport = {
+                        opUnitReport: true
+                    };
+
+                    pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [mockOpUnitReport]));
+
+                    downloadPivotTableDataConsumer.run();
+                    scope.$apply();
+
+                    expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(mockOpUnitReport, mockOpUnitId);
+                });
             });
         });
     });

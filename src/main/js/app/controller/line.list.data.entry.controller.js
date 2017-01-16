@@ -1,5 +1,5 @@
-define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUtils"], function(_, moment, dhisId, dateUtils, properties, dataElementUtils) {
-    return function($scope, $rootScope, $routeParams, $location, $anchorScroll, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService) {
+define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUtils", "customAttributes"], function(_, moment, dhisId, dateUtils, properties, dataElementUtils, customAttributes) {
+    return function($scope, $rootScope, $routeParams, $route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService) {
 
         var resetForm = function() {
             $scope.form = $scope.form || {};
@@ -18,12 +18,8 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
         };
 
         $scope.getNumberPattern = function(dataElement) {
-            var attr = _.find(dataElement.attributeValues, {
-                attribute: {
-                    name: 'Pediatric Age Field'
-                }
-            });
-            if((!_.isEmpty(attr)) && attr.value === 'true')
+            var isPediatricAgeDataElement = customAttributes.getBooleanAttributeValue(dataElement.attributeValues, customAttributes.PEDIATRIC_AGE_FIELD_CODE);
+            if(isPediatricAgeDataElement)
                 return '^((0.5)|[1-9][0-9]?)$';
             else
                 return '^[1-9][0-9]?$';
@@ -89,10 +85,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
         };
 
         $scope.isEventDateSubstitute = function(dataElement) {
-            var attr = _.find(dataElement.attributeValues, function(attributeValue) {
-                return attributeValue.attribute.code === "useAsEventDate";
-            });
-            return attr && attr.value === "true";
+            return customAttributes.getBooleanAttributeValue(dataElement.attributeValues, customAttributes.EVENT_DATE);
         };
 
         $scope.isReferralLocationPresent = function(dataElement) {
@@ -115,11 +108,6 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
             });
         };
 
-        var scrollToTop = function(eventId) {
-            $location.hash('top');
-            $anchorScroll();
-        };
-
         $scope.save = function(addAnother) {
 
             var dataValuesAndEventDate = getDataValuesAndEventDate();
@@ -137,9 +125,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
 
             programEventRepository.upsert($scope.event).then(function() {
                 if (addAnother) {
-                    resetForm();
-                    setEventMinAndMaxDate();
-                    scrollToTop(eventId);
+                    $route.reload();
                 } else {
                     historyService.back({
                         'messageType': 'success',

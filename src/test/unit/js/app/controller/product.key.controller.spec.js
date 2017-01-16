@@ -1,4 +1,4 @@
-define(["productKeyController", "angularMocks", "packagedDataImporter", "utils", "chromeUtils", "sessionHelper", "systemSettingRepository"], function(ProductKeyController, mocks, PackagedDataImporter, utils, chromeUtils, SessioHelper, SystemSettingRepository) {
+define(["productKeyController", "angularMocks", "packagedDataImporter", "utils", "platformUtils", "sessionHelper", "systemSettingRepository"], function(ProductKeyController, mocks, PackagedDataImporter, utils, platformUtils, SessioHelper, SystemSettingRepository) {
     describe("productKeyController", function() {
         var scope, location, productKeyController, packagedDataImporter, rootscope, q, sessionHelper, systemSettingRepository;
 
@@ -12,8 +12,7 @@ define(["productKeyController", "angularMocks", "packagedDataImporter", "utils",
 
             spyOn(systemSettingRepository, "upsertProductKey").and.returnValue(utils.getPromise(q, []));
 
-            spyOn(chromeUtils, "sendMessage");
-            spyOn(chromeUtils, "setAuthHeader").and.returnValue(utils.getPromise(q, {}));
+            spyOn(platformUtils, "sendMessage");
 
             packagedDataImporter = new PackagedDataImporter();
             spyOn(packagedDataImporter, "run").and.returnValue(utils.getPromise(q, {}));
@@ -53,14 +52,13 @@ define(["productKeyController", "angularMocks", "packagedDataImporter", "utils",
             expect(sessionHelper.logout).not.toHaveBeenCalled();
         });
 
-        it("should send a db ready message after metadata is imported", function() {
+        it("should send a productKeyDecrypted message after product key is decrypted successfully", function() {
             scope.productKey = "eyJpdiI6IkZlTlZqYTZxUWRtUjRwTHVybEs2cmc9PSIsInNhbHQiOiJxa045eUIxNS90bz0iLCJjdCI6ImxpR2VTV3Nvb0s2eFdtRTk1WGlGMFFYOFVrbXVTdWJaOGRiYndDTkg3ZjVKdTZWMDNJczR1SGpaV0VWU29CZz0ifQ==";
 
             scope.$apply();
             scope.setAuthHeaderAndProceed();
             scope.$apply();
-            expect(chromeUtils.sendMessage.calls.argsFor(1)).toEqual(["dbReady"]);
-            expect(chromeUtils.sendMessage.calls.argsFor(0)).toEqual(["productKeyDecrypted"]);
+            expect(platformUtils.sendMessage.calls.argsFor(0)).toEqual(["productKeyDecrypted"]);
         });
     });
 });

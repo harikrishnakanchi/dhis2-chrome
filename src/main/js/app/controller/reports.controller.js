@@ -1,5 +1,5 @@
-define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURItoBlob"], function(d3, _, moment, CustomAttributes, SVGUtils, dataURItoBlob) {
-    return function($rootScope, $scope, $q, $routeParams, datasetRepository, programRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService, changeLogRepository) {
+define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURItoBlob"], function(d3, _, moment, customAttributes, SVGUtils, dataURItoBlob) {
+    return function($rootScope, $scope, $q, $routeParams, datasetRepository, programRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService, changeLogRepository, referralLocationsRepository) {
 
         var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
         var REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY hh[.]mm A";
@@ -90,7 +90,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 else {
                     lastUpdatedTimeDetails = moment().format("DD-MMM-YYYY");
                 }
-                return [chart.serviceCode, chart.title, lastUpdatedTimeDetails, 'png'].join('.');
+                return [chart.serviceCode, chart.title, lastUpdatedTimeDetails].join('.');
             };
 
             SVGUtils.svgAsPngUri(svgElement, {}, function(uri) {
@@ -106,13 +106,13 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             });
         };
 
-        var loadChartsWithData = function() {
-            var filterOutNotificationCharts = function (charts) {
-                return _.reject(charts, function(chart) {
-                    return _.endsWith(chart.name, "Notifications");
-                });
-            };
+        var rejectNotificationReports = function (reportsForCurrentModule) {
+            return _.reject(reportsForCurrentModule, function (report) {
+                return _.endsWith(report.name, 'Notifications');
+            });
+        };
 
+        var loadChartsWithData = function() {
             var getChartData = function(charts) {
                 var promises = _.map(charts, function(chart) {
                     return chartRepository.getChartData(chart, $scope.orgUnit.id);
@@ -155,7 +155,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
 
             return chartRepository.getAll()
                 .then(filterReportsForCurrentModule)
-                .then(filterOutNotificationCharts)
+                .then(rejectNotificationReports)
                 .then(getChartData)
                 .then(translationsService.translateChartData)
                 .then(transformForNVD3)
@@ -171,7 +171,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
 
                 return datasetRepository.findAllForOrgUnits(modulesAndOrigins).then(function(dataSets) {
                     var filteredDataSets = _.reject(dataSets, function(ds) {
-                        return ds.isPopulationDataset || ds.isReferralDataset || ds.isLineListService;
+                        return ds.isPopulationDataset || ds.isLineListService;
                     });
                     
                     var translatedDataSets = translationsService.translate(filteredDataSets);
@@ -222,7 +222,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 .then(orgUnitRepository.enrichWithParent)
                 .then(function(orgUnit) {
                 orgUnit.displayName = orgUnit.parent.name + ' - ' + orgUnit.name;
-                orgUnit.lineListService = CustomAttributes.getBooleanAttributeValue(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
+                orgUnit.lineListService = customAttributes.getBooleanAttributeValue(orgUnit.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE);
                 $scope.orgUnit = orgUnit;
             });
         };
@@ -240,11 +240,18 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
         var loadPivotTablesWithData = function() {
             return pivotTableRepository.getAll()
                 .then(filterReportsForCurrentModule)
+                .then(rejectNotificationReports)
                 .then(getPivotTableData)
                 .then(translationsService.translatePivotTableData)
                 .then(function(pivotTables) {
                     $scope.pivotTables = pivotTables;
                 });
+        };
+
+        var loadReferralLocationForModule = function () {
+            return referralLocationsRepository.get($scope.orgUnit.parent.id).then(function (referralLocations) {
+                $scope.referralLocations = referralLocations;
+            });
         };
 
         var loadLastUpdatedForChartsAndReports = function () {
@@ -265,6 +272,31 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             });
         };
 
+        var countAvailableChartsAndReportsForServices = function () {
+            var countByService = function (items) {
+                return _.chain(items)
+                    .groupBy('serviceCode')
+                    .mapValues(_.property('length'))
+                    .value();
+            };
+
+            var chartCountByService = countByService($scope.charts);
+            var pivotTableCountByService = countByService($scope.pivotTables);
+
+            _.each($scope.services, function (service) {
+                service.areReportsAvailable = _.gt(_.add(
+                        _.get(chartCountByService, service.serviceCode, 0),
+                        _.get(pivotTableCountByService, service.serviceCode, 0)
+                ), 0);
+            });
+        };
+
+        var selectFirstServiceWithReports = function () {
+            $scope.selectedService = _.find($scope.services, function (service) {
+                return !service.isOriginDataset && !service.isReferralDataset && service.areReportsAvailable;
+            });
+        };
+
         var init = function() {
             $scope.startLoading();
 
@@ -275,13 +307,11 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 .then(loadServicesForOrgUnit)
                 .then(loadChartsWithData)
                 .then(loadPivotTablesWithData)
+                .then(loadReferralLocationForModule)
                 .then(loadLastUpdatedForChartsAndReports)
-                .finally(function() {
-                    $scope.selectedService = _.find($scope.services, function (service) {
-                        return !service.isOriginDataset;
-                    });
-                    $scope.stopLoading();
-                });
+                .then(countAvailableChartsAndReportsForServices)
+                .then(selectFirstServiceWithReports)
+                .finally($scope.stopLoading);
         };
 
         init();

@@ -1,7 +1,8 @@
 define(["lodash"], function(_) {
-    return function($scope, $q, $rootScope, userPreferenceRepository, chartRepository, orgUnitRepository, translationService) {
+    return function($scope, $q, $rootScope, userPreferenceRepository, orgUnitRepository, translationService, pivotTableRepository, chartRepository, systemSettingRepository) {
+        //TODO remove backward compatibility code one month after 10.0 release
 
-        var allCharts;
+        var notificationReports, standardDeviationValue;
         $scope.allDataElementValues = [];
         $scope.weeks = [];
         $scope.noNotificationsForAnyModule = true;
@@ -23,18 +24,24 @@ define(["lodash"], function(_) {
             });
         };
 
-        var getAllCharts = function() {
-            return chartRepository.getAllChartsForNotifications().then(function(charts) {
-                allCharts = charts;
+        var getNotificationReports = function () {
+            return pivotTableRepository.getPivotTablesForNotifications().then(function (pivotTables) {
+                    notificationReports = pivotTables;
+                if (pivotTables.length === 0) {
+                    return chartRepository.getAllChartsForNotifications().then(function (charts) {
+                        notificationReports = charts;
+                    });
+                }
             });
         };
 
-        var loadChartData = function(chart, moduleId) {
-            return chartRepository.getDataForChart(chart.name, moduleId).then(function(chartData) {
-                if (chartData) {
-                    var periods = chartData.metaData.pe;
-                    $scope.weeks = _.slice(periods, periods.length - 5, periods.length - 1);
-                    return chartData;
+        var loadReportData = function (report, moduleId) {
+            return pivotTableRepository.getPivotTableData(report, moduleId, true).then(function (pivotTableData) {
+                if (pivotTableData) { return pivotTableData; }
+                else {
+                    return chartRepository.getChartData(report, moduleId).then(function (chartData) {
+                        if (chartData) { return chartData; }
+                    });
                 }
             });
         };
@@ -60,33 +67,19 @@ define(["lodash"], function(_) {
             var avgSquareDiff = findAverage(squareDiffs);
 
             var stdDev = Math.sqrt(avgSquareDiff);
-            return stdDev * 1.25;
+            return stdDev * standardDeviationValue;
         };
 
-        var getWeeklyData = function(dataElementData) {
+        var getWeeklyData = function(periods, dataElement, reportData) {
 
-            var getDataForCalculation = function(week) {
-                var allData = [];
-                dataElementData = _.sortBy(dataElementData, "1");
+            var getDataForCalculation = [];
 
-                var dataUptoGivenWeek = _.dropRightWhile(dataElementData, function(deData) {
-                    return deData[1] !== week;
-                });
+            return _.reduce(periods, function(result, row) {
+                var dataValueForWeek = reportData.getDataValue(row, dataElement);
+                dataValueForWeek = _.isNumber(dataValueForWeek) ? parseInt(dataValueForWeek) : dataValueForWeek;
 
-                _.each(dataUptoGivenWeek, function(datum) {
-                    allData.push(parseInt(datum[2]));
-                });
-
-                return allData;
-            };
-
-            return _.reduce($scope.weeks, function(result, week) {
-                var dataForWeek = _.find(dataElementData, function(data) {
-                    return data[1] === week;
-                });
-
-                if (!dataForWeek) {
-                    result[week] = {
+                if (_.isUndefined(dataValueForWeek)) {
+                    result[row.name] = {
                         "value": "-",
                         "standardDeviation": undefined,
                         "mean": undefined,
@@ -95,12 +88,11 @@ define(["lodash"], function(_) {
                     return result;
                 }
 
-                var dataForCalculation = getDataForCalculation(week);
-                var standardDeviation = _.round(calculateStandardDeviation(dataForCalculation));
-                var mean = _.round(findAverage(dataForCalculation));
-
-                result[week] = {
-                    "value": parseInt(dataForWeek[2]),
+                getDataForCalculation.push(dataValueForWeek);
+                var standardDeviation = _.round(calculateStandardDeviation(getDataForCalculation));
+                var mean = _.round(findAverage(getDataForCalculation));
+                result[row.name] = {
+                    "value": parseInt(dataValueForWeek),
                     "standardDeviation": standardDeviation,
                     "mean": mean,
                     "max": _.round(mean + standardDeviation)
@@ -110,21 +102,40 @@ define(["lodash"], function(_) {
             }, {});
         };
 
-        var getDataElementValues = function(chart, chartData, module) {
-            if (_.isEmpty(chartData) || _.isEmpty(chartData.rows)) {
+        var getDataElementValues = function(report, reportData, module) {
+            if (_.isEmpty(reportData) || (_.isEmpty(reportData.rows) && _.isEmpty(reportData.columns) && _.isEmpty(reportData.categories) && _.isEmpty(reportData.series))) {
                 return;
             }
 
-            var dataElementIds = _.chain(chartData.rows).reduce(function(result, row) {
-                result.push(row[0]);
-                return result;
-            }, []).uniq().value();
+            var getFromRows = function (dimension) {
+                var rows = _.filter(reportData.rows, dimension);
+                return rows.length ? rows : null;
+            };
 
-            _.forEach(dataElementIds, function(dataElementId) {
-                var dataElementRows = _.filter(chartData.rows, function(row) {
-                    return row[0] === dataElementId;
-                });
-                var weeklyData = getWeeklyData(dataElementRows);
+            var getFromColumns = function (dimension) {
+                var columns = _.reduce(reportData.columns, function (result, column) {
+                    return _.first(column)[dimension] ? result.concat(column) : result;
+                }, []);
+                return columns.length ? columns : null;
+            };
+
+            var getFromCategories = function (dimension) {
+                var categories = _.filter(reportData.categories, dimension);
+                return categories.length ? categories : null;
+            };
+
+            var getFromSeries = function (dimension) {
+                var series = _.filter(reportData.series, dimension);
+                return series.length ? series : null;
+            };
+
+            var periods = getFromRows('periodDimension') || getFromColumns('periodDimension') || getFromCategories('periodDimension') || getFromSeries('periodDimension');
+            var dataElements = getFromRows('dataDimension') || getFromColumns('dataDimension') || getFromCategories('dataDimension') || getFromSeries('dataDimension');
+
+            $scope.weeks = _.uniq(_.union($scope.weeks, _.slice(periods, periods.length - 5, periods.length - 1)), 'name');
+
+            _.forEach(dataElements, function(dataElement) {
+                var weeklyData = getWeeklyData($scope.weeks, dataElement, reportData);
                 var showInNotifications = false;
 
                 _.each(weeklyData, function(dataForWeek) {
@@ -132,21 +143,13 @@ define(["lodash"], function(_) {
                         showInNotifications = showInNotifications || true;
                         $scope.noNotificationsForAnyModule = false;
                     }
-
                 });
-
-                var dataElement;
-                if(chart.columns) {
-                    dataElement = _.find(chart.columns[0].items, function (item) {
-                        return item.id == dataElementId;
-                    });
-                }
 
                 $scope.allDataElementValues.push({
                     "moduleName": module.parent.name + " - " + module.name,
-                    "dataElementId": dataElementId,
-                    "dataElementName": translationService.getTranslationForProperty(dataElementId, 'name', chartData.metaData.names[dataElementId]),
-                    "dataElementDescription": (dataElement && dataElement.description) ? dataElement.description : '',
+                    "dataElementId": dataElement.id,
+                    "dataElementName": translationService.getTranslationForProperty(dataElement.id, 'name', reportData.getDisplayName(dataElement)),
+                    "dataElementDescription": translationService.getTranslationForProperty(dataElement.id, 'description', dataElement.description),
                     "weeklyData": weeklyData,
                     "showInNotifications": showInNotifications
                 });
@@ -154,25 +157,32 @@ define(["lodash"], function(_) {
             });
         };
 
-        var getChartData = function(userModules) {
-            var chartDataPromises = [];
+        var getStandardDeviationValue = function () {
+            return systemSettingRepository.getStandardDeviationValue().then(function (value) {
+                standardDeviationValue = value;
+            });
+        };
+
+        var getReportData = function(userModules) {
+            var reportDataPromises = [];
             _.forEach(userModules, function(module) {
-                _.forEach(allCharts, function(chart) {
-                    var chartDataPromise = loadChartData(chart, module.id).then(function(chartData) {
-                        getDataElementValues(chart, chartData, module);
+                _.forEach(notificationReports, function(report) {
+                    var reportDataPromise = loadReportData(report, module.id).then(function(reportData) {
+                        getDataElementValues(report, reportData, module);
                     });
-                    chartDataPromises.push(chartDataPromise);
+                    reportDataPromises.push(reportDataPromise);
                 });
             });
-            return $q.all(chartDataPromises);
+            return $q.all(reportDataPromises);
         };
 
         var init = function() {
             $scope.startLoading();
-            return getAllCharts()
+            return getStandardDeviationValue()
+                .then(getNotificationReports)
                 .then(getUserModules)
                 .then(orgUnitRepository.enrichWithParent)
-                .then(getChartData)
+                .then(getReportData)
                 .then($scope.stopLoading);
         };
 

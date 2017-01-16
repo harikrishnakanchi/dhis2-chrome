@@ -4,7 +4,9 @@ var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
 var shell = require('gulp-shell');
 var http = require('http');
-var ecstatic = require('ecstatic');
+var express = require('express');
+var compress = require('compression');
+var nocache = require('nocache');
 var protractor = require('gulp-protractor').protractor;
 var request = require('request');
 var fs = require('fs');
@@ -30,7 +32,18 @@ var supportEmail = argv.supportEmail || "";
 var exportTranslations = require('./tasks/export.translations');
 var importTranslations = require('./tasks/import.translations');
 
+var ensureDirectoryExistence = function(filePath) {
+    var dirname = path.dirname(filePath);
+    if (fs.existsSync(dirname)) {
+        return true;
+    }
+    ensureDirectoryExistence(dirname);
+    fs.mkdirSync(dirname);
+};
+
 var download = function (url, outputFile, onDone) {
+    ensureDirectoryExistence(outputFile);
+
     var options = {
         url: url,
         headers: {
@@ -73,17 +86,15 @@ gulp.task('update-webdriver', shell.task([
     './node_modules/protractor/bin/webdriver-manager update'
 ]));
 
-gulp.task('serve', ['generate-service-worker'], function() {
-    webserver = http.createServer(
-        ecstatic({
-            root: __dirname + '/src/main',
-            gzip: true,
-            cache: 'private',
-            showDir: true
-        })
-    );
-    webserver.listen(8081);
-    return webserver;
+gulp.task('serve', ['generate-service-worker', 'watch'], function() {
+
+    var app = express();
+
+    app.use(compress());    // gzip
+    app.use(nocache());     // nocache
+
+    app.use('/', express.static(__dirname + '/src/main'));
+    app.listen(8081);
 });
 
 gulp.task('ft', ['update-webdriver', 'serve'], function() {
@@ -98,7 +109,7 @@ gulp.task('ft', ['update-webdriver', 'serve'], function() {
 
 gulp.task('lint', function() {
     return gulp.src(['./src/main/js/app/**/*.js', './src/test/**/js/app/**/*.js'])
-        .pipe(jshint())
+        .pipe(jshint({expr: true}))
         .pipe(jshint.reporter(stylish))
         .pipe(jshint.reporter('fail'));
 });
@@ -127,7 +138,7 @@ gulp.task('less', function() {
 });
 
 gulp.task('download-metadata', function (callback) {
-    return download(baseIntUrl + "/api/metadata.json?assumeTrue=false&categories=true&categoryCombos=true&categoryOptionCombos=true&categoryOptions=true&dataElementGroups=true&dataElements=true&optionSets=true&organisationUnitGroupSets=true&sections=true&translations=true&users=true&organisationUnitGroups=true", "./src/main/data/metadata.json", callback);
+    return download(baseIntUrl + "/api/metadata.json?assumeTrue=false&categories=true&categoryCombos=true&categoryOptionCombos=true&categoryOptions=true&dataElementGroups=true&indicators=true&programIndicators&dataElements=true&optionSets=true&organisationUnitGroupSets=true&sections=true&translations=true&users=true&organisationUnitGroups=true", "./src/main/data/metadata.json", callback);
 });
 
 gulp.task('download-datasets', function (callback) {
@@ -157,14 +168,16 @@ gulp.task('generate-service-worker', ['less'], function (callback) {
         staticFileGlobs: [
             rootDir + '/css/*.css',
             rootDir + '/fonts/*',
-            rootDir + '/data/*',
             rootDir + '/img/*',
             rootDir + '/js/**/*/!(chrome.*.js)',
             rootDir + '/templates/**/*',
             rootDir + '/{background,index}.html'
         ],
         stripPrefix: rootDir + '/',
-        importScripts: ['js/app/interceptors/fetch.interceptor.js']
+        importScripts: ['js/app/interceptors/fetch.interceptor.js'],
+        templateFilePath: 'service-worker-custom.tmpl',
+        skipWaiting: false,
+        maximumFileSizeToCacheInBytes: 50 * (1024 * 1024)
     }, callback);
 });
 
@@ -182,8 +195,13 @@ gulp.task('generate-pwa', ['config', 'generate-service-worker'], function () {})
 
 gulp.task('zip', ['less', 'config', 'download-metadata'], function() {
     var basePath = './src/main';
-    return gulp.src([ basePath + '/**',
-                    '!' + basePath + '/js/app/pwa{,/**}'])
+    return gulp.src([
+        `${basePath}/**`,
+        `!${basePath}/js/app/pwa{,/**}`,
+        `!${basePath}/less{,/**}`,
+        `!${basePath}/index.html`,
+        `!${basePath}/service.worker.js`
+    ])
         .pipe(zip("praxis_" + (argv.env || "dev") + ".zip"))
         .pipe(gulp.dest(''));
 });

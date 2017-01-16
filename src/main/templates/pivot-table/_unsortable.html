@@ -6,12 +6,12 @@
             colspan="{{ baseColumnConfiguration.length / columnConfiguration.length}}">
             <div ng-class="{ 'header-cell-with-weeks' : table.monthlyReport }">
                 <span>{{ table.getDisplayName(column) }}</span>
-                <p ng-if="column.periodDimension && table.monthlyReport" class="small weeks">{{ getNumberOfWeeksLabel(column.id) }}</p>
+                <p ng-if="column.periodDimension && table.monthlyReport && !table.hideWeeks" class="small weeks">{{ getNumberOfWeeksLabel(column.id) }}</p>
             </div>
         </th>
     </tr>
     </thead>
-    <tbody>
+    <tbody ng-if="!table.referralLocationReport">
     <tr ng-repeat="row in table.rows">
         <td>
             <a ng-if="row.dataDimension"
@@ -24,6 +24,19 @@
             </a>
             <span ng-if="!row.dataDimension">
                 {{  table.getDisplayName(row)  }}
+            </span>
+        </td>
+        <td ng-repeat="column in baseColumnConfiguration">
+            <span>{{ table.getDataValue(row, column) }}</span>
+        </td>
+    </tr>
+    </tbody>
+
+    <tbody ng-if="table.referralLocationReport">
+    <tr ng-repeat="row in table.rows">
+        <td>
+            <span>
+                {{  getDisplayNameForReferralLocations(row)  }}
             </span>
         </td>
         <td ng-repeat="column in baseColumnConfiguration">

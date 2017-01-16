@@ -1,8 +1,8 @@
-define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "timecop", "dhisId", "dataSetRepository",
-        "orgUnitRepository", "originOrgunitCreator", "excludedDataElementsRepository", "systemSettingRepository", "translationsService", "orgUnitMapper", "systemSettingsTransformer"
+define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "timecop", "dhisId", "dataSetRepository", "orgUnitRepository",
+    "originOrgunitCreator", "excludedDataElementsRepository", "systemSettingRepository", "translationsService", "orgUnitMapper", "systemSettingsTransformer", "customAttributes"
     ],
     function(AggregateModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, timecop, dhisId, DatasetRepository,
-        OrgUnitRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, SystemSettingRepository, TranslationsService, orgUnitMapper, systemSettingsTransformer) {
+        OrgUnitRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, SystemSettingRepository, TranslationsService, orgUnitMapper, systemSettingsTransformer, customAttributes) {
 
         var scope,rootScope, mockOrgStore, db, q, location, orgUnitRepo, orgunitGroupRepo, hustle,
             dataSetRepo, systemSettingRepository, excludedDataElementsRepository, fakeModal, allPrograms, originOrgunitCreator, translationsService, orgUnitGroupHelper;
@@ -103,6 +103,12 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
 
                 scope.isNewMode = true;
 
+                scope.form = {
+                    $setDirty : jasmine.createSpy('$setDirty')
+                };
+
+                spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(false);
+
                 Timecop.install();
                 Timecop.freeze(new Date("2014-04-01T00:00:00.000Z"));
 
@@ -149,24 +155,21 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                         created: moment().toISOString(),
                         lastUpdated: moment().toISOString(),
                         attribute: {
-                            code: "Type",
-                            name: "Type",
+                            code: "Type"
                         },
                         value: 'Module'
                     }, {
                         created: moment().toISOString(),
                         lastUpdated: moment().toISOString(),
                         attribute: {
-                            code: "isLineListService",
-                            name: "Is Linelist Service"
+                            code: "isLineListService"
                         },
                         value: 'false'
                     }, {
                         created: moment().toISOString(),
                         lastUpdated: moment().toISOString(),
                         attribute: {
-                            code: "isNewDataModel",
-                            name: "Is New Data Model"
+                            code: "isNewDataModel"
                         },
                         value: 'true'
                     }],
@@ -351,24 +354,21 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                         "created": '2014-04-01T00:00:00.000Z',
                         "lastUpdated": '2014-04-01T00:00:00.000Z',
                         "attribute": {
-                            "code": 'Type',
-                            "name": 'Type'
+                            "code": 'Type'
                         },
                         "value": 'Module'
                     }, {
                         "created": '2014-04-01T00:00:00.000Z',
                         "lastUpdated": '2014-04-01T00:00:00.000Z',
                         "attribute": {
-                            "code": 'isLineListService',
-                            "name": 'Is Linelist Service'
+                            "code": 'isLineListService'
                         },
                         "value": 'false'
                     }, {
                         "created": '2014-04-01T00:00:00.000Z',
                         "lastUpdated": '2014-04-01T00:00:00.000Z',
                         "attribute": {
-                            "code": "isNewDataModel",
-                            "name": "Is New Data Model"
+                            "code": "isNewDataModel"
                         },
                         "value": 'true'
                     }],
@@ -433,22 +433,13 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     "dataSets": [{
                         "id": "ds1",
                         "name": "dataset1",
-                        "attributeValues": [{
-                            "attribute": {
-                                "code": "isNewDataModel"
-                            },
-                            "value": true
-                        }]
+                        "attributeValues": []
                     }],
-                    "attributeValues": [{
-                        "attribute": {
-                            "code": "isDisabled"
-                        },
-                        "value": "true"
-                    }]
+                    "attributeValues": []
                 };
                 scope.isNewMode = false;
 
+                customAttributes.getBooleanAttributeValue.and.returnValue(true);
                 initialiseController();
 
                 scope.$apply();
@@ -564,24 +555,21 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                         created: moment().toISOString(),
                         lastUpdated: moment().toISOString(),
                         attribute: {
-                            code: 'Type',
-                            name: 'Type'
+                            code: 'Type'
                         },
                         value: 'Module'
                     }, {
                         created: moment().toISOString(),
                         lastUpdated: moment().toISOString(),
                         attribute: {
-                            code: 'isLineListService',
-                            name: 'Is Linelist Service'
+                            code: 'isLineListService'
                         },
                         value: 'false'
                     }, {
                         created: moment().toISOString(),
                         lastUpdated: moment().toISOString(),
                         attribute: {
-                            code: "isNewDataModel",
-                            name: "Is New Data Model"
+                            code: "isNewDataModel"
                         },
                         value: 'true'
                     }],
@@ -720,6 +708,60 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 });
             });
 
+            describe('isIncluded flag of section', function () {
+                var createSection = function (options) {
+                    return _.merge({
+                        'id': "sec1",
+                        "dataElements": [{
+                            'id': "test1",
+                            'isIncluded': false,
+                        }, {
+                            'id': "test2",
+                            'isIncluded': false,
+                        }],
+                    }, options);
+                };
+
+                it("should set the isIncluded to true in section if all the data elements under it are selected", function () {
+                    var section = createSection({
+                        dataElements: [{
+                            id: 'test1',
+                            isIncluded: true
+                        }, {
+                            id: "test2",
+                            isIncluded: true
+                        }]
+                    });
+
+                    scope.changeSectionSelection(section);
+                    expect(section.isIncluded).toBeTruthy();
+                });
+
+                it("should set isIncluded to false for the section if at least one of the data elements under it is de-selected", function () {
+                    var section = createSection({
+                        "dataElements": [{
+                            'id': "test1",
+                            'isIncluded': true
+                        }, {
+                            'id': "test2",
+                            'isIncluded': false
+                        }]
+                    });
+
+                    scope.changeSectionSelection(section);
+                    expect(section.isIncluded).toBeFalsy();
+                });
+
+                it("should select/de-select all data elements if the section containing it is toggled", function () {
+                    var section = createSection();
+                    scope.toggleSelect(section);
+
+                    expect(section.dataElements[0].isIncluded).toBeTruthy();
+                    expect(section.dataElements[1].isIncluded).toBeTruthy();
+                    expect(section.isIncluded).toBeTruthy();
+                });
+            });
+
             it("should return false if datasets for modules are selected", function() {
                 scope.$apply();
                 scope.associatedDatasets = [{
@@ -738,148 +780,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.associatedDatasets = [];
 
                 expect(scope.areDatasetsSelected()).toEqual(false);
-            });
-
-            it("should de-select all data elements except mandatory elements if the section containing it is de-selected", function() {
-                var section = {
-                    'id': "sec1",
-                    "dataElements": [{
-                        'id': "test1",
-                        'isMandatory': true
-                    }, {
-                        'id': "test2",
-                        'isIncluded': false,
-                        'isMandatory': false
-                    }, {
-                        'id': "test3",
-                        'isIncluded': false,
-                        'isMandatory': false
-                    }],
-                    isIncluded: false
-                };
-
-                var expectedSection = {
-                    id: 'sec1',
-                    dataElements: [{
-                        id: 'test1',
-                        'isMandatory': true,
-                        'isIncluded': true
-                    }, {
-                        id: 'test2',
-                        'isIncluded': false,
-                        'isMandatory': false
-                    }, {
-                        id: 'test3',
-                        'isIncluded': false,
-                        'isMandatory': false
-                    }],
-                    isIncluded: false
-                };
-
-                scope.changeDataElementSelection(section);
-                expect(section).toEqual(expectedSection);
-            });
-
-            it("should de-select the section if all data elements under it are de-selected", function() {
-                var section = {
-                    'id': "sec1",
-                    "dataElements": [{
-                        'id': "test1",
-                        'isIncluded': false
-                    }, {
-                        'id': "test2",
-                        'isIncluded': false
-                    }, {
-                        'id': "test3",
-                        'isIncluded': false
-                    }]
-                };
-
-                var expectedSection = {
-                    id: 'sec1',
-                    dataElements: [{
-                        'id': "test1",
-                        'isIncluded': false
-                    }, {
-                        'id': "test2",
-                        'isIncluded': false
-                    }, {
-                        'id': "test3",
-                        'isIncluded': false
-                    }],
-                    isIncluded: false
-                };
-
-                scope.changeSectionSelection(section);
-                expect(section).toEqual(expectedSection);
-            });
-
-            it("should de-select the section if even one of the data elements under it are de-selected", function() {
-                var section = {
-                    'id': "sec1",
-                    "dataElements": [{
-                        'id': "test1",
-                        'isIncluded': true
-                    }, {
-                        'id': "test2",
-                        'isIncluded': true
-                    }, {
-                        'id': "test3",
-                        'isIncluded': false
-                    }]
-                };
-
-                var expectedSection = {
-                    id: 'sec1',
-                    dataElements: [{
-                        'id': "test1",
-                        'isIncluded': true
-                    }, {
-                        'id': "test2",
-                        'isIncluded': true
-                    }, {
-                        'id': "test3",
-                        'isIncluded': false
-                    }],
-                    isIncluded: false
-                };
-
-                scope.changeSectionSelection(section);
-                expect(section).toEqual(expectedSection);
-            });
-
-            it("should select the section if all the data elements under it are selected", function() {
-                var section = {
-                    'id': "sec1",
-                    "dataElements": [{
-                        'id': "test1",
-                        'isIncluded': true
-                    }, {
-                        'id': "test2",
-                        'isIncluded': true
-                    }, {
-                        'id': "test3",
-                        'isIncluded': true
-                    }]
-                };
-
-                var expectedSection = {
-                    id: 'sec1',
-                    dataElements: [{
-                        'id': "test1",
-                        'isIncluded': true
-                    }, {
-                        'id': "test2",
-                        'isIncluded': true
-                    }, {
-                        'id': "test3",
-                        'isIncluded': true
-                    }],
-                    isIncluded: true
-                };
-
-                scope.changeSectionSelection(section);
-                expect(section).toEqual(expectedSection);
             });
 
             it("should select a dataset", function() {
@@ -964,32 +864,28 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                         created: moment().toISOString(),
                         lastUpdated: moment().toISOString(),
                         attribute: {
-                            code: 'Type',
-                            name: 'Type'
+                            code: 'Type'
                         },
                         value: 'Module'
                     }, {
                         created: moment().toISOString(),
                         lastUpdated: moment().toISOString(),
                         attribute: {
-                            code: 'isLineListService',
-                            name: 'Is Linelist Service'
+                            code: 'isLineListService'
                         },
                         value: 'false'
                     }, {
                         created: '2014-04-01T00:00:00.000Z',
                         lastUpdated: '2014-04-01T00:00:00.000Z',
                         attribute: {
-                            code: "isNewDataModel",
-                            name: "Is New Data Model"
+                            code: "isNewDataModel"
                         },
                         value: 'true'
                     }, {
                         created: '2014-04-01T00:00:00.000Z',
                         lastUpdated: '2014-04-01T00:00:00.000Z',
                         attribute: {
-                            code: 'isDisabled',
-                            name: 'Is Disabled'
+                            code: 'isDisabled'
                         },
                         value: "true"
                     }],
@@ -1017,26 +913,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 expect(scope.isDisabled).toEqual(true);
             });
 
-            it("should change collapsed", function() {
-
-                scope.collapseSection = {
-                    "sectionId": true
-                };
-
-                scope.changeCollapsed("sectionId");
-                scope.$apply();
-
-                expect(scope.collapseSection.sectionId).toEqual(false);
-            });
-
-            it("should get collapsed for a section", function() {
-                scope.collapseSection = {
-                    "sectionId": true
-                };
-
-                expect(scope.getCollapsed("sectionId")).toEqual(true);
-            });
-
             it("should create patient origin org units", function()  {
                 scope.module = {
                     "id": "mod1",
@@ -1060,24 +936,21 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                         created: moment().toISOString(),
                         lastUpdated: moment().toISOString(),
                         attribute: {
-                            code: "Type",
-                            name: "Type",
+                            code: "Type"
                         },
                         value: 'Module'
                     }, {
                         created: moment().toISOString(),
                         lastUpdated: moment().toISOString(),
                         attribute: {
-                            code: "isLineListService",
-                            name: "Is Linelist Service"
+                            code: "isLineListService"
                         },
                         value: 'false'
                     }, {
                         created: moment().toISOString(),
                         lastUpdated: moment().toISOString(),
                         attribute: {
-                            code: "isNewDataModel",
-                            name: "Is New Data Model"
+                            code: "isNewDataModel"
                         },
                         value: 'true'
                     }],
@@ -1396,36 +1269,23 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 expect(section.isIncluded).toBe(false);
             });
 
-            it("should de-select all subSections if the section containing it is de-selected", function() {
+            it("should select/de-select all subSections if the section containing it is toggled", function() {
                 var section = {
                     'id': "sec1",
                     "subSections": [{
-                        'name': "test1"
+                        'name': "test1",
+                        'isIncluded': true
                     }, {
-                        'name': "test2"
-                    }, {
-                        'name': "test3"
+                        'name': "test2",
+                        'isIncluded': false
                     }],
                     isIncluded: false
                 };
 
-                var expectedSection = {
-                    id: 'sec1',
-                    subSections: [{
-                        name: 'test1',
-                        isIncluded: false
-                    }, {
-                        name: 'test2',
-                        isIncluded: false
-                    }, {
-                        name: 'test3',
-                        isIncluded: false
-                    }],
-                    isIncluded: false
-                };
-
-                scope.changeDataElementSelection(section);
-                expect(section).toEqual(expectedSection);
+                scope.toggleSelect(section);
+                expect(section.subSections[0].isIncluded).toBeTruthy();
+                expect(section.subSections[1].isIncluded).toBeTruthy();
+                expect(section.isIncluded).toBeTruthy();
             });
 
             describe('associateReferralLocation', function () {

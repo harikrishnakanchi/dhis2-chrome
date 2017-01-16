@@ -5,7 +5,8 @@ define([], function() {
                 table: "=",
                 resourceBundle:"=",
                 disableDownload: "@?",
-                updatedTime:"@?"
+                updatedTime:"@?",
+                referralLocations: "="
             },
             controller: 'pivotTableController',
             templateUrl: "templates/pivot-table/pivot.table.html"
