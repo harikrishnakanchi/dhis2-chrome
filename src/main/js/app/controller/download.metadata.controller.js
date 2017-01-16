@@ -1,11 +1,11 @@
 define(['platformUtils', 'moment', 'properties'], function (platformUtils, moment, properties) {
-    return function ($scope, $q, $location, metadataDownloader, changeLogRepository, packagedDataImporter) {
+    return function ($scope, $q, $location, $log, metadataDownloader, changeLogRepository, packagedDataImporter) {
         var retries = 0, updated;
 
         var downloadMetadata = function () {
             updated = moment().toISOString();
             var success = function () {
-                console.log('Metadata download complete');
+                $log.info('Metadata download complete');
             };
 
             var promptForManualRetry = function () {
@@ -29,14 +29,9 @@ define(['platformUtils', 'moment', 'properties'], function (platformUtils, momen
 
         $scope.supportEmail = properties.support_email;
 
-        var upsertChangeLog = function () {
-            var promises = [];
-            promises.push(changeLogRepository.upsert('metaData', updated));
-            promises.push(changeLogRepository.upsert('orgUnits', updated));
-            promises.push(changeLogRepository.upsert('orgUnitGroups', updated));
-            promises.push(changeLogRepository.upsert('datasets', updated));
-            promises.push(changeLogRepository.upsert('programs', updated));
-            return $q.all(promises);
+        var updateChangeLog = function () {
+            var entities = ['metaData', 'orgUnits', 'orgUnitGroups', 'datasets', 'programs'];
+            return $q.all(_.map(entities, _.partial(changeLogRepository.upsert, _, updated)));
         };
 
         var redirectToLogin = function () {
@@ -44,7 +39,7 @@ define(['platformUtils', 'moment', 'properties'], function (platformUtils, momen
         };
 
         $scope.downloadAndUpsertMetadata = function () {
-            return downloadMetadata().then(upsertChangeLog).then(redirectToLogin);
+            return downloadMetadata().then(updateChangeLog).then(redirectToLogin);
         };
 
         var init = function () {

@@ -1,12 +1,13 @@
-define(['angularMocks', 'utils','properties', 'platformUtils', 'downloadMetadataController', 'metadataDownloader', 'changeLogRepository', 'packagedDataImporter'],
-    function (mocks, utils, properties, platformUtils, DownloadMetadataController, MetadataDownloader, ChangeLogRepository, PackagedDataImporter) {
+define(['lodash', 'angularMocks', 'utils','properties', 'platformUtils', 'downloadMetadataController', 'metadataDownloader', 'changeLogRepository', 'packagedDataImporter'],
+    function (_, mocks, utils, properties, platformUtils, DownloadMetadataController, MetadataDownloader, ChangeLogRepository, PackagedDataImporter) {
         describe('DownloadMetadataController', function () {
-            var q, rootScope, scope, location, downloadMetadataController, metadataDownloader, changeLogRepository, packagedDataImporter, initializeController;
+            var q, rootScope, scope, location, log, downloadMetadataController, metadataDownloader, changeLogRepository, packagedDataImporter, initializeController;
 
-            beforeEach(mocks.inject(function ($q, $rootScope, $location) {
+            beforeEach(mocks.inject(function ($q, $rootScope, $location, $log) {
                 q = $q;
-                rootScope = $rootScope;
                 location = $location;
+                log = $log;
+                rootScope = $rootScope;
                 scope = $rootScope.$new();
 
                 spyOn(location, 'path');
@@ -25,7 +26,7 @@ define(['angularMocks', 'utils','properties', 'platformUtils', 'downloadMetadata
                 Timecop.freeze(new Date('2016-12-23T11:05:29.002Z'));
 
                 initializeController = function () {
-                    downloadMetadataController = new DownloadMetadataController(scope, q, location, metadataDownloader, changeLogRepository, packagedDataImporter);
+                    downloadMetadataController = new DownloadMetadataController(scope, q, location, log, metadataDownloader, changeLogRepository, packagedDataImporter);
                 };
             }));
 
@@ -67,11 +68,14 @@ define(['angularMocks', 'utils','properties', 'platformUtils', 'downloadMetadata
                     initializeController();
                     scope.$apply();
 
-                    expect(changeLogRepository.upsert).toHaveBeenCalledWith('metaData', '2016-12-23T11:05:29.002Z');
-                    expect(changeLogRepository.upsert).toHaveBeenCalledWith('orgUnits', '2016-12-23T11:05:29.002Z');
-                    expect(changeLogRepository.upsert).toHaveBeenCalledWith('orgUnitGroups', '2016-12-23T11:05:29.002Z');
-                    expect(changeLogRepository.upsert).toHaveBeenCalledWith('datasets', '2016-12-23T11:05:29.002Z');
-                    expect(changeLogRepository.upsert).toHaveBeenCalledWith('programs', '2016-12-23T11:05:29.002Z');
+                    var entities = ['metaData', 'orgUnits', 'orgUnitGroups', 'datasets', 'programs'];
+
+                    var lastUpdated = '2016-12-23T11:05:29.002Z';
+
+                    _.each(entities, function (entity, index) {
+                        expect(changeLogRepository.upsert.calls.argsFor(index)[0]).toEqual(entity);
+                        expect(changeLogRepository.upsert.calls.argsFor(index)[1]).toEqual(lastUpdated);
+                    });
                 });
 
                 describe('Metadata download failure', function () {
