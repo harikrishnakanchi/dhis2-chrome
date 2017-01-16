@@ -150,65 +150,65 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
                 return programRepository.upsertDhisDownloadedData(response);
             }
         }, {
-            name: 'systemSettings',
-            url: dhisUrl.systemSettings,
-            params: {
-                key: 'fieldAppSettings,versionCompatibilityInfo,notificationSetting'
-            },
-            upsertFn: function (response) {
-                var accumulator = [];
-                _.each(response, function (fieldAppSetting) {
-                    _.transform(fieldAppSetting, function (acc, value, key) {
-                        acc.push({
-                            "key": key,
-                            "value": value
-                        });
-                    }, []);
-                });
-                return systemSettingRepository.upsert(accumulator);
-            }
-        }, {
             name: 'organisationUnits',
             url: dhisUrl.orgUnits,
             params: {
                 fields: ':all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid'
             },
-            upsertFn: function (response) {
+            upsertFn: function(response) {
                 return orgUnitRepository.upsertDhisDownloadedData(response);
+            }
+        }, {
+            name: 'systemSettings',
+            url: dhisUrl.systemSettings,
+            params: {
+                key: 'fieldAppSettings,versionCompatibilityInfo,notificationSetting'
+            },
+            skipPaging: true,
+            upsertFn: function (response) {
+                var accumulator = [];
+                _.each(response, function (systemSetting) {
+                    _.each(systemSetting, function (value, key) {
+                        accumulator.push({ key: key, value: value });
+                    });
+                });
+                return systemSettingRepository.upsert(accumulator);
             }
         }];
 
         var getChangeLog = function (entity) {
-            return changeLogRepository.get(TEMP_CHANGE_LOG_PREFIX + entity).then(function (lastUpdated) {
-                return !!lastUpdated;
-            });
+            return changeLogRepository.get(TEMP_CHANGE_LOG_PREFIX + entity);
         };
 
         var downloadAndUpsert = function (entity) {
             updated = moment().toISOString();
             var upsertFn = entity.upsertFn || function () {};
-            var downloadFn = function (queryParams) {
-                return $http.get(entity.url, { params: queryParams} ).then(function(response) {
+
+            var downloadWithPagination = function (queryParams) {
+                return $http.get(entity.url, { params: queryParams }).then(function(response) {
                     return {
                         pager: response.data.pager,
                         data: response.data[entity.name]
                     };
                 });
             };
-            return pagingUtils.paginateRequest(downloadFn, entity.params, MAX_PAGE_REQUESTS, []).then(function (response) {
-                upsertFn(response);
-            });
+
+            var downloadWithoutPagination = function (entity) {
+                return $http.get(entity.url, { params: entity.params}).then(_.property('data'));
+            };
+
+            return (entity.skipPaging ? downloadWithoutPagination(entity) : pagingUtils.paginateRequest(downloadWithPagination, entity.params, MAX_PAGE_REQUESTS, []))
+                .then(upsertFn);
         };
 
-        var upsertChangeLog = function (entity) {
+        var updateChangeLog = function (entity) {
             return changeLogRepository.upsert(TEMP_CHANGE_LOG_PREFIX + entity, updated);
         };
 
         var downloadEntityIfNotExists = function (entity) {
             return getChangeLog(entity.name).then(function (lastUpdated) {
-                return lastUpdated ? $q.when() : downloadAndUpsert(entity).then(_.partial(upsertChangeLog, entity.name));
+                return lastUpdated ? $q.when() : downloadAndUpsert(entity).then(_.partial(updateChangeLog, entity.name));
             });
-
         };
 
         this.run = function () {

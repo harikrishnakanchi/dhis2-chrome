@@ -20,8 +20,8 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
             httpBackend.expectGET(/.*organisationUnitGroups.*/).respond(200, options);
             httpBackend.expectGET(/.*dataSets.*/).respond(200, options);
             httpBackend.expectGET(/.*programs.*/).respond(200, options);
-            httpBackend.expectGET(/.*systemSettings.*/).respond(200, options);
             httpBackend.expectGET(/.*organisationUnits.*/).respond(200, options);
+            httpBackend.expectGET(/.*systemSettings.*/).respond(200, options);
         };
 
         beforeEach(mocks.inject(function ($injector) {
