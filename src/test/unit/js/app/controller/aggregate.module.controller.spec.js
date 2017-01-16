@@ -103,6 +103,10 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
 
                 scope.isNewMode = true;
 
+                scope.form = {
+                    $setDirty : jasmine.createSpy('$setDirty')
+                };
+
                 spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(false);
 
                 Timecop.install();

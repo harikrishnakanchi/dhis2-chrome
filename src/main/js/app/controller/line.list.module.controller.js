@@ -450,12 +450,14 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
             };
 
             $scope.unSelectAll = function (dataElement) {
+                $scope.form.$setDirty();
                 _.each(dataElement.dataElement.optionSet.options, function (option) {
                     option.isSelected = false;
                 });
             };
 
             $scope.selectAll = function (dataElement) {
+                $scope.form.$setDirty();
                 _.each(dataElement.dataElement.optionSet.options, function (option) {
                     option.isSelected = true;
                 });

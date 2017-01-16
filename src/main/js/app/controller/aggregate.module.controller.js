@@ -392,6 +392,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
             };
 
             $scope.toggleSelect = function (section) {
+                $scope.form.$setDirty();
                 section.isIncluded = !section.isIncluded;
                 _.each(section.dataElements, function(dataElement) {
                     dataElement.isIncluded = section.isIncluded;
@@ -402,6 +403,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
             };
 
             $scope.toggleSelectSubSection = function (subSection, section) {
+                $scope.form.$setDirty();
                 subSection.isIncluded = !subSection.isIncluded;
                 _.each(subSection.dataElements, function(dataElement) {
                     dataElement.isIncluded = subSection.isIncluded || dataElement.isMandatory;
