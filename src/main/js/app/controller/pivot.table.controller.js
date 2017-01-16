@@ -62,6 +62,13 @@ define(["lodash", "dateUtils", "moment", "excelBuilder"], function(_, dateUtils,
             return '[' + dateUtils.getNumberOfISOWeeksInMonth(month) + ' ' + $scope.resourceBundle.weeksLabel + ']';
         };
 
+        $scope.getDisplayNameForReferralLocations = function (pivotTableRow) {
+            var referralLocation = _.find(_.keys($scope.referralLocations), function (referralLocationName) {
+                return _.contains(pivotTableRow.name, referralLocationName);
+            });
+            return $scope.referralLocations[referralLocation].name;
+        };
+
         if ($scope.table) {
             $scope.baseColumnConfiguration = _.last($scope.table.columnConfigurations);
 

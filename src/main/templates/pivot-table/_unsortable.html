@@ -36,7 +36,7 @@
     <tr ng-repeat="row in table.rows">
         <td>
             <span>
-                {{  referralLocations[table.getDisplayName(row)].name  }}
+                {{  getDisplayNameForReferralLocations(row)  }}
             </span>
         </td>
         <td ng-repeat="column in baseColumnConfiguration">
