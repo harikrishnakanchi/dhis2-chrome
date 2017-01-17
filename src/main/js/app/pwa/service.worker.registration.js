@@ -81,10 +81,12 @@
     };
 
     var reload = function () {
-        global.sessionStorage.setItem("serviceWorkerFailCount", 0);
-        global.document.getElementById('loadingPraxisMsg').style.display = 'block';
-        global.document.getElementById('loadingPraxisError').style.display = 'none';
-        global.location.reload();
+        if (global.navigator.onLine) {
+            global.sessionStorage.setItem("serviceWorkerFailCount", 0);
+            global.document.getElementById('loadingPraxisMsg').style.display = 'block';
+            global.document.getElementById('loadingPraxisError').style.display = 'none';
+            global.location.reload();
+        }
     };
 
     global.Praxis = {
