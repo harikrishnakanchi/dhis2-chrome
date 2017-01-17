@@ -100,6 +100,12 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                         section.isIncluded = !_.any(section.dataElements, {
                             "isIncluded": false
                         });
+
+                        _.each(section.subSections, function(subSection) {
+                            subSection.isIncluded = !_.any(subSection.dataElements, {
+                                "isIncluded": false
+                            });
+                        });
                     });
                 };
 
