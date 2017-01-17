@@ -27,28 +27,34 @@ define(['dataEntryTableColumnConfig', 'lodash'], function(dataEntryTableColumnCo
                 var expectedResult = [
                     [{
                         name: categoryOptionA.name,
+                        id: categoryOptionA.id,
                         categoryOptions: [categoryOptionA]
                     }, {
                         name: categoryOptionB.name,
+                        id: categoryOptionB.id,
                         categoryOptions: [categoryOptionB]
                     }],
                     [{
                         name: categoryOptionX.name,
+                        id: categoryOptionX.id,
                         categoryOptions: [categoryOptionA, categoryOptionX],
                         categoryOptionComboId: categoryOptionCombo1.id,
                         excludeFromTotal: false
                     }, {
                         name: categoryOptionY.name,
+                        id: categoryOptionY.id,
                         categoryOptions: [categoryOptionA, categoryOptionY],
                         categoryOptionComboId: categoryOptionCombo2.id,
                         excludeFromTotal: true
                     }, {
                         name: categoryOptionX.name,
+                        id: categoryOptionX.id,
                         categoryOptions: [categoryOptionB, categoryOptionX],
                         categoryOptionComboId: categoryOptionCombo3.id,
                         excludeFromTotal: false
                     }, {
                         name: categoryOptionY.name,
+                        id: categoryOptionY.id,
                         categoryOptions: [categoryOptionB, categoryOptionY],
                         categoryOptionComboId: categoryOptionCombo4.id,
                         excludeFromTotal: true
