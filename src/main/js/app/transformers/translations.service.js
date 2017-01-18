@@ -98,7 +98,7 @@ define(['lodash'], function(_){
                 });
 
                 _.each(objectToBeTranslated, function(value, key) {
-                    if(_.isArray(value) && _.contains("sections", key)){
+                    if(_.isArray(value) && !_.contains("dataElements", key)){
                         _.each(value,function(object){
                             self.translateReferralLocations([object]);
                         });
