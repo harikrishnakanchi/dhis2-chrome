@@ -1,9 +1,14 @@
-define(['platformUtils', 'moment', 'properties'], function (platformUtils, moment, properties) {
-    return function ($scope, $q, $location, $log, metadataDownloader, changeLogRepository, packagedDataImporter) {
+define(['platformUtils', 'moment', 'properties', 'lodash'], function (platformUtils, moment, properties, _) {
+    return function ($scope, $q, $location, $log, systemInfoService, metadataDownloader, changeLogRepository, packagedDataImporter) {
         var retries = 0, updated;
 
+        var setDownloadStartTime = function () {
+            return systemInfoService.getServerDate().then(function(serverDate) {
+                updated = serverDate;
+            });
+        };
+
         var downloadMetadata = function () {
-            updated = moment().toISOString();
             var success = function () {
                 $log.info('Metadata download complete');
             };
@@ -24,7 +29,9 @@ define(['platformUtils', 'moment', 'properties'], function (platformUtils, momen
             };
 
             $scope.maxRetriesExceeded = false;
-            return metadataDownloader.run().then(success, failure, notify);
+            return setDownloadStartTime().then(function() {
+                return metadataDownloader.run().then(success, failure, notify);
+            });
         };
 
         $scope.supportEmail = properties.support_email;

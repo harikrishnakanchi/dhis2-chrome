@@ -96,6 +96,7 @@ require.config({
         "orgUnitGroupService": "app/service/orgunit.group.service",
         "historyService": "app/service/history.service",
         "storageService": "app/service/storage.service",
+        "systemInfoService": "app/service/system.info.service",
         "metadataDownloader": "app/service/metadata.downloader",
 
         //Repositories
