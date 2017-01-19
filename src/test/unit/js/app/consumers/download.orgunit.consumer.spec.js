@@ -1,6 +1,7 @@
-define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "orgUnitRepository", "timecop", "mergeBy"], function(DownloadOrgunitConsumer, OrgUnitService, utils, mocks, OrgUnitRepository, timecop, MergeBy) {
+define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "orgUnitRepository", "timecop", "mergeBy", "systemInfoService"],
+    function(DownloadOrgunitConsumer, OrgUnitService, utils, mocks, OrgUnitRepository, timecop, MergeBy, SystemInfoService) {
     describe("downloadOrgunitConsumer", function() {
-        var downloadOrgunitConsumer, payload, orgUnitService, orgUnitRepository, q, scope, changeLogRepository, mergeBy;
+        var downloadOrgunitConsumer, payload, orgUnitService, orgUnitRepository, systemInfoService, q, scope, changeLogRepository, mergeBy;
 
         beforeEach(mocks.inject(function($q, $rootScope, $log) {
             q = $q;
@@ -33,9 +34,11 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             orgUnitService = new OrgUnitService();
             orgUnitRepository = new OrgUnitRepository();
             mergeBy = new MergeBy($log);
+            systemInfoService = new SystemInfoService();
 
             spyOn(orgUnitRepository, "upsert");
             spyOn(orgUnitRepository, "upsertDhisDownloadedData");
+            spyOn(systemInfoService, 'getServerDate').and.returnValue(utils.getPromise(q, 'someTime'));
 
             changeLogRepository = {
                 "get": jasmine.createSpy("get").and.returnValue(utils.getPromise(q, "2014-10-24T09:01:12.020+0000")),
@@ -86,7 +89,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             spyOn(orgUnitService, 'upsert');
             spyOn(orgUnitRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy]));
 
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q, mergeBy);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy);
 
             downloadOrgunitConsumer.run(message);
             scope.$apply();
@@ -136,7 +139,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             spyOn(orgUnitService, 'upsert');
             spyOn(orgUnitRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy]));
 
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q, mergeBy);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy);
 
             downloadOrgunitConsumer.run(message);
             scope.$apply();
@@ -184,7 +187,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             spyOn(orgUnitService, 'upsert');
             spyOn(orgUnitRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy]));
 
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q, mergeBy);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy);
             downloadOrgunitConsumer.run(message);
 
             scope.$apply();
@@ -234,7 +237,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             spyOn(orgUnitService, 'upsert');
             spyOn(orgUnitRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy]));
 
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q, mergeBy);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy);
             downloadOrgunitConsumer.run(message);
 
             scope.$apply();
@@ -261,12 +264,12 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHISSinceLastUpdatedTime));
             spyOn(orgUnitService, 'upsert');
 
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q, mergeBy);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy);
             downloadOrgunitConsumer.run(message);
 
             scope.$apply();
 
-            expect(changeLogRepository.upsert).toHaveBeenCalledWith("orgUnits", "2014-05-30T12:43:54.972Z");
+            expect(changeLogRepository.upsert).toHaveBeenCalledWith("orgUnits", "someTime");
         });
 
         it("should upsert new org units from dhis to local db", function() {
@@ -303,13 +306,52 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             spyOn(orgUnitService, 'upsert');
             spyOn(orgUnitRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
 
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q, mergeBy);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy);
             downloadOrgunitConsumer.run(message);
 
             scope.$apply();
 
             expect(orgUnitService.upsert).not.toHaveBeenCalled();
             expect(orgUnitRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitFromDHISSinceLastUpdatedTime);
+        });
+
+        it('should get server date from system info', function () {
+            var message = {
+                "data": {
+                    "data": [],
+                    "type": "downloadOrgUnit"
+                }
+            };
+            spyOn(orgUnitService, 'get').and.returnValue(utils.getPromise(q, []));
+            spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, []));
+            spyOn(orgUnitRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
+
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy);
+
+            downloadOrgunitConsumer.run(message);
+            scope.$apply();
+
+            expect(systemInfoService.getServerDate).toHaveBeenCalled();
+        });
+
+        it('should upsert with the server date', function () {
+            var message = {
+                "data": {
+                    "data": [],
+                    "type": "downloadOrgUnit"
+                }
+            };
+
+            spyOn(orgUnitService, 'get').and.returnValue(utils.getPromise(q, []));
+            spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, []));
+            spyOn(orgUnitRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
+
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy);
+
+            downloadOrgunitConsumer.run(message);
+            scope.$apply();
+
+            expect(changeLogRepository.upsert).toHaveBeenCalledWith('orgUnits', 'someTime');
         });
     });
 });
