@@ -18,6 +18,7 @@ define(["lodash"], function(_) {
                     return _.map(category.categoryOptions, function (categoryOption) {
                         return {
                             name: categoryOption.name,
+                            id: categoryOption.id,
                             categoryOptions: previousColumnConfigItem.categoryOptions.concat([categoryOption])
                         };
                     });
@@ -26,6 +27,7 @@ define(["lodash"], function(_) {
                 columnConfigurations.push(_.map(category.categoryOptions, function (categoryOption) {
                     return {
                         name: categoryOption.name,
+                        id: categoryOption.id,
                         categoryOptions: [categoryOption]
                     };
                 }));

@@ -513,11 +513,15 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                             return dataSets;
                         };
 
+                        var sortDataSetsByName = function (dataSets) {
+                            return _.sortBy(dataSets, 'name');
+                        };
+
                         if (noReferralLocationConfigured) {
                             dataSets = filterOutReferralLocations(dataSets);
                         }
 
-                        var transformations = [filterOutNonIncludedSectionsAndDataElements, translateDatasets, setTotalsDisplayPreferencesforDataSetSections];
+                        var transformations = [filterOutNonIncludedSectionsAndDataElements, translateDatasets, setTotalsDisplayPreferencesforDataSetSections, sortDataSetsByName];
                         $scope.dataSets = transformations.reduce(function (dataSets, transformer) {
                             return transformer(dataSets);
                         }, dataSets);

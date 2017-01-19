@@ -27,6 +27,7 @@ require.config({
         "orgUnitGroupService": "app/service/orgunit.group.service",
         "reportService": "app/service/report.service",
         "dataStoreService": "app/service/datastore.service",
+        "systemInfoService": "app/service/system.info.service",
 
         //Repositories
         "repositories": "app/repository/bg.repositories",

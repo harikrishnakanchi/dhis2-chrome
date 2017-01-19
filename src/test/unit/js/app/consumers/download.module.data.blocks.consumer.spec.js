@@ -1,14 +1,14 @@
-define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', "dataSetRepository", 'userPreferenceRepository', 'changeLogRepository', 'orgUnitRepository', 'moduleDataBlockFactory',
+define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'systemInfoService', "dataSetRepository", 'userPreferenceRepository', 'changeLogRepository', 'orgUnitRepository', 'moduleDataBlockFactory',
         'moduleDataBlockMerger', 'eventService', 'angularMocks', 'dateUtils', 'utils', 'timecop', 'moment'],
-    function(DownloadModuleDataBlocksConsumer, DataService, ApprovalService, DataSetRepository, UserPreferenceRepository, ChangeLogRepository, OrgUnitRepository, ModuleDataBlockFactory,
+    function(DownloadModuleDataBlocksConsumer, DataService, ApprovalService, SystemInfoService, DataSetRepository, UserPreferenceRepository, ChangeLogRepository, OrgUnitRepository, ModuleDataBlockFactory,
              ModuleDataBlockMerger, EventService, mocks, dateUtils, utils, timecop, moment) {
         
-        var downloadModuleDataBlocksConsumer, dataService, approvalService,
+        var downloadModuleDataBlocksConsumer, dataService, approvalService, systemInfoService,
             userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository,
             moduleDataBlockFactory, moduleDataBlockMerger,
             q, scope, aggregateDataSet, periodRange, mockProjectId, mockModule, mockOriginOrgUnits, mockAggregateModuleDataBlock, mockLineListModuleDataBlock, someMomentInTime, eventService;
 
-        describe('downloadModuleDataBlocksConsumer', function() {
+            describe('downloadModuleDataBlocksConsumer', function() {
             beforeEach(mocks.inject(function($rootScope, $q) {
                 q = $q;
                 scope = $rootScope.$new();
@@ -76,7 +76,10 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', "d
                 spyOn(eventService, 'getEvents').and.returnValue(utils.getPromise(q, []));
                 spyOn(eventService, 'getEventIds').and.returnValue(utils.getPromise(q, []));
 
-                downloadModuleDataBlocksConsumer = new DownloadModuleDataBlocksConsumer(dataService, approvalService, datasetRepository,
+                systemInfoService = new SystemInfoService();
+                spyOn(systemInfoService, 'getServerDate').and.returnValue(utils.getPromise(q, 'someTime'));
+
+                downloadModuleDataBlocksConsumer = new DownloadModuleDataBlocksConsumer(dataService, approvalService, systemInfoService, datasetRepository,
                     userPreferenceRepository, changeLogRepository, orgUnitRepository, moduleDataBlockFactory, moduleDataBlockMerger, eventService, q);
 
             }));
@@ -279,14 +282,10 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', "d
             });
 
             it('should update the change log for each module after merging all data', function() {
-                var changeLogKey = ['dataValues', mockProjectId, mockModule.id].join(':'),
-                    currentTime = '2016-05-21T00:00:00.000Z';
-
-                Timecop.install();
-                Timecop.freeze(currentTime);
+                var changeLogKey = ['dataValues', mockProjectId, mockModule.id].join(':');
 
                 runConsumer();
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith(changeLogKey, currentTime);
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith(changeLogKey, 'someTime');
             });
 
             it('should not update the change log if at least one module failed', function() {
@@ -320,6 +319,11 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', "d
                 expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockA, undefined, undefined, undefined, undefined, undefined);
                 expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).not.toHaveBeenCalledWith(mockModuleDataBlockB, undefined, undefined, undefined, undefined, undefined);
                 expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockC, undefined, undefined, undefined, undefined, undefined);
+            });
+
+            it('should get the system info server data', function () {
+                runConsumer();
+                expect(systemInfoService.getServerDate).toHaveBeenCalled();
             });
         });
     });

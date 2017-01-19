@@ -21,7 +21,7 @@ define(["downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupC
             app.service('lineListEventsMerger', [lineListEventsMerger]);
             app.service('moduleDataBlockMerger', ["dataRepository", "approvalDataRepository", "dataService", "$q", "dataSetRepository", "approvalService", "dataSyncFailureRepository", "programEventRepository", "eventService", "aggregateDataValuesMerger", "lineListEventsMerger", moduleDataBlockMerger]);
             app.service('excludedLinelistOptionsMerger', ['$q', 'excludedLineListOptionsRepository', 'dataStoreService', 'orgUnitRepository', excludedLinelistOptionsMerger]);
-            app.service("downloadOrgUnitConsumer", ["orgUnitService", "orgUnitRepository", "changeLogRepository", "$q", "mergeBy", downloadOrgUnitConsumer]);
+            app.service("downloadOrgUnitConsumer", ["orgUnitService", "systemInfoService", "orgUnitRepository", "changeLogRepository", "$q", "mergeBy", downloadOrgUnitConsumer]);
             app.service("uploadOrgUnitConsumer", ["orgUnitService", "orgUnitRepository", "$q", uploadOrgUnitConsumer]);
             app.service("downloadOrgUnitGroupConsumer", ["orgUnitGroupService", "orgUnitGroupRepository", "changeLogRepository", downloadOrgUnitGroupConsumer]);
             app.service("uploadOrgUnitGroupConsumer", ["orgUnitGroupService", "orgUnitGroupRepository", "$q", uploadOrgUnitGroupConsumer]);
@@ -44,7 +44,7 @@ define(["downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupC
             app.service("downloadChartDataConsumer", ["reportService", "chartRepository", "userPreferenceRepository", "dataSetRepository", "changeLogRepository", "orgUnitRepository","programRepository", "$q", downloadChartDataConsumer]);
             app.service("uploadReferralLocationsConsumer", ["$q", "systemSettingService", "referralLocationsRepository", "orgUnitRepository", uploadReferralLocationsConsumer]);
             app.service("uploadExcludedDataElementsConsumer", ["$q", "systemSettingService", "excludedDataElementsRepository", "orgUnitRepository", uploadExcludedDataElementsConsumer]);
-            app.service("downloadModuleDataBlocksConsumer", ["dataService", "approvalService", "dataSetRepository", "userPreferenceRepository", "changeLogRepository", "orgUnitRepository",
+            app.service("downloadModuleDataBlocksConsumer", ["dataService", "approvalService", "systemInfoService", "dataSetRepository", "userPreferenceRepository", "changeLogRepository", "orgUnitRepository",
                 "moduleDataBlockFactory", "moduleDataBlockMerger", "eventService", "$q", downloadModuleDataBlocksConsumer]);
             app.service("syncModuleDataBlockConsumer", ["moduleDataBlockFactory", "dataService", "eventService", "dataSetRepository", "approvalService", "orgUnitRepository", "changeLogRepository", "moduleDataBlockMerger", "$q", syncModuleDataBlockConsumer]);
             app.service("syncExcludedLinelistOptionsConsumer", ["$q", "excludedLinelistOptionsMerger", syncExcludedLinelistOptionsConsumer]);

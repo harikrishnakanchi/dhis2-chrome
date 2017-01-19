@@ -1,6 +1,6 @@
 define(['lodash'], function(_){
     return function($q, db, $rootScope, ngI18nResourceBundle, systemSettingRepository) {
-        var TRANSLATABLE_ENTITIES = ["sections", "dataElements", "headers", "programStages", "programStageSections", "programStageDataElements", "dataElement", "optionSet", "options", "dataValues", "attribute"],
+        var TRANSLATABLE_ENTITIES = ["sections", "dataElements", "headers", "programStages", "programStageSections", "columnConfigurations", "programStageDataElements", "dataElement", "optionSet", "options", "dataValues", "attribute"],
             TRANSLATABLE_PROPERTIES = ["name", "description", "formName", "shortName", "displayName"],
             translations, _locale, self = this;
 
@@ -98,7 +98,7 @@ define(['lodash'], function(_){
                 });
 
                 _.each(objectToBeTranslated, function(value, key) {
-                    if(_.isArray(value) && _.contains("sections", key)){
+                    if(_.isArray(value) && !_.contains("dataElements", key)){
                         _.each(value,function(object){
                             self.translateReferralLocations([object]);
                         });

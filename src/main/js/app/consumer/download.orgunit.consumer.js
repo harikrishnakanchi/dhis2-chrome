@@ -1,11 +1,19 @@
 define(['moment', "lodashUtils", "dateUtils"], function(moment, _, dateUtils) {
-    return function(orgUnitService, orgUnitRepository, changeLogRepository, $q, mergeBy) {
+    return function(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, $q, mergeBy) {
+        var serverDate;
 
         this.run = function(message) {
             var orgUnits = _.isArray(message.data.data) ? message.data.data : [message.data.data];
-            return download(orgUnits)
+            return getServerDate()
+                .then(_.partial(download, orgUnits))
                 .then(mergeAndSave)
                 .then(updateChangeLog);
+        };
+
+        var getServerDate = function () {
+            return systemInfoService.getServerDate().then(function (date) {
+                serverDate = date;
+            });
         };
 
         var download = function(orgUnits) {
@@ -39,7 +47,7 @@ define(['moment', "lodashUtils", "dateUtils"], function(moment, _, dateUtils) {
         };
 
         var updateChangeLog = function() {
-            return changeLogRepository.upsert("orgUnits", moment().toISOString());
+            return changeLogRepository.upsert("orgUnits", serverDate);
         };
     };
 });
