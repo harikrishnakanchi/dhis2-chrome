@@ -1,5 +1,5 @@
 define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _, dateUtils, moment) {
-    return function (dataService, approvalService, datasetRepository, userPreferenceRepository, changeLogRepository, orgUnitRepository,
+    return function (dataService, approvalService, systemInfoService, datasetRepository, userPreferenceRepository, changeLogRepository, orgUnitRepository,
                      moduleDataBlockFactory, moduleDataBlockMerger, eventService, $q) {
 
         var CHANGE_LOG_PREFIX = 'dataValues';
@@ -31,10 +31,18 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
             });
         };
 
+        var setDownloadStartTime = function (data) {
+            return systemInfoService.getServerDate().then(function (serverDate) {
+                return _.merge({
+                    downloadStartTime: serverDate
+                }, data);
+            });
+        };
+
         var updateLastUpdatedTime = function(data) {
             var changeLogKey = [CHANGE_LOG_PREFIX, data.projectId, data.module.id].join(':');
 
-            return changeLogRepository.upsert(changeLogKey, moment().toISOString());
+            return changeLogRepository.upsert(changeLogKey, data.downloadStartTime);
         };
 
         var getOriginsForModule = function(data) {
@@ -137,6 +145,7 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
                 module: options.modules.pop(),
                 projectId: options.projectId
             })
+                .then(setDownloadStartTime)
                 .then(getModuleDataBlocks)
                 .then(getOriginsForModule)
                 .then(getDataSetsForModuleAndOrigins)
