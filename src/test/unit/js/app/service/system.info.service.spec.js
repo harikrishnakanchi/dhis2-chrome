@@ -1,4 +1,4 @@
-define(['dhisUrl', 'angularMocks', 'systemInfoService', 'moment'], function (dhisUrl, mocks, SystemInfoService, moment) {
+define(['dhisUrl', 'angularMocks', 'systemInfoService', 'moment', 'timecop'], function (dhisUrl, mocks, SystemInfoService, moment, timecop) {
     describe('System Info Service', function () {
         var systemInfoService, http, httpBackend;
 
@@ -20,10 +20,29 @@ define(['dhisUrl', 'angularMocks', 'systemInfoService', 'moment'], function (dhi
             httpBackend.expectGET(dhisUrl.systemInfo).respond(200, systemInfoResponse);
 
             systemInfoService.getServerDate().then(function (serverDate) {
-                expect(serverDate).toEqual(moment(systemInfoResponse.serverDate).toISOString());
+                expect(serverDate).toEqual(moment.utc(systemInfoResponse.serverDate).toISOString());
             });
 
             httpBackend.flush();
+        });
+
+        it('get current time if time returned by server is invalid', function () {
+            var systemInfoResponse = {
+                serverDate: 'Invalid Date'
+            };
+            var currentTime = moment('2017-01-18');
+            Timecop.install();
+            Timecop.freeze(currentTime);
+
+            httpBackend.expectGET(dhisUrl.systemInfo).respond(200, systemInfoResponse);
+
+            systemInfoService.getServerDate().then(function (serverDate) {
+                expect(serverDate).toEqual(currentTime.toISOString());
+            });
+
+            httpBackend.flush();
+            Timecop.returnToPresent();
+            Timecop.uninstall();
         });
     });
 });
