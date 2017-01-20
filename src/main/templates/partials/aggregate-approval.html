@@ -110,7 +110,7 @@
                 </accordion-group>
             </div>
 
-            <div class="data-set-acc-wrapper" ng-if="!(referralLocations | isEmpty )">
+            <div class="data-set-acc-wrapper" ng-if="referralLocations && !(referralLocations | isEmpty)">
                 <accordion-group ng-repeat="dataSet in dataSets | filter:{ isReferralDataset: true }" is-open="getDatasetState(dataSet.id, false)[dataSet.id]">
                     <accordion-heading>
                         <span>{{ dataSet.name}}</span>
