@@ -110,7 +110,7 @@
                 </accordion-group>
             </div>
 
-            <div class="data-set-acc-wrapper">
+            <div class="data-set-acc-wrapper" ng-if="!(referralLocations | isEmpty )">
                 <accordion-group ng-repeat="dataSet in dataSets | filter:{ isReferralDataset: true }" is-open="getDatasetState(dataSet.id, false)[dataSet.id]">
                     <accordion-heading>
                         <span>{{ dataSet.name}}</span>
@@ -137,7 +137,7 @@
                                         <th class="display-print" ng-if="!$first">
                                         </th>
                                         <th ng-repeat="column in columnConfiguration" colspan="{{ section.baseColumnConfiguration.length / columnConfiguration.length}}">
-                                            <span>{{ option.name}}</span>
+                                            <span>{{ column.name}}</span>
                                         </th>
                                         <th ng-hide="$last" class="last-column">
                                         </th>
@@ -205,7 +205,7 @@
                                         <th class="display-print" ng-if="!$first">
                                         </th>
                                         <th ng-repeat="column in columnConfiguration" colspan="{{ section.baseColumnConfiguration.length / columnConfiguration.length}}">
-                                            <span>{{ option.name}}</span>
+                                            <span>{{ column.name}}</span>
                                         </th>
                                         <th ng-hide="$last" class="last-column">
                                         </th>
