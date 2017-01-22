@@ -44,7 +44,7 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
                     $scope.allUserModules = _.map(modules, function(module) {
                         return {
                             "id": module.id,
-                            "displayName": module.parent.name + ' - ' + module.name,
+                            "name": module.name,
                             "isLineListService": customAttributes.getBooleanAttributeValue(module.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE)
                         };
                     });
@@ -55,9 +55,15 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
         var getModulesInOpUnit = function(opUnit) {
             return orgUnitRepository.getAllModulesInOrgUnits(opUnit.id, "Module").then(function(modules) {
                 return {
-                    'opUnitName': opUnit.name,
-                    'opUnitId': opUnit.id,
-                    'modules': modules
+                    'name': opUnit.name,
+                    'id': opUnit.id,
+                    'modules': _.map(modules, function(module) {
+                        return {
+                            "id": module.id,
+                            "name": module.name,
+                            "isLineListService": customAttributes.getBooleanAttributeValue(module.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE)
+                        };
+                    })
                 };
             });
         };

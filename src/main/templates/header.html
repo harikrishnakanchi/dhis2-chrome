@@ -86,43 +86,106 @@
                     {{ resourceBundle.homeMenuLabel }}
                 </a>
             </li>
-            <li role="presentation" ng-class="{ active: isActive('\/aggregate-data-entry')}"
-                ng-if="hasRoles(['Data entry user'])">
-                <a href="#/aggregate-data-entry">
-                    <i class="fa fa-pencil"></i>
-                    {{ resourceBundle.dataEntryLabel }}
-                </a>
-            </li>
-            <li role="presentation" ng-class="{ active: isActive('\/data-approval')}"
-                ng-if="hasRoles(['Project Level Approver', 'Coordination Level Approver'])">
-                <a href="#/data-approval">
+
+            <li dropdown role="presentation" ng-class="{ active: isActive('\/data-approval')}" class="dropdown praxis-dropdown-menu"
+                ng-if="hasRoles(['Project Level Approver', 'Coordination Level Approver']) && allUserModules.length > 0">
+                <a class="dropdown-toggle" dropdown-toggle href="" role="button">
                     <i class="fa fa-check-square-o"></i>
                     {{ resourceBundle.approveDataLabel }}
+                    <i class="fa fa-caret-down"></i>
                 </a>
+                <ul class="dropdown-menu multi-level" role="menu">
+                    <li class="dropdown-submenu"
+                        ng-repeat="opUnit in allOpUnitsWithModules | orderBy: 'name' "
+                        ng-class="{'pull-left': layoutDirection.direction == 'rtl' }">
+                        <a class="dropdown-toggle">
+                            {{ opUnit.name }}
+                            <i class="fa" ng-class="layoutDirection.direction == 'rtl' ? 'fa-caret-left' : 'fa-caret-right'"></i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li ng-repeat="module in opUnit.modules | orderBy:'name'">
+                                <a class="submenu-item" ng-href="#/data-approval/{{ module.id }}" tabindex="-1">{{ module.name }}</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
             </li>
-            <li role="presentation" ng-class="{ active: isActive('\/data-approval')}" ng-if="hasRoles(['Observer'])">
-                <a href="#/data-approval">
+
+            <li dropdown role="presentation" ng-class="{ active: isActive('\/data-approval')}" class="dropdown praxis-dropdown-menu"
+                ng-if="hasRoles(['Observer']) && allUserModules.length > 0">
+                <a class="dropdown-toggle" dropdown-toggle href="" role="button">
                     <i class="fa fa-database"></i>
-                    {{resourceBundle.observerDataLabel}}
+                    {{ resourceBundle.observerDataLabel }}
+                    <i class="fa fa-caret-down"></i>
                 </a>
+                <ul class="dropdown-menu multi-level" role="menu">
+                    <li class="dropdown-submenu"
+                        ng-repeat="opUnit in allOpUnitsWithModules | orderBy: 'name' "
+                        ng-class="{'pull-left': layoutDirection.direction == 'rtl' }">
+                        <a class="dropdown-toggle">
+                            {{ opUnit.name }}
+                            <i class="fa" ng-class="layoutDirection.direction == 'rtl' ? 'fa-caret-left' : 'fa-caret-right'"></i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li ng-repeat="module in opUnit.modules | orderBy:'name'">
+                                <a class="submenu-item" ng-href="#/data-approval/{{ module.id }}" tabindex="-1">{{ module.name }}</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
             </li>
-            <li role="presentation" ng-class="{ active: isActive('\/line-list')}" class="dropdown praxis-dropdown-menu"
-                ng-if="hasRoles(['Data entry user']) &amp;&amp; (allUserModules | filter: {isLineListService:true}).length > 0"
-                dropdown>
+
+            <li dropdown role="presentation" ng-class="{ active: isActive('\/aggregate-data-entry')}" class="dropdown praxis-dropdown-menu"
+                ng-if="hasRoles(['Data entry user']) && (allUserModules | filter: {isLineListService:false}).length > 0">
+                <a class="dropdown-toggle" dropdown-toggle href="" role="button">
+                    <i class="fa fa-pencil"></i>
+                    {{ resourceBundle.dataEntryLabel }}
+                    <i class="fa fa-caret-down"></i>
+                </a>
+                <ul class="dropdown-menu multi-level" role="menu">
+                    <li class="dropdown-submenu"
+                        ng-repeat="opUnit in allOpUnitsWithModules | orderBy: 'name' "
+                        ng-class="{'pull-left': layoutDirection.direction == 'rtl' }">
+                        <a class="dropdown-toggle">
+                            {{ opUnit.name }}
+                            <i class="fa" ng-class="layoutDirection.direction == 'rtl' ? 'fa-caret-left' : 'fa-caret-right'"></i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li ng-repeat="module in opUnit.modules | filter: {isLineListService:false} | orderBy:'name'">
+                                <a class="submenu-item" ng-href="#/aggregate-data-entry/{{ module.id }}" tabindex="-1">{{ module.name }}</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+
+            <li dropdown role="presentation" ng-class="{ active: isActive('\/line-list')}" class="dropdown praxis-dropdown-menu"
+                ng-if="hasRoles(['Data entry user']) && (allUserModules | filter: {isLineListService:true}).length > 0">
                 <a class="dropdown-toggle" dropdown-toggle href="" role="button">
                     <i class="fa fa-pencil"></i>
                     {{ resourceBundle.lineListDataEntryMenuLabel }}
                     <i class="fa fa-caret-down"></i>
                 </a>
-                <ul class="dropdown-menu" role="menu">
-                    <li ng-repeat="module in allUserModules | filter: {isLineListService:true} | orderBy:'displayName'">
-                        <a class="submenu-item" ng-href="#/line-list-summary/{{module.id}}" tabindex="-1">{{module.displayName}}</a>
+                <ul class="dropdown-menu multi-level" role="menu">
+                    <li class="dropdown-submenu"
+                        ng-repeat="opUnit in allOpUnitsWithModules | orderBy: 'name' "
+                        ng-class="{'pull-left': layoutDirection.direction == 'rtl' }"
+                        ng-if="(opUnit.modules | filter: {isLineListService:true}).length > 0">
+                        <a class="dropdown-toggle">
+                            {{ opUnit.name }}
+                            <i class="fa" ng-class="layoutDirection.direction == 'rtl' ? 'fa-caret-left' : 'fa-caret-right'"></i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li ng-repeat="module in opUnit.modules | filter: {isLineListService:true} | orderBy:'name'">
+                                <a class="submenu-item" ng-href="#/line-list-summary/{{ module.id }}" tabindex="-1">{{ module.name }}</a>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </li>
             <li role="presentation" ng-class="{ active: isActive('\/reports') || isActive('\/projectReport') || isActive('\/opUnitReport') }"
                 class="dropdown praxis-dropdown-menu"
-                ng-if="hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver', 'Data entry user']) &amp;&amp; allUserModules.length > 0"
+                ng-if="hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver', 'Data entry user']) && allUserModules.length > 0"
                 dropdown>
                 <a class="dropdown-toggle" dropdown-toggle href="" role="button">
                     <i class="fa fa-bar-chart"></i>
@@ -131,21 +194,20 @@
                 </a>
                 <ul class="dropdown-menu multi-level" role="menu">
                     <li class="dropdown-submenu"
-                        ng-repeat="opUnitWithModule in allOpUnitsWithModules | orderBy: 'opUnitName' "
+                        ng-repeat="opUnit in allOpUnitsWithModules | orderBy: 'name' "
                         ng-class="{'pull-left': layoutDirection.direction == 'rtl' }">
                         <a class="dropdown-toggle">
-                            {{ opUnitWithModule.opUnitName }}
+                            {{ opUnit.name }}
                             <i class="fa"
                                ng-class="layoutDirection.direction == 'rtl' ? 'fa-caret-left' : 'fa-caret-right'"></i>
                         </a>
                         <ul class="dropdown-menu">
-                            <li ng-repeat="module in opUnitWithModule.modules | orderBy:'name'">
-                                <a class="submenu-item" ng-href="#/reports/{{ module.id }}" tabindex="-1">{{ module.name
-                                    }}</a>
+                            <li ng-repeat="module in opUnit.modules | orderBy:'name'">
+                                <a class="submenu-item" ng-href="#/reports/{{ module.id }}" tabindex="-1">{{ module.name }}</a>
                             </li>
-                            <li class="divider"></li>
+                            <li class="divider" ng-if="opUnit.modules.length > 0"></li>
                             <li>
-                                <a class="submenu-item" href="#/opUnitReport/{{ opUnitWithModule.opUnitId }}">{{ opUnitWithModule.opUnitName }} {{ resourceBundle.reportLabel }}</a>
+                                <a class="submenu-item" href="#/opUnitReport/{{ opUnit.id }}">{{ opUnit.name }} {{ resourceBundle.reportLabel }}</a>
                             </li>
                         </ul>
                     </li>
