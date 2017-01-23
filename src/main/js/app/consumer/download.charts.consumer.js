@@ -1,7 +1,14 @@
-define(['moment'], function (moment) {
-    return function(reportService, chartRepository, changeLogRepository) {
+define([], function () {
+    return function(reportService, systemInfoService, chartRepository, changeLogRepository) {
+        var downloadStartTime;
+        var getServerTime = function () {
+          return systemInfoService.getServerDate().then(function (serverTime) {
+              downloadStartTime = serverTime;
+          });
+        };
+
         var updateChangeLog = function() {
-            return changeLogRepository.upsert('charts', moment().toISOString());
+            return changeLogRepository.upsert('charts', downloadStartTime);
         };
 
         var removeChartsThatHaveBeenDeletedRemotely = function() {
@@ -15,7 +22,8 @@ define(['moment'], function (moment) {
         };
 
         this.run = function() {
-            return changeLogRepository.get('charts')
+            return getServerTime()
+                .then(_.partial(changeLogRepository.get, 'charts'))
                 .then(reportService.getUpdatedCharts)
                 .then(chartRepository.upsert)
                 .then(updateChangeLog)
