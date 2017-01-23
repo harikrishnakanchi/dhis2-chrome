@@ -1,7 +1,8 @@
-define(["downloadDataSetConsumer", "dataSetService", "utils", "angularMocks", "dataSetRepository", "mergeBy"],
-    function(DownloadDatasetConsumer, DatasetService, utils, mocks, DatasetRepository, MergeBy) {
+define(["downloadDataSetConsumer", "dataSetService", "systemInfoService", "utils", "angularMocks", "dataSetRepository", "mergeBy"],
+    function(DownloadDatasetConsumer, DatasetService, SystemInfoService, utils, mocks, DatasetRepository, MergeBy) {
         describe("download dataset consumer", function() {
-            var scope, q, datasetService, datasetRepository, downloadDatasetConsumer, changeLogRepository, mergeBy;
+            var scope, q, datasetService, systemInfoService, datasetRepository, downloadDatasetConsumer, changeLogRepository, mergeBy,
+                message;
 
             beforeEach(mocks.inject(function($q, $rootScope, $log) {
                 q = $q;
@@ -14,8 +15,19 @@ define(["downloadDataSetConsumer", "dataSetService", "utils", "angularMocks", "d
 
                 datasetService = new DatasetService();
                 datasetRepository = new DatasetRepository();
+                systemInfoService = new SystemInfoService();
                 mergeBy = new MergeBy($log);
+                message = {};
+
+                spyOn(datasetRepository, 'upsertDhisDownloadedData');
+                spyOn(datasetService, 'getAll').and.returnValue(utils.getPromise(q, []));
+                spyOn(datasetRepository, 'findAllDhisDatasets').and.returnValue(utils.getPromise(q, []));
+                spyOn(systemInfoService, 'getServerDate').and.returnValue(utils.getPromise(q, ''));
             }));
+
+            var createDownloadDataSetConsumer = function () {
+                return new DownloadDatasetConsumer(datasetService, systemInfoService, datasetRepository, q, changeLogRepository, mergeBy);
+            };
 
             it("should save new dataset from dhis into the local repo", function() {
                 var dhisDatasets = [{
@@ -24,19 +36,9 @@ define(["downloadDataSetConsumer", "dataSetService", "utils", "angularMocks", "d
                     'organisationUnits': []
                 }];
 
-                spyOn(datasetRepository, 'upsertDhisDownloadedData');
-                spyOn(datasetRepository, 'findAllDhisDatasets').and.returnValue(utils.getPromise(q, []));
-                spyOn(datasetService, 'getAll').and.returnValue(utils.getPromise(q, dhisDatasets));
+                datasetService.getAll.and.returnValue(utils.getPromise(q, dhisDatasets));
 
-                var message = {
-                    'data': {
-                        'data': [],
-                        'type': 'downloadDataset'
-                    },
-                    'created': '2015-01-02T09:00:00.000+0000'
-                };
-
-                downloadDatasetConsumer = new DownloadDatasetConsumer(datasetService, datasetRepository, q, changeLogRepository, mergeBy);
+                downloadDatasetConsumer = createDownloadDataSetConsumer();
                 downloadDatasetConsumer.run(message);
                 scope.$apply();
 
@@ -56,19 +58,10 @@ define(["downloadDataSetConsumer", "dataSetService", "utils", "angularMocks", "d
                     'organisationUnits': []
                 }];
 
-                spyOn(datasetRepository, 'upsertDhisDownloadedData');
-                spyOn(datasetRepository, 'findAllDhisDatasets').and.returnValue(utils.getPromise(q, localDataset));
-                spyOn(datasetService, 'getAll').and.returnValue(utils.getPromise(q, dhisDatasets));
+                datasetRepository.findAllDhisDatasets.and.returnValue(utils.getPromise(q, localDataset));
+                datasetService.getAll.and.returnValue(utils.getPromise(q, dhisDatasets));
 
-                var message = {
-                    'data': {
-                        'data': [],
-                        'type': 'downloadDataset'
-                    },
-                    'created': '2015-01-02T09:00:00.000+0000'
-                };
-
-                downloadDatasetConsumer = new DownloadDatasetConsumer(datasetService, datasetRepository, q, changeLogRepository, mergeBy);
+                downloadDatasetConsumer = createDownloadDataSetConsumer();
                 downloadDatasetConsumer.run(message);
                 scope.$apply();
 
@@ -76,14 +69,6 @@ define(["downloadDataSetConsumer", "dataSetService", "utils", "angularMocks", "d
             });
 
             it("should merge local dataset with dhis copy when new orgunits are associated to the dataset either in dhis or locally", function() {
-                var originalDataset = {
-                    'id': 'ds1',
-                    'lastUpdated': '2015-01-01T09:00:00.000+0000',
-                    'organisationUnits': [{
-                        'id': 'ou1'
-                    }]
-                };
-
                 var locallyUpdatedDataset = {
                     'id': 'ds1',
                     'lastUpdated': '2015-01-01T09:00:00.000+0000',
@@ -105,19 +90,10 @@ define(["downloadDataSetConsumer", "dataSetService", "utils", "angularMocks", "d
                     }]
                 };
 
-                spyOn(datasetRepository, 'upsertDhisDownloadedData');
-                spyOn(datasetRepository, 'findAllDhisDatasets').and.returnValue(utils.getPromise(q, [locallyUpdatedDataset]));
-                spyOn(datasetService, 'getAll').and.returnValue(utils.getPromise(q, [dhisUpdatedDataset]));
+                datasetRepository.findAllDhisDatasets.and.returnValue(utils.getPromise(q, [locallyUpdatedDataset]));
+                datasetService.getAll.and.returnValue(utils.getPromise(q, [dhisUpdatedDataset]));
 
-                var message = {
-                    'data': {
-                        'data': [],
-                        'type': 'downloadDataset'
-                    },
-                    'created': '2015-01-02T09:00:00.000+0000'
-                };
-
-                downloadDatasetConsumer = new DownloadDatasetConsumer(datasetService, datasetRepository, q, changeLogRepository, mergeBy);
+                downloadDatasetConsumer = createDownloadDataSetConsumer();
                 downloadDatasetConsumer.run(message);
                 scope.$apply();
 
@@ -134,5 +110,16 @@ define(["downloadDataSetConsumer", "dataSetService", "utils", "angularMocks", "d
                 }];
                 expect(datasetRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(expectedUpsertedDataset);
             });
+
+            it('should upsert the change log repository with the system info time', function () {
+                systemInfoService.getServerDate.and.returnValue(utils.getPromise(q, 'someTime'));
+
+                downloadDatasetConsumer = createDownloadDataSetConsumer();
+                downloadDatasetConsumer.run(message);
+                scope.$apply();
+
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('datasets', 'someTime');
+            });
+
         });
     });

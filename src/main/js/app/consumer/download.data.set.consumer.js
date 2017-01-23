@@ -1,24 +1,41 @@
 define(['moment', 'lodashUtils'], function(moment, _) {
-    return function(datasetService, datasetRepository, $q, changeLogRepository, mergeBy) {
+    return function(datasetService, systemInfoService, datasetRepository, $q, changeLogRepository, mergeBy) {
         this.run = function(message) {
-            return download()
+            return getServerTime()
+                .then(download)
                 .then(mergeAndSave)
                 .then(updateChangeLog);
         };
 
-        var updateChangeLog = function() {
-            return changeLogRepository.upsert("datasets", moment().toISOString());
+        var getServerTime = function () {
+            return systemInfoService.getServerDate()
+                .then(function (serverDate) {
+                    return {
+                        downloadStartTime: serverDate
+                    };
+                });
         };
 
-        var download = function() {
-            return changeLogRepository.get("datasets").then(datasetService.getAll);
+        var download = function (data) {
+            return changeLogRepository.get("datasets")
+                .then(datasetService.getAll)
+                .then(function (dataSets) {
+                    return _.merge({dataSets: dataSets}, data);
+                });
         };
 
-        var mergeAndSave = function(allDhisDatasets) {
-            var dataSetIds = _.pluck(allDhisDatasets, "id");
+        var mergeAndSave = function(data) {
+            var dataSetIds = _.pluck(data.dataSets, "id");
             return datasetRepository.findAllDhisDatasets(dataSetIds)
-                .then(_.curry(mergeBy.union)("organisationUnits", "id", allDhisDatasets))
-                .then(datasetRepository.upsertDhisDownloadedData);
+                .then(_.curry(mergeBy.union)("organisationUnits", "id", data.dataSets))
+                .then(datasetRepository.upsertDhisDownloadedData)
+                .then(function () {
+                    return data;
+                });
+        };
+
+        var updateChangeLog = function(data) {
+            return changeLogRepository.upsert("datasets", data.downloadStartTime);
         };
     };
 });

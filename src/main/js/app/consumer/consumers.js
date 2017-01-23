@@ -25,7 +25,7 @@ define(["downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupC
             app.service("uploadOrgUnitConsumer", ["orgUnitService", "orgUnitRepository", "$q", uploadOrgUnitConsumer]);
             app.service("downloadOrgUnitGroupConsumer", ["orgUnitGroupService", "orgUnitGroupRepository", "changeLogRepository", downloadOrgUnitGroupConsumer]);
             app.service("uploadOrgUnitGroupConsumer", ["orgUnitGroupService", "orgUnitGroupRepository", "$q", uploadOrgUnitGroupConsumer]);
-            app.service("downloadDataSetConsumer", ["dataSetService", "dataSetRepository", "$q", "changeLogRepository", "mergeBy", downloadDataSetConsumer]);
+            app.service("downloadDataSetConsumer", ["dataSetService", "systemInfoService", "dataSetRepository", "$q", "changeLogRepository", "mergeBy", downloadDataSetConsumer]);
             app.service("assignDataSetsToOrgUnitsConsumer", ["orgUnitService", "$q", assignDataSetsToOrgUnitsConsumer]);
             app.service("associateOrgunitToProgramConsumer", ["programService", "$q", associateOrgunitToProgramConsumer]);
             app.service("removeOrgunitDataSetAssociationConsumer", ["dataSetService", "$q", removeOrgunitDataSetAssociationConsumer]);
