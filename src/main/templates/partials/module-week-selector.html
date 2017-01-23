@@ -6,7 +6,7 @@
             <ul class="form" ng-hide="showOfflineSummaryForViewOnly">
                 <li class="form-group">
                     <label for="module">{{resourceBundle.moduleLabel}}</label>
-                    <select name="module" id="module" class="input-sm" ng-model="currentModule" ng-options="module.displayName for module in modules | orderBy:'displayName'">
+                    <select name="module" id="module" class="input-sm module" ng-model="currentModule" ng-options="module.displayName for module in modules | orderBy:'displayName'">
                         <option value="">-</option>
                     </select>
                 </li>
