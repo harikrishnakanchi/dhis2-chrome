@@ -1,7 +1,8 @@
-define(["downloadMetadataConsumer", "metadataService", "metadataRepository", "changeLogRepository", "moment", "utils", "angularMocks"], function(DownloadMetadataConsumer, MetadataService, MetadataRepository, ChangeLogRepository, moment, utils, mocks) {
+define(["downloadMetadataConsumer", "metadataService", "systemInfoService", "metadataRepository", "changeLogRepository", "moment", "utils", "angularMocks"],
+    function(DownloadMetadataConsumer, MetadataService, SystemInfoService, MetadataRepository, ChangeLogRepository, moment, utils, mocks) {
     describe("download metadata consumer", function() {
 
-        var downloadMetadataConsumer, metadataService, metadataRepository, changeLogRepository, q, scope, thisMoment;
+        var downloadMetadataConsumer, metadataService, systemInfoService, metadataRepository, changeLogRepository, q, scope, thisMoment;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
@@ -35,7 +36,10 @@ define(["downloadMetadataConsumer", "metadataService", "metadataRepository", "ch
             spyOn(changeLogRepository, "get").and.returnValue(utils.getPromise(q, lastSyncedDate));
             spyOn(changeLogRepository, "upsert");
 
-            downloadMetadataConsumer = new DownloadMetadataConsumer(metadataService, metadataRepository, changeLogRepository);
+            systemInfoService = new SystemInfoService();
+            spyOn(systemInfoService, 'getServerDate').and.returnValue(utils.getPromise(q, 'someTime'));
+
+            downloadMetadataConsumer = new DownloadMetadataConsumer(metadataService, systemInfoService, metadataRepository, changeLogRepository);
 
             var message = {
                 "data": {
@@ -45,10 +49,10 @@ define(["downloadMetadataConsumer", "metadataService", "metadataRepository", "ch
             downloadMetadataConsumer.run(message);
             scope.$apply();
 
-            expect(changeLogRepository.get).toHaveBeenCalledWith("metaData");
+            expect(changeLogRepository.get).toHaveBeenCalledWith("metaData", undefined);
             expect(metadataService.getMetadata).toHaveBeenCalledWith(lastSyncedDate);
             expect(metadataRepository.upsertMetadata).toHaveBeenCalledWith(dhisMetadata);
-            expect(changeLogRepository.upsert).toHaveBeenCalledWith("metaData", thisMoment.toISOString());
+            expect(changeLogRepository.upsert).toHaveBeenCalledWith("metaData", 'someTime');
         });
     });
 });
