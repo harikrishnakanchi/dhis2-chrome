@@ -1,4 +1,5 @@
 define(['lodash', 'moment'], function(_, moment) {
+    var codeIdMapper;
     var ATTRIBUTE_CODES = {
         LINE_LIST_ATTRIBUTE_CODE: 'isLineListService',
         LINE_LIST_OFFLINE_SUMMARY_CODE: 'praxisLineListSummaryType',
@@ -67,10 +68,18 @@ define(['lodash', 'moment'], function(_, moment) {
         return attribute;
     };
 
+    var initializeData = function (attributes) {
+        codeIdMapper = _.reduce(attributes, function (result, attribute) {
+            result[attribute.code] = attribute.id;
+            return result;
+        }, {});
+    };
+
     return _.merge(ATTRIBUTE_CODES, {
         getBooleanAttributeValue: getBooleanAttributeValue,
         getAttributeValue: getAttributeValue,
         cleanAttributeValues: cleanAttributeValues,
-        createAttribute: createAttribute
+        createAttribute: createAttribute,
+        initializeData: initializeData
     });
 });
