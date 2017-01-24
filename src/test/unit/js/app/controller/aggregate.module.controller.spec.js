@@ -121,29 +121,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
             });
 
             it("should save aggregate module", function() {
-                var parent = {
-                    "name": "Project1",
-                    "id": "someid",
-                    "children": []
-                };
-
-                orgUnitRepo.get.and.returnValue(utils.getPromise(q, parent));
-
-                spyOn(dhisId, "get").and.callFake(function(name) {
-                    return name;
-                });
-
-
-                scope.$apply();
-
-                scope.orgUnit = parent;
-                scope.module = {
-                    'name': "Module1",
-                    'serviceType': "Aggregate",
-                    'openingDate': new Date(),
-                    'parent': parent
-                };
-
                 var enrichedAggregateModule = {
                     name: 'Module1',
                     shortName: 'Module1',
@@ -158,26 +135,21 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                             code: "Type"
                         },
                         value: 'Module'
-                    }, {
-                        created: moment().toISOString(),
-                        lastUpdated: moment().toISOString(),
-                        attribute: {
-                            code: "isLineListService"
-                        },
-                        value: 'false'
-                    }, {
-                        created: moment().toISOString(),
-                        lastUpdated: moment().toISOString(),
-                        attribute: {
-                            code: "isNewDataModel"
-                        },
-                        value: 'true'
                     }],
                     parent: {
                         name: 'Project1',
                         id: 'someid'
                     },
                     dataSets: []
+                };
+
+                spyOn(orgUnitMapper, 'mapToModule').and.returnValue(enrichedAggregateModule);
+
+                scope.module = {
+                    'name': "Module1",
+                    'serviceType': "Aggregate",
+                    'openingDate': new Date(),
+                    'parent': parent
                 };
 
                 scope.save();
@@ -380,6 +352,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 };
 
                 scope.associatedDatasets = associatedDatasets;
+                spyOn(orgUnitMapper, 'mapToModule').and.returnValue(enrichedModule);
                 spyOn(dhisId, "get").and.callFake(function(name) {
                     return name;
                 });
@@ -482,7 +455,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     serviceType: "Aggregate",
                     parent: parent
                 };
-                scope.module = updatedModule;
 
                 var excludedDataElements = [{
                     id: 'de1'
@@ -490,6 +462,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     id: 'de3'
                 }];
 
+                spyOn(orgUnitMapper, 'mapToModule').and.returnValue(updatedModule);
                 systemSettingsTransformer.excludedDataElementsForAggregateModule.and.returnValue(excludedDataElements);
 
                 scope.update();
@@ -540,49 +513,13 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 initialiseController();
                 scope.$apply();
 
-                scope.module = updatedModule;
+                spyOn(orgUnitMapper, 'mapToModule').and.returnValue(updatedModule);
                 scope.update();
                 scope.$apply();
 
-                var expectedModule = {
-                    name: 'module NEW name',
-                    shortName: 'module NEW name',
-                    displayName: 'Par1 - module NEW name',
-                    id: oldid,
-                    level: 6,
-                    openingDate: moment.utc().format('YYYY-MM-DD'),
-                    attributeValues: [{
-                        created: moment().toISOString(),
-                        lastUpdated: moment().toISOString(),
-                        attribute: {
-                            code: 'Type'
-                        },
-                        value: 'Module'
-                    }, {
-                        created: moment().toISOString(),
-                        lastUpdated: moment().toISOString(),
-                        attribute: {
-                            code: 'isLineListService'
-                        },
-                        value: 'false'
-                    }, {
-                        created: moment().toISOString(),
-                        lastUpdated: moment().toISOString(),
-                        attribute: {
-                            code: "isNewDataModel"
-                        },
-                        value: 'true'
-                    }],
-                    parent: {
-                        name: "Par1",
-                        id: 'par1'
-                    },
-                    dataSets: []
-                };
-
-                expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedModule);
+                expect(orgUnitRepo.upsert).toHaveBeenCalledWith(updatedModule);
                 expect(hustle.publish).toHaveBeenCalledWith({
-                    data: { orgUnitId: expectedModule.id },
+                    data: { orgUnitId: updatedModule.id },
                     type: "syncOrgUnit",
                     locale: "en",
                     desc: "save organisation unit"
@@ -838,50 +775,19 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
             });
 
             it("should disable module", function() {
-                var parent = {
-                    "id": "par1",
-                    "name": "Par1"
-                };
                 scope.$parent.closeNewForm = jasmine.createSpy();
                 scope.$apply();
                 var module = {
                     name: "test1",
                     id: "projectId",
                     dataSets: [],
-                    attributeValues: [],
-                    parent: parent
+                    attributeValues: []
                 };
-                scope.module = module;
 
-                var expectedModule = {
+                var mockDisabledModule = {
                     name: 'test1',
-                    shortName: 'test1',
-                    displayName: 'Par1 - test1',
                     id: 'projectId',
-                    level: 6,
-                    openingDate: moment.utc(new Date()).format('YYYY-MM-DD'),
                     attributeValues: [{
-                        created: moment().toISOString(),
-                        lastUpdated: moment().toISOString(),
-                        attribute: {
-                            code: 'Type'
-                        },
-                        value: 'Module'
-                    }, {
-                        created: moment().toISOString(),
-                        lastUpdated: moment().toISOString(),
-                        attribute: {
-                            code: 'isLineListService'
-                        },
-                        value: 'false'
-                    }, {
-                        created: '2014-04-01T00:00:00.000Z',
-                        lastUpdated: '2014-04-01T00:00:00.000Z',
-                        attribute: {
-                            code: "isNewDataModel"
-                        },
-                        value: 'true'
-                    }, {
                         created: '2014-04-01T00:00:00.000Z',
                         lastUpdated: '2014-04-01T00:00:00.000Z',
                         attribute: {
@@ -894,8 +800,11 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                         id: 'par1'
                     }
                 };
+
+                spyOn(orgUnitMapper, 'mapToModule').and.returnValue(module);
+                spyOn(orgUnitMapper, 'disable').and.returnValue(mockDisabledModule);
                 var expectedHustleMessage = {
-                    data: expectedModule,
+                    data: mockDisabledModule,
                     type: "upsertOrgUnit",
                     locale: "en",
                     desc: "disable organisation unit"
@@ -907,7 +816,8 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.disable(module);
                 scope.$apply();
 
-                expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedModule);
+                expect(orgUnitMapper.disable).toHaveBeenCalled();
+                expect(orgUnitRepo.upsert).toHaveBeenCalledWith(mockDisabledModule);
                 expect(hustle.publish).toHaveBeenCalledWith(expectedHustleMessage, 'dataValues');
                 expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(module, "disabledModule");
                 expect(scope.isDisabled).toEqual(true);
@@ -966,10 +876,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     "name": "origin org unit"
                 }];
 
-                spyOn(dhisId, "get").and.callFake(function(name) {
-                    return name;
-                });
-
+                spyOn(orgUnitMapper, 'mapToModule').and.returnValue(enrichedAggregateModule);
                 originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnits));
 
                 scope.save();

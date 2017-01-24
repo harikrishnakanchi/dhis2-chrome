@@ -1,5 +1,5 @@
-define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "timecop", "moment", "dhisId", "orgUnitRepository", "patientOriginRepository", "orgUnitGroupSetRepository", "customAttributes"],
-    function(OpUnitController, mocks, utils, OrgUnitGroupHelper, timecop, moment, dhisId, OrgUnitRepository, PatientOriginRepository, OrgUnitGroupSetRepository, customAttributes) {
+define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "timecop", "moment", "dhisId", "orgUnitRepository", "patientOriginRepository", "orgUnitGroupSetRepository", "customAttributes", "orgUnitMapper"],
+    function(OpUnitController, mocks, utils, OrgUnitGroupHelper, timecop, moment, dhisId, OrgUnitRepository, PatientOriginRepository, OrgUnitGroupSetRepository, customAttributes, orgUnitMapper) {
     describe('opUnitController', function() {
         var scope, db, q, hustle, fakeModal,
             opUnitController,
@@ -118,6 +118,11 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             };
             scope.orgUnit.level = 4;
 
+            var attributes = [createMockAttribute('someType', 'someValue', 'someName'),
+                createMockAttribute('someType', 'someValue', 'someName'),
+                createMockAttribute('someType', 'someValue', 'someName'),
+                createMockAttribute('someType', 'someValue', 'someName')
+            ];
             var expectedOpUnit = {
                 "name": "OpUnit1",
                 "openingDate": moment().format("YYYY-MM-DD"),
@@ -125,16 +130,18 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "shortName": "OpUnit1",
                 "level": 5,
                 "parent": _.pick(scope.orgUnit, ['id', 'name']),
-                "attributeValues": [createMockAttribute ('opUnitType', 'Hospital'),
-                    createMockAttribute ('Type', 'Operation Unit'),
-                    createMockAttribute ('hospitalUnitCode', 'Unit Code - A'),
-                    createMockAttribute ('isNewDataModel', 'true')
-                ]
+                "attributeValues": attributes
             };
 
+            spyOn(customAttributes, 'createAttribute').and.returnValue(createMockAttribute('someType', 'someValue', 'someName'));
+            spyOn(customAttributes, 'cleanAttributeValues').and.returnValue(attributes);
             scope.save(opUnit);
             scope.$apply();
 
+            expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.OPERATION_UNIT_TYPE_CODE, "Hospital");
+            expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.TYPE, "Operation Unit");
+            expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.HOSPITAL_UNIT_CODE, "Unit Code - A");
+            expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.NEW_DATA_MODEL_CODE, "true");
             expect(orgUnitRepository.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": [expectedOpUnit],
@@ -192,32 +199,13 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             };
             scope.orgUnit.level = 4;
 
-            var expectedOpUnit = {
-                "name": "OpUnit1",
-                "openingDate": moment().format("YYYY-MM-DD"),
-                "id": "someMd5Hash",
-                "shortName": "OpUnit1",
-                "level": 5,
-                "parent": _.pick(scope.orgUnit, ['id', 'name']),
-                "attributeValues": [createMockAttribute('opUnitType', 'Hospital'),
-                    createMockAttribute('Type', 'Operation Unit'),
-                    createMockAttribute('hospitalUnitCode', 'Unit Code - A'),
-                    createMockAttribute('isNewDataModel', 'true')
-                ],
-                "coordinates": "[25,50]",
-                "featureType": "POINT"
-            };
-
+            spyOn(customAttributes, 'createAttribute').and.returnValue(createMockAttribute('someType', 'someValue'));
+            spyOn(customAttributes, 'cleanAttributeValues').and.returnValue(createMockAttribute('someType', 'someValue'));
             scope.save(opUnit);
             scope.$apply();
 
-            expect(orgUnitRepository.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);
-            expect(hustle.publish).toHaveBeenCalledWith({
-                "data": [expectedOpUnit],
-                "type": "upsertOrgUnit",
-                "locale": "en",
-                "desc": "upsert org unit"
-            }, "dataValues");
+            expect(orgUnitRepository.upsert.calls.argsFor(0)[0].coordinates).toEqual("[25,50]");
+            expect(orgUnitRepository.upsert.calls.argsFor(0)[0].featureType).toEqual("POINT");
         });
 
         it("should not ask for hospital unit code while saving operation unit if it is not hospital", function() {
@@ -233,29 +221,11 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             };
             scope.orgUnit.level = 4;
 
-            var expectedOpUnit = {
-                "name": "OpUnit1",
-                "openingDate": moment().format("YYYY-MM-DD"),
-                "id": "someMd5Hash",
-                "shortName": "OpUnit1",
-                "level": 5,
-                "parent": _.pick(scope.orgUnit, ['id', 'name']),
-                "attributeValues": [createMockAttribute('opUnitType', 'Health Center'),
-                    createMockAttribute('Type', 'Operation Unit'),
-                    createMockAttribute('isNewDataModel', 'true')
-                ]
-            };
-
+            spyOn(customAttributes, 'createAttribute').and.returnValue(createMockAttribute('someType', 'someValue'));
             scope.save(opUnit);
             scope.$apply();
 
-            expect(orgUnitRepository.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);
-            expect(hustle.publish).toHaveBeenCalledWith({
-                "data": [expectedOpUnit],
-                "type": "upsertOrgUnit",
-                "locale": "en",
-                "desc": "upsert org unit"
-            }, "dataValues");
+            expect(customAttributes.createAttribute).not.toHaveBeenCalledWith(customAttributes.HOSPITAL_UNIT_CODE, 'Unit Code - A');
         });
 
         it("should set operation unit for view and show patientOrigins", function() {
@@ -363,13 +333,14 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 }
             }];
             var expectedHustleMessage = {
-                "data": expectedOrgUnits,
+                "data": [module, opunit],
                 "type": "upsertOrgUnit",
                 "locale": "en",
                 "desc": scope.resourceBundle.upsertOrgUnitDesc
             };
             orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modulesUnderOpunit));
 
+            spyOn(orgUnitMapper, 'disable').and.returnValue(expectedOrgUnits);
             scope.disable(opunit);
             scope.$apply();
 
@@ -403,6 +374,11 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 }
             };
 
+            var attributes = [createMockAttribute('someType', 'someValue'),
+                createMockAttribute('someType', 'someValue'),
+                createMockAttribute('someType', 'someValue'),
+                createMockAttribute('someType', 'someValue')];
+
             var expectedOpUnit = {
                 "name": "OpUnit1",
                 "id": "opUnit1Id",
@@ -413,11 +389,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     "name": "Parent",
                     "id": "ParentId"
                 },
-                "attributeValues": [createMockAttribute('opUnitType', 'Hospital'),
-                    createMockAttribute('Type', 'Operation Unit'),
-                    createMockAttribute('hospitalUnitCode', 'Unit Code - A'),
-                    createMockAttribute('isNewDataModel', 'true')
-                ]
+                "attributeValues": attributes
             };
 
             var modulesUnderOpunit = [{
@@ -440,12 +412,18 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "name": "child2"
             }];
 
+            spyOn(customAttributes, 'createAttribute').and.returnValue(createMockAttribute('someType', 'someValue'));
+            spyOn(customAttributes, 'cleanAttributeValues').and.returnValue(attributes);
             orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modulesUnderOpunit));
             orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, originOrgUnits));
 
             scope.update(opUnit);
             scope.$apply();
 
+            expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.OPERATION_UNIT_TYPE_CODE, "Hospital");
+            expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.TYPE, "Operation Unit");
+            expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.HOSPITAL_UNIT_CODE, "Unit Code - A");
+            expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.NEW_DATA_MODEL_CODE, "true");
             expect(orgUnitRepository.upsert).toHaveBeenCalledWith(expectedOpUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": [expectedOpUnit],
@@ -470,32 +448,12 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "longitude": 25
             };
 
-            var expectedOpUnit = {
-                "name": "OpUnit1",
-                "id": scope.orgUnit.id,
-                "openingDate": moment().format("YYYY-MM-DD"),
-                "shortName": "OpUnit1",
-                "level": 5,
-                "parent": scope.orgUnit.parent,
-                "attributeValues": [createMockAttribute('opUnitType', 'Hospital'),
-                    createMockAttribute('Type', 'Operation Unit'),
-                    createMockAttribute('hospitalUnitCode', 'Unit Code - A'),
-                    createMockAttribute('isNewDataModel', 'true')
-                ],
-                "coordinates": "[25,50]",
-                "featureType": "POINT"
-            };
-
+            spyOn(customAttributes, 'createAttribute').and.returnValue(createMockAttribute('someType', 'someValue'));
             scope.update(opUnit);
             scope.$apply();
 
-            expect(orgUnitRepository.upsert).toHaveBeenCalledWith(expectedOpUnit);
-            expect(hustle.publish).toHaveBeenCalledWith({
-                "data": [expectedOpUnit],
-                "type": "upsertOrgUnit",
-                "locale": "en",
-                "desc": "upsert org unit"
-            }, "dataValues");
+            expect(orgUnitRepository.upsert.calls.argsFor(0)[0].coordinates).toEqual("[25,50]");
+            expect(orgUnitRepository.upsert.calls.argsFor(0)[0].featureType).toEqual("POINT");
         });
 
         it("should take the user to the view page of the parent project on clicking cancel", function() {
@@ -523,6 +481,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 }]
             };
 
+            spyOn(customAttributes, 'createAttribute').and.returnValue(createMockAttribute('someType', 'someValue'));
             scope.save(opUnit);
             scope.$apply();
 
@@ -558,6 +517,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "name": "child2"
             }];
 
+            spyOn(customAttributes, 'createAttribute').and.returnValue(createMockAttribute('someType', 'someValue'));
             orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modulesUnderOpunit));
             orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, originOrgUnits));
 
@@ -579,14 +539,14 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
 
         it("should disable patient origin", function() {
             var originToEnableDisable = {
-                "id": "0",
+                "id": "o1",
                 "name": "origin1"
             };
 
             var patientOrigin = {
                 "orgUnit": "opUnit1Id",
                 "origins": [{
-                    "id": "0",
+                    "id": "o1",
                     "name": "origin1",
                     "isDisabled": false
                 }]
@@ -617,12 +577,15 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             var expectedPatientOriginUpsert = {
                 "orgUnit": "opUnit1Id",
                 "origins": [{
-                    "id": "0",
+                    "id": "o1",
                     "name": "origin1",
                     "isDisabled": true
                 }]
             };
 
+            spyOn(customAttributes, 'createAttribute').and.callFake(function (code, value) {
+                return createMockAttribute(code, value);
+            });
             orgUnitRepository.getAllOriginsByName.and.returnValue(utils.getPromise(q, origins));
             patientOriginRepository.get.and.returnValue(utils.getPromise(q, patientOrigin));
 

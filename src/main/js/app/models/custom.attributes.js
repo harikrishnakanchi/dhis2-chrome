@@ -57,15 +57,15 @@ define(['lodash', 'moment'], function(_, moment) {
     };
 
     var createAttribute = function (attributeCode, value) {
-        var attribute = {
+        return {
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
             "attribute": {
-                "code": attributeCode
+                "code": attributeCode,
+                "id": codeIdMapper[attributeCode]
             },
             "value": value
         };
-        return attribute;
     };
 
     var initializeData = function (attributes) {

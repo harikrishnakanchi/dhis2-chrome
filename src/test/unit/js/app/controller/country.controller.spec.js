@@ -1,8 +1,17 @@
-define(["countryController", "angularMocks", "utils", "moment", "timecop", "dhisId"], function(CountryController, mocks, utils, moment, timecop, dhisId) {
+define(["countryController", "angularMocks", "utils", "moment", "timecop", "dhisId", "customAttributes"], function(CountryController, mocks, utils, moment, timecop, dhisId, customAttributes) {
 
     describe("country controller", function() {
 
-        var scope, timeout, q, location, anchorScroll, hustle, orgUnitRepo, DhisId;
+        var scope, timeout, q, location, anchorScroll, hustle, orgUnitRepo;
+
+        var createMockAttribute = function (code, value) {
+            return {
+                "attribute": {
+                    "code": code
+                },
+                "value": value
+            };
+        };
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $hustle, $q, $timeout, $location) {
@@ -19,6 +28,9 @@ define(["countryController", "angularMocks", "utils", "moment", "timecop", "dhis
             orgUnitRepo = utils.getMockRepo(q);
             orgUnitRepo.getAllModulesInOrgUnits = jasmine.createSpy("getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
             orgUnitRepo.getChildOrgUnitNames = jasmine.createSpy("getChildOrgUnitNames").and.returnValue(utils.getPromise(q, []));
+            spyOn(customAttributes, 'createAttribute').and.callFake(function (code, value) {
+                return createMockAttribute(code, value);
+            });
 
             scope.isNewMode = true;
             scope.orgUnit = {
@@ -68,7 +80,7 @@ define(["countryController", "angularMocks", "utils", "moment", "timecop", "dhis
 
             var newOrgUnit = {
                 'name': 'Org1',
-                'openingDate': moment().toDate(),
+                'openingDate': moment().toDate()
             };
 
             var parent = {
@@ -86,18 +98,14 @@ define(["countryController", "angularMocks", "utils", "moment", "timecop", "dhis
                 'shortName': newOrgUnit.name,
                 'parent': {
                     'id': parent.id,
-                    'name': parent.name,
+                    'name': parent.name
                 },
                 'attributeValues': [{
-                    'created': '2014-10-29T12:43:54.972Z',
-                    'lastUpdated': '2014-10-29T12:43:54.972Z',
                     'attribute': {
                         'code': 'Type'
                     },
                     'value': "Country"
                 }, {
-                    'created': '2014-10-29T12:43:54.972Z',
-                    'lastUpdated': '2014-10-29T12:43:54.972Z',
                     'attribute': {
                         'code': 'isNewDataModel'
                     },

@@ -5,9 +5,18 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
              DatasetRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, ProgramRepository, ExcludedLineListOptionsRepository, TranslationsService, customAttributes) {
 
         describe("line list module controller", function() {
-            var scope, rootScope, lineListModuleController, mockOrgStore, db, q, datasets, sections, dataElements, sectionsdata,
-                dataElementsdata, orgUnitRepository, hustle, excludedDataElementsRepository, excludedLineListOptionsRepository,
+            var scope, rootScope, lineListModuleController, mockOrgStore, db, q, datasets, dataElements,
+                orgUnitRepository, hustle, excludedDataElementsRepository, excludedLineListOptionsRepository,
                 fakeModal, allPrograms, programRepository, datasetRepository, originOrgunitCreator, translationsService;
+
+            var createMockAttribute = function (code, value) {
+                return {
+                    "attribute": {
+                        "code": code
+                    },
+                    "value": value
+                };
+            };
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle) {
@@ -34,6 +43,10 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         "value": "Ds1"
                     }]
                 }];
+
+                spyOn(customAttributes, 'createAttribute').and.callFake(function (code, value) {
+                    return createMockAttribute(code, value);
+                });
 
                 excludedDataElementsRepository = new ExcludedDataElementsRepository();
                 spyOn(excludedDataElementsRepository, "get").and.returnValue(utils.getPromise(q, {}));
@@ -290,22 +303,16 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "level": 4,
                     "openingDate": moment.utc(today).format('YYYY-MM-DD'),
                     "attributeValues": [{
-                        "created": moment().toISOString(),
-                        "lastUpdated": moment().toISOString(),
                         "attribute": {
                             "code": "Type"
                         },
                         "value": "Module"
                     }, {
-                        "created": moment().toISOString(),
-                        "lastUpdated": moment().toISOString(),
                         "attribute": {
                             "code": "isLineListService"
                         },
                         "value": "true"
                     }, {
-                        "created": moment().toISOString(),
-                        "lastUpdated": moment().toISOString(),
                         "attribute": {
                             "code": 'isNewDataModel'
                         },
@@ -939,22 +946,16 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "level": 6,
                     "openingDate": moment.utc(new Date()).format('YYYY-MM-DD'),
                     "attributeValues": [{
-                        "created": moment().toISOString(),
-                        "lastUpdated": moment().toISOString(),
                         "attribute": {
                             "code": "Type"
                         },
                         "value": "Module"
                     }, {
-                        "created": moment().toISOString(),
-                        "lastUpdated": moment().toISOString(),
                         "attribute": {
                             "code": "isLineListService"
                         },
                         "value": "true"
                     }, {
-                        "created": moment().toISOString(),
-                        "lastUpdated": moment().toISOString(),
                         "attribute": {
                             "code": 'isNewDataModel'
                         },
@@ -1267,22 +1268,16 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "level": NaN,
                     "openingDate": moment.utc().format('YYYY-MM-DD'),
                     "attributeValues": [{
-                        "created": "2014-04-01T00:00:00.000Z",
-                        "lastUpdated": "2014-04-01T00:00:00.000Z",
                         "attribute": {
                             "code": "Type"
                         },
                         "value": "Module"
                     }, {
-                        "created": "2014-04-01T00:00:00.000Z",
-                        "lastUpdated": "2014-04-01T00:00:00.000Z",
                         "attribute": {
                             "code": "isLineListService"
                         },
                         "value": "true"
                     }, {
-                        "created": "2014-04-01T00:00:00.000Z",
-                        "lastUpdated": "2014-04-01T00:00:00.000Z",
                         "attribute": {
                             "code": 'isNewDataModel'
                         },
