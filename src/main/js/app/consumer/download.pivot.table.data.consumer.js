@@ -1,5 +1,5 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function(reportService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository, $q) {
+    return function(reportService, systemInfoService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository, $q) {
 
         this.run = function() {
             var downloadPivotTableDataForProject = function(pivotTables, projectId, userModules) {
@@ -113,9 +113,9 @@ define(["lodash", "moment"], function(_, moment) {
                     });
             };
 
-            var updateChangeLogs = function(changeLogKeys) {
+            var updateChangeLogs = function(changeLogKeys, downloadStartTime) {
                 var upsertPromises = _.map(changeLogKeys, function(changeLogKey) {
-                    return changeLogRepository.upsert(changeLogKey, moment().toISOString());
+                    return changeLogRepository.upsert(changeLogKey, downloadStartTime);
                 });
                 return $q.all(upsertPromises);
             };
@@ -150,7 +150,8 @@ define(["lodash", "moment"], function(_, moment) {
             var updatePivotTableDataForProject = function(projectId) {
                 return $q.all({
                     modules: orgUnitRepository.getAllModulesInOrgUnits([projectId]),
-                    pivotTables: pivotTableRepository.getAll()
+                    pivotTables: pivotTableRepository.getAll(),
+                    downloadStartTime: systemInfoService.getServerDate()
                 }).then(function (data) {
                     return applyDownloadFrequencyStrategy(projectId, data.pivotTables).then(function(strategyResult) {
                         var pivotTablesToDownload = strategyResult.pivotTables,
@@ -158,7 +159,7 @@ define(["lodash", "moment"], function(_, moment) {
 
                         return downloadPivotTableDataForProject(pivotTablesToDownload, projectId, data.modules).then(function(allDownloadsWereSuccessful) {
                             if(allDownloadsWereSuccessful) {
-                                return updateChangeLogs(changeLogKeysToUpdate);
+                                return updateChangeLogs(changeLogKeysToUpdate, data.downloadStartTime);
                             }
                         });
                     });
