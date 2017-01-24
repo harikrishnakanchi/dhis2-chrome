@@ -174,7 +174,7 @@ gulp.task('generate-service-worker', ['less'], function (callback) {
             rootDir + '/{background,index}.html'
         ],
         stripPrefix: rootDir + '/',
-        importScripts: ['js/app/interceptors/fetch.interceptor.js'],
+        importScripts: ['js/app/pwa/service.worker.events.js'],
         templateFilePath: 'service-worker-custom.tmpl',
         skipWaiting: false
     }, callback);

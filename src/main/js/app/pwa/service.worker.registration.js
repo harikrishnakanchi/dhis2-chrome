@@ -1,4 +1,6 @@
 (function (global) {
+    var serviceWorker;
+
     var addCss = function (href) {
         var link = document.createElement('link');
         link.href = href;
@@ -28,6 +30,59 @@
         global.document.getElementById('loadingPraxisError').style.display = 'block';
     };
 
+    var showMultipleTabsOpenMessage = function () {
+        global.document.getElementById('loadingPraxisMsg').style.display = 'none';
+        global.document.getElementById('multipleTabsOpen').style.display = 'block';
+    };
+
+    var focusActiveTab = function () {
+        global.document.getElementById('multipleTabsOpen').style.display = 'none';
+        global.document.getElementById('focusActiveTab').style.display = 'none';
+        global.document.getElementById('supportMessage').style.display = 'block';
+        sendMessage('focusActiveTab');
+    };
+
+    var registerMessageCallback = function (messageType, callback) {
+        return function (event) {
+            if (event.data.type === messageType)
+                callback(event.data.data);
+        };
+    };
+
+    var addListener = function (type, callback) {
+        navigator.serviceWorker.addEventListener('message', registerMessageCallback(type, callback));
+    };
+
+    var sendMessage = function (type, data) {
+        serviceWorker.postMessage({type: type, data: data});
+    };
+
+    var checkForMultipleClients = function (registration) {
+        serviceWorker = registration.active;
+        if (serviceWorker) {
+            sendMessage('checkForMultipleClients');
+
+            return new Promise(function (resolve, reject) {
+                addListener('checkForMultipleClients', function (multipleTabsAreOpen) {
+                    if (!multipleTabsAreOpen) {
+
+                        loadApp();
+
+                        addListener('focusActiveTab', function () {
+                            alert('Praxis is active here. Please close any other open tabs/window');
+                        });
+
+                        resolve(registration);
+                    } else {
+                        reject('multipleTabsAreOpen');
+                    }
+                });
+            });
+        } else {
+            return registration;
+        }
+    };
+
     var registerServiceWorker = function () {
         var retryServiceWorkerDownload = function () {
             var failCount = window.sessionStorage.getItem("serviceWorkerFailCount") || 0;
@@ -44,10 +99,8 @@
 
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./service.worker.js')
+                .then(checkForMultipleClients)
                 .then(function (registration) {
-                    if (registration.active) {
-                        loadApp();
-                    }
                     registration.onupdatefound = function () {
                         var installingWorker = registration.installing;
 
@@ -71,8 +124,12 @@
                         };
                     };
                 }).catch(function (e) {
-                console.error('Error during service worker registration:', e);
-                retryServiceWorkerDownload();
+                if (e == 'multipleTabsAreOpen') {
+                    showMultipleTabsOpenMessage();
+                } else {
+                    console.error('Error during service worker registration:', e);
+                    retryServiceWorkerDownload();
+                }
             });
         }
         else {
@@ -89,6 +146,7 @@
 
     global.Praxis = {
         reload: reload,
+        focusActiveTab: focusActiveTab,
         initialize: registerServiceWorker
     };
 })(window);
