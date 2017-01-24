@@ -1,6 +1,11 @@
-define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupService", "orgUnitGroupRepository", "timecop", "mergeBy"], function(DownloadOrgUnitGroupConsumer, utils, mocks, OrgUnitGroupService, OrgUnitGroupRepository, timecop, MergeBy) {
+define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupService", "systemInfoService", "orgUnitGroupRepository", "timecop", "mergeBy"],
+    function(DownloadOrgUnitGroupConsumer, utils, mocks, OrgUnitGroupService, SystemInfoService, OrgUnitGroupRepository, timecop, MergeBy) {
     describe("downloadOrgUnitGroupConsumer", function() {
-        var downloadOrgUnitGroupConsumer, payload, orgUnitGroupService, orgUnitGroupRepository, q, scope, changeLogRepository, mergeBy;
+        var downloadOrgUnitGroupConsumer, payload, orgUnitGroupService, systemInfoService, orgUnitGroupRepository, q, scope, changeLogRepository, mergeBy;
+
+        var createDownloadOrgUnitGroupConsumer = function () {
+            return new DownloadOrgUnitGroupConsumer(orgUnitGroupService, systemInfoService, orgUnitGroupRepository, changeLogRepository, q, mergeBy);
+        };
 
         beforeEach(mocks.inject(function($q, $rootScope, $log) {
             q = $q;
@@ -29,10 +34,13 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             }];
 
             orgUnitGroupService = new OrgUnitGroupService();
+            systemInfoService = new SystemInfoService();
             orgUnitGroupRepository = new OrgUnitGroupRepository();
             mergeBy = new MergeBy($log);
 
             spyOn(orgUnitGroupRepository, "upsertDhisDownloadedData");
+            spyOn(systemInfoService, 'getServerDate').and.returnValue(utils.getPromise(q, ''));
+            spyOn(orgUnitGroupRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
 
             changeLogRepository = {
                 "get": jasmine.createSpy("get").and.returnValue(utils.getPromise(q, "2014-10-24T09:01:12.020+0000")),
@@ -50,12 +58,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
 
         it("should merge orgunits from local and remote org unit groups for upsertOrgUnitGroups message", function() {
             var localCopy = payload;
-            var message = {
-                "data": {
-                    "data": payload,
-                    "type": "upsertOrgUnitGroups"
-                }
-            };
+            var message = {};
 
             var orgUnitGroupsFromDHIS = [{
                 "id": "a35778ed565",
@@ -91,9 +94,9 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             }];
 
             spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitGroupsFromDHIS));
-            spyOn(orgUnitGroupRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy[0]]));
+            orgUnitGroupRepository.findAll.and.returnValue(utils.getPromise(q, [localCopy[0]]));
 
-            downloadOrgUnitGroupConsumer = new DownloadOrgUnitGroupConsumer(orgUnitGroupService, orgUnitGroupRepository, changeLogRepository, q, mergeBy);
+            downloadOrgUnitGroupConsumer = createDownloadOrgUnitGroupConsumer();
 
             downloadOrgUnitGroupConsumer.run(message);
             scope.$apply();
@@ -105,12 +108,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
 
         it("should merge orgunits from local and remote org unit groups for downloadOrgUnitGroups message", function() {
             var localCopy = payload;
-            var message = {
-                "data": {
-                    "data": [],
-                    "type": "downloadOrgUnitGroups"
-                }
-            };
+            var message = {};
 
             var orgUnitGroupsFromDHIS = [{
                 "id": "a35778ed565",
@@ -140,9 +138,9 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             }];
 
             spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitGroupsFromDHIS));
-            spyOn(orgUnitGroupRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy[0]]));
+            orgUnitGroupRepository.findAll.and.returnValue(utils.getPromise(q, [localCopy[0]]));
 
-            downloadOrgUnitGroupConsumer = new DownloadOrgUnitGroupConsumer(orgUnitGroupService, orgUnitGroupRepository, changeLogRepository, q, mergeBy);
+            downloadOrgUnitGroupConsumer = createDownloadOrgUnitGroupConsumer();
 
             downloadOrgUnitGroupConsumer.run(message);
             scope.$apply();
@@ -150,13 +148,8 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(expectedOrgUnitGroups);
         });
 
-        it("should upsert lastUpdated time in change log", function() {
-            var message = {
-                "data": {
-                    "data": [],
-                    "type": "downloadOrgUnitGroups"
-                }
-            };
+        it("should upsert server time in change log", function() {
+            var message = {};
 
             var orgUnitGroupsFromDHIS = {
                 "data": {
@@ -165,23 +158,18 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             };
 
             spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitGroupsFromDHIS));
-            spyOn(orgUnitGroupRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
+            systemInfoService.getServerDate.and.returnValue(utils.getPromise(q, 'someTime'));
 
-            downloadOrgUnitGroupConsumer = new DownloadOrgUnitGroupConsumer(orgUnitGroupService, orgUnitGroupRepository, changeLogRepository, q, mergeBy);
+            downloadOrgUnitGroupConsumer = createDownloadOrgUnitGroupConsumer();
             downloadOrgUnitGroupConsumer.run(message);
 
             scope.$apply();
 
-            expect(changeLogRepository.upsert).toHaveBeenCalledWith("orgUnitGroups", "2014-05-30T12:43:54.972Z");
+            expect(changeLogRepository.upsert).toHaveBeenCalledWith("orgUnitGroups", "someTime");
         });
 
         it("should upsert new org unit groups from dhis to local db", function() {
-            var message = {
-                "data": {
-                    "data": [],
-                    "type": "downloadOrgUnitGroups"
-                }
-            };
+            var message = {};
 
             var orgUnitGroupsFromDHIS = [{
                 "id": "a35778ed565",
@@ -201,9 +189,8 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             }];
 
             spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitGroupsFromDHIS));
-            spyOn(orgUnitGroupRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
 
-            downloadOrgUnitGroupConsumer = new DownloadOrgUnitGroupConsumer(orgUnitGroupService, orgUnitGroupRepository, changeLogRepository, q, mergeBy);
+            downloadOrgUnitGroupConsumer = createDownloadOrgUnitGroupConsumer();
 
             downloadOrgUnitGroupConsumer.run(message);
             scope.$apply();

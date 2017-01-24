@@ -23,7 +23,7 @@ define(["downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupC
             app.service('excludedLinelistOptionsMerger', ['$q', 'excludedLineListOptionsRepository', 'dataStoreService', 'orgUnitRepository', excludedLinelistOptionsMerger]);
             app.service("downloadOrgUnitConsumer", ["orgUnitService", "systemInfoService", "orgUnitRepository", "changeLogRepository", "$q", "mergeBy", downloadOrgUnitConsumer]);
             app.service("uploadOrgUnitConsumer", ["orgUnitService", "orgUnitRepository", "$q", uploadOrgUnitConsumer]);
-            app.service("downloadOrgUnitGroupConsumer", ["orgUnitGroupService", "orgUnitGroupRepository", "changeLogRepository", downloadOrgUnitGroupConsumer]);
+            app.service("downloadOrgUnitGroupConsumer", ["orgUnitGroupService", "systemInfoService","orgUnitGroupRepository", "changeLogRepository", downloadOrgUnitGroupConsumer]);
             app.service("uploadOrgUnitGroupConsumer", ["orgUnitGroupService", "orgUnitGroupRepository", "$q", uploadOrgUnitGroupConsumer]);
             app.service("downloadDataSetConsumer", ["dataSetService", "systemInfoService", "dataSetRepository", "$q", "changeLogRepository", "mergeBy", downloadDataSetConsumer]);
             app.service("assignDataSetsToOrgUnitsConsumer", ["orgUnitService", "$q", assignDataSetsToOrgUnitsConsumer]);
