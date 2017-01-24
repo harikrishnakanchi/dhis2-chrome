@@ -1,5 +1,5 @@
 define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (dhisUrl, moment, properties, _, pagingUtils) {
-    return function ($http, $q, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository) {
+    return function ($http, $q, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository, customAttributeRepository) {
 
         var TEMP_CHANGE_LOG_PREFIX = 'temp:',
             MAX_PAGE_REQUESTS = 500, updated;
@@ -173,6 +173,15 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
                     });
                 });
                 return systemSettingRepository.upsert(accumulator);
+            }
+        }, {
+            name: 'attributes',
+            url: dhisUrl.customAttributes,
+            params: {
+                fields: 'id,code,lastUpdated,name,valueType,mandatory'
+            },
+            upsertFn: function (attributes) {
+                return customAttributeRepository.upsert(attributes);
             }
         }];
 

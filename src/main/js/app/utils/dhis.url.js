@@ -37,6 +37,7 @@ define(["properties"], function(properties) {
         "organisationUnitGroupSets": with_host("/api/organisationUnitGroupSets.json"),
         "sections": with_host("/api/sections.json"),
         "organisationUnitGroups": with_host("/api/organisationUnitGroups.json"),
-        "systemInfo": with_host("/api/system/info")
+        "systemInfo": with_host("/api/system/info"),
+        "customAttributes": with_host("/api/attributes.json")
     };
 });

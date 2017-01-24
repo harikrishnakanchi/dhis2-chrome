@@ -1,6 +1,6 @@
-define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'metadataRepository', 'orgUnitGroupRepository', 'dataSetRepository', 'programRepository', 'systemSettingRepository', 'orgUnitRepository'], function (mocks, utils, MetadataDownloader, ChangeLogRepository, MetadataRepository, OrgUnitGroupRepository, DataSetRepository, ProgramRepository, SystemSettingRepository, OrgUnitRepository) {
+define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'metadataRepository', 'orgUnitGroupRepository', 'dataSetRepository', 'programRepository', 'systemSettingRepository', 'orgUnitRepository', 'customAttributeRepository'], function (mocks, utils, MetadataDownloader, ChangeLogRepository, MetadataRepository, OrgUnitGroupRepository, DataSetRepository, ProgramRepository, SystemSettingRepository, CustomAttributeRepository) {
     describe('metaDataDownloader', function () {
-        var http, q, httpBackend, rootScope, metadataDownloader, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository;
+        var http, q, httpBackend, rootScope, metadataDownloader, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository, customAttributeRepository;
 
         var expectMetadataDownload = function (options) {
             options = options || {};
@@ -22,6 +22,7 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
             httpBackend.expectGET(/.*programs.*/).respond(200, options);
             httpBackend.expectGET(/.*organisationUnits.*/).respond(200, options);
             httpBackend.expectGET(/.*systemSettings.*/).respond(200, options);
+            httpBackend.expectGET(/.*attributes.*/).respond(200, options);
         };
 
         beforeEach(mocks.inject(function ($injector) {
@@ -43,6 +44,9 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
             orgUnitGroupRepository = new OrgUnitGroupRepository();
             spyOn(orgUnitGroupRepository,'upsertDhisDownloadedData').and.returnValue(utils.getPromise(q, {}));
 
+            customAttributeRepository = new CustomAttributeRepository();
+            spyOn(customAttributeRepository, 'upsert').and.returnValue(utils.getPromise(q, undefined));
+
             dataSetRepository = new DataSetRepository();
             spyOn(dataSetRepository,'upsertDhisDownloadedData').and.returnValue(utils.getPromise(q, {}));
 
@@ -55,7 +59,7 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
             orgUnitRepository = new OrgUnitGroupRepository();
             spyOn(orgUnitRepository,'upsertDhisDownloadedData').and.returnValue(utils.getPromise(q, {}));
 
-            metadataDownloader = new MetadataDownloader(http, q, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository);
+            metadataDownloader = new MetadataDownloader(http, q, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository, customAttributeRepository);
         }));
 
         afterEach(function() {
