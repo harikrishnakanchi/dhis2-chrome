@@ -1,5 +1,5 @@
 define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], function (_, moment, dateUtils, properties, customAttributes) {
-    return function ($q, dataService, eventService, userPreferenceRepository, orgUnitRepository, datasetRepository, changeLogRepository, dataRepository, programEventRepository) {
+    return function ($q, dataService, eventService, systemInfoService, userPreferenceRepository, orgUnitRepository, datasetRepository, changeLogRepository, dataRepository, programEventRepository) {
         var CHANGE_LOG_PREFIX = 'yearlyDataValues',
             CHUNK_SIZE = 11;
 
@@ -41,7 +41,14 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], func
                 dateUtils.getPeriodRange(properties.projectDataSync.numWeeksToSync));
 
             var downloadDataForModule = function (module) {
-                var changeLogKey = [CHANGE_LOG_PREFIX, module.projectId, module.id].join(':');
+                var changeLogKey = [CHANGE_LOG_PREFIX, module.projectId, module.id].join(':'),
+                    downloadStartTime;
+
+                var getServerTime = function () {
+                  return systemInfoService.getServerDate().then(function (serverTime) {
+                      downloadStartTime = serverTime;
+                  });
+                };
 
                 var downloadModuleData = function () {
 
@@ -64,14 +71,16 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], func
                 };
 
                 var onSuccess = function () {
-                    return changeLogRepository.upsert(changeLogKey, moment().toISOString());
+                    return changeLogRepository.upsert(changeLogKey, downloadStartTime);
                 };
 
                 var onFailure = function () {
                     return $q.when(); //continue with next module
                 };
 
-                return changeLogRepository.get(changeLogKey).then(function (lastUpdatedTime) {
+                return getServerTime()
+                    .then(_.partial(changeLogRepository.get, changeLogKey))
+                    .then(function (lastUpdatedTime) {
                     var areDataValuesAlreadyDownloaded = !!lastUpdatedTime;
                     return areDataValuesAlreadyDownloaded ? $q.when() : downloadModuleData().then(onSuccess, onFailure);
                 });
