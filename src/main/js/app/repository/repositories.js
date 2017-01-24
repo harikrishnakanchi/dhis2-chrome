@@ -2,12 +2,12 @@ define(["dataRepository", "dataSetRepository", "userPreferenceRepository", "orgU
         "userRepository", "approvalDataRepository", "programRepository", "programEventRepository", "dataElementRepository", "excludedDataElementsRepository",
         "orgUnitGroupRepository", "changeLogRepository", "metadataRepository", "orgUnitGroupSetRepository", "optionSetRepository", "chartRepository",
         "referralLocationsRepository", "pivotTableRepository","dataSyncFailureRepository", "excludedLineListOptionsRepository", "categoryRepository",
-        "indicatorRepository", "programIndicatorRepository"],
+        "indicatorRepository", "programIndicatorRepository", "customAttributeRepository"],
     function(dataRepository, dataSetRepository, userPreferenceRepository, orgUnitRepository, systemSettingRepository, patientOriginRepository,
         userRepository, approvalDataRepository, programRepository, programEventRepository, dataElementRepository, excludedDataElementsRepository,
         orgUnitGroupRepository, changeLogRepository, metadataRepository, orgUnitGroupSetRepository, optionSetRepository, chartRepository,
         referralLocationsRepository, pivotTableRepository, dataSyncFailureRepository, excludedLineListOptionsRepository, categoryRepository,
-        indicatorRepository, programIndicatorRepository) {
+        indicatorRepository, programIndicatorRepository, customAttributeRepository) {
         var init = function(app) {
             app.service('dataRepository', ['$q', '$indexedDB', dataRepository]);
             app.service('approvalDataRepository', ['$indexedDB', '$q', approvalDataRepository]);
@@ -34,6 +34,7 @@ define(["dataRepository", "dataSetRepository", "userPreferenceRepository", "orgU
             app.service('categoryRepository', ['$indexedDB', '$q', categoryRepository]);
             app.service('indicatorRepository', ['$indexedDB', indicatorRepository]);
             app.service('programIndicatorRepository', ['$indexedDB', programIndicatorRepository]);
+            app.service('customAttributeRepository', ['$indexedDB', customAttributeRepository]);
         };
         return {
             init: init

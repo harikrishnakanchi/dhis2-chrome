@@ -126,6 +126,7 @@ require.config({
         "excludedLineListOptionsRepository": "app/repository/excluded.line.list.options.repository",
         "categoryRepository": "app/repository/category.repository",
         "programIndicatorRepository": "app/repository/program.indicator.repository",
+        "customAttributeRepository": "app/repository/custom.attribute.repository",
 
         //Models
         "chart": "app/models/chart",

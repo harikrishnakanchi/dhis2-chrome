@@ -1,12 +1,12 @@
 define(["dataRepository", "dataSetRepository", "userPreferenceRepository", "approvalDataRepository", "orgUnitRepository", "patientOriginRepository", "programEventRepository",
         "orgUnitGroupRepository", "changeLogRepository", "programRepository", "systemSettingRepository", "metadataRepository", "chartRepository",
         "referralLocationsRepository", "pivotTableRepository", "excludedDataElementsRepository", "dataSyncFailureRepository", "dataElementRepository",
-        "excludedLineListOptionsRepository", "categoryRepository", "indicatorRepository", "programIndicatorRepository"
+        "excludedLineListOptionsRepository", "categoryRepository", "indicatorRepository", "programIndicatorRepository", "customAttributeRepository"
     ],
     function(dataRepository, dataSetRepository, userPreferenceRepository, approvalDataRepository, orgUnitRepository, patientOriginRepository,
         programEventRepository, orgUnitGroupRepository, changeLogRepository, programRepository, systemSettingRepository, metadataRepository, chartRepository,
         referralLocationsRepository, pivotTableRepository, excludedDataElementsRepository, dataSyncFailureRepository, dataElementRepository,
-             excludedLineListOptionsRepository, categoryRepository, indicatorRepository, programIndicatorRepository) {
+             excludedLineListOptionsRepository, categoryRepository, indicatorRepository, programIndicatorRepository, customAttributeRepository) {
         var init = function(app) {
             app.service('dataRepository', ['$q', '$indexedDB', dataRepository]);
             app.service('dataSetRepository', ['$indexedDB', '$q', dataSetRepository]);
@@ -30,6 +30,7 @@ define(["dataRepository", "dataSetRepository", "userPreferenceRepository", "appr
             app.service('categoryRepository', ['$indexedDB', '$q', categoryRepository]);
             app.service('indicatorRepository', ['$indexedDB', indicatorRepository]);
             app.service('programIndicatorRepository', ['$indexedDB', programIndicatorRepository]);
+            app.service('customAttributeRepository', ['$indexedDB', customAttributeRepository]);
         };
         return {
             init: init

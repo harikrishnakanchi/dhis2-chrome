@@ -53,6 +53,7 @@ require.config({
         "categoryRepository": "app/repository/category.repository",
         "indicatorRepository": "app/repository/indicator.repository",
         "programIndicatorRepository": "app/repository/program.indicator.repository",
+        "customAttributeRepository": "app/repository/custom.attribute.repository",
 
         //Models
         "chart": "app/models/chart",
