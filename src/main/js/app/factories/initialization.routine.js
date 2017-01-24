@@ -1,5 +1,5 @@
 define(['lodash', 'platformUtils'], function (_, platformUtils) {
-    return function ($rootScope, $location, systemSettingRepository, translationsService, packagedDataImporter) {
+    return function ($rootScope, $location, systemSettingRepository, translationsService) {
 
         $rootScope.setLocale = function (locale) {
             translationsService.setLocale(locale);

@@ -1,7 +1,6 @@
 define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter', 'systemSettingRepository', 'translationsService', 'platformUtils'],
     function (mocks, utils, InitializationRoutine, PackagedDataImporter, SystemSettingRepository, TranslationsService, platformUtils) {
         var initializationRoutine, packagedDataImporter, q, location, rootScope, systemSettingRepository, translationsService;
-
         describe("InitializationRoutine", function () {
             beforeEach(mocks.inject(function ($q, $rootScope, $location) {
                 q = $q;
@@ -22,7 +21,7 @@ define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter'
                 spyOn(systemSettingRepository, 'getLocale').and.returnValue(utils.getPromise(q, 'SOME_LOCALE'));
                 spyOn(systemSettingRepository, 'loadProductKey').and.returnValue(utils.getPromise(q, {}));
 
-                initializationRoutine = InitializationRoutine(rootScope, location, systemSettingRepository, translationsService, packagedDataImporter);
+                initializationRoutine = InitializationRoutine(rootScope, location, systemSettingRepository, translationsService);
             }));
 
             describe('locale', function () {
