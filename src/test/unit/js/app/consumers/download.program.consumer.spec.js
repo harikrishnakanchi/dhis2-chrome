@@ -1,6 +1,11 @@
-define(["downloadProgramConsumer", "programService", "utils", "angularMocks", "programRepository", "timecop", "mergeBy"], function(DownloadProgramConsumer, ProgramService, utils, mocks, ProgramRepository, timecop, MergeBy) {
+define(["downloadProgramConsumer", "programService", "systemInfoService", "utils", "angularMocks", "programRepository", "timecop", "mergeBy"],
+    function(DownloadProgramConsumer, ProgramService, SystemInfoService, utils, mocks, ProgramRepository, timecop, MergeBy) {
     describe("download program consumer", function() {
-        var downloadProgramConsumer, changeLogRepository, q, scope, programService, programRepository, mergeBy;
+        var downloadProgramConsumer, changeLogRepository, q, scope, programService, systemInfoService, programRepository, mergeBy, message;
+
+        var createDownloadProgramConsumer = function () {
+            return new DownloadProgramConsumer(programService, systemInfoService, programRepository, changeLogRepository, q, mergeBy);
+        };
 
         beforeEach(mocks.inject(function($q, $rootScope, $log) {
             q = $q;
@@ -14,10 +19,13 @@ define(["downloadProgramConsumer", "programService", "utils", "angularMocks", "p
             };
 
             programService = new ProgramService();
+            systemInfoService = new SystemInfoService();
             programRepository = new ProgramRepository();
             mergeBy = new MergeBy($log);
-            
+            message = {};
+
             spyOn(programRepository, "upsert");
+            spyOn(systemInfoService, 'getServerDate').and.returnValue(utils.getPromise(q, ''));
             spyOn(programRepository, "upsertDhisDownloadedData");
         }));
 
@@ -48,14 +56,7 @@ define(["downloadProgramConsumer", "programService", "utils", "angularMocks", "p
             spyOn(programRepository, 'findAll').and.returnValue(utils.getPromise(q, programsFromDb));
             spyOn(programService, 'upsert');
 
-            var message = {
-                "data": {
-                    "data": [],
-                    "type": "downloadPrograms"
-                },
-                "created": "2014-10-24T09:01:12.020+0000"
-            };
-            downloadProgramConsumer = new DownloadProgramConsumer(programService, programRepository, changeLogRepository, q, mergeBy);
+            downloadProgramConsumer = createDownloadProgramConsumer();
             downloadProgramConsumer.run(message);
             scope.$apply();
 
@@ -89,14 +90,7 @@ define(["downloadProgramConsumer", "programService", "utils", "angularMocks", "p
             spyOn(programRepository, 'findAll').and.returnValue(utils.getPromise(q, programsFromDb));
             spyOn(programService, 'upsert');
 
-            var message = {
-                "data": {
-                    "data": [],
-                    "type": "downloadPrograms"
-                },
-                "created": "2014-10-24T09:01:12.020+0000"
-            };
-            downloadProgramConsumer = new DownloadProgramConsumer(programService, programRepository, changeLogRepository, q, mergeBy);
+            downloadProgramConsumer = createDownloadProgramConsumer();
             downloadProgramConsumer.run(message);
             scope.$apply();
 
@@ -105,23 +99,17 @@ define(["downloadProgramConsumer", "programService", "utils", "angularMocks", "p
         });
 
         it("should upsert lastUpdated time in change log", function() {
-            var message = {
-                "data": {
-                    "data": [],
-                    "type": "downloadPrograms"
-                }
-            };
-
+            systemInfoService.getServerDate.and.returnValue(utils.getPromise(q, 'someTime'));
             spyOn(programService, 'getAll').and.returnValue(utils.getPromise(q, []));
             spyOn(programService, 'upsert');
             spyOn(programRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
 
-            downloadOrgunitConsumer = new DownloadProgramConsumer(programService, programRepository, changeLogRepository, q, mergeBy);
+            var downloadOrgunitConsumer = createDownloadProgramConsumer();
             downloadOrgunitConsumer.run(message);
 
             scope.$apply();
 
-            expect(changeLogRepository.upsert).toHaveBeenCalledWith("programs", "2014-05-30T12:43:54.972Z");
+            expect(changeLogRepository.upsert).toHaveBeenCalledWith("programs", 'someTime');
         });
     });
 });

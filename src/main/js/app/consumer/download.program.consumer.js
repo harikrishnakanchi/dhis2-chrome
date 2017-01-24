@@ -1,24 +1,34 @@
 define(['moment', 'lodashUtils'], function(moment, _) {
-    return function(programService, programRepository, changeLogRepository, $q, mergeBy) {
+    return function(programService, systemInfoService, programRepository, changeLogRepository, $q, mergeBy) {
         this.run = function(message) {
-            return download()
+            return getServerTime()
+                .then(download)
                 .then(mergeAndSave)
                 .then(updateChangeLog);
         };
 
-        var updateChangeLog = function() {
-            return changeLogRepository.upsert("programs", moment().toISOString());
+        var getServerTime = function () {
+          return systemInfoService.getServerDate().then(function (serverTime) {
+             return { downloadStartTime: serverTime };
+          });
         };
 
-        var download = function() {
-            return changeLogRepository.get("programs").then(programService.getAll);
+        var download = function(data) {
+            return changeLogRepository.get("programs").then(programService.getAll).then(function (programs) {
+                return _.merge({ programs: programs }, data);
+            });
         };
 
-        var mergeAndSave = function(remotePrograms) {
-            var programIds = _.pluck(remotePrograms, "id");
+        var mergeAndSave = function(data) {
+            var programIds = _.map(data.programs, "id");
             return programRepository.findAll(programIds)
-                .then(_.curry(mergeBy.union)("organisationUnits", "id", remotePrograms))
-                .then(programRepository.upsertDhisDownloadedData);
+                .then(_.curry(mergeBy.union)("organisationUnits", "id", data.programs))
+                .then(programRepository.upsertDhisDownloadedData)
+                .then(function () { return data; });
+        };
+
+        var updateChangeLog = function(data) {
+            return changeLogRepository.upsert("programs", data.downloadStartTime);
         };
     };
 });
