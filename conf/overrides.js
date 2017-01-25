@@ -21,7 +21,7 @@ define([], function() {
         },
         queue: {
             retryDelayConfig: {
-                0: 0,
+                0: 1,
                 1: 300000,
                 2: 1800000
             }
