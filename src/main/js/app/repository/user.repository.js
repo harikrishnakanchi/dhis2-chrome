@@ -42,5 +42,19 @@ define(["lodash"], function(_) {
             else
                 return userCredentialsStore.find("project_user");
         };
+
+        this.getUserRoles = function (roleNames) {
+            var store = db.objectStore("userRoles");
+            return store.getAll().then(function (roles) {
+                return _.filter(roles, function (role) {
+                    return _.contains(roleNames, role.name);
+                });
+            });
+        };
+
+        this.upsertUserRoles = function (userRoles) {
+            var store = db.objectStore("userRoles");
+            store.upsert(userRoles);
+        };
     };
 });

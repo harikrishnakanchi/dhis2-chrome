@@ -153,5 +153,23 @@ define(["userRepository", "angularMocks", "utils"], function(UserRepository, moc
                expect(userCredentials).toEqual(expected);
             });
         });
+
+        it('should get specified userRoles by role name', function () {
+            var roles = ['someRole'];
+            var userRolesFromDb = [{
+                id: 'someId',
+                name: 'someRole'
+            },{
+                id: 'someOtherId',
+                name: 'someOtherRole'
+            }];
+
+            mockStore.getAll.and.returnValue(utils.getPromise(q, userRolesFromDb));
+
+            repo.getUserRoles(roles).then(function (roles) {
+                expect(roles).toEqual([userRolesFromDb[0]]);
+            });
+            rootScope.$apply();
+        });
     });
 });
