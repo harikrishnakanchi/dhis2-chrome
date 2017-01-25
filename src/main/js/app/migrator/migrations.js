@@ -460,6 +460,10 @@ define(['dateUtils', 'lodash'], function(dateUtils, _) {
         create_store_with_key("customAttributes", "id", db);
     };
 
+    var add_user_roles_store = function (db, tx) {
+        create_store_with_key("userRoles", "id", db);
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -513,6 +517,7 @@ define(['dateUtils', 'lodash'], function(dateUtils, _) {
         migrate_chart_and_pivot_table_keys_from_names_to_ids,
         delete_keys_chart_and_reports_from_changelog,
         add_indicator_and_program_indicator_stores,
-        add_custom_attributes_store
+        add_custom_attributes_store,
+        add_user_roles_store
     ];
 });
