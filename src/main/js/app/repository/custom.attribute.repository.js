@@ -1,11 +1,13 @@
 define([], function () {
     return function (db) {
-        var store = db.objectStore('customAttributes');
+
         this.upsert = function (customAttributes) {
+            var store = db.objectStore('customAttributes');
             return store.upsert(customAttributes);
         };
 
         this.getAll = function () {
+            var store = db.objectStore('customAttributes');
             return store.getAll();
         };
     };

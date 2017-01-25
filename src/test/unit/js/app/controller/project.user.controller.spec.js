@@ -1,6 +1,7 @@
-define(["projectUserController", "angularMocks", "utils", "dhisId", "customAttributes"], function(ProjectUserController, mocks, utils, dhisId, customAttributes) {
+define(["projectUserController", "angularMocks", "utils", "dhisId", "customAttributes", "userRepository"],
+    function(ProjectUserController, mocks, utils, dhisId, customAttributes, UserRepository) {
     describe("projectUserControllerspec", function() {
-        var scope, projectUserController, q, userRepository, hustle, fakeModal, timeout;
+        var scope, projectUserController, q, userRepository, hustle, fakeModal, timeout, userRoles;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout) {
@@ -33,12 +34,27 @@ define(["projectUserController", "angularMocks", "utils", "dhisId", "customAttri
                 open: function(object) {}
             };
 
-            userRepository = utils.getMockRepo(q);
-            userRepository.getAllUsernames = function() {};
-            userRepository.getAllProjectUsers = function() {};
+            userRoles = [
+                {
+                    "name": 'Data entry user',
+                    "id": 'Role1Id'
+                }, {
+                    "name": 'Project Level Approver',
+                    "id": 'Role2Id'
+                }, {
+                    "name": 'Observer',
+                    "id": 'Role3Id'
+                }
+            ];
+
+            userRepository = new UserRepository();
 
             spyOn(userRepository, "getAllUsernames").and.returnValue(utils.getPromise(q, {}));
             spyOn(userRepository, "getAllProjectUsers").and.returnValue(utils.getPromise(q, {}));
+            spyOn(userRepository, "getUserRoles").and.returnValue(utils.getPromise(q, userRoles));
+            spyOn(userRepository, "upsert").and.callFake(function (data) {
+                return utils.getPromise(q, data);
+            });
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
             spyOn(customAttributes, "getAttributeValue").and.callFake(function (attributeValues, code) {
                 var fakeAttributeValues = {
@@ -55,7 +71,8 @@ define(["projectUserController", "angularMocks", "utils", "dhisId", "customAttri
                 username: "ProJ_1_Blah",
                 password: "P@ssw0rd",
                 userRole: {
-                    name: 'SomeRole'
+                    name: 'SomeRole',
+                    id: 'roleId'
                 }
             };
             var expectedUserPayload = {
@@ -66,9 +83,13 @@ define(["projectUserController", "angularMocks", "utils", "dhisId", "customAttri
                 "userCredentials": {
                     "username": "proj_1_blah",
                     "userRoles": [{
-                        "name": user.userRole.name
+                        "name": user.userRole.name,
+                        "id": "roleId"
                     }],
-                    "password": "msfuser",
+                    userInfo: {
+                       id: 'ProJ_1_Blah'
+                    },
+                    "password": "msfuser"
                 },
                 "organisationUnits": [{
                     "id": scope.orgUnit.id,
@@ -99,6 +120,12 @@ define(["projectUserController", "angularMocks", "utils", "dhisId", "customAttri
             expect(scope.saveFailure).toEqual(false);
         });
 
+        it('should get user roles with id and set it to scope', function () {
+            scope.$apply();
+            expect(userRepository.getUserRoles).toHaveBeenCalled();
+            expect(_.map(scope.userRoles, 'id')).toEqual(["Role1Id", "Role2Id", "Role3Id"]);
+        });
+
         it("should take the user to the view page of the project on clicking cancel", function() {
             scope.orgUnit = {
                 "id": "parent",
@@ -125,6 +152,7 @@ define(["projectUserController", "angularMocks", "utils", "dhisId", "customAttri
                     "id": "someId"
                 }
             };
+
             scope.isNewMode = false;
             var users = [{
                 'userCredentials': {
@@ -156,7 +184,7 @@ define(["projectUserController", "angularMocks", "utils", "dhisId", "customAttri
                         "id": 'Role1Id'
                     }, {
                         "name": 'Project Level Approver',
-                        "id": 'Role2Id',
+                        "id": 'Role2Id'
                     }]
                 }
             }];

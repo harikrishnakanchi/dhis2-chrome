@@ -1,6 +1,10 @@
-define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'metadataRepository', 'orgUnitGroupRepository', 'dataSetRepository', 'programRepository', 'systemSettingRepository', 'orgUnitRepository', 'customAttributeRepository'], function (mocks, utils, MetadataDownloader, ChangeLogRepository, MetadataRepository, OrgUnitGroupRepository, DataSetRepository, ProgramRepository, SystemSettingRepository, CustomAttributeRepository) {
+define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'metadataRepository', 'orgUnitGroupRepository',
+    'dataSetRepository', 'programRepository', 'systemSettingRepository', 'orgUnitRepository', 'customAttributeRepository', 'userRepository'],
+    function (mocks, utils, MetadataDownloader, ChangeLogRepository, MetadataRepository, OrgUnitGroupRepository,
+              DataSetRepository, ProgramRepository, SystemSettingRepository, OrgUnitRepository, CustomAttributeRepository, UserRepository) {
     describe('metaDataDownloader', function () {
-        var http, q, httpBackend, rootScope, metadataDownloader, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository, customAttributeRepository;
+        var http, q, httpBackend, rootScope, metadataDownloader, changeLogRepository, metadataRepository, orgUnitGroupRepository,
+            dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository, customAttributeRepository, userRepository;
 
         var expectMetadataDownload = function (options) {
             options = options || {};
@@ -15,8 +19,8 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
             httpBackend.expectGET(/.*optionSets.*/).respond(200, options);
             httpBackend.expectGET(/.*organisationUnitGroupSets.*/).respond(200, options);
             httpBackend.expectGET(/.*sections.*/).respond(200, options);
-            httpBackend.expectGET(/.*translations.*/).respond(200, options);
             httpBackend.expectGET(/.*users.*/).respond(200, options);
+            httpBackend.expectGET(/.*userRoles.*/).respond(200, options);
             httpBackend.expectGET(/.*organisationUnitGroups.*/).respond(200, options);
             httpBackend.expectGET(/.*dataSets.*/).respond(200, options);
             httpBackend.expectGET(/.*programs.*/).respond(200, options);
@@ -45,7 +49,7 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
             spyOn(orgUnitGroupRepository,'upsertDhisDownloadedData').and.returnValue(utils.getPromise(q, {}));
 
             customAttributeRepository = new CustomAttributeRepository();
-            spyOn(customAttributeRepository, 'upsert').and.returnValue(utils.getPromise(q, undefined));
+            spyOn(customAttributeRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
 
             dataSetRepository = new DataSetRepository();
             spyOn(dataSetRepository,'upsertDhisDownloadedData').and.returnValue(utils.getPromise(q, {}));
@@ -59,7 +63,10 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
             orgUnitRepository = new OrgUnitGroupRepository();
             spyOn(orgUnitRepository,'upsertDhisDownloadedData').and.returnValue(utils.getPromise(q, {}));
 
-            metadataDownloader = new MetadataDownloader(http, q, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository, customAttributeRepository);
+            userRepository = new UserRepository();
+            spyOn(userRepository, 'upsertUserRoles').and.returnValue(utils.getPromise(q, {}));
+
+            metadataDownloader = new MetadataDownloader(http, q, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository, customAttributeRepository, userRepository);
         }));
 
         afterEach(function() {
@@ -92,7 +99,7 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
 
             expectMetadataDownload(metadataPayload);
             httpBackend.flush();
-            expect(metadataRepository.upsertMetadataForEntity).toHaveBeenCalledTimes(13);
+            expect(metadataRepository.upsertMetadataForEntity).toHaveBeenCalledTimes(12);
         });
 
         it('should update changeLog with the lastUpdated after metadata has been downloaded and upserted successfully', function () {

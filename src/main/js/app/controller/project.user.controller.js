@@ -21,18 +21,34 @@ define(["dhisId", "interpolate", "properties", "customAttributes"], function(dhi
             }]
         };
 
-        var init = function() {
+        var init = function () {
             var projCode = customAttributes.getAttributeValue($scope.orgUnit.attributeValues, customAttributes.PROJECT_CODE, '').toLowerCase();
             var orgUnitType = customAttributes.getAttributeValue($scope.orgUnit.attributeValues, customAttributes.TYPE, '');
             var userNamePrefix = _.isEmpty(projCode) ? projCode : projCode + "_";
             $scope.userNameMatchExpr = orgUnitType === "Country" ? new RegExp("[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+\\.[a-zA-Z]{2,4}$", "i") : new RegExp(userNamePrefix + "(.)+", "i");
-            $scope.patternValidationMessage = orgUnitType === "Country" ? $scope.resourceBundle.emailValidation :  interpolate($scope.resourceBundle.usernamePrefixValidation, { username_prefix: userNamePrefix });
+            $scope.patternValidationMessage = orgUnitType === "Country" ? $scope.resourceBundle.emailValidation : interpolate($scope.resourceBundle.usernamePrefixValidation, {username_prefix: userNamePrefix});
 
-            $scope.userNamePlaceHolder = _.isEmpty(userNamePrefix) ? "" : interpolate($scope.resourceBundle.usernamePrefixValidation, { username_prefix: userNamePrefix });
+            $scope.userNamePlaceHolder = _.isEmpty(userNamePrefix) ? "" : interpolate($scope.resourceBundle.usernamePrefixValidation, {username_prefix: userNamePrefix});
 
-            $scope.userRoles = allRoles[orgUnitType];
             $scope.form = {};
-            userRepository.getAllUsernames()
+            var userRoles = allRoles[orgUnitType];
+
+            var getUserRolesWithId = userRepository.getUserRoles(_.map(userRoles, 'name'))
+                .then(function (rolesFromDb) {
+                    return _.map(userRoles, function (role) {
+                        var roleWithId = _.find(rolesFromDb, {name: role.name});
+                        role.id = roleWithId && roleWithId.id;
+                        return role;
+                    });
+                });
+
+            var setUserRoles = function (data) {
+                $scope.userRoles = data;
+            };
+
+            return getUserRolesWithId
+                .then(setUserRoles)
+                .then(userRepository.getAllUsernames)
                 .then(setExistingUserNames)
                 .then(loadOrgUnitUsers);
         };
@@ -115,16 +131,21 @@ define(["dhisId", "interpolate", "properties", "customAttributes"], function(dhi
         };
 
         $scope.save = function(projectUser) {
+            var userId = dhisId.get(projectUser.username);
             var userPayload = {
                 "username": projectUser.username.toLowerCase(),
-                "id": dhisId.get(projectUser.username),
+                "id": userId,
                 "surname": "LNU",
                 "firstName": "FNU",
                 "userCredentials": {
                     "username": projectUser.username.toLowerCase(),
                     "userRoles": [{
-                        "name": projectUser.userRole.name
+                        "name": projectUser.userRole.name,
+                        "id": projectUser.userRole.id
                     }],
+                    "userInfo": {
+                        "id": userId
+                    },
                     "password": "msfuser"
                 },
                 "organisationUnits": [{

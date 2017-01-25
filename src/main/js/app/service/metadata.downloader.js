@@ -1,5 +1,6 @@
 define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (dhisUrl, moment, properties, _, pagingUtils) {
-    return function ($http, $q, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository, customAttributeRepository) {
+    return function ($http, $q, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository,
+                     systemSettingRepository, orgUnitRepository, customAttributeRepository, userRepository) {
 
         var TEMP_CHANGE_LOG_PREFIX = 'temp:',
             MAX_PAGE_REQUESTS = 500, updated;
@@ -105,15 +106,6 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
                 return metadataRepository.upsertMetadataForEntity(response, 'sections');
             }
         }, {
-            name: 'translations',
-            url: dhisUrl.translations,
-            params: {
-                fields: ':all,!access,!userGroupAccesses,!externalAccess,!href,attributeValues[value,attribute[id,code,name]]'
-            },
-            upsertFn: function (response) {
-                return metadataRepository.upsertMetadataForEntity(response, 'translations');
-            }
-        }, {
             name: 'users',
             url: dhisUrl.users,
             params: {
@@ -121,6 +113,15 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
             },
             upsertFn: function (response) {
                 return metadataRepository.upsertMetadataForEntity(response, 'users');
+            }
+        }, {
+            name: 'userRoles',
+            url: dhisUrl.userRoles,
+            params: {
+                fields: 'name,id,displayName,lastUpdated'
+            },
+            upsertFn: function (response) {
+                return userRepository.upsertUserRoles(response);
             }
         }, {
             name: 'organisationUnitGroups',
