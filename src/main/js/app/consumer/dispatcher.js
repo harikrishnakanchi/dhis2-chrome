@@ -10,8 +10,7 @@ define(["lodash"], function(_) {
             $log.info("Processing message: " + message.data.type, message.data);
             switch (message.data.type) {
                 case "downloadMetadata":
-                    return downloadMetadataConsumer.run(message)
-                        .then(_.partial(downloadSystemSettingConsumer.run, message))
+                    return downloadSystemSettingConsumer.run(message)
                         .then(_.partial(downloadOrgUnitConsumer.run, message))
                         .then(_.partial(downloadOrgUnitGroupConsumer.run, message))
                         .then(_.partial(downloadProgramConsumer.run, message))
