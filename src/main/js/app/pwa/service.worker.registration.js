@@ -69,7 +69,13 @@
                         loadApp();
 
                         addListener('focusActiveTab', function () {
-                            alert('Praxis is active here. Please close any other open tabs/window');
+                            var message, locale = angular.element(document.getElementById('praxis')).scope().locale;
+
+                            if (locale == 'en') message = 'Praxis is active here. Please close any other open tabs/window';
+                            else if (locale == 'fr') message = 'Praxis est actif ici. Fermez tous les autres onglets / fenêtres ouverts';
+                            else message = 'التطبيق العملي نشطة هنا. الرجاء إغلاق أي علامات التبويب المفتوحة / نافذة أخرى';
+
+                            global.alert(message);
                         });
 
                         resolve(registration);
