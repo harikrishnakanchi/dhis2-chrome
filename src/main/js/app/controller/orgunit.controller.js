@@ -16,6 +16,7 @@ define(["toTree", "lodash", "moment", "properties", "customAttributes"], functio
             'Referral Locations': 'templates/partials/referral-locations-form.html'
         };
 
+        $scope.geographicOriginEnabled = properties.organisationSettings.geographicOriginEnabled;
         $scope.organisationUnits = [];
 
         var getUserSelectedProjectId = function() {

@@ -1,5 +1,5 @@
 /*global Date:true*/
-define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepository", "customAttributes"], function(OrgUnitController, mocks, utils, _, OrgUnitRepository, customAttributes) {
+define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepository", "customAttributes", "properties"], function(OrgUnitController, mocks, utils, _, OrgUnitRepository, customAttributes, properties) {
     describe("org unit controller", function() {
         var q, scope, orgUnitContoller, location, timeout, anchorScroll, orgUnitRepository, rootScope;
 
@@ -436,6 +436,12 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             scope.$apply();
 
             expect(location.path).toHaveBeenCalledWith("/selectProjectPreference");
+        });
+
+        it("should enable or disable geographic origin depending on properties config", function () {
+            orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
+            scope.$apply();
+            expect(scope.geographicOriginEnabled).toEqual(false);
         });
     });
 });
