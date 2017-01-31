@@ -1,4 +1,4 @@
-define(["dhisUrl", "moment", "properties"], function(dhisUrl, moment, properties) {
+define(["dhisUrl", "moment", "properties", "metadataConf"], function(dhisUrl, moment, properties, metadataConf) {
     return function($http) {
         this.getMetadata = function(lastUpdatedTime) {
             var config = {
@@ -31,9 +31,9 @@ define(["dhisUrl", "moment", "properties"], function(dhisUrl, moment, properties
             });
         };
 
-        this.getMetadataOfType = function (type, fields, lastUpdated) {
+        this.getMetadataOfType = function (type, lastUpdated) {
             var url = dhisUrl[type];
-            var params = {fields: fields};
+            var params = {fields: metadataConf.types[type]};
             if (lastUpdated) {
                 params.filter = 'lastUpdated:ge:' + lastUpdated;
             }

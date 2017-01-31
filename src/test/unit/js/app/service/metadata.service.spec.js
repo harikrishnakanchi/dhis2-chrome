@@ -1,4 +1,4 @@
-define(["metadataService", "properties", "angularMocks", "moment", "dhisUrl"], function(MetadataService, properties, mocks, moment, dhisUrl) {
+define(["metadataService", "properties", "angularMocks", "moment", "dhisUrl", "metadataConf"], function(MetadataService, properties, mocks, moment, dhisUrl, metadataConf) {
     describe("Metadata service", function() {
         var httpBackend, http, metadataService;
 
@@ -99,13 +99,13 @@ define(["metadataService", "properties", "angularMocks", "moment", "dhisUrl"], f
 
         describe('getMetadataOfType', function () {
             var type = "categories";
-            var fields = "paramValue";
+            var fields = metadataConf.types[type];
 
             it('should get the data based on the given type', function () {
                 var url = dhisUrl[type] + "?fields=" + fields;
                 var categories = 'someData';
-                httpBackend.expectGET(url).respond(200, categories);
-                metadataService.getMetadataOfType(type, fields).then(function (data) {
+                httpBackend.expectGET(encodeURI(url)).respond(200, categories);
+                metadataService.getMetadataOfType(type).then(function (data) {
                     expect(data).toEqual(categories);
                 });
                 httpBackend.flush();
@@ -114,8 +114,8 @@ define(["metadataService", "properties", "angularMocks", "moment", "dhisUrl"], f
             it('should get only lastUpdated data', function () {
                 var lastUpdated = "someTime";
                 var url = dhisUrl[type] + "?fields=" + fields + "&filter=lastUpdated:ge:" + lastUpdated;
-                httpBackend.expectGET(url).respond(200);
-                metadataService.getMetadataOfType(type, fields, lastUpdated);
+                httpBackend.expectGET(encodeURI(url)).respond(200);
+                metadataService.getMetadataOfType(type, lastUpdated);
                 httpBackend.flush();
             });
         });

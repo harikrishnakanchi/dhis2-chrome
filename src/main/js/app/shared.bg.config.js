@@ -5,6 +5,7 @@ require.config({
         "ng-i18n": "lib/ng-i18n/ng-i18n-0.2.0.min",
         "properties": "app/conf/properties",
         "overrides": "app/conf/overrides",
+        "metadataConf": "app/conf/metadata.conf",
         "indexedDBLogger": "app/utils/indexeddb.logger",
         "hustle": "lib/hustle/hustle",
         "moment": "lib/moment/moment-with-locales.min",
