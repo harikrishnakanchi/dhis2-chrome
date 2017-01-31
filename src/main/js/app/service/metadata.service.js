@@ -30,5 +30,16 @@ define(["dhisUrl", "moment", "properties"], function(dhisUrl, moment, properties
                 };
             });
         };
+
+        this.getMetadataOfType = function (type, fields, lastUpdated) {
+            var url = dhisUrl[type];
+            var params = {fields: fields};
+            if (lastUpdated) {
+                params.filter = 'lastUpdated:ge:' + lastUpdated;
+            }
+            return $http.get(url, {params: params}).then(function (response) {
+                return response.data;
+            });
+        };
     };
 });
