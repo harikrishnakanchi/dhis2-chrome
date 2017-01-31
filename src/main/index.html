@@ -12,7 +12,7 @@
 
     <div id="loadingPraxis" style="font-family: Helvetica Neue, Helvetica, Arial, sans-serif;font-size: 14px;font-weight:bold;text-align: center;">
         <div style="margin: 100px auto 3px;width: 506px;">
-            <div id="loadingPraxisMsg"><img src="img/ajax-loader.gif"/> Downloading Praxis...</div>
+            <div id="loadingPraxisMsg"><img src="img/ajax-loader.gif"/> Downloading Praxis&hellip;</div>
             <div id="loadingPraxisError" style="background-color: #f2dede;color: #a94442;padding: 15px;margin-bottom: 20px;border: 1px solid transparent;border-radius: 4px;line-height: 1.4;font-size: 15px;display: none">
                 Download is interrupted because of poor or no Internet connectivity.
                 Retry when Internet connection is available. If it fails after repeated retries, contact HIS team for assistance.
@@ -21,15 +21,36 @@
                 <button onclick="Praxis.reload()" style="color: #fff;background-color: #428bca;border-color: #357ebd;text-align: center;border-radius: 4px;border: 4px solid transparent;font-size: 14px;font-weight: bold;cursor: pointer">Retry</button>
             </div>
             <div id="multipleTabsOpen" style="background-color: #f2dede;color: #a94442;padding: 15px;margin-bottom: 20px;border: 1px solid transparent;border-radius: 4px;line-height: 1.4;font-size: 15px;display: none">
+                <img src="img/logo.png" style="margin: 25px">
                 <div>Praxis is already open in another tab.</div>
+                <div>Praxis est déjà ouvert dans un autre onglet.</div>
+                <div>التطبيق العملي هو بالفعل فتح في علامة تبويب أخرى.</div>
                 <br>
                 <div>
-                    <button onclick="Praxis.focusActiveTab()" id="focusActiveTab" style="color: #fff;background-color: #428bca;border-color: #357ebd;text-align: center;border-radius: 4px;border: 4px solid transparent;font-size: 14px;font-weight: bold;cursor: pointer">Take me there</button>
+                    <button onclick="Praxis.focusActiveTab()" id="focusActiveTab" style="color: #fff;background-color: #428bca;border-color: #357ebd;text-align: center;border-radius: 4px;border: 4px solid transparent;font-size: 14px;font-weight: bold;cursor: pointer">
+                        Take me there
+                        <br> Emmène-moi là <br> خذني هناك
+                    </button>
                 </div>
             </div>
             <div id="supportMessage" style="background-color: #f2dede;color: #a94442;padding: 15px;margin-bottom: 20px;border: 1px solid transparent;border-radius: 4px;line-height: 1.4;font-size: 15px;display: none">
-                <h3 style="margin-top: 15px">Please close this tab/window.</h3>
-                You are seeing this message because Praxis is currently active in another tab. If you cannot see Praxis after multiple attempts, please close the browser and load Praxis again.</div>
+                <img src="img/logo.png" style="margin: 25px">
+                <h3 style="margin: 20px 0 10px">
+                    Please close this tab/window.<br>
+                </h3>
+                You are seeing this message because Praxis is currently active in another tab. If you cannot see Praxis after multiple attempts, please close the browser and load Praxis again.
+
+                <h3 style="margin: 40px 0 10px">
+                    Veuillez fermer cet onglet / fenêtre.<br>
+                </h3>
+                Vous voyez ce message parce que Praxis est actuellement actif dans un autre onglet. Si vous ne pouvez pas voir Praxis après plusieurs tentatives, fermez le navigateur et chargez Praxis à nouveau.
+
+                <h3 style="margin: 40px 0 10px">
+                          الرجاء إغلاق هذا التبويب / نافذة.
+                </h3>
+     كنت ترى هذه الرسالة لأن التطبيق العملي تنشط حاليا في علامة تبويب أخرى. إذا كنت لا تستطيع رؤية التطبيق العملي بعد محاولات متعددة، يرجى إغلاق المتصفح وتحميل التطبيق العملي مرة أخرى.
+
+            </div>
         </div>
     </div>
 
