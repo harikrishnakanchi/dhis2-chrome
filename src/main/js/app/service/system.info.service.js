@@ -4,9 +4,10 @@ define(['dhisUrl', 'lodash', 'moment'], function (dhisUrl, _, moment) {
             return $http.get(dhisUrl.systemInfo)
                 .then(_.property('data'))
                 .then(function (systemInfo) {
-                    var serverDate = moment.utc(systemInfo.serverDate, 'YYYY-MM-DD hh:mm:ss.SSS');
+                    var timeFormat = 'YYYY-MM-DDThh:mm:ss.SSS';
+                    var serverDate = moment.utc(systemInfo.serverDate, timeFormat);
                     var isServerTimeValid = serverDate.isValid();
-                    return isServerTimeValid ? serverDate.toISOString() : moment().toISOString();
+                    return isServerTimeValid ? serverDate.format(timeFormat) : moment.utc().format(timeFormat);
                 });
         };
     };
