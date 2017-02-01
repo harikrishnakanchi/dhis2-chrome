@@ -1,4 +1,4 @@
-define(["moment"], function(moment) {
+define(["metadataConf"], function(metadataConf) {
     return function(metadataService, systemInfoService, metadataRepository, changeLogRepository) {
         var downloadStartTime;
 
@@ -8,16 +8,23 @@ define(["moment"], function(moment) {
             });
         };
 
-        var updateChangeLog = function() {
-            return changeLogRepository.upsert("metaData", downloadStartTime);
+        var updateChangeLog = function(type) {
+            return changeLogRepository.upsert(type, downloadStartTime);
+        };
+
+        var downloadAndUpsertEntity = function (type) {
+            return changeLogRepository.get(type)
+                .then(_.partial(metadataService.getMetadataOfType, type))
+                .then(_.partial(metadataRepository.upsertMetadataForEntity, _, type))
+                .then(_.partial(updateChangeLog, type));
         };
 
         this.run = function () {
-            return getServerTime().then
-                (_.partial(changeLogRepository.get, 'metaData'))
-                .then(metadataService.getMetadata)
-                .then(metadataRepository.upsertMetadata)
-                .then(updateChangeLog);
+            return _.reduce(metadataConf.types, function (res, val, key) {
+                return res.then(function () {
+                    return downloadAndUpsertEntity(key);
+                });
+            }, getServerTime());
         };
     };
 });

@@ -12,6 +12,7 @@ require.config({
         "migrator": "app/migrator/migrator",
         "properties": "app/conf/properties",
         "overrides": "app/conf/overrides",
+        "metadataConf": "app/conf/metadata.conf",
         "moment": "lib/moment/moment-with-locales.min",
         "timecop": "lib/timecop/timecop-0.1.1",
         "hustle": "lib/hustle/hustle",

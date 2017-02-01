@@ -38,7 +38,7 @@ define(["dhisUrl", "moment", "properties", "metadataConf"], function(dhisUrl, mo
                 params.filter = 'lastUpdated:ge:' + lastUpdated;
             }
             return $http.get(url, {params: params}).then(function (response) {
-                return response.data;
+                return response.data[type];
             });
         };
     };
