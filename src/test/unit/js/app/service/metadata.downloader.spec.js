@@ -4,7 +4,7 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
               DataSetRepository, ProgramRepository, SystemSettingRepository, OrgUnitRepository, CustomAttributeRepository, UserRepository) {
     describe('metaDataDownloader', function () {
         var http, q, httpBackend, rootScope, metadataDownloader, changeLogRepository, metadataRepository, orgUnitGroupRepository,
-            dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository, customAttributeRepository, userRepository;
+            dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository, userRepository;
 
         var expectMetadataDownload = function (options) {
             options = options || {};
@@ -48,9 +48,6 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
             orgUnitGroupRepository = new OrgUnitGroupRepository();
             spyOn(orgUnitGroupRepository,'upsertDhisDownloadedData').and.returnValue(utils.getPromise(q, {}));
 
-            customAttributeRepository = new CustomAttributeRepository();
-            spyOn(customAttributeRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
-
             dataSetRepository = new DataSetRepository();
             spyOn(dataSetRepository,'upsertDhisDownloadedData').and.returnValue(utils.getPromise(q, {}));
 
@@ -66,7 +63,7 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
             userRepository = new UserRepository();
             spyOn(userRepository, 'upsertUserRoles').and.returnValue(utils.getPromise(q, {}));
 
-            metadataDownloader = new MetadataDownloader(http, q, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository, customAttributeRepository, userRepository);
+            metadataDownloader = new MetadataDownloader(http, q, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository, userRepository);
         }));
 
         afterEach(function() {
@@ -99,7 +96,7 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
 
             expectMetadataDownload(metadataPayload);
             httpBackend.flush();
-            expect(metadataRepository.upsertMetadataForEntity).toHaveBeenCalledTimes(12);
+            expect(metadataRepository.upsertMetadataForEntity).toHaveBeenCalledTimes(13);
         });
 
         it('should update changeLog with the lastUpdated after metadata has been downloaded and upserted successfully', function () {

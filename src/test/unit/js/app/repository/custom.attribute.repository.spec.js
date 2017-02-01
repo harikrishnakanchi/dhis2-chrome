@@ -10,19 +10,6 @@ define(['customAttributeRepository', 'angularMocks', 'utils'], function (CustomA
             customAttributeRepository = new CustomAttributeRepository(mockDB.db, q);
         }));
 
-        it('should upsert the custom attributes', function () {
-            var mockAttributes = [{
-                id: 'someId',
-                code: 'someCode'
-            }, {
-                id: 'someOtherId',
-                code: 'someOtherCode'
-            }];
-
-            customAttributeRepository.upsert(mockAttributes);
-            expect(mockStore.upsert).toHaveBeenCalledWith(mockAttributes);
-        });
-
         it('should get all the custom attributes from the store', function () {
             customAttributeRepository.getAll();
             expect(mockStore.getAll).toHaveBeenCalled();
