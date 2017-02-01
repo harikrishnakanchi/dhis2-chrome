@@ -35,7 +35,7 @@
                         <label class="col-sm-6 col-md-6 control-label">{{ resourceBundle.referralLocationCheckboxLabel }}</label>
 
                     </li>
-                    <li class="form-group add-service-checkbox">
+                    <li class="form-group add-service-checkbox" ng-if="geographicOriginEnabled">
                         <div class="col-sm-4 col-md-4">
                             <input type="checkbox" ng-model="associateOriginDataSet"/>
                         </div>

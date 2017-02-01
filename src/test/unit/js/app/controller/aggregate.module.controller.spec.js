@@ -107,6 +107,8 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     $setDirty : jasmine.createSpy('$setDirty')
                 };
 
+                scope.geographicOriginEnabled = true;
+
                 spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(false);
 
                 Timecop.install();
@@ -823,73 +825,95 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 expect(scope.isDisabled).toEqual(true);
             });
 
-            it("should create patient origin org units", function()  {
-                scope.module = {
-                    "id": "mod1",
-                    "name": "mod1",
-                    "openingDate": "2014-04-01",
-                    "parent": {
-                        "id": "pid",
-                        "name": "parent",
-                        "level": 5
-                    }
-                };
+            describe("Patient origin org unit", function () {
+                it("should create patient origin org units", function()  {
+                    scope.module = {
+                        "id": "mod1",
+                        "name": "mod1",
+                        "openingDate": "2014-04-01",
+                        "parent": {
+                            "id": "pid",
+                            "name": "parent",
+                            "level": 5
+                        }
+                    };
 
-                var enrichedAggregateModule = {
-                    name: 'mod1',
-                    shortName: 'mod1',
-                    displayName: 'parent - mod1',
-                    id: 'mod1pid',
-                    level: 6,
-                    openingDate: moment.utc("2014-04-01").format('YYYY-MM-DD'),
-                    attributeValues: [{
-                        created: moment().toISOString(),
-                        lastUpdated: moment().toISOString(),
-                        attribute: {
-                            code: "Type"
+                    var enrichedAggregateModule = {
+                        name: 'mod1',
+                        shortName: 'mod1',
+                        displayName: 'parent - mod1',
+                        id: 'mod1pid',
+                        level: 6,
+                        openingDate: moment.utc("2014-04-01").format('YYYY-MM-DD'),
+                        attributeValues: [{
+                            created: moment().toISOString(),
+                            lastUpdated: moment().toISOString(),
+                            attribute: {
+                                code: "Type"
+                            },
+                            value: 'Module'
+                        }, {
+                            created: moment().toISOString(),
+                            lastUpdated: moment().toISOString(),
+                            attribute: {
+                                code: "isLineListService"
+                            },
+                            value: 'false'
+                        }, {
+                            created: moment().toISOString(),
+                            lastUpdated: moment().toISOString(),
+                            attribute: {
+                                code: "isNewDataModel"
+                            },
+                            value: 'true'
+                        }],
+                        parent: {
+                            name: 'parent',
+                            id: 'pid'
                         },
-                        value: 'Module'
-                    }, {
-                        created: moment().toISOString(),
-                        lastUpdated: moment().toISOString(),
-                        attribute: {
-                            code: "isLineListService"
-                        },
-                        value: 'false'
-                    }, {
-                        created: moment().toISOString(),
-                        lastUpdated: moment().toISOString(),
-                        attribute: {
-                            code: "isNewDataModel"
-                        },
-                        value: 'true'
-                    }],
-                    parent: {
-                        name: 'parent',
-                        id: 'pid'
-                    },
-                    dataSets: []
-                };
+                        dataSets: []
+                    };
 
-                var originOrgUnits = [{
-                    "id": "ou1",
-                    "name": "origin org unit"
-                }];
+                    var originOrgUnits = [{
+                        "id": "ou1",
+                        "name": "origin org unit"
+                    }];
 
-                spyOn(orgUnitMapper, 'mapToModule').and.returnValue(enrichedAggregateModule);
-                originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnits));
+                    spyOn(orgUnitMapper, 'mapToModule').and.returnValue(enrichedAggregateModule);
 
-                scope.save();
-                scope.$apply();
+                    originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnits));
 
-                expect(originOrgunitCreator.create).toHaveBeenCalledWith(enrichedAggregateModule, undefined, undefined);
-                expect(hustle.publish.calls.count()).toEqual(3);
-                expect(hustle.publish.calls.argsFor(2)).toEqual([{
-                    "data": { orgUnitId: originOrgUnits[0].id},
-                    "type": "syncOrgUnit",
-                    "locale": "en",
-                    "desc": "save organisation unit"
-                }, "dataValues"]);
+                    scope.save();
+                    scope.$apply();
+
+                    expect(originOrgunitCreator.create).toHaveBeenCalledWith(enrichedAggregateModule, undefined, undefined);
+                    expect(hustle.publish.calls.count()).toEqual(3);
+                    expect(hustle.publish.calls.argsFor(2)).toEqual([{
+                        "data": { orgUnitId: originOrgUnits[0].id},
+                        "type": "syncOrgUnit",
+                        "locale": "en",
+                        "desc": "save organisation unit"
+                    }, "dataValues"]);
+                });
+
+                it("should not create patient origin org units if geographicOrigin is disabled", function () {
+                    scope.module = {
+                        "id": "mod1",
+                        "name": "mod1",
+                        "openingDate": "2014-04-01",
+                        "parent": {
+                            "id": "pid",
+                            "name": "parent",
+                            "level": 5
+                        }
+                    };
+
+                    scope.geographicOriginEnabled = false;
+                    scope.save();
+                    scope.$apply();
+
+                    expect(originOrgunitCreator.create).not.toHaveBeenCalled();
+                });
             });
 
             it("should apply module templates", function() {
@@ -1228,6 +1252,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
             });
 
             describe('associateOriginDataSet', function () {
+
                 it('should set to true if the origins for a module are associated with originDataset for an existing module', function () {
                     scope.isNewMode = false;
                     var mockOrigin = {
@@ -1247,6 +1272,14 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     scope.$apply();
 
                     expect(scope.associateOriginDataSet).toBeTruthy();
+                });
+
+                it('should not set associateOriginDataSet if geographicOrigin is disabled', function () {
+                    scope.geographicOriginEnabled = false;
+                    initialiseController();
+                    scope.$apply();
+
+                    expect(scope.associateOriginDataSet).toBeUndefined();
                 });
             });
 
