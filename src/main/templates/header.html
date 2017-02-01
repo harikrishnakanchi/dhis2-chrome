@@ -66,8 +66,8 @@
                                     <ul class="dropdown-menu" role="menu" ng-if="!isLoggedIn">
                                         <li><a href="" ng-click="gotoProductKeyPage()" tabindex="-1">{{
                                             resourceBundle.updateProductKeyMenuLabel }}</a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="" ng-click="uninstallPraxis()">{{ resourceBundle.uninstall.title }}</a></li>
+                                        <li ng-hide="metadataDownloading()" class="divider"></li>
+                                        <li ng-hide="metadataDownloading()"><a href="" ng-click="uninstallPraxis()">{{ resourceBundle.uninstall.title }}</a></li>
                                     </ul>
                                 </div>
                             </li>
