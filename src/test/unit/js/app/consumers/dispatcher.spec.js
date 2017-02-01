@@ -1,5 +1,5 @@
 define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, utils) {
-    xdescribe("dispatcher", function() {
+    describe("dispatcher", function() {
         var dispatcher, message, q, log, scope,
             createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer,
             downloadMetadataConsumer, downloadDataSetConsumer, updateDataSetConsumer, associateOrgunitToProgramConsumer,
