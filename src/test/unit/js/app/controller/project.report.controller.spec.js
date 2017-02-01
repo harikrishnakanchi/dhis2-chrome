@@ -269,7 +269,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             it('should prompt the user to save the Excel file with suggested filename', function () {
                 scope.exportToExcel();
 
-                var expectedFilename = 'Aweil - SS153.ProjectReport.[updated ' + moment(lastUpdatedTime).format(LAST_UPDATED_TIME_FORMAT) + '].xlsx';
+                var expectedFilename = 'Aweil - SS153.ProjectReport.[updated ' + moment(lastUpdatedTime).format(LAST_UPDATED_TIME_FORMAT) + ']';
                 expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.XLSX);
             });
 

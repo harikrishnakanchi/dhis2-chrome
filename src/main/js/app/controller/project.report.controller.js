@@ -51,7 +51,7 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper", "excelBuilder"], funct
             else {
                 lastUpdatedTimeDetails = moment().format("DD-MMM-YYYY");
             }
-            var filename = [$scope.selectedProject.name, 'ProjectReport', lastUpdatedTimeDetails, 'xlsx'].join('.');
+            var filename = [$scope.selectedProject.name, 'ProjectReport', lastUpdatedTimeDetails].join('.');
             filesystemService.promptAndWriteFile(filename, excelBuilder.createWorkBook(buildSpreadSheetContent()), filesystemService.FILE_TYPE_OPTIONS.XLSX);
         };
 
