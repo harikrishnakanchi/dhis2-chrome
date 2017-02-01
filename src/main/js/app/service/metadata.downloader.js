@@ -177,7 +177,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
             }
         }, {
             name: 'attributes',
-            url: dhisUrl.customAttributes,
+            url: dhisUrl.attributes,
             params: {
                 fields: 'id,code,lastUpdated,name,valueType,mandatory'
             },

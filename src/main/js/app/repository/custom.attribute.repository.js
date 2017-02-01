@@ -7,7 +7,7 @@ define([], function () {
         };
 
         this.getAll = function () {
-            var store = db.objectStore('customAttributes');
+            var store = db.objectStore('attributes');
             return store.getAll();
         };
     };

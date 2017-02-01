@@ -457,7 +457,7 @@ define(['dateUtils', 'lodash'], function(dateUtils, _) {
     };
 
     var add_custom_attributes_store = function (db, tx) {
-        create_store_with_key("customAttributes", "id", db);
+        create_store_with_key("attributes", "id", db);
     };
 
     var add_user_roles_store = function (db, tx) {
