@@ -204,6 +204,14 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
 
                     expect(changeLogRepository.upsert).toHaveBeenCalledWith(jasmine.any(String), 'someTime');
                 });
+
+                it('should not make systemInfo call if historical data is already downloaded', function () {
+                    changeLogRepository.get.and.returnValue(utils.getPromise(q, 'lastUpdatedTime'));
+                    downloadHistoricalDataConsumer.run();
+                    scope.$apply();
+
+                    expect(systemInfoService.getServerDate).not.toHaveBeenCalled();
+                });
             });
         });
     });

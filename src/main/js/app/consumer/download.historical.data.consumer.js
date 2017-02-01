@@ -44,13 +44,12 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], func
                 var changeLogKey = [CHANGE_LOG_PREFIX, module.projectId, module.id].join(':'),
                     downloadStartTime;
 
-                var getServerTime = function () {
-                  return systemInfoService.getServerDate().then(function (serverTime) {
-                      downloadStartTime = serverTime;
-                  });
-                };
-
                 var downloadModuleData = function () {
+                    var getServerTime = function () {
+                        return systemInfoService.getServerDate().then(function (serverTime) {
+                            downloadStartTime = serverTime;
+                        });
+                    };
 
                     var downloadModuleDataValues = function () {
                         var periodChunks = _.chunk(periodRange, CHUNK_SIZE);
@@ -66,8 +65,10 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], func
                         return eventService.getEvents(module.id, periodRange).then(programEventRepository.upsert);
                     };
 
-                    var isLinelistModule = customAttributes.getBooleanAttributeValue(module.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE);
-                    return isLinelistModule ? downloadLineListEvents() : downloadModuleDataValues();
+                    return getServerTime().then(function () {
+                        var isLinelistModule = customAttributes.getBooleanAttributeValue(module.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE);
+                        return isLinelistModule ? downloadLineListEvents() : downloadModuleDataValues();
+                    });
                 };
 
                 var onSuccess = function () {
@@ -78,9 +79,7 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], func
                     return $q.when(); //continue with next module
                 };
 
-                return getServerTime()
-                    .then(_.partial(changeLogRepository.get, changeLogKey))
-                    .then(function (lastUpdatedTime) {
+                return changeLogRepository.get(changeLogKey).then(function (lastUpdatedTime) {
                     var areDataValuesAlreadyDownloaded = !!lastUpdatedTime;
                     return areDataValuesAlreadyDownloaded ? $q.when() : downloadModuleData().then(onSuccess, onFailure);
                 });
