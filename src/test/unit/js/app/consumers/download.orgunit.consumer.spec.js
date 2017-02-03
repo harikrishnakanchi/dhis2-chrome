@@ -246,32 +246,6 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             expect(orgUnitRepository.upsert).not.toHaveBeenCalled();
         });
 
-        it("should upsert lastUpdated time in change log", function() {
-            var message = {
-                "data": {
-                    "data": [],
-                    "type": "downloadOrgUnit"
-                }
-            };
-
-            var orgUnitFromDHISSinceLastUpdatedTime = {
-                "data": {
-                    "organisationUnits": []
-                }
-            };
-
-            spyOn(orgUnitRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
-            spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHISSinceLastUpdatedTime));
-            spyOn(orgUnitService, 'upsert');
-
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy);
-            downloadOrgunitConsumer.run(message);
-
-            scope.$apply();
-
-            expect(changeLogRepository.upsert).toHaveBeenCalledWith("orgUnits", "someTime");
-        });
-
         it("should upsert new org units from dhis to local db", function() {
             var message = {
                 "data": {
@@ -351,7 +325,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             downloadOrgunitConsumer.run(message);
             scope.$apply();
 
-            expect(changeLogRepository.upsert).toHaveBeenCalledWith('orgUnits', 'someTime');
+            expect(changeLogRepository.upsert).toHaveBeenCalledWith('organisationUnits', 'someTime');
         });
     });
 });

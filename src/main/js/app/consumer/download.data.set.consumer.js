@@ -17,7 +17,7 @@ define(['moment', 'lodashUtils'], function(moment, _) {
         };
 
         var download = function (data) {
-            return changeLogRepository.get("datasets")
+            return changeLogRepository.get("dataSets")
                 .then(datasetService.getAll)
                 .then(function (dataSets) {
                     return _.merge({dataSets: dataSets}, data);
@@ -35,7 +35,7 @@ define(['moment', 'lodashUtils'], function(moment, _) {
         };
 
         var updateChangeLog = function(data) {
-            return changeLogRepository.upsert("datasets", data.downloadStartTime);
+            return changeLogRepository.upsert("dataSets", data.downloadStartTime);
         };
     };
 });

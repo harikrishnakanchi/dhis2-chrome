@@ -14,7 +14,7 @@ define(["moment", "lodash"], function(moment, _) {
         };
 
         var download = function(data) {
-            return changeLogRepository.get("orgUnitGroups").then(function(lastUpdatedTime) {
+            return changeLogRepository.get("organisationUnitGroups").then(function(lastUpdatedTime) {
                 return orgUnitGroupService.getAll(lastUpdatedTime).then(function (orgUnitGroups) {
                     return _.merge({ orgUnitGroups: orgUnitGroups }, data);
                 });
@@ -54,7 +54,7 @@ define(["moment", "lodash"], function(moment, _) {
         };
 
         var updateChangeLog = function(data) {
-            return changeLogRepository.upsert("orgUnitGroups", data.downloadStartTime);
+            return changeLogRepository.upsert("organisationUnitGroups", data.downloadStartTime);
         };
     };
 });

@@ -118,7 +118,7 @@ define(["downloadDataSetConsumer", "dataSetService", "systemInfoService", "utils
                 downloadDatasetConsumer.run(message);
                 scope.$apply();
 
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith('datasets', 'someTime');
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('dataSets', 'someTime');
             });
 
         });

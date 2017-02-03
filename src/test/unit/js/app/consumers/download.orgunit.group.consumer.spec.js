@@ -165,7 +165,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
 
             scope.$apply();
 
-            expect(changeLogRepository.upsert).toHaveBeenCalledWith("orgUnitGroups", "someTime");
+            expect(changeLogRepository.upsert).toHaveBeenCalledWith("organisationUnitGroups", "someTime");
         });
 
         it("should upsert new org unit groups from dhis to local db", function() {

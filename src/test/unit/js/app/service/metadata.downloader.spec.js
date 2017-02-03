@@ -1,10 +1,10 @@
 define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'metadataRepository', 'orgUnitGroupRepository',
-    'dataSetRepository', 'programRepository', 'systemSettingRepository', 'orgUnitRepository', 'customAttributeRepository', 'userRepository'],
+    'dataSetRepository', 'programRepository', 'systemSettingRepository', 'orgUnitRepository', 'customAttributeRepository', 'userRepository', 'systemInfoService'],
     function (mocks, utils, MetadataDownloader, ChangeLogRepository, MetadataRepository, OrgUnitGroupRepository,
-              DataSetRepository, ProgramRepository, SystemSettingRepository, OrgUnitRepository, CustomAttributeRepository, UserRepository) {
+              DataSetRepository, ProgramRepository, SystemSettingRepository, OrgUnitRepository, CustomAttributeRepository, UserRepository, SystemInfoService) {
     describe('metaDataDownloader', function () {
         var http, q, httpBackend, rootScope, metadataDownloader, changeLogRepository, metadataRepository, orgUnitGroupRepository,
-            dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository, userRepository;
+            dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository, userRepository, systemInfoService;
 
         var expectMetadataDownload = function (options) {
             options = options || {};
@@ -63,7 +63,10 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
             userRepository = new UserRepository();
             spyOn(userRepository, 'upsertUserRoles').and.returnValue(utils.getPromise(q, {}));
 
-            metadataDownloader = new MetadataDownloader(http, q, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository, userRepository);
+            systemInfoService = new SystemInfoService();
+            spyOn(systemInfoService, 'getServerDate').and.returnValue(utils.getPromise(q, 'someDate'));
+
+            metadataDownloader = new MetadataDownloader(http, q, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository, userRepository, systemInfoService);
         }));
 
         afterEach(function() {
@@ -77,6 +80,12 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
 
             expectMetadataDownload();
             httpBackend.flush();
+        });
+
+        it('should get system time from DHIS', function () {
+            metadataDownloader.run();
+            rootScope.$apply();
+            expect(systemInfoService.getServerDate).toHaveBeenCalled();
         });
 
         it('should not download metadata if changeLog exists',function () {
@@ -108,20 +117,11 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
             expect(changeLogRepository.upsert).toHaveBeenCalled();
         });
 
-        it('should clear temp changeLogs once all data is downloaded', function () {
-            changeLogRepository.get.and.returnValue(utils.getPromise(q, null));
+        it('should update metadata changelog after download completes', function () {
             metadataDownloader.run();
+            rootScope.$apply();
 
-            expectMetadataDownload();
-            httpBackend.flush();
-            expect(changeLogRepository.clear).toHaveBeenCalled();
-        });
-
-        it('should not clear temp changeLogs if data is not downloaded', function () {
-            changeLogRepository.get.and.returnValue(utils.getRejectedPromise(q, null));
-            metadataDownloader.run();
-
-            expect(changeLogRepository.clear).not.toHaveBeenCalled();
+            expect(changeLogRepository.upsert).toHaveBeenCalledWith('metaData', 'someDate');
         });
     });
 });

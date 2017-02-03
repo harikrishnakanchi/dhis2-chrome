@@ -1,9 +1,8 @@
 define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (dhisUrl, moment, properties, _, pagingUtils) {
     return function ($http, $q, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository,
-                     systemSettingRepository, orgUnitRepository, userRepository) {
+                     systemSettingRepository, orgUnitRepository, userRepository, systemInfoService) {
 
-        var TEMP_CHANGE_LOG_PREFIX = 'temp:',
-            MAX_PAGE_REQUESTS = 500, updated;
+        var MAX_PAGE_REQUESTS = 500, updated;
 
         var entities = [{
             name: 'categories',
@@ -187,11 +186,10 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
         }];
 
         var getChangeLog = function (entity) {
-            return changeLogRepository.get(TEMP_CHANGE_LOG_PREFIX + entity);
+            return changeLogRepository.get(entity);
         };
 
         var downloadAndUpsert = function (entity) {
-            updated = moment().toISOString();
             var upsertFn = entity.upsertFn || function () {};
 
             var downloadWithPagination = function (queryParams) {
@@ -212,7 +210,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
         };
 
         var updateChangeLog = function (entity) {
-            return changeLogRepository.upsert(TEMP_CHANGE_LOG_PREFIX + entity, updated);
+            return changeLogRepository.upsert(entity, updated);
         };
 
         var downloadEntityIfNotExists = function (entity) {
@@ -224,14 +222,24 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
         this.run = function () {
             var deferred = $q.defer();
 
+            var setDownloadStartTime = function () {
+                return systemInfoService.getServerDate().then(function(serverDate) {
+                    updated = serverDate;
+                });
+            };
+
+            var updateMetadataChangeLog = function () {
+                return changeLogRepository.upsert('metaData', updated);
+            };
+
             _.reduce(entities, function (promise, entity, index) {
                 return promise.then(function () {
                     return downloadEntityIfNotExists(entity).then(function () {
                         deferred.notify({percent: _.floor(((index + 1) / entities.length) * 100)});
                     });
                 });
-            }, $q.when())
-                .then(_.partial(changeLogRepository.clear, TEMP_CHANGE_LOG_PREFIX))
+            }, setDownloadStartTime())
+                .then(updateMetadataChangeLog)
                 .then(deferred.resolve)
                 .catch(deferred.reject);
 

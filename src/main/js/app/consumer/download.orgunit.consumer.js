@@ -26,7 +26,7 @@ define(['moment', "lodashUtils", "dateUtils"], function(moment, _, dateUtils) {
             };
 
             var downloadRemotelyChanged = function() {
-                return changeLogRepository.get("orgUnits").then(function(lastUpdatedTime) {
+                return changeLogRepository.get("organisationUnits").then(function(lastUpdatedTime) {
                     return orgUnitService.getAll(lastUpdatedTime);
                 });
             };
@@ -47,7 +47,7 @@ define(['moment', "lodashUtils", "dateUtils"], function(moment, _, dateUtils) {
         };
 
         var updateChangeLog = function() {
-            return changeLogRepository.upsert("orgUnits", serverDate);
+            return changeLogRepository.upsert("organisationUnits", serverDate);
         };
     };
 });

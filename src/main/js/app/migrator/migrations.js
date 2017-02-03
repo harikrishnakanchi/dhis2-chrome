@@ -1,4 +1,4 @@
-define(['dateUtils', 'lodash'], function(dateUtils, _) {
+define(['dateUtils', 'lodash', 'metadataConf'], function(dateUtils, _, metadataConf) {
     var create_data_store = function(stores, db) {
         _.each(stores, function(type) {
             db.createObjectStore(type, {
@@ -464,6 +464,44 @@ define(['dateUtils', 'lodash'], function(dateUtils, _) {
         create_store_with_key("userRoles", "id", db);
     };
 
+    var update_change_log_keys = function (db, tx) {
+        var changeLogKeyMapper = {'orgUnits': 'organisationUnits', 'orgUnitGroups': 'organisationUnitGroups', 'datasets': 'dataSets'};
+        var changeLogStore = tx.objectStore('changeLog');
+        Object.keys(changeLogKeyMapper).forEach(function (key) {
+            var request = changeLogStore.get(key);
+            request.onsuccess = function (e) {
+                var changeLog = e.target.result;
+                if (changeLog) {
+                    changeLogStore.delete(key);
+                    changeLogStore.put({
+                        'type': changeLogKeyMapper[key],
+                        'lastUpdatedTime': changeLog.lastUpdatedTime
+                    });
+                }
+            };
+        });
+    };
+
+    var migrate_metadata_change_log = function (db, tx) {
+        var changeLogStore = tx.objectStore('changeLog');
+        var req = changeLogStore.get('metaData');
+        req.onsuccess = function (e) {
+            var metaDataChangeLog = e.target.result;
+            if (metaDataChangeLog) {
+                Object.keys(metadataConf.types)
+                    .reject(function (type) {
+                        return _.includes(['userRoles', 'attributes'], type);
+                    })
+                    .forEach(function (type) {
+                        changeLogStore.put({
+                            'type': type,
+                            'lastUpdatedTime': metaDataChangeLog.lastUpdatedTime
+                        });
+                    });
+            }
+        };
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -518,6 +556,8 @@ define(['dateUtils', 'lodash'], function(dateUtils, _) {
         delete_keys_chart_and_reports_from_changelog,
         add_indicator_and_program_indicator_stores,
         add_custom_attributes_store,
-        add_user_roles_store
+        add_user_roles_store,
+        update_change_log_keys,
+        migrate_metadata_change_log
     ];
 });

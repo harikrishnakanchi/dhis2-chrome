@@ -1,7 +1,7 @@
-define(['lodash', 'angularMocks', 'utils','properties', 'platformUtils', 'downloadMetadataController', 'metadataDownloader', 'changeLogRepository', 'packagedDataImporter', 'systemInfoService'],
-    function (_, mocks, utils, properties, platformUtils, DownloadMetadataController, MetadataDownloader, ChangeLogRepository, PackagedDataImporter, SystemInfoService) {
+define(['lodash', 'angularMocks', 'utils','properties', 'platformUtils', 'downloadMetadataController', 'metadataDownloader', 'packagedDataImporter'],
+    function (_, mocks, utils, properties, platformUtils, DownloadMetadataController, MetadataDownloader, PackagedDataImporter) {
         describe('DownloadMetadataController', function () {
-            var q, rootScope, scope, location, log, systemInfoService, downloadMetadataController, metadataDownloader, changeLogRepository, packagedDataImporter, initializeController;
+            var q, rootScope, scope, location, log, downloadMetadataController, metadataDownloader, packagedDataImporter, initializeController;
 
             beforeEach(mocks.inject(function ($q, $rootScope, $location, $log) {
                 q = $q;
@@ -16,17 +16,11 @@ define(['lodash', 'angularMocks', 'utils','properties', 'platformUtils', 'downlo
                 metadataDownloader = new MetadataDownloader();
                 spyOn(metadataDownloader, 'run').and.returnValue(utils.getPromise(q, {}));
 
-                changeLogRepository = new ChangeLogRepository();
-                spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
-
                 packagedDataImporter = new PackagedDataImporter();
                 spyOn(packagedDataImporter, 'run').and.returnValue(utils.getPromise(q, {}));
 
-                systemInfoService = new SystemInfoService();
-                spyOn(systemInfoService, 'getServerDate').and.returnValue(utils.getPromise(q, 'someDate'));
-
                 initializeController = function () {
-                    downloadMetadataController = new DownloadMetadataController(scope, q, location, log, systemInfoService, metadataDownloader, changeLogRepository, packagedDataImporter);
+                    downloadMetadataController = new DownloadMetadataController(scope, q, location, log, metadataDownloader, packagedDataImporter);
                 };
             }));
 
@@ -56,20 +50,7 @@ define(['lodash', 'angularMocks', 'utils','properties', 'platformUtils', 'downlo
                     initializeController();
                     scope.$apply();
 
-                    expect(systemInfoService.getServerDate).toHaveBeenCalled();
                     expect(metadataDownloader.run).toHaveBeenCalled();
-                });
-
-                it('should upsert the metadata changelog after download is complete', function () {
-                    initializeController();
-                    scope.$apply();
-
-                    var entities = ['metaData', 'orgUnits', 'orgUnitGroups', 'datasets', 'programs'];
-
-                    _.each(entities, function (entity, index) {
-                        expect(changeLogRepository.upsert.calls.argsFor(index)[0]).toEqual(entity);
-                        expect(changeLogRepository.upsert.calls.argsFor(index)[1]).toEqual('someDate');
-                    });
                 });
 
                 describe('Metadata download failure', function () {
@@ -98,7 +79,6 @@ define(['lodash', 'angularMocks', 'utils','properties', 'platformUtils', 'downlo
                         scope.$apply();
 
                         expect(metadataDownloader.run).toHaveBeenCalledTimes(properties.metaDataRetryLimit);
-                        expect(changeLogRepository.upsert).not.toHaveBeenCalled();
                     });
                 });
             });
