@@ -16,6 +16,7 @@ var webserver;
 var path = require('path');
 var zip = require('gulp-zip');
 var template = require('gulp-template');
+var requirejs = require('requirejs');
 
 var baseUrl = argv.url || "http://localhost:8080";
 var baseIntUrl = argv.int_url || baseUrl;
@@ -56,6 +57,8 @@ var download = function (url, outputFile, onDone) {
             if (response.statusCode != 200) {
                 onDone("Server exited with " + response.statusCode);
                 process.exit(1);
+            } else if (response.statusCode == 200){
+                onDone();
             }
         })
         .pipe(fs.createWriteStream(outputFile));
@@ -138,23 +141,32 @@ gulp.task('less', function() {
 });
 
 gulp.task('download-metadata', function (callback) {
-    return download(baseIntUrl + "/api/metadata.json?assumeTrue=false&categories=true&categoryCombos=true&categoryOptionCombos=true&categoryOptions=true&dataElementGroups=true&indicators=true&programIndicators=true&dataElements=true&optionSets=true&organisationUnitGroupSets=true&sections=true&translations=true&users=true&organisationUnitGroups=true", "./src/main/data/metadata.json", callback);
+    requirejs(['./src/main/js/app/conf/metadata.conf.js'], function (metadataConf) {
+        var buildUrl = function () {
+            var url = "";
+            Object.keys(metadataConf.types).forEach(function (type) {
+                url += `&${type}=true&${type}:fields=${metadataConf.types[type]}`;
+            });
+            return url;
+        };
+        download(baseIntUrl + "/api/metadata.json?assumeTrue=False&organisationUnitGroups=true" + buildUrl(), "./src/main/data/metadata.json", callback);
+    });
 });
 
 gulp.task('download-datasets', function (callback) {
-    return download(baseIntUrl + "/api/dataSets.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]],!organisationUnits&paging=false", "./src/main/data/dataSets.json", callback);
+    download(baseIntUrl + "/api/dataSets.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]],!organisationUnits&paging=false", "./src/main/data/dataSets.json", callback);
 });
 
 gulp.task('download-programs', function (callback) {
-    return download(baseIntUrl + "/api/programs.json?fields=id,name,displayName,organisationUnits,attributeValues[:identifiable,value,attribute[:identifiable]],programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false", "./src/main/data/programs.json", callback);
+    download(baseIntUrl + "/api/programs.json?fields=id,name,displayName,organisationUnits,attributeValues[:identifiable,value,attribute[:identifiable]],programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false", "./src/main/data/programs.json", callback);
 });
 
 gulp.task('download-fieldapp-settings', function(callback) {
-    return download(baseIntUrl + "/api/systemSettings.json?key=fieldAppSettings,versionCompatibilityInfo", "./src/main/data/systemSettings.json", callback);
+    download(baseIntUrl + "/api/systemSettings.json?key=fieldAppSettings,versionCompatibilityInfo", "./src/main/data/systemSettings.json", callback);
 });
 
 gulp.task('download-organisation-units', function(callback) {
-    return download(baseIntUrl + "/api/organisationUnits.json?fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid&paging=false", "./src/main/data/organisationUnits.json", callback)
+    download(baseIntUrl + "/api/organisationUnits.json?fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid&paging=false", "./src/main/data/organisationUnits.json", callback)
 });
 
 gulp.task('download-packaged-data', ['download-metadata', 'download-datasets', 'download-programs', 'download-fieldapp-settings', 'download-organisation-units'], function () {});
