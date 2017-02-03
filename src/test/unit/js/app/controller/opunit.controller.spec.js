@@ -462,36 +462,50 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(scope.orgUnit);
         });
 
-        it("should create unknown origin orgunit while creating an operational unit", function() {
-            var opUnit = {
-                "id": "OpUnit1",
-                "name": "OpUnit1",
-                "type": "Hospital",
-                "openingDate": moment().format("YYYY-MM-DD"),
-                "hospitalUnitCode": "Unit Code - A"
-            };
+        describe('Not Specified origin for new opunit', function () {
+            var opUnit, payload, publishPayload;
 
-            var payload = {
-                "orgUnit": "someMd5Hash",
-                "origins": [{
-                    "name": "Not Specified",
-                    "id": "someMd5Hash",
-                    "isDisabled": false,
-                    "clientLastUpdated": "2014-10-29T12:43:54.972Z"
-                }]
-            };
+            beforeEach(function () {
+                opUnit = {
+                    id: 'someOpUnitId',
+                    name: 'someOpUnitName',
+                    type: 'type',
+                    hospitalUnitCode: 'code'
+                };
+                payload = {
+                    orgUnit: 'someMd5Hash',
+                    origins: [{
+                        name: 'Not Specified',
+                        id: 'someMd5Hash',
+                        isDisabled: false,
+                        clientLastUpdated: '2014-10-29T12:43:54.972Z'
+                    }]
+                };
+                publishPayload = {
+                        "data": "someMd5Hash",
+                        "type": "uploadPatientOriginDetails",
+                        "locale": "en",
+                        "desc": "create patient origin Not Specified"
+                    };
+            });
 
-            spyOn(customAttributes, 'createAttribute').and.returnValue(createMockAttribute('someType', 'someValue'));
-            scope.save(opUnit);
-            scope.$apply();
+            it('should be created when geographicOriginEnabled is true', function () {
+                scope.geographicOriginEnabled = true;
+                scope.save(opUnit);
+                scope.$apply();
 
-            expect(patientOriginRepository.upsert).toHaveBeenCalledWith(payload);
-            expect(hustle.publish).toHaveBeenCalledWith({
-                "data": "someMd5Hash",
-                "type": "uploadPatientOriginDetails",
-                "locale": "en",
-                "desc": "create patient origin Not Specified"
-            }, "dataValues");
+                expect(patientOriginRepository.upsert).toHaveBeenCalledWith(payload);
+                expect(hustle.publish).toHaveBeenCalledWith(publishPayload, 'dataValues');
+            });
+
+            it('should not be created when geographicOriginEnabled is false', function () {
+                scope.geographicOriginEnabled = false;
+                scope.save(opUnit);
+                scope.$apply();
+
+                expect(patientOriginRepository.upsert).not.toHaveBeenCalled();
+                expect(hustle.publish).not.toHaveBeenCalledWith(publishPayload, "dataValues");
+            });
         });
 
         it("should update org unit groups when op unit is updated", function() {
@@ -665,6 +679,5 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "desc": "upsert org unit"
             }, "dataValues");
         });
-
     });
 });
