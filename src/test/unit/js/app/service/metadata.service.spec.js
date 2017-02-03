@@ -50,53 +50,6 @@ define(["metadataService", "properties", "angularMocks", "moment", "dhisUrl", "m
             });
         });
 
-        it("should get metadata from DHIS based on last updated date specified", function() {
-            var today = moment().toISOString();
-            var lastUpdated = moment().subtract(1, 'days').toISOString();
-
-            var metadata = {
-                "users": [],
-                "created": today
-            };
-
-            var filterString = "assumeTrue=false&" +
-                               "categories=true&categoryCombos=true&categoryOptionCombos=true&categoryOptions=true&dataElementGroups=true&dataElements=true&indicators=true&" +
-                               "lastUpdated="+lastUpdated+"&" +
-                               "optionSets=true&organisationUnitGroupSets=true&programIndicators=true&sections=true&translations=true&users=true";
-            httpBackend.expectGET(properties.dhis.url + "/api/metadata.json?" + filterString).respond(200, metadata);
-
-            var actualMetadata;
-            metadataService.getMetadata(lastUpdated).then(function(data) {
-                actualMetadata = data;
-            });
-
-            httpBackend.flush();
-            expect(actualMetadata).toEqual(metadata);
-        });
-
-        it("should get all metadata from DHIS if syncing for the first time", function() {
-            var today = moment().toISOString();
-
-            var metadata = {
-                "users": [],
-                "created": today
-            };
-
-            var filterString = "assumeTrue=false&" +
-                              "categories=true&categoryCombos=true&categoryOptionCombos=true&categoryOptions=true&dataElementGroups=true&" +
-                              "dataElements=true&indicators=true&optionSets=true&organisationUnitGroupSets=true&" +
-                              "programIndicators=true&sections=true&translations=true&users=true";
-            httpBackend.expectGET(properties.dhis.url + "/api/metadata.json?" + filterString).respond(200, metadata);
-
-            var actualMetadata;
-            metadataService.getMetadata().then(function(data) {
-                actualMetadata = data;
-            });
-
-            httpBackend.flush();
-            expect(actualMetadata).toEqual(metadata);
-        });
-
         describe('getMetadataOfType', function () {
             var type = "categories";
             var fields = metadataConf.types[type];

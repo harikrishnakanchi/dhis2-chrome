@@ -13,7 +13,6 @@ define(["downloadMetadataConsumer", "metadataService", "systemInfoService", "met
             Timecop.install();
             Timecop.freeze(thisMoment.toDate());
             metadataService = new MetadataService();
-            spyOn(metadataService, "getMetadata").and.returnValue(utils.getPromise(q, undefined));
             spyOn(metadataService, "getMetadataOfType").and.returnValue(utils.getPromise(q, undefined));
 
             metadataRepository = new MetadataRepository();
