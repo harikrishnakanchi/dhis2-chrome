@@ -4,22 +4,7 @@ define(['lodash', 'overrides', 'platformConfig'], function(_, overrides, platfor
         metadata: {
             sync: {
                 intervalInMinutes: 720
-            },
-            types: [
-                'categories',
-                'categoryCombos',
-                'categoryOptionCombos',
-                'categoryOptions',
-                'dataElements',
-                'indicators',
-                'programIndicators',
-                'sections',
-                'users',
-                'optionSets',
-                'translations',
-                'organisationUnitGroupSets',
-                'dataElementGroups'
-            ]
+            }
         },
         http: {
             timeout: 180000
