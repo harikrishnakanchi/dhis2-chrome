@@ -29,9 +29,9 @@ define(['platformUtils', 'moment', 'properties', 'lodash'], function (platformUt
             };
 
             $scope.maxRetriesExceeded = false;
-            return setDownloadStartTime().then(function() {
-                return metadataDownloader.run().then(success, failure, notify);
-            });
+            return setDownloadStartTime()
+                .then(metadataDownloader.run)
+                .then(success, failure, notify);
         };
 
         $scope.supportEmail = properties.support_email;
