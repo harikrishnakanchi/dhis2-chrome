@@ -489,8 +489,8 @@ define(['dateUtils', 'lodash', 'metadataConf'], function(dateUtils, _, metadataC
             var metaDataChangeLog = e.target.result;
             if (metaDataChangeLog) {
                 Object.keys(metadataConf.types)
-                    .reject(function (type) {
-                        return _.includes(['userRoles', 'attributes'], type);
+                    .filter(function (type) {
+                        return !_.includes(['userRoles', 'attributes'], type);
                     })
                     .forEach(function (type) {
                         changeLogStore.put({
