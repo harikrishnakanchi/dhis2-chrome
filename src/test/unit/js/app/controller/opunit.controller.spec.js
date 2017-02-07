@@ -489,8 +489,8 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     };
             });
 
-            it('should be created when geographicOriginEnabled is true', function () {
-                scope.geographicOriginEnabled = true;
+            it('should be created when geographicOriginDisabled is false', function () {
+                scope.geographicOriginDisabled = false;
                 scope.save(opUnit);
                 scope.$apply();
 
@@ -498,8 +498,8 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 expect(hustle.publish).toHaveBeenCalledWith(publishPayload, 'dataValues');
             });
 
-            it('should not be created when geographicOriginEnabled is false', function () {
-                scope.geographicOriginEnabled = false;
+            it('should not be created when geographicOriginDisabled is true', function () {
+                scope.geographicOriginDisabled = true;
                 scope.save(opUnit);
                 scope.$apply();
 

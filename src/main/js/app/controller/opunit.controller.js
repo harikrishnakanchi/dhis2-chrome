@@ -98,7 +98,7 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
             };
 
             var createPatientOriginsIfEnabled = function () {
-                return ($scope.geographicOriginEnabled) ?
+                return (!$scope.geographicOriginDisabled) ?
                     patientOriginRepository.upsert(patientOriginPayload).then(_.partial(publishMessage, patientOriginPayload.orgUnit, "uploadPatientOriginDetails",
                         interpolate($scope.resourceBundle.uploadPatientOriginDetailsDesc, {origin_name: _.map(patientOriginPayload.origins, 'name').toString()})))
                     : $q.when();

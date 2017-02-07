@@ -1240,7 +1240,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             });
 
             it("should create origin org units when geographic origin is enabled", function() {
-                scope.geographicOriginEnabled = true;
+                scope.geographicOriginDisabled = false;
                 var today = new Date();
                 scope.$apply();
 
@@ -1319,7 +1319,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             });
 
             it("should associate origin org units to programs and datasets and publish jobs accordingly when geographic origin is enabled", function() {
-                scope.geographicOriginEnabled = true;
+                scope.geographicOriginDisabled = false;
                 scope.$apply();
 
                 scope.module = {
@@ -1373,7 +1373,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
             it("should associate module to program when geographicOrigin is disabled", function() {
                 var today = new Date();
-                scope.geographicOriginEnabled = false;
+                scope.geographicOriginDisabled = true;
                 scope.$apply();
 
                 scope.module = {
@@ -1437,7 +1437,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 });
 
                 it("should associate line list summary datasets along with population and referral dataSets to modules and publish jobs accordingly when geographic origin is disabled", function() {
-                    scope.geographicOriginEnabled = false;
+                    scope.geographicOriginDisabled = true;
 
                     scope.save();
                     scope.$apply();
@@ -1453,7 +1453,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 });
 
                 it("should associate only population and referral datasets to modules and publish jobs accordingly when geographic origin is enabled", function() {
-                    scope.geographicOriginEnabled = true;
+                    scope.geographicOriginDisabled = false;
 
                     scope.save();
                     scope.$apply();
@@ -1480,7 +1480,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 });
 
                 it("should associate to origins when geographicOrigin is enabled", function() {
-                    scope.geographicOriginEnabled = true;
+                    scope.geographicOriginDisabled = false;
                     var originOrgUnit = [{
                         "name": "someOriginName",
                         "id": "someOriginId"
@@ -1495,7 +1495,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 });
 
                 it("should associate to modules when geographicOrigin is disabled", function () {
-                    scope.geographicOriginEnabled = false;
+                    scope.geographicOriginDisabled = true;
 
                     spyOn(orgUnitMapper, 'mapToModule').and.returnValue(scope.module);
 
@@ -1534,14 +1534,14 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 });
 
                 it("should find the program association from module when geographicOrigin is disabled", function () {
-                    scope.geographicOriginEnabled = false;
+                    scope.geographicOriginDisabled = true;
                     scope.$apply();
 
                     expect(programRepository.getProgramForOrgUnit).toHaveBeenCalledWith(scope.module.id);
                 });
 
                 it("should find the program associated from the origin when geographicOrigin is enabled", function () {
-                    scope.geographicOriginEnabled = true;
+                    scope.geographicOriginDisabled = false;
                     scope.$apply();
 
                     expect(programRepository.getProgramForOrgUnit).toHaveBeenCalledWith(mockOrigin.id);

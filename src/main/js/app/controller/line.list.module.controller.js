@@ -74,7 +74,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
                     }
 
                     var getOrgUnitIdAssociatedWithProgram = function () {
-                        if($scope.geographicOriginEnabled) {
+                        if(!$scope.geographicOriginDisabled) {
                             return orgUnitRepository.findAllByParent($scope.module.id).then(function (origins) {
                                 return origins[0].id;
                             });
@@ -387,7 +387,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
                         return orgUnitGroupHelper.createOrgUnitGroups(orgUnitPayLoad, false);
                     };
 
-                    if ($scope.geographicOriginEnabled) {
+                    if (!$scope.geographicOriginDisabled) {
                         return originOrgunitCreator.create(enrichedModule).then(function (originPayload) {
                             return publishMessage(originPayload, "upsertOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, {orgUnit: _.pluck(originPayload, "name")}))
                                 .then(_.partial(associateToProgram, $scope.program, originPayload))
@@ -403,7 +403,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
                 var associateMandatoryDatasetsToModule = function() {
                     var datasetIds = [dataSets.populationDatasetId, dataSets.referralDatasetId];
 
-                    if(!$scope.geographicOriginEnabled) {
+                    if($scope.geographicOriginDisabled) {
                         datasetIds = datasetIds.concat(dataSets.summaryDatasetId);
                     }
 

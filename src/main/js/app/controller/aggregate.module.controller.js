@@ -116,7 +116,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                 };
 
                 var isOriginDataSetEnabled = function () {
-                    if (!$scope.geographicOriginEnabled) return $q.when();
+                    if ($scope.geographicOriginDisabled) return $q.when();
 
                     if ($scope.isNewMode) {
                         $scope.associateOriginDataSet = true;
@@ -297,7 +297,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                 };
 
                 var createOriginsIfConfigured = function() {
-                    if(!$scope.geographicOriginEnabled) {
+                    if($scope.geographicOriginDisabled) {
                         return $q.when();
                     }
 

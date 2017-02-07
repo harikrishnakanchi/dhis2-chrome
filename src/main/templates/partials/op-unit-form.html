@@ -3,7 +3,7 @@
         <div class="top-actions" ng-if="!isNewMode">
             <input type="button" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.createAggregateModuleBtnLabel }}" ng-if="!(isDisabled)" ng-click="openInNewMode('Module')" />
             <input type="button" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.createLinelistModuleBtnLabel }}" ng-if="!(isDisabled)" ng-click="openInNewMode('LineListModule')" />
-            <input type="button" ng-if="geographicOriginEnabled" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.addPatientOriginLabel}}" ng-click="openInNewMode('Patient Origin')" />
+            <input type="button" ng-if="!geographicOriginDisabled" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.addPatientOriginLabel}}" ng-click="openInNewMode('Patient Origin')" />
             <input type="button" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.setupReferralLocationsBtnLabel }}" ng-click="openInNewMode('Referral Locations')" />
         </div>
         <div class="panel panel-default panelWith-Overflow-Visible">
@@ -86,7 +86,7 @@
                 </form>
             </div>
         </div>
-        <div class="panel panel-default" ng-if="geographicOriginEnabled && !isNewMode && originDetails && originDetails.length !== 0">
+        <div class="panel panel-default" ng-if="!geographicOriginDisabled && !isNewMode && originDetails && originDetails.length !== 0">
             <div class="panel-heading">
                 <h3 class="panel-title">{{ resourceBundle.patientOriginsLabel }}</h3>
             </div>

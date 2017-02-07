@@ -107,7 +107,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     $setDirty : jasmine.createSpy('$setDirty')
                 };
 
-                scope.geographicOriginEnabled = true;
+                scope.geographicOriginDisabled = false;
 
                 spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(false);
 
@@ -908,7 +908,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                         }
                     };
 
-                    scope.geographicOriginEnabled = false;
+                    scope.geographicOriginDisabled = true;
                     scope.save();
                     scope.$apply();
 
@@ -1275,7 +1275,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 });
 
                 it('should not set associateOriginDataSet if geographicOrigin is disabled', function () {
-                    scope.geographicOriginEnabled = false;
+                    scope.geographicOriginDisabled = true;
                     initialiseController();
                     scope.$apply();
 
