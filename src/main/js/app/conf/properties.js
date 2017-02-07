@@ -54,9 +54,6 @@ define(['lodash', 'overrides', 'platformConfig'], function(_, overrides, platfor
         encryption: {
             passphrase: 'My Product Key'
         },
-        organisationSettings: {
-          geographicOriginEnabled: false
-        },
         messageTimeout: 5000,
         devMode: true,
         weeksForAutoApprove: 8,

@@ -29,6 +29,7 @@ var ks = argv.ks || 128;
 var ts = argv.ts || 64;
 
 var supportEmail = argv.supportEmail || "";
+var praxisConfiguration = require('./praxis.configuration.json');
 
 var exportTranslations = require('./tasks/export.translations');
 var importTranslations = require('./tasks/import.translations');
@@ -126,7 +127,8 @@ gulp.task('config', function () {
                 ITER: iter,
                 KS: ks,
                 TS: ts,
-                SUPPORT_EMAIL: supportEmail
+                SUPPORT_EMAIL: supportEmail,
+                PRAXIS_CONFIGURATION: JSON.stringify(praxisConfiguration)
             }))
         .pipe(gulp.dest('./src/main/js/app/conf'));
 });
