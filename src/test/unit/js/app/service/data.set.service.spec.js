@@ -1,4 +1,4 @@
-define(["dataSetService", "angularMocks", "properties"], function(DatasetService, mocks, properties) {
+define(["dataSetService", "angularMocks", "properties", "metadataConf"], function(DatasetService, mocks, properties, metadataConf) {
     describe("dataset service", function() {
         var http, httpBackend, datasetService, q;
 
@@ -25,11 +25,12 @@ define(["dataSetService", "angularMocks", "properties"], function(DatasetService
                 'id': 'ds1'
             }];
 
+            var url = properties.dhis.url + "/api/dataSets.json?fields=" + metadataConf.fields.dataSets + "&paging=false";
             var responsePayload = {
                 'dataSets': datasets
             };
 
-            httpBackend.expectGET(properties.dhis.url + "/api/dataSets.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]],!organisationUnits&paging=false").respond(200, responsePayload);
+            httpBackend.expectGET(encodeURI(url)).respond(200, responsePayload);
             httpBackend.flush();
 
             expect(actualDataSets).toEqual(responsePayload.dataSets);
@@ -41,9 +42,10 @@ define(["dataSetService", "angularMocks", "properties"], function(DatasetService
                 'dataSets': []
             };
 
+            var url = properties.dhis.url + "/api/dataSets.json?fields="+ metadataConf.fields.dataSets +"&filter=lastUpdated:gte:" + lastUpdatedTime + "&paging=false";
             datasetService.getAll(lastUpdatedTime);
 
-            httpBackend.expectGET(properties.dhis.url + "/api/dataSets.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]],!organisationUnits&paging=false&filter=lastUpdated:gte:" + lastUpdatedTime).respond(200, responsePayload);
+            httpBackend.expectGET(encodeURI(url)).respond(200, responsePayload);
             httpBackend.flush();
         });
 

@@ -1,4 +1,4 @@
-define(["dhisUrl"], function(dhisUrl) {
+define(["dhisUrl", "metadataConf"], function(dhisUrl, metadataConf) {
     return function($http, $q) {
 
         this.removeOrgUnitFromDataset = function(datasetId, orgUnitId) {
@@ -10,10 +10,16 @@ define(["dhisUrl"], function(dhisUrl) {
                 });
         };
 
-        this.getAll = function(lastUpdatedTime) {
-            var url = dhisUrl.dataSets + '.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]],!organisationUnits&paging=false';
-            url = lastUpdatedTime ? url + "&filter=lastUpdated:gte:" + lastUpdatedTime : url;
-            return $http.get(url).then(function(response) {
+        this.getAll = function (lastUpdatedTime) {
+            var url = dhisUrl.dataSets + ".json";
+            var params = {
+                fields: metadataConf.fields.dataSets,
+                paging: false
+            };
+            if (lastUpdatedTime)
+                params.filter = "lastUpdated:gte:" + lastUpdatedTime;
+
+            return $http.get(url, {params: params}).then(function (response) {
                 return response.data.dataSets;
             });
         };
