@@ -146,8 +146,8 @@ gulp.task('download-metadata', function (callback) {
     requirejs(['./src/main/js/app/conf/metadata.conf.js'], function (metadataConf) {
         var buildUrl = function () {
             var url = "";
-            Object.keys(metadataConf.types).forEach(function (type) {
-                url += `&${type}=true&${type}:fields=${metadataConf.types[type]}`;
+            metadataConf.entities.forEach(function (entity) {
+                url += `&${entity}=true&${entity}:fields=${metadataConf.fields[entity]}`;
             });
             return url;
         };
@@ -156,11 +156,15 @@ gulp.task('download-metadata', function (callback) {
 });
 
 gulp.task('download-datasets', function (callback) {
-    download(baseIntUrl + "/api/dataSets.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]],!organisationUnits&paging=false", "./src/main/data/dataSets.json", callback);
+    requirejs(['./src/main/js/app/conf/metadata.conf.js'], function (metadataConf) {
+        download(baseIntUrl + "/api/dataSets.json?paging=false&fields=" + metadataConf.fields.dataSets, "./src/main/data/dataSets.json", callback);
+    });
 });
 
 gulp.task('download-programs', function (callback) {
-    download(baseIntUrl + "/api/programs.json?fields=id,name,displayName,organisationUnits,attributeValues[:identifiable,value,attribute[:identifiable]],programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false", "./src/main/data/programs.json", callback);
+    requirejs(['./src/main/js/app/conf/metadata.conf.js'], function (metadataConf) {
+        download(baseIntUrl + "/api/programs.json?paging=false&fields=" + metadataConf.fields.programs, "./src/main/data/programs.json", callback);
+    });
 });
 
 gulp.task('download-fieldapp-settings', function(callback) {
@@ -168,7 +172,9 @@ gulp.task('download-fieldapp-settings', function(callback) {
 });
 
 gulp.task('download-organisation-units', function(callback) {
-    download(baseIntUrl + "/api/organisationUnits.json?fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid&paging=false", "./src/main/data/organisationUnits.json", callback)
+    requirejs(['./src/main/js/app/conf/metadata.conf.js'], function (metadataConf) {
+        download(baseIntUrl + "/api/organisationUnits.json?paging=false&fields=" + metadataConf.fields.organisationUnits, "./src/main/data/organisationUnits.json", callback)
+    });
 });
 
 gulp.task('download-packaged-data', ['download-metadata', 'download-datasets', 'download-programs', 'download-fieldapp-settings', 'download-organisation-units'], function () {});
