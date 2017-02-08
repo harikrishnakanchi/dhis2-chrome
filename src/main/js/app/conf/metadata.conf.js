@@ -19,7 +19,6 @@ define([], function () {
             "dataSets": ":all,attributeValues[:identifiable,value,attribute[:identifiable]],!organisationUnits",
             "programs": "id,name,displayName,organisationUnits,attributeValues[:identifiable,value,attribute[:identifiable]],programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]",
             "organisationUnits": ":all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid"
-
         },
         entities: [
             "categories",
@@ -37,6 +36,5 @@ define([], function () {
             "userRoles",
             "attributes"
         ]
-
     };
 });
