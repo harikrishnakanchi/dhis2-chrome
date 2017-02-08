@@ -2,13 +2,13 @@ define(["downloadMetadataConsumer", "metadataService", "systemInfoService", "met
     function(DownloadMetadataConsumer, MetadataService, SystemInfoService, MetadataRepository, ChangeLogRepository, moment, utils, mocks, metadataConf) {
     describe("download metadata consumer", function() {
 
-        var downloadMetadataConsumer, metadataService, systemInfoService, metadataRepository, changeLogRepository, q, scope, thisMoment, metaDataTypes;
+        var downloadMetadataConsumer, metadataService, systemInfoService, metadataRepository, changeLogRepository, q, scope, thisMoment, metaDataEntities;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
             scope = $rootScope.$new();
             thisMoment = moment("2014-01-01");
-            metaDataTypes = metadataConf.types;
+            metaDataEntities = metadataConf.entities;
 
             Timecop.install();
             Timecop.freeze(thisMoment.toDate());
@@ -30,16 +30,14 @@ define(["downloadMetadataConsumer", "metadataService", "systemInfoService", "met
         }));
 
         afterEach(function() {
-            metadataConf.types = metaDataTypes;
+            metadataConf.entities = metaDataEntities;
             Timecop.returnToPresent();
             Timecop.uninstall();
         });
 
         it('should download data for all the metadata entities', function () {
             var type = "categories", someTime = "someTime", someData = "someData";
-            metadataConf.types = {
-                "categories": "id,name"
-            };
+            metadataConf.entities = ["categories"];
             systemInfoService.getServerDate.and.returnValue(utils.getPromise(q, someTime));
             metadataService.getMetadataOfType.and.returnValue(utils.getPromise(q, someData));
             changeLogRepository.get.and.returnValue(utils.getPromise(q, someTime));

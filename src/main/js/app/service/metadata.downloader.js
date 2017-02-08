@@ -1,4 +1,4 @@
-define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (dhisUrl, moment, properties, _, pagingUtils) {
+define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataConf'], function (dhisUrl, moment, properties, _, pagingUtils, metadataConf) {
     return function ($http, $q, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository,
                      systemSettingRepository, orgUnitRepository, userRepository, systemInfoService) {
 
@@ -8,7 +8,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
             name: 'categories',
             url: dhisUrl.categories,
             params: {
-                fields: 'id,name,shortName,created,dataDimension,dataDimensionType,lastUpdated,categoryOptions,categoryCombos,attributeValues[value,attribute[id,code,name]]'
+                fields: metadataConf.fields.categories
             },
             upsertFn: function (response) {
                 return metadataRepository.upsertMetadataForEntity(response, 'categories');
@@ -17,7 +17,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
             name: 'categoryCombos',
             url: dhisUrl.categoryCombos,
             params: {
-                fields: 'id,name,skipTotal,created,dataDimensionType,lastUpdated,categories,attributeValues[value,attribute[id,code,name]],categoryOptionCombos'
+                fields: metadataConf.fields.categoryCombos
             },
             upsertFn: function (response) {
                 return metadataRepository.upsertMetadataForEntity(response, 'categoryCombos');
@@ -26,7 +26,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
             name: 'categoryOptionCombos',
             url: dhisUrl.categoryOptionCombos,
             params: {
-                fields: 'id,name,created,shortName,lastUpdated,categoryCombo,categoryOptions,attributeValues[value,attribute[id,code,name]]'
+                fields: metadataConf.fields.categoryOptionCombos
             },
             upsertFn: function (response) {
                 return metadataRepository.upsertMetadataForEntity(response, 'categoryOptionCombos');
@@ -35,7 +35,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
             name: 'categoryOptions',
             url: dhisUrl.categoryOptions,
             params: {
-                fields: 'id,name,shortName,created,lastUpdated,dimensionItemType,categories,organisationUnits,categoryOptionCombos,attributeValues[value,attribute[id,code,name]]'
+                fields: metadataConf.fields.categoryOptions
             },
             upsertFn: function (response) {
                 return metadataRepository.upsertMetadataForEntity(response, 'categoryOptions');
@@ -44,7 +44,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
             name: 'dataElementGroups',
             url: dhisUrl.dataElementGroups,
             params: {
-                fields: 'id,name,shortName,created,lastUpdated,attributeValues[value,attribute[id,code,name]],dataElements,dimensionItemType'
+                fields: metadataConf.fields.dataElementGroups
             },
             upsertFn: function (response) {
                 return metadataRepository.upsertMetadataForEntity(response, 'dataElementGroups');
@@ -53,8 +53,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
             name: 'dataElements',
             url: dhisUrl.dataElements,
             params: {
-                fields: ':all,!href,!publicAccess,!externalAccess,!dimensionItem,!zeroIsSignificant,!url,!access,!user,' +
-                '!userGroupAccesses,!aggregationLevels,optionSet[id,name,options[id,name,code]],categoryCombo,dataElementGroups,attributeValues[value,attribute[id,code,name]],dataSets'
+                fields: metadataConf.fields.dataElements
             },
             upsertFn: function (response) {
                 return metadataRepository.upsertMetadataForEntity(response, 'dataElements');
@@ -63,7 +62,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
             name: 'indicators',
             url: dhisUrl.indicators,
             params: {
-                fields: ':all,!href,!displayName,!publicAccess,!externalAccess,!displayShortName,!access,!userGroupAccesses,attributeValues[value,attribute[id,code,name]]'
+                fields: metadataConf.fields.indicators
             },
             upsertFn: function (response) {
                 return metadataRepository.upsertMetadataForEntity(response, 'indicators');
@@ -72,7 +71,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
             name: 'programIndicators',
             url: dhisUrl.programIndicators,
             params: {
-                fields: ':all,!href,!displayName,!displayInForm,!publicAccess,!access,!userGroupAccesses,attributeValues[value,attribute[id,code,name]]'
+                fields: metadataConf.fields.programIndicators
             },
             upsertFn: function (response) {
                 return metadataRepository.upsertMetadataForEntity(response, 'programIndicators');
@@ -81,7 +80,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
             name: 'optionSets',
             url: dhisUrl.optionSets,
             params: {
-                fields: 'id,name,code,created,lastUpdated,valueType,attributeValues[value,attribute[id,code,name]],options[id,name,code]'
+                fields: metadataConf.fields.optionSets
             },
             upsertFn: function (response) {
                 return metadataRepository.upsertMetadataForEntity(response, 'optionSets');
@@ -90,7 +89,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
             name: 'organisationUnitGroupSets',
             url: dhisUrl.organisationUnitGroupSets,
             params: {
-                fields: 'id,name,code,shortName,created,lastUpdated,description,dimensionType,dataDimension,organisationUnitGroups[id,name],attributeValues[value,attribute[id,code,name]]'
+                fields: metadataConf.fields.organisationUnitGroupSets
             },
             upsertFn: function (response) {
                 return metadataRepository.upsertMetadataForEntity(response, 'organisationUnitGroupSets');
@@ -99,7 +98,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
             name: 'sections',
             url: dhisUrl.sections,
             params: {
-                fields: 'id,name,created,lastUpdated,sortOrder,dataSet,attributeValues[value,attribute[id,code,name]],indicators,dataElements'
+                fields: metadataConf.fields.sections
             },
             upsertFn: function (response) {
                 return metadataRepository.upsertMetadataForEntity(response, 'sections');
@@ -108,7 +107,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
             name: 'users',
             url: dhisUrl.users,
             params: {
-                fields: ':all,!href,!externalAccess,!access,!teiSearchOrganisationUnits,!dataViewOrganisationUnits,!userGroupAccesses,userCredentials[:all,userRoles[:all]],organisationUnits[:all]'
+                fields: metadataConf.fields.users
             },
             upsertFn: function (response) {
                 return metadataRepository.upsertMetadataForEntity(response, 'users');
@@ -117,7 +116,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
             name: 'userRoles',
             url: dhisUrl.userRoles,
             params: {
-                fields: 'name,id,displayName,lastUpdated'
+                fields: metadataConf.fields.userRoles
             },
             upsertFn: function (response) {
                 return userRepository.upsertUserRoles(response);
@@ -126,7 +125,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
             name: 'organisationUnitGroups',
             url: dhisUrl.organisationUnitGroups,
             params: {
-                fields: ':all,!externalAccess,!access,!userGroupAccess,attributeValues[value,attribute[id,code,name]]'
+                fields: metadataConf.fields.organisationUnitGroups
             },
             upsertFn: function (response) {
                 return orgUnitGroupRepository.upsertDhisDownloadedData(response);
@@ -135,7 +134,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
             name: 'dataSets',
             url: dhisUrl.dataSets,
             params: {
-                fields: ':all,attributeValues[:identifiable,value,attribute[:identifiable]],!organisationUnits'
+                fields: metadataConf.fields.dataSets
             },
             upsertFn: function (response) {
                 return dataSetRepository.upsertDhisDownloadedData(response);
@@ -144,7 +143,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
             name: 'programs',
             url: dhisUrl.programs,
             params: {
-                fields: 'id,name,displayName,organisationUnits,attributeValues[:identifiable,value,attribute[:identifiable]],programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]'
+                fields: metadataConf.fields.programs
             },
             upsertFn: function (response) {
                 return programRepository.upsertDhisDownloadedData(response);
@@ -153,7 +152,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
             name: 'organisationUnits',
             url: dhisUrl.orgUnits,
             params: {
-                fields: ':all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid'
+                fields: metadataConf.fields.organisationUnits
             },
             upsertFn: function(response) {
                 return orgUnitRepository.upsertDhisDownloadedData(response);
@@ -178,7 +177,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils'], function (d
             name: 'attributes',
             url: dhisUrl.attributes,
             params: {
-                fields: 'id,code,lastUpdated,name,valueType,mandatory'
+                fields: metadataConf.fields.attributes
             },
             upsertFn: function (attributes) {
                 return metadataRepository.upsertMetadataForEntity(attributes, 'attributes');

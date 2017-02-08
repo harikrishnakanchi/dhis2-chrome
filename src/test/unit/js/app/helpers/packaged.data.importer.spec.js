@@ -101,7 +101,7 @@ define(["angularMocks", "utils", "moment", "packagedDataImporter", "metadataServ
                 expect(methodCalls).toContain(["organisationUnitGroups", metadataCreateDate]);
                 expect(methodCalls).toContain(["dataSets", metadataCreateDate]);
                 expect(methodCalls).toContain(["programs", metadataCreateDate]);
-                _.each(_.keys(metadataConf.types), function (entity) {
+                _.each(metadataConf.entities, function (entity) {
                     expect(methodCalls).toContain([entity, metadataCreateDate]);
                 });
             });

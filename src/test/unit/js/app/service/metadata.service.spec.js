@@ -52,7 +52,7 @@ define(["metadataService", "properties", "angularMocks", "moment", "dhisUrl", "m
 
         describe('getMetadataOfType', function () {
             var type = "categories";
-            var fields = metadataConf.types[type];
+            var fields = metadataConf.fields[type];
 
             it('should get the data based on the given type', function () {
                 var url = dhisUrl[type] + "?fields=" + fields + "&paging=false";

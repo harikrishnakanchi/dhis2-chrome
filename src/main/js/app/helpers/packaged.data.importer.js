@@ -27,7 +27,7 @@ define(["lodash", "moment", "metadataConf"], function(_, moment, metadataConf) {
                 'programs'
             ];
 
-            entities = entities.concat(_.keys(metadataConf.types));
+            entities = entities.concat(metadataConf.entities);
             return $q.all(_.map(entities, _.partial(changeLogRepository.upsert, _, created)));
         };
 

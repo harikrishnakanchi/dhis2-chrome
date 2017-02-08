@@ -20,9 +20,9 @@ define(["metadataConf"], function(metadataConf) {
         };
 
         this.run = function () {
-            return _.reduce(metadataConf.types, function (res, val, key) {
+            return _.reduce(metadataConf.entities, function (res, entity) {
                 return res.then(function () {
-                    return downloadAndUpsertEntity(key);
+                    return downloadAndUpsertEntity(entity);
                 });
             }, getServerTime());
         };

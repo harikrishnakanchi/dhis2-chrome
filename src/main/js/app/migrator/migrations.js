@@ -488,13 +488,13 @@ define(['dateUtils', 'lodash', 'metadataConf'], function(dateUtils, _, metadataC
         req.onsuccess = function (e) {
             var metaDataChangeLog = e.target.result;
             if (metaDataChangeLog) {
-                Object.keys(metadataConf.types)
-                    .filter(function (type) {
-                        return !_.includes(['userRoles', 'attributes'], type);
+                metadataConf.entities
+                    .filter(function (entity) {
+                        return !_.includes(['userRoles', 'attributes'], entity);
                     })
-                    .forEach(function (type) {
+                    .forEach(function (entityType) {
                         changeLogStore.put({
-                            'type': type,
+                            'type': entityType,
                             'lastUpdatedTime': metaDataChangeLog.lastUpdatedTime
                         });
                     });

@@ -17,7 +17,7 @@ define(["dhisUrl", "moment", "properties", "metadataConf"], function(dhisUrl, mo
 
         this.getMetadataOfType = function (type, lastUpdated) {
             var url = dhisUrl[type];
-            var params = {fields: metadataConf.types[type], paging: false};
+            var params = {fields: metadataConf.fields[type], paging: false};
             if (lastUpdated) {
                 params.filter = 'lastUpdated:ge:' + lastUpdated;
             }

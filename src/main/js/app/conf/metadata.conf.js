@@ -1,6 +1,6 @@
 define([], function () {
     return {
-        types: {
+        fields: {
             "categories": "id,name,shortName,created,dataDimension,dataDimensionType,lastUpdated,categoryOptions,categoryCombos,attributeValues[value,attribute[id,code,name]]",
             "categoryCombos": "id,name,skipTotal,created,dataDimensionType,lastUpdated,categories,attributeValues[value,attribute[id,code,name]],categoryOptionCombos",
             "categoryOptionCombos": "id,name,created,shortName,lastUpdated,categoryCombo,categoryOptions,attributeValues[value,attribute[id,code,name]]",
@@ -14,7 +14,29 @@ define([], function () {
             "sections": "id,name,created,lastUpdated,sortOrder,dataSet,attributeValues[value,attribute[id,code,name]],indicators,dataElements",
             "users": ":all,!href,!externalAccess,!access,!teiSearchOrganisationUnits,!dataViewOrganisationUnits,!userGroupAccesses,userCredentials[:all,userRoles[:all]],organisationUnits[:all]",
             "userRoles": "name,id,displayName,lastUpdated",
-            "attributes": "id,code,lastUpdated,name,valueType,mandatory"
-        }
+            "attributes": "id,code,lastUpdated,name,valueType,mandatory",
+            "organisationUnitGroups": ":all,!externalAccess,!access,!userGroupAccess,attributeValues[value,attribute[id,code,name]]",
+            "dataSets": ":all,attributeValues[:identifiable,value,attribute[:identifiable]],!organisationUnits",
+            "programs": "id,name,displayName,organisationUnits,attributeValues[:identifiable,value,attribute[:identifiable]],programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]",
+            "organisationUnits": ":all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid"
+
+        },
+        entities: [
+            "categories",
+            "categoryCombos",
+            "categoryOptionCombos",
+            "categoryOptions",
+            "dataElementGroups",
+            "dataElements",
+            "indicators",
+            "programIndicators",
+            "optionSets",
+            "organisationUnitGroupSets",
+            "sections",
+            "users",
+            "userRoles",
+            "attributes"
+        ]
+
     };
 });
