@@ -1,7 +1,7 @@
 define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timecop", "programEventRepository", "optionSetRepository", "orgUnitRepository",
-    "excludedDataElementsRepository", "programRepository", "translationsService", "historyService", "excludedLineListOptionsRepository", "customAttributes"],
+    "excludedDataElementsRepository", "programRepository", "translationsService", "historyService", "excludedLineListOptionsRepository", "customAttributes", "properties"],
     function(LineListDataEntryController, mocks, utils, moment, timecop, ProgramEventRepository, OptionSetRepository, OrgUnitRepository,
-             ExcludedDataElementsRepository, ProgramRepository, TranslationsService, HistoryService, ExcludedLineListOptionsRepository, customAttributes) {
+             ExcludedDataElementsRepository, ProgramRepository, TranslationsService, HistoryService, ExcludedLineListOptionsRepository, customAttributes, properties) {
         describe("lineListDataEntryController ", function() {
 
             var scope, lineListDataEntryController, q, routeParams, rootScope, programEventRepository, originOrgUnits, mockModule, mockProgram, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, route, translationsService, historyService,excludedLineListOptionsRepository;
@@ -137,6 +137,8 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 Timecop.install();
                 Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
+
+                properties.organisationSettings.geographicOriginDisabled = false;
 
                 lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
                 scope.$apply();
@@ -405,6 +407,14 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     });
                 });
 
+                it('should get Program from module if geographic origin is disabled', function () {
+                    properties.organisationSettings.geographicOriginDisabled = true;
+
+                    lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
+                    scope.$apply();
+
+                    expect(programRepository.getProgramForOrgUnit).toHaveBeenCalledWith(mockModule.id);
+                });
             });
 
             it("should save event details as newDraft and show summary view", function() {
@@ -421,9 +431,8 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     'de5': moment('2015-02-05 20:00:00').toDate()
                 };
 
-                scope.patientOrigin = {
-                    "selected": originOrgUnits[0]
-                };
+                scope.orgUnitAssociatedToEvent = originOrgUnits[0];
+
 
                 scope.save();
                 scope.$apply();
@@ -459,9 +468,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
             });
 
             it("should save event details as newDraft and show data entry form again", function() {
-                scope.patientOrigin = {
-                    "selected": originOrgUnits[0]
-                };
+                scope.orgUnitAssociatedToEvent = originOrgUnits[0];
                 scope.eventDates = {
                     "Prg1": {
                         "PrgStage1": "2014-11-18T10:34:14.067Z"
@@ -477,9 +484,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
             });
 
             it("should update event details", function() {
-                scope.patientOrigin = {
-                    "selected": originOrgUnits[0]
-                };
+                scope.orgUnitAssociatedToEvent = originOrgUnits[0];
 
                 scope.dataValues = {
                     'de1': "2015-04-15",
@@ -525,9 +530,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     'de3': moment.utc('2015-04-16').toDate(),
                     'de4': undefined
                 };
-                scope.patientOrigin = {
-                    "selected": originOrgUnits[0]
-                };
+                scope.orgUnitAssociatedToEvent = originOrgUnits[0];
                 scope.save();
                 scope.$apply();
 

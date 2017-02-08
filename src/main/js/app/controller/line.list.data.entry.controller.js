@@ -4,7 +4,6 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
         var resetForm = function() {
             $scope.form = $scope.form || {};
             $scope.dataValues = {};
-            $scope.patientOrigin = {};
             $scope.isNewMode = true;
             if ($scope.eventDataEntryForm) {
                 $scope.eventDataEntryForm.$setPristine();
@@ -94,7 +93,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
 
         $scope.update = function() {
             var dataValuesAndEventDate = getDataValuesAndEventDate();
-            $scope.event.orgUnit = $scope.patientOrigin.selected.id;
+            $scope.event.orgUnit = $scope.orgUnitAssociatedToEvent.id;
             $scope.event.eventDate = dataValuesAndEventDate.eventDate;
             $scope.event.localStatus = dataValuesAndEventDate.compulsoryFieldsPresent ? "UPDATED_DRAFT" : "UPDATED_INCOMPLETE_DRAFT";
             $scope.event.dataValues = dataValuesAndEventDate.dataValues;
@@ -116,8 +115,8 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
                 "event": eventId,
                 "program": $scope.program.id,
                 "programStage": $scope.program.programStages[0].id,
-                "orgUnit": $scope.patientOrigin.selected.id,
-                "orgUnitName": $scope.patientOrigin.selected.name,
+                "orgUnit": $scope.orgUnitAssociatedToEvent.id,
+                "orgUnitName": $scope.orgUnitAssociatedToEvent.name,
                 "eventDate": dataValuesAndEventDate.eventDate,
                 "localStatus": dataValuesAndEventDate.compulsoryFieldsPresent ? "NEW_DRAFT" : "NEW_INCOMPLETE_DRAFT",
                 "dataValues": dataValuesAndEventDate.dataValues
@@ -146,6 +145,8 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
                     $scope.selectedModuleId = module.id;
                     $scope.selectedModuleName = module.name;
                     $scope.opUnitId = module.parent.id;
+                    $scope.selectedModule = module;
+                    $scope.orgUnitAssociatedToEvent = module;
                 });
             };
 
@@ -175,7 +176,12 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
                 };
 
                 var getProgram = function(excludedDataElements) {
-                    return programRepository.getProgramForOrgUnit($scope.originOrgUnits[0].id).then(function(program) {
+                    var getProgramFromOrgUnit = function () {
+                        var orgUnitAssociatedToProgram = properties.organisationSettings.geographicOriginDisabled ? $scope.selectedModuleId : _.get($scope.originOrgUnits[0], 'id');
+                        return programRepository.getProgramForOrgUnit(orgUnitAssociatedToProgram);
+                    };
+
+                    return getProgramFromOrgUnit().then(function(program) {
                         return programRepository.get(program.id, excludedDataElements).then(function(program) {
                             $scope.program = translationsService.translate(program);
                         });
@@ -239,7 +245,8 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
                     return programEventRepository.findEventById($scope.program.id, $routeParams.eventId).then(function(events) {
                         $scope.event = events[0];
                         $scope.isNewMode = false;
-                        $scope.patientOrigin.selected = _.find($scope.originOrgUnits, function(originOrgUnit) {
+                        var orgUnits = $scope.originOrgUnits.concat($scope.selectedModule);
+                        $scope.orgUnitAssociatedToEvent = _.find(orgUnits, function(originOrgUnit) {
                             return originOrgUnit.id === $scope.event.orgUnit;
                         });
 
