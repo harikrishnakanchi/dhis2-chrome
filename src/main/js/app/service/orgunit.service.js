@@ -1,4 +1,4 @@
-define(["dhisUrl", "httpUtils", "lodash"], function(dhisUrl, httpUtils, _) {
+define(["dhisUrl", "httpUtils", "lodash", "metadataConf"], function(dhisUrl, httpUtils, _, metadataConf) {
     return function($http) {
 
         this.assignDataSetToOrgUnit = function(orgUnitId, dataSetId) {
@@ -16,7 +16,7 @@ define(["dhisUrl", "httpUtils", "lodash"], function(dhisUrl, httpUtils, _) {
 
         this.get = function(orgUnitIds) {
             orgUnitIds = _.isArray(orgUnitIds) ? orgUnitIds : [orgUnitIds];
-            var url = dhisUrl.orgUnits + '.json?' + httpUtils.getParamString('id', orgUnitIds) + '&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid';
+            var url = dhisUrl.orgUnits + '.json?' + httpUtils.getParamString('id', orgUnitIds) + '&fields=' + metadataConf.fields.organisationUnits;
             return $http.get(url).then(function(response) {
                 return response.data.organisationUnits;
             });
@@ -29,7 +29,7 @@ define(["dhisUrl", "httpUtils", "lodash"], function(dhisUrl, httpUtils, _) {
         };
 
         this.getAll = function(lastUpdatedTime) {
-            var url = dhisUrl.orgUnits + '.json?paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid';
+            var url = dhisUrl.orgUnits + '.json?paging=false&fields=' + metadataConf.fields.organisationUnits;
             url = lastUpdatedTime ? url + "&filter=lastUpdated:gte:" + lastUpdatedTime : url;
             return $http.get(url).then(function(response) {
                 return response.data.organisationUnits;
