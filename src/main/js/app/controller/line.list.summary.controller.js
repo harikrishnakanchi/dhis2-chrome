@@ -106,13 +106,13 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
                 $scope.eventListTitle = $scope.resourceBundle.incompleteEventsTitle;
                 $scope.noCasesMsg = $scope.resourceBundle.noIncompleteEventsFound;
 
-                return programEventRepository.getDraftEventsFor($scope.program.id, _.pluck($scope.originOrgUnits, "id"))
+                return programEventRepository.getDraftEventsFor($scope.program.id, $scope.orgUnitIdAssociatedToProgram)
                     .then(enhanceEvents);
             }
             if ($scope.filterParams.filterBy === "readyToSubmit") {
                 $scope.eventListTitle = $scope.resourceBundle.readyToSubmitEventsTitle;
                 $scope.noCasesMsg = $scope.resourceBundle.noReadyToSubmitEventsFound;
-                return programEventRepository.getSubmitableEventsFor($scope.program.id, _.pluck($scope.originOrgUnits, "id")).then(function(events) {
+                return programEventRepository.getSubmitableEventsFor($scope.program.id, $scope.orgUnitIdAssociatedToProgram).then(function(events) {
                     return _.filter(events, function(event) {
                         var eventIsADraft = event.localStatus === "NEW_DRAFT" || event.localStatus === "UPDATED_DRAFT",
                             eventIsSubmittedButHasNoTimestamp = event.localStatus === "READY_FOR_DHIS" && _.isUndefined(event.clientLastUpdated),
@@ -330,7 +330,7 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
 
         $scope.filterByCaseNumber = function() {
             $scope.startLoading();
-            programEventRepository.findEventsByCode($scope.program.id, _.pluck($scope.originOrgUnits, "id"), $scope.filterParams.caseNumber)
+            programEventRepository.findEventsByCode($scope.program.id, $scope.orgUnitIdAssociatedToProgram, $scope.filterParams.caseNumber)
                 .then(enhanceEvents)
                 .then($scope.stopLoading);
         };
@@ -340,7 +340,7 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
             var startDate = moment($scope.filterParams.startDate).format("YYYY-MM-DD");
             var endDate = moment($scope.filterParams.endDate).format("YYYY-MM-DD");
 
-            programEventRepository.findEventsByDateRange($scope.program.id, _.pluck($scope.originOrgUnits, "id"), startDate, endDate)
+            programEventRepository.findEventsByDateRange($scope.program.id, $scope.orgUnitIdAssociatedToProgram, startDate, endDate)
                 .then(enhanceEvents)
                 .then($scope.stopLoading);
         };
@@ -423,6 +423,7 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
             var loadOriginOrgUnits = function() {
                 return orgUnitRepository.findAllByParent($scope.selectedModuleId).then(function(data) {
                     $scope.originOrgUnits = data;
+                    $scope.orgUnitIdAssociatedToProgram = properties.organisationSettings.geographicOriginDisabled ? [$scope.selectedModuleId] : _.map($scope.originOrgUnits, 'id');
                 });
             };
 
@@ -449,7 +450,11 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
                 };
 
                 var getProgram = function(excludedDataElements) {
-                    return programRepository.getProgramForOrgUnit($scope.originOrgUnits[0].id).then(function(program) {
+                    var getProgramFromOrgUnit = function () {
+                        return programRepository.getProgramForOrgUnit(_.first($scope.orgUnitIdAssociatedToProgram));
+                    };
+
+                    return getProgramFromOrgUnit().then(function(program) {
                         return programRepository.get(program.id, excludedDataElements).then(function(program) {
                             $scope.program = translationsService.translate(program);
                             $scope.summaryDataElements = getSummaryDataElementFromProgram($scope.program);
