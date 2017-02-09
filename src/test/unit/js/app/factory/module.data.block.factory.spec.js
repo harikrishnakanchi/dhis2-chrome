@@ -188,7 +188,7 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
                     var returnedObjects = createModuleDataBlocksForProject();
 
                     expect(orgUnitRepository.findAllByParent).toHaveBeenCalledWith(['ou1']);
-                    expect(programEventRepository.getEventsFromPeriod).toHaveBeenCalledWith(defaultPeriodForTesting, ['origin1']);
+                    expect(programEventRepository.getEventsFromPeriod).toHaveBeenCalledWith(defaultPeriodForTesting, ['origin1', 'ou1']);
                     expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, defaultPeriodForTesting, [], lineListEvents, {}, {});
                     expect(returnedObjects.length).toEqual(1);
                 });

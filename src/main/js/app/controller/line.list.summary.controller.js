@@ -225,7 +225,7 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
 
         $scope.submit = function() {
             var submitableEvents = $scope.events,
-                submitablePeriods = _.uniq(_.pluck(submitableEvents, 'period')),
+                submitablePeriods = _.uniq(_.map(submitableEvents, 'period')),
                 periodsAndOrgUnits = getPeriodsAndOrgUnits(submitablePeriods);
 
             var clearAnyExisingApprovals = function() {

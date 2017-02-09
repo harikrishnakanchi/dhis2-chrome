@@ -37,11 +37,12 @@ define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
 
             var getIndexedLineListData = function(mapOfOriginIdsToModuleIds) {
                 var startPeriod = _.first(periodRange),
-                    originOrgUnitIds = _.keys(mapOfOriginIdsToModuleIds);
+                    originOrgUnitIds = _.keys(mapOfOriginIdsToModuleIds).concat(moduleIds);
 
                 return programEventRepository.getEventsFromPeriod(startPeriod, originOrgUnitIds).then(function (lineListEvents) {
                     return _.groupBy(lineListEvents, function(lineListEvent) {
-                        return lineListEvent.period + mapOfOriginIdsToModuleIds[lineListEvent.orgUnit];
+                        var orgUnitToGroupBy = mapOfOriginIdsToModuleIds[lineListEvent.orgUnit] || lineListEvent.orgUnit;
+                        return lineListEvent.period + orgUnitToGroupBy;
                     });
                 });
             };
