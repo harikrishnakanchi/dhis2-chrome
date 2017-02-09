@@ -1,18 +1,25 @@
-define(["dhisUrl", "httpUtils", "lodash"], function(dhisUrl, httpUtils, _) {
+define(["dhisUrl", "httpUtils", "lodash", "metadataConf"], function(dhisUrl, httpUtils, _, metadataConf) {
     return function($http, $q) {
 
         this.get = function(orgUnitGroupIds) {
             orgUnitGroupIds = _.isArray(orgUnitGroupIds) ? orgUnitGroupIds : [orgUnitGroupIds];
-            var url = dhisUrl.orgUnitGroups + '.json?' + httpUtils.getParamString('id', orgUnitGroupIds) + '&fields=:all';
+            var url = dhisUrl.orgUnitGroups + '.json?' + httpUtils.getParamString('id', orgUnitGroupIds) + '&fields=' + metadataConf.fields.organisationUnitGroups;
             return $http.get(url).then(function(response) {
                 return response.data.organisationUnitGroups;
             });
         };
 
-        this.getAll = function(lastUpdatedTime) {
-            var url = dhisUrl.orgUnitGroups + '.json?fields=:all&paging=false';
-            url = lastUpdatedTime ? url + "&filter=lastUpdated:gte:" + lastUpdatedTime : url;
-            return $http.get(url).then(function(response) {
+        this.getAll = function (lastUpdatedTime) {
+            var url = dhisUrl.orgUnitGroups + '.json';
+            var params = {
+                fields: metadataConf.fields.organisationUnitGroups,
+                paging: false
+            };
+
+            if (lastUpdatedTime) {
+                params.filter = "lastUpdated:gte:" + lastUpdatedTime;
+            }
+            return $http.get(url, {params: params}).then(function (response) {
                 return response.data.organisationUnitGroups;
             });
         };
