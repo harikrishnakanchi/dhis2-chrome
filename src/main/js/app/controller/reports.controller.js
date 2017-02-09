@@ -190,8 +190,8 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             };
 
             var loadProgramForOrigins = function (data) {
-                var oneOriginId = _.get(_.first(data.origins), 'id');
-                return programRepository.getProgramForOrgUnit(oneOriginId).then(function (program) {
+                var orgUnitId = _.get(_.first(data.origins), 'id') || $scope.orgUnit.id;
+                return programRepository.getProgramForOrgUnit(orgUnitId).then(function (program) {
                     var translatedProgram = translationsService.translate(program);
                     $scope.services = _.compact(data.dataSets.concat([translatedProgram]));
                 });
