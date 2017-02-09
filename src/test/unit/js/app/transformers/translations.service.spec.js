@@ -123,6 +123,22 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
             expect(translationsService.translate(object).name).toEqual('someEnglishName');
         });
 
+        it('should get translation from object when translations are part of the object', function () {
+            var obj = {
+                id: 'randomId',
+                name: 'someName',
+                translations: [
+                    {
+                        'property': 'NAME',
+                        'locale': 'fr',
+                        'value': 'FrenchName'
+                    }
+                ]
+            };
+            initialiseTranslationsServiceForLocale(FRENCH);
+            expect(translationsService.translate(obj).name).toEqual('FrenchName');
+        });
+
         it('should translate the description property in the object', function () {
             var obj = {
                 id: 'someIdD',

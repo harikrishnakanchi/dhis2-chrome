@@ -1,7 +1,8 @@
 define(['lodash'], function(_){
     return function($q, db, $rootScope, ngI18nResourceBundle, systemSettingRepository) {
         var TRANSLATABLE_ENTITIES = ["sections", "dataElements", "headers", "programStages", "programStageSections", "columnConfigurations", "programStageDataElements", "dataElement", "optionSet", "options", "dataValues", "attribute"],
-            TRANSLATABLE_PROPERTIES = ["name", "description", "formName", "shortName", "displayName"],
+            TRANSLATABLE_OBJECT_PROPERTIES = ["name", "description", "formName", "shortName", "displayName"],
+            TRANSLATABLE_PROPERTIES_MAP = {'name': 'NAME', 'description': 'DESCRIPTION', 'formName': 'FORM_NAME', 'shortName': 'SHORT_NAME'},
             translations, _locale, self = this;
 
         var refreshResourceBundle = function () {
@@ -57,13 +58,20 @@ define(['lodash'], function(_){
             });
         };
 
-        var getTranslation = function (objectId, property) {
-            var translationObject = _.find(translations[objectId], { property: property });
-            return translationObject && translationObject.value;
+        var getTranslationFromCollection = function (translationsCollection, property, defaultValue) {
+            var translationObject = _.find(translationsCollection, { property: property });
+            return (translationObject && translationObject.value) || defaultValue;
         };
 
         this.getTranslationForProperty = function (objectId, property, defaultValue) {
-            return getTranslation(objectId, property) || defaultValue;
+            return getTranslationFromCollection(translations[objectId], property, defaultValue);
+        };
+
+        var getTranslationFromObject = function (object, property, defaultValue) {
+            if (object.translations) {
+                return getTranslationFromCollection(object.translations, TRANSLATABLE_PROPERTIES_MAP[property], defaultValue);
+            }
+            return self.getTranslationForProperty(object.id, property, defaultValue);
         };
 
         this.translateChartData = function (charts) {
@@ -89,9 +97,9 @@ define(['lodash'], function(_){
             }
             return _.map(arrayOfObjectsToBeTranslated, function (objectToBeTranslated) {
 
-                _.each(TRANSLATABLE_PROPERTIES, function (property) {
+                _.each(TRANSLATABLE_OBJECT_PROPERTIES, function (property) {
                     if(objectToBeTranslated[property]) {
-                        objectToBeTranslated[property] = self.getTranslationForProperty(objectToBeTranslated.id, property, objectToBeTranslated[property]);
+                        objectToBeTranslated[property] = getTranslationFromObject(objectToBeTranslated, property, objectToBeTranslated[property]);
                     }
                 });
 
@@ -131,9 +139,9 @@ define(['lodash'], function(_){
 
         var translateObject = function (objectToBeTranslated) {
 
-            _.each(TRANSLATABLE_PROPERTIES, function (property) {
+            _.each(TRANSLATABLE_OBJECT_PROPERTIES, function (property) {
                 if (objectToBeTranslated[property]) {
-                    objectToBeTranslated[property] = self.getTranslationForProperty(objectToBeTranslated.id, property, objectToBeTranslated[property]);
+                    objectToBeTranslated[property] = getTranslationFromObject(objectToBeTranslated, property, objectToBeTranslated[property]);
                 }
             });
 
