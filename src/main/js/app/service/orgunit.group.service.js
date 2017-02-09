@@ -1,10 +1,17 @@
 define(["dhisUrl", "httpUtils", "lodash", "metadataConf"], function(dhisUrl, httpUtils, _, metadataConf) {
     return function($http, $q) {
 
-        this.get = function(orgUnitGroupIds) {
+        this.get = function (orgUnitGroupIds) {
             orgUnitGroupIds = _.isArray(orgUnitGroupIds) ? orgUnitGroupIds : [orgUnitGroupIds];
-            var url = dhisUrl.orgUnitGroups + '.json?' + httpUtils.getParamString('id', orgUnitGroupIds) + '&fields=' + metadataConf.fields.organisationUnitGroups;
-            return $http.get(url).then(function(response) {
+            var url = dhisUrl.orgUnitGroups + '.json';
+            var params = {
+                filter: _.map(orgUnitGroupIds, function (orgUnitGroupId) {
+                    return 'id:eq:' + orgUnitGroupId;
+                }),
+                fields: metadataConf.fields.organisationUnitGroups,
+                paging: false
+            };
+            return $http.get(url, {params: params}).then(function (response) {
                 return response.data.organisationUnitGroups;
             });
         };

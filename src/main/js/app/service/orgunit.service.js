@@ -14,10 +14,17 @@ define(["dhisUrl", "httpUtils", "lodash", "metadataConf"], function(dhisUrl, htt
                 });
         };
 
-        this.get = function(orgUnitIds) {
+        this.get = function (orgUnitIds) {
             orgUnitIds = _.isArray(orgUnitIds) ? orgUnitIds : [orgUnitIds];
-            var url = dhisUrl.orgUnits + '.json?' + httpUtils.getParamString('id', orgUnitIds) + '&fields=' + metadataConf.fields.organisationUnits;
-            return $http.get(url).then(function(response) {
+            var url = dhisUrl.orgUnits + '.json';
+            var params = {
+                filter: _.map(orgUnitIds, function (orgUnitId) {
+                    return 'id:eq:' + orgUnitId;
+                }),
+                fields: metadataConf.fields.organisationUnits,
+                paging: false
+            };
+            return $http.get(url, {params: params}).then(function (response) {
                 return response.data.organisationUnits;
             });
         };
@@ -28,10 +35,17 @@ define(["dhisUrl", "httpUtils", "lodash", "metadataConf"], function(dhisUrl, htt
             });
         };
 
-        this.getAll = function(lastUpdatedTime) {
-            var url = dhisUrl.orgUnits + '.json?paging=false&fields=' + metadataConf.fields.organisationUnits;
-            url = lastUpdatedTime ? url + "&filter=lastUpdated:gte:" + lastUpdatedTime : url;
-            return $http.get(url).then(function(response) {
+        this.getAll = function (lastUpdatedTime) {
+            var url = dhisUrl.orgUnits + '.json';
+
+            var params = {
+                fields: metadataConf.fields.organisationUnits,
+                paging: false
+            };
+            if (lastUpdatedTime) {
+                params.filter = "lastUpdated:gte:" + lastUpdatedTime;
+            }
+            return $http.get(url, {params: params}).then(function (response) {
                 return response.data.organisationUnits;
             });
         };

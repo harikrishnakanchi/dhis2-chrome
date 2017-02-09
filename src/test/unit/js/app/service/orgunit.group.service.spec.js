@@ -20,7 +20,7 @@ define(["orgUnitGroupService", "angularMocks", "properties", "metadataConf"], fu
         it("should get org unit groups with specific ids", function() {
             var orgUnitGroupIds = ["id1", "id2", "id3"];
             var url = properties.dhis.url +
-                "/api/organisationUnitGroups.json?filter=id:eq:id1&filter=id:eq:id2&filter=id:eq:id3&paging=false&fields=id,name";
+                "/api/organisationUnitGroups.json?fields=id,name&filter=id:eq:id1&filter=id:eq:id2&filter=id:eq:id3&paging=false";
 
             orgUnitGroupService.get(orgUnitGroupIds);
 
