@@ -88,12 +88,10 @@ define(['lodash'], function(_){
                 return arrayOfObjectsToBeTranslated;
             }
             return _.map(arrayOfObjectsToBeTranslated, function (objectToBeTranslated) {
-                var translationObject = translations[objectToBeTranslated.id];
 
                 _.each(TRANSLATABLE_PROPERTIES, function (property) {
                     if(objectToBeTranslated[property]) {
-                        var translationsByProperty = _.filter(translationObject, {property: property});
-                        objectToBeTranslated[property] = translationsByProperty[0] ? translationsByProperty[0].value : objectToBeTranslated[property];
+                        objectToBeTranslated[property] = self.getTranslationForProperty(objectToBeTranslated.id, property, objectToBeTranslated[property]);
                     }
                 });
 
@@ -132,12 +130,10 @@ define(['lodash'], function(_){
         };
 
         var translateObject = function (objectToBeTranslated) {
-            var translationsForObject = translations[objectToBeTranslated.id] || [];
 
             _.each(TRANSLATABLE_PROPERTIES, function (property) {
-                var translationForProperty = _.find(translationsForObject, { property: property });
-                if(translationForProperty && translationForProperty.value) {
-                    objectToBeTranslated[property] = translationForProperty.value;
+                if (objectToBeTranslated[property]) {
+                    objectToBeTranslated[property] = self.getTranslationForProperty(objectToBeTranslated.id, property, objectToBeTranslated[property]);
                 }
             });
 
