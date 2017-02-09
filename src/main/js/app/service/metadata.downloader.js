@@ -4,186 +4,6 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
 
         var MAX_PAGE_REQUESTS = 500, updated;
 
-        var entities = [{
-            name: 'categories',
-            url: dhisUrl.categories,
-            params: {
-                fields: metadataConf.fields.categories
-            },
-            upsertFn: function (response) {
-                return metadataRepository.upsertMetadataForEntity(response, 'categories');
-            }
-        }, {
-            name: 'categoryCombos',
-            url: dhisUrl.categoryCombos,
-            params: {
-                fields: metadataConf.fields.categoryCombos
-            },
-            upsertFn: function (response) {
-                return metadataRepository.upsertMetadataForEntity(response, 'categoryCombos');
-            }
-        }, {
-            name: 'categoryOptionCombos',
-            url: dhisUrl.categoryOptionCombos,
-            params: {
-                fields: metadataConf.fields.categoryOptionCombos
-            },
-            upsertFn: function (response) {
-                return metadataRepository.upsertMetadataForEntity(response, 'categoryOptionCombos');
-            }
-        }, {
-            name: 'categoryOptions',
-            url: dhisUrl.categoryOptions,
-            params: {
-                fields: metadataConf.fields.categoryOptions
-            },
-            upsertFn: function (response) {
-                return metadataRepository.upsertMetadataForEntity(response, 'categoryOptions');
-            }
-        }, {
-            name: 'dataElementGroups',
-            url: dhisUrl.dataElementGroups,
-            params: {
-                fields: metadataConf.fields.dataElementGroups
-            },
-            upsertFn: function (response) {
-                return metadataRepository.upsertMetadataForEntity(response, 'dataElementGroups');
-            }
-        }, {
-            name: 'dataElements',
-            url: dhisUrl.dataElements,
-            params: {
-                fields: metadataConf.fields.dataElements
-            },
-            upsertFn: function (response) {
-                return metadataRepository.upsertMetadataForEntity(response, 'dataElements');
-            }
-        }, {
-            name: 'indicators',
-            url: dhisUrl.indicators,
-            params: {
-                fields: metadataConf.fields.indicators
-            },
-            upsertFn: function (response) {
-                return metadataRepository.upsertMetadataForEntity(response, 'indicators');
-            }
-        }, {
-            name: 'programIndicators',
-            url: dhisUrl.programIndicators,
-            params: {
-                fields: metadataConf.fields.programIndicators
-            },
-            upsertFn: function (response) {
-                return metadataRepository.upsertMetadataForEntity(response, 'programIndicators');
-            }
-        }, {
-            name: 'optionSets',
-            url: dhisUrl.optionSets,
-            params: {
-                fields: metadataConf.fields.optionSets
-            },
-            upsertFn: function (response) {
-                return metadataRepository.upsertMetadataForEntity(response, 'optionSets');
-            }
-        }, {
-            name: 'organisationUnitGroupSets',
-            url: dhisUrl.organisationUnitGroupSets,
-            params: {
-                fields: metadataConf.fields.organisationUnitGroupSets
-            },
-            upsertFn: function (response) {
-                return metadataRepository.upsertMetadataForEntity(response, 'organisationUnitGroupSets');
-            }
-        }, {
-            name: 'sections',
-            url: dhisUrl.sections,
-            params: {
-                fields: metadataConf.fields.sections
-            },
-            upsertFn: function (response) {
-                return metadataRepository.upsertMetadataForEntity(response, 'sections');
-            }
-        }, {
-            name: 'users',
-            url: dhisUrl.users,
-            params: {
-                fields: metadataConf.fields.users
-            },
-            upsertFn: function (response) {
-                return metadataRepository.upsertMetadataForEntity(response, 'users');
-            }
-        }, {
-            name: 'userRoles',
-            url: dhisUrl.userRoles,
-            params: {
-                fields: metadataConf.fields.userRoles
-            },
-            upsertFn: function (response) {
-                return userRepository.upsertUserRoles(response);
-            }
-        }, {
-            name: 'organisationUnitGroups',
-            url: dhisUrl.organisationUnitGroups,
-            params: {
-                fields: metadataConf.fields.organisationUnitGroups
-            },
-            upsertFn: function (response) {
-                return orgUnitGroupRepository.upsertDhisDownloadedData(response);
-            }
-        }, {
-            name: 'dataSets',
-            url: dhisUrl.dataSets,
-            params: {
-                fields: metadataConf.fields.dataSets
-            },
-            upsertFn: function (response) {
-                return dataSetRepository.upsertDhisDownloadedData(response);
-            }
-        }, {
-            name: 'programs',
-            url: dhisUrl.programs,
-            params: {
-                fields: metadataConf.fields.programs
-            },
-            upsertFn: function (response) {
-                return programRepository.upsertDhisDownloadedData(response);
-            }
-        }, {
-            name: 'organisationUnits',
-            url: dhisUrl.orgUnits,
-            params: {
-                fields: metadataConf.fields.organisationUnits
-            },
-            upsertFn: function(response) {
-                return orgUnitRepository.upsertDhisDownloadedData(response);
-            }
-        }, {
-            name: 'systemSettings',
-            url: dhisUrl.systemSettings,
-            params: {
-                key: 'fieldAppSettings,versionCompatibilityInfo,notificationSetting'
-            },
-            skipPaging: true,
-            upsertFn: function (response) {
-                var accumulator = [];
-                _.each(response, function (systemSetting) {
-                    _.each(systemSetting, function (value, key) {
-                        accumulator.push({ key: key, value: value });
-                    });
-                });
-                return systemSettingRepository.upsert(accumulator);
-            }
-        }, {
-            name: 'attributes',
-            url: dhisUrl.attributes,
-            params: {
-                fields: metadataConf.fields.attributes
-            },
-            upsertFn: function (attributes) {
-                return metadataRepository.upsertMetadataForEntity(attributes, 'attributes');
-            }
-        }];
-
         var getChangeLog = function (entity) {
             return changeLogRepository.get(entity);
         };
@@ -219,6 +39,187 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
         };
 
         this.run = function () {
+
+            var entities = [{
+                name: 'categories',
+                url: dhisUrl.categories,
+                params: {
+                    fields: metadataConf.fields.categories
+                },
+                upsertFn: function (response) {
+                    return metadataRepository.upsertMetadataForEntity(response, 'categories');
+                }
+            }, {
+                name: 'categoryCombos',
+                url: dhisUrl.categoryCombos,
+                params: {
+                    fields: metadataConf.fields.categoryCombos
+                },
+                upsertFn: function (response) {
+                    return metadataRepository.upsertMetadataForEntity(response, 'categoryCombos');
+                }
+            }, {
+                name: 'categoryOptionCombos',
+                url: dhisUrl.categoryOptionCombos,
+                params: {
+                    fields: metadataConf.fields.categoryOptionCombos
+                },
+                upsertFn: function (response) {
+                    return metadataRepository.upsertMetadataForEntity(response, 'categoryOptionCombos');
+                }
+            }, {
+                name: 'categoryOptions',
+                url: dhisUrl.categoryOptions,
+                params: {
+                    fields: metadataConf.fields.categoryOptions
+                },
+                upsertFn: function (response) {
+                    return metadataRepository.upsertMetadataForEntity(response, 'categoryOptions');
+                }
+            }, {
+                name: 'dataElementGroups',
+                url: dhisUrl.dataElementGroups,
+                params: {
+                    fields: metadataConf.fields.dataElementGroups
+                },
+                upsertFn: function (response) {
+                    return metadataRepository.upsertMetadataForEntity(response, 'dataElementGroups');
+                }
+            }, {
+                name: 'dataElements',
+                url: dhisUrl.dataElements,
+                params: {
+                    fields: metadataConf.fields.dataElements
+                },
+                upsertFn: function (response) {
+                    return metadataRepository.upsertMetadataForEntity(response, 'dataElements');
+                }
+            }, {
+                name: 'indicators',
+                url: dhisUrl.indicators,
+                params: {
+                    fields: metadataConf.fields.indicators
+                },
+                upsertFn: function (response) {
+                    return metadataRepository.upsertMetadataForEntity(response, 'indicators');
+                }
+            }, {
+                name: 'programIndicators',
+                url: dhisUrl.programIndicators,
+                params: {
+                    fields: metadataConf.fields.programIndicators
+                },
+                upsertFn: function (response) {
+                    return metadataRepository.upsertMetadataForEntity(response, 'programIndicators');
+                }
+            }, {
+                name: 'optionSets',
+                url: dhisUrl.optionSets,
+                params: {
+                    fields: metadataConf.fields.optionSets
+                },
+                upsertFn: function (response) {
+                    return metadataRepository.upsertMetadataForEntity(response, 'optionSets');
+                }
+            }, {
+                name: 'organisationUnitGroupSets',
+                url: dhisUrl.organisationUnitGroupSets,
+                params: {
+                    fields: metadataConf.fields.organisationUnitGroupSets
+                },
+                upsertFn: function (response) {
+                    return metadataRepository.upsertMetadataForEntity(response, 'organisationUnitGroupSets');
+                }
+            }, {
+                name: 'sections',
+                url: dhisUrl.sections,
+                params: {
+                    fields: metadataConf.fields.sections
+                },
+                upsertFn: function (response) {
+                    return metadataRepository.upsertMetadataForEntity(response, 'sections');
+                }
+            }, {
+                name: 'users',
+                url: dhisUrl.users,
+                params: {
+                    fields: metadataConf.fields.users
+                },
+                upsertFn: function (response) {
+                    return metadataRepository.upsertMetadataForEntity(response, 'users');
+                }
+            }, {
+                name: 'userRoles',
+                url: dhisUrl.userRoles,
+                params: {
+                    fields: metadataConf.fields.userRoles
+                },
+                upsertFn: function (response) {
+                    return userRepository.upsertUserRoles(response);
+                }
+            }, {
+                name: 'organisationUnitGroups',
+                url: dhisUrl.organisationUnitGroups,
+                params: {
+                    fields: metadataConf.fields.organisationUnitGroups
+                },
+                upsertFn: function (response) {
+                    return orgUnitGroupRepository.upsertDhisDownloadedData(response);
+                }
+            }, {
+                name: 'dataSets',
+                url: dhisUrl.dataSets,
+                params: {
+                    fields: metadataConf.fields.dataSets
+                },
+                upsertFn: function (response) {
+                    return dataSetRepository.upsertDhisDownloadedData(response);
+                }
+            }, {
+                name: 'programs',
+                url: dhisUrl.programs,
+                params: {
+                    fields: metadataConf.fields.programs
+                },
+                upsertFn: function (response) {
+                    return programRepository.upsertDhisDownloadedData(response);
+                }
+            }, {
+                name: 'organisationUnits',
+                url: dhisUrl.orgUnits,
+                params: {
+                    fields: metadataConf.fields.organisationUnits
+                },
+                upsertFn: function(response) {
+                    return orgUnitRepository.upsertDhisDownloadedData(response);
+                }
+            }, {
+                name: 'systemSettings',
+                url: dhisUrl.systemSettings,
+                params: {
+                    key: 'fieldAppSettings,versionCompatibilityInfo,notificationSetting'
+                },
+                skipPaging: true,
+                upsertFn: function (response) {
+                    var accumulator = [];
+                    _.each(response, function (systemSetting) {
+                        _.each(systemSetting, function (value, key) {
+                            accumulator.push({ key: key, value: value });
+                        });
+                    });
+                    return systemSettingRepository.upsert(accumulator);
+                }
+            }, {
+                name: 'attributes',
+                url: dhisUrl.attributes,
+                params: {
+                    fields: metadataConf.fields.attributes
+                },
+                upsertFn: function (attributes) {
+                    return metadataRepository.upsertMetadataForEntity(attributes, 'attributes');
+                }
+            }];
+
             var deferred = $q.defer();
 
             var setDownloadStartTime = function () {
