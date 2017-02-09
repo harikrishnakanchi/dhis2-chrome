@@ -138,7 +138,6 @@ require.config({
         "dateUtils": "app/utils/date.utils",
         "lodashUtils": "app/utils/lodash.utils",
         "cipherUtils": "app/utils/cipher.utils",
-        "httpUtils": "app/utils/http.utils",
         "dhisUrl": "app/utils/dhis.url",
         "interpolate": "app/utils/interpolate",
         "pagingUtils": "app/utils/paging.utils"

@@ -178,7 +178,6 @@ require.config({
         "dhisId": "app/utils/dhis.id",
         "dateUtils": "app/utils/date.utils",
         "lodashUtils": "app/utils/lodash.utils",
-        "httpUtils": "app/utils/http.utils",
         "dhisUrl": "app/utils/dhis.url",
         "zipUtils": "app/utils/zip.utils",
         "cipherUtils": "app/utils/cipher.utils",

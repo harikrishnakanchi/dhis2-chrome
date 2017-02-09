@@ -1,4 +1,4 @@
-define(["dhisUrl", "httpUtils", "lodash", "metadataConf"], function(dhisUrl, httpUtils, _, metadataConf) {
+define(["dhisUrl", "lodash", "metadataConf"], function(dhisUrl, _, metadataConf) {
     return function($http, $q) {
 
         this.get = function (orgUnitGroupIds) {
