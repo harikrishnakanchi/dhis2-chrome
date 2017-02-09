@@ -50,13 +50,6 @@ define(["dhisUrl", "httpUtils", "lodash", "metadataConf"], function(dhisUrl, htt
             });
         };
 
-        this.getIds = function(orgUnitIds) {
-            var url = dhisUrl.orgUnits + '.json?' + httpUtils.getParamString('id', orgUnitIds) + "&fields=id";
-            return $http.get(url).then(function(response) {
-                return _.pluck(response.data.organisationUnits, "id");
-            });
-        };
-
         this.create = function (orgUnit) {
             return $http.post(dhisUrl.orgUnits, orgUnit);
         };
