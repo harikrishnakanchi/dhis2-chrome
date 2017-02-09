@@ -267,8 +267,9 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
         };
 
         var getAssociatedDataSets = function() {
-            return datasetRepository.findAllForOrgUnits([$scope.originOrgUnits[0]]).then(function(data) {
-                $scope.associatedDataSets = translationsService.translate(data);
+            var orgUnitAssociatedWithDataSet = [$scope.originOrgUnits[0]].concat($scope.selectedModule);
+            return datasetRepository.findAllForOrgUnits(orgUnitAssociatedWithDataSet).then(function(dataSets) {
+                $scope.associatedDataSets = translationsService.translate(dataSets);
             });
         };
 
@@ -287,7 +288,8 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
 
         var init = function() {
             return $q.all([loadOriginsOrgUnits(), loadProgram(), getOptionSetMapping(), getReferralLocations()]).then(function() {
-                return programEventRepository.getEventsForPeriod($scope.program.id, _.pluck($scope.originOrgUnits, "id"), getPeriod()).then(function(events) {
+                var orgUnitIdsAssociatedToEvents = _.map($scope.originOrgUnits, "id").concat($scope.selectedModule.id);
+                return programEventRepository.getEventsForPeriod($scope.program.id, orgUnitIdsAssociatedToEvents, getPeriod()).then(function(events) {
                     var submittedEvents = _.filter(events, function(event) {
                         return event.localStatus === "READY_FOR_DHIS" || event.localStatus === undefined;
                     });
