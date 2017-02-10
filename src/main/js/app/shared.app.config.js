@@ -160,6 +160,7 @@ require.config({
         "translationsService": "app/transformers/translations.service",
         "eventsAggregator": "app/transformers/events.aggregator",
         "transformers": "app/transformers/transformers",
+        'optionSetTransformer': "app/transformers/option.set.transformer",
 
         //Database Utilities
         "dbutils": "app/dbutils/dbutils",
