@@ -1,7 +1,9 @@
 <div class="line-list dataentrypage parent-margin {{layoutDirection.direction}}">
     <div ng-if="viewRegistrationBook">
         <section class="panel tab-panel panel-default">
-            <span>{{ resourceBundle.patientOriginLabel }}</span>
+            <div ng-if="!(originOrgUnits | isEmpty)">
+                <span>{{ resourceBundle.patientOriginLabel }}</span>
+            </div>
             <div id="forPrinting" name="forPrinting" ng-repeat="programStage in program.programStages">
                 <div class="registrationBook" ng-repeat="section in programStage.programStageSections">
                     <div>
