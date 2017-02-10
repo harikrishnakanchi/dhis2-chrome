@@ -1,5 +1,6 @@
 define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'dataElementUtils'], function (moment, _, dateUtils, excelBuilder, eventsAggregator, dataElementUtils) {
-    return function($scope, $q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository, excludedLineListOptionsRepository) {
+    return function($scope, $q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository,
+                    moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository, excludedLineListOptionsRepository, categoryRepository) {
         var EMPTY_LINE = [];
 
         $scope.weeksToExportOptions = [{
@@ -63,13 +64,22 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'da
             });
         };
 
-        var createDataValuesMap = function () {
+        var getCategoryOptionCombosExcludedFromTotal = function () {
+            return categoryRepository.getAllCategoryOptionCombos().then(function (categoryOptionCombos) {
+                return _.indexBy(_.filter(categoryOptionCombos, 'excludeFromTotal'), 'id');
+            });
+        };
+
+        var createDataValuesMap = function (categoryOptionComboIdsExcludedFromTotal) {
             return moduleDataBlockFactory.createForModule($scope.orgUnit.id, $scope.weeks).then(function(moduleDataBlocks) {
                 var allDataValues = _.flatten(_.map(moduleDataBlocks, 'dataValues')),
                     submittedDataValues = _.reject(allDataValues, 'isDraft'),
+                    filteredDataValues = _.reject(submittedDataValues, function (submittedDataValue) {
+                        return !!categoryOptionComboIdsExcludedFromTotal[submittedDataValue.categoryOptionCombo];
+                    }),
                     selectedDataSetDataElementIds = _.map(_.flatten(_.map($scope.sections, 'dataElements')), 'id');
 
-                $scope.dataValuesMap = _.transform(submittedDataValues, function (map, dataValue) {
+                $scope.dataValuesMap = _.transform(filteredDataValues, function (map, dataValue) {
                     if(_.contains(selectedDataSetDataElementIds, dataValue.dataElement)) {
                         var dataDimension = $scope.selectedService.isOriginDataset ? dataValue.orgUnit : dataValue.dataElement;
                         map[dataValue.period] = map[dataValue.period] || {};
@@ -220,6 +230,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'da
                 .then(createSections)
                 .then(filterDataElementsAndRetrieveOriginsForOriginDataSet)
                 .then(filterDataElementsAndRetrieveAliasesForReferralDataSet)
+                .then(getCategoryOptionCombosExcludedFromTotal)
                 .then(createDataValuesMap);
         };
 

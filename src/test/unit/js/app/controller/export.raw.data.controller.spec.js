@@ -1,10 +1,14 @@
-define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'excludedDataElementsRepository', 'orgUnitRepository', 'referralLocationsRepository', 'moduleDataBlockFactory', 'filesystemService', 'translationsService', 'excelBuilder', 'programRepository', 'programEventRepository','excludedLineListOptionsRepository', 'eventsAggregator', 'utils', 'dateUtils', 'timecop', 'moment', 'lodash'],
-    function (ExportRawDataController, mocks, DatasetRepository, ExcludedDataElementsRepository, OrgUnitRepository, ReferralLocationsRepository, ModuleDataBlockFactory, FilesystemService, TranslationsService, excelBuilder, ProgramRepository, ProgramEventRepository, ExcludedLineListOptionsRepository, eventsAggregator, utils, dateUtils, timecop, moment, _) {
+define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'excludedDataElementsRepository', 'orgUnitRepository', 'categoryRepository',
+        'referralLocationsRepository', 'moduleDataBlockFactory', 'filesystemService', 'translationsService', 'excelBuilder',
+        'programRepository', 'programEventRepository','excludedLineListOptionsRepository', 'eventsAggregator', 'utils', 'dateUtils', 'timecop', 'moment', 'lodash'],
+    function (ExportRawDataController, mocks, DatasetRepository, ExcludedDataElementsRepository, OrgUnitRepository, CategoryRepository,
+              ReferralLocationsRepository, ModuleDataBlockFactory, FilesystemService, TranslationsService, excelBuilder,
+              ProgramRepository, ProgramEventRepository, ExcludedLineListOptionsRepository, eventsAggregator, utils, dateUtils, timecop, moment, _) {
         describe('ExportRawDataController', function () {
             var controller, rootScope, scope, q,
-                datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, programRepository, programEventRepository, excludedLineListOptionsRepository,
+                datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, programRepository, programEventRepository, excludedLineListOptionsRepository, categoryRepository,
                 moduleDataBlockFactory, filesystemService, translationsService,
-                selectedOrgUnit, selectedService, mockEnrichedDataSet, mockExcludedDataElements, mockExcludedLineListOptions, mockDataBlocks, mockOriginOrgUnits, mockProgram, mockEvents, mockDataElement, spreadSheetContent;
+                selectedOrgUnit, selectedService, mockEnrichedDataSet, mockExcludedDataElements, mockDataBlocks, mockOriginOrgUnits, mockProgram, mockEvents, mockDataElement, spreadSheetContent;
 
             beforeEach(mocks.inject(function ($rootScope, $q) {
                 rootScope = $rootScope;
@@ -142,12 +146,21 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
                     moduleDataBlockFactory = ModuleDataBlockFactory();
                     spyOn(moduleDataBlockFactory, 'createForModule').and.returnValue(utils.getPromise(q, mockDataBlocks));
 
-                    controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository, excludedLineListOptionsRepository);
+                    categoryRepository = new CategoryRepository();
+                    spyOn(categoryRepository, 'getAllCategoryOptionCombos').and.returnValue(utils.getPromise(q, []));
+
+                    controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository,
+                        referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository, excludedLineListOptionsRepository, categoryRepository);
                 });
 
                 it('should fetch sections along with data elements', function () {
                     scope.$apply();
                     expect(datasetRepository.includeDataElements).toHaveBeenCalledWith([selectedService], _.map(mockExcludedDataElements.dataElements, 'id'));
+                });
+
+                it('should fetch all the categoryOptionCombos', function () {
+                     scope.$apply();
+                     expect(categoryRepository.getAllCategoryOptionCombos).toHaveBeenCalled();
                 });
 
                 it('should filter out excluded dataSetSections', function () {
@@ -275,6 +288,49 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
 
                     scope.$apply();
                     expect(scope.dataValuesMap['2016W01']).toEqual({ dataElementIdForDataSetA: 1 });
+                });
+
+                it('should not include data values with excluded totals in categoryOptionCombos in the data value map', function () {
+                    mockDataBlocks = [{
+                        period: '2016W01',
+                        dataValues: [{
+                            period: '2016W01',
+                            dataElement: 'dataElementIdForDataSetA',
+                            value: '1',
+                            categoryOptionCombo: 'excludedId'
+                        }, {
+                            period: '2016W01',
+                            dataElement: 'dataElementIdForDataSetA',
+                            value: '2',
+                            categoryOptionCombo: 'someOtherId'
+                        }]
+                    }];
+
+                    mockEnrichedDataSet = {
+                        name: 'dataSetNameA',
+                        sections: [{
+                            id: 'sectionId',
+                            isIncluded: true,
+                            dataElements: [{
+                                id: 'dataElementIdForDataSetA',
+                                isIncluded: true
+                            }]
+                        }]
+                    };
+
+                    var mockCategoryOptionCombos = [{
+                        id: 'excludedId',
+                        excludeFromTotal: true
+                    }, {
+                        id: 'someOtherId',
+                        excludeFromTotal: false
+                    }];
+
+                    categoryRepository.getAllCategoryOptionCombos.and.returnValue(utils.getPromise(q, mockCategoryOptionCombos));
+                    datasetRepository.includeDataElements.and.returnValue(utils.getPromise(q, [mockEnrichedDataSet]));
+                    moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, mockDataBlocks));
+                    scope.$apply();
+                    expect(scope.dataValuesMap['2016W01']).toEqual({ dataElementIdForDataSetA: 2 });
                 });
 
                 describe('selected dataSet is an origin dataSet', function () {

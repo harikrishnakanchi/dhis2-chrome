@@ -89,7 +89,7 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
         this.getUpdatedCharts = function(lastUpdatedTime) {
             var requiredFields = 'id,name,title,relativePeriods,type,' +
                                  'categoryDimensions[dataElementCategory,categoryOptions[:identifiable]],' +
-                                 'dataDimensionItems[dataElement,indicator,programIndicator],' +
+                                 'dataDimensionItems[dataElement[id,name,shortName,description],indicator[id,name,shortName,description],programIndicator[id,name,shortName,description]],' +
                                  'columns[dimension,items[id,name]],' +
                                  'rows[dimension,items[id,name]],' +
                                  'filters[dimension,items[id]]';
@@ -103,7 +103,7 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
         this.getUpdatedPivotTables = function(lastUpdatedTime) {
             var requiredFields = 'id,name,sortOrder,relativePeriods,' +
                                  'categoryDimensions[dataElementCategory,categoryOptions[:identifiable]],' +
-                                 'dataDimensionItems[dataElement,indicator,programIndicator],' +
+                                 'dataDimensionItems[dataElement[id,name,shortName,description],indicator[id,name,shortName,description],programIndicator[id,name,shortName,description]],' +
                                  'columns[dimension,items[id,name]],' +
                                  'rows[dimension,items[id,name]],' +
                                  'filters[dimension,items[id]]';

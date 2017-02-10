@@ -24,6 +24,7 @@ define(['customAttributes', 'lodash'], function (customAttributes, _) {
                     item.categoryOptions = _.map(item.categoryOptions, function (categoryOption) {
                         return indexedCategoryOptions[categoryOption.id];
                     });
+                    item.excludeFromTotal = _.any(item.categoryOptions, 'excludeFromTotal');
                 });
             });
         };

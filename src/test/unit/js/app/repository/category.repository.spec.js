@@ -62,7 +62,7 @@ define(['categoryRepository', 'angularMocks', 'utils', 'customAttributes'], func
 
             it('should get all categories', function () {
                 var actualCategories, expectedCategories;
-                expectedCategories = [{ id: 'someCategoryId', categoryOptions: mockCategoryOptions }];
+                expectedCategories = [{ id: 'someCategoryId', categoryOptions: mockCategoryOptions, excludeFromTotal: false }];
 
                 mockStore.getAll.and.returnValues(utils.getPromise(q, mockCategories), utils.getPromise(q, mockCategoryOptions));
 
@@ -106,7 +106,7 @@ define(['categoryRepository', 'angularMocks', 'utils', 'customAttributes'], func
 
             it('should get all category option combos', function () {
                 var actualCategoryOptionCombos, expectedCategoryOptionCombos;
-                expectedCategoryOptionCombos = [{ id: 'someCategoryOptionComboId', categoryOptions: mockCategoryOptions }];
+                expectedCategoryOptionCombos = [{ id: 'someCategoryOptionComboId', categoryOptions: mockCategoryOptions, excludeFromTotal: false }];
 
                 mockStore.getAll.and.returnValues(utils.getPromise(q, mockCategoryOptionCombos), utils.getPromise(q, mockCategoryOptions));
 

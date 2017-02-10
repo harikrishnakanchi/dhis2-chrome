@@ -502,6 +502,12 @@ define(['dateUtils', 'lodash', 'metadataConf'], function(dateUtils, _, metadataC
         };
     };
 
+    var force_charts_and_reports_to_redownload = function (db, tx) {
+        var changeLogStore = tx.objectStore("changeLog");
+        changeLogStore.delete("charts");
+        changeLogStore.delete("pivotTables");
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -555,6 +561,7 @@ define(['dateUtils', 'lodash', 'metadataConf'], function(dateUtils, _, metadataC
         migrate_chart_and_pivot_table_keys_from_names_to_ids,
         delete_keys_chart_and_reports_from_changelog,
         add_indicator_and_program_indicator_stores,
+        force_charts_and_reports_to_redownload,
         add_custom_attributes_store,
         add_user_roles_store,
         update_change_log_keys,
