@@ -423,7 +423,7 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
             var loadOriginOrgUnits = function() {
                 return orgUnitRepository.findAllByParent($scope.selectedModuleId).then(function(data) {
                     $scope.originOrgUnits = data;
-                    $scope.orgUnitIdAssociatedToProgram = properties.organisationSettings.geographicOriginDisabled ? [$scope.selectedModuleId] : _.map($scope.originOrgUnits, 'id');
+                    $scope.orgUnitIdAssociatedToProgram = _.map($scope.originOrgUnits, 'id').concat($scope.selectedModuleId);
                 });
             };
 

@@ -177,7 +177,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
 
                 var getProgram = function(excludedDataElements) {
                     var getProgramFromOrgUnit = function () {
-                        var orgUnitAssociatedToProgram = properties.organisationSettings.geographicOriginDisabled ? $scope.selectedModuleId : _.get($scope.originOrgUnits[0], 'id');
+                        var orgUnitAssociatedToProgram = _.get($scope.originOrgUnits[0], 'id') || $scope.selectedModuleId;
                         return programRepository.getProgramForOrgUnit(orgUnitAssociatedToProgram);
                     };
 

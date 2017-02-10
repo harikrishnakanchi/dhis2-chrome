@@ -1,7 +1,7 @@
 define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timecop", "programEventRepository", "optionSetRepository", "orgUnitRepository",
-    "excludedDataElementsRepository", "programRepository", "translationsService", "historyService", "excludedLineListOptionsRepository", "customAttributes", "properties"],
+    "excludedDataElementsRepository", "programRepository", "translationsService", "historyService", "excludedLineListOptionsRepository", "customAttributes"],
     function(LineListDataEntryController, mocks, utils, moment, timecop, ProgramEventRepository, OptionSetRepository, OrgUnitRepository,
-             ExcludedDataElementsRepository, ProgramRepository, TranslationsService, HistoryService, ExcludedLineListOptionsRepository, customAttributes, properties) {
+             ExcludedDataElementsRepository, ProgramRepository, TranslationsService, HistoryService, ExcludedLineListOptionsRepository, customAttributes) {
         describe("lineListDataEntryController ", function() {
 
             var scope, lineListDataEntryController, q, routeParams, rootScope, programEventRepository, originOrgUnits, mockModule, mockProgram, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, route, translationsService, historyService,excludedLineListOptionsRepository;
@@ -137,8 +137,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 Timecop.install();
                 Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
-
-                properties.organisationSettings.geographicOriginDisabled = false;
 
                 lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
                 scope.$apply();
@@ -408,8 +406,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 });
 
                 it('should get Program from module if geographic origin is disabled', function () {
-                    properties.organisationSettings.geographicOriginDisabled = true;
-
+                    orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, []));
                     lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
                     scope.$apply();
 

@@ -1,9 +1,9 @@
 define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment", "interpolate", "programRepository", "programEventRepository", "excludedDataElementsRepository",
         "orgUnitRepository", "approvalDataRepository", "referralLocationsRepository", "dataSyncFailureRepository", "translationsService", "filesystemService", "historyService",
-        "excelBuilder", "customAttributes", "properties"],
+        "excelBuilder", "customAttributes"],
     function(LineListSummaryController, mocks, utils, timecop, moment, interpolate, ProgramRepository, ProgramEventRepository, ExcludedDataElementsRepository,
              OrgUnitRepository, ApprovalDataRepository, ReferralLocationsRepository, DataSyncFailureRepository, TranslationsService, FilesystemService, HistoryService,
-             excelBuilder, customAttributes, properties) {
+             excelBuilder, customAttributes) {
         describe("lineListSummaryController ", function() {
             var scope, q, hustle, timeout, fakeModal, anchorScroll, location, routeParams, window, currentTime,
                 lineListSummaryController,
@@ -443,9 +443,8 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
 
                 scope.filterParams.caseNumber = "someCaseNumber";
                 scope.filterByCaseNumber();
-                scope.$apply();
 
-                expect(programEventRepository.findEventsByCode).toHaveBeenCalledWith(program.id, _.pluck(originOrgUnits, 'id'), scope.filterParams.caseNumber);
+                expect(programEventRepository.findEventsByCode).toHaveBeenCalledWith(program.id, _.map(originOrgUnits, 'id').concat(currentModule.id), scope.filterParams.caseNumber);
                 expect(scope.events).toEqual([mockEvent]);
             });
 
@@ -459,13 +458,12 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                 scope.filterByDateRange();
                 scope.$apply();
 
-                expect(programEventRepository.findEventsByDateRange).toHaveBeenCalledWith(program.id, _.pluck(originOrgUnits, 'id'), "2015-11-12", "2015-12-28");
+                expect(programEventRepository.findEventsByDateRange).toHaveBeenCalledWith(program.id, _.map(originOrgUnits, 'id').concat(currentModule.id), "2015-11-12", "2015-12-28");
                 expect(scope.events).toEqual([mockEvent]);
             });
 
             it('should get Program from module if geographic origin is disabled', function () {
-                properties.organisationSettings.geographicOriginDisabled = true;
-
+                orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, []));
                 createLineListSummary();
                 scope.$apply();
 
