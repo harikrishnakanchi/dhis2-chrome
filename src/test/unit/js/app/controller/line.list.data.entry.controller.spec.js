@@ -4,7 +4,8 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
              ExcludedDataElementsRepository, ProgramRepository, TranslationsService, HistoryService, ExcludedLineListOptionsRepository, customAttributes) {
         describe("lineListDataEntryController ", function() {
 
-            var scope, lineListDataEntryController, q, routeParams, rootScope, programEventRepository, originOrgUnits, mockModule, mockProgram, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, route, translationsService, historyService,excludedLineListOptionsRepository;
+            var scope, lineListDataEntryController, q, routeParams, rootScope, programEventRepository, originOrgUnits,
+                mockModule, mockProgram, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, route, translationsService, historyService, excludedLineListOptionsRepository;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q) {
@@ -36,16 +37,40 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     }]
                 };
 
+                var optionSets = [{
+                    "id": "os1",
+                    "options": [{
+                        "id": 'os1o1',
+                        "code": 'os1o1',
+                        "name": 'os1o1 name',
+                        "isDisabled": false
+                    }, {
+                        "id": 'os1o2',
+                        "code": 'os1o2',
+                        "name": 'os1o2 name',
+                        "isDisabled": true
+                    }, {
+                        "id": 'os1o3',
+                        "code": 'os1o3',
+                        "name": 'os1o3 name',
+                        "isDisabled": false
+                    }]
+                }, {
+                    "id": "os2",
+                    options: [{
+                        "id": 'os2o1',
+                        "code": 'os2o1',
+                        "name": 'os2o1 name',
+                        "isDisabled": false
+                    }]
+                }];
+
                 programEventRepository = new ProgramEventRepository();
                 spyOn(programEventRepository, "upsert").and.returnValue(utils.getPromise(q, []));
                 spyOn(programEventRepository, "findEventById").and.returnValue(utils.getPromise(q, [ev]));
 
-                var optionSetMapping = {
-                    "optionSetMap": {}
-                };
-
                 optionSetRepository = new OptionSetRepository();
-                spyOn(optionSetRepository, "getOptionSetMapping").and.returnValue(utils.getPromise(q, optionSetMapping));
+                spyOn(optionSetRepository, "getOptionSets").and.returnValue(utils.getPromise(q, optionSets));
 
                 historyService = new HistoryService();
                 spyOn(historyService, "back");
@@ -119,6 +144,14 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                                     "id": "de5",
                                     "valueType": "DATETIME"
                                 }
+                            }, {
+                                "dataElement": {
+                                    "id": "de6",
+                                    "valueType": "TEXT",
+                                    "optionSet": {
+                                        "id": "os2"
+                                    }
+                                }
                             }]
                         }]
                     }]
@@ -129,17 +162,15 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, mockProgram));
 
                 translationsService = new TranslationsService();
-                spyOn(translationsService, "translate").and.returnValue(mockProgram);
-                spyOn(translationsService, "translateOptionSetMap").and.returnValue(optionSetMapping.optionSetMap);
+                spyOn(translationsService, "translate").and.callFake(function (o) {
+                    return o;
+                });
 
                 excludedLineListOptionsRepository = new ExcludedLineListOptionsRepository();
                 spyOn(excludedLineListOptionsRepository, 'get').and.returnValue(utils.getPromise(q, []));
 
                 Timecop.install();
                 Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
-
-                lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
-                scope.$apply();
             }));
 
             afterEach(function() {
@@ -148,16 +179,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
             });
 
             describe('init', function () {
-
-                it("should set scope variables on init", function() {
-                    expect(scope.selectedModuleId).toBeDefined();
-                    expect(scope.selectedModuleName).toBeDefined();
-                    expect(scope.originOrgUnits).toBeDefined();
-                    expect(scope.program).toBeDefined();
-                });
-
-                it("should load dataValues on init", function() {
-
+                beforeEach(function () {
                     var ev = {
                         "event": "event1",
                         "dataValues": [{
@@ -183,377 +205,259 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                         }]
                     };
                     programEventRepository.findEventById.and.returnValue(utils.getPromise(q, [ev]));
+                });
 
+                it("should set scope variables on init", function() {
+                    var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
+                    scope.$apply();
 
-                    var optionSetMapping = {
-                        "optionSetMap": {
-                            "os1": [{
-                                "id": 'os1o1',
-                                "code": 'os1o1',
-                                "name": 'os1o1 name',
-                                "displayName": 'os1o1 name'
-                            }],
-                            "os2": [{
-                                "id": 'os2o1',
-                                "code": 'os2o1',
-                                "name": 'os2o1 name',
-                                "displayName": 'os2o1 translated name'
-                            }]
-                        }
-                    };
-                    optionSetRepository.getOptionSetMapping.and.returnValue(utils.getPromise(q, optionSetMapping));
-                    translationsService.translateOptionSetMap.and.returnValue(optionSetMapping.optionSetMap);
+                    expect(scope.selectedModuleId).toBeDefined();
+                    expect(scope.selectedModuleName).toBeDefined();
+                    expect(scope.originOrgUnits).toBeDefined();
+                    expect(scope.program).toBeDefined();
+                });
 
-                    var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
+                it("should load dataValues on init", function () {
+                    var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
                     scope.$apply();
 
                     expect(scope.dataValues).toEqual({
                         'de1': '66',
                         'de2': "2015-04-15",
                         'de3': 3,
-                        'de4': {
-                            'id': 'os1o1',
-                            'code': 'os1o1',
-                            'name': 'os1o1 name',
-                            'displayName': 'os1o1 name'
-                        }
+                        'de4': jasmine.objectContaining({
+                            'id': 'os1o1'
+                        })
                     });
-                });
-
-                it('should load excluded linelist options', function () {
-                    expect(excludedLineListOptionsRepository.get).toHaveBeenCalledWith(mockModule.id);
                 });
 
                 describe('dataElementOptions', function () {
-                    var excludedOptions;
-                    beforeEach(function () {
-                        var optionSetMapping = {
-                            "optionSetMap": {
-                                "os1": [{
-                                    "id": 'os1o1',
-                                    "code": 'os1o1',
-                                    "name": 'os1o1 name',
-                                    "displayName": 'os1o1 name'
-                                }, {
-                                    "id": 'os1o2',
-                                    "code": 'os1o2',
-                                    "name": 'os1o2 name',
-                                    "displayName": 'os1o2 name'
-                                },{
-                                    "id": 'os1o3',
-                                    "code": 'os1o3',
-                                    "name": 'os1o3 name',
-                                    "displayName": 'os1o3 name'
-                                }],
-                                "os2": [{
-                                    "id": 'os2o1',
-                                    "code": 'os2o1',
-                                    "name": 'os2o1 name',
-                                    "displayName": 'os2o1 translated name'
-                                }]
-                            }
-                        };
-                        optionSetRepository.getOptionSetMapping.and.returnValue(utils.getPromise(q, optionSetMapping));
-                        translationsService.translateOptionSetMap.and.returnValue(optionSetMapping.optionSetMap);
-                    });
 
                     it('should set dataElementOptions to scope', function () {
-                        excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, undefined));
-                        var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
+                        var option = {'id': 'os1o1'};
+                        var anotherOption = {'id': 'os1o3'};
+
+                        var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
                         scope.$apply();
 
-                        var expectedDataElementOptions = {
-                            de4:[{
-                                "id": 'os1o1',
-                                "code": 'os1o1',
-                                "name": 'os1o1 name',
-                                "displayName": 'os1o1 name'
-                            }, {
-                                "id": 'os1o2',
-                                "code": 'os1o2',
-                                "name": 'os1o2 name',
-                                "displayName": 'os1o2 name'
-                            }, {
-                                "id": 'os1o3',
-                                "code": 'os1o3',
-                                "name": 'os1o3 name',
-                                "displayName": 'os1o3 name'
-                            }]
-                        };
-                        expect(scope.dataElementOptions).toEqual(expectedDataElementOptions);
+                        expect(scope.dataElementOptions).toBeDefined();
+                        expect(Object.keys(scope.dataElementOptions)).toContain("de4");
+                        expect(scope.dataElementOptions.de4).toContain(jasmine.objectContaining(option));
+                        expect(scope.dataElementOptions.de4).toContain(jasmine.objectContaining(anotherOption));
                     });
 
                     it('should filter out the excluded options from the dataElementOptions', function () {
-                        excludedOptions = {
-                            moduleId: mockModule.id,
-                            dataElements: [{
-                                dataElementId: 'de4',
-                                excludedOptionIds: ['os1o2']
-                            }]
-                        };
-                        excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, excludedOptions));
-                        lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
-
+                        var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
                         scope.$apply();
-                        var expectedDataElementOptions = {
-                            de4: [{
-                                "id": 'os1o1',
-                                "code": 'os1o1',
-                                "name": 'os1o1 name',
-                                "displayName": 'os1o1 name'
-                            }, {
-                                "id": 'os1o3',
-                                "code": 'os1o3',
-                                "name": 'os1o3 name',
-                                "displayName": 'os1o3 name'
-                            }]
-                        };
 
-                        expect(scope.dataElementOptions).toEqual(expectedDataElementOptions);
+                        expect(scope.dataElementOptions.de4).not.toContain(jasmine.objectContaining({id: 'os1o2'}));
                     });
 
                     it('should not filter out the excluded option from the dataElementOptions if the selected option for data element is in the list of excluded options', function () {
-                        excludedOptions = {
-                            moduleId: mockModule.id,
-                            dataElements: [{
-                                dataElementId: 'de4',
-                                excludedOptionIds: ['os1o2', 'os1o3']
-                            }]
-                        };
-
                         var ev = {
                             "dataValues": [{
                                 "value": "os1o2",
-                                "dataElement": "de4",
-                                "optionSet": {
-                                    options: [{
-                                        "id": 'os1o1',
-                                        "code": 'os1o1',
-                                        "name": 'os1o1 name',
-                                        "displayName": 'os1o1 name'
-                                    }, {
-                                        "id": 'os1o2',
-                                        "code": 'os1o2',
-                                        "name": 'os1o2 name',
-                                        "displayName": 'os1o2 name'
-                                    }, {
-                                        "id": 'os1o3',
-                                        "code": 'os1o3',
-                                        "name": 'os1o3 name',
-                                        "displayName": 'os1o3 name'
-                                    }]
-                                }
+                                "dataElement": "de4"
                             }]
                         };
                         programEventRepository.findEventById.and.returnValue(utils.getPromise(q, [ev]));
 
-                        excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, excludedOptions));
-                        lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
-
+                        var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
                         scope.$apply();
 
-                        var expectedDataElementOptions = {
-                            de4: [{
-                                "id": 'os1o1',
-                                "code": 'os1o1',
-                                "name": 'os1o1 name',
-                                "displayName": 'os1o1 name'
-                            }, {
-                                "id": 'os1o2',
-                                "code": 'os1o2',
-                                "name": 'os1o2 name',
-                                "displayName": 'os1o2 name'
-                            }]
-                        };
-
-                        expect(scope.dataElementOptions).toEqual(expectedDataElementOptions);
+                        expect(scope.dataElementOptions.de4).toContain(jasmine.objectContaining({id: 'os1o2'}));
                     });
 
                     it('should set all the dataElementOptions if there are no excluded options for a data element', function () {
-                        excludedOptions = {
-                            moduleId: mockModule.id,
-                            dataElements: [{
-                                dataElementId: 'de3',
-                                excludedOptionIds: ['os1o2']
+                        var ev = {
+                            "dataValues": [{
+                                "value": "os2o1",
+                                "dataElement": "de6"
                             }]
                         };
-                        excludedLineListOptionsRepository.get.and.returnValue(utils.getPromise(q, excludedOptions));
-                        var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
+                        programEventRepository.findEventById.and.returnValue(utils.getPromise(q, [ev]));
+                        var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
 
                         scope.$apply();
-                        var expectedDataElementOptions = {
-                            de4: [{
-                                "id": 'os1o1',
-                                "code": 'os1o1',
-                                "name": 'os1o1 name',
-                                "displayName": 'os1o1 name'
-                            }, {
-                                "id": 'os1o2',
-                                "code": 'os1o2',
-                                "name": 'os1o2 name',
-                                "displayName": 'os1o2 name'
-                            }, {
-                                "id": 'os1o3',
-                                "code": 'os1o3',
-                                "name": 'os1o3 name',
-                                "displayName": 'os1o3 name'
-                            }]
-                        };
 
-                        expect(scope.dataElementOptions).toEqual(expectedDataElementOptions);
+                        expect(scope.dataElementOptions.de6).toContain(jasmine.objectContaining({id: 'os2o1'}));
 
                     });
                 });
 
                 it('should get Program from module if geographic origin is disabled', function () {
                     orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, []));
-                    lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, excludedLineListOptionsRepository, translationsService);
+                    lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
                     scope.$apply();
 
                     expect(programRepository.getProgramForOrgUnit).toHaveBeenCalledWith(mockModule.id);
                 });
             });
 
-            it("should save event details as newDraft and show summary view", function() {
-                scope.dataValues = {
-                    'de1': "2015-02-03",
-                    'de2': "someValue",
-                    'de3': moment.utc('2015-02-04').toDate(),
-                    'de4': {
-                        'id': 'os1o1',
-                        'code': 'os1o1',
-                        'name': 'os1o1 name',
-                        'displayName': 'os1o1 name'
-                    },
-                    'de5': moment('2015-02-05 20:00:00').toDate()
-                };
+            describe('save', function () {
+                beforeEach(function () {
+                    lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
+                    scope.$apply();
+                });
 
-                scope.orgUnitAssociatedToEvent = originOrgUnits[0];
+                it("should save event details as newDraft and show summary view", function() {
+                    scope.dataValues = {
+                        'de1': "2015-02-03",
+                        'de2': "someValue",
+                        'de3': moment.utc('2015-02-04').toDate(),
+                        'de4': {
+                            'id': 'os1o1',
+                            'code': 'os1o1',
+                            'name': 'os1o1 name'
+                        },
+                        'de5': moment('2015-02-05 20:00:00').toDate(),
+                        'de6': {
+                            'id': 'os2o1',
+                            'code': 'os2o1'
+                        }
+                    };
+
+                    scope.orgUnitAssociatedToEvent = originOrgUnits[0];
 
 
-                scope.save();
-                scope.$apply();
+                    scope.save();
+                    scope.$apply();
 
-                var actualUpsertedEvent = programEventRepository.upsert.calls.first().args[0];
+                    var actualUpsertedEvent = programEventRepository.upsert.calls.first().args[0];
 
-                expect(actualUpsertedEvent.program).toEqual("Prg1");
-                expect(actualUpsertedEvent.programStage).toEqual("PrgStage1");
-                expect(actualUpsertedEvent.orgUnit).toEqual(originOrgUnits[0].id);
-                expect(actualUpsertedEvent.orgUnitName).toEqual(originOrgUnits[0].name);
-                expect(actualUpsertedEvent.eventDate).toEqual("2015-02-03");
-                expect(actualUpsertedEvent.localStatus).toEqual("NEW_DRAFT");
-                expect(actualUpsertedEvent.dataValues).toEqual([{
-                    "dataElement": 'de1',
-                    "value": '2015-02-03'
-                }, {
-                    "dataElement": 'de2',
-                    "value": 'someValue'
-                }, {
-                    "dataElement": 'de3',
-                    "value": '2015-02-04'
-                }, {
-                    "dataElement": 'de4',
-                    "value": 'os1o1'
-                }, {
-                    "dataElement": 'de5',
-                    "value": moment('2015-02-05 20:00:00').toISOString()
-                }]);
-                expect(historyService.back).toHaveBeenCalledWith({
-                    "messageType": "success",
-                    "message": scope.resourceBundle.eventSaveSuccess
+                    expect(actualUpsertedEvent.program).toEqual("Prg1");
+                    expect(actualUpsertedEvent.programStage).toEqual("PrgStage1");
+                    expect(actualUpsertedEvent.orgUnit).toEqual(originOrgUnits[0].id);
+                    expect(actualUpsertedEvent.orgUnitName).toEqual(originOrgUnits[0].name);
+                    expect(actualUpsertedEvent.eventDate).toEqual("2015-02-03");
+                    expect(actualUpsertedEvent.localStatus).toEqual("NEW_DRAFT");
+                    expect(actualUpsertedEvent.dataValues).toEqual([{
+                        "dataElement": 'de1',
+                        "value": '2015-02-03'
+                    }, {
+                        "dataElement": 'de2',
+                        "value": 'someValue'
+                    }, {
+                        "dataElement": 'de3',
+                        "value": '2015-02-04'
+                    }, {
+                        "dataElement": 'de4',
+                        "value": 'os1o1'
+                    }, {
+                        "dataElement": 'de5',
+                        "value": moment('2015-02-05 20:00:00').toISOString()
+                    }, {
+                        "dataElement": 'de6',
+                        "value": 'os2o1'
+                    }]);
+                    expect(historyService.back).toHaveBeenCalledWith({
+                        "messageType": "success",
+                        "message": scope.resourceBundle.eventSaveSuccess
+                    });
+                });
+
+                it("should save event details as newDraft and show data entry form again", function() {
+                    scope.orgUnitAssociatedToEvent = originOrgUnits[0];
+                    scope.eventDates = {
+                        "Prg1": {
+                            "PrgStage1": "2014-11-18T10:34:14.067Z"
+                        }
+                    };
+
+                    scope.save(true);
+
+                    scope.$apply();
+
+                    expect(historyService.back).not.toHaveBeenCalled();
+                    expect(route.reload).toHaveBeenCalled();
+                });
+
+                it("should save incomplete events", function() {
+                    scope.dataValues = {
+                        'de1': "2015-02-03",
+                        'de2': undefined,
+                        'de3': moment.utc('2015-04-16').toDate(),
+                        'de4': undefined
+                    };
+                    scope.orgUnitAssociatedToEvent = originOrgUnits[0];
+                    scope.save();
+                    scope.$apply();
+
+                    var actualUpsertedEvent = programEventRepository.upsert.calls.first().args[0];
+
+                    expect(actualUpsertedEvent.program).toEqual("Prg1");
+                    expect(actualUpsertedEvent.programStage).toEqual("PrgStage1");
+                    expect(actualUpsertedEvent.orgUnit).toEqual("o1");
+                    expect(actualUpsertedEvent.eventDate).toEqual("2015-02-03");
+                    expect(actualUpsertedEvent.localStatus).toEqual("NEW_INCOMPLETE_DRAFT");
+                    expect(actualUpsertedEvent.dataValues).toEqual([{
+                        "dataElement": 'de1',
+                        "value": '2015-02-03'
+                    }, {
+                        "dataElement": 'de2',
+                        "value": undefined
+                    }, {
+                        "dataElement": 'de3',
+                        "value": '2015-04-16'
+                    }, {
+                        "dataElement": 'de4',
+                        "value": undefined
+                    }, {
+                        "dataElement": 'de5',
+                        "value": undefined
+                    }, {
+                        "dataElement": 'de6',
+                        "value": undefined
+                    }]);
                 });
             });
 
-            it("should save event details as newDraft and show data entry form again", function() {
-                scope.orgUnitAssociatedToEvent = originOrgUnits[0];
-                scope.eventDates = {
-                    "Prg1": {
-                        "PrgStage1": "2014-11-18T10:34:14.067Z"
-                    }
-                };
+            describe('update', function () {
+                beforeEach(function () {
+                    lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
+                    scope.$apply();
+                });
 
-                scope.save(true);
+                it("should update event details", function() {
+                    scope.orgUnitAssociatedToEvent = originOrgUnits[0];
+                    scope.dataValues = {
+                        'de1': "2015-04-15",
+                        'de2': "someValue",
+                        'de3': moment.utc('2015-04-16').toDate(),
+                        'de4': "blah-again"
+                    };
 
-                scope.$apply();
+                    scope.update();
+                    scope.$apply();
 
-                expect(historyService.back).not.toHaveBeenCalled();
-                expect(route.reload).toHaveBeenCalled();
-            });
+                    var expectedEventPayload = {
+                        'event': "event1",
+                        'orgUnit': "o1",
+                        'eventDate': "2015-04-15",
+                        'dataValues': [{
+                            "dataElement": "de1",
+                            "value": "2015-04-15"
+                        }, {
+                            "dataElement": "de2",
+                            "value": "someValue"
+                        }, {
+                            "dataElement": "de3",
+                            "value": "2015-04-16"
+                        }, {
+                            "dataElement": "de4",
+                            "value": "blah-again"
+                        }, {
+                            "dataElement": "de5",
+                            "value": undefined
+                        }, {
+                            "dataElement": "de6",
+                            "value": undefined
+                        }],
+                        'localStatus': "UPDATED_DRAFT"
+                    };
 
-            it("should update event details", function() {
-                scope.orgUnitAssociatedToEvent = originOrgUnits[0];
-
-                scope.dataValues = {
-                    'de1': "2015-04-15",
-                    'de2': "someValue",
-                    'de3': moment.utc('2015-04-16').toDate(),
-                    'de4': "blah-again"
-                };
-
-
-                scope.update();
-                scope.$apply();
-
-                var expectedEventPayload = {
-                    'event': "event1",
-                    'orgUnit': "o1",
-                    'eventDate': "2015-04-15",
-                    'dataValues': [{
-                        "dataElement": "de1",
-                        "value": "2015-04-15"
-                    }, {
-                        "dataElement": "de2",
-                        "value": "someValue"
-                    }, {
-                        "dataElement": "de3",
-                        "value": "2015-04-16"
-                    }, {
-                        "dataElement": "de4",
-                        "value": "blah-again"
-                    }, {
-                        "dataElement": "de5",
-                        "value": undefined
-                    }],
-                    'localStatus': "UPDATED_DRAFT"
-                };
-
-                expect(programEventRepository.upsert).toHaveBeenCalledWith(expectedEventPayload);
-            });
-
-            it("should save incomplete events", function() {
-                scope.dataValues = {
-                    'de1': "2015-02-03",
-                    'de2': undefined,
-                    'de3': moment.utc('2015-04-16').toDate(),
-                    'de4': undefined
-                };
-                scope.orgUnitAssociatedToEvent = originOrgUnits[0];
-                scope.save();
-                scope.$apply();
-
-                var actualUpsertedEvent = programEventRepository.upsert.calls.first().args[0];
-
-                expect(actualUpsertedEvent.program).toEqual("Prg1");
-                expect(actualUpsertedEvent.programStage).toEqual("PrgStage1");
-                expect(actualUpsertedEvent.orgUnit).toEqual("o1");
-                expect(actualUpsertedEvent.eventDate).toEqual("2015-02-03");
-                expect(actualUpsertedEvent.localStatus).toEqual("NEW_INCOMPLETE_DRAFT");
-                expect(actualUpsertedEvent.dataValues).toEqual([{
-                    "dataElement": 'de1',
-                    "value": '2015-02-03'
-                }, {
-                    "dataElement": 'de2',
-                    "value": undefined
-                }, {
-                    "dataElement": 'de3',
-                    "value": '2015-04-16'
-                }, {
-                    "dataElement": 'de4',
-                    "value": undefined
-                }, {
-                    "dataElement": 'de5',
-                    "value": undefined
-                }]);
+                    expect(programEventRepository.upsert).toHaveBeenCalledWith(expectedEventPayload);
+                });
             });
 
             it('should set isEventDateSubstitute to true for the corresponding data element', function () {
@@ -561,6 +465,10 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     id: 'someDataElementId'
                 };
                 spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(true);
+
+                lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, route, historyService, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
+                scope.$apply();
+
                 expect(scope.isEventDateSubstitute(mockDataElement)).toEqual(true);
             });
         });
