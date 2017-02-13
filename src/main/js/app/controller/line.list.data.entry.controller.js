@@ -75,10 +75,6 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
             $scope.dataValues[dataElementId] = moment().set('millisecond', 0).set('second', 0).toDate();
         };
 
-        $scope.isReferralLocationOptionSet = function(optionSet) {
-          return _.endsWith(optionSet.code, '_referralLocations');
-        };
-
         $scope.loadEventsView = function() {
             historyService.back();
         };
