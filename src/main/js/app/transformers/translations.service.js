@@ -114,29 +114,6 @@ define(['lodash'], function(_){
             });
         };
 
-        this.translateOptionSetMap = function (optionSetMap) {
-            if(_locale == 'en') {
-                return optionSetMap;
-            }
-            
-            _.each(optionSetMap, function(value) {
-                self.translate(value);
-            });
-            return optionSetMap;
-        };
-
-        this.translateOptionMap = function (optionMap) {
-            if(_locale == 'en') {
-                return optionMap;
-            }
-
-            _.each(optionMap, function(value, key) {
-                optionMap[key] = translations[key] ? translations[key][0].value : value;
-            });
-
-            return optionMap;
-        };
-
         var translateObject = function (objectToBeTranslated) {
 
             _.each(TRANSLATABLE_OBJECT_PROPERTIES, function (property) {
