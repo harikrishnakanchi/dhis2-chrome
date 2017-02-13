@@ -138,7 +138,7 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
                 return 0;
 
             var optionId = _.find($scope.referralOptions, {
-                "displayName": locationName
+                "name": locationName
             }).id;
             return _.filter($scope.dataValues._referralLocations, {
                 "value": optionId
@@ -209,13 +209,21 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
             return getExcludedDataElementsForModule().then(getProgram);
         };
 
-        var getOptionSetMapping = function() {
-            return optionSetRepository.getOptionSetMapping($scope.selectedModule.parent.id).then(function(data) {
-                var translatedOptionSetMap = translationsService.translateOptionSetMap(data.optionSetMap);
-                $scope.optionSetMapping = translatedOptionSetMap;
+        var getOptionSetMapping = function () {
+            return optionSetRepository.getOptionSets($scope.selectedModule.parent.id).then(function (optionSets) {
+                var partitionedDataset = _.partition(optionSets, 'isReferralLocationOptionSet');
+                var translatedOptionSets = translationsService.translate(partitionedDataset[1]);
+                translatedOptionSets = translatedOptionSets.concat(partitionedDataset[0]);
+                $scope.optionSetMapping = {};
+                $scope.optionMapping = {};
 
-                var translatedOptionMap = translationsService.translateOptionMap(data.optionMap);
-                $scope.optionMapping = translatedOptionMap;
+                _.forEach(translatedOptionSets, function (optionSet) {
+                    var options = (optionSet && optionSet.options) || [];
+                    $scope.optionSetMapping[optionSet.id] = options;
+                    _.forEach(options, function (option) {
+                        $scope.optionMapping[option.id] = option.name;
+                    });
+                }, {});
             });
         };
 
