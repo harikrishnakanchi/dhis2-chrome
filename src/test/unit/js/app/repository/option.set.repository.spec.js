@@ -1,6 +1,8 @@
-define(["optionSetRepository", "angularMocks", "utils", "referralLocationsRepository"], function(OptionSetRepository, mocks, utils, ReferralLocationsRepository) {
+define(["optionSetRepository", "angularMocks", "utils", "referralLocationsRepository", "excludedLineListOptionsRepository", "optionSetTransformer"],
+    function(OptionSetRepository, mocks, utils, ReferralLocationsRepository, ExcludedLineListOptionsRepository, optionSetTransformer) {
     describe("optionSet repository", function() {
-        var optionSetRepository, db, mockStore, q, scope, referralLocations;
+        var optionSetRepository, db, mockStore, mockDB, q, scope, referralLocations, excludedLineListOptionsRepository,
+            referralLocationsRepository, moduleId;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
@@ -20,7 +22,12 @@ define(["optionSetRepository", "angularMocks", "utils", "referralLocationsReposi
             referralLocationsRepository = new ReferralLocationsRepository();
             spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, referralLocations));
 
-            optionSetRepository = new OptionSetRepository(mockDB.db, referralLocationsRepository);
+            spyOn(optionSetTransformer, "enrichOptionSets");
+
+            excludedLineListOptionsRepository = new ExcludedLineListOptionsRepository();
+            spyOn(excludedLineListOptionsRepository, "get").and.returnValue(utils.getPromise(q, {}));
+
+            optionSetRepository = new OptionSetRepository(mockDB.db, q, referralLocationsRepository, excludedLineListOptionsRepository);
         }));
 
         it("should get all option sets", function() {
@@ -113,6 +120,40 @@ define(["optionSetRepository", "angularMocks", "utils", "referralLocationsReposi
 
             scope.$apply();
             expect(filteredOptionSet).toEqual(mockOptionSets[0]);
+        });
+
+        describe('getOptionSets', function () {
+            beforeEach(function () {
+                moduleId = "someModuleId";
+            });
+
+            it('should get all optionSets', function () {
+                optionSetRepository.getOptionSets(moduleId);
+                scope.$apply();
+
+                expect(mockStore.getAll).toHaveBeenCalled();
+            });
+
+            it('should get referral locations', function () {
+                optionSetRepository.getOptionSets(moduleId);
+                scope.$apply();
+
+                expect(referralLocationsRepository.get).toHaveBeenCalledWith(moduleId);
+            });
+
+            it('should get excluded linelist options', function () {
+                optionSetRepository.getOptionSets(moduleId);
+                scope.$apply();
+
+                expect(excludedLineListOptionsRepository.get).toHaveBeenCalledWith(moduleId);
+            });
+
+            it('should enrich optionSets', function () {
+                optionSetRepository.getOptionSets(moduleId);
+                scope.$apply();
+
+                expect(optionSetTransformer.enrichOptionSets).toHaveBeenCalled();
+            });
         });
     });
 });

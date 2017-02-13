@@ -24,7 +24,7 @@ define(["dataRepository", "dataSetRepository", "userPreferenceRepository", "orgU
             app.service('changeLogRepository', ['$indexedDB', '$q', changeLogRepository]);
             app.service('metadataRepository', ['$indexedDB', "$q", metadataRepository]);
             app.service('orgUnitGroupSetRepository', ['$indexedDB', orgUnitGroupSetRepository]);
-            app.service('optionSetRepository', ['$indexedDB', 'referralLocationsRepository', optionSetRepository]);
+            app.service('optionSetRepository', ['$indexedDB', '$q', 'referralLocationsRepository', 'excludedLineListOptionsRepository', optionSetRepository]);
             app.service('chartRepository', ['$indexedDB', '$q', 'categoryRepository', 'dataElementRepository', 'indicatorRepository', 'programIndicatorRepository', chartRepository]);
             app.service('referralLocationsRepository', ['$indexedDB', '$q', 'dataSetRepository', referralLocationsRepository]);
             app.service('excludedDataElementsRepository', ['$indexedDB', '$q', excludedDataElementsRepository]);
