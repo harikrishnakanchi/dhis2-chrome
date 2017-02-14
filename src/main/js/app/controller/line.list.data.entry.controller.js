@@ -5,6 +5,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
             $scope.form = $scope.form || {};
             $scope.dataValues = {};
             $scope.isNewMode = true;
+            $scope.orgUnitAssociatedToEvent = {};
             if ($scope.eventDataEntryForm) {
                 $scope.eventDataEntryForm.$setPristine();
             }
@@ -89,7 +90,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
 
         $scope.update = function() {
             var dataValuesAndEventDate = getDataValuesAndEventDate();
-            $scope.event.orgUnit = $scope.orgUnitAssociatedToEvent.id;
+            $scope.event.orgUnit = $scope.orgUnitAssociatedToEvent.selected.id;
             $scope.event.eventDate = dataValuesAndEventDate.eventDate;
             $scope.event.localStatus = dataValuesAndEventDate.compulsoryFieldsPresent ? "UPDATED_DRAFT" : "UPDATED_INCOMPLETE_DRAFT";
             $scope.event.dataValues = dataValuesAndEventDate.dataValues;
@@ -107,12 +108,13 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
 
             var dataValuesAndEventDate = getDataValuesAndEventDate();
             var eventId = dhisId.get($scope.program.id + $scope.program.programStages[0].id + $scope.selectedModuleId + moment().format());
+            var orgUnit = $scope.orgUnitAssociatedToEvent.selected || $scope.selectedModule;
             $scope.event = {
                 "event": eventId,
                 "program": $scope.program.id,
                 "programStage": $scope.program.programStages[0].id,
-                "orgUnit": $scope.orgUnitAssociatedToEvent.id,
-                "orgUnitName": $scope.orgUnitAssociatedToEvent.name,
+                "orgUnit": orgUnit.id,
+                "orgUnitName": orgUnit.name,
                 "eventDate": dataValuesAndEventDate.eventDate,
                 "localStatus": dataValuesAndEventDate.compulsoryFieldsPresent ? "NEW_DRAFT" : "NEW_INCOMPLETE_DRAFT",
                 "dataValues": dataValuesAndEventDate.dataValues
@@ -142,7 +144,6 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
                     $scope.selectedModuleName = module.name;
                     $scope.opUnitId = module.parent.id;
                     $scope.selectedModule = module;
-                    $scope.orgUnitAssociatedToEvent = module;
                 });
             };
 
@@ -225,7 +226,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
                         $scope.event = events[0];
                         $scope.isNewMode = false;
                         var orgUnits = $scope.originOrgUnits.concat($scope.selectedModule);
-                        $scope.orgUnitAssociatedToEvent = _.find(orgUnits, function(originOrgUnit) {
+                        $scope.orgUnitAssociatedToEvent.selected = _.find(orgUnits, function(originOrgUnit) {
                             return originOrgUnit.id === $scope.event.orgUnit;
                         });
 

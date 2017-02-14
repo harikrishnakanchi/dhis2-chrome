@@ -319,7 +319,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                         }
                     };
 
-                    scope.orgUnitAssociatedToEvent = originOrgUnits[0];
+                    scope.orgUnitAssociatedToEvent.selected = originOrgUnits[0];
 
 
                     scope.save();
@@ -381,7 +381,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                         'de3': moment.utc('2015-04-16').toDate(),
                         'de4': undefined
                     };
-                    scope.orgUnitAssociatedToEvent = originOrgUnits[0];
+                    scope.orgUnitAssociatedToEvent.selected = originOrgUnits[0];
                     scope.save();
                     scope.$apply();
 
@@ -420,7 +420,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 });
 
                 it("should update event details", function() {
-                    scope.orgUnitAssociatedToEvent = originOrgUnits[0];
+                    scope.orgUnitAssociatedToEvent.selected = originOrgUnits[0];
                     scope.dataValues = {
                         'de1': "2015-04-15",
                         'de2': "someValue",
