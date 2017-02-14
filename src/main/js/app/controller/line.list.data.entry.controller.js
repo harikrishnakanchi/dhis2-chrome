@@ -193,7 +193,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
             };
 
             var loadOptionSets = function() {
-                return optionSetRepository.getOptionSets($scope.opUnitId);
+                return optionSetRepository.getOptionSets($scope.opUnitId, $scope.selectedModuleId);
             };
 
             var loadEvent = function() {

@@ -7,11 +7,11 @@ define(['lodash', 'optionSetTransformer'], function(_, optionSetTransformer) {
             return store.getAll();
         };
 
-        this.getOptionSets = function(moduleId) {
+        this.getOptionSets = function(opUnitId, moduleId) {
             var getAllParameters = function () {
                 return $q.all({
                     optionSets: self.getAll(),
-                    referralLocations: referralLocationsRepository.get(moduleId),
+                    referralLocations: referralLocationsRepository.get(opUnitId),
                     excludedLineListOptions: excludedLineListOptionsRepository.get(moduleId)
                 });
             };

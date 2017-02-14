@@ -1,8 +1,8 @@
 define(["optionSetRepository", "angularMocks", "utils", "referralLocationsRepository", "excludedLineListOptionsRepository", "optionSetTransformer"],
     function(OptionSetRepository, mocks, utils, ReferralLocationsRepository, ExcludedLineListOptionsRepository, optionSetTransformer) {
     describe("optionSet repository", function() {
-        var optionSetRepository, db, mockStore, mockDB, q, scope, referralLocations, excludedLineListOptionsRepository,
-            referralLocationsRepository, moduleId;
+        var optionSetRepository, mockStore, mockDB, q, scope, referralLocations, excludedLineListOptionsRepository,
+            referralLocationsRepository, moduleId, opUnitId;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
@@ -67,31 +67,32 @@ define(["optionSetRepository", "angularMocks", "utils", "referralLocationsReposi
         describe('getOptionSets', function () {
             beforeEach(function () {
                 moduleId = "someModuleId";
+                opUnitId = "someOpUnitId";
             });
 
             it('should get all optionSets', function () {
-                optionSetRepository.getOptionSets(moduleId);
+                optionSetRepository.getOptionSets(opUnitId, moduleId);
                 scope.$apply();
 
                 expect(mockStore.getAll).toHaveBeenCalled();
             });
 
-            it('should get referral locations', function () {
-                optionSetRepository.getOptionSets(moduleId);
+            it('should get referral locations by opUnitId', function () {
+                optionSetRepository.getOptionSets(opUnitId, moduleId);
                 scope.$apply();
 
-                expect(referralLocationsRepository.get).toHaveBeenCalledWith(moduleId);
+                expect(referralLocationsRepository.get).toHaveBeenCalledWith(opUnitId);
             });
 
             it('should get excluded linelist options', function () {
-                optionSetRepository.getOptionSets(moduleId);
+                optionSetRepository.getOptionSets(opUnitId, moduleId);
                 scope.$apply();
 
                 expect(excludedLineListOptionsRepository.get).toHaveBeenCalledWith(moduleId);
             });
 
             it('should enrich optionSets', function () {
-                optionSetRepository.getOptionSets(moduleId);
+                optionSetRepository.getOptionSets(opUnitId, moduleId);
                 scope.$apply();
 
                 expect(optionSetTransformer.enrichOptionSets).toHaveBeenCalled();

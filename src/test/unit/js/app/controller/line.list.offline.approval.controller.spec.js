@@ -400,6 +400,10 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 expect(scope.associatedDataSets).toEqual(associatedDataSets);
             });
 
+            it('should load optionSets on initialize', function () {
+                expect(optionSetRepository.getOptionSets).toHaveBeenCalledWith('par', 'Mod1');
+            });
+
             it("should translate procedure dataElements formName and description", function () {
                 var translatedValue = "translatedValue";
                 expect(scope.originOrgUnits).toEqual([origin2, origin1, origin4, origin3]);

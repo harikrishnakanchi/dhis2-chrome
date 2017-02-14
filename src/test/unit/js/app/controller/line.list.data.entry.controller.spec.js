@@ -236,6 +236,12 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 describe('dataElementOptions', function () {
 
+                    it('should get optionSets', function () {
+                        initializeController();
+
+                        expect(optionSetRepository.getOptionSets).toHaveBeenCalledWith('par', 'mod1');
+                    });
+
                     it('should set dataElementOptions to scope', function () {
                         var option = {'id': 'os1o1'};
                         var anotherOption = {'id': 'os1o3'};

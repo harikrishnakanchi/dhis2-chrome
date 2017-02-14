@@ -210,7 +210,7 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
         };
 
         var getOptionSetMapping = function () {
-            return optionSetRepository.getOptionSets($scope.selectedModule.parent.id).then(function (optionSets) {
+            return optionSetRepository.getOptionSets($scope.selectedModule.parent.id, $scope.selectedModule.id).then(function (optionSets) {
                 var partitionedDataset = _.partition(optionSets, 'isReferralLocationOptionSet');
                 var translatedOptionSets = translationsService.translate(partitionedDataset[1]);
                 translatedOptionSets = translatedOptionSets.concat(partitionedDataset[0]);
