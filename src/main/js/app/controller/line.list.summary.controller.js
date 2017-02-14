@@ -350,11 +350,6 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
         };
 
         $scope.exportToExcel = function () {
-            var DELIMITER = ',';
-
-            var escapeString = function (string) {
-                return '"' + string + '"';
-            };
 
             var buildHeaders = function () {
                 var formNames = _.map($scope.dataElementsForExport, dataElementUtils.getDisplayName);
