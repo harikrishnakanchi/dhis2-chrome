@@ -1,11 +1,12 @@
 define(['dhisUrl', 'angularMocks', 'systemInfoService', 'moment', 'timecop'], function (dhisUrl, mocks, SystemInfoService, moment, timecop) {
     describe('System Info Service', function () {
-        var systemInfoService, http, httpBackend;
+        var systemInfoService, http, httpBackend, q;
 
-        beforeEach(mocks.inject(function ($http, $httpBackend) {
+        beforeEach(mocks.inject(function ($http, $httpBackend, $q) {
             http = $http;
             httpBackend = $httpBackend;
-            systemInfoService = new SystemInfoService(http);
+            q = $q;
+            systemInfoService = new SystemInfoService(http, q);
         }));
 
         afterEach(function () {
@@ -43,6 +44,20 @@ define(['dhisUrl', 'angularMocks', 'systemInfoService', 'moment', 'timecop'], fu
             httpBackend.flush();
             Timecop.returnToPresent();
             Timecop.uninstall();
+        });
+
+        describe('getVersion', function () {
+            it('should get version number', function () {
+                var systemInfoResponse = {
+                    version: "2.25"
+                };
+                httpBackend.expectGET(dhisUrl.systemInfo).respond(200, systemInfoResponse);
+                systemInfoService.getVersion().then(function (version) {
+                    expect(version).toEqual("2.25");
+                });
+
+                httpBackend.flush();
+            });
         });
     });
 });
