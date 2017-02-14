@@ -65,6 +65,7 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
 
             systemInfoService = new SystemInfoService();
             spyOn(systemInfoService, 'getServerDate').and.returnValue(utils.getPromise(q, 'someDate'));
+            spyOn(systemInfoService, 'getVersion').and.returnValue(utils.getPromise(q, 'someVersion'));
 
             metadataDownloader = new MetadataDownloader(http, q, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository, userRepository, systemInfoService);
         }));
@@ -86,6 +87,22 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
             metadataDownloader.run();
             rootScope.$apply();
             expect(systemInfoService.getServerDate).toHaveBeenCalled();
+        });
+
+        it('should get DHIS version', function () {
+            metadataDownloader.run();
+            rootScope.$apply();
+            expect(systemInfoService.getVersion).toHaveBeenCalled();
+        });
+
+        it('should download translation if DHIS is on 2.23', function () {
+            systemInfoService.getVersion.and.returnValue(utils.getPromise(q, '2.23'));
+            changeLogRepository.get.and.returnValue(utils.getPromise(q, null));
+            metadataDownloader.run();
+
+            expectMetadataDownload();
+            httpBackend.expectGET(/.*translations.*/).respond(200, {});
+            httpBackend.flush();
         });
 
         it('should not download metadata if changeLog exists',function () {

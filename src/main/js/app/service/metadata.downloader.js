@@ -2,7 +2,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
     return function ($http, $q, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository,
                      systemSettingRepository, orgUnitRepository, userRepository, systemInfoService) {
 
-        var MAX_PAGE_REQUESTS = 500, updated;
+        var MAX_PAGE_REQUESTS = 500, updated, DHIS_VERSION;
 
         var getChangeLog = function (entity) {
             return changeLogRepository.get(entity);
@@ -218,6 +218,15 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 upsertFn: function (attributes) {
                     return metadataRepository.upsertMetadataForEntity(attributes, 'attributes');
                 }
+            }, {
+                name: 'translations',
+                url: dhisUrl.translations,
+                params: {
+                    fields: metadataConf.fields.translations
+                },
+                upsertFn: function (response) {
+                    return metadataRepository.upsertMetadataForEntity(response, 'translations');
+                }
             }];
 
             var deferred = $q.defer();
@@ -228,17 +237,28 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 });
             };
 
+            var setDhisVersion = function () {
+                return systemInfoService.getVersion().then(function (version) {
+                    DHIS_VERSION = version;
+                });
+            };
+
+            var setSystemInfoDetails = function () {
+                return setDownloadStartTime().then(setDhisVersion);
+            };
+
             var updateMetadataChangeLog = function () {
                 return changeLogRepository.upsert('metaData', updated);
             };
 
             _.reduce(entities, function (promise, entity, index) {
                 return promise.then(function () {
-                    return downloadEntityIfNotExists(entity).then(function () {
+                    var downloadPromise = (entity.name == 'translations' && DHIS_VERSION != '2.23') ? $q.when() : downloadEntityIfNotExists(entity);
+                    return downloadPromise.then(function () {
                         deferred.notify({percent: _.floor(((index + 1) / entities.length) * 100)});
                     });
                 });
-            }, setDownloadStartTime())
+            }, setSystemInfoDetails())
                 .then(updateMetadataChangeLog)
                 .then(deferred.resolve)
                 .catch(deferred.reject);
