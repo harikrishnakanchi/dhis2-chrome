@@ -25,8 +25,9 @@ define(["downloadMetadataConsumer", "metadataService", "systemInfoService", "met
 
             systemInfoService = new SystemInfoService();
             spyOn(systemInfoService, 'getServerDate').and.returnValue(utils.getPromise(q, 'someTime'));
+            spyOn(systemInfoService, 'getVersion').and.returnValue(utils.getPromise(q, 'someVersion'));
 
-            downloadMetadataConsumer = new DownloadMetadataConsumer(metadataService, systemInfoService, metadataRepository, changeLogRepository);
+            downloadMetadataConsumer = new DownloadMetadataConsumer(q, metadataService, systemInfoService, metadataRepository, changeLogRepository);
         }));
 
         afterEach(function() {
@@ -49,6 +50,24 @@ define(["downloadMetadataConsumer", "metadataService", "systemInfoService", "met
             expect(metadataService.getMetadataOfType).toHaveBeenCalledWith(type, someTime);
             expect(metadataRepository.upsertMetadataForEntity).toHaveBeenCalledWith(someData, type);
             expect(changeLogRepository.upsert).toHaveBeenCalledWith(type, someTime);
+        });
+
+        it('should get system info before downloading data', function () {
+            downloadMetadataConsumer.run();
+            scope.$apply();
+
+            expect(systemInfoService.getServerDate).toHaveBeenCalled();
+            expect(systemInfoService.getVersion).toHaveBeenCalled();
+        });
+
+        it('should not download translations if DHIS is not 2.23', function () {
+            var someTime = "someTime";
+            metadataConf.entities = ["translations"];
+            changeLogRepository.get.and.returnValue(utils.getPromise(q, someTime));
+            downloadMetadataConsumer.run();
+            scope.$apply();
+
+            expect(metadataService.getMetadataOfType).not.toHaveBeenCalledWith("translations", someTime);
         });
     });
 });

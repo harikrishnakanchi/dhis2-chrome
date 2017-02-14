@@ -1,11 +1,21 @@
 define(["metadataConf"], function(metadataConf) {
-    return function(metadataService, systemInfoService, metadataRepository, changeLogRepository) {
-        var downloadStartTime;
+    return function($q, metadataService, systemInfoService, metadataRepository, changeLogRepository) {
+        var downloadStartTime, DHIS_VERSION;
 
         var getServerTime = function() {
             return systemInfoService.getServerDate().then(function (serverTime) {
                 downloadStartTime = serverTime;
             });
+        };
+
+        var setDhisVersion = function () {
+            return systemInfoService.getVersion().then(function (version) {
+                DHIS_VERSION = version;
+            });
+        };
+
+        var setSystemInfoDetails = function () {
+            return getServerTime().then(setDhisVersion);
         };
 
         var updateChangeLog = function(type) {
@@ -20,11 +30,16 @@ define(["metadataConf"], function(metadataConf) {
         };
 
         this.run = function () {
-            return _.reduce(metadataConf.entities, function (res, entity) {
-                return res.then(function () {
-                    return downloadAndUpsertEntity(entity);
+            return setSystemInfoDetails().then(function () {
+                var entities = _.filter(metadataConf.entities, function (entity) {
+                    return entity == 'translations' ? DHIS_VERSION == '2.23' : true;
                 });
-            }, getServerTime());
+                return _.reduce(entities, function (res, entity) {
+                    return res.then(function () {
+                        return downloadAndUpsertEntity(entity);
+                    });
+                }, $q.when());
+            });
         };
     };
 });
