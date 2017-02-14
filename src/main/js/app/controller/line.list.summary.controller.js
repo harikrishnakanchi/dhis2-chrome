@@ -1,6 +1,6 @@
 define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpolate", "excelBuilder", "dataElementUtils", "customAttributes"], function(_, moment, properties, dateUtils, orgUnitMapper, interpolate, excelBuilder, dataElementUtils, customAttributes) {
     return function($scope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, historyService, programRepository, programEventRepository, excludedDataElementsRepository,
-        orgUnitRepository, approvalDataRepository, referralLocationsRepository, dataSyncFailureRepository, translationsService, filesystemService) {
+        orgUnitRepository, approvalDataRepository, dataSyncFailureRepository, translationsService, filesystemService, optionSetRepository) {
 
         $scope.filterParams = {};
         $scope.showOfflineSummaryForViewOnly = true;
@@ -8,6 +8,7 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
         $scope.excludedDataElementIds = [];
 
         var INITIAL_PAGE_LIMIT = 20;
+        var indexedOptionSets = {};
         $scope.pageLimit = INITIAL_PAGE_LIMIT;
 
         $scope.loadMoreEvents = function () {
@@ -62,27 +63,7 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
             scrollToTop();
         };
 
-        var isReferralLocationDataValue = function (dataValue) {
-            var dataElement = _.find($scope.dataElementsForExport, {id: dataValue.dataElement});
-            return !!(dataElement && dataElement.offlineSummaryType == 'referralLocations');
-        };
-
         var enhanceEvents = function (events) {
-            var setReferralLocationGenericNames = function (events) {
-                var referralLocationDataValues = _.compact(_.map(events, function (event) {
-                    return _.find(event.dataValues, function (dataValue) {
-                        return isReferralLocationDataValue(dataValue);
-                    });
-                }));
-                _.each(referralLocationDataValues, function (dataValue) {
-                    _.each(dataValue.optionSet.options, function (option) {
-                        option.referralLocationGenericName = option.name;
-                    });
-                });
-                return events;
-            };
-
-            setReferralLocationGenericNames(events);
 
             var minEventDate = dateUtils.max([dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync), $scope.moduleOpeningDate]).startOf('day').toISOString();
 
@@ -173,14 +154,11 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
 
             if (!dataValue.value) return "";
 
-            if (isReferralLocationDataValue(dataValue)){
-                var referralLocationGenericName = _.chain(dataValue.optionSet.options).find({ id: dataValue.value }).get('referralLocationGenericName').value();
-                return $scope.referralLocations[referralLocationGenericName].name;
-            }
-
-            if (dataValue.optionSet && dataValue.optionSet.options.length > 0) {
-                var option = _.find(dataValue.optionSet.options, function(o) {
-                    return o.code === dataValue.value;
+            if (dataValue.optionSet) {
+                var optionSetId = dataValue.optionSet.id;
+                var optionSet = indexedOptionSets[optionSetId] || {};
+                var option = _.find(optionSet.options, function(o) {
+                    return o.id === dataValue.value;
                 });
                 return option ? option.name : "";
             }
@@ -461,15 +439,29 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
                 return getExcludedDataElementsForModule().then(getProgram);
             };
 
+            var loadOptionSets = function () {
+                var translateOptionSets = function (optionSets) {
+                    var partitionedDataset = _.partition(optionSets, 'isReferralLocationOptionSet');
+                    var translatedOptionSets = translationsService.translate(partitionedDataset[1]);
+                    return translatedOptionSets.concat(partitionedDataset[0]);
+                };
+
+                var getOptionSets = function () {
+                    return optionSetRepository.getOptionSets($scope.opUnitId, $scope.selectedModuleId);
+                };
+
+                var setOptionSets = function (optionSets) {
+                    indexedOptionSets = _.indexBy(optionSets, 'id');
+                };
+
+                return getOptionSets()
+                    .then(translateOptionSets)
+                    .then(setOptionSets);
+            };
+
             var setUpProjectAutoApprovedFlag = function() {
                 return orgUnitRepository.getParentProject($scope.selectedModuleId).then(function(orgUnit) {
                     $scope.projectIsAutoApproved = customAttributes.getBooleanAttributeValue(orgUnit.attributeValues, customAttributes.AUTO_APPROVE);
-                });
-            };
-
-            var getreferralLocations = function() {
-                referralLocationsRepository.get($scope.opUnitId).then(function(referralLocations) {
-                    $scope.referralLocations = referralLocations;
                 });
             };
 
@@ -482,9 +474,9 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
             $scope.noCasesMsg = $scope.resourceBundle.noCasesFound;
             $scope.startLoading();
             return loadModule()
-                .then(getreferralLocations)
                 .then(loadOriginOrgUnits)
                 .then(loadPrograms)
+                .then(loadOptionSets)
                 .then(setUpProjectAutoApprovedFlag)
                 .then(loadEventsView)
                 .finally($scope.stopLoading);
