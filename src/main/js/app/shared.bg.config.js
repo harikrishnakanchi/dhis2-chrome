@@ -55,6 +55,7 @@ require.config({
         "indicatorRepository": "app/repository/indicator.repository",
         "programIndicatorRepository": "app/repository/program.indicator.repository",
         "customAttributeRepository": "app/repository/custom.attribute.repository",
+        "optionSetRepository": "app/repository/option.set.repository",
 
         //Models
         "chart": "app/models/chart",
@@ -74,6 +75,7 @@ require.config({
         //Transformers
         "dataSetTransformer": "app/transformers/data.set.transformer",
         "dataEntryTableColumnConfig": "app/transformers/data.entry.table.column.config",
+        'optionSetTransformer': "app/transformers/option.set.transformer",
 
         //Monitors
         "dhisMonitor": "app/monitors/dhis.monitor",

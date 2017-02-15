@@ -1,6 +1,6 @@
-define(["dataElementRepository", "angularMocks", "utils", "customAttributes"], function(DataElementRepository, mocks, utils, customAttributes) {
+define(["dataElementRepository", "angularMocks", "utils", "customAttributes", "optionSetRepository"], function(DataElementRepository, mocks, utils, customAttributes, OptionSetRepository) {
     describe("data element repository", function() {
-        var mockDb, mockStore, dataElementRepository, scope, q, mockAttributeValue;
+        var mockDb, mockStore, dataElementRepository, scope, q, mockAttributeValue, optionSetRepository;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
@@ -13,7 +13,10 @@ define(["dataElementRepository", "angularMocks", "utils", "customAttributes"], f
             spyOn(customAttributes, 'getAttributeValue').and.returnValue(mockAttributeValue);
             spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(mockAttributeValue);
 
-            dataElementRepository = new DataElementRepository(mockDb.db);
+            optionSetRepository = new OptionSetRepository();
+            spyOn(optionSetRepository, 'get').and.returnValue(utils.getPromise(q, {}));
+
+            dataElementRepository = new DataElementRepository(mockDb.db, q, optionSetRepository);
         }));
 
         describe('get', function() {
@@ -31,6 +34,15 @@ define(["dataElementRepository", "angularMocks", "utils", "customAttributes"], f
             it('should get for the given data element id', function () {
                 dataElementRepository.get(dataElementId);
                 expect(mockStore.find).toHaveBeenCalled();
+            });
+
+            it('should enrich dataElement with OptionSets', function () {
+                mockDataElement.optionSet = {"id": "someId"};
+                optionSetRepository.get.and.returnValue(utils.getPromise(q, "someOptionSet"));
+                dataElementRepository.get(dataElementId).then(function (de) {
+                    expect(de.optionSet).toEqual('someOptionSet');
+                });
+                scope.$apply();
             });
 
             it('should add offlineSummaryType custom attribute to DataElement', function () {
@@ -55,11 +67,12 @@ define(["dataElementRepository", "angularMocks", "utils", "customAttributes"], f
 
         describe('findAll', function() {
             it('should get all data elements for the list of data elements', function() {
+                spyOn(dataElementRepository, 'get').and.returnValue(utils.getPromise(q, {}));
                 var dataElementIds = ["someDataElem1", "someDataElem2"];
 
                 dataElementRepository.findAll(dataElementIds);
 
-                expect(mockStore.each).toHaveBeenCalled();
+                expect(dataElementRepository.get.calls.count()).toEqual(2);
             });
         });
 

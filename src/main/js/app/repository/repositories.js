@@ -19,7 +19,7 @@ define(["dataRepository", "dataSetRepository", "userPreferenceRepository", "orgU
             app.service('userRepository', ['$indexedDB', userRepository]);
             app.service('programRepository', ['$indexedDB', '$q', 'dataElementRepository', programRepository]);
             app.service('programEventRepository', ['$indexedDB', '$q', 'dataElementRepository', programEventRepository]);
-            app.service('dataElementRepository', ['$indexedDB', dataElementRepository]);
+            app.service('dataElementRepository', ['$indexedDB', '$q', 'optionSetRepository', dataElementRepository]);
             app.service('orgUnitGroupRepository', ['$indexedDB', '$q', orgUnitGroupRepository]);
             app.service('changeLogRepository', ['$indexedDB', '$q', changeLogRepository]);
             app.service('metadataRepository', ['$indexedDB', "$q", metadataRepository]);

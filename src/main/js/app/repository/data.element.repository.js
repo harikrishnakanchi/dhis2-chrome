@@ -1,11 +1,23 @@
 define(["lodash", "customAttributes"], function (_, customAttributes) {
-    return function (db) {
+    return function (db, $q, optionSetRepository) {
         var store = db.objectStore("dataElements");
 
-        var transformDataElement = function (dataElement) {
+        var addCustomAttributeFields = function (dataElement) {
             dataElement.offlineSummaryType = customAttributes.getAttributeValue(dataElement.attributeValues, customAttributes.LINE_LIST_OFFLINE_SUMMARY_CODE);
             dataElement.showInEventSummary = customAttributes.getBooleanAttributeValue(dataElement.attributeValues, customAttributes.SHOW_IN_EVENT_SUMMARY_CODE);
             return dataElement;
+        };
+
+        var addOptionSet = function (dataElement) {
+            var optionSetId = dataElement.optionSet && dataElement.optionSet.id;
+            if (optionSetId) {
+                dataElement.optionSet = optionSetRepository.get(optionSetId);
+            }
+            return $q.all(dataElement);
+        };
+
+        var transformDataElement = function (dataElement) {
+            return addOptionSet(dataElement).then(addCustomAttributeFields);
         };
 
         this.get = function (dataElementId) {
@@ -14,10 +26,7 @@ define(["lodash", "customAttributes"], function (_, customAttributes) {
         };
 
         this.findAll = function (dataElementIds) {
-            var query = db.queryBuilder().$in(dataElementIds).compile();
-            return store.each(query).then(function (dataElements) {
-                return _.map(dataElements, transformDataElement);
-            });
+            return $q.all(_.map(dataElementIds, this.get));
         };
 
         this.enrichWithDataElementsDetails = function (dataElements) {
