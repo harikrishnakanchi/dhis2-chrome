@@ -25,5 +25,10 @@ define(['lodash', 'optionSetTransformer'], function(_, optionSetTransformer) {
         this.getOptionSetByCode = function (optionSetCode) {
             return this.getAll().then(_.partial(_.find, _, {code: optionSetCode}));
         };
+
+        this.get = function (optionId) {
+            var store = db.objectStore('optionSets');
+            return store.find(optionId);
+        };
     };
 });
