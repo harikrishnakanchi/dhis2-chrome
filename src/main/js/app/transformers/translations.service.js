@@ -63,15 +63,15 @@ define(['lodash'], function(_){
             return (translationObject && translationObject.value) || defaultValue;
         };
 
-        this.getTranslationForProperty = function (objectId, property, defaultValue) {
-            return getTranslationFromCollection(translations[objectId], property, defaultValue);
+        this.getTranslationForProperty = function (object, property, defaultValue) {
+            return getTranslationFromObject(object, property, defaultValue);
         };
 
         var getTranslationFromObject = function (object, property, defaultValue) {
-            if (object.translations) {
+            if (object && object.translations) {
                 return getTranslationFromCollection(_.filter(object.translations, {locale: _locale}), TRANSLATABLE_PROPERTIES_MAP[property], defaultValue);
             }
-            return self.getTranslationForProperty(object.id, property, defaultValue);
+            return getTranslationFromCollection(translations[object.id], property, defaultValue);
         };
 
         this.translateChartData = function (charts) {

@@ -164,8 +164,8 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
             var proceduresPerformed = _.uniq($scope.dataValues._procedures, 'formName');
             proceduresPerformed =  _.map(proceduresPerformed, function (procedurePerformed) {
                 return {
-                    "title" : translationsService.getTranslationForProperty(procedurePerformed.dataElement, 'formName', procedurePerformed.formName),
-                    "description": translationsService.getTranslationForProperty(procedurePerformed.dataElement, 'description', procedurePerformed.description)
+                    "title" : translationsService.getTranslationForProperty(procedurePerformed, 'formName', procedurePerformed.formName),
+                    "description": translationsService.getTranslationForProperty(procedurePerformed, 'description', procedurePerformed.description)
                 };
             });
             $scope.proceduresPerformed = _.groupBy(proceduresPerformed, 'description');

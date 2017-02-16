@@ -49,9 +49,9 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
             scope.$apply();
         };
 
-        it('should return translation value of property for specified object', function() {
+        it('should return translation value of property for specified object', function () {
             initialiseTranslationsServiceForLocale(FRENCH);
-            expect(translationsService.getTranslationForProperty('someIdA', 'name')).toEqual('someFrenchNameA');
+            expect(translationsService.getTranslationForProperty({'id': 'someIdA'}, 'name')).toEqual('someFrenchNameA');
         });
 
         it('should return default value if translation for specified property in specified object is not present', function() {
