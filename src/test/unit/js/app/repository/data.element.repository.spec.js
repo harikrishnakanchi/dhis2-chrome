@@ -1,4 +1,4 @@
-define(["dataElementRepository", "angularMocks", "utils", "customAttributes", "optionSetRepository"], function(DataElementRepository, mocks, utils, customAttributes, OptionSetRepository) {
+define(["dataElementRepository", "angularMocks", "utils", "lodash", "customAttributes", "optionSetRepository"], function(DataElementRepository, mocks, utils, _, customAttributes, OptionSetRepository) {
     describe("data element repository", function() {
         var mockDb, mockStore, dataElementRepository, scope, q, mockAttributeValue, optionSetRepository;
 
@@ -14,21 +14,24 @@ define(["dataElementRepository", "angularMocks", "utils", "customAttributes", "o
             spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(mockAttributeValue);
 
             optionSetRepository = new OptionSetRepository();
-            spyOn(optionSetRepository, 'get').and.returnValue(utils.getPromise(q, {}));
+            spyOn(optionSetRepository, 'getAll').and.returnValue(utils.getPromise(q, []));
 
             dataElementRepository = new DataElementRepository(mockDb.db, q, optionSetRepository);
         }));
+
+        var createMockDataElement = function (options) {
+            return _.merge({
+                attributeValues: 'someAttributeValues'
+            }, options);
+        };
 
         describe('get', function() {
             var dataElementId, mockDataElement;
 
             beforeEach(function () {
                 dataElementId = "someDataElementId";
-                mockDataElement = {
-                    attributeValues: 'someAttributeValues'
-                };
+                mockDataElement = createMockDataElement();
                 mockStore.find.and.returnValue(utils.getPromise(q, mockDataElement));
-
             });
 
             it('should get for the given data element id', function () {
@@ -37,11 +40,16 @@ define(["dataElementRepository", "angularMocks", "utils", "customAttributes", "o
             });
 
             it('should enrich dataElement with OptionSets', function () {
-                mockDataElement.optionSet = {"id": "someId"};
-                optionSetRepository.get.and.returnValue(utils.getPromise(q, "someOptionSet"));
+                mockDataElement = createMockDataElement({optionSet: {id: "someId"}});
+                var mockOptionSet = {"id": "someId", "name": "someName"};
+
+                mockStore.find.and.returnValue(utils.getPromise(q, mockDataElement));
+                optionSetRepository.getAll.and.returnValue(utils.getPromise(q, [mockOptionSet]));
+
                 dataElementRepository.get(dataElementId).then(function (de) {
-                    expect(de.optionSet).toEqual('someOptionSet');
+                    expect(de.optionSet).toEqual(mockOptionSet);
                 });
+
                 scope.$apply();
             });
 
@@ -66,13 +74,19 @@ define(["dataElementRepository", "angularMocks", "utils", "customAttributes", "o
         });
 
         describe('findAll', function() {
-            it('should get all data elements for the list of data elements', function() {
-                spyOn(dataElementRepository, 'get').and.returnValue(utils.getPromise(q, {}));
+            it('should get all data elements for the list of data elements', function () {
                 var dataElementIds = ["someDataElem1", "someDataElem2"];
+                var mockedDataElements = [createMockDataElement(), createMockDataElement({optionSet: {id: "someId"}})];
+                var mockOptionSet = {"id": "someId", "name": "someName"};
+                mockStore.each.and.returnValue(utils.getPromise(q, mockedDataElements));
+                optionSetRepository.getAll.and.returnValue(utils.getPromise(q, [mockOptionSet]));
 
-                dataElementRepository.findAll(dataElementIds);
+                dataElementRepository.findAll(dataElementIds).then(function (dataElements) {
+                    expect(dataElements[0].optionSet).toBeUndefined();
+                    expect(dataElements[1]).toEqual(jasmine.objectContaining({optionSet: mockOptionSet}));
+                });
 
-                expect(dataElementRepository.get.calls.count()).toEqual(2);
+                scope.$apply();
             });
         });
 
