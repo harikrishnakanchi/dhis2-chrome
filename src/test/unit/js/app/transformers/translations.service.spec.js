@@ -130,6 +130,11 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                 translations: [
                     {
                         'property': 'NAME',
+                        'locale': 'ar',
+                        'value': 'Arabic name'
+                    },
+                    {
+                        'property': 'NAME',
                         'locale': 'fr',
                         'value': 'FrenchName'
                     }

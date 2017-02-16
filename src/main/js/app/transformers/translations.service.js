@@ -69,7 +69,7 @@ define(['lodash'], function(_){
 
         var getTranslationFromObject = function (object, property, defaultValue) {
             if (object.translations) {
-                return getTranslationFromCollection(object.translations, TRANSLATABLE_PROPERTIES_MAP[property], defaultValue);
+                return getTranslationFromCollection(_.filter(object.translations, {locale: _locale}), TRANSLATABLE_PROPERTIES_MAP[property], defaultValue);
             }
             return self.getTranslationForProperty(object.id, property, defaultValue);
         };
