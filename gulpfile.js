@@ -145,13 +145,13 @@ gulp.task('less', function() {
 gulp.task('download-metadata', function (callback) {
     requirejs(['./src/main/js/app/conf/metadata.conf.js'], function (metadataConf) {
         var buildUrl = function () {
-            var url = "";
+            var url = `&organisationUnitGroups=true&organisationUnitGroups:fields=${metadataConf.fields.organisationUnitGroups}`;
             metadataConf.entities.forEach(function (entity) {
                 url += `&${entity}=true&${entity}:fields=${metadataConf.fields[entity]}`;
             });
             return url;
         };
-        download(baseIntUrl + "/api/metadata.json?assumeTrue=False&organisationUnitGroups=true" + buildUrl(), "./src/main/data/metadata.json", callback);
+        download(baseIntUrl + "/api/metadata.json?assumeTrue=False" + buildUrl(), "./src/main/data/metadata.json", callback);
     });
 });
 
