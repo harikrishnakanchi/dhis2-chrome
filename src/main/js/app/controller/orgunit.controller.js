@@ -17,6 +17,7 @@ define(["toTree", "lodash", "moment", "properties", "customAttributes"], functio
         };
 
         $scope.geographicOriginDisabled = _.get(properties, 'organisationSettings.geographicOriginDisabled');
+        $scope.referralLocationDisabled = _.get(properties, 'organisationSettings.referralLocationDisabled');
         $scope.organisationUnits = [];
 
         var getUserSelectedProjectId = function() {

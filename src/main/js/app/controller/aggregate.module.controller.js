@@ -263,7 +263,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
             };
 
             var getDatasetsToAssociate = function() {
-                if($scope.associateReferralLocation) {
+                if($scope.associateReferralLocation && !$scope.referralLocationDisabled) {
                     $scope.associatedDatasets = $scope.associatedDatasets.concat(referralDataset);
                 }
                 return _.compact($scope.associatedDatasets.concat(populationDataset));

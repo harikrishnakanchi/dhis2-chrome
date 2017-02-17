@@ -1,5 +1,6 @@
 {
   "organisationSettings": {
-    "geographicOriginDisabled": false
+    "geographicOriginDisabled": false,
+    "referralLocationDisabled": false
   }
 }
