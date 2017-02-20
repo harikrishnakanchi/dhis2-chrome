@@ -1,12 +1,13 @@
 define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'excludedDataElementsRepository', 'orgUnitRepository', 'categoryRepository',
-        'referralLocationsRepository', 'moduleDataBlockFactory', 'filesystemService', 'translationsService', 'excelBuilder',
+        'referralLocationsRepository', 'optionSetRepository', 'moduleDataBlockFactory', 'filesystemService', 'translationsService', 'excelBuilder',
         'programRepository', 'programEventRepository','excludedLineListOptionsRepository', 'eventsAggregator', 'utils', 'dateUtils', 'timecop', 'moment', 'lodash'],
     function (ExportRawDataController, mocks, DatasetRepository, ExcludedDataElementsRepository, OrgUnitRepository, CategoryRepository,
-              ReferralLocationsRepository, ModuleDataBlockFactory, FilesystemService, TranslationsService, excelBuilder,
+              ReferralLocationsRepository, OptionSetRepository, ModuleDataBlockFactory, FilesystemService, TranslationsService, excelBuilder,
               ProgramRepository, ProgramEventRepository, ExcludedLineListOptionsRepository, eventsAggregator, utils, dateUtils, timecop, moment, _) {
         describe('ExportRawDataController', function () {
             var controller, rootScope, scope, q,
-                datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, programRepository, programEventRepository, excludedLineListOptionsRepository, categoryRepository,
+                datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, programRepository,
+                programEventRepository, excludedLineListOptionsRepository, categoryRepository, optionSetRepository,
                 moduleDataBlockFactory, filesystemService, translationsService,
                 selectedOrgUnit, selectedService, mockEnrichedDataSet, mockExcludedDataElements, mockDataBlocks, mockOriginOrgUnits, mockProgram, mockEvents, mockDataElement, spreadSheetContent;
 
@@ -149,8 +150,10 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
                     categoryRepository = new CategoryRepository();
                     spyOn(categoryRepository, 'getAllCategoryOptionCombos').and.returnValue(utils.getPromise(q, []));
 
+                    optionSetRepository = new OptionSetRepository();
+
                     controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository,
-                        referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository, excludedLineListOptionsRepository, categoryRepository);
+                        referralLocationsRepository, optionSetRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository, excludedLineListOptionsRepository, categoryRepository);
                 });
 
                 it('should fetch sections along with data elements', function () {
@@ -618,10 +621,13 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
                     
                     spyOn(referralLocationsRepository, 'get').and.returnValue(utils.getPromise(q, {}));
 
+                    optionSetRepository = new OptionSetRepository();
+                    spyOn(optionSetRepository, 'getOptionSets').and.returnValue(utils.getPromise(q, {}));
+
                     spyOn(eventsAggregator, 'buildEventsTree');
                     spyOn(eventsAggregator, 'nest');
 
-                    controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository, excludedLineListOptionsRepository);
+                    controller = new ExportRawDataController(scope, q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository, optionSetRepository, moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository, excludedLineListOptionsRepository);
                 });
 
                 it('should fetch the origin org units under the selected module', function () {
@@ -637,17 +643,26 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
                     expect(excludedDataElementsRepository.get).toHaveBeenCalledWith(selectedOrgUnit.id);
                 });
 
-                it('should fetch excluded linelist options for the selected module', function () {
-                    scope.$apply();
-
-                    expect(excludedLineListOptionsRepository.get).toHaveBeenCalledWith(selectedOrgUnit.id);
-                });
-
                 it('should fetch the associated program for the selected module', function () {
                     scope.$apply();
 
                     expect(programRepository.getProgramForOrgUnit).toHaveBeenCalledWith(mockOriginOrgUnits[0].id);
                     expect(programRepository.get).toHaveBeenCalledWith(mockProgram.id, _.map(mockExcludedDataElements, 'id'));
+                });
+
+                it('should fetch the options from optionSetRepository', function () {
+                    var mockOptionSets = [{
+                        id: "ID_A",
+                        isReferralLocationOptionSet: true
+                    }, {
+                        id: "ID_B",
+                        isReferralLocationOptionSet: false
+                    }];
+                    optionSetRepository.getOptionSets.and.returnValue(utils.getPromise(q, mockOptionSets));
+                    scope.$apply();
+
+                    expect(optionSetRepository.getOptionSets).toHaveBeenCalledWith(selectedOrgUnit.parent.id, selectedOrgUnit.id);
+                    expect(translationsService.translate).toHaveBeenCalledWith([mockOptionSets[1]]);
                 });
 
                 it('should fetch all the events in the specified week range for the associated program in selected module', function () {
@@ -679,29 +694,16 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
                         };
                     });
 
-                    it('should get referral locations for the given opUnit', function () {
-                        scope.$apply();
-                        expect(referralLocationsRepository.get).toHaveBeenCalledWith(scope.orgUnit.parent.id);
-                    });
-
                     describe('exportToExcel', function () {
                         beforeEach(function () {
                             scope.weeks = ['2016W01', '2016W02'];
 
-                            scope.referralLocations = {
-                               someGenericNameA: {
-                                   name: 'someReferralLocationName'
-                               }
-                            };
                             scope.referralLocationDataElement = {
                                 id: 'someDataElementId',
                                 optionSet: {
                                     options: [{
                                         id: 'referralLocationOptionIdA',
-                                        genericName: 'someGenericNameA'
-                                    }, {
-                                        id: 'referralLocationOptionIdB',
-                                        genericName: 'someGenericNameB'
+                                        name: 'someReferralLocationName'
                                     }]
                                 }
                             };
