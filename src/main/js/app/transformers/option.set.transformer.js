@@ -8,7 +8,7 @@ define(["lodash"], function (_) {
                 var excludedOptionIds = _.get(indexedExcludedLineListOptions[optionSetId], 'excludedOptionIds', []);
                 var referralLocation = referralLocations && referralLocations[option.name] || {};
                 option.isDisabled = _.contains(excludedOptionIds, option.id) || !!(referralLocation.isDisabled);
-                option.name = (isReferralLocationOptionSet && referralLocation) ? referralLocation.name : option.name;
+                option.name = (isReferralLocationOptionSet && referralLocation.name) ? referralLocation.name : option.name;
                 return option;
             });
         };
