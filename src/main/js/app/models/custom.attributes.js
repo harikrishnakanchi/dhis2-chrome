@@ -53,7 +53,9 @@ define(['lodash', 'moment'], function(_, moment) {
     };
 
     var cleanAttributeValues = function (attributeValues) {
-        return _.filter(attributeValues, 'value');
+        return _.filter(attributeValues, function (attributeValue) {
+            return attributeValue && !_.isEmpty(attributeValue.value);
+        });
     };
 
     var createAttribute = function (attributeCode, value) {
