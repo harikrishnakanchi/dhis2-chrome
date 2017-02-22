@@ -6,7 +6,7 @@
     <div id="weeklyCharts">
         <div ng-if="!(charts | filter: { weeklyChart: true, serviceCode: selectedService.serviceCode } | isEmpty)">
             <span ng-show="updatedForWeeklyChart" class="text-info">
-                <strong> Updated: {{ updatedForWeeklyChart }} </strong>
+                <strong>{{ resourceBundle.updated }}: {{ updatedForWeeklyChart }} </strong>
             </span>
             <div ng-repeat="chart in charts | filter: { weeklyChart: true, serviceCode: selectedService.serviceCode } | orderBy: 'displayPosition'">
                 <div class="row chart-title">
@@ -31,7 +31,7 @@
                 </accordion-heading>
                 <div class="exp-coll-group">
                     <div class="text-info mb15" ng-show="updatedForWeeklyPivotTable">
-                        <strong> Updated: {{ updatedForWeeklyPivotTable }} </strong>
+                        <strong>{{ resourceBundle.updated }}: {{ updatedForWeeklyPivotTable }} </strong>
                     </div>
                     <div ng-repeat="table in pivotTables | filter: { weeklyReport: true, serviceCode: selectedService.serviceCode } | orderBy: 'displayPosition'" class="exportCSV-container">
                         <accordion close-others="false">
