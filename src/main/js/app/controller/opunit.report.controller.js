@@ -84,6 +84,7 @@ define(['moment', 'excelBuilder'], function (moment, excelBuilder) {
                 $scope.pivotTables= [];
                 return pivotTableRepository.getAll()
                     .then(filterOpUnitPivotTables)
+                    .then(translationsService.translate)
                     .then(getDataForPivotTables)
                     .then(translatePivotTableData)
                     .then(function (pivotTables) {

@@ -306,6 +306,13 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             expect(scope.pivotTables).toEqual([pivotTableData]);
         });
 
+        it('should translate project report table', function () {
+            var projectReportPivotTables = _.filter(mockPivotTables, { projectReport: true });
+            scope.$apply();
+
+            expect(translationsService.translate).toHaveBeenCalledWith(projectReportPivotTables);
+        });
+
         it('should filter out project report tables without data', function() {
             pivotTableData.isDataAvailable = false;
             scope.$apply();

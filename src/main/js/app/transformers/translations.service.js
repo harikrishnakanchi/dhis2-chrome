@@ -1,8 +1,8 @@
 define(['lodash'], function(_){
     return function($q, db, $rootScope, ngI18nResourceBundle, systemSettingRepository) {
         var TRANSLATABLE_ENTITIES = ["sections", "dataElements", "headers", "programStages", "programStageSections", "columnConfigurations", "programStageDataElements", "dataElement", "optionSet", "options", "dataValues", "attribute"],
-            TRANSLATABLE_OBJECT_PROPERTIES = ["name", "description", "formName", "shortName", "displayName"],
-            TRANSLATABLE_PROPERTIES_MAP = {'name': 'NAME', 'description': 'DESCRIPTION', 'formName': 'FORM_NAME', 'shortName': 'SHORT_NAME'},
+            TRANSLATABLE_OBJECT_PROPERTIES = ["name", "description", "formName", "shortName", "displayName", "title"],
+            TRANSLATABLE_PROPERTIES_MAP = {'name': 'NAME', 'description': 'DESCRIPTION', 'formName': 'FORM_NAME', 'shortName': 'SHORT_NAME', 'title': 'SHORT_NAME'},
             translations, _locale, self = this;
 
         var refreshResourceBundle = function () {

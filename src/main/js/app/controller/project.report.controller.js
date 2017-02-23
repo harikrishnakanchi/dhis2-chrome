@@ -156,6 +156,7 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper", "excelBuilder"], funct
         var loadPivotTables = function() {
             return pivotTableRepository.getAll()
                 .then(filterProjectReportTables)
+                .then(translationsService.translate)
                 .then(getDataForPivotTables)
                 .then(translationsService.translatePivotTableData)
                 .then(function(pivotTables) {

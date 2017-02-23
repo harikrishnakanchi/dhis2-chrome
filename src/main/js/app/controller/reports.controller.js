@@ -156,6 +156,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             return chartRepository.getAll()
                 .then(filterReportsForCurrentModule)
                 .then(rejectNotificationReports)
+                .then(translationsService.translate)
                 .then(getChartData)
                 .then(translationsService.translateChartData)
                 .then(transformForNVD3)
@@ -241,6 +242,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             return pivotTableRepository.getAll()
                 .then(filterReportsForCurrentModule)
                 .then(rejectNotificationReports)
+                .then(translationsService.translate)
                 .then(getPivotTableData)
                 .then(translationsService.translatePivotTableData)
                 .then(function(pivotTables) {
