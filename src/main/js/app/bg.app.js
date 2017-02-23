@@ -113,6 +113,11 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         });
                     };
 
+                    var clearAlarms = function () {
+                        platformUtils.clearAlarm('metadataSyncAlarm');
+                        platformUtils.clearAlarm('projectDataSyncAlarm');
+                    };
+
                     var startBgApp = function () {
                         if (!$rootScope.isBackgroundRunning) {
                             $rootScope.isBackgroundRunning = true;
@@ -126,10 +131,18 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         }
                     };
 
+                    var stopBgApp = function () {
+                        clearAlarms();
+                        dhisMonitor.stop();
+                        $rootScope.isBackgroundRunning = false;
+                    };
+
                     platformUtils.addListener("startBgApp", startBgApp);
 
+                    platformUtils.addListener("stopBgApp", stopBgApp);
+
                     platformUtils.addListener("productKeyExpired", function() {
-                        dhisMonitor.stop();
+                        stopBgApp();
                     });
 
                     platformUtils.addListener('online', dhisMonitor.start);
