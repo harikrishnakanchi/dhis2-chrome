@@ -7,6 +7,8 @@ define(['pivotTable'], function(PivotTable) {
                config = {
                    id: 'someId',
                    name: 'someName',
+                   title: 'someTitle',
+                   translations: [],
                    columns: 'columnInfo',
                    rows: 'rowInfo',
                    filters: 'filterInfo',
@@ -16,6 +18,8 @@ define(['pivotTable'], function(PivotTable) {
                pivotTable = PivotTable.create(config);
                expect(pivotTable.id).toEqual(config.id);
                expect(pivotTable.name).toEqual(config.name);
+               expect(pivotTable.title).toEqual(config.title);
+               expect(pivotTable.translations).toEqual(config.translations);
                expect(pivotTable.columns).toEqual(config.columns);
                expect(pivotTable.rows).toEqual(config.rows);
                expect(pivotTable.filters).toEqual(config.filters);
@@ -127,23 +131,6 @@ define(['pivotTable'], function(PivotTable) {
            it('should return false if relativePeriods contains Months', function () {
                pivotTable = PivotTable.create({ relativePeriods: { last12Months: true } });
                expect(pivotTable.weeklyReport).toBeFalsy();
-           });
-       });
-
-       describe('title', function() {
-           it('should parse the title from the pivot table name', function() {
-               pivotTable = PivotTable.create({ name: '[FieldApp - someServiceCode] 1 SomePivotTableTitle' });
-               expect(pivotTable.title).toEqual('SomePivotTableTitle');
-           });
-
-           it('should parse the title from the pivot table name with special characters', function() {
-               pivotTable = PivotTable.create({ name: '[FieldApp - someServiceCode] 1 Some\'Pi/vo>t< & Tab=le%Title' });
-               expect(pivotTable.title).toEqual('Some\'Pi/vo>t< & Tab=le%Title');
-           });
-
-           it('should return an empty string if the pivot table name is malformed', function() {
-               pivotTable = PivotTable.create({ name: 'some malformed pivot table name' });
-               expect(pivotTable.title).toEqual('');
            });
        });
 

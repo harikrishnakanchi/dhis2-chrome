@@ -4,12 +4,13 @@ define(['lodash'], function (_) {
     var FIELD_APP_TITLE_REGEX = /^\[(Praxis|FieldApp) - ([a-zA-Z0-9()><]+)\]([0-9\s]*)([a-zA-Z0-9-\s)><(&\/\\=%\+']+)/;
 
     var SERVICE_CODE_INDEX = 2,
-        DISPLAY_POSITION_INDEX = 3,
-        TITLE_INDEX = 4;
+        DISPLAY_POSITION_INDEX = 3;
 
     var PivotTable = function (config) {
         this.id = config.id;
         this.name = config.name;
+        this.title = config.title ;
+        this.translations = config.translations;
         this.columns = config.columns;
         this.rows = config.rows;
         this.filters = config.filters;
@@ -29,13 +30,7 @@ define(['lodash'], function (_) {
         this.weeklyReport = !this.monthlyReport;
         this.hideWeeks = hideWeeks(this.dataDimensionItems);
 
-        this.title = parseTitle(this.name);
         this.displayPosition = parseDisplayPosition(this.name);
-    };
-
-    var parseTitle = function(pivotTableName) {
-        var matches = FIELD_APP_TITLE_REGEX.exec(pivotTableName);
-        return (matches && matches[TITLE_INDEX]) ? matches[TITLE_INDEX] : "";
     };
 
     var parseDisplayPosition = function(pivotTableName) {

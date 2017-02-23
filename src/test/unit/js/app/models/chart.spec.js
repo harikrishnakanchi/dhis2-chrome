@@ -8,6 +8,7 @@ define(['chart'], function(Chart) {
                     id: 'someId',
                     name: 'someName',
                     title: 'someTitle',
+                    translations: [],
                     columns: 'someColumns',
                     filters: 'someFilters',
                     rows: 'someRows',
@@ -19,6 +20,7 @@ define(['chart'], function(Chart) {
                 expect(chart.id).toEqual(config.id);
                 expect(chart.name).toEqual(config.name);
                 expect(chart.title).toEqual(config.title);
+                expect(chart.translations).toEqual(config.translations);
                 expect(chart.columns).toEqual(config.columns);
                 expect(chart.filters).toEqual(config.filters);
                 expect(chart.rows).toEqual(config.rows);
