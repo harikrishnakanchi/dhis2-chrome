@@ -10,7 +10,9 @@ require(["app/pwa/pwa.app.config", "app/shared.app.config"], function() {
         window.moment = moment;
 
         var initializeForeground = function () {
-            app.bootstrap(app.init());
+            app.bootstrap(app.init()).then(function () {
+                platformUtils.sendMessage('dbReady');
+            });
         };
 
         self.worker = new Worker('js/app/pwa/pwa.bg.bootstrap.js');

@@ -2,7 +2,6 @@ define(["platformUtils"], function(platformUtils) {
     return function($scope, $location, $rootScope, packagedDataImporter, sessionHelper, systemSettingRepository) {
         var onSuccess = function() {
             $scope.isKeyInvalid = false;
-            platformUtils.sendMessage("productKeyDecrypted");
 
             if ($rootScope.currentUser) sessionHelper.logout();
             $location.path("/login");

@@ -57,6 +57,8 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
 
                 function(consumerRegistry, dhisMonitor, hustleMonitor, queueInterceptor, $hustle, $log, $rootScope, systemSettingRepository) {
 
+                    $rootScope.isBackgroundRunning = false;
+
                     $hustle.registerInterceptor(queueInterceptor);
 
                     var metadataSync = function() {
@@ -92,11 +94,11 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         consumerRegistry.stopConsumer();
                     };
 
-                    var checkOnlineStatusAndSync = function() {
+                    var checkOnlineStatusAndSync = function () {
                         dhisMonitor.online(startConsumers);
                         dhisMonitor.offline(stopConsumers);
 
-                        dhisMonitor.start()
+                        return dhisMonitor.start()
                             .then(metadataSync)
                             .then(projectDataSync);
                     };
@@ -111,13 +113,20 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         });
                     };
 
-                    platformUtils.addListener("productKeyDecrypted", function() {
-                        systemSettingRepository.loadProductKey().then(function() {
-                            setupAlarms();
-                            consumerRegistry.register()
-                                .then(checkOnlineStatusAndSync);
-                        });
-                    });
+                    var startBgApp = function () {
+                        if (!$rootScope.isBackgroundRunning) {
+                            $rootScope.isBackgroundRunning = true;
+                            systemSettingRepository.loadProductKey()
+                                .then(setupAlarms)
+                                .then(consumerRegistry.register)
+                                .then(checkOnlineStatusAndSync)
+                                .catch(function () {
+                                    $rootScope.isBackgroundRunning = false;
+                                });
+                        }
+                    };
+
+                    platformUtils.addListener("startBgApp", startBgApp);
 
                     platformUtils.addListener("productKeyExpired", function() {
                         dhisMonitor.stop();
@@ -130,15 +139,8 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     platformUtils.addAlarmListener("projectDataSyncAlarm", projectDataSync);
                     platformUtils.addAlarmListener("dhisConnectivityCheckAlarm", dhisMonitor.checkNow);
 
-                    systemSettingRepository.isProductKeySet()
-                        .then(systemSettingRepository.loadProductKey)
-                        .then(function() {
-                            setupAlarms();
-                            $hustle.rescueReservedItems(properties.queue.maxNumberOfTimesItemCanBeRescued,
-                                properties.queue.minTimeInSecToIncrementItemRescuedCount)
-                                .then(consumerRegistry.register)
-                                .then(checkOnlineStatusAndSync);
-                        });
+                    $hustle.rescueReservedItems(properties.queue.maxNumberOfTimesItemCanBeRescued,
+                        properties.queue.minTimeInSecToIncrementItemRescuedCount);
 
                     systemSettingRepository.getPraxisUid()
                         .then(function (uid) {

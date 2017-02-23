@@ -46,7 +46,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     var checkMetadata = function () {
                         return changeLogRepository.get("metaData").then(function (metadataLastUpdated) {
                             if (metadataLastUpdated) {
-                                platformUtils.sendMessage('dbReady');
+                                platformUtils.sendMessage('startBgApp');
                                 return customAttributeRepository.getAll().then(customAttributes.initializeData);
                             } else {
                                 return $q.reject('noMetadata');

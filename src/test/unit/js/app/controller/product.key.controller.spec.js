@@ -51,14 +51,5 @@ define(["productKeyController", "angularMocks", "packagedDataImporter", "utils",
 
             expect(sessionHelper.logout).not.toHaveBeenCalled();
         });
-
-        it("should send a productKeyDecrypted message after product key is decrypted successfully", function() {
-            scope.productKey = "eyJpdiI6IkZlTlZqYTZxUWRtUjRwTHVybEs2cmc9PSIsInNhbHQiOiJxa045eUIxNS90bz0iLCJjdCI6ImxpR2VTV3Nvb0s2eFdtRTk1WGlGMFFYOFVrbXVTdWJaOGRiYndDTkg3ZjVKdTZWMDNJczR1SGpaV0VWU29CZz0ifQ==";
-
-            scope.$apply();
-            scope.setAuthHeaderAndProceed();
-            scope.$apply();
-            expect(platformUtils.sendMessage.calls.argsFor(0)).toEqual(["productKeyDecrypted"]);
-        });
     });
 });
