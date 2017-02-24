@@ -490,7 +490,7 @@ define(['dateUtils', 'lodash', 'metadataConf'], function(dateUtils, _, metadataC
             if (metaDataChangeLog) {
                 metadataConf.entities
                     .filter(function (entity) {
-                        return !_.includes(['userRoles', 'attributes'], entity);
+                        return !_.includes(['userRoles', 'attributes', 'indicators', 'programIndicators'], entity);
                     })
                     .forEach(function (entityType) {
                         changeLogStore.put({
