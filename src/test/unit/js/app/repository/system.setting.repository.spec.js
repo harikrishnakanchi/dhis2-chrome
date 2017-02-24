@@ -26,6 +26,15 @@ define(["systemSettingRepository", "angularMocks", "utils", "dhisId"], function(
             expect(mockStore.upsert).toHaveBeenCalledWith(systemSettings);
         });
 
+        it('should upsert the app sync setting', function () {
+            var syncSetting = {
+                key: "offline",
+                value: true
+            };
+            repo.upsertSyncSetting(true);
+            expect(mockStore.upsert).toHaveBeenCalledWith(syncSetting);
+        });
+
         it("should find all system settings given a project id", function() {
             var key = "moduleTemplates";
 

@@ -45,6 +45,12 @@ define(["lodash", "cipherUtils", "properties", "dhisId"], function(_, cipherUtil
 
         };
 
+        var upsertSyncSetting = function(syncState) {
+            var syncSetting = {"key": "offline", "value": syncState};
+            var store = db.objectStore("systemSettings");
+            return store.upsert(syncSetting);
+        };
+
         var upsertLocale = function (locale) {
             var localeJson = {"key": "locale", "value": locale};
             var store = db.objectStore("systemSettings");
@@ -140,6 +146,7 @@ define(["lodash", "cipherUtils", "properties", "dhisId"], function(_, cipherUtil
             "upsert": upsert,
             "upsertProductKey": upsertProductKey,
             "upsertLocale": upsertLocale,
+            "upsertSyncSetting": upsertSyncSetting,
             "get": get,
             "getDhisUrl": getDhisUrl,
             "getAuthHeader": getAuthHeader,
