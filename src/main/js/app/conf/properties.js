@@ -32,7 +32,7 @@ define(['lodash', 'overrides', 'platformConfig'], function(_, overrides, platfor
             delay: 100,
             skipRetryMessages: [],
             maxNumberOfTimesItemCanBeRescued: 5,
-            minTimeInSecToIncrementItemRescuedCount: 60,
+            minTimeInSecToIncrementItemRescuedCount: 120,
             httpGetRetryDelay: 10000,
             retryDelayConfig: {
                 0: 10000,
