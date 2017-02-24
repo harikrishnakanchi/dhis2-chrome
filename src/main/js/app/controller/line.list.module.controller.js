@@ -401,8 +401,11 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
                 };
 
                 var associateMandatoryDatasetsToModule = function() {
-                    var datasetIds = [dataSets.populationDatasetId, dataSets.referralDatasetId];
+                    var datasetIds = [dataSets.populationDatasetId];
 
+                    if(!$scope.referralLocationDisabled) {
+                        datasetIds = datasetIds.concat(dataSets.referralDatasetId);
+                    }
                     if($scope.geographicOriginDisabled) {
                         datasetIds = datasetIds.concat(dataSets.summaryDatasetId);
                     }
