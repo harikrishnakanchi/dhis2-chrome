@@ -10,6 +10,8 @@ define(['lodash'], function (_) {
     var PivotTable = function (config) {
         this.id = config.id;
         this.name = config.name;
+
+        // TODO: Stop parsing the title from name after all fields have downloaded pivot table titles which are available in DHIS 2.25
         this.title = config.title || parseTitle(config.name) ;
         this.translations = config.translations;
         this.columns = config.columns;
@@ -38,7 +40,6 @@ define(['lodash'], function (_) {
         var matches = FIELD_APP_TITLE_REGEX.exec(pivotTableName);
         return (matches && matches[TITLE_INDEX]) ? matches[TITLE_INDEX] : "";
     };
-
 
     var parseDisplayPosition = function(pivotTableName) {
         var matches = FIELD_APP_TITLE_REGEX.exec(pivotTableName);
