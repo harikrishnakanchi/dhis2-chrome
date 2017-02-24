@@ -98,7 +98,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         dhisMonitor.online(startConsumers);
                         dhisMonitor.offline(stopConsumers);
 
-                        return dhisMonitor.start()
+                        return dhisMonitor.resume()
                             .then(metadataSync)
                             .then(projectDataSync);
                     };
@@ -133,7 +133,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
 
                     var stopBgApp = function () {
                         clearAlarms();
-                        dhisMonitor.stop();
+                        dhisMonitor.halt();
                         $rootScope.isBackgroundRunning = false;
                     };
 
