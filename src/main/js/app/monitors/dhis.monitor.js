@@ -2,7 +2,7 @@ define(["properties", "platformUtils", "lodash"], function(properties, platformU
     return function($http, $log, $timeout, $rootScope, userPreferenceRepository) {
         var onlineEventHandlers = [];
         var offlineEventHandlers = [];
-        var isDhisOnline;
+        var isDhisOnline, isHalted= false;
 
         var dhisConnectivityCheck = function() {
 
@@ -83,11 +83,13 @@ define(["properties", "platformUtils", "lodash"], function(properties, platformU
         };
 
         var start = function() {
+            if (isHalted) return;
             createAlarms();
             return dhisConnectivityCheck();
         };
 
         var stop = function() {
+            if (isHalted) return;
             platformUtils.clearAlarm("dhisConnectivityCheckAlarm");
             isDhisOnline = false;
             platformUtils.sendMessage('dhisOffline');
@@ -115,6 +117,16 @@ define(["properties", "platformUtils", "lodash"], function(properties, platformU
             return $rootScope.timeoutEventReferenceCount !== undefined && $rootScope.timeoutEventReferenceCount > 0;
         };
 
+        var halt = function () {
+            stop();
+            isHalted = true;
+        };
+
+        var resume = function () {
+            isHalted = false;
+            return start();
+        };
+
         platformUtils.addListener("dhisOffline", onDhisOffline);
         platformUtils.addListener("dhisOnline", onDhisOnline);
 
@@ -126,7 +138,9 @@ define(["properties", "platformUtils", "lodash"], function(properties, platformU
             online: online,
             offline: offline,
             checkNow: checkNow,
-            onTimeoutOccurred: onTimeoutOccurred
+            onTimeoutOccurred: onTimeoutOccurred,
+            halt: halt,
+            resume: resume
         };
     };
 });
