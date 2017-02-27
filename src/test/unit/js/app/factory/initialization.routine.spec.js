@@ -1,6 +1,6 @@
-define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter', 'systemSettingRepository', 'translationsService', 'platformUtils'],
-    function (mocks, utils, InitializationRoutine, PackagedDataImporter, SystemSettingRepository, TranslationsService, platformUtils) {
-        var initializationRoutine, packagedDataImporter, q, location, rootScope, systemSettingRepository, translationsService;
+define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter', 'systemSettingRepository', 'translationsService', 'platformUtils', 'hustleMonitor'],
+    function (mocks, utils, InitializationRoutine, PackagedDataImporter, SystemSettingRepository, TranslationsService, platformUtils, HustleMonitor) {
+        var initializationRoutine, packagedDataImporter, q, location, rootScope, systemSettingRepository, translationsService, hustleMonitor;
         describe("InitializationRoutine", function () {
             beforeEach(mocks.inject(function ($q, $rootScope, $location) {
                 q = $q;
@@ -21,7 +21,10 @@ define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter'
                 spyOn(systemSettingRepository, 'getLocale').and.returnValue(utils.getPromise(q, 'SOME_LOCALE'));
                 spyOn(systemSettingRepository, 'loadProductKey').and.returnValue(utils.getPromise(q, {}));
 
-                initializationRoutine = InitializationRoutine(rootScope, location, systemSettingRepository, translationsService);
+                hustleMonitor = new HustleMonitor();
+                spyOn(hustleMonitor, 'checkHustleQueueCount').and.returnValue(utils.getPromise(q, undefined));
+
+                initializationRoutine = InitializationRoutine(rootScope, location, systemSettingRepository, translationsService, hustleMonitor);
             }));
 
             describe('locale', function () {
@@ -98,20 +101,23 @@ define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter'
                 });
             });
 
-            it('should initialize platformUtils', function () {
-                initializationRoutine.run();
+            describe('run', function () {
+                beforeEach(function () {
+                    initializationRoutine.run();
+                    rootScope.$apply();
+                });
 
-                rootScope.$apply();
+                it('should initialize platformUtils', function () {
+                    expect(platformUtils.init).toHaveBeenCalled();
+                });
 
-                expect(platformUtils.init).toHaveBeenCalled();
-            });
+                it('should load the product key', function () {
+                    expect(systemSettingRepository.loadProductKey).toHaveBeenCalled();
+                });
 
-            it('should load the product key', function () {
-                initializationRoutine.run();
-
-                rootScope.$apply();
-
-                expect(systemSettingRepository.loadProductKey).toHaveBeenCalled();
+                it('should check the hustle queue count', function () {
+                    expect(hustleMonitor.checkHustleQueueCount).toHaveBeenCalled();
+                });
             });
         });
     });
