@@ -2,7 +2,7 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
     function(HeaderController, mocks, utils, SessionHelper, platformUtils, OrgUnitRepository, SystemSettingRepository, DhisMonitor) {
         describe("headerController", function() {
             var rootScope, headerController, scope, q, timeout, fakeModal, dhisMonitor,
-                translationStore, location, sessionHelper, orgUnitRepository, hustle, systemSettingRepository;
+                translationStore, location, sessionHelper, orgUnitRepository, hustle, systemSettingRepository, deferredPromise;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $location, $hustle, $timeout) {
@@ -51,6 +51,9 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
 
                 spyOn(systemSettingRepository, "isProductKeySet").and.returnValue(utils.getPromise(q, true));
                 spyOn(systemSettingRepository, "isKeyGeneratedFromProd").and.returnValue(utils.getPromise(q, true));
+                spyOn(systemSettingRepository, "upsertSyncSetting").and.returnValue(utils.getPromise(q, {}));
+                deferredPromise = q.defer();
+                spyOn(systemSettingRepository, "isSyncOff").and.returnValue(deferredPromise.promise);
 
                 location = $location;
 
@@ -62,7 +65,7 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
                     return {
                         upsert: upsert,
                         find: find,
-                        each: each,
+                        each: each
                     };
                 };
 
@@ -144,6 +147,38 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
             it("should show the test logo if not connected to prod", function() {
                 systemSettingRepository.isKeyGeneratedFromProd.and.returnValue(false);
                 expect(scope.showTestLogo()).toBe(true);
+            });
+
+            it("should set isOffline flag on init", function () {
+                deferredPromise.resolve(true);
+                scope.$apply();
+
+                expect(systemSettingRepository.isSyncOff).toHaveBeenCalled();
+                expect(scope.isOffline).toBeTruthy();
+            });
+
+            describe('toggleSync', function () {
+                it('should turn off sync', function () {
+                    deferredPromise.resolve(false);
+                    scope.$apply();
+                    scope.toggleSync();
+
+                    scope.$apply();
+                    expect(scope.isOffline).toBeTruthy();
+                    expect(systemSettingRepository.upsertSyncSetting).toHaveBeenCalledWith(true);
+                    expect(platformUtils.sendMessage).toHaveBeenCalledWith('stopBgApp');
+                });
+
+                it('should turn on sync', function () {
+                    deferredPromise.resolve(true);
+                    scope.$apply();
+                    scope.toggleSync();
+
+                    scope.$apply();
+                    expect(scope.isOffline).toBeFalsy();
+                    expect(systemSettingRepository.upsertSyncSetting).toHaveBeenCalledWith(false);
+                    expect(platformUtils.sendMessage).toHaveBeenCalledWith('startBgApp');
+                });
             });
 
             describe('Praxis Version', function () {

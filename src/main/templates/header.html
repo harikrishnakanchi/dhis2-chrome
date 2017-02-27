@@ -56,6 +56,8 @@
                                         <li class="divider"></li>
                                         <li><a href="" ng-click="gotoProductKeyPage()" tabindex="-1">{{
                                             resourceBundle.updateProductKeyMenuLabel }}</a></li>
+                                        <li><a href="" ng-click="toggleSync()" ng-if="!isOffline">Turn off Sync</a></li>
+                                        <li><a href="" ng-click="toggleSync()" ng-if="isOffline">Turn on Sync</a></li>
                                         <li class="dropdown-submenu"
                                             ng-class="{'pull-left': layoutDirection.direction != 'rtl'}"
                                             ng-include="'templates/partials/clone.html'"></li>
@@ -66,6 +68,8 @@
                                     <ul class="dropdown-menu" role="menu" ng-if="!isLoggedIn">
                                         <li><a href="" ng-click="gotoProductKeyPage()" tabindex="-1">{{
                                             resourceBundle.updateProductKeyMenuLabel }}</a></li>
+                                        <li><a href="" ng-click="toggleSync()" ng-if="!isOffline">Turn off Sync</a></li>
+                                        <li><a href="" ng-click="toggleSync()" ng-if="isOffline">Turn on Sync</a></li>
                                         <li ng-hide="metadataDownloading()" class="divider"></li>
                                         <li ng-hide="metadataDownloading()"><a href="" ng-click="uninstallPraxis()">{{ resourceBundle.uninstall.title }}</a></li>
                                     </ul>

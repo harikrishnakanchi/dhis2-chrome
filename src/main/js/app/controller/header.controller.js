@@ -154,6 +154,20 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
             }, modalMessages);
         };
 
+        var turnOffSync = function () {
+            $scope.isOffline = true;
+            systemSettingRepository.upsertSyncSetting($scope.isOffline).then(function () {
+                platformUtils.sendMessage("stopBgApp");
+            });
+        };
+
+        var turnOnSync = function () {
+            $scope.isOffline = false;
+            systemSettingRepository.upsertSyncSetting($scope.isOffline).then(function () {
+                platformUtils.sendMessage("startBgApp");
+            });
+        };
+
         var showModal = function(okCallback, messages) {
             var scope = $rootScope.$new();
             scope.modalMessages = messages;
@@ -167,8 +181,18 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
             return modalInstance.result.then(okCallback);
         };
 
+        $scope.toggleSync = function () {
+            if ($scope.isOffline) {
+                turnOnSync();
+            } else {
+                turnOffSync();
+            }
+        };
+
         var init = function() {
-            checkConnectionQuality();
+            systemSettingRepository.isSyncOff().then(function (isOffline) {
+                $scope.isOffline = isOffline;
+            }).then(checkConnectionQuality);
         };
 
         init();
