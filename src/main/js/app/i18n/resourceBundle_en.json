@@ -353,5 +353,6 @@
         "successMessage": "Praxis is uninstalled. Please close the browser window."
     },
     "selectAll": "Select All",
-    "unselectAll": "Unselect All"
+    "unselectAll": "Unselect All",
+    "syncOffMessage": "SYNC OFF"
 }

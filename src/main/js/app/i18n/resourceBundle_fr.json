@@ -353,5 +353,6 @@
         "successMessage": "Praxis est désinstallé. Fermez la fenêtre du navigateur."
     },
     "selectAll": "Sélectionner Tout",
-    "unselectAll": "Tout Déselectionner"
+    "unselectAll": "Tout Déselectionner",
+    "syncOffMessage": "Synchronisation désactivée"
 }

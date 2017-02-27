@@ -81,6 +81,11 @@
             </nav>
         </div>
     </header>
+    <div class="container info-bar {{layoutDirection.direction}}">
+        <div class="alert alert-danger" ng-if="isOffline">
+            <li>{{ resourceBundle.syncOffMessage }}</li>
+        </div>
+    </div>
     <div class="container hide-from-print {{layoutDirection.direction}}" style="padding-top:10px;" ng-if="isLoggedIn">
         <ul class="nav nav-tabs main-menu">
             <li role="presentation" ng-class="{ active: isActive('\/dashboard$')}"
