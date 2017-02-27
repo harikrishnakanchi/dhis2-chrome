@@ -53,9 +53,9 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                 basePath: self.basePath + "js/app/i18n"
             });
 
-            app.run(['consumerRegistry', 'dhisMonitor', 'hustleMonitor', 'queueInterceptor', '$hustle', '$log', '$rootScope', 'systemSettingRepository',
+            app.run(['consumerRegistry', 'dhisMonitor', 'hustleMonitor', 'queueInterceptor', '$hustle', '$log', '$rootScope','$q', 'systemSettingRepository',
 
-                function(consumerRegistry, dhisMonitor, hustleMonitor, queueInterceptor, $hustle, $log, $rootScope, systemSettingRepository) {
+                function(consumerRegistry, dhisMonitor, hustleMonitor, queueInterceptor, $hustle, $log, $rootScope, $q, systemSettingRepository) {
 
                     $rootScope.isBackgroundRunning = false;
 
@@ -120,8 +120,10 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
 
                     var startBgApp = function () {
                         if (!$rootScope.isBackgroundRunning) {
-                            $rootScope.isBackgroundRunning = true;
-                            systemSettingRepository.loadProductKey()
+                            systemSettingRepository.isSyncOff().then(function (isOffline) {
+                                if (isOffline) return $q.reject();
+                                else $rootScope.isBackgroundRunning = true;
+                            }).then(systemSettingRepository.loadProductKey)
                                 .then(setupAlarms)
                                 .then(consumerRegistry.register)
                                 .then(checkOnlineStatusAndSync)
