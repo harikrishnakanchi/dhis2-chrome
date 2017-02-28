@@ -354,5 +354,9 @@
     },
     "selectAll": "اختر الكل",
     "unselectAll": "إلغاء تحديد الكل",
-    "syncOffMessage": "مزامنة قبالة"
+    "sync": {
+        "turnOffMessage": "مزامنة قبالة",
+        "turnOn": "Turn on Sync",
+        "turnOff": "Turn off Sync"
+    }
 }

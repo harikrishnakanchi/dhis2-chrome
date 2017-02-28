@@ -354,5 +354,9 @@
     },
     "selectAll": "Select All",
     "unselectAll": "Unselect All",
-    "syncOffMessage": "SYNC OFF"
+    "sync": {
+        "turnOffMessage": "SYNC OFF",
+        "turnOn": "Turn on Sync",
+        "turnOff": "Turn off Sync"
+    }
 }

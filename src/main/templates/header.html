@@ -29,7 +29,7 @@
                                 </span>
                         </p>
                         <ul class="nav navbar-nav" ng-class="{'navbar-right': layoutDirection.direction != 'rtl'}">
-                            <li class="sync-status" ng-if="remainingJobs >= 0">
+                            <li class="sync-status" ng-if="remainingJobs >= 0 && !metadataDownloading()">
                                 <span class="badge dhis-online" ng-if="isDhisOnline && !poorConnection && remainingJobs > 0" title="{{ resourceBundle.online + getRemainingJobs() + resourceBundle.jobsInProgress }}">{{ getRemainingJobs() }}</span>
                                 <span class="badge dhis-online" ng-if="isDhisOnline && !poorConnection && remainingJobs == 0" title="{{ resourceBundle.online  + resourceBundle.noPendingRequest }}">{{ getRemainingJobs() }}</span>
                                 <span class="badge dhis-poor-connection" ng-if="poorConnection && remainingJobs > 0" title="{{ resourceBundle.poorConnection  + getRemainingJobs() + resourceBundle.pendingRequests }}">{{ getRemainingJobs() }}</span>
@@ -56,8 +56,8 @@
                                         <li class="divider"></li>
                                         <li><a href="" ng-click="gotoProductKeyPage()" tabindex="-1">{{
                                             resourceBundle.updateProductKeyMenuLabel }}</a></li>
-                                        <li><a href="" ng-click="toggleSync()" ng-if="!isOffline">Turn off Sync</a></li>
-                                        <li><a href="" ng-click="toggleSync()" ng-if="isOffline">Turn on Sync</a></li>
+                                        <li><a href="" ng-click="toggleSync()" ng-if="!isOffline">{{ resourceBundle.sync.turnOff }}</a></li>
+                                        <li><a href="" ng-click="toggleSync()" ng-if="isOffline">{{ resourceBundle.sync.turnOn }}</a></li>
                                         <li class="dropdown-submenu"
                                             ng-class="{'pull-left': layoutDirection.direction != 'rtl'}"
                                             ng-include="'templates/partials/clone.html'"></li>
@@ -68,8 +68,8 @@
                                     <ul class="dropdown-menu" role="menu" ng-if="!isLoggedIn">
                                         <li><a href="" ng-click="gotoProductKeyPage()" tabindex="-1">{{
                                             resourceBundle.updateProductKeyMenuLabel }}</a></li>
-                                        <li><a href="" ng-click="toggleSync()" ng-if="!isOffline">Turn off Sync</a></li>
-                                        <li><a href="" ng-click="toggleSync()" ng-if="isOffline">Turn on Sync</a></li>
+                                        <li ng-hide="metadataDownloading()" ng-if="!isOffline"><a href="" ng-click="toggleSync()">{{ resourceBundle.sync.turnOff }}</a></li>
+                                        <li ng-hide="metadataDownloading()" ng-if="isOffline"><a href="" ng-click="toggleSync()">{{ resourceBundle.sync.turnOn }}</a></li>
                                         <li ng-hide="metadataDownloading()" class="divider"></li>
                                         <li ng-hide="metadataDownloading()"><a href="" ng-click="uninstallPraxis()">{{ resourceBundle.uninstall.title }}</a></li>
                                     </ul>
@@ -83,7 +83,7 @@
     </header>
     <div class="container info-bar {{layoutDirection.direction}}">
         <div class="alert alert-danger" ng-if="isOffline">
-            <li>{{ resourceBundle.syncOffMessage }}</li>
+            <li>{{ resourceBundle.sync.turnOffMessage }}</li>
         </div>
     </div>
     <div class="container hide-from-print {{layoutDirection.direction}}" style="padding-top:10px;" ng-if="isLoggedIn">

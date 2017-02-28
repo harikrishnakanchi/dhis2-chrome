@@ -354,5 +354,9 @@
     },
     "selectAll": "Sélectionner Tout",
     "unselectAll": "Tout Déselectionner",
-    "syncOffMessage": "Synchronisation désactivée"
+    "sync": {
+        "turnOffMessage": "Synchronisation désactivée",
+        "turnOn": "Activer la synchronisation",
+        "turnOff": "Désactiver la synchronisation"
+    }
 }
