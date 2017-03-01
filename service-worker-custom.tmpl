@@ -103,8 +103,8 @@ self.addEventListener('install', function(event) {
   };
 
   var shouldUpgrade = caches.open(cacheName).then(function (cache) {
-    return cache.keys().then(function (keys) {
-      if(keys.length > 0) {
+    return setOfCachedUrls(cache).then(function (cachedUrls) {
+      if(cachedUrls.size >= urlsToCacheKeys.size) {
         return checkForSyncStatus();
       } else {
         return Promise.resolve();
