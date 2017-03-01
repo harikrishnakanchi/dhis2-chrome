@@ -191,7 +191,7 @@ gulp.task('generate-service-worker', ['less'], function (callback) {
             rootDir + '/img/*',
             rootDir + '/js/**/*/!(chrome.*.js)',
             rootDir + '/templates/**/*',
-            rootDir + '/{background,index}.html'
+            rootDir + '/index.html'
         ],
         stripPrefix: rootDir + '/',
         importScripts: ['js/app/pwa/service.worker.events.js'],
@@ -219,7 +219,7 @@ gulp.task('generate-zip', ['config', 'generate-service-worker'], function () {
             `!${basePath}/chrome.app.html`,
             `!${basePath}/background.html`
         ])
-        .pipe(zip("praxis_" + (argv.env || "dev") + ".zip"))
+        .pipe(zip("praxis_pwa_" + (argv.env || "dev") + ".zip"))
         .pipe(gulp.dest('dist'));
 });
 
