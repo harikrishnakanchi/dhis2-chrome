@@ -70,20 +70,65 @@ function setOfCachedUrls(cache) {
 }
 
 self.addEventListener('install', function(event) {
-  event.waitUntil(
-    caches.open(cacheName).then(function(cache) {
-      return setOfCachedUrls(cache).then(function(cachedUrls) {
-        return Array.from(urlsToCacheKeys.values()).reduce(function(promise, cacheKey) {
-          return promise.then(function () {
-            if (!cachedUrls.has(cacheKey)) {
-              return cache.add(new Request(cacheKey, {credentials: 'same-origin'}));
-            } else {
-              return Promise.resolve();
+  var checkForSyncStatus = function () {
+    return new Promise(function (resolve, reject) {
+      var db;
+      var request = indexedDB.open("praxis");
+
+      var getSyncStatus = function() {
+        if(db.objectStoreNames.contains('systemSettings')) {
+          var tx = db.transaction("systemSettings", "readonly");
+          var objectStore = tx.objectStore('systemSettings');
+          var req = objectStore.get('offline');
+          req.onsuccess = function () {
+            var val = req.result;
+            if (val && val.value) {
+              console.warn('Stopping service worker from updating because sync is turned off.');
+              reject();
             }
-          });
-        }, Promise.resolve());
+            else resolve();
+          };
+        }
+        else resolve();
+      };
+
+      request.onsuccess = function (event) {
+        db = request.result;
+        getSyncStatus();
+        db.close();
+      };
+
+      request.onerror = resolve;
+    });
+  };
+
+  var shouldUpgrade = caches.open(cacheName).then(function (cache) {
+    return cache.keys().then(function (keys) {
+      if(keys.length > 0) {
+        return checkForSyncStatus();
+      } else {
+        return Promise.resolve();
+      }
+    });
+  });
+
+  event.waitUntil(
+    shouldUpgrade.then(function() {
+      return caches.open(cacheName).then(function(cache) {
+        return setOfCachedUrls(cache).then(function(cachedUrls) {
+          return Array.from(urlsToCacheKeys.values()).reduce(function(promise, cacheKey) {
+            return promise.then(function () {
+              if (!cachedUrls.has(cacheKey)) {
+                return cache.add(new Request(cacheKey, {credentials: 'same-origin'}));
+              } else {
+                return Promise.resolve();
+              }
+            });
+          }, Promise.resolve());
+        });
       });
-    }).then(function() {
+    })
+    .then(function() {
       <% if (skipWaiting) { %>
       // Force the SW to transition from installing -> active state
       return self.skipWaiting();
