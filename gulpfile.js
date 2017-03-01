@@ -210,7 +210,20 @@ gulp.task('pack', ['less', 'config', 'download-packaged-data'], function() {
     return stream;
 });
 
-gulp.task('generate-pwa', ['config', 'generate-service-worker'], function () {});
+gulp.task('generate-zip', ['config', 'generate-service-worker'], function () {
+    var basePath = './src/main';
+    return gulp.src([
+            `${basePath}/**`,
+            `!${basePath}/js/app/chrome{,/**}`,
+            `!${basePath}/less{,/**}`,
+            `!${basePath}/chrome.app.html`,
+            `!${basePath}/background.html`
+        ])
+        .pipe(zip("praxis_" + (argv.env || "dev") + ".zip"))
+        .pipe(gulp.dest('dist'));
+});
+
+gulp.task('generate-pwa', ['generate-zip'], function () {});
 
 gulp.task('zip', ['less', 'config', 'download-metadata'], function() {
     var basePath = './src/main';
