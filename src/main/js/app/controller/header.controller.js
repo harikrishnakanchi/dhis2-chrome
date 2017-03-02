@@ -155,20 +155,36 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
         };
 
         var turnOffSync = function () {
-            $scope.isOffline = true;
-            systemSettingRepository.upsertSyncSetting($scope.isOffline).then(function () {
-                platformUtils.sendMessage("stopBgApp");
-            });
+            var modalMessage = {
+                "ok": $scope.resourceBundle.okLabel,
+                "title": $scope.resourceBundle.sync.turnOff,
+                "confirmationMessage": $scope.resourceBundle.sync.turnOffConfirmationMessage
+            };
+
+            showModal(function () {
+                $scope.isOffline = true;
+                systemSettingRepository.upsertSyncSetting($scope.isOffline).then(function () {
+                    platformUtils.sendMessage("stopBgApp");
+                });
+            }, modalMessage);
         };
 
         var turnOnSync = function () {
-            $scope.isOffline = false;
-            if(platformUtils.platform == 'web') {
-                window.Praxis.update();
-            }
-            systemSettingRepository.upsertSyncSetting($scope.isOffline).then(function () {
-                platformUtils.sendMessage("startBgApp");
-            });
+            var modalMessage = {
+                "ok": $scope.resourceBundle.okLabel,
+                "title": $scope.resourceBundle.sync.turnOn,
+                "confirmationMessage": $scope.resourceBundle.sync.turnOnConfirmationMessage
+            };
+
+            showModal(function () {
+                $scope.isOffline = false;
+                if(platformUtils.platform == 'web') {
+                    window.Praxis.update();
+                }
+                systemSettingRepository.upsertSyncSetting($scope.isOffline).then(function () {
+                    platformUtils.sendMessage("startBgApp");
+                });
+            }, modalMessage);
         };
 
         var showModal = function(okCallback, messages) {

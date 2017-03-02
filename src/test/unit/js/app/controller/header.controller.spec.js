@@ -18,6 +18,13 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
                     uninstall: {
                         title: 'Uninstall Praxis',
                         successMessage: "Uninstalled successfully"
+                    },
+                    sync: {
+                        turnOffMessage: "SYNC OFF",
+                        turnOn: "Turn on Sync",
+                        turnOff: "Turn off Sync",
+                        turnOnConfirmationMessage: "Warning: Turn On Sync will sync data from Praxis to DHIS. It will update Praxis to the latest versions, if available. Are you sure you want to turn Sync On?",
+                        turnOffConfirmationMessage: "Warning: Turn Off Sync will stop Praxis from getting data and uploading data on DHIS. It will stop Praxis versions from update. Are you sure you want to turn Sync Off?"
                     }
                 };
 
@@ -158,6 +165,11 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
             });
 
             describe('toggleSync', function () {
+                beforeEach(function () {
+                    spyOn(fakeModal, 'open').and.returnValue({
+                        result: utils.getPromise(q, {})
+                    });
+                });
                 it('should turn off sync', function () {
                     deferredPromise.resolve(false);
                     scope.$apply();
