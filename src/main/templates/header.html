@@ -29,7 +29,7 @@
                                 </span>
                         </p>
                         <ul class="nav navbar-nav" ng-class="{'navbar-right': layoutDirection.direction != 'rtl'}">
-                            <li class="sync-status" ng-if="remainingJobs >= 0 && !metadataDownloading()">
+                            <li class="sync-status" ng-if="remainingJobs >= 0 && !hideSyncStatus()">
                                 <span class="badge dhis-online" ng-if="isDhisOnline && !poorConnection && remainingJobs > 0" title="{{ resourceBundle.online + getRemainingJobs() + resourceBundle.jobsInProgress }}">{{ getRemainingJobs() }}</span>
                                 <span class="badge dhis-online" ng-if="isDhisOnline && !poorConnection && remainingJobs == 0" title="{{ resourceBundle.online  + resourceBundle.noPendingRequest }}">{{ getRemainingJobs() }}</span>
                                 <span class="badge dhis-poor-connection" ng-if="poorConnection && remainingJobs > 0" title="{{ resourceBundle.poorConnection  + getRemainingJobs() + resourceBundle.pendingRequests }}">{{ getRemainingJobs() }}</span>
@@ -37,7 +37,7 @@
                                 <span class="badge dhis-offline" ng-if="!isDhisOnline && !poorConnection && remainingJobs > 0" title="{{ resourceBundle.offline  + getRemainingJobs() + resourceBundle.pendingRequests }}">{{ getRemainingJobs() }}</span>
                                 <span class="badge dhis-offline" ng-if="!isDhisOnline && !poorConnection && remainingJobs == 0" title="{{ resourceBundle.offline  + resourceBundle.noPendingRequest }}">{{ getRemainingJobs() }}</span>
                             </li>
-                            <li ng-hide="metadataDownloading()">
+                            <li ng-hide="hideSyncStatus()">
                                 <span class="glyphicon dhis-status"
                                       title="{{ networkStatus() }}"
                                       >
@@ -68,10 +68,10 @@
                                     <ul class="dropdown-menu" role="menu" ng-if="!isLoggedIn">
                                         <li><a href="" ng-click="gotoProductKeyPage()" tabindex="-1">{{
                                             resourceBundle.updateProductKeyMenuLabel }}</a></li>
-                                        <li ng-hide="metadataDownloading()" ng-if="!isOffline"><a href="" ng-click="toggleSync()">{{ resourceBundle.sync.turnOff }}</a></li>
-                                        <li ng-hide="metadataDownloading()" ng-if="isOffline"><a href="" ng-click="toggleSync()">{{ resourceBundle.sync.turnOn }}</a></li>
-                                        <li ng-hide="metadataDownloading()" class="divider"></li>
-                                        <li ng-hide="metadataDownloading()"><a href="" ng-click="uninstallPraxis()">{{ resourceBundle.uninstall.title }}</a></li>
+                                        <li ng-hide="hideSyncStatus()" ng-if="!isOffline"><a href="" ng-click="toggleSync()">{{ resourceBundle.sync.turnOff }}</a></li>
+                                        <li ng-hide="hideSyncStatus()" ng-if="isOffline"><a href="" ng-click="toggleSync()">{{ resourceBundle.sync.turnOn }}</a></li>
+                                        <li ng-hide="hideSyncStatus()" class="divider"></li>
+                                        <li ng-hide="hideSyncStatus()"><a href="" ng-click="uninstallPraxis()">{{ resourceBundle.uninstall.title }}</a></li>
                                     </ul>
                                 </div>
                             </li>
