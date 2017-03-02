@@ -83,8 +83,7 @@ self.addEventListener('install', function(event) {
           req.onsuccess = function () {
             var val = req.result;
             if (val && val.value) {
-              console.warn('Stopping service worker from updating because sync is turned off.');
-              reject();
+              reject('Stopping service worker from updating because sync is turned off.');
             }
             else resolve();
           };
