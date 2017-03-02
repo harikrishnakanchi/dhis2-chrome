@@ -163,6 +163,9 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
 
         var turnOnSync = function () {
             $scope.isOffline = false;
+            if(platformUtils.platform == 'web') {
+                window.Praxis.update();
+            }
             systemSettingRepository.upsertSyncSetting($scope.isOffline).then(function () {
                 platformUtils.sendMessage("startBgApp");
             });

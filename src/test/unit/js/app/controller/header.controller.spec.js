@@ -169,15 +169,36 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
                     expect(platformUtils.sendMessage).toHaveBeenCalledWith('stopBgApp');
                 });
 
-                it('should turn on sync', function () {
-                    deferredPromise.resolve(true);
-                    scope.$apply();
-                    scope.toggleSync();
+                describe('turnOnSync', function () {
+                    beforeEach(function () {
+                        window.Praxis = {
+                            update: jasmine.createSpy('update')
+                        };
+                    });
 
-                    scope.$apply();
-                    expect(scope.isOffline).toBeFalsy();
-                    expect(systemSettingRepository.upsertSyncSetting).toHaveBeenCalledWith(false);
-                    expect(platformUtils.sendMessage).toHaveBeenCalledWith('startBgApp');
+                    it('should turn on sync and update app for web', function () {
+                        platformUtils.platform = 'web';
+                        deferredPromise.resolve(true);
+                        scope.$apply();
+                        scope.toggleSync();
+
+                        scope.$apply();
+                        expect(scope.isOffline).toBeFalsy();
+                        expect(systemSettingRepository.upsertSyncSetting).toHaveBeenCalledWith(false);
+                        expect(platformUtils.sendMessage).toHaveBeenCalledWith('startBgApp');
+                        expect(window.Praxis.update).toHaveBeenCalled();
+                    });
+
+                    it('should not update the app for chrome', function () {
+                        platformUtils.platform = 'chrome';
+                        deferredPromise.resolve(true);
+                        scope.$apply();
+                        scope.toggleSync();
+
+                        scope.$apply();
+                        expect(window.Praxis.update).not.toHaveBeenCalled();
+                    });
+
                 });
             });
 
