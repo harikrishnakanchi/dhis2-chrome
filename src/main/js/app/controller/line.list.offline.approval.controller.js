@@ -26,6 +26,12 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
             });
         };
 
+        $scope.canShowReferralLocations = function () {
+            return _.any($scope.locationNames, function(name) {
+                return $scope.getReferralCount(name) > 0;
+            });
+        };
+
         $scope.getCount = function(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter) {
             var count;
 
@@ -206,7 +212,18 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
                 });
             };
 
-            return getExcludedDataElementsForModule().then(getProgram);
+            var setReferralLocationsFlag = function () {
+                var referralLocationDataElement =  _.chain($scope.program.programStages)
+                    .map('programStageSections').flatten()
+                    .map('programStageDataElements').flatten()
+                    .map('dataElement')
+                    .filter('isIncluded')
+                    .find({ offlineSummaryType: 'referralLocations'}).value();
+
+                $scope.shouldShowReferrals = !!referralLocationDataElement;
+            };
+
+            return getExcludedDataElementsForModule().then(getProgram).then(setReferralLocationsFlag);
         };
 
         var getOptionSetMapping = function () {

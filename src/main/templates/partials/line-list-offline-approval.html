@@ -382,7 +382,7 @@
                         </div>
                     </div>
                 </accordion-group>
-                <accordion-group ng-if="shouldShowReferrals" is-open="status.open">
+                <accordion-group ng-if="shouldShowReferrals || canShowReferralLocations()" is-open="status.open">
                     <accordion-heading>
                         <span>{{ resourceBundle.referralLocationLabel }}</span>
                         <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>

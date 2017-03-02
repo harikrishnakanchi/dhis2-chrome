@@ -398,7 +398,7 @@
                     </accordion-group>
                 </div>
             </accordion>
-            <div class="offlineProcedure" ng-if="shouldShowReferrals">
+            <div class="offlineProcedure" ng-if="shouldShowReferrals || canShowReferralLocations()">
                 <accordion close-others="false">
                     <div class="data-set-acc-wrapper">
                         <accordion-group is-open="status.open">
