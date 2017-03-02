@@ -1,5 +1,5 @@
 (function (global) {
-    var serviceWorker;
+    var serviceWorkerRegistration;
 
     var addCss = function (href) {
         var link = document.createElement('link');
@@ -54,12 +54,12 @@
     };
 
     var sendMessage = function (type, data) {
-        serviceWorker.postMessage({type: type, data: data});
+        serviceWorkerRegistration.active.postMessage({type: type, data: data});
     };
 
     var checkForMultipleClients = function (registration) {
-        serviceWorker = registration.active;
-        if (serviceWorker) {
+        serviceWorkerRegistration = registration;
+        if (serviceWorkerRegistration.active) {
             sendMessage('checkForMultipleClients');
 
             return new Promise(function (resolve, reject) {
@@ -150,10 +150,15 @@
         registerServiceWorker();
     };
 
+    var updateServiceWorker = function () {
+        serviceWorkerRegistration.update();
+    };
+
     global.Praxis = {
         reload: reload,
         focusActiveTab: focusActiveTab,
-        initialize: registerServiceWorker
+        initialize: registerServiceWorker,
+        update: updateServiceWorker
     };
 })(window);
 
