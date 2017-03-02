@@ -6,7 +6,7 @@
     <div id="monthlyCharts">
         <div ng-if="!(charts | filter: { monthlyChart: true, serviceCode: selectedService.serviceCode } | isEmpty)">
             <span ng-show="updatedForMonthlyChart" class="text-info">
-                <strong> Updated: {{ updatedForMonthlyChart }} </strong>
+                <strong>{{ resourceBundle.updated }}: {{ updatedForMonthlyChart }} </strong>
             </span>
             <div ng-repeat="chart in charts | filter: { monthlyChart: true, serviceCode: selectedService.serviceCode, isDataAvailable: true } | orderBy: 'displayPosition'">
                 <div class="row chart-title">
@@ -31,7 +31,7 @@
                 </accordion-heading>
                 <div class="exp-coll-group">
                     <div ng-show="updatedForMonthlyPivotTable" class="text-info mb15">
-                        <strong> Updated: {{ updatedForMonthlyPivotTable }} </strong>
+                        <strong>{{ resourceBundle.updated }}: {{ updatedForMonthlyPivotTable }} </strong>
                     </div>
                     <div ng-repeat="table in pivotTables | filter: { monthlyReport: true, serviceCode: selectedService.serviceCode, isDataAvailable: true } | orderBy: 'displayPosition'" class="exportCSV-container">
                         <accordion close-others="false">

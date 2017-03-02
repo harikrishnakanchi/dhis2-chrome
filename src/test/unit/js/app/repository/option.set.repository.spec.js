@@ -1,6 +1,8 @@
-define(["optionSetRepository", "angularMocks", "utils", "referralLocationsRepository"], function(OptionSetRepository, mocks, utils, ReferralLocationsRepository) {
+define(["optionSetRepository", "angularMocks", "utils", "referralLocationsRepository", "excludedLineListOptionsRepository", "optionSetTransformer"],
+    function(OptionSetRepository, mocks, utils, ReferralLocationsRepository, ExcludedLineListOptionsRepository, optionSetTransformer) {
     describe("optionSet repository", function() {
-        var optionSetRepository, db, mockStore, q, scope, referralLocations;
+        var optionSetRepository, mockStore, mockDB, q, scope, referralLocations, excludedLineListOptionsRepository,
+            referralLocationsRepository, moduleId, opUnitId;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
@@ -20,7 +22,12 @@ define(["optionSetRepository", "angularMocks", "utils", "referralLocationsReposi
             referralLocationsRepository = new ReferralLocationsRepository();
             spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, referralLocations));
 
-            optionSetRepository = new OptionSetRepository(mockDB.db, referralLocationsRepository);
+            spyOn(optionSetTransformer, "enrichOptionSets");
+
+            excludedLineListOptionsRepository = new ExcludedLineListOptionsRepository();
+            spyOn(excludedLineListOptionsRepository, "get").and.returnValue(utils.getPromise(q, {}));
+
+            optionSetRepository = new OptionSetRepository(mockDB.db, q, referralLocationsRepository, excludedLineListOptionsRepository);
         }));
 
         it("should get all option sets", function() {
@@ -39,64 +46,6 @@ define(["optionSetRepository", "angularMocks", "utils", "referralLocationsReposi
             expect(result).toEqual(allOptionSets);
         });
 
-        it("should get option set mapping", function() {
-            var allOptionSets = [{
-                'id': 'os1',
-                'options': [{
-                    'id': 'os1o1',
-                    'name': 'os1o1 name'
-                }]
-            }, {
-                'id': 'os2',
-                'options': [{
-                    'id': 'os2o1',
-                    'name': 'os2o1 name'
-                }]
-            }, {
-                'id': 'os3',
-                'code': '_referralLocations',
-                'options': [{
-                    'id': 'os3o1',
-                    'name': 'MSF Facility 1'
-                }]
-            }];
-
-            mockStore.getAll.and.returnValue(utils.getPromise(q, allOptionSets));
-
-
-            var optionSetMap, optionMap;
-
-            optionSetRepository.getOptionSetMapping().then(function(data) {
-                optionSetMap = data.optionSetMap;
-                optionMap = data.optionMap;
-            });
-            scope.$apply();
-
-            expect(optionSetMap).toEqual({
-                "os1": [{
-                    "id": 'os1o1',
-                    "name": 'os1o1 name'
-                }],
-                "os2": [{
-                    "id": 'os2o1',
-                    "name": 'os2o1 name'
-                }],
-                "os3": [{
-                    "id": 'os3o1',
-                    "name": 'Referral 1',
-                    "displayName": 'Referral 1',
-                    "isDisabled": false
-                }]
-            });
-            expect(optionMap).toEqual({
-                "os1o1": "os1o1 name",
-                "os2o1": "os2o1 name",
-                "os3o1": "Referral 1"
-            });
-
-
-        });
-
         it('should filter the optionSets by code', function () {
             var filteredOptionSet,
                 mockOptionSets = [{
@@ -113,6 +62,41 @@ define(["optionSetRepository", "angularMocks", "utils", "referralLocationsReposi
 
             scope.$apply();
             expect(filteredOptionSet).toEqual(mockOptionSets[0]);
+        });
+
+        describe('getOptionSets', function () {
+            beforeEach(function () {
+                moduleId = "someModuleId";
+                opUnitId = "someOpUnitId";
+            });
+
+            it('should get all optionSets', function () {
+                optionSetRepository.getOptionSets(opUnitId, moduleId);
+                scope.$apply();
+
+                expect(mockStore.getAll).toHaveBeenCalled();
+            });
+
+            it('should get referral locations by opUnitId', function () {
+                optionSetRepository.getOptionSets(opUnitId, moduleId);
+                scope.$apply();
+
+                expect(referralLocationsRepository.get).toHaveBeenCalledWith(opUnitId);
+            });
+
+            it('should get excluded linelist options', function () {
+                optionSetRepository.getOptionSets(opUnitId, moduleId);
+                scope.$apply();
+
+                expect(excludedLineListOptionsRepository.get).toHaveBeenCalledWith(moduleId);
+            });
+
+            it('should enrich optionSets', function () {
+                optionSetRepository.getOptionSets(opUnitId, moduleId);
+                scope.$apply();
+
+                expect(optionSetTransformer.enrichOptionSets).toHaveBeenCalled();
+            });
         });
     });
 });

@@ -1,14 +1,14 @@
 define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment", "interpolate", "programRepository", "programEventRepository", "excludedDataElementsRepository",
-        "orgUnitRepository", "approvalDataRepository", "referralLocationsRepository", "dataSyncFailureRepository", "translationsService", "filesystemService", "historyService",
-        "excelBuilder", "customAttributes"],
+        "orgUnitRepository", "approvalDataRepository", "dataSyncFailureRepository", "translationsService", "filesystemService", "historyService",
+        "excelBuilder", "customAttributes", "optionSetRepository"],
     function(LineListSummaryController, mocks, utils, timecop, moment, interpolate, ProgramRepository, ProgramEventRepository, ExcludedDataElementsRepository,
-             OrgUnitRepository, ApprovalDataRepository, ReferralLocationsRepository, DataSyncFailureRepository, TranslationsService, FilesystemService, HistoryService,
-             excelBuilder, customAttributes) {
+             OrgUnitRepository, ApprovalDataRepository, DataSyncFailureRepository, TranslationsService, FilesystemService, HistoryService,
+             excelBuilder, customAttributes, OptionSetRepository) {
         describe("lineListSummaryController ", function() {
             var scope, q, hustle, timeout, fakeModal, anchorScroll, location, routeParams, window, currentTime,
                 lineListSummaryController,
-                programRepository, programEventRepository, referralLocationsRepository, approvalDataRepository, excludedDataElementsRepository, orgUnitRepository, dataSyncFailureRepository, translationsService,
-                systemSettings, currentModule, originOrgUnits, program, project, mockEvent, filesystemService, historyService;
+                programRepository, programEventRepository, approvalDataRepository, excludedDataElementsRepository, orgUnitRepository, dataSyncFailureRepository, translationsService,
+                systemSettings, currentModule, originOrgUnits, program, project, mockEvent, filesystemService, historyService, optionSetRepository;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout, $location, $window) {
@@ -143,9 +143,6 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                     }
                 };
 
-                referralLocationsRepository = new ReferralLocationsRepository();
-                spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, {}));
-
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, currentModule));
                 spyOn(orgUnitRepository, "getParentProject").and.returnValue(utils.getPromise(q, project));
@@ -163,6 +160,9 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                     return object;
                 });
 
+                optionSetRepository = new OptionSetRepository();
+                spyOn(optionSetRepository, 'getOptionSets').and.returnValue(utils.getPromise(q, []));
+
                 spyOn(excelBuilder, 'createWorkBook').and.returnValue(new Blob());
 
                 createLineListSummary();
@@ -174,7 +174,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
             });
 
             var createLineListSummary = function () {
-                lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, historyService, programRepository, programEventRepository, excludedDataElementsRepository, orgUnitRepository, approvalDataRepository, referralLocationsRepository, dataSyncFailureRepository, translationsService, filesystemService);
+                lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, historyService, programRepository, programEventRepository, excludedDataElementsRepository, orgUnitRepository, approvalDataRepository, dataSyncFailureRepository, translationsService, filesystemService, optionSetRepository);
             };
 
             var createMockEvent = function (options) {
@@ -244,6 +244,30 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                 scope.$apply();
 
                 expect(scope.program).toEqual(program);
+            });
+
+            describe('loadOptionSets', function () {
+                it('should get optionSets', function () {
+                    scope.$apply();
+
+                    expect(optionSetRepository.getOptionSets).toHaveBeenCalledWith('par', 'ou1');
+                });
+
+                it('should translate optionSets', function () {
+                    var referralOptionSet = {
+                        isReferralLocationOptionSet: true,
+                        options: []
+                    };
+                    var mockOptionSet = {
+                        isReferralLocationOptionSet: false,
+                        options: []
+                    };
+                    var mockOptionSets = [referralOptionSet, mockOptionSet];
+                    optionSetRepository.getOptionSets.and.returnValue(utils.getPromise(q, mockOptionSets));
+                    scope.$apply();
+
+                    expect(translationsService.translate).toHaveBeenCalledWith([mockOptionSet]);
+                });
             });
 
             it("should submit event details", function() {
@@ -391,48 +415,30 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                 });
 
                 it("should get option names as data value if options are present", function() {
+                    var mockOptionSets = [{
+                        "id": "os1",
+                        "options": [{
+                            "id": "Code1",
+                            "code": "Code1",
+                            "name": "Male"
+                        }, {
+                            "id": "Code2",
+                            "code": "Code2",
+                            "name": "Female"
+                        }
+                        ]
+                    }];
+                    optionSetRepository.getOptionSets.and.returnValue(utils.getPromise(q, mockOptionSets));
+                    scope.$apply();
                     var dataValue = {
                         "id": "dv1",
                         "optionSet": {
-                            "options": [{
-                                "id": "Code1",
-                                "code": "Code1",
-                                "name": "Male"
-                            }, {
-                                "id": "Code2",
-                                "code": "Code2",
-                                "name": "Female"
-                            }]
+                            "id": "os1"
                         },
                         "value": "Code1"
                     };
                     var actualValue = scope.getDisplayValue(dataValue);
                     expect(actualValue).toEqual("Male");
-                });
-
-                it('should get the referral location name if dataValue is of type referral location', function () {
-                    var dataValue = {
-                        id: 'dv1',
-                        optionSet: {
-                            options: [{
-                                id: 'option1',
-                                name: 'Referral1',
-                                referralLocationGenericName: 'Referral1'
-                            }]
-                        },
-                        value: 'option1',
-                        dataElement: 'referralLocationDataElement'
-                    };
-
-                    scope.dataElementsForExport = [{id: 'referralLocationDataElement', offlineSummaryType: 'referralLocations'}];
-                    scope.referralLocations = {
-                        Referral1: {
-                            name: 'LocationName1'
-                        }
-                    };
-
-                    var actualValue = scope.getDisplayValue(dataValue);
-                    expect(actualValue).toEqual('LocationName1');
                 });
             });
 
@@ -443,9 +449,8 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
 
                 scope.filterParams.caseNumber = "someCaseNumber";
                 scope.filterByCaseNumber();
-                scope.$apply();
 
-                expect(programEventRepository.findEventsByCode).toHaveBeenCalledWith(program.id, _.pluck(originOrgUnits, 'id'), scope.filterParams.caseNumber);
+                expect(programEventRepository.findEventsByCode).toHaveBeenCalledWith(program.id, _.map(originOrgUnits, 'id').concat(currentModule.id), scope.filterParams.caseNumber);
                 expect(scope.events).toEqual([mockEvent]);
             });
 
@@ -459,8 +464,16 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
                 scope.filterByDateRange();
                 scope.$apply();
 
-                expect(programEventRepository.findEventsByDateRange).toHaveBeenCalledWith(program.id, _.pluck(originOrgUnits, 'id'), "2015-11-12", "2015-12-28");
+                expect(programEventRepository.findEventsByDateRange).toHaveBeenCalledWith(program.id, _.map(originOrgUnits, 'id').concat(currentModule.id), "2015-11-12", "2015-12-28");
                 expect(scope.events).toEqual([mockEvent]);
+            });
+
+            it('should get Program from module if geographic origin is disabled', function () {
+                orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, []));
+                createLineListSummary();
+                scope.$apply();
+
+                expect(programRepository.getProgramForOrgUnit).toHaveBeenCalledWith(currentModule.id);
             });
 
             describe('exportToExcel', function() {

@@ -1,7 +1,8 @@
 define(['lodash'], function(_){
     return function($q, db, $rootScope, ngI18nResourceBundle, systemSettingRepository) {
         var TRANSLATABLE_ENTITIES = ["sections", "dataElements", "headers", "programStages", "programStageSections", "columnConfigurations", "programStageDataElements", "dataElement", "optionSet", "options", "dataValues", "attribute"],
-            TRANSLATABLE_PROPERTIES = ["name", "description", "formName", "shortName", "displayName"],
+            TRANSLATABLE_OBJECT_PROPERTIES = ["name", "description", "formName", "shortName", "displayName", "title"],
+            TRANSLATABLE_PROPERTIES_MAP = {'name': 'NAME', 'description': 'DESCRIPTION', 'formName': 'FORM_NAME', 'shortName': 'SHORT_NAME', 'title': 'SHORT_NAME'},
             translations, _locale, self = this;
 
         var refreshResourceBundle = function () {
@@ -57,13 +58,20 @@ define(['lodash'], function(_){
             });
         };
 
-        var getTranslation = function (objectId, property) {
-            var translationObject = _.find(translations[objectId], { property: property });
-            return translationObject && translationObject.value;
+        var getTranslationFromCollection = function (translationsCollection, property, defaultValue) {
+            var translationObject = _.find(translationsCollection, { property: property });
+            return (translationObject && translationObject.value) || defaultValue;
         };
 
-        this.getTranslationForProperty = function (objectId, property, defaultValue) {
-            return getTranslation(objectId, property) || defaultValue;
+        this.getTranslationForProperty = function (object, property, defaultValue) {
+            return getTranslationFromObject(object, property, defaultValue);
+        };
+
+        var getTranslationFromObject = function (object, property, defaultValue) {
+            if (object && object.translations) {
+                return getTranslationFromCollection(_.filter(object.translations, {locale: _locale}), TRANSLATABLE_PROPERTIES_MAP[property], defaultValue);
+            }
+            return getTranslationFromCollection(translations[object.id], property, defaultValue);
         };
 
         this.translateChartData = function (charts) {
@@ -88,12 +96,10 @@ define(['lodash'], function(_){
                 return arrayOfObjectsToBeTranslated;
             }
             return _.map(arrayOfObjectsToBeTranslated, function (objectToBeTranslated) {
-                var translationObject = translations[objectToBeTranslated.id];
 
-                _.each(TRANSLATABLE_PROPERTIES, function (property) {
+                _.each(TRANSLATABLE_OBJECT_PROPERTIES, function (property) {
                     if(objectToBeTranslated[property]) {
-                        var translationsByProperty = _.filter(translationObject, {property: property});
-                        objectToBeTranslated[property] = translationsByProperty[0] ? translationsByProperty[0].value : objectToBeTranslated[property];
+                        objectToBeTranslated[property] = getTranslationFromObject(objectToBeTranslated, property, objectToBeTranslated[property]);
                     }
                 });
 
@@ -108,36 +114,11 @@ define(['lodash'], function(_){
             });
         };
 
-        this.translateOptionSetMap = function (optionSetMap) {
-            if(_locale == 'en') {
-                return optionSetMap;
-            }
-            
-            _.each(optionSetMap, function(value) {
-                self.translate(value);
-            });
-            return optionSetMap;
-        };
-
-        this.translateOptionMap = function (optionMap) {
-            if(_locale == 'en') {
-                return optionMap;
-            }
-
-            _.each(optionMap, function(value, key) {
-                optionMap[key] = translations[key] ? translations[key][0].value : value;
-            });
-
-            return optionMap;
-        };
-
         var translateObject = function (objectToBeTranslated) {
-            var translationsForObject = translations[objectToBeTranslated.id] || [];
 
-            _.each(TRANSLATABLE_PROPERTIES, function (property) {
-                var translationForProperty = _.find(translationsForObject, { property: property });
-                if(translationForProperty && translationForProperty.value) {
-                    objectToBeTranslated[property] = translationForProperty.value;
+            _.each(TRANSLATABLE_OBJECT_PROPERTIES, function (property) {
+                if (objectToBeTranslated[property]) {
+                    objectToBeTranslated[property] = getTranslationFromObject(objectToBeTranslated, property, objectToBeTranslated[property]);
                 }
             });
 

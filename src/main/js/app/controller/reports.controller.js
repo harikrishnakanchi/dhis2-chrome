@@ -156,6 +156,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             return chartRepository.getAll()
                 .then(filterReportsForCurrentModule)
                 .then(rejectNotificationReports)
+                .then(translationsService.translate)
                 .then(getChartData)
                 .then(translationsService.translateChartData)
                 .then(transformForNVD3)
@@ -190,8 +191,8 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             };
 
             var loadProgramForOrigins = function (data) {
-                var oneOriginId = _.get(_.first(data.origins), 'id');
-                return programRepository.getProgramForOrgUnit(oneOriginId).then(function (program) {
+                var orgUnitId = _.get(_.first(data.origins), 'id') || $scope.orgUnit.id;
+                return programRepository.getProgramForOrgUnit(orgUnitId).then(function (program) {
                     var translatedProgram = translationsService.translate(program);
                     $scope.services = _.compact(data.dataSets.concat([translatedProgram]));
                 });
@@ -241,6 +242,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             return pivotTableRepository.getAll()
                 .then(filterReportsForCurrentModule)
                 .then(rejectNotificationReports)
+                .then(translationsService.translate)
                 .then(getPivotTableData)
                 .then(translationsService.translatePivotTableData)
                 .then(function(pivotTables) {

@@ -1,5 +1,5 @@
 define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], function (_, moment, dateUtils, properties, customAttributes) {
-    return function ($q, dataService, eventService, userPreferenceRepository, orgUnitRepository, datasetRepository, changeLogRepository, dataRepository, programEventRepository) {
+    return function ($q, dataService, eventService, systemInfoService, userPreferenceRepository, orgUnitRepository, datasetRepository, changeLogRepository, dataRepository, programEventRepository) {
         var CHANGE_LOG_PREFIX = 'yearlyDataValues',
             CHUNK_SIZE = 11;
 
@@ -41,9 +41,15 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], func
                 dateUtils.getPeriodRange(properties.projectDataSync.numWeeksToSync));
 
             var downloadDataForModule = function (module) {
-                var changeLogKey = [CHANGE_LOG_PREFIX, module.projectId, module.id].join(':');
+                var changeLogKey = [CHANGE_LOG_PREFIX, module.projectId, module.id].join(':'),
+                    downloadStartTime;
 
                 var downloadModuleData = function () {
+                    var getServerTime = function () {
+                        return systemInfoService.getServerDate().then(function (serverTime) {
+                            downloadStartTime = serverTime;
+                        });
+                    };
 
                     var downloadModuleDataValues = function () {
                         var periodChunks = _.chunk(periodRange, CHUNK_SIZE);
@@ -59,12 +65,14 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], func
                         return eventService.getEvents(module.id, periodRange).then(programEventRepository.upsert);
                     };
 
-                    var isLinelistModule = customAttributes.getBooleanAttributeValue(module.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE);
-                    return isLinelistModule ? downloadLineListEvents() : downloadModuleDataValues();
+                    return getServerTime().then(function () {
+                        var isLinelistModule = customAttributes.getBooleanAttributeValue(module.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE);
+                        return isLinelistModule ? downloadLineListEvents() : downloadModuleDataValues();
+                    });
                 };
 
                 var onSuccess = function () {
-                    return changeLogRepository.upsert(changeLogKey, moment().toISOString());
+                    return changeLogRepository.upsert(changeLogKey, downloadStartTime);
                 };
 
                 var onFailure = function () {

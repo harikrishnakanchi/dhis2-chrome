@@ -59,6 +59,7 @@ define(['moment', 'timecop', 'angularMocks', 'utils', 'orgUnitRepository', 'chan
 
             translationsService = new TranslationsService();
             spyOn(translationsService, 'translatePivotTableData').and.callFake(function(object) { return object; });
+            spyOn(translationsService, 'translate').and.callFake(function(object) { return object; });
 
             pivotTableExportBuilder = new PivotTableExportBuilder();
             spyOn(pivotTableExportBuilder, 'build');
@@ -96,6 +97,13 @@ define(['moment', 'timecop', 'angularMocks', 'utils', 'orgUnitRepository', 'chan
             scope.$apply();
             expect(pivotTableRepository.getPivotTableData).toHaveBeenCalledWith(opUnitReportPivotTable, routeParams.opUnit);
             expect(scope.pivotTables).toEqual([mockPivotTableData]);
+        });
+
+        it('should translate opunit pivot tables', function () {
+            var opUnitReportPivotTables = _.filter(mockPivotTables, { opUnitReport: true });
+            scope.$apply();
+
+            expect(translationsService.translate).toHaveBeenCalledWith(opUnitReportPivotTables);
         });
 
         it('should filter out opunit pivot tables without data', function() {

@@ -1,10 +1,10 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function(reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository, $q) {
+    return function(reportService, systemInfoService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository, $q) {
 
         this.run = function() {
-            var updateChangeLogs = function(changeLogKeys) {
+            var updateChangeLogs = function(changeLogKeys, downloadStartTime) {
                 var upsertPromises = _.map(changeLogKeys, function (changeLogKey) {
-                    return changeLogRepository.upsert(changeLogKey, moment().toISOString());
+                    return changeLogRepository.upsert(changeLogKey, downloadStartTime);
                 });
                 return $q.all(upsertPromises);
             };
@@ -115,7 +115,8 @@ define(["lodash", "moment"], function(_, moment) {
             var updateChartDataForProject = function(projectId) {
                 return $q.all({
                     modules: orgUnitRepository.getAllModulesInOrgUnits([projectId]),
-                    charts: chartRepository.getAll()
+                    charts: chartRepository.getAll(),
+                    downloadStartTime: systemInfoService.getServerDate()
                 }).then(function (data) {
                     return applyDownloadFrequencyStrategy(projectId, data.charts).then(function(strategyResult) {
                         var chartsToDownload = strategyResult.charts,
@@ -123,7 +124,7 @@ define(["lodash", "moment"], function(_, moment) {
 
                         return downloadRelevantChartData(chartsToDownload, data.modules).then(function(allDownloadsWereSuccessful) {
                             if(allDownloadsWereSuccessful) {
-                                return updateChangeLogs(changeLogKeysToUpdate);
+                                return updateChangeLogs(changeLogKeysToUpdate, data.downloadStartTime);
                             }
                         });
                     });

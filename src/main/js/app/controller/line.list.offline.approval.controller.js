@@ -138,7 +138,7 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
                 return 0;
 
             var optionId = _.find($scope.referralOptions, {
-                "displayName": locationName
+                "name": locationName
             }).id;
             return _.filter($scope.dataValues._referralLocations, {
                 "value": optionId
@@ -164,8 +164,8 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
             var proceduresPerformed = _.uniq($scope.dataValues._procedures, 'formName');
             proceduresPerformed =  _.map(proceduresPerformed, function (procedurePerformed) {
                 return {
-                    "title" : translationsService.getTranslationForProperty(procedurePerformed.dataElement, 'formName', procedurePerformed.formName),
-                    "description": translationsService.getTranslationForProperty(procedurePerformed.dataElement, 'description', procedurePerformed.description)
+                    "title" : translationsService.getTranslationForProperty(procedurePerformed, 'formName', procedurePerformed.formName),
+                    "description": translationsService.getTranslationForProperty(procedurePerformed, 'description', procedurePerformed.description)
                 };
             });
             $scope.proceduresPerformed = _.groupBy(proceduresPerformed, 'description');
@@ -209,13 +209,21 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
             return getExcludedDataElementsForModule().then(getProgram);
         };
 
-        var getOptionSetMapping = function() {
-            return optionSetRepository.getOptionSetMapping($scope.selectedModule.parent.id).then(function(data) {
-                var translatedOptionSetMap = translationsService.translateOptionSetMap(data.optionSetMap);
-                $scope.optionSetMapping = translatedOptionSetMap;
+        var getOptionSetMapping = function () {
+            return optionSetRepository.getOptionSets($scope.selectedModule.parent.id, $scope.selectedModule.id).then(function (optionSets) {
+                var partitionedDataset = _.partition(optionSets, 'isReferralLocationOptionSet');
+                var translatedOptionSets = translationsService.translate(partitionedDataset[1]);
+                translatedOptionSets = translatedOptionSets.concat(partitionedDataset[0]);
+                $scope.optionSetMapping = {};
+                $scope.optionMapping = {};
 
-                var translatedOptionMap = translationsService.translateOptionMap(data.optionMap);
-                $scope.optionMapping = translatedOptionMap;
+                _.forEach(translatedOptionSets, function (optionSet) {
+                    var options = (optionSet && optionSet.options) || [];
+                    $scope.optionSetMapping[optionSet.id] = options;
+                    _.forEach(options, function (option) {
+                        $scope.optionMapping[option.id] = option.name;
+                    });
+                }, {});
             });
         };
 
@@ -267,8 +275,9 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
         };
 
         var getAssociatedDataSets = function() {
-            return datasetRepository.findAllForOrgUnits([$scope.originOrgUnits[0]]).then(function(data) {
-                $scope.associatedDataSets = translationsService.translate(data);
+            var orgUnitAssociatedWithDataSet = [$scope.originOrgUnits[0]].concat($scope.selectedModule);
+            return datasetRepository.findAllForOrgUnits(orgUnitAssociatedWithDataSet).then(function(dataSets) {
+                $scope.associatedDataSets = translationsService.translate(dataSets);
             });
         };
 
@@ -287,7 +296,8 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
 
         var init = function() {
             return $q.all([loadOriginsOrgUnits(), loadProgram(), getOptionSetMapping(), getReferralLocations()]).then(function() {
-                return programEventRepository.getEventsForPeriod($scope.program.id, _.pluck($scope.originOrgUnits, "id"), getPeriod()).then(function(events) {
+                var orgUnitIdsAssociatedToEvents = _.map($scope.originOrgUnits, "id").concat($scope.selectedModule.id);
+                return programEventRepository.getEventsForPeriod($scope.program.id, orgUnitIdsAssociatedToEvents, getPeriod()).then(function(events) {
                     var submittedEvents = _.filter(events, function(event) {
                         return event.localStatus === "READY_FOR_DHIS" || event.localStatus === undefined;
                     });

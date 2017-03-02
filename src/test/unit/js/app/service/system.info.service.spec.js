@@ -1,11 +1,12 @@
 define(['dhisUrl', 'angularMocks', 'systemInfoService', 'moment', 'timecop'], function (dhisUrl, mocks, SystemInfoService, moment, timecop) {
     describe('System Info Service', function () {
-        var systemInfoService, http, httpBackend;
+        var systemInfoService, http, httpBackend, q;
 
-        beforeEach(mocks.inject(function ($http, $httpBackend) {
+        beforeEach(mocks.inject(function ($http, $httpBackend, $q) {
             http = $http;
             httpBackend = $httpBackend;
-            systemInfoService = new SystemInfoService(http);
+            q = $q;
+            systemInfoService = new SystemInfoService(http, q);
         }));
 
         afterEach(function () {
@@ -20,7 +21,7 @@ define(['dhisUrl', 'angularMocks', 'systemInfoService', 'moment', 'timecop'], fu
             httpBackend.expectGET(dhisUrl.systemInfo).respond(200, systemInfoResponse);
 
             systemInfoService.getServerDate().then(function (serverDate) {
-                expect(serverDate).toEqual(moment.utc(systemInfoResponse.serverDate).toISOString());
+                expect(serverDate).toEqual('2017-01-19T06:04:49.208');
             });
 
             httpBackend.flush();
@@ -37,12 +38,26 @@ define(['dhisUrl', 'angularMocks', 'systemInfoService', 'moment', 'timecop'], fu
             httpBackend.expectGET(dhisUrl.systemInfo).respond(200, systemInfoResponse);
 
             systemInfoService.getServerDate().then(function (serverDate) {
-                expect(serverDate).toEqual(currentTime.toISOString());
+                expect(serverDate).toEqual(moment.utc(currentTime).format('YYYY-MM-DDThh:mm:ss.SSS'));
             });
 
             httpBackend.flush();
             Timecop.returnToPresent();
             Timecop.uninstall();
+        });
+
+        describe('getVersion', function () {
+            it('should get version number', function () {
+                var systemInfoResponse = {
+                    version: "2.25"
+                };
+                httpBackend.expectGET(dhisUrl.systemInfo).respond(200, systemInfoResponse);
+                systemInfoService.getVersion().then(function (version) {
+                    expect(version).toEqual("2.25");
+                });
+
+                httpBackend.flush();
+            });
         });
     });
 });

@@ -216,5 +216,37 @@ define(["dhisMonitor", "utils", "angularMocks", "platformUtils", "mockChrome", "
             httpBackend.flush();
         });
 
+        describe('halt', function () {
+            it('should stop DHIS monitor once halted', function () {
+                dhisMonitor.halt();
+
+                expect(platformUtils.sendMessage).toHaveBeenCalledWith('dhisOffline');
+                expect(platformUtils.clearAlarm).toHaveBeenCalledWith('dhisConnectivityCheckAlarm');
+                expect(dhisMonitor.isOnline()).toBeFalsy();
+            });
+
+            it('should not start a DHIS monitor once halted', function () {
+                spyOn(http, "head").and.returnValue(utils.getPromise(q, {}));
+                dhisMonitor.halt();
+                dhisMonitor.start();
+
+                rootScope.$apply();
+                expect(http.head).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('resume', function () {
+            it('should start DHIS monitor once resumed', function () {
+                httpBackend.expectHEAD(favIconUrl + "&prj=ss153").respond(200, "ok");
+                dhisMonitor.halt();
+                dhisMonitor.resume();
+                rootScope.$apply();
+
+                httpBackend.flush();
+                expect(platformUtils.createAlarm).toHaveBeenCalledWith('dhisConnectivityCheckAlarm', jasmine.any(Object));
+                expect(platformUtils.sendMessage).toHaveBeenCalledWith('dhisOnline');
+            });
+        });
+
     });
 });

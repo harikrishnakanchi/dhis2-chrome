@@ -1,7 +1,7 @@
-define(['lodash', 'angularMocks', 'utils','properties', 'platformUtils', 'downloadMetadataController', 'metadataDownloader', 'changeLogRepository', 'packagedDataImporter'],
-    function (_, mocks, utils, properties, platformUtils, DownloadMetadataController, MetadataDownloader, ChangeLogRepository, PackagedDataImporter) {
+define(['lodash', 'angularMocks', 'utils','properties', 'platformUtils', 'downloadMetadataController', 'metadataDownloader', 'packagedDataImporter'],
+    function (_, mocks, utils, properties, platformUtils, DownloadMetadataController, MetadataDownloader, PackagedDataImporter) {
         describe('DownloadMetadataController', function () {
-            var q, rootScope, scope, location, log, downloadMetadataController, metadataDownloader, changeLogRepository, packagedDataImporter, initializeController;
+            var q, rootScope, scope, location, log, downloadMetadataController, metadataDownloader, packagedDataImporter, initializeController;
 
             beforeEach(mocks.inject(function ($q, $rootScope, $location, $log) {
                 q = $q;
@@ -16,24 +16,13 @@ define(['lodash', 'angularMocks', 'utils','properties', 'platformUtils', 'downlo
                 metadataDownloader = new MetadataDownloader();
                 spyOn(metadataDownloader, 'run').and.returnValue(utils.getPromise(q, {}));
 
-                changeLogRepository = new ChangeLogRepository();
-                spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
-
                 packagedDataImporter = new PackagedDataImporter();
                 spyOn(packagedDataImporter, 'run').and.returnValue(utils.getPromise(q, {}));
 
-                Timecop.install();
-                Timecop.freeze(new Date('2016-12-23T11:05:29.002Z'));
-
                 initializeController = function () {
-                    downloadMetadataController = new DownloadMetadataController(scope, q, location, log, metadataDownloader, changeLogRepository, packagedDataImporter);
+                    downloadMetadataController = new DownloadMetadataController(scope, q, location, log, metadataDownloader, packagedDataImporter);
                 };
             }));
-
-            afterEach(function () {
-                Timecop.returnToPresent();
-                Timecop.uninstall();
-            });
 
             describe('Chrome platform', function () {
                 beforeEach(function () {
@@ -64,20 +53,6 @@ define(['lodash', 'angularMocks', 'utils','properties', 'platformUtils', 'downlo
                     expect(metadataDownloader.run).toHaveBeenCalled();
                 });
 
-                it('should upsert the metadata changelog after download is complete', function () {
-                    initializeController();
-                    scope.$apply();
-
-                    var entities = ['metaData', 'orgUnits', 'orgUnitGroups', 'datasets', 'programs'];
-
-                    var lastUpdated = '2016-12-23T11:05:29.002Z';
-
-                    _.each(entities, function (entity, index) {
-                        expect(changeLogRepository.upsert.calls.argsFor(index)[0]).toEqual(entity);
-                        expect(changeLogRepository.upsert.calls.argsFor(index)[1]).toEqual(lastUpdated);
-                    });
-                });
-
                 describe('Metadata download failure', function () {
 
                     it('should retry metadata download', function () {
@@ -104,7 +79,6 @@ define(['lodash', 'angularMocks', 'utils','properties', 'platformUtils', 'downlo
                         scope.$apply();
 
                         expect(metadataDownloader.run).toHaveBeenCalledTimes(properties.metaDataRetryLimit);
-                        expect(changeLogRepository.upsert).not.toHaveBeenCalled();
                     });
                 });
             });

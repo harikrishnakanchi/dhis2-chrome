@@ -7,32 +7,89 @@ define(["dhisId", "interpolate", "properties", "customAttributes"], function(dhi
         var allRoles = {
             "Project": [{
                 "name": "Data entry user",
-                "displayName": $scope.resourceBundle.dataEntryUserLabel
+                "displayName": $scope.resourceBundle.dataEntryUserLabel,
+                "validationType": _.get(properties.organisationSettings.userNameValidations, 'Data entry user')
             }, {
                 "name": "Project Level Approver",
-                "displayName": $scope.resourceBundle.projectLevelUserLabel
+                "displayName": $scope.resourceBundle.projectLevelUserLabel,
+                "validationType": _.get(properties.organisationSettings.userNameValidations, 'Project Level Approver')
             }, {
                 "name": "Observer",
-                "displayName": $scope.resourceBundle.observerUserLabel
+                "displayName": $scope.resourceBundle.observerUserLabel,
+                "validationType": _.get(properties.organisationSettings.userNameValidations, 'Observer')
             }],
             "Country": [{
                 "name": "Coordination Level Approver",
-                "displayName": $scope.resourceBundle.coordinationLevelUserLabel
+                "displayName": $scope.resourceBundle.coordinationLevelUserLabel,
+                "validationType": _.get(properties.organisationSettings.userNameValidations, 'Coordination Level Approver')
             }]
         };
 
-        var init = function() {
+        $scope.setNameValidations = function () {
             var projCode = customAttributes.getAttributeValue($scope.orgUnit.attributeValues, customAttributes.PROJECT_CODE, '').toLowerCase();
-            var orgUnitType = customAttributes.getAttributeValue($scope.orgUnit.attributeValues, customAttributes.TYPE, '');
             var userNamePrefix = _.isEmpty(projCode) ? projCode : projCode + "_";
-            $scope.userNameMatchExpr = orgUnitType === "Country" ? new RegExp("[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+\\.[a-zA-Z]{2,4}$", "i") : new RegExp(userNamePrefix + "(.)+", "i");
-            $scope.patternValidationMessage = orgUnitType === "Country" ? $scope.resourceBundle.emailValidation :  interpolate($scope.resourceBundle.usernamePrefixValidation, { username_prefix: userNamePrefix });
 
-            $scope.userNamePlaceHolder = _.isEmpty(userNamePrefix) ? "" : interpolate($scope.resourceBundle.usernamePrefixValidation, { username_prefix: userNamePrefix });
+            var emailRegExp = /[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+\.[a-zA-Z]{2,4}$/i;
+            var projectCodeRegExp = new RegExp(userNamePrefix + ".+", "i");
+            var dhisDefaultRegExp = /^.{2,140}$/i;
 
-            $scope.userRoles = allRoles[orgUnitType];
+            if(!$scope.projectUser.userRole) {
+                $scope.userNameMatchExpr = new RegExp('', 'i');
+                $scope.patternValidationMessage = '';
+                $scope.userNamePlaceHolder = '';
+                return;
+            }
+
+            var validationDetails = {
+                'PROJECT_CODE_PREFIX': {
+                    userNameMatchExpr: projectCodeRegExp,
+                    patternValidationMessage: interpolate($scope.resourceBundle.usernamePrefixValidation, {username_prefix: userNamePrefix}),
+                    userNamePlaceHolder: interpolate($scope.resourceBundle.usernamePrefixValidation, {username_prefix: userNamePrefix})
+                },
+                'EMAIL': {
+                    userNameMatchExpr: emailRegExp,
+                    patternValidationMessage: $scope.resourceBundle.emailValidation,
+                    userNamePlaceHolder: $scope.resourceBundle.emailValidation
+                },
+                'NONE': {
+                    userNameMatchExpr: dhisDefaultRegExp,
+                    patternValidationMessage: $scope.resourceBundle.defaultValidation,
+                    userNamePlaceHolder: $scope.resourceBundle.defaultValidation
+                }
+            };
+
+            var validationType = $scope.projectUser.userRole.validationType;
+            var isValidValidationType = _.contains(_.keys(validationDetails), validationType);
+            validationType = isValidValidationType ? validationType : 'NONE';
+
+            var validation = _.get(validationDetails, validationType);
+            $scope.userNameMatchExpr = validation.userNameMatchExpr;
+            $scope.patternValidationMessage = validation.patternValidationMessage;
+            $scope.userNamePlaceHolder = validation.userNamePlaceHolder;
+        };
+
+        var init = function () {
+            var orgUnitType = customAttributes.getAttributeValue($scope.orgUnit.attributeValues, customAttributes.TYPE, '');
+
             $scope.form = {};
-            userRepository.getAllUsernames()
+            var userRoles = allRoles[orgUnitType];
+
+            var getUserRolesWithId = userRepository.getUserRoles(_.map(userRoles, 'name'))
+                .then(function (rolesFromDb) {
+                    return _.map(userRoles, function (role) {
+                        var roleWithId = _.find(rolesFromDb, {name: role.name});
+                        role.id = roleWithId && roleWithId.id;
+                        return role;
+                    });
+                });
+
+            var setUserRoles = function (data) {
+                $scope.userRoles = data;
+            };
+
+            return getUserRolesWithId
+                .then(setUserRoles)
+                .then(userRepository.getAllUsernames)
                 .then(setExistingUserNames)
                 .then(loadOrgUnitUsers);
         };
@@ -115,16 +172,21 @@ define(["dhisId", "interpolate", "properties", "customAttributes"], function(dhi
         };
 
         $scope.save = function(projectUser) {
+            var userId = dhisId.get(projectUser.username);
             var userPayload = {
                 "username": projectUser.username.toLowerCase(),
-                "id": dhisId.get(projectUser.username),
+                "id": userId,
                 "surname": "LNU",
                 "firstName": "FNU",
                 "userCredentials": {
                     "username": projectUser.username.toLowerCase(),
                     "userRoles": [{
-                        "name": projectUser.userRole.name
+                        "name": projectUser.userRole.name,
+                        "id": projectUser.userRole.id
                     }],
+                    "userInfo": {
+                        "id": userId
+                    },
                     "password": "msfuser"
                 },
                 "organisationUnits": [{

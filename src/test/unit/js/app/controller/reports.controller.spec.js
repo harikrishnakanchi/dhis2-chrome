@@ -165,7 +165,6 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                 chartRepository.getChartData.and.returnValue(utils.getPromise(q, chartData));
             });
 
-
             it('should load all chart definitions', function () {
                 scope.$apply();
                 expect(chartRepository.getAll).toHaveBeenCalled();
@@ -177,7 +176,22 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                 expect(chartRepository.getChartData).toHaveBeenCalledTimes(1);
             });
 
-            it('should translate the charts', function () {
+            it('should not get the notification chartData', function () {
+                var notificationChart = {
+                    serviceCode: 'someDataSetServiceCode',
+                    name: 'Something - Notifications'
+                };
+                chartRepository.getAll.and.returnValue(utils.getPromise(q, [notificationChart]));
+                scope.$apply();
+                expect(chartRepository.getChartData).not.toHaveBeenCalled();
+            });
+
+            it('should translate charts', function () {
+                scope.$apply();
+                expect(translationsService.translate).toHaveBeenCalledWith([chartA]);
+            });
+
+            it('should translate the chart data', function () {
                 scope.$apply();
                 expect(translationsService.translateChartData).toHaveBeenCalledWith([chartData]);
             });
@@ -234,7 +248,12 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                 expect(pivotTableRepository.getPivotTableData).not.toHaveBeenCalled();
             });
 
-            it('should translate the pivot tables', function () {
+            it('should translate pivot tables', function () {
+                scope.$apply();
+                expect(translationsService.translate).toHaveBeenCalledWith([pivotTableA]);
+            });
+
+            it('should translate the pivot table data', function () {
                 scope.$apply();
                 expect(translationsService.translatePivotTableData).toHaveBeenCalledWith([pivotTableData]);
             });

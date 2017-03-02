@@ -1,9 +1,9 @@
-define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportService', 'chartRepository', 'changeLogRepository'],
-    function (DownloadChartsConsumer, mocks, utils, timecop, ReportService, ChartRepository, ChangeLogRepository) {
+define(['downloadChartsConsumer', 'angularMocks', 'utils', 'reportService', 'systemInfoService', 'chartRepository', 'changeLogRepository'],
+    function (DownloadChartsConsumer, mocks, utils, ReportService, SystemInfoService, ChartRepository, ChangeLogRepository) {
         describe('DownloadChartsConsumer', function () {
             var scope, q,
                 downloadChartsConsumer,
-                reportService, chartRepository, changeLogRepository,
+                reportService, systemInfoService, chartRepository, changeLogRepository,
                 lastUpdated, currentTime;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
@@ -20,16 +20,14 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                 spyOn(chartRepository, 'getAll').and.returnValue(utils.getPromise(q, {}));
                 spyOn(chartRepository, 'deleteMultipleChartsById').and.returnValue(utils.getPromise(q, {}));
 
-                lastUpdated = new Date('2016-02-19T09:42:00.000Z');
                 changeLogRepository = new ChangeLogRepository();
                 spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, lastUpdated));
                 spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
 
-                currentTime = '2016-02-19T10:11:00.000Z';
-                Timecop.install();
-                Timecop.freeze(currentTime);
+                systemInfoService = new SystemInfoService();
+                spyOn(systemInfoService, 'getServerDate').and.returnValue(utils.getPromise(q, {}));
 
-                downloadChartsConsumer = new DownloadChartsConsumer(reportService, chartRepository, changeLogRepository);
+                downloadChartsConsumer = new DownloadChartsConsumer(reportService, systemInfoService, chartRepository, changeLogRepository);
             }));
 
             it('should download and upsert any charts that have been updated', function () {
@@ -42,16 +40,17 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                 downloadChartsConsumer.run();
                 scope.$apply();
 
-                expect(changeLogRepository.get).toHaveBeenCalledWith('charts');
+                expect(changeLogRepository.get).toHaveBeenCalledWith('charts', undefined);
                 expect(reportService.getUpdatedCharts).toHaveBeenCalledWith(lastUpdated);
                 expect(chartRepository.upsert).toHaveBeenCalledWith(updatedCharts);
             });
 
-            it('should update the lastUpdated time in the changeLog', function () {
+            it('should update the system time in the changeLog', function () {
+                systemInfoService.getServerDate.and.returnValue(utils.getPromise(q, 'someTime'));
                 downloadChartsConsumer.run();
                 scope.$apply();
 
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith('charts', currentTime);
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('charts', 'someTime');
             });
 
             it('should delete any charts that are stored locally but not available remotely on DHIS', function () {

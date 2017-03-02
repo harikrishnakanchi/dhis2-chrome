@@ -116,6 +116,8 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                 };
 
                 var isOriginDataSetEnabled = function () {
+                    if ($scope.geographicOriginDisabled) return $q.when();
+
                     if ($scope.isNewMode) {
                         $scope.associateOriginDataSet = true;
                         return $q.when();
@@ -261,7 +263,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
             };
 
             var getDatasetsToAssociate = function() {
-                if($scope.associateReferralLocation) {
+                if($scope.associateReferralLocation && !$scope.referralLocationDisabled) {
                     $scope.associatedDatasets = $scope.associatedDatasets.concat(referralDataset);
                 }
                 return _.compact($scope.associatedDatasets.concat(populationDataset));
@@ -294,7 +296,11 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                     return orgUnitGroupHelper.createOrgUnitGroups([enrichedModule], false);
                 };
 
-                var createOriginOrgUnits = function() {
+                var createOriginsIfConfigured = function() {
+                    if($scope.geographicOriginDisabled) {
+                        return $q.when();
+                    }
+
                     return originOrgunitCreator.create(enrichedModule, undefined, $scope.associateOriginDataSet).then(function(originOrgUnits) {
                         return _.map(originOrgUnits, function (originOrgUnit) {
                             return publishMessage({orgUnitId: originOrgUnit.id}, "syncOrgUnit", interpolate($scope.resourceBundle.upsertOrgUnitDesc, { orgUnit: _.pluck(originOrgUnits, "name").toString()}));
@@ -307,7 +313,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                     .then(createModules)
                     .then(_.partial(saveExcludedDataElements, enrichedModule))
                     .then(createOrgUnitGroups)
-                    .then(createOriginOrgUnits)
+                    .then(createOriginsIfConfigured)
                     .then(_.partial(onSuccess, enrichedModule), onError)
                     .finally($scope.stopLoading);
             };

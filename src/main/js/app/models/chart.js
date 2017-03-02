@@ -9,6 +9,7 @@ define([], function() {
         this.id = config.id;
         this.name = config.name;
         this.title = config.title;
+        this.translations = config.translations;
         this.columns = config.columns;
         this.filters = config.filters;
         this.rows = config.rows;

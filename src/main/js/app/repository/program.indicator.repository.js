@@ -10,7 +10,7 @@ define(['lodash'], function (_) {
             return this.getAll().then(function (programIndicatorsFromStore) {
                 var indexedProgramIndicatorsFromStore = _.indexBy(programIndicatorsFromStore, 'id');
                 return _.map(programIndicators, function (programIndicator) {
-                    return _.merge(programIndicator, _.pick(indexedProgramIndicatorsFromStore[programIndicator.id], ['name', 'shortName', 'description']));
+                    return _.merge(programIndicator, _.pick(indexedProgramIndicatorsFromStore[programIndicator.id], ['name', 'shortName', 'description', 'translations']));
                 });
             });
         };

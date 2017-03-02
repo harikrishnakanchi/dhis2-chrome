@@ -1,4 +1,4 @@
-define(["lodash", "moment"], function(_, moment) {
+define(["lodash", "moment", "metadataConf"], function(_, moment, metadataConf) {
     return function($q, metadataService, systemSettingService, datasetService, programService, orgUnitService, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository, systemSettingRepository) {
         this.run = function() {
             return verifyIsNewInstall().then(importData);
@@ -6,9 +6,7 @@ define(["lodash", "moment"], function(_, moment) {
 
         var verifyIsNewInstall = function() {
             return changeLogRepository.get("metaData").then(function(metadataLastUpdated) {
-                if (!metadataLastUpdated)
-                    return true;
-                return false;
+                return !metadataLastUpdated;
             });
         };
 
@@ -18,14 +16,19 @@ define(["lodash", "moment"], function(_, moment) {
             if (!_.isObject(metadata))
                 return;
 
-            var created = moment.utc(metadata.created).toISOString();
-            var promises = [];
-            promises.push(changeLogRepository.upsert("metaData", created));
-            promises.push(changeLogRepository.upsert("orgUnits", created));
-            promises.push(changeLogRepository.upsert("orgUnitGroups", created));
-            promises.push(changeLogRepository.upsert("datasets", created));
-            promises.push(changeLogRepository.upsert("programs", created));
-            return $q.all(promises);
+            // TODO: Remove 'metadata.created' backwards compatibility code after upgrading to DHIS 2.25
+            var created = moment.utc(metadata.created || metadata.system.date).toISOString();
+
+            var entities = [
+                'metaData',
+                'organisationUnits',
+                'organisationUnitGroups',
+                'dataSets',
+                'programs'
+            ];
+
+            entities = entities.concat(metadataConf.entities);
+            return $q.all(_.map(entities, _.partial(changeLogRepository.upsert, _, created)));
         };
 
         var importData = function(isNewInstall) {

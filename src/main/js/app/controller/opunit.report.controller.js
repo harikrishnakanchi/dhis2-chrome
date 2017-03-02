@@ -82,9 +82,9 @@ define(['moment', 'excelBuilder'], function (moment, excelBuilder) {
 
             var loadOpunitPivotTable = function () {
                 $scope.pivotTables= [];
-                $scope.startLoading();
                 return pivotTableRepository.getAll()
                     .then(filterOpUnitPivotTables)
+                    .then(translationsService.translate)
                     .then(getDataForPivotTables)
                     .then(translatePivotTableData)
                     .then(function (pivotTables) {
@@ -92,7 +92,12 @@ define(['moment', 'excelBuilder'], function (moment, excelBuilder) {
                     });
             };
 
-            return $q.all([getOpUnitName(), getLastUpdatedTimeForOpUnitPivotTables()], loadOpunitPivotTable())
+            $scope.startLoading();
+            return $q.all([
+                getOpUnitName(),
+                getLastUpdatedTimeForOpUnitPivotTables()
+            ])
+                .then(loadOpunitPivotTable)
                 .finally($scope.stopLoading);
         };
 

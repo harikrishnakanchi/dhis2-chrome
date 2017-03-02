@@ -18,7 +18,7 @@ define(["properties"], function(properties) {
         "orgUnitGroups": with_host("/api/organisationUnitGroups"),
         "orgUnits": with_host("/api/organisationUnits"),
         "users": with_host("/api/users"),
-        "getProgramsAndStages": with_host("/api/programs.json?fields=id,name,displayName,shortName,programType,organisationUnits,attributeValues[:identifiable,value,attribute[:identifiable]],programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false"),
+        "userRoles": with_host("/api/userRoles.json"),
         "programs": with_host("/api/programs"),
         "dataSets": with_host("/api/dataSets"),
         "charts": with_host("/api/charts"),
@@ -37,6 +37,7 @@ define(["properties"], function(properties) {
         "organisationUnitGroupSets": with_host("/api/organisationUnitGroupSets.json"),
         "sections": with_host("/api/sections.json"),
         "organisationUnitGroups": with_host("/api/organisationUnitGroups.json"),
-        "systemInfo": with_host("/api/system/info")
+        "systemInfo": with_host("/api/system/info"),
+        "attributes": with_host("/api/attributes.json")
     };
 });

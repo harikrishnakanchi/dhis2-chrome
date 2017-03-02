@@ -148,8 +148,8 @@ define(["lodash"], function(_) {
                 $scope.allDataElementValues.push({
                     "moduleName": module.parent.name + " - " + module.name,
                     "dataElementId": dataElement.id,
-                    "dataElementName": translationService.getTranslationForProperty(dataElement.id, 'name', reportData.getDisplayName(dataElement)),
-                    "dataElementDescription": translationService.getTranslationForProperty(dataElement.id, 'description', dataElement.description),
+                    "dataElementName": translationService.getTranslationForProperty(dataElement, 'shortName', reportData.getDisplayName(dataElement)),
+                    "dataElementDescription": translationService.getTranslationForProperty(dataElement, 'description', dataElement.description),
                     "weeklyData": weeklyData,
                     "showInNotifications": showInNotifications
                 });

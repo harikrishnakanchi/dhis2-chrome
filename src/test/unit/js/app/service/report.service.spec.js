@@ -142,7 +142,7 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                 httpBackend.expectGET(/.*charts.json.*/).respond(200, chartIds);
                 httpBackend.expectGET(/.*charts.json.*/).respond(200, chartIds);
 
-                var expectedQueryParams = encodeURI('fields=id,name,title,relativePeriods,type,' +
+                var expectedQueryParams = encodeURI('fields=id,name,title,translations,relativePeriods,type,' +
                                                     'categoryDimensions[dataElementCategory,categoryOptions[:identifiable]],' +
                                                     'dataDimensionItems[dataElement[id,name,shortName,description],indicator[id,name,shortName,description],programIndicator[id,name,shortName,description]],' +
                                                     'columns[dimension,items[id,name]],' +
@@ -228,7 +228,7 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                 httpBackend.expectGET(/.*reportTables.json.*/).respond(200, pivotTableIds);
                 httpBackend.expectGET(/.*reportTables.json.*/).respond(200, pivotTableIds);
 
-                var expectedQueryParams = encodeURI('fields=id,name,sortOrder,relativePeriods,' +
+                var expectedQueryParams = encodeURI('fields=id,name,title,translations,sortOrder,relativePeriods,' +
                                                     'categoryDimensions[dataElementCategory,categoryOptions[:identifiable]],' +
                                                     'dataDimensionItems[dataElement[id,name,shortName,description],indicator[id,name,shortName,description],programIndicator[id,name,shortName,description]],' +
                                                     'columns[dimension,items[id,name]],' +

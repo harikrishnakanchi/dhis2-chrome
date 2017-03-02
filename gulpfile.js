@@ -16,6 +16,7 @@ var webserver;
 var path = require('path');
 var zip = require('gulp-zip');
 var template = require('gulp-template');
+var requirejs = require('requirejs');
 
 var baseUrl = argv.url || "http://localhost:8080";
 var baseIntUrl = argv.int_url || baseUrl;
@@ -28,6 +29,7 @@ var ks = argv.ks || 128;
 var ts = argv.ts || 64;
 
 var supportEmail = argv.supportEmail || "";
+var praxisConfiguration = require('./praxis.configuration.json');
 
 var exportTranslations = require('./tasks/export.translations');
 var importTranslations = require('./tasks/import.translations');
@@ -56,6 +58,8 @@ var download = function (url, outputFile, onDone) {
             if (response.statusCode != 200) {
                 onDone("Server exited with " + response.statusCode);
                 process.exit(1);
+            } else if (response.statusCode == 200){
+                onDone();
             }
         })
         .pipe(fs.createWriteStream(outputFile));
@@ -123,7 +127,8 @@ gulp.task('config', function () {
                 ITER: iter,
                 KS: ks,
                 TS: ts,
-                SUPPORT_EMAIL: supportEmail
+                SUPPORT_EMAIL: supportEmail,
+                PRAXIS_CONFIGURATION: JSON.stringify(praxisConfiguration)
             }))
         .pipe(gulp.dest('./src/main/js/app/conf'));
 });
@@ -138,23 +143,38 @@ gulp.task('less', function() {
 });
 
 gulp.task('download-metadata', function (callback) {
-    return download(baseIntUrl + "/api/metadata.json?assumeTrue=false&categories=true&categoryCombos=true&categoryOptionCombos=true&categoryOptions=true&dataElementGroups=true&indicators=true&programIndicators=true&dataElements=true&optionSets=true&organisationUnitGroupSets=true&sections=true&translations=true&users=true&organisationUnitGroups=true", "./src/main/data/metadata.json", callback);
+    requirejs(['./src/main/js/app/conf/metadata.conf.js'], function (metadataConf) {
+        var buildUrl = function () {
+            var url = `&organisationUnitGroups=true&organisationUnitGroups:fields=${metadataConf.fields.organisationUnitGroups}`;
+            metadataConf.entities.forEach(function (entity) {
+                url += `&${entity}=true&${entity}:fields=${metadataConf.fields[entity]}`;
+            });
+            return url;
+        };
+        download(baseIntUrl + "/api/metadata.json?assumeTrue=False" + buildUrl(), "./src/main/data/metadata.json", callback);
+    });
 });
 
 gulp.task('download-datasets', function (callback) {
-    return download(baseIntUrl + "/api/dataSets.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]],!organisationUnits&paging=false", "./src/main/data/dataSets.json", callback);
+    requirejs(['./src/main/js/app/conf/metadata.conf.js'], function (metadataConf) {
+        download(baseIntUrl + "/api/dataSets.json?paging=false&fields=" + metadataConf.fields.dataSets, "./src/main/data/dataSets.json", callback);
+    });
 });
 
 gulp.task('download-programs', function (callback) {
-    return download(baseIntUrl + "/api/programs.json?fields=id,name,displayName,organisationUnits,attributeValues[:identifiable,value,attribute[:identifiable]],programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false", "./src/main/data/programs.json", callback);
+    requirejs(['./src/main/js/app/conf/metadata.conf.js'], function (metadataConf) {
+        download(baseIntUrl + "/api/programs.json?paging=false&fields=" + metadataConf.fields.programs, "./src/main/data/programs.json", callback);
+    });
 });
 
 gulp.task('download-fieldapp-settings', function(callback) {
-    return download(baseIntUrl + "/api/systemSettings.json?key=fieldAppSettings,versionCompatibilityInfo", "./src/main/data/systemSettings.json", callback);
+    download(baseIntUrl + "/api/systemSettings.json?key=fieldAppSettings,versionCompatibilityInfo", "./src/main/data/systemSettings.json", callback);
 });
 
 gulp.task('download-organisation-units', function(callback) {
-    return download(baseIntUrl + "/api/organisationUnits.json?fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid&paging=false", "./src/main/data/organisationUnits.json", callback)
+    requirejs(['./src/main/js/app/conf/metadata.conf.js'], function (metadataConf) {
+        download(baseIntUrl + "/api/organisationUnits.json?paging=false&fields=" + metadataConf.fields.organisationUnits, "./src/main/data/organisationUnits.json", callback)
+    });
 });
 
 gulp.task('download-packaged-data', ['download-metadata', 'download-datasets', 'download-programs', 'download-fieldapp-settings', 'download-organisation-units'], function () {});
@@ -171,13 +191,12 @@ gulp.task('generate-service-worker', ['less'], function (callback) {
             rootDir + '/img/*',
             rootDir + '/js/**/*/!(chrome.*.js)',
             rootDir + '/templates/**/*',
-            rootDir + '/{background,index}.html'
+            rootDir + '/index.html'
         ],
         stripPrefix: rootDir + '/',
-        importScripts: ['js/app/interceptors/fetch.interceptor.js'],
+        importScripts: ['js/app/pwa/service.worker.events.js'],
         templateFilePath: 'service-worker-custom.tmpl',
-        skipWaiting: false,
-        maximumFileSizeToCacheInBytes: 50 * (1024 * 1024)
+        skipWaiting: false
     }, callback);
 });
 
@@ -192,6 +211,19 @@ gulp.task('pack', ['less', 'config', 'download-packaged-data'], function() {
 });
 
 gulp.task('generate-pwa', ['config', 'generate-service-worker'], function () {});
+
+gulp.task('generate-pwa-zip', ['config', 'generate-service-worker'], function () {
+    var basePath = './src/main';
+    return gulp.src([
+        `${basePath}/**`,
+        `!${basePath}/js/app/chrome{,/**}`,
+        `!${basePath}/less{,/**}`,
+        `!${basePath}/chrome.app.html`,
+        `!${basePath}/background.html`
+    ])
+        .pipe(zip("praxis_pwa_" + (argv.env || "dev") + ".zip"))
+        .pipe(gulp.dest(''));
+});
 
 gulp.task('zip', ['less', 'config', 'download-metadata'], function() {
     var basePath = './src/main';

@@ -1,13 +1,22 @@
 define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "timecop", "dhisId", "orgUnitRepository", "dataSetRepository",
-    "originOrgunitCreator", "excludedDataElementsRepository", "programRepository", "excludedLineListOptionsRepository", "translationsService", "customAttributes"
+    "originOrgunitCreator", "excludedDataElementsRepository", "programRepository", "excludedLineListOptionsRepository", "translationsService", "customAttributes", "orgUnitMapper"
     ],
     function(LineListModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, timecop, dhisId, OrgUnitRepository,
-             DatasetRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, ProgramRepository, ExcludedLineListOptionsRepository, TranslationsService, customAttributes) {
+             DatasetRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, ProgramRepository, ExcludedLineListOptionsRepository, TranslationsService, customAttributes, orgUnitMapper) {
 
         describe("line list module controller", function() {
-            var scope, rootScope, lineListModuleController, mockOrgStore, db, q, datasets, sections, dataElements, sectionsdata,
-                dataElementsdata, orgUnitRepository, hustle, excludedDataElementsRepository, excludedLineListOptionsRepository,
+            var scope, rootScope, lineListModuleController, mockOrgStore, mockOrigin, db, q, datasets, dataElements,
+                orgUnitRepository, hustle, excludedDataElementsRepository, excludedLineListOptionsRepository,
                 fakeModal, allPrograms, programRepository, datasetRepository, originOrgunitCreator, translationsService;
+
+            var createMockAttribute = function (code, value) {
+                return {
+                    "attribute": {
+                        "code": code
+                    },
+                    "value": value
+                };
+            };
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle) {
@@ -15,6 +24,10 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 scope = $rootScope.$new();
 
                 q = $q;
+
+                mockOrigin = {
+                    "id": "originOrgUnit"
+                };
 
                 rootScope.startLoading = jasmine.createSpy('startLoading');
                 rootScope.stopLoading = jasmine.createSpy('stopLoading');
@@ -35,6 +48,10 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     }]
                 }];
 
+                spyOn(customAttributes, 'createAttribute').and.callFake(function (code, value) {
+                    return createMockAttribute(code, value);
+                });
+
                 excludedDataElementsRepository = new ExcludedDataElementsRepository();
                 spyOn(excludedDataElementsRepository, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(excludedDataElementsRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
@@ -53,9 +70,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
                 spyOn(orgUnitRepository, "getProjectAndOpUnitAttributes").and.returnValue(utils.getPromise(q, undefined));
                 spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, undefined));
-                spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, [{
-                    "id": "originOrgUnit"
-                }]));
+                spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, [mockOrigin]));
                 spyOn(orgUnitRepository, "associateDataSetsToOrgUnits").and.returnValue(utils.getPromise(q, {}));
 
                 translationsService = new TranslationsService();
@@ -290,22 +305,16 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "level": 4,
                     "openingDate": moment.utc(today).format('YYYY-MM-DD'),
                     "attributeValues": [{
-                        "created": moment().toISOString(),
-                        "lastUpdated": moment().toISOString(),
                         "attribute": {
                             "code": "Type"
                         },
                         "value": "Module"
                     }, {
-                        "created": moment().toISOString(),
-                        "lastUpdated": moment().toISOString(),
                         "attribute": {
                             "code": "isLineListService"
                         },
                         "value": "true"
                     }, {
-                        "created": moment().toISOString(),
-                        "lastUpdated": moment().toISOString(),
                         "attribute": {
                             "code": 'isNewDataModel'
                         },
@@ -939,22 +948,16 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "level": 6,
                     "openingDate": moment.utc(new Date()).format('YYYY-MM-DD'),
                     "attributeValues": [{
-                        "created": moment().toISOString(),
-                        "lastUpdated": moment().toISOString(),
                         "attribute": {
                             "code": "Type"
                         },
                         "value": "Module"
                     }, {
-                        "created": moment().toISOString(),
-                        "lastUpdated": moment().toISOString(),
                         "attribute": {
                             "code": "isLineListService"
                         },
                         "value": "true"
                     }, {
-                        "created": moment().toISOString(),
-                        "lastUpdated": moment().toISOString(),
                         "attribute": {
                             "code": 'isNewDataModel'
                         },
@@ -1236,7 +1239,8 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 expect(scope.getCollapsed("sectionId")).toEqual(true);
             });
 
-            it("should create origin org units", function() {
+            it("should create origin org units when geographic origin is enabled", function() {
+                scope.geographicOriginDisabled = false;
                 var today = new Date();
                 scope.$apply();
 
@@ -1267,22 +1271,16 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "level": NaN,
                     "openingDate": moment.utc().format('YYYY-MM-DD'),
                     "attributeValues": [{
-                        "created": "2014-04-01T00:00:00.000Z",
-                        "lastUpdated": "2014-04-01T00:00:00.000Z",
                         "attribute": {
                             "code": "Type"
                         },
                         "value": "Module"
                     }, {
-                        "created": "2014-04-01T00:00:00.000Z",
-                        "lastUpdated": "2014-04-01T00:00:00.000Z",
                         "attribute": {
                             "code": "isLineListService"
                         },
                         "value": "true"
                     }, {
-                        "created": "2014-04-01T00:00:00.000Z",
-                        "lastUpdated": "2014-04-01T00:00:00.000Z",
                         "attribute": {
                             "code": 'isNewDataModel'
                         },
@@ -1320,46 +1318,30 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 }, "dataValues"]);
             });
 
-            it("should associate origin org units to programs and datasets and publish jobs accordingly", function() {
-                var today = new Date();
+            it("should associate origin org units to programs and datasets and publish jobs accordingly when geographic origin is enabled", function() {
+                scope.geographicOriginDisabled = false;
                 scope.$apply();
 
                 scope.module = {
-                    'id': "Module2",
-                    'name': "Module2",
-                    'openingDate': today,
-                    'serviceType': "Linelist",
+                    'id': "someModuleId",
+                    'name': "someModuleName",
                     'parent': scope.orgUnit
                 };
 
                 var program = {
-                    'id': 'prog1',
-                    'name': 'ER Linelist',
-                    'organisationUnits': [],
-                    'attributeValues': []
+                    'id': 'someProgramId',
+                    'name': 'someProgramName',
                 };
 
                 var originOrgUnit = [{
-                    "name": "Unknown",
-                    "shortName": "Unknown",
-                    "displayName": "Unknown",
-                    "id": "UnknownModule2someId",
-                    "level": 7,
-                    "openingDate": moment().toDate(),
-                    "attributeValues": [],
-                    "parent": {
-                        "id": "Module2someId"
-                    }
+                    "name": "someOriginName",
+                    "id": "someOriginId",
                 }];
 
                 var messageData = {
-                    programIds: ['prog1'],
-                    orgUnitIds: ['UnknownModule2someId']
+                    programIds: [program.id],
+                    orgUnitIds: [originOrgUnit[0].id]
                 };
-
-                spyOn(dhisId, "get").and.callFake(function(name) {
-                    return name;
-                });
 
                 programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, program));
                 originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnit));
@@ -1377,11 +1359,11 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     data: messageData,
                     type: "associateOrgunitToProgram",
                     locale: "en",
-                    desc: "associate selected program to Unknown"
+                    desc: "associate selected program to " + originOrgUnit[0].name
                 }, "dataValues"]);
 
                 expect(hustle.publish.calls.argsFor(4)).toEqual([{
-                    data: {"orgUnitIds":["UnknownModule2someId"], "dataSetIds":["Ds1", "OrgDs1"]},
+                    data: {"orgUnitIds":["someOriginId"], "dataSetIds":["Ds1", "OrgDs1"]},
                     type: "associateOrgUnitToDataset",
                     locale: "en",
                     desc: "associate datasets for SomeName"
@@ -1389,68 +1371,33 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
             });
 
-            it("should create org unit groups", function() {
+            it("should associate module to program when geographicOrigin is disabled", function() {
                 var today = new Date();
+                scope.geographicOriginDisabled = true;
                 scope.$apply();
 
                 scope.module = {
-                    'id': "Module2",
-                    'name': "Module2",
+                    'id': "someModuleId",
+                    'name': "someModuleName",
                     'openingDate': today,
                     'serviceType': "Linelist",
-                    'parent': scope.orgUnit,
-                    "attributeValues": [{
-                        "attribute": {
-                            "code": "associatedDataSet"
-                        },
-                        "value": ""
-                    }],
+                    'parent': scope.orgUnit
                 };
 
                 var program = {
-                    'id': 'prog1',
-                    'name': 'ER Linelist',
+                    'id': 'someProgramId',
+                    'name': 'someProgramName',
                     'organisationUnits': [],
-                    'attributeValues': [{
-                        "attribute": {
-                            "code": "associatedDataSet"
-                        },
-                        "value": "ds1Code"
-                    }]
+                    'attributeValues': []
                 };
 
-                var patientOrigins = {
-                    "origins": [{
-                        "id": "id",
-                        "name": "Unknown"
-                    }]
+                var messageData = {
+                    programIds: [program.id],
+                    orgUnitIds: [scope.module.id]
                 };
-
-                var originOrgUnit = [{
-                    "name": "Unknown",
-                    "shortName": "Unknown",
-                    "displayName": "Unknown",
-                    "id": "UnknownModule2someId",
-                    "level": 7,
-                    "openingDate": moment().toDate(),
-                    "attributeValues": [{
-                        "attribute": {
-                            "code": "Type",
-                            "name": "Type"
-                        },
-                        "value": "Patient Origin"
-                    }],
-                    "parent": {
-                        "id": "Module2someId"
-                    }
-                }];
-
-                spyOn(dhisId, "get").and.callFake(function(name) {
-                    return name;
-                });
 
                 programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, program));
-                originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnit));
+                spyOn(orgUnitMapper, 'mapToModule').and.returnValue(scope.module);
 
                 scope.program = program;
                 programRepository.get.and.returnValue(utils.getPromise(q, program));
@@ -1458,7 +1405,105 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 scope.save();
                 scope.$apply();
 
-                expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith(originOrgUnit, false);
+                expect(programRepository.associateOrgUnits).toHaveBeenCalledWith(program, [scope.module]);
+                expect(hustle.publish.calls.argsFor(2)).toEqual([{
+                    data: messageData,
+                    type: "associateOrgunitToProgram",
+                    locale: "en",
+                    desc: "associate selected program to "+ scope.module.name
+                }, "dataValues"]);
+            });
+
+            describe('DataSetsModuleAssociation', function () {
+                beforeEach(function () {
+                    scope.module = {
+                        'id': "someModuleId",
+                        'name': "someModuleName",
+                        'displayName': 'someModuleName',
+                        'parent': scope.orgUnit
+                    };
+
+                    var program = {
+                        'id': 'someProgramId',
+                        'name': 'someProgramName'
+                    };
+
+                    programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, program));
+
+                    scope.program = program;
+                    programRepository.get.and.returnValue(utils.getPromise(q, program));
+                    spyOn(customAttributes, 'getAttributeValue').and.returnValue('Ds1');
+                    spyOn(orgUnitMapper, 'mapToModule').and.returnValue(scope.module);
+                });
+
+                it("should associate line list summary datasets along with population and referral dataSets to modules and publish jobs accordingly when geographic origin is disabled", function() {
+                    scope.geographicOriginDisabled = true;
+
+                    scope.save();
+                    scope.$apply();
+
+                    expect(orgUnitRepository.associateDataSetsToOrgUnits).toHaveBeenCalledWith(["popDs", "refDs", "Ds1"], [scope.module]);
+
+                    expect(hustle.publish.calls.argsFor(3)).toEqual([{
+                        data: {"orgUnitIds":["someModuleId"], "dataSetIds":["popDs", "refDs", "Ds1"]},
+                        type: "associateOrgUnitToDataset",
+                        locale: "en",
+                        desc: "associate datasets for " + scope.module.displayName
+                    }, "dataValues"]);
+                });
+
+                it("should associate only population and referral datasets to modules and publish jobs accordingly when geographic origin is enabled", function() {
+                    scope.geographicOriginDisabled = false;
+
+                    scope.save();
+                    scope.$apply();
+
+                    var expectedDataSetIds = ["popDs", "refDs"];
+                    expect(orgUnitRepository.associateDataSetsToOrgUnits).toHaveBeenCalledWith(expectedDataSetIds, [scope.module]);
+
+                    expect(hustle.publish.calls.argsFor(5)).toEqual([{
+                        data: {"orgUnitIds": ["someModuleId"], "dataSetIds": expectedDataSetIds},
+                        type: "associateOrgUnitToDataset",
+                        locale: "en",
+                        desc: "associate datasets for " + scope.module.displayName
+                    }, "dataValues"]);
+                });
+            });
+
+            describe('OrgUnitGroupsAssociation', function () {
+                beforeEach(function () {
+                    scope.module = {
+                        'id': "someModuleId",
+                        'name': "someModuleName",
+                        'parent': scope.orgUnit
+                    };
+                });
+
+                it("should associate to origins when geographicOrigin is enabled", function() {
+                    scope.geographicOriginDisabled = false;
+                    var originOrgUnit = [{
+                        "name": "someOriginName",
+                        "id": "someOriginId"
+                    }];
+
+                    originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnit));
+
+                    scope.save();
+                    scope.$apply();
+
+                    expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith(originOrgUnit, false);
+                });
+
+                it("should associate to modules when geographicOrigin is disabled", function () {
+                    scope.geographicOriginDisabled = true;
+
+                    spyOn(orgUnitMapper, 'mapToModule').and.returnValue(scope.module);
+
+                    scope.save();
+                    scope.$apply();
+
+                    expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith([scope.module], false);
+                });
             });
 
             it("should take the user to the view page of the parent opUnit on clicking cancel", function() {
@@ -1480,5 +1525,27 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(scope.orgUnit);
             });
 
+            describe('FindAssociatiedProgram', function () {
+                beforeEach(function () {
+                    scope.module = {
+                        id: 'someModule',
+                        parent: scope.orgUnit
+                    };
+                });
+
+                it("should find the program association from module when geographicOrigin is disabled", function () {
+                    scope.geographicOriginDisabled = true;
+                    scope.$apply();
+
+                    expect(programRepository.getProgramForOrgUnit).toHaveBeenCalledWith(scope.module.id);
+                });
+
+                it("should find the program associated from the origin when geographicOrigin is enabled", function () {
+                    scope.geographicOriginDisabled = false;
+                    scope.$apply();
+
+                    expect(programRepository.getProgramForOrgUnit).toHaveBeenCalledWith(mockOrigin.id);
+                });
+            });
         });
     });

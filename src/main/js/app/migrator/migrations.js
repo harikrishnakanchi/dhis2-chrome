@@ -1,4 +1,4 @@
-define(['dateUtils', 'lodash'], function(dateUtils, _) {
+define(['dateUtils', 'lodash', 'metadataConf'], function(dateUtils, _, metadataConf) {
     var create_data_store = function(stores, db) {
         _.each(stores, function(type) {
             db.createObjectStore(type, {
@@ -456,6 +456,52 @@ define(['dateUtils', 'lodash'], function(dateUtils, _) {
         };
     };
 
+    var add_custom_attributes_store = function (db, tx) {
+        create_store_with_key("attributes", "id", db);
+    };
+
+    var add_user_roles_store = function (db, tx) {
+        create_store_with_key("userRoles", "id", db);
+    };
+
+    var update_change_log_keys = function (db, tx) {
+        var changeLogKeyMapper = {'orgUnits': 'organisationUnits', 'orgUnitGroups': 'organisationUnitGroups', 'datasets': 'dataSets'};
+        var changeLogStore = tx.objectStore('changeLog');
+        Object.keys(changeLogKeyMapper).forEach(function (key) {
+            var request = changeLogStore.get(key);
+            request.onsuccess = function (e) {
+                var changeLog = e.target.result;
+                if (changeLog) {
+                    changeLogStore.delete(key);
+                    changeLogStore.put({
+                        'type': changeLogKeyMapper[key],
+                        'lastUpdatedTime': changeLog.lastUpdatedTime
+                    });
+                }
+            };
+        });
+    };
+
+    var migrate_metadata_change_log = function (db, tx) {
+        var changeLogStore = tx.objectStore('changeLog');
+        var req = changeLogStore.get('metaData');
+        req.onsuccess = function (e) {
+            var metaDataChangeLog = e.target.result;
+            if (metaDataChangeLog) {
+                metadataConf.entities
+                    .filter(function (entity) {
+                        return !_.includes(['userRoles', 'attributes', 'indicators', 'programIndicators'], entity);
+                    })
+                    .forEach(function (entityType) {
+                        changeLogStore.put({
+                            'type': entityType,
+                            'lastUpdatedTime': metaDataChangeLog.lastUpdatedTime
+                        });
+                    });
+            }
+        };
+    };
+
     var force_charts_and_reports_to_redownload = function (db, tx) {
         var changeLogStore = tx.objectStore("changeLog");
         changeLogStore.delete("charts");
@@ -516,5 +562,9 @@ define(['dateUtils', 'lodash'], function(dateUtils, _) {
         delete_keys_chart_and_reports_from_changelog,
         add_indicator_and_program_indicator_stores,
         force_charts_and_reports_to_redownload,
+        add_custom_attributes_store,
+        add_user_roles_store,
+        update_change_log_keys,
+        migrate_metadata_change_log
     ];
 });

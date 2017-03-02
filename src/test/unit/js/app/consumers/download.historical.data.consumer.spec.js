@@ -1,9 +1,9 @@
-define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties', 'moment', 'downloadHistoricalDataConsumer', 'dataService',
+define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties', 'moment', 'downloadHistoricalDataConsumer', 'dataService', 'systemInfoService',
         'userPreferenceRepository', 'orgUnitRepository', 'dataSetRepository', 'changeLogRepository', 'dataRepository', 'programEventRepository','eventService','customAttributes'],
-    function (utils, timecop, mocks, _, dateUtils, properties, moment, DownloadHistoricalDataConsumer, DataService, UserPreferenceRepository,
+    function (utils, timecop, mocks, _, dateUtils, properties, moment, DownloadHistoricalDataConsumer, DataService, SystemInfoService, UserPreferenceRepository,
               OrgUnitRepository, DatasetRepository, ChangeLogRepository, DataRepository, ProgramEventRepository, EventService, customAttributes) {
         describe('DownloadHistoricalDataConsumer', function () {
-            var scope, q, downloadHistoricalDataConsumer, dataService, eventService, userPreferenceRepository, orgUnitRepository,
+            var scope, q, downloadHistoricalDataConsumer, dataService, eventService, systemInfoService, userPreferenceRepository, orgUnitRepository,
                 datasetRepository, dataRepository, changeLogRepository, programEventRepository,
                 mockOrigins, mockDataSets, mockPeriodRange, periodChunkSize, mockPayload, mockProjectA, mockProjectB, mockModuleA, mockModuleB, mockModuleC;
 
@@ -40,6 +40,9 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                 eventService = new EventService();
                 spyOn(eventService, 'getEvents').and.returnValue(utils.getPromise(q, {}));
 
+                systemInfoService = new SystemInfoService();
+                spyOn(systemInfoService, 'getServerDate').and.returnValue(utils.getPromise(q, ''));
+
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, 'getAllModulesInOrgUnits').and.callFake(function (projectId) {
                     if (projectId == mockProjectA.id) return utils.getPromise(q, [mockModuleA]);
@@ -67,7 +70,7 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                 programEventRepository = new ProgramEventRepository();
                 spyOn(programEventRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
 
-                downloadHistoricalDataConsumer = new DownloadHistoricalDataConsumer(q, dataService, eventService, userPreferenceRepository, orgUnitRepository, datasetRepository, changeLogRepository, dataRepository, programEventRepository);
+                downloadHistoricalDataConsumer = new DownloadHistoricalDataConsumer(q, dataService, eventService, systemInfoService, userPreferenceRepository, orgUnitRepository, datasetRepository, changeLogRepository, dataRepository, programEventRepository);
             }));
 
             afterEach(function () {
@@ -192,6 +195,22 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
 
                     expect(changeLogRepository.upsert).toHaveBeenCalledWith('yearlyDataValues:projectA:moduleA', jasmine.any(String));
                     expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('yearlyDataValues:projectB:moduleB', jasmine.any(String));
+                });
+
+                it('should upsert the changeLog with the server time', function () {
+                    systemInfoService.getServerDate.and.returnValue(utils.getPromise(q, 'someTime'));
+                    downloadHistoricalDataConsumer.run();
+                    scope.$apply();
+
+                    expect(changeLogRepository.upsert).toHaveBeenCalledWith(jasmine.any(String), 'someTime');
+                });
+
+                it('should not make systemInfo call if historical data is already downloaded', function () {
+                    changeLogRepository.get.and.returnValue(utils.getPromise(q, 'lastUpdatedTime'));
+                    downloadHistoricalDataConsumer.run();
+                    scope.$apply();
+
+                    expect(systemInfoService.getServerDate).not.toHaveBeenCalled();
                 });
             });
         });

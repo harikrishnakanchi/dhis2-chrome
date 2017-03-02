@@ -4,7 +4,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
             var lineListOfflineApprovalController,
                 scope, q,
                 programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository,
-                origins, program, optionSetMapping, events, origin1, origin2, origin3, origin4, associatedDataSets,
+                origins, program, optionSetMapping, mockOptionSets, events, origin1, origin2, origin3, origin4, associatedDataSets,
                 translationsService;
 
             beforeEach(mocks.inject(function($rootScope, $q) {
@@ -39,29 +39,52 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 optionSetMapping = {
                     "os1": [{
                         "id": 'os1o1',
-                        "name": 'os1o1 name',
-                        "displayName": 'os1o1 name'
+                        "name": 'os1o1 name'
                     }],
                     "os2": [{
                         "id": 'os2o1',
-                        "name": 'os2o1 name',
-                        "displayName": 'os2o1 translated name'
+                        "name": 'os2o1 name'
                     }],
                     "gender_id": [{
                         "id": 'male_id',
-                        "name": 'Male',
-                        "displayName": 'Male'
+                        "name": 'Male'
                     }, {
                         "id": 'female_id',
-                        "name": 'Female',
-                        "displayName": 'Female'
+                        "name": 'Female'
                     }],
                     "ref_id": [{
                         "id": 'ref_id',
-                        "name": 'ref 1',
-                        "displayName": 'ref 1'
+                        "name": 'ref 1'
                     }]
                 };
+                mockOptionSets = [{
+                    id: 'os1',
+                    options: [{
+                        "id": 'os1o1',
+                        "name": 'os1o1 name'
+                    }]
+                }, {
+                    id: 'os2',
+                    options: [{
+                        "id": 'os2o1',
+                        "name": 'os2o1 name'
+                    }]
+                }, {
+                    id: 'gender_id',
+                    options: [{
+                        "id": 'male_id',
+                        "name": 'Male'
+                    }, {
+                        "id": 'female_id',
+                        "name": 'Female'
+                    }]
+                }, {
+                    id: 'ref_id',
+                    options: [{
+                        "id": 'ref_id',
+                        "name": 'ref 1'
+                    }]
+                }];
                 events = [{
                     "event": "event1",
                     'orgUnit': 'origin1',
@@ -176,14 +199,13 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 spyOn(excludedDataElementsRepository, "get").and.returnValue(utils.getPromise(q, []));
 
                 translationsService = new TranslationsService();
-                spyOn(translationsService, "translate").and.returnValue(program);
-                spyOn(translationsService, "translateOptionSetMap").and.returnValue(optionSetMapping);
+                spyOn(translationsService, "translate").and.callFake(function (o) {
+                    return o;
+                });
                 spyOn(translationsService, "getTranslationForProperty").and.returnValue("");
 
                 optionSetRepository = new OptionSetRepository();
-                spyOn(optionSetRepository, "getOptionSetMapping").and.returnValue(utils.getPromise(q, {
-                    "optionSetMap": optionSetMapping
-                }));
+                spyOn(optionSetRepository, "getOptionSets").and.returnValue(utils.getPromise(q, mockOptionSets));
 
                 dataSetRepository = new DatasetRepository();
                 associatedDataSets = [{
@@ -212,7 +234,6 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 expect(scope.originOrgUnits).toEqual([origin2, origin1, origin4, origin3]);
                 expect(scope.program).toEqual(program);
 
-                translationsService.translate.and.returnValue(associatedDataSets);
                 lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService);
 
                 scope.$apply();
@@ -377,6 +398,10 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                     "origin2": [events[1]]
                 });
                 expect(scope.associatedDataSets).toEqual(associatedDataSets);
+            });
+
+            it('should load optionSets on initialize', function () {
+                expect(optionSetRepository.getOptionSets).toHaveBeenCalledWith('par', 'Mod1');
             });
 
             it("should translate procedure dataElements formName and description", function () {

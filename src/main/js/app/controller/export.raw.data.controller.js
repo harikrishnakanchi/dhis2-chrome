@@ -241,7 +241,8 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'da
         };
 
         var getProgramForCurrentModule = function () {
-            return programRepository.getProgramForOrgUnit($scope.originOrgUnits[0].id).then(function (program) {
+            var orgUnit = (_.get($scope.originOrgUnits[0], 'id')) || $scope.orgUnit.id;
+            return programRepository.getProgramForOrgUnit(orgUnit).then(function (program) {
                 return programRepository.get(program.id, $scope.excludedDataElementIds).then(function (program) {
                     $scope.allDataElements = _.chain(program.programStages)
                         .map('programStageSections').flatten()
@@ -292,7 +293,8 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'da
         var fetchEventsForProgram = function (program) {
             var startDate = moment(_.first($scope.weeks), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD'),
                 endDate = moment(_.last($scope.weeks), 'GGGG[W]W').endOf('isoWeek').format('YYYY-MM-DD');
-            return programEventRepository.findEventsByDateRange(program.id, _.map($scope.originOrgUnits, 'id'), startDate, endDate).then(function (events) {
+            var orgUnitIdsAssociatedToEvents = _.map($scope.originOrgUnits, 'id').concat($scope.orgUnit.id);
+            return programEventRepository.findEventsByDateRange(program.id, orgUnitIdsAssociatedToEvents, startDate, endDate).then(function (events) {
                 return _.filter(events, function (event) {
                     return !event.localStatus || event.localStatus == 'READY_FOR_DHIS';
                 });

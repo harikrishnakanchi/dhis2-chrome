@@ -1,21 +1,5 @@
-define(["dhisUrl", "moment", "properties"], function(dhisUrl, moment, properties) {
+define(["dhisUrl", "moment", "properties", "metadataConf"], function(dhisUrl, moment, properties, metadataConf) {
     return function($http) {
-        this.getMetadata = function(lastUpdatedTime) {
-            var config = {
-                params : {
-                    assumeTrue: false,
-                    lastUpdated: lastUpdatedTime || null
-                }
-            };
-
-            _.each(properties.metadata.types, function(type){
-               config.params[type] = true;
-            });
-
-            return $http.get(dhisUrl.filteredMetadata, config).then(function(response) {
-                return response.data;
-            });
-        };
 
         this.loadMetadataFromFile = function(lastUpdatedTime) {
             return $http.get("data/metadata.json").then(function(response) {
@@ -28,6 +12,17 @@ define(["dhisUrl", "moment", "properties"], function(dhisUrl, moment, properties
                     organisationUnits: [],
                     programs: []
                 };
+            });
+        };
+
+        this.getMetadataOfType = function (type, lastUpdated) {
+            var url = dhisUrl[type];
+            var params = {fields: metadataConf.fields[type], paging: false};
+            if (lastUpdated) {
+                params.filter = 'lastUpdated:ge:' + lastUpdated;
+            }
+            return $http.get(url, {params: params}).then(function (response) {
+                return response.data[type];
             });
         };
     };

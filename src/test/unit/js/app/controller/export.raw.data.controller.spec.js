@@ -653,7 +653,7 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
                 it('should fetch all the events in the specified week range for the associated program in selected module', function () {
                     scope.$apply();
 
-                    expect(programEventRepository.findEventsByDateRange).toHaveBeenCalledWith(mockProgram.id, _.map(scope.originOrgUnits, 'id'), '2016-09-05', '2016-09-25');
+                    expect(programEventRepository.findEventsByDateRange).toHaveBeenCalledWith(mockProgram.id, _.map(scope.originOrgUnits, 'id').concat(selectedOrgUnit.id), '2016-09-05', '2016-09-25');
                 });
 
                 it('should filter the submitted events', function () {

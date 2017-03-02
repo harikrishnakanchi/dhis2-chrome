@@ -1,10 +1,10 @@
-define(["properties", "lodash"], function(properties, _) {
+define(["properties", "lodash", "metadataConf"], function(properties, _, metadataConf) {
     return function(db, $q) {
         this.upsertMetadata = function(data) {
             var upsertPromises = [];
-            _.each(properties.metadata.types, function(type) {
-                var entities = data[type];
-                var store = db.objectStore(type);
+            _.each(metadataConf.entities, function(entity) {
+                var entities = data[entity];
+                var store = db.objectStore(entity);
                 if (!_.isEmpty(entities))
                     upsertPromises.push(store.upsert(entities));
             });

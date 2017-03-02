@@ -1,6 +1,21 @@
 define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customAttributes"], function(orgUnitMapper, mocks, moment, timecop, dhisId, customAttributes) {
     describe("orgUnitMapper", function() {
+
+        var createMockAttribute = function (code, value) {
+            return {
+                "created": "2014-10-29T12:43:54.972Z",
+                "lastUpdated": "2014-10-29T12:43:54.972Z",
+                "attribute": {
+                    "code": code
+                },
+                "value": value
+            };
+        };
+
         beforeEach(function() {
+            spyOn(customAttributes, 'createAttribute').and.callFake(function (code, value) {
+                return createMockAttribute(code, value);
+            });
             Timecop.install();
             Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
         });
@@ -330,7 +345,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                 }
             };
 
-            var today = new Date("2010-01-01T00:00:00");
+            var today = new Date("2014-10-29T12:43:54.972Z");
             spyOn(window, "Date").and.returnValue(today);
             spyOn(dhisId, "get").and.callFake(function(name) {
                 return name;
@@ -397,40 +412,9 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
 
             var actualModule = orgUnitMapper.mapToModule(module, "someId", "someLevel");
 
-            expect(actualModule).toEqual({
-                "name": "Module1",
-                "shortName": "Module1",
-                "displayName": "Parent - Module1",
-                "id": "someId",
-                "level": "someLevel",
-                "openingDate": moment.utc(new Date()).format("YYYY-MM-DD"),
-                "attributeValues": [{
-                    "created": moment().toISOString(),
-                    "lastUpdated": moment().toISOString(),
-                    "attribute": {
-                        "code": "Type"
-                    },
-                    "value": "Module"
-                }, {
-                    "created": moment().toISOString(),
-                    "lastUpdated": moment().toISOString(),
-                    "attribute": {
-                        "code": "isLineListService"
-                    },
-                    "value": "false"
-                }, {
-                    "created": moment().toISOString(),
-                    "lastUpdated": moment().toISOString(),
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }],
-                "parent": {
-                    "name": "Parent",
-                    "id": "Par1"
-                }
-            });
+            expect(actualModule.id).toEqual("someId");
+            expect(actualModule.level).toEqual("someLevel");
+
         });
 
         it("should filter modules from org units", function() {

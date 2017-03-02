@@ -1,9 +1,9 @@
 /*global Date:true*/
-define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepository", "customAttributes"], function(OrgUnitController, mocks, utils, _, OrgUnitRepository, customAttributes) {
+define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepository", "customAttributes", "properties"], function(OrgUnitController, mocks, utils, _, OrgUnitRepository, customAttributes, properties) {
     describe("org unit controller", function() {
         var q, scope, orgUnitContoller, location, timeout, anchorScroll, orgUnitRepository, rootScope;
 
-        beforeEach(mocks.inject(function($rootScope, $q, $location, $timeout, $anchorScroll) {
+        beforeEach(mocks.inject(function($rootScope, $q, $location, $timeout) {
             q = $q;
             rootScope = $rootScope;
 

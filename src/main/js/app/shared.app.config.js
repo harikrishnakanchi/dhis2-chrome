@@ -12,6 +12,7 @@ require.config({
         "migrator": "app/migrator/migrator",
         "properties": "app/conf/properties",
         "overrides": "app/conf/overrides",
+        "metadataConf": "app/conf/metadata.conf",
         "moment": "lib/moment/moment-with-locales.min",
         "timecop": "lib/timecop/timecop-0.1.1",
         "hustle": "lib/hustle/hustle",
@@ -96,6 +97,7 @@ require.config({
         "orgUnitGroupService": "app/service/orgunit.group.service",
         "historyService": "app/service/history.service",
         "storageService": "app/service/storage.service",
+        "systemInfoService": "app/service/system.info.service",
         "metadataDownloader": "app/service/metadata.downloader",
 
         //Repositories
@@ -125,6 +127,7 @@ require.config({
         "excludedLineListOptionsRepository": "app/repository/excluded.line.list.options.repository",
         "categoryRepository": "app/repository/category.repository",
         "programIndicatorRepository": "app/repository/program.indicator.repository",
+        "customAttributeRepository": "app/repository/custom.attribute.repository",
 
         //Models
         "chart": "app/models/chart",
@@ -157,6 +160,7 @@ require.config({
         "translationsService": "app/transformers/translations.service",
         "eventsAggregator": "app/transformers/events.aggregator",
         "transformers": "app/transformers/transformers",
+        'optionSetTransformer': "app/transformers/option.set.transformer",
 
         //Database Utilities
         "dbutils": "app/dbutils/dbutils",
@@ -175,7 +179,6 @@ require.config({
         "dhisId": "app/utils/dhis.id",
         "dateUtils": "app/utils/date.utils",
         "lodashUtils": "app/utils/lodash.utils",
-        "httpUtils": "app/utils/http.utils",
         "dhisUrl": "app/utils/dhis.url",
         "zipUtils": "app/utils/zip.utils",
         "cipherUtils": "app/utils/cipher.utils",

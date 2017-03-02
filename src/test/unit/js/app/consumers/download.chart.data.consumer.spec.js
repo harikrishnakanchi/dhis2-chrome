@@ -1,9 +1,9 @@
-define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment', 'reportService', 'chartRepository', 'userPreferenceRepository', "dataSetRepository", 'changeLogRepository', 'orgUnitRepository', 'programRepository'],
-    function(DownloadChartDataConsumer, mocks, utils, timecop, moment, ReportService, ChartRepository, UserPreferenceRepository, DatasetRepository, ChangeLogRepository, OrgUnitRepository, ProgramRepository) {
+define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment', 'reportService', 'systemInfoService', 'chartRepository', 'userPreferenceRepository', "dataSetRepository", 'changeLogRepository', 'orgUnitRepository', 'programRepository'],
+    function(DownloadChartDataConsumer, mocks, utils, timecop, moment, ReportService, SystemInfoService, ChartRepository, UserPreferenceRepository, DatasetRepository, ChangeLogRepository, OrgUnitRepository, ProgramRepository) {
 
         describe('Download Chart Data Consumer', function() {
             var downloadChartDataConsumer,
-                reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository,
+                reportService, systemInfoService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository,
                 scope, q, currentTime, mockProjectId, mockModule, mockProgram, mockDataSet, mockChart;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
@@ -44,6 +44,9 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 reportService = new ReportService();
                 spyOn(reportService, 'getReportDataForOrgUnit').and.returnValue(utils.getPromise(q, {}));
 
+                systemInfoService = new SystemInfoService();
+                spyOn(systemInfoService, 'getServerDate');
+
                 changeLogRepository = new ChangeLogRepository();
                 spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, null));
                 spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
@@ -55,7 +58,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 Timecop.install();
                 Timecop.freeze(currentTime.toISOString());
 
-                downloadChartDataConsumer = new DownloadChartDataConsumer(reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository, $q);
+                downloadChartDataConsumer = new DownloadChartDataConsumer(reportService, systemInfoService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository, $q);
             }));
 
             afterEach(function() {
@@ -82,12 +85,14 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyChartData:' + mockProjectId);
             });
 
-            it('should update the lastUpdated time in the changeLog', function() {
+            it('should update the lastUpdated with the system time in the changeLog', function() {
+                var systemTime = 'someTime';
+                systemInfoService.getServerDate.and.returnValue(utils.getPromise(q, systemTime));
                 downloadChartDataConsumer.run();
                 scope.$apply();
 
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith('weeklyChartData:' + mockProjectId, currentTime.toISOString());
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyChartData:' + mockProjectId, currentTime.toISOString());
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('weeklyChartData:' + mockProjectId, systemTime);
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyChartData:' + mockProjectId, systemTime);
             });
 
             it('should retrieve dataSets for each module', function() {
@@ -240,7 +245,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 scope.$apply();
 
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
-                expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('weeklyChartData:' + mockProjectId, currentTime.toISOString());
+                expect(changeLogRepository.upsert).not.toHaveBeenCalled();
             });
 
             it('should not download monthly chart data if it has already been downloaded that same day', function() {
@@ -250,8 +255,6 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 };
 
                 var lastDownloadedTime = moment('2014-10-01T12:00:00.000Z').toISOString();
-                currentTime = moment('2014-10-01T12:00:00.000Z');
-                Timecop.freeze(currentTime);
 
                 chartRepository.getAll.and.returnValue(utils.getPromise(q, [mockMonthlyChart]));
                 changeLogRepository.get.and.returnValue(utils.getPromise(q, lastDownloadedTime));
@@ -260,7 +263,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 scope.$apply();
 
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
-                expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('monthlyChartData:' + mockProjectId, currentTime.toISOString());
+                expect(changeLogRepository.upsert).not.toHaveBeenCalled();
             });
 
             it('should download monthly chart data if it has not been downloaded in the same day', function() {
@@ -281,7 +284,6 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 scope.$apply();
 
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalled();
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyChartData:' + mockProjectId, currentTime.toISOString());
             });
 
         });

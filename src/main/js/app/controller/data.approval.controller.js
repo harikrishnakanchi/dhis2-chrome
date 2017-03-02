@@ -221,7 +221,8 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
                 return orgUnitRepository.findAllByParent([$scope.selectedModule.id]).then(function(originOrgUnits) {
                     $scope.moduleAndOriginOrgUnits = [$scope.selectedModule].concat(originOrgUnits);
                     $scope.originOrgUnits = originOrgUnits;
-                    return programRepository.getProgramForOrgUnit(originOrgUnits[0].id).then(function(program) {
+                    var orgUnitIdAssociatedToProgram = _.get(originOrgUnits[0], 'id') || $scope.selectedModule.id;
+                    return programRepository.getProgramForOrgUnit(orgUnitIdAssociatedToProgram).then(function(program) {
                         $scope.program = program;
                         $scope.isLineListModule = !!program;
                     });

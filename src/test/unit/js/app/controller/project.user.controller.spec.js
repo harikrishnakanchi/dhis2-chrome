@@ -1,6 +1,7 @@
-define(["projectUserController", "angularMocks", "utils", "dhisId", "customAttributes"], function(ProjectUserController, mocks, utils, dhisId, customAttributes) {
+define(["projectUserController", "angularMocks", "utils", "dhisId", "customAttributes", "userRepository"],
+    function(ProjectUserController, mocks, utils, dhisId, customAttributes, UserRepository) {
     describe("projectUserControllerspec", function() {
-        var scope, projectUserController, q, userRepository, hustle, fakeModal, timeout;
+        var scope, projectUserController, q, userRepository, hustle, fakeModal, timeout, userRoles;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout) {
@@ -20,7 +21,9 @@ define(["projectUserController", "angularMocks", "utils", "dhisId", "customAttri
             scope.resourceBundle = {
                 "createUserDesc": "create user",
                 "updateUserDesc": "update user",
-                "usernamePrefixValidation": "Username should begin with"
+                "usernamePrefixValidation": "Username should begin with",
+                "emailValidation": "Should be an email address.",
+                "defaultValidation": "Enter a value between 2 and 140 characters long."
             };
 
             fakeModal = {
@@ -33,12 +36,27 @@ define(["projectUserController", "angularMocks", "utils", "dhisId", "customAttri
                 open: function(object) {}
             };
 
-            userRepository = utils.getMockRepo(q);
-            userRepository.getAllUsernames = function() {};
-            userRepository.getAllProjectUsers = function() {};
+            userRoles = [
+                {
+                    "name": 'Data entry user',
+                    "id": 'Role1Id'
+                }, {
+                    "name": 'Project Level Approver',
+                    "id": 'Role2Id'
+                }, {
+                    "name": 'Observer',
+                    "id": 'Role3Id'
+                }
+            ];
+
+            userRepository = new UserRepository();
 
             spyOn(userRepository, "getAllUsernames").and.returnValue(utils.getPromise(q, {}));
             spyOn(userRepository, "getAllProjectUsers").and.returnValue(utils.getPromise(q, {}));
+            spyOn(userRepository, "getUserRoles").and.returnValue(utils.getPromise(q, userRoles));
+            spyOn(userRepository, "upsert").and.callFake(function (data) {
+                return utils.getPromise(q, data);
+            });
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
             spyOn(customAttributes, "getAttributeValue").and.callFake(function (attributeValues, code) {
                 var fakeAttributeValues = {
@@ -55,7 +73,8 @@ define(["projectUserController", "angularMocks", "utils", "dhisId", "customAttri
                 username: "ProJ_1_Blah",
                 password: "P@ssw0rd",
                 userRole: {
-                    name: 'SomeRole'
+                    name: 'SomeRole',
+                    id: 'roleId'
                 }
             };
             var expectedUserPayload = {
@@ -66,9 +85,13 @@ define(["projectUserController", "angularMocks", "utils", "dhisId", "customAttri
                 "userCredentials": {
                     "username": "proj_1_blah",
                     "userRoles": [{
-                        "name": user.userRole.name
+                        "name": user.userRole.name,
+                        "id": "roleId"
                     }],
-                    "password": "msfuser",
+                    userInfo: {
+                       id: 'ProJ_1_Blah'
+                    },
+                    "password": "msfuser"
                 },
                 "organisationUnits": [{
                     "id": scope.orgUnit.id,
@@ -99,6 +122,60 @@ define(["projectUserController", "angularMocks", "utils", "dhisId", "customAttri
             expect(scope.saveFailure).toEqual(false);
         });
 
+        it('should get user roles with id and set it to scope', function () {
+            scope.$apply();
+            expect(userRepository.getUserRoles).toHaveBeenCalled();
+            expect(_.map(scope.userRoles, 'id')).toEqual(["Role1Id", "Role2Id", "Role3Id"]);
+        });
+
+        describe('NameValidations', function () {
+            it('should not validate the name if project user is not selected', function () {
+                scope.projectUser = {};
+
+                scope.setNameValidations();
+
+                expect(scope.userNameMatchExpr).toEqual(new RegExp('', 'i'));
+                expect(scope.patternValidationMessage).toEqual('');
+                expect(scope.userNamePlaceHolder).toEqual('');
+            });
+
+            it('should validate the name only if it is starts with project code', function () {
+                scope.projectUser.userRole = {
+                    validationType: 'PROJECT_CODE_PREFIX'
+                };
+
+                scope.setNameValidations();
+
+                expect(scope.userNameMatchExpr).toEqual(new RegExp('prj_.+', 'i'));
+                expect(scope.patternValidationMessage).toEqual(scope.resourceBundle.usernamePrefixValidation);
+                expect(scope.userNamePlaceHolder).toEqual(scope.resourceBundle.usernamePrefixValidation);
+            });
+
+            it('should validate the name only if it is an email', function () {
+                scope.projectUser.userRole = {
+                    validationType: 'EMAIL'
+                };
+
+                scope.setNameValidations();
+
+                expect(scope.userNameMatchExpr).toEqual(/[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+\.[a-zA-Z]{2,4}$/i);
+                expect(scope.patternValidationMessage).toEqual(scope.resourceBundle.emailValidation);
+                expect(scope.userNamePlaceHolder).toEqual(scope.resourceBundle.emailValidation);
+            });
+
+            it('should validate the name with DHIS defaults if validation is not specified', function () {
+                scope.projectUser.userRole = {
+                    validationType: 'someThingElse'
+                };
+
+                scope.setNameValidations();
+
+                expect(scope.userNameMatchExpr).toEqual(/^.{2,140}$/i);
+                expect(scope.patternValidationMessage).toEqual(scope.resourceBundle.defaultValidation);
+                expect(scope.userNamePlaceHolder).toEqual(scope.resourceBundle.defaultValidation);
+            });
+        });
+
         it("should take the user to the view page of the project on clicking cancel", function() {
             scope.orgUnit = {
                 "id": "parent",
@@ -125,6 +202,7 @@ define(["projectUserController", "angularMocks", "utils", "dhisId", "customAttri
                     "id": "someId"
                 }
             };
+
             scope.isNewMode = false;
             var users = [{
                 'userCredentials': {
@@ -156,7 +234,7 @@ define(["projectUserController", "angularMocks", "utils", "dhisId", "customAttri
                         "id": 'Role1Id'
                     }, {
                         "name": 'Project Level Approver',
-                        "id": 'Role2Id',
+                        "id": 'Role2Id'
                     }]
                 }
             }];

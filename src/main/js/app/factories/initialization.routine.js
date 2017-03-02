@@ -1,5 +1,5 @@
 define(['lodash', 'platformUtils'], function (_, platformUtils) {
-    return function ($rootScope, $location, systemSettingRepository, translationsService, packagedDataImporter) {
+    return function ($rootScope, $location, systemSettingRepository, translationsService, hustleMonitor) {
 
         $rootScope.setLocale = function (locale) {
             translationsService.setLocale(locale);
@@ -27,6 +27,7 @@ define(['lodash', 'platformUtils'], function (_, platformUtils) {
         var run = function () {
             systemSettingRepository.getLocale().then($rootScope.setLocale);
             systemSettingRepository.loadProductKey();
+            hustleMonitor.checkHustleQueueCount();
             platformUtils.init();
         };
 

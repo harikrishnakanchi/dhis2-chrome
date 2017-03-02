@@ -10,6 +10,10 @@ define(['lodash'], function (_) {
     var PivotTable = function (config) {
         this.id = config.id;
         this.name = config.name;
+
+        // TODO: Stop parsing the title from name after all fields have downloaded pivot table titles which are available in DHIS 2.25
+        this.title = config.title || parseTitle(config.name) ;
+        this.translations = config.translations;
         this.columns = config.columns;
         this.rows = config.rows;
         this.filters = config.filters;
@@ -29,7 +33,6 @@ define(['lodash'], function (_) {
         this.weeklyReport = !this.monthlyReport;
         this.hideWeeks = hideWeeks(this.dataDimensionItems);
 
-        this.title = parseTitle(this.name);
         this.displayPosition = parseDisplayPosition(this.name);
     };
 

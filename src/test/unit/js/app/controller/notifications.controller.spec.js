@@ -54,7 +54,7 @@
                  if (property === 'description') {
                      return translatedDataElementDescription;
                  }
-                 else if (property === 'name') {
+                 else if (property === 'shortName') {
                      return translatedDataElementName;
                  }
                  return defaultValue;
@@ -140,8 +140,8 @@
              initiateNotificationController();
 
              expect(scope.allDataElementValues).toEqual(expectedValues);
-             expect(translationService.getTranslationForProperty).toHaveBeenCalledWith(dataElementId, 'name', dataElementName);
-             expect(translationService.getTranslationForProperty).toHaveBeenCalledWith(dataElementId, 'description', dataElementDescription);
+             expect(translationService.getTranslationForProperty).toHaveBeenCalledWith(jasmine.objectContaining({id: dataElementId}), 'shortName', dataElementName);
+             expect(translationService.getTranslationForProperty).toHaveBeenCalledWith(jasmine.objectContaining({id: dataElementId}), 'description', dataElementDescription);
          });
      });
  });

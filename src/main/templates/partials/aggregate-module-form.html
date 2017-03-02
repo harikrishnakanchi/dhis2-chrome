@@ -28,14 +28,14 @@
                             </div>
                         </div>
                     </li>
-                    <li class="form-group add-service-checkbox">
+                    <li class="form-group add-service-checkbox" ng-show="!referralLocationDisabled">
                         <div class="col-sm-4 col-md-4">
                             <input type="checkbox" ng-model="associateReferralLocation"/>
                         </div>
                         <label class="col-sm-6 col-md-6 control-label">{{ resourceBundle.referralLocationCheckboxLabel }}</label>
 
                     </li>
-                    <li class="form-group add-service-checkbox">
+                    <li class="form-group add-service-checkbox" ng-show="!geographicOriginDisabled">
                         <div class="col-sm-4 col-md-4">
                             <input type="checkbox" ng-model="associateOriginDataSet"/>
                         </div>

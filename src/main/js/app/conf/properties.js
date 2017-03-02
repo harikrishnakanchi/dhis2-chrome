@@ -4,22 +4,7 @@ define(['lodash', 'overrides', 'platformConfig'], function(_, overrides, platfor
         metadata: {
             sync: {
                 intervalInMinutes: 720
-            },
-            types: [
-                'categories',
-                'categoryCombos',
-                'categoryOptionCombos',
-                'categoryOptions',
-                'dataElements',
-                'indicators',
-                'programIndicators',
-                'sections',
-                'users',
-                'optionSets',
-                'translations',
-                'organisationUnitGroupSets',
-                'dataElementGroups'
-            ]
+            }
         },
         http: {
             timeout: 180000
@@ -39,7 +24,7 @@ define(['lodash', 'overrides', 'platformConfig'], function(_, overrides, platfor
             url: url
         },
         praxis: {
-            version: '10.0',
+            version: '11.0',
             fileExtension: 'prx'
         },
         queue: {
@@ -47,7 +32,7 @@ define(['lodash', 'overrides', 'platformConfig'], function(_, overrides, platfor
             delay: 100,
             skipRetryMessages: [],
             maxNumberOfTimesItemCanBeRescued: 5,
-            minTimeInSecToIncrementItemRescuedCount: 60,
+            minTimeInSecToIncrementItemRescuedCount: 120,
             httpGetRetryDelay: 10000,
             retryDelayConfig: {
                 0: 10000,

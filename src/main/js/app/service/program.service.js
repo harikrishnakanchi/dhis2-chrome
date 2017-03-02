@@ -1,4 +1,4 @@
-define(["dhisUrl", "lodash"], function(dhisUrl, _) {
+define(["dhisUrl", "lodash", "metadataConf"], function(dhisUrl, _, metadataConf) {
     return function($http) {
         this.upsert = function(programs) {
             return $http.post(dhisUrl.metadata, {
@@ -10,10 +10,16 @@ define(["dhisUrl", "lodash"], function(dhisUrl, _) {
             return $http.post(dhisUrl.programs + '/' + programId + '/organisationUnits/' + orgUnitId);
         };
 
-        this.getAll = function(lastUpdatedTime) {
-            var url = dhisUrl.getProgramsAndStages;
-            url = lastUpdatedTime ? url + "&filter=lastUpdated:gte:" + lastUpdatedTime : url;
-            return $http.get(url).then(function(data) {
+        this.getAll = function (lastUpdatedTime) {
+            var url = dhisUrl.programs + ".json";
+            var params = {
+                fields: metadataConf.fields.programs,
+                paging: false
+            };
+            if (lastUpdatedTime)
+                params.filter = "lastUpdated:gte:" + lastUpdatedTime;
+
+            return $http.get(url, {params: params}).then(function (data) {
                 return data.data.programs;
             });
         };

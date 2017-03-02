@@ -10,26 +10,32 @@ define(["lodash"], function(_) {
             }).id;
         };
 
+        var setValue = function (obj, property, value) {
+            return value ? _.set(obj, property, value) : obj;
+        };
+
         var columnConfigurations = _.transform(categories, function (columnConfigurations, category) {
             var previousColumnConfig = _.last(columnConfigurations);
 
             if(previousColumnConfig) {
                 columnConfigurations.push(_.flatten(_.map(previousColumnConfig, function (previousColumnConfigItem) {
                     return _.map(category.categoryOptions, function (categoryOption) {
-                        return {
+                        var columnConfig = {
                             name: categoryOption.name,
                             id: categoryOption.id,
                             categoryOptions: previousColumnConfigItem.categoryOptions.concat([categoryOption])
                         };
+                        return setValue(columnConfig, 'translations', categoryOption.translations);
                     });
                 })));
             } else {
                 columnConfigurations.push(_.map(category.categoryOptions, function (categoryOption) {
-                    return {
+                    var columnConfig = {
                         name: categoryOption.name,
                         id: categoryOption.id,
                         categoryOptions: [categoryOption]
                     };
+                    return setValue(columnConfig, 'translations', categoryOption.translations);
                 }));
             }
         }, []);

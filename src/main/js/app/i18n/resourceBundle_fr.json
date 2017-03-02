@@ -218,7 +218,8 @@
     "productKeyExpiredMessage": "Votre Clé Produit est périmée. Svp contacter l'administrateur.",
     "disableOriginConfirmationMessage": "L'origine géographique patient va être désactivée.Voulez-vous continuer?",
     "enableOriginConfirmationMessage": "L'origine géographique de/du patient va être activée.Voulez-vous continuer?",
-    "emailValidation": "Email invalide",
+    "emailValidation": "Doit être une adresse email",
+    "defaultValidation": "Entrez une valeur comprise entre 2 et 140 caractères.",
     "successNotification": "Réussite",
     "errorNotification": "Erreur",
     "pendingRequests": " En attente",
@@ -353,5 +354,12 @@
         "successMessage": "Praxis est désinstallé. Fermez la fenêtre du navigateur."
     },
     "selectAll": "Sélectionner Tout",
-    "unselectAll": "Tout Déselectionner"
+    "unselectAll": "Tout Déselectionner",
+    "sync": {
+        "turnOffMessage": "Synchronisation désactivée",
+        "turnOn": "Activer la synchronisation",
+        "turnOff": "Désactiver la synchronisation",
+        "turnOnConfirmationMessage": "Warning: Turn On Sync will sync data from Praxis to DHIS. It will update Praxis to the latest versions, if available. Are you sure you want to turn Sync On?",
+        "turnOffConfirmationMessage": "Warning: Turn Off Sync will stop Praxis from getting data and uploading data on DHIS. It will stop Praxis versions from update. Are you sure you want to turn Sync Off?"
+    }
 }

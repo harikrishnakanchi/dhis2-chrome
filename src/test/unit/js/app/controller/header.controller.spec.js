@@ -2,7 +2,7 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
     function(HeaderController, mocks, utils, SessionHelper, platformUtils, OrgUnitRepository, SystemSettingRepository, DhisMonitor) {
         describe("headerController", function() {
             var rootScope, headerController, scope, q, timeout, fakeModal, dhisMonitor,
-                translationStore, location, sessionHelper, orgUnitRepository, hustle, systemSettingRepository;
+                translationStore, location, sessionHelper, orgUnitRepository, hustle, systemSettingRepository, deferredPromise;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $location, $hustle, $timeout) {
@@ -18,6 +18,13 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
                     uninstall: {
                         title: 'Uninstall Praxis',
                         successMessage: "Uninstalled successfully"
+                    },
+                    sync: {
+                        turnOffMessage: "SYNC OFF",
+                        turnOn: "Turn on Sync",
+                        turnOff: "Turn off Sync",
+                        turnOnConfirmationMessage: "Warning: Turn On Sync will sync data from Praxis to DHIS. It will update Praxis to the latest versions, if available. Are you sure you want to turn Sync On?",
+                        turnOffConfirmationMessage: "Warning: Turn Off Sync will stop Praxis from getting data and uploading data on DHIS. It will stop Praxis versions from update. Are you sure you want to turn Sync Off?"
                     }
                 };
 
@@ -51,6 +58,9 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
 
                 spyOn(systemSettingRepository, "isProductKeySet").and.returnValue(utils.getPromise(q, true));
                 spyOn(systemSettingRepository, "isKeyGeneratedFromProd").and.returnValue(utils.getPromise(q, true));
+                spyOn(systemSettingRepository, "upsertSyncSetting").and.returnValue(utils.getPromise(q, {}));
+                deferredPromise = q.defer();
+                spyOn(systemSettingRepository, "isSyncOff").and.returnValue(deferredPromise.promise);
 
                 location = $location;
 
@@ -62,7 +72,7 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
                     return {
                         upsert: upsert,
                         find: find,
-                        each: each,
+                        each: each
                     };
                 };
 
@@ -144,6 +154,64 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
             it("should show the test logo if not connected to prod", function() {
                 systemSettingRepository.isKeyGeneratedFromProd.and.returnValue(false);
                 expect(scope.showTestLogo()).toBe(true);
+            });
+
+            it("should set isOffline flag on init", function () {
+                deferredPromise.resolve(true);
+                scope.$apply();
+
+                expect(systemSettingRepository.isSyncOff).toHaveBeenCalled();
+                expect(scope.isOffline).toBeTruthy();
+            });
+
+            describe('toggleSync', function () {
+                beforeEach(function () {
+                    spyOn(fakeModal, 'open').and.returnValue({
+                        result: utils.getPromise(q, {})
+                    });
+                });
+                it('should turn off sync', function () {
+                    deferredPromise.resolve(false);
+                    scope.$apply();
+                    scope.toggleSync();
+
+                    scope.$apply();
+                    expect(scope.isOffline).toBeTruthy();
+                    expect(systemSettingRepository.upsertSyncSetting).toHaveBeenCalledWith(true);
+                    expect(platformUtils.sendMessage).toHaveBeenCalledWith('stopBgApp');
+                });
+
+                describe('turnOnSync', function () {
+                    beforeEach(function () {
+                        window.Praxis = {
+                            update: jasmine.createSpy('update')
+                        };
+                    });
+
+                    it('should turn on sync and update app for web', function () {
+                        platformUtils.platform = 'web';
+                        deferredPromise.resolve(true);
+                        scope.$apply();
+                        scope.toggleSync();
+
+                        scope.$apply();
+                        expect(scope.isOffline).toBeFalsy();
+                        expect(systemSettingRepository.upsertSyncSetting).toHaveBeenCalledWith(false);
+                        expect(platformUtils.sendMessage).toHaveBeenCalledWith('startBgApp');
+                        expect(window.Praxis.update).toHaveBeenCalled();
+                    });
+
+                    it('should not update the app for chrome', function () {
+                        platformUtils.platform = 'chrome';
+                        deferredPromise.resolve(true);
+                        scope.$apply();
+                        scope.toggleSync();
+
+                        scope.$apply();
+                        expect(window.Praxis.update).not.toHaveBeenCalled();
+                    });
+
+                });
             });
 
             describe('Praxis Version', function () {

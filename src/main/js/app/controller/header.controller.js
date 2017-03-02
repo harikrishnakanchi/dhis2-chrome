@@ -11,8 +11,8 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
             return re.test($location.path());
         };
 
-        $scope.metadataDownloading = function () {
-            return $location.path() == '/downloadingMetadata';
+        $scope.hideSyncStatus = function () {
+            return $location.path() == '/downloadingMetadata' || $location.path() == '/productKeyPage';
         };
 
         $scope.hasSelectedProject = function() {
@@ -44,7 +44,7 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
                     $scope.allUserModules = _.map(modules, function(module) {
                         return {
                             "id": module.id,
-                            "displayName": module.parent.name + ' - ' + module.name,
+                            "name": module.name,
                             "isLineListService": customAttributes.getBooleanAttributeValue(module.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE)
                         };
                     });
@@ -55,9 +55,15 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
         var getModulesInOpUnit = function(opUnit) {
             return orgUnitRepository.getAllModulesInOrgUnits(opUnit.id, "Module").then(function(modules) {
                 return {
-                    'opUnitName': opUnit.name,
-                    'opUnitId': opUnit.id,
-                    'modules': modules
+                    'name': opUnit.name,
+                    'id': opUnit.id,
+                    'modules': _.map(modules, function(module) {
+                        return {
+                            "id": module.id,
+                            "name": module.name,
+                            "isLineListService": customAttributes.getBooleanAttributeValue(module.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE)
+                        };
+                    })
                 };
             });
         };
@@ -110,7 +116,7 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
 
         $scope.getRemainingJobs = function () {
             var resourceBundleKey = $rootScope.remainingJobs == 1 ? 'job' : 'jobs';
-            return $rootScope.remainingJobs + ' ' + $scope.resourceBundle[resourceBundleKey];
+            return $rootScope.remainingJobs + ' ' + _.get($scope.resourceBundle, resourceBundleKey);
         };
 
         $scope.networkStatus = function () {
@@ -148,6 +154,39 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
             }, modalMessages);
         };
 
+        var turnOffSync = function () {
+            var modalMessage = {
+                "ok": $scope.resourceBundle.okLabel,
+                "title": $scope.resourceBundle.sync.turnOff,
+                "confirmationMessage": $scope.resourceBundle.sync.turnOffConfirmationMessage
+            };
+
+            showModal(function () {
+                $scope.isOffline = true;
+                systemSettingRepository.upsertSyncSetting($scope.isOffline).then(function () {
+                    platformUtils.sendMessage("stopBgApp");
+                });
+            }, modalMessage);
+        };
+
+        var turnOnSync = function () {
+            var modalMessage = {
+                "ok": $scope.resourceBundle.okLabel,
+                "title": $scope.resourceBundle.sync.turnOn,
+                "confirmationMessage": $scope.resourceBundle.sync.turnOnConfirmationMessage
+            };
+
+            showModal(function () {
+                $scope.isOffline = false;
+                if(platformUtils.platform == 'web') {
+                    window.Praxis.update();
+                }
+                systemSettingRepository.upsertSyncSetting($scope.isOffline).then(function () {
+                    platformUtils.sendMessage("startBgApp");
+                });
+            }, modalMessage);
+        };
+
         var showModal = function(okCallback, messages) {
             var scope = $rootScope.$new();
             scope.modalMessages = messages;
@@ -161,8 +200,18 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
             return modalInstance.result.then(okCallback);
         };
 
+        $scope.toggleSync = function () {
+            if ($scope.isOffline) {
+                turnOnSync();
+            } else {
+                turnOffSync();
+            }
+        };
+
         var init = function() {
-            checkConnectionQuality();
+            systemSettingRepository.isSyncOff().then(function (isOffline) {
+                $scope.isOffline = isOffline;
+            }).then(checkConnectionQuality);
         };
 
         init();

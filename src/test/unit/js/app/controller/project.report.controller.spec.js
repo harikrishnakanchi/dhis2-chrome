@@ -269,7 +269,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             it('should prompt the user to save the Excel file with suggested filename', function () {
                 scope.exportToExcel();
 
-                var expectedFilename = 'Aweil - SS153.ProjectReport.[updated ' + moment(lastUpdatedTime).format(LAST_UPDATED_TIME_FORMAT) + '].xlsx';
+                var expectedFilename = 'Aweil - SS153.ProjectReport.[updated ' + moment(lastUpdatedTime).format(LAST_UPDATED_TIME_FORMAT) + ']';
                 expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.XLSX);
             });
 
@@ -304,6 +304,13 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
 
             expect(pivotTableRepository.getPivotTableData).toHaveBeenCalledWith(projectReportPivotTable, rootScope.currentUser.selectedProject.id);
             expect(scope.pivotTables).toEqual([pivotTableData]);
+        });
+
+        it('should translate project report table', function () {
+            var projectReportPivotTables = _.filter(mockPivotTables, { projectReport: true });
+            scope.$apply();
+
+            expect(translationsService.translate).toHaveBeenCalledWith(projectReportPivotTables);
         });
 
         it('should filter out project report tables without data', function() {

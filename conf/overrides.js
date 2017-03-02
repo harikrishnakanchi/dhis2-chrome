@@ -1,4 +1,4 @@
-define([], function() {
+define(['lodash'], function(_) {
     var url = '<%= DHIS_URL %>';
     var metdataSyncInterval = '<%= METADATA_SYNC_INTERVAL %>';
     var passphrase = '<%= PASSPHRASE %>';
@@ -6,8 +6,9 @@ define([], function() {
     var ks = parseInt('<%= KS %>');
     var ts = parseInt('<%= TS %>');
     var supportEmail = '<%= SUPPORT_EMAIL %>';
+    var praxisConfiguration = JSON.parse('<%= PRAXIS_CONFIGURATION %>');
 
-    return {
+    return _.merge({
         dhisPing: {
             url: url + '/favicon.ico'
         },
@@ -34,5 +35,5 @@ define([], function() {
         },
         devMode: false,
         support_email: supportEmail
-    };
+    }, praxisConfiguration);
 });

@@ -1,4 +1,4 @@
-define(["metadataService", "properties", "angularMocks", "moment"], function(MetadataService, properties, mocks, moment) {
+define(["metadataService", "properties", "angularMocks", "moment", "dhisUrl", "metadataConf"], function(MetadataService, properties, mocks, moment, dhisUrl, metadataConf) {
     describe("Metadata service", function() {
         var httpBackend, http, metadataService;
 
@@ -50,51 +50,27 @@ define(["metadataService", "properties", "angularMocks", "moment"], function(Met
             });
         });
 
-        it("should get metadata from DHIS based on last updated date specified", function() {
-            var today = moment().toISOString();
-            var lastUpdated = moment().subtract(1, 'days').toISOString();
+        describe('getMetadataOfType', function () {
+            var type = "categories";
+            var fields = metadataConf.fields[type];
 
-            var metadata = {
-                "users": [],
-                "created": today
-            };
-
-            var filterString = "assumeTrue=false&" +
-                               "categories=true&categoryCombos=true&categoryOptionCombos=true&categoryOptions=true&dataElementGroups=true&dataElements=true&indicators=true&" +
-                               "lastUpdated="+lastUpdated+"&" +
-                               "optionSets=true&organisationUnitGroupSets=true&programIndicators=true&sections=true&translations=true&users=true";
-            httpBackend.expectGET(properties.dhis.url + "/api/metadata.json?" + filterString).respond(200, metadata);
-
-            var actualMetadata;
-            metadataService.getMetadata(lastUpdated).then(function(data) {
-                actualMetadata = data;
+            it('should get the data based on the given type', function () {
+                var url = dhisUrl[type] + "?fields=" + fields + "&paging=false";
+                var categories = 'someData';
+                httpBackend.expectGET(encodeURI(url)).respond(200, {"categories": categories});
+                metadataService.getMetadataOfType(type).then(function (data) {
+                    expect(data).toEqual(categories);
+                });
+                httpBackend.flush();
             });
 
-            httpBackend.flush();
-            expect(actualMetadata).toEqual(metadata);
-        });
-
-        it("should get all metadata from DHIS if syncing for the first time", function() {
-            var today = moment().toISOString();
-
-            var metadata = {
-                "users": [],
-                "created": today
-            };
-
-            var filterString = "assumeTrue=false&" +
-                              "categories=true&categoryCombos=true&categoryOptionCombos=true&categoryOptions=true&dataElementGroups=true&" +
-                              "dataElements=true&indicators=true&optionSets=true&organisationUnitGroupSets=true&" +
-                              "programIndicators=true&sections=true&translations=true&users=true";
-            httpBackend.expectGET(properties.dhis.url + "/api/metadata.json?" + filterString).respond(200, metadata);
-
-            var actualMetadata;
-            metadataService.getMetadata().then(function(data) {
-                actualMetadata = data;
+            it('should get only lastUpdated data', function () {
+                var lastUpdated = "someTime";
+                var url = dhisUrl[type] + "?fields=" + fields + "&filter=lastUpdated:ge:" + lastUpdated  + "&paging=false";
+                httpBackend.expectGET(encodeURI(url)).respond(200, {"categories": ""});
+                metadataService.getMetadataOfType(type, lastUpdated);
+                httpBackend.flush();
             });
-
-            httpBackend.flush();
-            expect(actualMetadata).toEqual(metadata);
         });
     });
 });

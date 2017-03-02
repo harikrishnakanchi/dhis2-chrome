@@ -1,7 +1,7 @@
-define(["angularMocks", "utils", "moment", "packagedDataImporter", "metadataService", "systemSettingService", "dataSetService", "programService", "orgUnitService", "changeLogRepository", "metadataRepository", "orgUnitRepository", "orgUnitGroupRepository", "dataSetRepository", "programRepository", "systemSettingRepository"],
-    function(mocks, utils, moment, PackagedDataImporter, MetadataService, SystemSettingService, DatasetService, ProgramService, OrgUnitService, ChangeLogRepository, MetadataRepository, OrgUnitRepository, OrgUnitGroupRepository, DatasetRepository, ProgramRepository, SystemSettingRepository) {
+define(["angularMocks", "utils", "moment", "packagedDataImporter", "metadataService", "systemSettingService", "dataSetService", "programService", "orgUnitService", "changeLogRepository", "metadataRepository", "orgUnitRepository", "orgUnitGroupRepository", "dataSetRepository", "programRepository", "systemSettingRepository", "metadataConf"],
+    function(mocks, utils, moment, PackagedDataImporter, MetadataService, SystemSettingService, DatasetService, ProgramService, OrgUnitService, ChangeLogRepository, MetadataRepository, OrgUnitRepository, OrgUnitGroupRepository, DatasetRepository, ProgramRepository, SystemSettingRepository, metadataConf) {
         describe("packagedDataImporter", function() {
-            var q, scope, packagedDataImporter, metadataService, systemSettingService, datasetService, programService, orgUnitService, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository, systemSettingRepository;
+            var q, scope, packagedDataImporter, metadataService, systemSettingService, datasetService, programService, orgUnitService, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository, systemSettingRepository, metadataCreateDate;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
                 q = $q;
@@ -18,7 +18,10 @@ define(["angularMocks", "utils", "moment", "packagedDataImporter", "metadataServ
                 orgUnitService = new OrgUnitService();
                 systemSettingService = new SystemSettingService();
 
-                spyOn(metadataService, "loadMetadataFromFile").and.returnValue(utils.getPromise(q, {}));
+                metadataCreateDate = moment().toISOString();
+                spyOn(metadataService, "loadMetadataFromFile").and.returnValue(utils.getPromise(q, {
+                    'created': metadataCreateDate
+                }));
                 spyOn(datasetService, "loadFromFile").and.returnValue(utils.getPromise(q, {}));
                 spyOn(programService, "loadFromFile").and.returnValue(utils.getPromise(q, {}));
                 spyOn(systemSettingService, "loadFromFile").and.returnValue(utils.getPromise(q, {}));
@@ -86,22 +89,21 @@ define(["angularMocks", "utils", "moment", "packagedDataImporter", "metadataServ
             });
 
             it("should update changelog after metadata import", function() {
-                var metadataCreateDate = moment().toISOString();
-                var dhisMetadata = {
-                    'created': metadataCreateDate,
-                    'users': []
-                };
-
-                metadataService.loadMetadataFromFile.and.returnValue(utils.getPromise(q, dhisMetadata));
-
                 packagedDataImporter.run();
                 scope.$apply();
 
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith("metaData", metadataCreateDate);
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith("orgUnits", metadataCreateDate);
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith("orgUnitGroups", metadataCreateDate);
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith("datasets", metadataCreateDate);
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith("programs", metadataCreateDate);
+                var methodCalls = _.map(changeLogRepository.upsert.calls.allArgs(), function (callArgs) {
+                    return [callArgs[0], callArgs[1]];
+                });
+
+                expect(methodCalls).toContain(["metaData", metadataCreateDate]);
+                expect(methodCalls).toContain(["organisationUnits", metadataCreateDate]);
+                expect(methodCalls).toContain(["organisationUnitGroups", metadataCreateDate]);
+                expect(methodCalls).toContain(["dataSets", metadataCreateDate]);
+                expect(methodCalls).toContain(["programs", metadataCreateDate]);
+                _.each(metadataConf.entities, function (entity) {
+                    expect(methodCalls).toContain([entity, metadataCreateDate]);
+                });
             });
 
             it("should not do anything if metadata is not valid", function() {

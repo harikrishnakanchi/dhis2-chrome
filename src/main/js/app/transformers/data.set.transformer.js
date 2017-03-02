@@ -1,6 +1,6 @@
 define(["dataEntryTableColumnConfig", "lodash", "customAttributes"], function(dataEntryTableColumnConfig, _, customAttributes) {
     this.mapDatasetForView = function(dataset) {
-        var resultDataset = _.pick(dataset, ["id", "name", "shortName", "code", "sections"]);
+        var resultDataset = _.pick(dataset, ["id", "name", "shortName", "code", "sections", "translations"]);
         resultDataset.isAggregateService = !customAttributes.getBooleanAttributeValue(dataset.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE) &&
             !customAttributes.getBooleanAttributeValue(dataset.attributeValues, customAttributes.ORIGIN_DATA_SET_CODE) &&
             !customAttributes.getBooleanAttributeValue(dataset.attributeValues, customAttributes.REFERRAL_DATA_SET_CODE) &&
@@ -20,7 +20,7 @@ define(["dataEntryTableColumnConfig", "lodash", "customAttributes"], function(da
 
         var enrichSections = function(sections) {
             return _.map(sections, function(section) {
-                var enrichedSection = _.pick(indexedSections[section.id], "id", "name", "sortOrder", "dataElements");
+                var enrichedSection = _.pick(indexedSections[section.id], "id", "name", "sortOrder", "dataElements", "translations");
                 enrichedSection.dataElements = enrichDataElements(enrichedSection.dataElements);
                 enrichedSection.isIncluded = !_.every(enrichedSection.dataElements, {
                     "isIncluded": false
@@ -42,7 +42,7 @@ define(["dataEntryTableColumnConfig", "lodash", "customAttributes"], function(da
 
         var enrichDataElements = function(dataElements) {
             return _.map(dataElements, function(dataElement) {
-                var enrichedDataElement = _.pick(indexedDataElements[dataElement.id], "id", "name", "formName", "categoryCombo", "description", "code");
+                var enrichedDataElement = _.pick(indexedDataElements[dataElement.id], "id", "name", "formName", "categoryCombo", "description", "code", "translations");
                 enrichedDataElement.isIncluded = _.isEmpty(excludedDataElements) ? true : !_.contains(excludedDataElements, dataElement.id);
                 enrichedDataElement.isMandatory = customAttributes.getBooleanAttributeValue(indexedDataElements[dataElement.id].attributeValues, customAttributes.MANDATORY_CODE);
                 // TODO REMOVE AFTER 10.0

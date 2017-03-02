@@ -70,6 +70,11 @@ define(['customAttributes', 'moment'], function(customAttributes, moment) {
                 var currentTime = '2016-11-27';
                 Timecop.install();
                 Timecop.freeze(new Date(currentTime));
+                var mockAttribute = [{
+                    id: 'someId',
+                    code: 'someType'
+                }];
+                customAttributes.initializeData(mockAttribute);
             });
 
             afterEach(function () {
@@ -78,21 +83,22 @@ define(['customAttributes', 'moment'], function(customAttributes, moment) {
             });
 
             it('should create and return the new attribute', function () {
-                var attributeCode = 'someType';
-                var value = 'someValue';
+                var attributeCode = 'someType',
+                    value = 'someValue',
+                    id = 'someId';
 
                 var actualAttribute = customAttributes.createAttribute(attributeCode, value);
                 var expectedAttribute = {
                     "created": moment().toISOString(),
                     "lastUpdated": moment().toISOString(),
                     "attribute": {
-                        "code": attributeCode
+                        "code": attributeCode,
+                        id: id
                     },
                     "value": value
                 };
                 expect(expectedAttribute).toEqual(actualAttribute);
             });
         });
-
     });
 });

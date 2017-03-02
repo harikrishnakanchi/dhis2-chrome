@@ -1,7 +1,15 @@
 define(['moment'], function(moment) {
-    return function(reportService, pivotTableRepository, changeLogRepository) {
+    return function(reportService, systemInfoService, pivotTableRepository, changeLogRepository) {
+        var downloadStartTime;
+
+        var getServerTime = function () {
+            return systemInfoService.getServerDate().then(function (serverTime) {
+                downloadStartTime = serverTime;
+            });
+        };
+
         var updateChangeLog = function() {
-            return changeLogRepository.upsert('pivotTables', moment().toISOString());
+            return changeLogRepository.upsert('pivotTables', downloadStartTime);
         };
 
         var removePivotTablesThatHaveBeenDeletedRemotely = function() {
@@ -14,8 +22,9 @@ define(['moment'], function(moment) {
             });
         };
 
-        this.run = function() {
-            return changeLogRepository.get('pivotTables')
+        this.run = function () {
+            return getServerTime()
+                .then(_.partial(changeLogRepository.get, 'pivotTables'))
                 .then(reportService.getUpdatedPivotTables)
                 .then(pivotTableRepository.upsert)
                 .then(updateChangeLog)

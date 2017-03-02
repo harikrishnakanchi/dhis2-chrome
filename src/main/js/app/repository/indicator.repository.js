@@ -10,7 +10,7 @@ define(['lodash'], function (_) {
             return this.getAll().then(function (indicatorsFromStore) {
                 var indexedIndicatorsFromStore = _.indexBy(indicatorsFromStore, 'id');
                 return _.map(indicators, function (indicator) {
-                    return _.merge(indicator, _.pick(indexedIndicatorsFromStore[indicator.id], ['name', 'shortName', 'description', 'numerator', 'denominator']));
+                    return _.merge(indicator, _.pick(indexedIndicatorsFromStore[indicator.id], ['name', 'shortName', 'description', 'numerator', 'denominator', 'translations']));
                 });
             });
         };

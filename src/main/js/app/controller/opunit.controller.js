@@ -97,9 +97,15 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
                 }]
             };
 
+            var createPatientOriginsIfEnabled = function () {
+                return (!$scope.geographicOriginDisabled) ?
+                    patientOriginRepository.upsert(patientOriginPayload).then(_.partial(publishMessage, patientOriginPayload.orgUnit, "uploadPatientOriginDetails",
+                        interpolate($scope.resourceBundle.uploadPatientOriginDetailsDesc, {origin_name: _.map(patientOriginPayload.origins, 'name').toString()})))
+                    : $q.when();
+            };
+
             $scope.startLoading();
-            return patientOriginRepository.upsert(patientOriginPayload)
-                .then(_.partial(publishMessage, patientOriginPayload.orgUnit, "uploadPatientOriginDetails", interpolate($scope.resourceBundle.uploadPatientOriginDetailsDesc, { origin_name: _.map(patientOriginPayload.origins, 'name').toString() })))
+            return createPatientOriginsIfEnabled()
                 .then(_.partial(orgUnitRepository.upsert, opUnit))
                 .then(saveToDhis)
                 .then(_.partial(exitForm, opUnit))

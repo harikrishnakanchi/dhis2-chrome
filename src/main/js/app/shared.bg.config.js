@@ -5,6 +5,7 @@ require.config({
         "ng-i18n": "lib/ng-i18n/ng-i18n-0.2.0.min",
         "properties": "app/conf/properties",
         "overrides": "app/conf/overrides",
+        "metadataConf": "app/conf/metadata.conf",
         "indexedDBLogger": "app/utils/indexeddb.logger",
         "hustle": "lib/hustle/hustle",
         "moment": "lib/moment/moment-with-locales.min",
@@ -53,6 +54,8 @@ require.config({
         "categoryRepository": "app/repository/category.repository",
         "indicatorRepository": "app/repository/indicator.repository",
         "programIndicatorRepository": "app/repository/program.indicator.repository",
+        "customAttributeRepository": "app/repository/custom.attribute.repository",
+        "optionSetRepository": "app/repository/option.set.repository",
 
         //Models
         "chart": "app/models/chart",
@@ -72,6 +75,7 @@ require.config({
         //Transformers
         "dataSetTransformer": "app/transformers/data.set.transformer",
         "dataEntryTableColumnConfig": "app/transformers/data.entry.table.column.config",
+        'optionSetTransformer': "app/transformers/option.set.transformer",
 
         //Monitors
         "dhisMonitor": "app/monitors/dhis.monitor",
@@ -136,7 +140,6 @@ require.config({
         "dateUtils": "app/utils/date.utils",
         "lodashUtils": "app/utils/lodash.utils",
         "cipherUtils": "app/utils/cipher.utils",
-        "httpUtils": "app/utils/http.utils",
         "dhisUrl": "app/utils/dhis.url",
         "interpolate": "app/utils/interpolate",
         "pagingUtils": "app/utils/paging.utils"

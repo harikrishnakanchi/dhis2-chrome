@@ -1,10 +1,10 @@
-define(["angular", "Q", "services", "directives", "dbutils", "controllers", "repositories", "factories", "migrator", "migrations", "properties", "queueInterceptor", "configureRequestInterceptor", "monitors", "helpers", "indexedDBLogger", "transformers", "platformUtils",
+define(["angular", "Q", "services", "directives", "dbutils", "controllers", "repositories", "factories", "migrator", "migrations", "properties", "queueInterceptor", "configureRequestInterceptor", "monitors", "helpers", "indexedDBLogger", "transformers", "platformUtils", "customAttributes",
         "angular-route", "ng-i18n", "angular-indexedDB", "hustleModule", "angular-ui-tabs", "angular-ui-accordion", "angular-ui-collapse", "angular-ui-transition", "angular-ui-weekselector",
         "angular-treeview", "angular-ui-modal", "angular-multiselect", "angular-ui-notin", "angular-ui-equals", "angular-ui-dropdown", "angular-filter", "angucomplete-alt", "angular-nvd3", "angular-ui-tooltip",
         "angular-ui-bindHtml", "angular-ui-position", "angular-sanitize"
 
     ],
-    function(angular, Q, services, directives, dbutils, controllers, repositories, factories, migrator, migrations, properties, queueInterceptor, configureRequestInterceptor, monitors, helpers, indexedDBLogger, transformers, platformUtils) {
+    function(angular, Q, services, directives, dbutils, controllers, repositories, factories, migrator, migrations, properties, queueInterceptor, configureRequestInterceptor, monitors, helpers, indexedDBLogger, transformers, platformUtils, customAttributes) {
         var init = function() {
             var app = angular.module('PRAXIS', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs", "ui.bootstrap.transition", "ui.bootstrap.collapse",
                 "ui.bootstrap.accordion", "ui.weekselector", "angularTreeview", "ui.bootstrap.modal", "ui.bootstrap.dropdown",
@@ -34,8 +34,8 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                 'SUPER_ADMIN': 'Superadmin'
             });
 
-            var routeResolver = ['$q', '$rootScope', '$location', 'systemSettingRepository', 'changeLogRepository',
-                function ($q, $rootScope, $location, systemSettingRepository, changeLogRepository) {
+            var routeResolver = ['$q', '$rootScope', '$location', 'systemSettingRepository', 'changeLogRepository','customAttributeRepository',
+                function ($q, $rootScope, $location, systemSettingRepository, changeLogRepository, customAttributeRepository) {
 
                     var checkProductKey = function () {
                         return systemSettingRepository.isProductKeySet().then(function (productKeySet) {
@@ -46,8 +46,8 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     var checkMetadata = function () {
                         return changeLogRepository.get("metaData").then(function (metadataLastUpdated) {
                             if (metadataLastUpdated) {
-                                platformUtils.sendMessage('dbReady');
-                                return $q.when();
+                                platformUtils.sendMessage('startBgApp');
+                                return customAttributeRepository.getAll().then(customAttributes.initializeData);
                             } else {
                                 return $q.reject('noMetadata');
                             }

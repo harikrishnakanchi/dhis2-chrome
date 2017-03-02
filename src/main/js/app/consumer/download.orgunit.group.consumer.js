@@ -1,25 +1,33 @@
 define(["moment", "lodash"], function(moment, _) {
-    return function(orgUnitGroupService, orgUnitGroupRepository, changeLogRepository) {
+    return function(orgUnitGroupService, systemInfoService, orgUnitGroupRepository, changeLogRepository) {
         this.run = function(message) {
-            return download()
+            return getServerTime()
+                .then(download)
                 .then(mergeAndSave)
                 .then(updateChangeLog);
         };
 
-        var download = function() {
-            return changeLogRepository.get("orgUnitGroups").then(function(lastUpdatedTime) {
-                return orgUnitGroupService.getAll(lastUpdatedTime);
+        var getServerTime = function () {
+            return systemInfoService.getServerDate().then(function (serverTime) {
+                return { downloadStartTime: serverTime };
             });
         };
 
-        var mergeAndSave = function(orgUnitGroupsFromDHIS) {
+        var download = function(data) {
+            return changeLogRepository.get("organisationUnitGroups").then(function(lastUpdatedTime) {
+                return orgUnitGroupService.getAll(lastUpdatedTime).then(function (orgUnitGroups) {
+                    return _.merge({ orgUnitGroups: orgUnitGroups }, data);
+                });
+            });
+        };
+
+        var mergeAndSave = function(data) {
             var mergeOrgUnits = function(remoteOrgUnits, localOrgUnits) {
                 var partitionedLocalOrgUnits = _.partition(localOrgUnits, function(orgUnit) {
                     return orgUnit.localStatus !== undefined;
                 });
 
                 var locallyModifiedOrgUnits = partitionedLocalOrgUnits[0];
-                var otherLocalOrgUnits = partitionedLocalOrgUnits[1];
 
                 var otherRemoteOrgUnits = _.reject(remoteOrgUnits, function(orgUnit) {
                     return _.containsBy(locallyModifiedOrgUnits, orgUnit, "id");
@@ -38,14 +46,15 @@ define(["moment", "lodash"], function(moment, _) {
                 });
             };
 
-            var orgUnitGroupIdsToMerge = _.pluck(orgUnitGroupsFromDHIS, "id");
+            var orgUnitGroupIdsToMerge = _.pluck(data.orgUnitGroups, "id");
             return orgUnitGroupRepository.findAll(orgUnitGroupIdsToMerge)
-                .then(_.curry(mergeOrgUnitGroups)(orgUnitGroupsFromDHIS))
-                .then(orgUnitGroupRepository.upsertDhisDownloadedData);
+                .then(_.curry(mergeOrgUnitGroups)(data.orgUnitGroups))
+                .then(orgUnitGroupRepository.upsertDhisDownloadedData)
+                .then(function(){ return data; });
         };
 
-        var updateChangeLog = function() {
-            return changeLogRepository.upsert("orgUnitGroups", moment().toISOString());
+        var updateChangeLog = function(data) {
+            return changeLogRepository.upsert("organisationUnitGroups", data.downloadStartTime);
         };
     };
 });

@@ -1,4 +1,4 @@
-define(["programService", "angularMocks", "properties", "utils"], function(ProgramService, mocks, properties, utils) {
+define(["programService", "angularMocks", "properties", "metadataConf"], function(ProgramService, mocks, properties, metadataConf) {
     describe("programService", function() {
         var http, httpBackend, programService;
 
@@ -46,7 +46,9 @@ define(["programService", "angularMocks", "properties", "utils"], function(Progr
                 programs: programs
             };
 
-            httpBackend.expectGET(properties.dhis.url + '/api/programs.json?fields=id,name,displayName,shortName,programType,organisationUnits,attributeValues[:identifiable,value,attribute[:identifiable]],programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false&filter=lastUpdated:gte:2014-12-30T09:13:41.092Z').respond(200, payload);
+            var url = properties.dhis.url + '/api/programs.json?fields=' + metadataConf.fields.programs + '&filter=lastUpdated:gte:2014-12-30T09:13:41.092Z&paging=false';
+
+            httpBackend.expectGET(encodeURI(url)).respond(200, payload);
             httpBackend.flush();
         });
 

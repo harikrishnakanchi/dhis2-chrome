@@ -1,6 +1,6 @@
-define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUnitService, mocks, properties, utils) {
+define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf"], function(OrgUnitService, mocks, properties, utils, metadataConf) {
     describe("org unit service", function() {
-        var http, httpBackend, projectService, orgUnitService, db, mockOrgStore, q;
+        var http, httpBackend, orgUnitService, db, mockOrgStore, q, orgUnitFields;
 
         beforeEach(mocks.inject(function($httpBackend, $http, $q) {
             http = $http;
@@ -15,6 +15,9 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
                 objectStore: function() {}
             };
 
+            orgUnitFields = metadataConf.fields.organisationUnits;
+            metadataConf.fields.organisationUnits = 'orgUnitFields';
+
             spyOn(db, "objectStore").and.returnValue(mockOrgStore);
             spyOn(mockOrgStore, "upsert").and.returnValue(utils.getPromise(q, "someId"));
 
@@ -22,6 +25,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
         }));
 
         afterEach(function() {
+            metadataConf.fields.organisationUnits = orgUnitFields;
             httpBackend.verifyNoOutstandingExpectation();
             httpBackend.verifyNoOutstandingRequest();
         });
@@ -138,22 +142,23 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
             httpBackend.flush();
         });
 
-        it("should get org unit with a particular id", function() {
+        it("should get org unit with a particular id", function () {
             var orgUnitId = "org1234";
 
             orgUnitService.get(orgUnitId);
+            var url = properties.dhis.url + '/api/organisationUnits.json?fields=orgUnitFields&filter=id:eq:org1234&paging=false';
 
-            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?filter=id:eq:org1234&paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid').respond(200, "ok");
+            httpBackend.expectGET(url).respond(200, "ok");
             httpBackend.flush();
         });
 
         it("should get multiple org units with given ids", function() {
-            var orgUnitId = ["id1", "id2", "id3"];
+            var orgUnitIds = ["id1", "id2"];
 
-            orgUnitService.get(orgUnitId);
+            orgUnitService.get(orgUnitIds);
 
             httpBackend.expectGET(properties.dhis.url +
-                '/api/organisationUnits.json?filter=id:eq:id1&filter=id:eq:id2&filter=id:eq:id3&paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid').respond(200, "ok");
+                '/api/organisationUnits.json?fields=orgUnitFields&filter=id:eq:id1&filter=id:eq:id2&paging=false').respond(200, "ok");
             httpBackend.flush();
         });
 
@@ -162,35 +167,14 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
 
             orgUnitService.getAll(lastUpdatedTime);
 
-            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid&filter=lastUpdated:gte:2014-12-30T09:13:41.092Z').respond(200, "ok");
+            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?fields=orgUnitFields&filter=lastUpdated:gte:2014-12-30T09:13:41.092Z&paging=false').respond(200, "ok");
             httpBackend.flush();
         });
 
         it("should get all org units", function() {
             orgUnitService.getAll();
 
-            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?paging=false&fields=:all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid').respond(200, "ok");
-            httpBackend.flush();
-        });
-
-        it("should return the id field if given org units are present in DHIS", function() {
-            var ids = ["abcd1234", "wert3456", "iujk8765"];
-            var expectedResponse = ["abcd1234", "wert3456"];
-
-            var httpResponse = {
-
-                "organisationUnits": [{
-                    "id": "abcd1234"
-                }, {
-                    "id": "wert3456"
-                }]
-            };
-
-            orgUnitService.getIds(ids).then(function(data) {
-                expect(data).toEqual(expectedResponse);
-            });
-
-            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?filter=id:eq:abcd1234&filter=id:eq:wert3456&filter=id:eq:iujk8765&paging=false&fields=id').respond(200, httpResponse);
+            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?fields=orgUnitFields&paging=false').respond(200, "ok");
             httpBackend.flush();
         });
 

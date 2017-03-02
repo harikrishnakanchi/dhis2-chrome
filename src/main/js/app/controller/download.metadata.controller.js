@@ -1,9 +1,8 @@
-define(['platformUtils', 'moment', 'properties'], function (platformUtils, moment, properties) {
-    return function ($scope, $q, $location, $log, metadataDownloader, changeLogRepository, packagedDataImporter) {
-        var retries = 0, updated;
+define(['platformUtils', 'moment', 'properties', 'lodash'], function (platformUtils, moment, properties, _) {
+    return function ($scope, $q, $location, $log, metadataDownloader, packagedDataImporter) {
+        var retries = 0;
 
         var downloadMetadata = function () {
-            updated = moment().toISOString();
             var success = function () {
                 $log.info('Metadata download complete');
             };
@@ -24,22 +23,18 @@ define(['platformUtils', 'moment', 'properties'], function (platformUtils, momen
             };
 
             $scope.maxRetriesExceeded = false;
+
             return metadataDownloader.run().then(success, failure, notify);
         };
 
         $scope.supportEmail = properties.support_email;
-
-        var updateChangeLog = function () {
-            var entities = ['metaData', 'orgUnits', 'orgUnitGroups', 'datasets', 'programs'];
-            return $q.all(_.map(entities, _.partial(changeLogRepository.upsert, _, updated)));
-        };
 
         var redirectToLogin = function () {
             $location.path('/login');
         };
 
         $scope.downloadAndUpsertMetadata = function () {
-            return downloadMetadata().then(updateChangeLog).then(redirectToLogin);
+            return downloadMetadata().then(redirectToLogin);
         };
 
         var init = function () {

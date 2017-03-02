@@ -218,7 +218,8 @@
     "productKeyExpiredMessage": "انتهت صلاحية مفتاح المنتج الخاص بك. يرجى الاتصال المشرف.",
     "disableOriginConfirmationMessage": "سيتم تعطيل مكان قدوم المريض، هل انت متأكد؟",
     "enableOriginConfirmationMessage": "سيتم تمكين مكان قدوم المريض، هل أنت متأكد",
-    "emailValidation": "هذا البريد الالكتروني غير صحيح",
+    "emailValidation": "يجب أن يكون عنوان البريد الإلكتروني",
+    "defaultValidation": "أدخل قيمة بين 2 و 140 حرفا.",
     "successNotification": "نجاح",
     "errorNotification": "خطأ",
     "pendingRequests": " ريثما",
@@ -353,5 +354,12 @@
         "successMessage": "يتم إلغاء تثبيت التطبيق العملي. الرجاء إغلاق نافذة المتصفح."
     },
     "selectAll": "اختر الكل",
-    "unselectAll": "إلغاء تحديد الكل"
+    "unselectAll": "إلغاء تحديد الكل",
+    "sync": {
+        "turnOffMessage": "مزامنة قبالة",
+        "turnOn": "Activer la synchronisation",
+        "turnOff": "Désactiver la synchronisation",
+        "turnOnConfirmationMessage": "Warning: Turn On Sync will sync data from Praxis to DHIS. It will update Praxis to the latest versions, if available. Are you sure you want to turn Sync On?",
+        "turnOffConfirmationMessage": "Warning: Turn Off Sync will stop Praxis from getting data and uploading data on DHIS. It will stop Praxis versions from update. Are you sure you want to turn Sync Off?"
+    }
 }
