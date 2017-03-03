@@ -128,18 +128,15 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
             });
 
             it('downloads the id of each chart', function () {
-                var expectedOldQueryParams = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false',
-                    expectedNewQueryParams = 'fields=id&filter=name:like:%5BPraxis+-+&paging=false';
+                var expectedQueryParams = 'fields=id&filter=name:like:%5BPraxis+-+&paging=false';
 
-                httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedOldQueryParams).respond(200, {});
-                httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedNewQueryParams).respond(200, {});
+                httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedQueryParams).respond(200, {});
 
                 reportService.getUpdatedCharts();
                 httpBackend.flush();
             });
 
             it('downloads the details of each chart', function () {
-                httpBackend.expectGET(/.*charts.json.*/).respond(200, chartIds);
                 httpBackend.expectGET(/.*charts.json.*/).respond(200, chartIds);
 
                 var expectedQueryParams = encodeURI('fields=id,name,title,translations,relativePeriods,type,' +
@@ -160,7 +157,6 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                     chart2 = { id: 'chart2' };
 
                 httpBackend.expectGET(/.*charts.json.*/).respond(200, chartIds);
-                httpBackend.expectGET(/.*charts.json.*/).respond(200, chartIds);
                 httpBackend.expectGET(/.*chart1.json.*/).respond(200, chart1);
                 httpBackend.expectGET(/.*chart2.json.*/).respond(200, chart2);
 
@@ -174,7 +170,6 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
             it('downloads the id of each chart modified since specific lastUpdated timestamp', function () {
                 reportService.getUpdatedCharts('someTimestamp');
 
-                httpBackend.expectGET(/.*filter=lastUpdated:gte:someTimestamp.*/).respond(200, {});
                 httpBackend.expectGET(/.*filter=lastUpdated:gte:someTimestamp.*/).respond(200, {});
                 httpBackend.flush();
             });
@@ -193,10 +188,8 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                     ]
                 };
 
-                var expectedOldQueryParamsForChartIds = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false',
-                    expectedNewQueryParamsForChartIds = 'fields=id&filter=name:like:%5BPraxis+-+&paging=false';
-                httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedOldQueryParamsForChartIds).respond(200, chartIdsResponse);
-                httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedNewQueryParamsForChartIds).respond(200, chartIdsResponse);
+                var expectedQueryParamsForChartIds = 'fields=id&filter=name:like:%5BPraxis+-+&paging=false';
+                httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedQueryParamsForChartIds).respond(200, chartIdsResponse);
                 httpBackend.flush();
             });
         });
@@ -214,18 +207,15 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
             });
 
             it('downloads the id of each pivot table', function () {
-                var expectedOldQueryParams = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false',
-                    expectedNewQueryParams = 'fields=id&filter=name:like:%5BPraxis+-+&paging=false';
+                var expectedQueryParams = 'fields=id&filter=name:like:%5BPraxis+-+&paging=false';
 
-                httpBackend.expectGET(properties.dhis.url + '/api/reportTables.json?' + expectedOldQueryParams).respond(200, {});
-                httpBackend.expectGET(properties.dhis.url + '/api/reportTables.json?' + expectedNewQueryParams).respond(200, {});
+                httpBackend.expectGET(properties.dhis.url + '/api/reportTables.json?' + expectedQueryParams).respond(200, {});
 
                 reportService.getUpdatedPivotTables();
                 httpBackend.flush();
             });
 
             it('downloads the details of each pivot table', function () {
-                httpBackend.expectGET(/.*reportTables.json.*/).respond(200, pivotTableIds);
                 httpBackend.expectGET(/.*reportTables.json.*/).respond(200, pivotTableIds);
 
                 var expectedQueryParams = encodeURI('fields=id,name,title,translations,sortOrder,relativePeriods,' +
@@ -246,7 +236,6 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                     pivotTable2 = { id: 'table2' };
 
                 httpBackend.expectGET(/.*reportTables.json.*/).respond(200, pivotTableIds);
-                httpBackend.expectGET(/.*reportTables.json.*/).respond(200, pivotTableIds);
                 httpBackend.expectGET(/.*pivotTable1.json.*/).respond(200, pivotTable1);
                 httpBackend.expectGET(/.*pivotTable2.json.*/).respond(200, pivotTable2);
 
@@ -260,7 +249,6 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
             it('downloads the id of each pivot table modified since specified lastUpdated timestamp', function () {
                 reportService.getUpdatedPivotTables('someTimestamp');
 
-                httpBackend.expectGET(/.*filter=lastUpdated:gte:someTimestamp.*/).respond(200, {});
                 httpBackend.expectGET(/.*filter=lastUpdated:gte:someTimestamp.*/).respond(200, {});
                 httpBackend.flush();
             });
@@ -279,11 +267,9 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                     ]
                 };
 
-                var expectedOldQueryParamsForPivotTableIds = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false',
-                    expectedNewQueryParamsForPivotTableIds = 'fields=id&filter=name:like:%5BPraxis+-+&paging=false';
+                var expectedQueryParamsForPivotTableIds = 'fields=id&filter=name:like:%5BPraxis+-+&paging=false';
 
-                httpBackend.expectGET(properties.dhis.url + '/api/reportTables.json?' + expectedOldQueryParamsForPivotTableIds).respond(200, pivotTableIdsResponse);
-                httpBackend.expectGET(properties.dhis.url + '/api/reportTables.json?' + expectedNewQueryParamsForPivotTableIds).respond(200, pivotTableIdsResponse);
+                httpBackend.expectGET(properties.dhis.url + '/api/reportTables.json?' + expectedQueryParamsForPivotTableIds).respond(200, pivotTableIdsResponse);
                 httpBackend.flush();
             });
         });
