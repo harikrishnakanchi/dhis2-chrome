@@ -1,7 +1,5 @@
 define(["lodash", "dateUtils", "moment", "excelBuilder"], function(_, dateUtils, moment, excelBuilder) {
     return function($scope, $rootScope, translationsService, filesystemService, pivotTableExportBuilder) {
-        var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
-        var REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY hh[.]mm A";
 
         $scope.resourceBundle = $rootScope.resourceBundle;
         $scope.showDownloadButton = $scope.disableDownload != 'true';
@@ -9,13 +7,13 @@ define(["lodash", "dateUtils", "moment", "excelBuilder"], function(_, dateUtils,
         var EMPTY_ROW = [];
 
         var getLastUpdatedTimeContent = function () {
-            var formattedTime = moment($scope.updatedTime, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
-            return ['Updated', formattedTime];
+            var formattedTime = $scope.updatedTime;
+            return [$scope.resourceBundle.updated, formattedTime];
         };
 
         $scope.exportToExcel = function () {
-            var formattedDate = moment($scope.updatedTime, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA),
-                updatedTimeDetails = $scope.updatedTime ? '[updated ' + formattedDate + ']' : moment().format("DD-MMM-YYYY"),
+            var formattedDate = $scope.updatedTime,
+                updatedTimeDetails = $scope.updatedTime ? '[' + $scope.resourceBundle.updated + ' ' + formattedDate + ']' : moment().format("DD-MMM-YYYY"),
                 fileName = [$scope.table.serviceCode, $scope.table.title, updatedTimeDetails].join('.');
 
             var spreadSheetContent = [{

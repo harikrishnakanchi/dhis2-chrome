@@ -110,14 +110,17 @@ define(["angularMocks", "dateUtils", "utils", "lodash", "moment", "pivotTableCon
                     title: 'A table named T. Able',
                     serviceCode: 'someDataSetServiceCode'
                 };
+                scope.resourceBundle = {
+                    "updated": "Updated"
+                };
             });
 
             it('should prompt the user to download tabular data as Excel with lastUpdated date in the filename', function () {
-                var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY HH[:]mm";
+                var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM YYYY hh[.]mm A";
                 scope.updatedTime = moment('2015-10-29').format(REPORTS_LAST_UPDATED_TIME_FORMAT);
 
                 scope.exportToExcel();
-                expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith([scope.table.serviceCode, scope.table.title, '[updated 29 October 2015 12.00 AM]'].join('.'), jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.XLSX);
+                expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith([scope.table.serviceCode, scope.table.title, '[Updated 29 October 2015 12.00 AM]'].join('.'), jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.XLSX);
             });
 
             it('should contain results of csv builder', function () {
