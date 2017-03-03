@@ -1,9 +1,8 @@
 define([], function() {
-    // TODO: [#2144] remove 'FieldApp' from regular expression and decrement the indices if capture group is removed.
-    var FIELD_APP_NAME_REGEX = /^\[(Praxis|FieldApp) - ([a-zA-Z0-9()><]+)\]([0-9\s]*)([a-zA-Z0-9-\s]+)/;
+    var FIELD_APP_NAME_REGEX = /^\[Praxis - ([a-zA-Z0-9()><]+)\]([0-9\s]*)([a-zA-Z0-9-\s]+)/;
 
-    var SERVICE_CODE_INDEX = 2,
-        DISPLAY_POSITION_INDEX = 3;
+    var SERVICE_CODE_INDEX = 1,
+        DISPLAY_POSITION_INDEX = 2;
 
     var Chart = function(config) {
         this.id = config.id;

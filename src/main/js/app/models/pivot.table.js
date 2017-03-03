@@ -1,11 +1,10 @@
 define(['lodash'], function (_) {
-    // TODO: [#2144] remove 'FieldApp' from regular expression and decrement the indices if capture group is removed.
-    var FIELD_APP_SERVICE_CODE_REGEX = /\[(Praxis|FieldApp) - (.*)]/;
-    var FIELD_APP_TITLE_REGEX = /^\[(Praxis|FieldApp) - ([a-zA-Z0-9()><]+)\]([0-9\s]*)([a-zA-Z0-9-\s)><(&\/\\=%\+']+)/;
+    var FIELD_APP_SERVICE_CODE_REGEX = /\[Praxis - (.*)]/;
+    var FIELD_APP_TITLE_REGEX = /^\[Praxis - ([a-zA-Z0-9()><]+)\]([0-9\s]*)([a-zA-Z0-9-\s)><(&\/\\=%\+']+)/;
 
-    var SERVICE_CODE_INDEX = 2,
-        DISPLAY_POSITION_INDEX = 3,
-        TITLE_INDEX = 4;
+    var SERVICE_CODE_INDEX = 1,
+        DISPLAY_POSITION_INDEX = 2,
+        TITLE_INDEX = 3;
 
     var PivotTable = function (config) {
         this.id = config.id;

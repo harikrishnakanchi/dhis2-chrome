@@ -33,7 +33,7 @@ define(['chart'], function(Chart) {
         describe('serviceCode', function() {
             it('should parse the dataSet code from the chart name', function() {
                 chart = Chart.create({
-                   name: '[FieldApp - ServiceCode] 1 someName'
+                   name: '[Praxis - ServiceCode] 1 someName'
                });
                 expect(chart.serviceCode).toEqual('ServiceCode');
             });
@@ -48,7 +48,7 @@ define(['chart'], function(Chart) {
 
         describe('geographicOriginChart', function() {
             it('should return true if chart name contains GeographicOrigin', function() {
-                chart = Chart.create({ name: '[FieldApp - GeographicOrigin] # Name' });
+                chart = Chart.create({ name: '[Praxis - GeographicOrigin] # Name' });
                 expect(chart.geographicOriginChart).toBeTruthy();
             });
 
@@ -61,7 +61,7 @@ define(['chart'], function(Chart) {
         describe('displayPosition', function() {
             it('should parse the position from the chart name', function() {
                 chart = Chart.create({
-                    'name': '[FieldApp - someServiceCode] 88 Name'
+                    'name': '[Praxis - someServiceCode] 88 Name'
                 });
                 expect(chart.displayPosition).toEqual(88);
             });
