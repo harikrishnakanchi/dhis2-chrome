@@ -21,12 +21,12 @@
             <div ng-if="!syncError">
                 <div ng-show="isApproved" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
                 <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
-                <div class="alert alert-danger" ng-if="(moduleDataBlock.active && !isCompleted) || !isSubmitted">{{resourceBundle.noDataForApproval}}</div>
+                <div class="alert alert-danger" ng-if="moduleDataBlock.active && (!(moduleDataBlock.approvedAtProjectLevel || moduleDataBlock.approvedAtCoordinationLevel) || !isSubmitted)">{{resourceBundle.noDataForApproval}}</div>
             </div>
             <div ng-if="syncError && moduleDataBlock.awaitingActionAtCoordinationLevelApprover">
                 <div class="alert alert-danger">{{resourceBundle.dataApprovalSyncError}}</div>
             </div>
-            <div ng-if="syncError && !moduleDataBlock.awaitingActionAtCoordinationLevelApprover">
+            <div ng-if="syncError && !(moduleDataBlock.approvedAtProjectLevel)">
                 <div class="alert alert-danger">{{resourceBundle.noDataForApproval}}</div>
             </div>
         </div>
@@ -436,22 +436,16 @@
         </accordion>
         <div>
             <div ng-if="hasRoles(['Project Level Approver'])">
-                <input ng-if="!syncError || moduleDataBlock.awaitingActionAtCoordinationLevelApprover"
+                <input ng-if="moduleDataBlock.submitted"
                        type="button" class="btn btn-primary" ng-click="firstLevelApproval()"
-                       ng-disabled="!moduleDataBlock.active || isCompleted"
-                       value="{{ resourceBundle.approveBtnValue }}"/>
-                <input ng-if="syncError && moduleDataBlock.awaitingActionAtProjectLevelApprover" type="button"
-                       class="btn btn-primary" ng-click="firstLevelApproval()"
-                       value="{{ resourceBundle.reApproveBtnValue }}"/>
+                       ng-disabled="!moduleDataBlock.active || !moduleDataBlock.awaitingActionAtProjectLevelApprover"
+                       ng-value="syncError ? resourceBundle.reApproveBtnValue : resourceBundle.approveBtnValue"/>
             </div>
             <div ng-if="hasRoles(['Coordination Level Approver'])">
-                <input ng-if="!syncError && (isSubmitted && (!(moduleDataBlock.awaitingActionAtDataEntryLevel || moduleDataBlock.awaitingActionAtProjectLevelApprover) || !moduleDataBlock.active))"
+                <input ng-if="moduleDataBlock.submitted && (moduleDataBlock.approvedAtProjectLevel || moduleDataBlock.approvedAtCoordinationLevel)"
                        type="button" class="btn btn-primary" ng-click="secondLevelApproval()"
-                       ng-disabled="!moduleDataBlock.active || isApproved"
-                       value="{{ resourceBundle.approveBtnValue }}"/>
-                <input ng-if="syncError && moduleDataBlock.awaitingActionAtCoordinationLevelApprover"
-                       type="button" class="btn btn-primary" ng-click="secondLevelApproval()"
-                       value="{{ resourceBundle.reApproveBtnValue }}"/>
+                       ng-disabled="!moduleDataBlock.active || !moduleDataBlock.awaitingActionAtCoordinationLevelApprover"
+                       ng-value="syncError ? resourceBundle.reApproveBtnValue : resourceBundle.approveBtnValue"/>
             </div>
         </div>
     </section>
