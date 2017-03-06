@@ -129,23 +129,6 @@ define(["dataSetTransformer", "testData", "dataEntryTableColumnConfig", "lodash"
                 expect(actualEnrichedDatasets[0].sections[0].dataElements[0].code).toEqual('someCode');
             });
 
-            it("should set associated program ids on data elements where available", function () {
-                var originDataset = createMockDataset(),
-                    sections = [{
-                        "id": "someSectionId",
-                        "dataElements": [{
-                            "id": "DE1"
-                        }]
-                    }],
-                    dataElements = [{
-                        "id": "DE1",
-                        "attributeValues": [createMockAttribute('associatedProgram', 'someProgramId')]
-                    }];
-
-                var actualEnrichedDatasets = datasetTransformer.enrichWithSectionsAndDataElements([originDataset], sections, dataElements);
-                expect(actualEnrichedDatasets[0].sections[0].dataElements[0].associatedProgramId).toEqual("someProgramId");
-            });
-
             it('should set isIncluded on the dataelement and dataset', function () {
                 var dataset = [createMockDataset()],
                     sections = [{ id: 'someSectionId', dataElements: [{ id: 'someDataElementId'}, {id: 'someOtherDataElementId'}]}],
