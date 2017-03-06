@@ -82,8 +82,9 @@
         </div>
     </header>
     <div class="container info-bar {{layoutDirection.direction}}">
-        <div class="alert alert-danger" ng-if="isOffline">
-            <li>{{ resourceBundle.sync.turnOffMessage }}</li>
+        <div class="red-band" ng-if="isOffline || showTestLogo">
+            <div ng-if="showTestLogo">{{ resourceBundle.praxisTrainingVersionMessage }}</div>
+            <div ng-if="isOffline">{{ resourceBundle.sync.turnOffMessage }}</div>
         </div>
     </div>
     <div class="container hide-from-print {{layoutDirection.direction}}" style="padding-top:10px;" ng-if="isLoggedIn">

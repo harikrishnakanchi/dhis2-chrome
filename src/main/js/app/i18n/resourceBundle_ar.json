@@ -355,6 +355,7 @@
     },
     "selectAll": "اختر الكل",
     "unselectAll": "إلغاء تحديد الكل",
+    "praxisTrainingVersionMessage": "PRAXIS TRAINING VERSION",
     "sync": {
         "turnOffMessage": "مزامنة قبالة",
         "turnOn": "Activer la synchronisation",

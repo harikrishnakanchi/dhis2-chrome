@@ -182,10 +182,6 @@ body {
         &.info-bar {
             padding: 0px;
             font-weight: 600;
-            .alert {
-                margin-bottom: 0px;
-                padding: 0px 15px;
-            }
             &.rtl {
                 direction: rtl;
             }
@@ -1519,4 +1515,13 @@ header .sync-status {
 .metadata-download {
     margin: 30px auto;
     width: 550px;
+}
+
+.red-band {
+    .alert-danger;
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 0;
+    padding: 0 15px;
+    border: 1px solid #ebccd1;
 }
