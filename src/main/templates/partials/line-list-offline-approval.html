@@ -26,7 +26,7 @@
             <div ng-if="syncError && moduleDataBlock.awaitingActionAtCoordinationLevelApprover">
                 <div class="alert alert-danger">{{resourceBundle.dataApprovalSyncError}}</div>
             </div>
-            <div ng-if="syncError && !(moduleDataBlock.approvedAtProjectLevel)">
+            <div ng-if="syncError && !(moduleDataBlock.awaitingActionAtCoordinationLevelApprover)">
                 <div class="alert alert-danger">{{resourceBundle.noDataForApproval}}</div>
             </div>
         </div>
@@ -439,13 +439,13 @@
                 <input ng-if="moduleDataBlock.submitted"
                        type="button" class="btn btn-primary" ng-click="firstLevelApproval()"
                        ng-disabled="!moduleDataBlock.active || !moduleDataBlock.awaitingActionAtProjectLevelApprover"
-                       ng-value="syncError ? resourceBundle.reApproveBtnValue : resourceBundle.approveBtnValue"/>
+                       ng-value="(syncError && moduleDataBlock.awaitingActionAtProjectLevelApprover) ? resourceBundle.reApproveBtnValue : resourceBundle.approveBtnValue"/>
             </div>
             <div ng-if="hasRoles(['Coordination Level Approver'])">
-                <input ng-if="moduleDataBlock.submitted && (moduleDataBlock.approvedAtProjectLevel || moduleDataBlock.approvedAtCoordinationLevel)"
+                <input ng-if="moduleDataBlock.submitted && (moduleDataBlock.awaitingActionAtCoordinationLevelApprover || moduleDataBlock.approvedAtCoordinationLevel)"
                        type="button" class="btn btn-primary" ng-click="secondLevelApproval()"
                        ng-disabled="!moduleDataBlock.active || !moduleDataBlock.awaitingActionAtCoordinationLevelApprover"
-                       ng-value="syncError ? resourceBundle.reApproveBtnValue : resourceBundle.approveBtnValue"/>
+                       ng-value="(syncError && moduleDataBlock.awaitingActionAtCoordinationLevelApprover) ? resourceBundle.reApproveBtnValue : resourceBundle.approveBtnValue"/>
             </div>
         </div>
     </section>
