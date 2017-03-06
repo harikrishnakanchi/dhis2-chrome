@@ -133,7 +133,9 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             getModuleName();
             var nonPopulationDataSets = _.reject($scope.dataSets, 'isPopulationDataset');
             var originDataSetsAndRemainingDatasets = _.partition(nonPopulationDataSets, 'isOriginDataset');
-            _.forEach(originDataSetsAndRemainingDatasets[1], buildDataSet);
+            var referralDataSetAndRemainingDatasets = _.partition(originDataSetsAndRemainingDatasets[1], 'isReferralDataset');
+            _.forEach(referralDataSetAndRemainingDatasets[1], buildDataSet);
+            _.forEach(referralDataSetAndRemainingDatasets[0], buildDataSet);
             _.forEach(originDataSetsAndRemainingDatasets[0], buildDataSet);
             return [spreadSheet.generate()];
         };
