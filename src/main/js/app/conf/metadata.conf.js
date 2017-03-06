@@ -16,7 +16,7 @@ define([], function () {
             "userRoles": "name,id,displayName,lastUpdated",
             "attributes": "id,code,lastUpdated,name,valueType,mandatory",
             "organisationUnitGroups": ":all,!externalAccess,!access,!userGroupAccess,attributeValues[value,attribute[id,code,name]],translations[value,property,locale]",
-            "dataSets": ":all,attributeValues[:identifiable,value,attribute[:identifiable]],!organisationUnits,translations[value,property,locale]",
+            "dataSets": ":all,attributeValues[:identifiable,value,attribute[:identifiable]],!organisationUnits,translations[value,property,locale],!dataSetElements",
             "programs": "id,name,displayName,organisationUnits,attributeValues[:identifiable,value,attribute[:identifiable]],programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]],translations[value,property,locale]",
             "organisationUnits": ":all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid",
             "translations": ":all,!access,!userGroupAccesses,!externalAccess,!href,attributeValues[value,attribute[id,code,name]]"
