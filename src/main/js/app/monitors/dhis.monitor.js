@@ -44,8 +44,9 @@ define(["properties", "platformUtils", "lodash"], function(properties, platformU
                     }
                 }
                 var praxisVersion = platformUtils.getPraxisVersion();
+                var platform = platformUtils.platform == 'web' ? 'pwa' : 'chrome';
                 return properties.dhisPing.url + "?" + (new Date()).getTime() + "&pv=" + praxisVersion +
-                    "&pid=" + $rootScope.praxisUid + getRequestParams ;
+                    "&pid=" + $rootScope.praxisUid + "&" + platform + getRequestParams;
             };
 
             return userPreferenceRepository.getCurrentUsersPreferences()
