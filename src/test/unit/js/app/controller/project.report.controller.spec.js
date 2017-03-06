@@ -35,11 +35,13 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
                 modeOfOperationLabel: 'Mode Of Operation',
                 modelOfManagementLabel: 'Model Of Management',
                 openingDateLabel: 'Opening Date',
-                endDateLabel: 'End Date'
+                endDateLabel: 'End Date',
+                updated: 'Updated'
             };
 
             scope.startLoading = jasmine.createSpy('startLoading');
             scope.stopLoading = jasmine.createSpy('stopLoading');
+            scope.locale = 'en';
 
             mockProjectOrgUnit = {
                 "id": "xyz",
@@ -254,7 +256,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
 
         describe('Excel Export', function () {
             var spreadSheetContent,
-                LAST_UPDATED_TIME_FORMAT = "D MMMM YYYY hh[.]mm A";
+                LAST_UPDATED_TIME_FORMAT = "D MMMM, YYYY hh[.]mm A";
 
             beforeEach(function () {
                 scope.$apply();
@@ -269,7 +271,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             it('should prompt the user to save the Excel file with suggested filename', function () {
                 scope.exportToExcel();
 
-                var expectedFilename = 'Aweil - SS153.ProjectReport.[updated ' + moment(lastUpdatedTime).format(LAST_UPDATED_TIME_FORMAT) + ']';
+                var expectedFilename = 'Aweil - SS153.ProjectReport.[Updated ' + moment(lastUpdatedTime).format(LAST_UPDATED_TIME_FORMAT) + ']';
                 expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.XLSX);
             });
 

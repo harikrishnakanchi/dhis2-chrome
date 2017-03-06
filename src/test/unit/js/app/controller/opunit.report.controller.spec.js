@@ -7,7 +7,11 @@ define(['moment', 'timecop', 'angularMocks', 'utils', 'orgUnitRepository', 'chan
             rootScope = $rootScope;
             scope = $rootScope.$new();
             q = $q;
-            
+
+            scope.resourceBundle = {
+                updated: 'Updated'
+            };
+
             routeParams = {
                 opUnit: 'opUnitId'
             };
@@ -43,6 +47,7 @@ define(['moment', 'timecop', 'angularMocks', 'utils', 'orgUnitRepository', 'chan
 
             scope.startLoading = jasmine.createSpy('startLoading');
             scope.stopLoading = jasmine.createSpy('stopLoading');
+            scope.locale = 'en';
 
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, 'get').and.returnValue(utils.getPromise(q, mockOpUnit));
@@ -121,7 +126,7 @@ define(['moment', 'timecop', 'angularMocks', 'utils', 'orgUnitRepository', 'chan
 
         describe('should export to excel', function () {
             var spreadSheetContent,
-                LAST_UPDATED_TIME_FORMAT = "D MMMM YYYY hh[.]mm A";
+                LAST_UPDATED_TIME_FORMAT = "D MMMM, YYYY hh[.]mm A";
 
             beforeEach(function () {
                 scope.$apply();
@@ -136,7 +141,7 @@ define(['moment', 'timecop', 'angularMocks', 'utils', 'orgUnitRepository', 'chan
             it('should prompt the user to save the Excel file with suggested filename', function () {
                 scope.exportToExcel();
 
-                var expectedFilename = 'opUnitName.OpUnitReport.[updated ' + moment(lastUpdatedTime).format(LAST_UPDATED_TIME_FORMAT) + '].xlsx';
+                var expectedFilename = 'opUnitName.OpUnitReport.[Updated ' + moment(lastUpdatedTime).format(LAST_UPDATED_TIME_FORMAT) + '].xlsx';
                 expect(filesystemService.promptAndWriteFile).toHaveBeenCalledWith(expectedFilename, jasmine.any(Blob), filesystemService.FILE_TYPE_OPTIONS.XLSX);
             });
 
