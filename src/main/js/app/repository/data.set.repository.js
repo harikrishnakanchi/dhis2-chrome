@@ -26,8 +26,7 @@ define(["lodash", "dataSetTransformer", "customAttributes"], function(_, dataSet
             var groupStore = db.objectStore("dataElementGroups");
             return groupStore.getAll().then(function(dataElementGroups) {
                 return _.filter(dataElementGroups, function(group) {
-                    // TODO: Remove this backward compatible code once we are sure that all the fields are upgraded to 9.0
-                    return customAttributes.getBooleanAttributeValue(group.attributeValues, customAttributes.PRAXIS_SHOW_IN_MODULE_CREATION_CODE) || _.endsWith(group.code, "module_creation");
+                    return customAttributes.getBooleanAttributeValue(group.attributeValues, customAttributes.PRAXIS_SHOW_IN_MODULE_CREATION_CODE);
                 });
             });
         };
