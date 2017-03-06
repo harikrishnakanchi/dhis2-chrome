@@ -56,8 +56,11 @@
                                         <li class="divider"></li>
                                         <li><a href="" ng-click="gotoProductKeyPage()" tabindex="-1">{{
                                             resourceBundle.updateProductKeyMenuLabel }}</a></li>
-                                        <li><a href="" ng-click="toggleSync()" ng-if="!isOffline">{{ resourceBundle.sync.turnOff }}</a></li>
-                                        <li><a href="" ng-click="toggleSync()" ng-if="isOffline">{{ resourceBundle.sync.turnOn }}</a></li>
+                                        <li ng-if="!isChromeApp">
+                                            <a href="" ng-click="toggleSync()">
+                                                {{ isOffline ? resourceBundle.sync.turnOn : resourceBundle.sync.turnOff }}
+                                            </a>
+                                        </li>
                                         <li class="dropdown-submenu"
                                             ng-class="{'pull-left': layoutDirection.direction != 'rtl'}"
                                             ng-include="'templates/partials/clone.html'"></li>
@@ -68,8 +71,11 @@
                                     <ul class="dropdown-menu" role="menu" ng-if="!isLoggedIn">
                                         <li><a href="" ng-click="gotoProductKeyPage()" tabindex="-1">{{
                                             resourceBundle.updateProductKeyMenuLabel }}</a></li>
-                                        <li ng-hide="hideSyncStatus()" ng-if="!isOffline"><a href="" ng-click="toggleSync()">{{ resourceBundle.sync.turnOff }}</a></li>
-                                        <li ng-hide="hideSyncStatus()" ng-if="isOffline"><a href="" ng-click="toggleSync()">{{ resourceBundle.sync.turnOn }}</a></li>
+                                        <li ng-hide="hideSyncStatus()" ng-if="!isChromeApp">
+                                            <a href="" ng-click="toggleSync()">
+                                                {{ isOffline ? resourceBundle.sync.turnOn : resourceBundle.sync.turnOff }}
+                                            </a>
+                                        </li>
                                         <li ng-hide="hideSyncStatus()" class="divider"></li>
                                         <li ng-hide="hideSyncStatus()"><a href="" ng-click="uninstallPraxis()">{{ resourceBundle.uninstall.title }}</a></li>
                                     </ul>

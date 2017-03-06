@@ -209,6 +209,8 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
         };
 
         var init = function() {
+            $scope.isChromeApp = platformUtils.platform == 'chrome';
+
             systemSettingRepository.isSyncOff().then(function (isOffline) {
                 $scope.isOffline = isOffline;
             }).then(checkConnectionQuality);
