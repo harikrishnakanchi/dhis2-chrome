@@ -288,9 +288,8 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                     _.forEach(populationDataset.sections[0].dataElements, function(dataElement) {
                         $scope.dataValues[currentModuleId][dataElement.id] = !$scope.dataValues[currentModuleId][dataElement.id] ? {} : $scope.dataValues[currentModuleId][dataElement.id];
 
-                        // TODO: Remove this backward compatible code once we are sure that all the fields are upgraded to 9.0
-                        var code = dataElement.populationDataElementCode || dataElement.code.split("_")[1];
-                        var value = _.isEmpty($scope.projectPopulationDetails[code]) ? "0" : $scope.projectPopulationDetails[code];
+                        var code = dataElement.populationDataElementCode;
+                        var value = _.isEmpty(_.get($scope.projectPopulationDetails, code)) ? "0" : $scope.projectPopulationDetails[code];
                         $scope.dataValues[currentModuleId][dataElement.id][categoryOptionComboId] = {
                             "formula": value,
                             "value": value
