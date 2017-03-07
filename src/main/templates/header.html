@@ -87,7 +87,7 @@
             </nav>
         </div>
     </header>
-    <div class="container info-bar {{layoutDirection.direction}}">
+    <div class="container info-bar hide-from-print {{layoutDirection.direction}}">
         <div class="red-band" ng-if="isOffline || showTestLogo">
             <div ng-if="showTestLogo">{{ resourceBundle.praxisTrainingVersionMessage }}</div>
             <div ng-if="isOffline">{{ resourceBundle.sync.turnOffMessage }}</div>
