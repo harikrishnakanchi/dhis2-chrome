@@ -125,7 +125,6 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                                 else $rootScope.isBackgroundRunning = true;
                             }).then(systemSettingRepository.loadProductKey)
                                 .then(setupAlarms)
-                                .then(consumerRegistry.register)
                                 .then(checkOnlineStatusAndSync)
                                 .catch(function () {
                                     $rootScope.isBackgroundRunning = false;
@@ -156,6 +155,8 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
 
                     $hustle.rescueReservedItems(properties.queue.maxNumberOfTimesItemCanBeRescued,
                         properties.queue.minTimeInSecToIncrementItemRescuedCount);
+
+                    consumerRegistry.register();
 
                     systemSettingRepository.getPraxisUid()
                         .then(function (uid) {
