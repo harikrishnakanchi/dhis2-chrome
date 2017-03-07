@@ -10,6 +10,9 @@
                              tabindex="-1" ng-if="showTestLogo()">
                         <label class="version-number">{{ versionNumber() }}</label>
                     </div>
+                    <div class="label label-danger training-msg-label" ng-if="!isProductKeyPage() && showTestLogo()">
+                        {{ resourceBundle.praxisTrainingVersionMessage }}
+                    </div>
                     <div class="nav navbar-nav" ng-class="{'navbar-right': layoutDirection.direction != 'rtl'}">
                         <p class="text-right login-message">
                                 <span ng-show="isLoggedIn">
@@ -87,9 +90,8 @@
             </nav>
         </div>
     </header>
-    <div class="container info-bar hide-from-print {{layoutDirection.direction}}">
-        <div class="red-band" ng-if="isOffline || showTestLogo">
-            <div ng-if="showTestLogo">{{ resourceBundle.praxisTrainingVersionMessage }}</div>
+    <div class="container info-bar hide-from-print {{layoutDirection.direction}}" ng-if="!isProductKeyPage()">
+        <div class="red-band" ng-if="isOffline">
             <div ng-if="isOffline">{{ resourceBundle.sync.turnOffMessage }}</div>
         </div>
     </div>

@@ -15,6 +15,10 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
             return $location.path() == '/downloadingMetadata' || $location.path() == '/productKeyPage';
         };
 
+        $scope.isProductKeyPage = function () {
+            return $location.path() == '/productKeyPage';
+        };
+
         $scope.hasSelectedProject = function() {
             return !!$rootScope.currentUser.selectedProject;
         };
