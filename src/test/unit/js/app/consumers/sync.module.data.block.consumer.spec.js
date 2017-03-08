@@ -92,7 +92,7 @@ define(['syncModuleDataBlockConsumer', "dataSetRepository", 'approvalService', '
 
             it('should retrieve the lastUpdated time for the project', function () {
                 runConsumer();
-                expect(changeLogRepository.get).toHaveBeenCalledWith('dataValues:' + mockProject.id);
+                expect(changeLogRepository.get).toHaveBeenCalledWith('dataValues:' + mockProject.id + ":" + mockModule.id);
             });
 
             describe('download data for an aggregate module', function () {

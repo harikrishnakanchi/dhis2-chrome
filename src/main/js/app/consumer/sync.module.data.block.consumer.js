@@ -35,7 +35,7 @@ define(['properties', 'dateUtils'], function (properties, dateUtils) {
 
         var getLastUpdatedTime = function(data) {
             return orgUnitRepository.getParentProject(data.moduleId).then(function(projectOrgUnit) {
-                return changeLogRepository.get('dataValues:' + projectOrgUnit.id).then(function(lastUpdatedTime) {
+                return changeLogRepository.get('dataValues:' + projectOrgUnit.id+":" +data.moduleId).then(function(lastUpdatedTime) {
                     return _.merge({ lastUpdatedTime: lastUpdatedTime }, data);
                 });
             });
