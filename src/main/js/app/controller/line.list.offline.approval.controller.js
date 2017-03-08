@@ -312,6 +312,8 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
         };
 
         var init = function() {
+            $scope.loading = true;
+
             return $q.all([loadOriginsOrgUnits(), loadProgram(), getOptionSetMapping(), getReferralLocations()]).then(function() {
                 var orgUnitIdsAssociatedToEvents = _.map($scope.originOrgUnits, "id").concat($scope.selectedModule.id);
                 return programEventRepository.getEventsForPeriod($scope.program.id, orgUnitIdsAssociatedToEvents, getPeriod()).then(function(events) {
@@ -323,6 +325,8 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
                     getAssociatedDataSets();
                     getDescriptionsForProceduresPerformed();
                 });
+            }).finally(function () {
+                $scope.loading = false;
             });
         };
 
