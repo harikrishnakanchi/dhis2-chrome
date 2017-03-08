@@ -52,7 +52,7 @@ define(['pivotTable'], function(PivotTable) {
 
        describe('serviceCode', function() {
            it('should parse the dataSet code from the pivot table name', function() {
-               pivotTable = PivotTable.create({ name: '[FieldApp - someServiceCode] # Name' });
+               pivotTable = PivotTable.create({ name: '[Praxis - someServiceCode] # Name' });
                expect(pivotTable.serviceCode).toEqual('someServiceCode');
            });
 
@@ -64,7 +64,7 @@ define(['pivotTable'], function(PivotTable) {
 
        describe('projectReport', function() {
            it('should return true if pivot table name contains ProjectReport', function() {
-               pivotTable = PivotTable.create({ name: '[FieldApp - ProjectReport] # Name' });
+               pivotTable = PivotTable.create({ name: '[Praxis - ProjectReport] # Name' });
                expect(pivotTable.projectReport).toBeTruthy();
            });
 
@@ -88,7 +88,7 @@ define(['pivotTable'], function(PivotTable) {
 
        describe('geographicOriginReport', function() {
            it('should return true if pivot table name contains GeographicOrigin', function() {
-               pivotTable = PivotTable.create({ name: '[FieldApp - GeographicOrigin] # Name' });
+               pivotTable = PivotTable.create({ name: '[Praxis - GeographicOrigin] # Name' });
                expect(pivotTable.geographicOriginReport).toBeTruthy();
            });
 
@@ -100,7 +100,7 @@ define(['pivotTable'], function(PivotTable) {
 
        describe('referralLocationReport', function() {
            it('should return true if pivot table service code contains Referral location', function() {
-               pivotTable = PivotTable.create({ name: '[FieldApp - ReferralLocation] # Name' });
+               pivotTable = PivotTable.create({ name: '[Praxis - ReferralLocation] # Name' });
                expect(pivotTable.referralLocationReport).toBeTruthy();
            });
 
@@ -136,7 +136,7 @@ define(['pivotTable'], function(PivotTable) {
 
        describe('displayPosition', function() {
            it('should parse the display position from the pivot table name', function() {
-               pivotTable = PivotTable.create({ name: '[FieldApp - someServiceCode] 88 SomePivotTableTitle' });
+               pivotTable = PivotTable.create({ name: '[Praxis - someServiceCode] 88 SomePivotTableTitle' });
                expect(pivotTable.displayPosition).toEqual(88);
            });
 

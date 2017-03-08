@@ -54,15 +54,19 @@ var download = function (url, outputFile, onDone) {
     };
 
     return request(options)
-        .on('response', function(response) {
-            if (response.statusCode != 200) {
+        .on('response', function (response) {
+            if(response.statusCode != 200) {
                 onDone("Server exited with " + response.statusCode);
                 process.exit(1);
-            } else if (response.statusCode == 200){
-                onDone();
             }
-        })
-        .pipe(fs.createWriteStream(outputFile));
+            else {
+                var fileStream = fs.createWriteStream(outputFile);
+                response.pipe(fileStream);
+                fileStream.on('finish', function () {
+                    onDone();
+                })
+            }
+        });
 };
 
 gulp.task('test', function(onDone) {

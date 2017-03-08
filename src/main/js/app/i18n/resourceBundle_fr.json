@@ -355,6 +355,7 @@
     },
     "selectAll": "Sélectionner Tout",
     "unselectAll": "Tout Déselectionner",
+    "praxisTrainingVersionMessage": "PRAXIS TRAINING VERSION",
     "sync": {
         "turnOffMessage": "Synchronisation désactivée",
         "turnOn": "Activer la synchronisation",

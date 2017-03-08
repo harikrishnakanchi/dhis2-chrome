@@ -41,6 +41,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             scope.startLoading = jasmine.createSpy('startLoading');
             scope.stopLoading = jasmine.createSpy('stopLoading');
             scope.orgUnit = {id: 'someId', parent: {id: 'someOrgUnitId'}};
+            scope.locale = 'en';
 
             rootScope.currentUser = {
                 selectedProject: mockProject

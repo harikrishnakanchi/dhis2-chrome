@@ -1,4 +1,4 @@
-define(["dhisUrl", "lodash", "metadataConf"], function(dhisUrl, _, metadataConf) {
+define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], function(dhisUrl, _, metadataConf, pagingUtils, properties) {
     return function($http) {
         this.upsert = function(programs) {
             return $http.post(dhisUrl.metadata, {
@@ -14,14 +14,21 @@ define(["dhisUrl", "lodash", "metadataConf"], function(dhisUrl, _, metadataConf)
             var url = dhisUrl.programs + ".json";
             var params = {
                 fields: metadataConf.fields.programs,
-                paging: false
+                paging: true
             };
             if (lastUpdatedTime)
                 params.filter = "lastUpdated:gte:" + lastUpdatedTime;
 
-            return $http.get(url, {params: params}).then(function (data) {
-                return data.data.programs;
-            });
+            var downloadWithPagination = function (params) {
+                return $http.get(url, {params: params}).then(function (response) {
+                    return {
+                        pager: response.data.pager,
+                        data: response.data.programs
+                    };
+                });
+            };
+
+            return pagingUtils.paginateRequest(downloadWithPagination, params, properties.paging.maxPageRequests, []);
         };
 
         this.loadFromFile = function() {

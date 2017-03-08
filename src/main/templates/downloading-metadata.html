@@ -6,7 +6,9 @@
         </div>
     </div>
 
-    <h4 ng-if="!maxRetriesExceeded">Downloading data&hellip;</h4>
+    <h4 ng-if="!maxRetriesExceeded && showProgressBar">Downloading data&hellip;</h4>
+
+    <h4 ng-if="!showProgressBar" class="text-center">Initializing Praxis&hellip;</h4>
 
     <div ng-if="maxRetriesExceeded">
         <div class="alert alert-danger">

@@ -15,6 +15,10 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
             return $location.path() == '/downloadingMetadata' || $location.path() == '/productKeyPage';
         };
 
+        $scope.isProductKeyPage = function () {
+            return $location.path() == '/productKeyPage';
+        };
+
         $scope.hasSelectedProject = function() {
             return !!$rootScope.currentUser.selectedProject;
         };
@@ -209,6 +213,8 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
         };
 
         var init = function() {
+            $scope.isChromeApp = platformUtils.platform == 'chrome';
+
             systemSettingRepository.isSyncOff().then(function (isOffline) {
                 $scope.isOffline = isOffline;
             }).then(checkConnectionQuality);

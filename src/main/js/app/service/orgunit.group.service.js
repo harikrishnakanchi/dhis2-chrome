@@ -1,4 +1,4 @@
-define(["dhisUrl", "lodash", "metadataConf"], function(dhisUrl, _, metadataConf) {
+define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], function(dhisUrl, _, metadataConf, pagingUtils, properties) {
     return function($http, $q) {
 
         this.get = function (orgUnitGroupIds) {
@@ -20,15 +20,22 @@ define(["dhisUrl", "lodash", "metadataConf"], function(dhisUrl, _, metadataConf)
             var url = dhisUrl.orgUnitGroups + '.json';
             var params = {
                 fields: metadataConf.fields.organisationUnitGroups,
-                paging: false
+                paging: true
             };
 
             if (lastUpdatedTime) {
                 params.filter = "lastUpdated:gte:" + lastUpdatedTime;
             }
-            return $http.get(url, {params: params}).then(function (response) {
-                return response.data.organisationUnitGroups;
-            });
+            var downloadWithPagination = function (params) {
+                return $http.get(url, {params: params}).then(function (response) {
+                    return {
+                        pager: response.data.pager,
+                        data: response.data.organisationUnitGroups
+                    };
+                });
+            };
+
+            return pagingUtils.paginateRequest(downloadWithPagination, params, properties.paging.maxPageRequests, []);
         };
 
         this.addOrgUnit = function(orgUnitGroupId, orgUnitId) {

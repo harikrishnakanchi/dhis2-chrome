@@ -6,7 +6,7 @@ define(["lodash"], function (_) {
         var enrichOptions = function (options, optionSetId, isReferralLocationOptionSet) {
             return _.map(options, function (option) {
                 var excludedOptionIds = _.get(indexedExcludedLineListOptions[optionSetId], 'excludedOptionIds', []);
-                var referralLocation = referralLocations && referralLocations[option.name] || {};
+                var referralLocation = referralLocations && referralLocations[option.name] || {isDisabled: isReferralLocationOptionSet};
                 option.isDisabled = _.contains(excludedOptionIds, option.id) || !!(referralLocation.isDisabled);
                 option.name = (isReferralLocationOptionSet && referralLocation.name) ? referralLocation.name : option.name;
                 return option;

@@ -1,15 +1,14 @@
 define(['moment', 'excelBuilder'], function (moment, excelBuilder) {
     return function ($rootScope, $q, $scope, $routeParams, orgUnitRepository, changeLogRepository, pivotTableRepository, filesystemService, translationsService, pivotTableExportBuilder) {
         var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
-        var REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY hh[.]mm A";
 
         var buildSpreadSheetContent = function () {
             var spreadSheetContent,
                 EMPTY_ROW = [];
 
             var getLastUpdatedTimeDetails = function () {
-                var formattedTime = moment($scope.lastUpdatedTimeForOpUnitReport, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
-                return ['Updated', formattedTime];
+                var formattedTime = $scope.lastUpdatedTimeForOpUnitReport;
+                return [$scope.resourceBundle.updated, formattedTime];
             };
 
             var getPivotTableData = function () {
@@ -35,8 +34,8 @@ define(['moment', 'excelBuilder'], function (moment, excelBuilder) {
         $scope.exportToExcel = function () {
             var lastUpdatedTimeDetails;
             if ($scope.lastUpdatedTimeForOpUnitReport) {
-                var formattedDate = moment($scope.lastUpdatedTimeForOpUnitReport, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
-                lastUpdatedTimeDetails = '[updated ' + formattedDate + ']';
+                var formattedDate = $scope.lastUpdatedTimeForOpUnitReport;
+                lastUpdatedTimeDetails = '[' + $scope.resourceBundle.updated + ' ' + formattedDate + ']';
             }
             else {
                 lastUpdatedTimeDetails = moment().format("DD-MMM-YYYY");
@@ -52,7 +51,7 @@ define(['moment', 'excelBuilder'], function (moment, excelBuilder) {
             var getLastUpdatedTimeForOpUnitPivotTables = function () {
                 var changeLogKey = 'monthlyPivotTableData:'.concat(selectedProjectId);
                 return changeLogRepository.get(changeLogKey).then(function (lastUpdatedTime) {
-                    $scope.lastUpdatedTimeForOpUnitReport = lastUpdatedTime ? moment(lastUpdatedTime).format(REPORTS_LAST_UPDATED_TIME_FORMAT) : undefined;
+                    $scope.lastUpdatedTimeForOpUnitReport = lastUpdatedTime ? moment(lastUpdatedTime).locale($scope.locale).format(REPORTS_LAST_UPDATED_TIME_FORMAT) : undefined;
                 });
             };
 

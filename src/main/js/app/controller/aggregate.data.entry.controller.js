@@ -133,7 +133,9 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             getModuleName();
             var nonPopulationDataSets = _.reject($scope.dataSets, 'isPopulationDataset');
             var originDataSetsAndRemainingDatasets = _.partition(nonPopulationDataSets, 'isOriginDataset');
-            _.forEach(originDataSetsAndRemainingDatasets[1], buildDataSet);
+            var referralDataSetAndRemainingDatasets = _.partition(originDataSetsAndRemainingDatasets[1], 'isReferralDataset');
+            _.forEach(referralDataSetAndRemainingDatasets[1], buildDataSet);
+            _.forEach(referralDataSetAndRemainingDatasets[0], buildDataSet);
             _.forEach(originDataSetsAndRemainingDatasets[0], buildDataSet);
             return [spreadSheet.generate()];
         };
@@ -288,9 +290,8 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
                     _.forEach(populationDataset.sections[0].dataElements, function(dataElement) {
                         $scope.dataValues[currentModuleId][dataElement.id] = !$scope.dataValues[currentModuleId][dataElement.id] ? {} : $scope.dataValues[currentModuleId][dataElement.id];
 
-                        // TODO: Remove this backward compatible code once we are sure that all the fields are upgraded to 9.0
-                        var code = dataElement.populationDataElementCode || dataElement.code.split("_")[1];
-                        var value = _.isEmpty($scope.projectPopulationDetails[code]) ? "0" : $scope.projectPopulationDetails[code];
+                        var code = dataElement.populationDataElementCode;
+                        var value = _.isEmpty(_.get($scope.projectPopulationDetails, code)) ? "0" : $scope.projectPopulationDetails[code];
                         $scope.dataValues[currentModuleId][dataElement.id][categoryOptionComboId] = {
                             "formula": value,
                             "value": value

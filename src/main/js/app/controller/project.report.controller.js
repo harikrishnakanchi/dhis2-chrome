@@ -3,14 +3,13 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper", "excelBuilder"], funct
         $scope.selectedProject = $rootScope.currentUser.selectedProject;
 
         var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
-        var REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY hh[.]mm A";
 
         var buildSpreadSheetContent = function () {
             var EMPTY_ROW = [];
 
             var getLastUpdatedTimeDetails = function () {
-                var formattedTime = moment($scope.lastUpdatedTimeForProjectReport, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
-                return ['Updated', formattedTime];
+                var formattedTime = $scope.lastUpdatedTimeForProjectReport;
+                return [$scope.resourceBundle.updated, formattedTime];
             };
 
             var getProjectBasicInfo = function() {
@@ -45,8 +44,8 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper", "excelBuilder"], funct
         $scope.exportToExcel = function () {
             var lastUpdatedTimeDetails;
             if ($scope.lastUpdatedTimeForProjectReport) {
-                var formattedDate = moment($scope.lastUpdatedTimeForProjectReport, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
-                lastUpdatedTimeDetails = '[updated ' + formattedDate + ']';
+                var formattedDate = $scope.lastUpdatedTimeForProjectReport;
+                lastUpdatedTimeDetails = '[' + $scope.resourceBundle.updated + ' ' + formattedDate + ']';
             }
             else {
                 lastUpdatedTimeDetails = moment().format("DD-MMM-YYYY");
@@ -143,7 +142,7 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper", "excelBuilder"], funct
 
         var loadLastUpdatedTimeForProjectReport = function() {
             var formatlastUpdatedTime = function (date) {
-                return date ? moment(date).format(REPORTS_LAST_UPDATED_TIME_FORMAT) : undefined;
+                return date ? moment(date).locale($scope.locale).format(REPORTS_LAST_UPDATED_TIME_FORMAT) : undefined;
             };
 
             return changeLogRepository.get('monthlyPivotTableData:' +  $scope.selectedProject.id)

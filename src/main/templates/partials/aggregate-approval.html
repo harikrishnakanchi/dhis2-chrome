@@ -215,8 +215,7 @@
                                     </tr>
                                     </thead>
                                     <tbody ng-repeat="orgUnit in originOrgUnits | orderBy: 'name'">
-                                    <!-- TODO remove ng-if after 10.0-->
-                                    <tr ng-repeat="dataElement in section.dataElements" ng-if="dataElement.associatedProgramId === undefined" ng-form="dataElementForm">
+                                    <tr ng-repeat="dataElement in section.dataElements" ng-form="dataElementForm">
                                         <td>
                                             <span>{{ orgUnit.name }}</span>
                                         </td>

@@ -17,6 +17,8 @@ define(["dhisMonitor", "utils", "angularMocks", "platformUtils", "mockChrome", "
             spyOn(platformUtils, 'createAlarm');
             spyOn(platformUtils, 'clearAlarm');
             spyOn(platformUtils, 'addAlarmListener');
+            platformUtils.platform = 'web';
+
             rootScope.praxisUid = "ade3fab1ab0";
             userPreferenceRepository = new UserPreferenceRepository();
             var userPreferences = {
@@ -34,7 +36,7 @@ define(["dhisMonitor", "utils", "angularMocks", "platformUtils", "mockChrome", "
             currentTime = (new Date()).getTime();
             Timecop.install();
             Timecop.freeze(currentTime);
-            favIconUrl = properties.dhisPing.url + "?" + currentTime + "&pv=5.1&pid=ade3fab1ab0";
+            favIconUrl = properties.dhisPing.url + "?" + currentTime + "&pv=5.1&pid=ade3fab1ab0&pwa";
             dhisMonitor = new DhisMonitor(http, log, timeout, rootScope, userPreferenceRepository);
         }));
 

@@ -1,4 +1,4 @@
-define(["programService", "angularMocks", "properties", "metadataConf"], function(ProgramService, mocks, properties, metadataConf) {
+define(["programService", "angularMocks", "properties", "metadataConf", "pagingUtils"], function(ProgramService, mocks, properties, metadataConf, pagingUtils) {
     describe("programService", function() {
         var http, httpBackend, programService;
 
@@ -34,6 +34,7 @@ define(["programService", "angularMocks", "properties", "metadataConf"], functio
         it("should download programs modified since lastUpdated", function() {
             var lastUpdatedTime = "2014-12-30T09:13:41.092Z";
 
+            spyOn(pagingUtils, 'paginateRequest').and.callThrough();
             programService.getAll(lastUpdatedTime).then(function(actualPrograms) {
                 expect(actualPrograms).toEqual(programs);
             });
@@ -46,10 +47,11 @@ define(["programService", "angularMocks", "properties", "metadataConf"], functio
                 programs: programs
             };
 
-            var url = properties.dhis.url + '/api/programs.json?fields=' + metadataConf.fields.programs + '&filter=lastUpdated:gte:2014-12-30T09:13:41.092Z&paging=false';
+            var url = properties.dhis.url + '/api/programs.json?fields=' + metadataConf.fields.programs + '&filter=lastUpdated:gte:2014-12-30T09:13:41.092Z&page=1&paging=true&totalPages=true';
 
             httpBackend.expectGET(encodeURI(url)).respond(200, payload);
             httpBackend.flush();
+            expect(pagingUtils.paginateRequest).toHaveBeenCalled();
         });
 
         it("should load pre-packaged programs data", function() {

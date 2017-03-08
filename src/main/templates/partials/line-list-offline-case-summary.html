@@ -1,5 +1,5 @@
 <div ng-controller="lineListOfflineApprovalController">
-    <section ng-if="!errorMessage" class="panel tab-panel {{ layoutDirection.direction }}">
+    <section ng-if="!errorMessage && !loading" class="panel tab-panel {{ layoutDirection.direction }}">
 
         <div class="alert alert-info" ng-if="!showFilters && isValidWeek">{{ resourceBundle.noCasesToSummarize }}</div>
         <div class="alert alert-danger" ng-if="!(showFilters || isValidWeek)">{{ resourceBundle.linelistDataNotAvailableMessage }}
@@ -398,7 +398,7 @@
                     </accordion-group>
                 </div>
             </accordion>
-            <div class="offlineProcedure" ng-if="shouldShowReferrals">
+            <div class="offlineProcedure" ng-if="shouldShowReferrals || canShowReferralLocations()">
                 <accordion close-others="false">
                     <div class="data-set-acc-wrapper">
                         <accordion-group is-open="status.open">

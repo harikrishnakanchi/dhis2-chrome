@@ -29,37 +29,20 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
         };
 
         var getResourceIds = function(resourceUrl, resourceCollectionName, lastUpdatedTime) {
-            // TODO: [#2144] remove oldConfig with 'FieldApp' filter and retain only 'Praxis' much after 10.0
-            var oldConfig = {
-                params: {
-                    'filter': ['name:like:[FieldApp - '],
-                    'paging': false,
-                    'fields': 'id'
-                }
-            };
-
-            var newConfig = {
+            var config = {
                 params: {
                     'filter': ['name:like:[Praxis - '],
                     'paging': false,
                     'fields': 'id'
                 }
             };
-
-            if(lastUpdatedTime) {
-                oldConfig.params.filter.push('lastUpdated:gte:' + lastUpdatedTime);
-                newConfig.params.filter.push('lastUpdated:gte:' + lastUpdatedTime);
+            if (lastUpdatedTime) {
+                config.params.filter.push('lastUpdated:gte:' + lastUpdatedTime);
             }
 
-            var resourceIds = [];
-            return $http.get(resourceUrl + '.json', oldConfig)
+            return $http.get(resourceUrl + '.json', config)
                 .then(function (response) {
-                    resourceIds.push(_.map(response.data[resourceCollectionName], 'id'));
-                    return $http.get(resourceUrl + '.json', newConfig);
-                })
-                .then(function (response) {
-                    resourceIds.push(_.map(response.data[resourceCollectionName], 'id'));
-                    return _.chain(resourceIds).flatten().uniq().value();
+                    return _.map(response.data[resourceCollectionName], 'id');
                 });
         };
 

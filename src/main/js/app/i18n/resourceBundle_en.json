@@ -355,8 +355,9 @@
     },
     "selectAll": "Select All",
     "unselectAll": "Unselect All",
+    "praxisTrainingVersionMessage": "PRAXIS TRAINING VERSION",
     "sync": {
-        "turnOffMessage": "SYNC OFF",
+        "turnOffMessage": "SYNC IS TURNED OFF",
         "turnOn": "Turn on Sync",
         "turnOff": "Turn off Sync",
         "turnOnConfirmationMessage": "Warning: Turn On Sync will sync data from Praxis to DHIS. It will update Praxis to the latest versions, if available. Are you sure you want to turn Sync On?",

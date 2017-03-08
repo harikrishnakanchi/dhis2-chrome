@@ -34,6 +34,9 @@ define(['optionSetTransformer'], function (optionSetTransformer) {
                 }, {
                     id: 'otherOption',
                     name: "Facility 2"
+                }, {
+                    id: 'optionC',
+                    name: "Facility 3"
                 }]
             }];
 
@@ -58,6 +61,12 @@ define(['optionSetTransformer'], function (optionSetTransformer) {
         });
 
         it('should set isDisabled to true to option for disabled referral location in referral location optionSet', function () {
+            mockedOptionSets = [mockedOptionSets[1]];
+            var actualResult = optionSetTransformer.enrichOptionSets(mockedOptionSets, mockedReferralLocations, mockExcludedLineListOptions);
+            expect(actualResult[0].options).toContain(jasmine.objectContaining({id : "optionC", isDisabled: true}));
+        });
+
+        it('should set isDisabled to true to option if referral location is not configured for referral option set', function () {
             mockedOptionSets = [mockedOptionSets[1]];
             var actualResult = optionSetTransformer.enrichOptionSets(mockedOptionSets, mockedReferralLocations, mockExcludedLineListOptions);
             expect(actualResult[0].options).toContain(jasmine.objectContaining({id : "optionIdB", isDisabled: true}));

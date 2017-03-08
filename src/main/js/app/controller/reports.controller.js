@@ -258,7 +258,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
 
         var loadLastUpdatedForChartsAndReports = function () {
             var formatlastUpdatedTime = function (date) {
-                return date ? moment(date).format(REPORTS_LAST_UPDATED_TIME_FORMAT) : undefined;
+                return date ? moment(date).locale($scope.locale).format(REPORTS_LAST_UPDATED_TIME_FORMAT) : undefined;
             };
             var projectId = $rootScope.currentUser.selectedProject.id;
             return $q.all({

@@ -26,6 +26,12 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
             });
         };
 
+        $scope.canShowReferralLocations = function () {
+            return _.any($scope.locationNames, function(name) {
+                return $scope.getReferralCount(name) > 0;
+            });
+        };
+
         $scope.getCount = function(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter) {
             var count;
 
@@ -206,7 +212,18 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
                 });
             };
 
-            return getExcludedDataElementsForModule().then(getProgram);
+            var setReferralLocationsFlag = function () {
+                var referralLocationDataElement =  _.chain($scope.program.programStages)
+                    .map('programStageSections').flatten()
+                    .map('programStageDataElements').flatten()
+                    .map('dataElement')
+                    .filter('isIncluded')
+                    .find({ offlineSummaryType: 'referralLocations'}).value();
+
+                $scope.shouldShowReferrals = !!referralLocationDataElement;
+            };
+
+            return getExcludedDataElementsForModule().then(getProgram).then(setReferralLocationsFlag);
         };
 
         var getOptionSetMapping = function () {
@@ -295,6 +312,8 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
         };
 
         var init = function() {
+            $scope.loading = true;
+
             return $q.all([loadOriginsOrgUnits(), loadProgram(), getOptionSetMapping(), getReferralLocations()]).then(function() {
                 var orgUnitIdsAssociatedToEvents = _.map($scope.originOrgUnits, "id").concat($scope.selectedModule.id);
                 return programEventRepository.getEventsForPeriod($scope.program.id, orgUnitIdsAssociatedToEvents, getPeriod()).then(function(events) {
@@ -306,6 +325,8 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
                     getAssociatedDataSets();
                     getDescriptionsForProceduresPerformed();
                 });
+            }).finally(function () {
+                $scope.loading = false;
             });
         };
 
