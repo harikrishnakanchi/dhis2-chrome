@@ -1,4 +1,4 @@
-define(["metadataService", "properties", "angularMocks", "moment", "dhisUrl", "metadataConf"], function(MetadataService, properties, mocks, moment, dhisUrl, metadataConf) {
+define(["metadataService", "properties", "angularMocks", "moment", "dhisUrl", "metadataConf", "pagingUtils"], function(MetadataService, properties, mocks, moment, dhisUrl, metadataConf, pagingUtils) {
     describe("Metadata service", function() {
         var httpBackend, http, metadataService;
 
@@ -71,6 +71,20 @@ define(["metadataService", "properties", "angularMocks", "moment", "dhisUrl", "m
                 metadataService.getMetadataOfType(type, lastUpdated);
                 httpBackend.flush();
             });
+
+            it('should paginate the given entity type which has pagination params', function () {
+                var type = "indicators";
+                var fields = metadataConf.fields[type];
+                var lastUpdated = "someTime";
+                spyOn(pagingUtils, 'paginateRequest').and.callThrough();
+
+                var url = dhisUrl[type] + "?fields=" + fields + "&filter=lastUpdated:ge:" + lastUpdated  + "&page=1&pageSize=100&paging=true&totalPages=true";
+                httpBackend.expectGET(encodeURI(url)).respond(200, {"indicators": ""});
+                metadataService.getMetadataOfType(type, lastUpdated);
+                expect(pagingUtils.paginateRequest).toHaveBeenCalled();
+                httpBackend.flush();
+            });
         });
+
     });
 });
