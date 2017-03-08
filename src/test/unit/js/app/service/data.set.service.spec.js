@@ -1,4 +1,4 @@
-define(["dataSetService", "angularMocks", "properties", "metadataConf"], function(DatasetService, mocks, properties, metadataConf) {
+define(["dataSetService", "angularMocks", "properties", "metadataConf", "pagingUtils"], function(DatasetService, mocks, properties, metadataConf, pagingUtils) {
     describe("dataset service", function() {
         var http, httpBackend, datasetService, q;
 
@@ -14,9 +14,10 @@ define(["dataSetService", "angularMocks", "properties", "metadataConf"], functio
             httpBackend.verifyNoOutstandingRequest();
         });
 
-        it("should download datasets", function() {
-
+        it("should download datasets with pagination", function() {
             var actualDataSets;
+            spyOn(pagingUtils, 'paginateRequest').and.callThrough();
+
             datasetService.getAll().then(function(data) {
                 actualDataSets = data;
             });
@@ -25,11 +26,12 @@ define(["dataSetService", "angularMocks", "properties", "metadataConf"], functio
                 'id': 'ds1'
             }];
 
-            var url = properties.dhis.url + "/api/dataSets.json?fields=" + metadataConf.fields.dataSets + "&paging=false";
+            var url = properties.dhis.url + "/api/dataSets.json?fields=" + metadataConf.fields.dataSets + "&page=1&paging=true&totalPages=true";
             var responsePayload = {
                 'dataSets': datasets
             };
 
+            expect(pagingUtils.paginateRequest).toHaveBeenCalled();
             httpBackend.expectGET(encodeURI(url)).respond(200, responsePayload);
             httpBackend.flush();
 
@@ -42,7 +44,7 @@ define(["dataSetService", "angularMocks", "properties", "metadataConf"], functio
                 'dataSets': []
             };
 
-            var url = properties.dhis.url + "/api/dataSets.json?fields="+ metadataConf.fields.dataSets +"&filter=lastUpdated:gte:" + lastUpdatedTime + "&paging=false";
+            var url = properties.dhis.url + "/api/dataSets.json?fields="+ metadataConf.fields.dataSets +"&filter=lastUpdated:gte:" + lastUpdatedTime + "&page=1&paging=true&totalPages=true";
             datasetService.getAll(lastUpdatedTime);
 
             httpBackend.expectGET(encodeURI(url)).respond(200, responsePayload);
