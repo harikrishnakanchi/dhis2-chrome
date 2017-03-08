@@ -1,4 +1,4 @@
-define(["orgUnitGroupService", "angularMocks", "properties", "metadataConf"], function(OrgUnitGroupService, mocks, properties, metadataConf) {
+define(["orgUnitGroupService", "angularMocks", "properties", "metadataConf", "pagingUtils"], function(OrgUnitGroupService, mocks, properties, metadataConf, pagingUtils) {
     describe("orgUnitGroupService", function() {
         var http, httpBackend, orgUnitGroupService, q, orgUnitGroupFields;
 
@@ -29,17 +29,20 @@ define(["orgUnitGroupService", "angularMocks", "properties", "metadataConf"], fu
             httpBackend.flush();
         });
 
-        it("should get all org unit groups", function() {
-            orgUnitGroupService.getAll();
-            var url = properties.dhis.url + "/api/organisationUnitGroups.json?fields=id,name&paging=false";
+        it("should get all org unit groups with pagination", function() {
+            var url = properties.dhis.url + "/api/organisationUnitGroups.json?fields=id,name&page=1&paging=true&totalPages=true";
+            spyOn(pagingUtils, 'paginateRequest').and.callThrough();
 
+            orgUnitGroupService.getAll();
+
+            expect(pagingUtils.paginateRequest).toHaveBeenCalled();
             httpBackend.expectGET(url).respond(200, "ok");
             httpBackend.flush();
         });
 
         it("should get all org unit groups since lastUpdated", function() {
             var lastUpdatedTime = "2014-12-30T09:13:41.092Z";
-            var url = properties.dhis.url + "/api/organisationUnitGroups.json?fields=id,name&filter=lastUpdated:gte:2014-12-30T09:13:41.092Z&paging=false";
+            var url = properties.dhis.url + "/api/organisationUnitGroups.json?fields=id,name&filter=lastUpdated:gte:2014-12-30T09:13:41.092Z&page=1&paging=true&totalPages=true";
 
             orgUnitGroupService.getAll(lastUpdatedTime);
             httpBackend.expectGET(url).respond(200, "ok");
