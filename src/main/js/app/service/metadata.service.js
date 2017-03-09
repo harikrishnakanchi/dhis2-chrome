@@ -29,7 +29,12 @@ define(["dhisUrl", "moment", "properties", "metadataConf", "pagingUtils"], funct
             users: {
                 paging: true,
                 pageSize: 25
-            }};
+            },
+            translations: {
+                paging: true,
+                pageSize: 300
+            }
+        };
 
         this.loadMetadataFromFile = function(lastUpdatedTime) {
             return $http.get("data/metadata.json").then(function(response) {
