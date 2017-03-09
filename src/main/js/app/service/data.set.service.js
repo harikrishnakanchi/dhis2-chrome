@@ -14,7 +14,7 @@ define(["dhisUrl", "metadataConf", "pagingUtils", "properties"], function(dhisUr
             var url = dhisUrl.dataSets + ".json";
             var params = {
                 fields: metadataConf.fields.dataSets.params,
-                paging: true
+                paging: metadataConf.fields.dataSets.paging
             };
             if (lastUpdatedTime)
                 params.filter = "lastUpdated:gte:" + lastUpdatedTime;

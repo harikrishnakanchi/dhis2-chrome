@@ -40,7 +40,7 @@ define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], funct
 
             var params = {
                 fields: metadataConf.fields.organisationUnits.params,
-                paging: true,
+                paging: metadataConf.fields.organisationUnits.paging,
                 pageSize: metadataConf.fields.organisationUnits.pageSize
             };
             if (lastUpdatedTime) {

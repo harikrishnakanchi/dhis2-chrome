@@ -20,7 +20,7 @@ define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], funct
             var url = dhisUrl.orgUnitGroups + '.json';
             var params = {
                 fields: metadataConf.fields.organisationUnitGroups.params,
-                paging: true
+                paging: metadataConf.fields.organisationUnitGroups.paging
             };
 
             if (lastUpdatedTime) {

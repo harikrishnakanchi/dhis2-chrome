@@ -32,7 +32,7 @@ define(["dhisUrl", "moment", "properties", "metadataConf", "pagingUtils"], funct
 
         this.getMetadataOfType = function (type, lastUpdated) {
             var url = dhisUrl[type];
-            var params = {fields: metadataConf.fields[type].params, paging: true};
+            var params = {fields: metadataConf.fields[type].params, paging: metadataConf.fields[type].paging};
             if (lastUpdated) {
                 params.filter = 'lastUpdated:ge:' + lastUpdated;
             }
