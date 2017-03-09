@@ -21,7 +21,7 @@ define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], funct
                 filter: _.map(orgUnitIds, function (orgUnitId) {
                     return 'id:eq:' + orgUnitId;
                 }),
-                fields: metadataConf.fields.organisationUnits,
+                fields: metadataConf.fields.organisationUnits.params,
                 paging: false
             };
             return $http.get(url, {params: params}).then(function (response) {
@@ -39,9 +39,9 @@ define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], funct
             var url = dhisUrl.orgUnits + '.json';
 
             var params = {
-                fields: metadataConf.fields.organisationUnits,
+                fields: metadataConf.fields.organisationUnits.params,
                 paging: true,
-                pageSize: 150
+                pageSize: metadataConf.fields.organisationUnits.pageSize
             };
             if (lastUpdatedTime) {
                 params.filter = "lastUpdated:gte:" + lastUpdatedTime;

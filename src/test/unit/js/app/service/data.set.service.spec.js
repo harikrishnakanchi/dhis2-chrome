@@ -26,7 +26,7 @@ define(["dataSetService", "angularMocks", "properties", "metadataConf", "pagingU
                 'id': 'ds1'
             }];
 
-            var url = properties.dhis.url + "/api/dataSets.json?fields=" + metadataConf.fields.dataSets + "&page=1&paging=true&totalPages=true";
+            var url = properties.dhis.url + "/api/dataSets.json?fields=" + metadataConf.fields.dataSets.params + "&page=1&paging=true&totalPages=true";
             var responsePayload = {
                 'dataSets': datasets
             };
@@ -44,7 +44,7 @@ define(["dataSetService", "angularMocks", "properties", "metadataConf", "pagingU
                 'dataSets': []
             };
 
-            var url = properties.dhis.url + "/api/dataSets.json?fields="+ metadataConf.fields.dataSets +"&filter=lastUpdated:gte:" + lastUpdatedTime + "&page=1&paging=true&totalPages=true";
+            var url = properties.dhis.url + "/api/dataSets.json?fields="+ metadataConf.fields.dataSets.params +"&filter=lastUpdated:gte:" + lastUpdatedTime + "&page=1&paging=true&totalPages=true";
             datasetService.getAll(lastUpdatedTime);
 
             httpBackend.expectGET(encodeURI(url)).respond(200, responsePayload);

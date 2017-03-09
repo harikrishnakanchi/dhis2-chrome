@@ -15,8 +15,8 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
                 objectStore: function() {}
             };
 
-            orgUnitFields = metadataConf.fields.organisationUnits;
-            metadataConf.fields.organisationUnits = 'orgUnitFields';
+            orgUnitFields = metadataConf.fields.organisationUnits.params;
+            metadataConf.fields.organisationUnits.params = 'orgUnitFields';
 
             spyOn(db, "objectStore").and.returnValue(mockOrgStore);
             spyOn(mockOrgStore, "upsert").and.returnValue(utils.getPromise(q, "someId"));
@@ -25,7 +25,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
         }));
 
         afterEach(function() {
-            metadataConf.fields.organisationUnits = orgUnitFields;
+            metadataConf.fields.organisationUnits.params = orgUnitFields;
             httpBackend.verifyNoOutstandingExpectation();
             httpBackend.verifyNoOutstandingRequest();
         });

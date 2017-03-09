@@ -8,7 +8,7 @@ define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], funct
                 filter: _.map(orgUnitGroupIds, function (orgUnitGroupId) {
                     return 'id:eq:' + orgUnitGroupId;
                 }),
-                fields: metadataConf.fields.organisationUnitGroups,
+                fields: metadataConf.fields.organisationUnitGroups.params,
                 paging: false
             };
             return $http.get(url, {params: params}).then(function (response) {
@@ -19,7 +19,7 @@ define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], funct
         this.getAll = function (lastUpdatedTime) {
             var url = dhisUrl.orgUnitGroups + '.json';
             var params = {
-                fields: metadataConf.fields.organisationUnitGroups,
+                fields: metadataConf.fields.organisationUnitGroups.params,
                 paging: true
             };
 

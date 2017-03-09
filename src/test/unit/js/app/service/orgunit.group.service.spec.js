@@ -6,13 +6,13 @@ define(["orgUnitGroupService", "angularMocks", "properties", "metadataConf", "pa
             http = $http;
             httpBackend = $httpBackend;
             q = $q;
-            orgUnitGroupFields = metadataConf.fields.organisationUnitGroups;
-            metadataConf.fields.organisationUnitGroups = "id,name";
+            orgUnitGroupFields = metadataConf.fields.organisationUnitGroups.params;
+            metadataConf.fields.organisationUnitGroups.params = "id,name";
             orgUnitGroupService = new OrgUnitGroupService(http, q);
         }));
 
         afterEach(function() {
-            metadataConf.fields.organisationUnitGroups = orgUnitGroupFields;
+            metadataConf.fields.organisationUnitGroups.params = orgUnitGroupFields;
             httpBackend.verifyNoOutstandingExpectation();
             httpBackend.verifyNoOutstandingRequest();
         });

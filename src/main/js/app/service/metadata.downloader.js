@@ -44,7 +44,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 name: 'categories',
                 url: dhisUrl.categories,
                 params: {
-                    fields: metadataConf.fields.categories
+                    fields: metadataConf.fields.categories.params
                 },
                 upsertFn: function (response) {
                     return metadataRepository.upsertMetadataForEntity(response, 'categories');
@@ -53,7 +53,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 name: 'categoryCombos',
                 url: dhisUrl.categoryCombos,
                 params: {
-                    fields: metadataConf.fields.categoryCombos
+                    fields: metadataConf.fields.categoryCombos.params
                 },
                 upsertFn: function (response) {
                     return metadataRepository.upsertMetadataForEntity(response, 'categoryCombos');
@@ -62,8 +62,8 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 name: 'categoryOptionCombos',
                 url: dhisUrl.categoryOptionCombos,
                 params: {
-                    fields: metadataConf.fields.categoryOptionCombos,
-                    pageSize: 200   // PageSize of 50 : ~12KB
+                    fields: metadataConf.fields.categoryOptionCombos.params,
+                    pageSize: metadataConf.fields.categoryOptionCombos.pageSize
                 },
                 upsertFn: function (response) {
                     return metadataRepository.upsertMetadataForEntity(response, 'categoryOptionCombos');
@@ -72,8 +72,8 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 name: 'categoryOptions',
                 url: dhisUrl.categoryOptions,
                 params: {
-                    fields: metadataConf.fields.categoryOptions,
-                    pageSize: 200   // PageSize of 50 : ~12KB
+                    fields: metadataConf.fields.categoryOptions.params,
+                    pageSize: metadataConf.fields.categoryOptions.pageSize
                 },
                 upsertFn: function (response) {
                     return metadataRepository.upsertMetadataForEntity(response, 'categoryOptions');
@@ -82,7 +82,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 name: 'dataElementGroups',
                 url: dhisUrl.dataElementGroups,
                 params: {
-                    fields: metadataConf.fields.dataElementGroups
+                    fields: metadataConf.fields.dataElementGroups.params
                 },
                 upsertFn: function (response) {
                     return metadataRepository.upsertMetadataForEntity(response, 'dataElementGroups');
@@ -91,8 +91,8 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 name: 'dataElements',
                 url: dhisUrl.dataElements,
                 params: {
-                    fields: metadataConf.fields.dataElements,
-                    pageSize: 100   // PageSize of 50 : ~12KB
+                    fields: metadataConf.fields.dataElements.params,
+                    pageSize: metadataConf.fields.dataElements.pageSize
                 },
                 upsertFn: function (response) {
                     return metadataRepository.upsertMetadataForEntity(response, 'dataElements');
@@ -101,8 +101,8 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 name: 'indicators',
                 url: dhisUrl.indicators,
                 params: {
-                    fields: metadataConf.fields.indicators,
-                    pageSize: 100   // PageSize of 50 : ~8KB
+                    fields: metadataConf.fields.indicators.params,
+                    pageSize: metadataConf.fields.indicators.pageSize
                 },
                 upsertFn: function (response) {
                     return metadataRepository.upsertMetadataForEntity(response, 'indicators');
@@ -111,8 +111,8 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 name: 'programIndicators',
                 url: dhisUrl.programIndicators,
                 params: {
-                    fields: metadataConf.fields.programIndicators,
-                    pageSize: 100   // PageSize of 50 : ~6KB
+                    fields: metadataConf.fields.programIndicators.params,
+                    pageSize: metadataConf.fields.programIndicators.pageSize
                 },
                 upsertFn: function (response) {
                     return metadataRepository.upsertMetadataForEntity(response, 'programIndicators');
@@ -121,7 +121,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 name: 'optionSets',
                 url: dhisUrl.optionSets,
                 params: {
-                    fields: metadataConf.fields.optionSets
+                    fields: metadataConf.fields.optionSets.params
                 },
                 upsertFn: function (response) {
                     return metadataRepository.upsertMetadataForEntity(response, 'optionSets');
@@ -130,7 +130,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 name: 'organisationUnitGroupSets',
                 url: dhisUrl.organisationUnitGroupSets,
                 params: {
-                    fields: metadataConf.fields.organisationUnitGroupSets
+                    fields: metadataConf.fields.organisationUnitGroupSets.params
                 },
                 upsertFn: function (response) {
                     return metadataRepository.upsertMetadataForEntity(response, 'organisationUnitGroupSets');
@@ -139,8 +139,8 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 name: 'sections',
                 url: dhisUrl.sections,
                 params: {
-                    fields: metadataConf.fields.sections,
-                    pageSize: 150   // PageSize of 50 : ~8KB
+                    fields: metadataConf.fields.sections.params,
+                    pageSize: metadataConf.fields.sections.pageSize
                 },
                 upsertFn: function (response) {
                     return metadataRepository.upsertMetadataForEntity(response, 'sections');
@@ -149,8 +149,8 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 name: 'users',
                 url: dhisUrl.users,
                 params: {
-                    fields: metadataConf.fields.users,
-                    pageSize: 25    // PageSize of 50 : ~50KB
+                    fields: metadataConf.fields.users.params,
+                    pageSize: metadataConf.fields.users.pageSize
                 },
                 upsertFn: function (response) {
                     return metadataRepository.upsertMetadataForEntity(response, 'users');
@@ -159,7 +159,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 name: 'userRoles',
                 url: dhisUrl.userRoles,
                 params: {
-                    fields: metadataConf.fields.userRoles
+                    fields: metadataConf.fields.userRoles.params
                 },
                 upsertFn: function (response) {
                     return userRepository.upsertUserRoles(response);
@@ -168,7 +168,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 name: 'organisationUnitGroups',
                 url: dhisUrl.organisationUnitGroups,
                 params: {
-                    fields: metadataConf.fields.organisationUnitGroups
+                    fields: metadataConf.fields.organisationUnitGroups.params
                 },
                 upsertFn: function (response) {
                     return orgUnitGroupRepository.upsertDhisDownloadedData(response);
@@ -177,7 +177,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 name: 'dataSets',
                 url: dhisUrl.dataSets,
                 params: {
-                    fields: metadataConf.fields.dataSets
+                    fields: metadataConf.fields.dataSets.params
                 },
                 upsertFn: function (response) {
                     return dataSetRepository.upsertDhisDownloadedData(response);
@@ -186,7 +186,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 name: 'programs',
                 url: dhisUrl.programs,
                 params: {
-                    fields: metadataConf.fields.programs
+                    fields: metadataConf.fields.programs.params
                 },
                 upsertFn: function (response) {
                     return programRepository.upsertDhisDownloadedData(response);
@@ -195,8 +195,8 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 name: 'organisationUnits',
                 url: dhisUrl.orgUnits,
                 params: {
-                    fields: metadataConf.fields.organisationUnits,
-                    pageSize: 150   //PageSize of 50 : ~ 9KB-10KB
+                    fields: metadataConf.fields.organisationUnits.params,
+                    pageSize: metadataConf.fields.organisationUnits.pageSize
                 },
                 upsertFn: function(response) {
                     return orgUnitRepository.upsertDhisDownloadedData(response);
@@ -221,7 +221,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 name: 'attributes',
                 url: dhisUrl.attributes,
                 params: {
-                    fields: metadataConf.fields.attributes
+                    fields: metadataConf.fields.attributes.params
                 },
                 upsertFn: function (attributes) {
                     return metadataRepository.upsertMetadataForEntity(attributes, 'attributes');
@@ -230,8 +230,8 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 name: 'translations',
                 url: dhisUrl.translations,
                 params: {
-                    fields: metadataConf.fields.translations,
-                    pageSize: 300   //PageSize of 50 : ~2KB - 3KB
+                    fields: metadataConf.fields.translations.params,
+                    pageSize: metadataConf.fields.translations.pageSize
                 },
                 upsertFn: function (response) {
                     return metadataRepository.upsertMetadataForEntity(response, 'translations');

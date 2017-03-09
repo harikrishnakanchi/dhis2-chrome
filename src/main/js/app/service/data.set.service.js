@@ -13,7 +13,7 @@ define(["dhisUrl", "metadataConf", "pagingUtils", "properties"], function(dhisUr
         this.getAll = function (lastUpdatedTime) {
             var url = dhisUrl.dataSets + ".json";
             var params = {
-                fields: metadataConf.fields.dataSets,
+                fields: metadataConf.fields.dataSets.params,
                 paging: true
             };
             if (lastUpdatedTime)
