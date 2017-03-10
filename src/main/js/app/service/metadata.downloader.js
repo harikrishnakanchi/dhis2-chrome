@@ -289,7 +289,10 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
             }, setSystemInfoDetails())
                 .then(updateMetadataChangeLog)
                 .then(deferred.resolve)
-                .catch(deferred.reject);
+                .catch(function (response) {
+                    var data = response.status == 401 ? "productKeyExpired" : "downloadFailed";
+                    deferred.reject(data);
+                });
 
             return deferred.promise;
         };

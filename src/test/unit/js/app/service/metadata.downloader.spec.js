@@ -89,6 +89,15 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
             expect(systemInfoService.getServerDate).toHaveBeenCalled();
         });
 
+        it('should handle when product key is invalid', function () {
+            systemInfoService.getServerDate.and.returnValue(utils.getRejectedPromise(q, {status: 401}));
+            metadataDownloader.run().catch(function (data) {
+                expect(data).toEqual('productKeyExpired');
+            });
+
+            rootScope.$apply();
+        });
+
         it('should get DHIS version', function () {
             metadataDownloader.run();
             rootScope.$apply();

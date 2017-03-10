@@ -13,9 +13,19 @@ define(['platformUtils', 'moment', 'properties', 'lodash'], function (platformUt
                 return $q.reject();
             };
 
-            var failure = function () {
-                retries++;
-                return (retries < properties.metaDataRetryLimit) ? downloadMetadata() : promptForManualRetry();
+            var promptForValidProductKey = function () {
+                $scope.productKeyExpired = true;
+                return $q.reject();
+            };
+
+            var failure = function (data) {
+                if (data == 'productKeyExpired') {
+                    return promptForValidProductKey();
+                }
+                else {
+                    retries++;
+                    return (retries < properties.metaDataRetryLimit) ? downloadMetadata() : promptForManualRetry(data);
+                }
             };
 
             var notify = function (data) {
@@ -33,11 +43,16 @@ define(['platformUtils', 'moment', 'properties', 'lodash'], function (platformUt
             $location.path('/login');
         };
 
+        $scope.redirectToProductKeyPage = function () {
+            $location.path('/productKeyPage');
+        };
+
         $scope.downloadAndUpsertMetadata = function () {
             return downloadMetadata().then(redirectToLogin);
         };
 
         var init = function () {
+            $scope.productKeyExpired = false;
             switch(platformUtils.platform) {
                 case 'web':
                     $scope.showProgressBar = true;
