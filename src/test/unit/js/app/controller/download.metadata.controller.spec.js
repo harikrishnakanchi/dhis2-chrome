@@ -80,6 +80,15 @@ define(['lodash', 'angularMocks', 'utils','properties', 'platformUtils', 'downlo
 
                         expect(metadataDownloader.run).toHaveBeenCalledTimes(properties.metaDataRetryLimit);
                     });
+
+                    it('should show message for invalid product key', function () {
+                        metadataDownloader.run.and.returnValue(utils.getRejectedPromise(q, 'productKeyExpired'));
+
+                        initializeController();
+                        scope.$apply();
+
+                        expect(scope.productKeyExpired).toBeTruthy();
+                    });
                 });
             });
         });
