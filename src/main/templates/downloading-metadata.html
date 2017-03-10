@@ -1,6 +1,6 @@
 <div class="metadata-download {{ layoutDirection.direction }}">
 
-    <div class="progress progress-striped" ng-class="!maxRetriesExceeded && !productKeyExpired ? 'active' : 'stop'" ng-if="showProgressBar">
+    <div class="progress progress-striped" ng-class="!maxRetriesExceeded ? 'active' : 'stop'" ng-if="showProgressBar && !productKeyExpired">
         <div class="progress-bar progress-bar-primary"  role="progressbar" style="width: {{ progress.percent }}%">
             <span>{{ progress.percent }}% Complete</span>
         </div>
@@ -10,12 +10,13 @@
 
     <h4 ng-if="!showProgressBar" class="text-center">Initializing Praxis&hellip;</h4>
 
-    <div ng-if="productKeyExpired">
-        <div class="alert alert-danger">
-            Download is interrupted because of invalid product key. Please submit the valid product key to continue download, contact {{ supportEmail }} for assistance.
-            <br><br>
-            <button class="btn btn-primary" ng-click="redirectToProductKeyPage()"><b>Go to productKey page</b></button>
-        </div>
+    <div class="jumbotron alert-danger" ng-if="productKeyExpired">
+        <h2>
+            <i class="fa fa-warning"></i>
+            Product key has expired.
+        </h2>
+        <p>Please submit the updated product key to continue download. Contact {{ supportEmail }} for assistance.</p>
+        <p><button class="btn btn-primary btn-md" ng-click="redirectToProductKeyPage()">Update the Product Key</button></p>
     </div>
 
     <div ng-if="maxRetriesExceeded">
