@@ -1,8 +1,8 @@
-define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURItoBlob"], function(d3, _, moment, customAttributes, SVGUtils, dataURItoBlob) {
+define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURItoBlob", "constants"], function(d3, _, moment, customAttributes, SVGUtils, dataURItoBlob, constants) {
     return function($rootScope, $scope, $q, $routeParams, datasetRepository, programRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, filesystemService, changeLogRepository, referralLocationsRepository) {
 
-        var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
-        var REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA = "D MMMM YYYY hh[.]mm A";
+        var REPORTS_LAST_UPDATED_TIME_FORMAT = constants.TIME_FORMAT_12HR,
+            REPORTS_LAST_UPDATED_TIME_24HR_FORMAT = constants.TIME_FORMAT_24HR;
         var DEFAULT_SERVICE_CODE = 'noServiceCode';
 
         var NVD3_CHART_OPTIONS = {
@@ -84,8 +84,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
 
             var getPNGFileName = function() {
                 if (lastUpdatedTime) {
-                    var formattedDate = moment(lastUpdatedTime, REPORTS_LAST_UPDATED_TIME_FORMAT).format(REPORTS_LAST_UPDATED_TIME_FORMAT_WITHOUT_COMMA);
-                    lastUpdatedTimeDetails = '[updated ' + formattedDate + ']';
+                    lastUpdatedTimeDetails = '[updated ' + lastUpdatedTime + ']';
                 }
                 else {
                     lastUpdatedTimeDetails = moment().format("DD-MMM-YYYY");
@@ -256,10 +255,12 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             });
         };
 
+        var formatLastUpdatedTime = function (date) {
+            var timeFormat = $scope.locale == 'fr' ? REPORTS_LAST_UPDATED_TIME_24HR_FORMAT : REPORTS_LAST_UPDATED_TIME_FORMAT;
+            return date ? moment.utc(date).local().locale($scope.locale).format(timeFormat) : undefined;
+        };
+
         var loadLastUpdatedForChartsAndReports = function () {
-            var formatlastUpdatedTime = function (date) {
-                return date ? moment(date).locale($scope.locale).format(REPORTS_LAST_UPDATED_TIME_FORMAT) : undefined;
-            };
             var projectId = $rootScope.currentUser.selectedProject.id;
             return $q.all({
                 monthlyChartsLastUpdated: changeLogRepository.get('monthlyChartData:' + projectId),
@@ -267,10 +268,10 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 monthlyPivotTableLastUpdated: changeLogRepository.get('monthlyPivotTableData:' + projectId),
                 weeklyPivotTableDataLastUpdated: changeLogRepository.get('weeklyPivotTableData:' + projectId)
             }).then(function (data) {
-                $scope.updatedForWeeklyChart = formatlastUpdatedTime(data.weeklyChartsLastUpdated);
-                $scope.updatedForWeeklyPivotTable = formatlastUpdatedTime(data.weeklyPivotTableDataLastUpdated);
-                $scope.updatedForMonthlyChart = formatlastUpdatedTime(data.monthlyChartsLastUpdated);
-                $scope.updatedForMonthlyPivotTable = formatlastUpdatedTime(data.monthlyPivotTableLastUpdated);
+                $scope.updatedForWeeklyChart = formatLastUpdatedTime(data.weeklyChartsLastUpdated);
+                $scope.updatedForWeeklyPivotTable = formatLastUpdatedTime(data.weeklyPivotTableDataLastUpdated);
+                $scope.updatedForMonthlyChart = formatLastUpdatedTime(data.monthlyChartsLastUpdated);
+                $scope.updatedForMonthlyPivotTable = formatLastUpdatedTime(data.monthlyPivotTableLastUpdated);
             });
         };
 

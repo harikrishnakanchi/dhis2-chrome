@@ -200,7 +200,10 @@ require.config({
         "directives": "app/directives/directives",
         "pivotTableDirective": "app/directives/pivot.table",
         "lockedTableHeader": "app/directives/locked.table.header",
-        "descriptionPopup": "app/directives/description.popup"
+        "descriptionPopup": "app/directives/description.popup",
+
+        //Constants
+        "constants": "app/constants/constants"
     },
     waitSeconds: 0,
     shim: {

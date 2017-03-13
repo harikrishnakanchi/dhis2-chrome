@@ -1,6 +1,7 @@
-define(['moment', 'excelBuilder'], function (moment, excelBuilder) {
+define(['moment', 'excelBuilder', 'constants'], function (moment, excelBuilder, constants) {
     return function ($rootScope, $q, $scope, $routeParams, orgUnitRepository, changeLogRepository, pivotTableRepository, filesystemService, translationsService, pivotTableExportBuilder) {
-        var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
+        var REPORTS_LAST_UPDATED_TIME_FORMAT = constants.TIME_FORMAT_12HR,
+            REPORTS_LAST_UPDATED_TIME_24HR_FORMAT = constants.TIME_FORMAT_24HR;
 
         var buildSpreadSheetContent = function () {
             var spreadSheetContent,
@@ -51,7 +52,13 @@ define(['moment', 'excelBuilder'], function (moment, excelBuilder) {
             var getLastUpdatedTimeForOpUnitPivotTables = function () {
                 var changeLogKey = 'monthlyPivotTableData:'.concat(selectedProjectId);
                 return changeLogRepository.get(changeLogKey).then(function (lastUpdatedTime) {
-                    $scope.lastUpdatedTimeForOpUnitReport = lastUpdatedTime ? moment(lastUpdatedTime).locale($scope.locale).format(REPORTS_LAST_UPDATED_TIME_FORMAT) : undefined;
+
+                    var formatLastUpdatedTime = function (date) {
+                        var timeFormat = $scope.locale == 'fr' ? REPORTS_LAST_UPDATED_TIME_24HR_FORMAT : REPORTS_LAST_UPDATED_TIME_FORMAT;
+                        return date ? moment.utc(date).local().locale($scope.locale).format(timeFormat) : undefined;
+                    };
+
+                    $scope.lastUpdatedTimeForOpUnitReport = formatLastUpdatedTime(lastUpdatedTime);
                 });
             };
 
