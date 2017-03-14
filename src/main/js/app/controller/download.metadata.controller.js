@@ -39,7 +39,7 @@ define(['platformUtils', 'moment', 'properties', 'lodash'], function (platformUt
 
         var init = function () {
             switch(platformUtils.platform) {
-                case 'web':
+                case 'pwa':
                     $scope.showProgressBar = true;
                     return $scope.downloadAndUpsertMetadata();
                 case 'chrome':

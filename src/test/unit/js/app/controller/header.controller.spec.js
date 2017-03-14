@@ -188,8 +188,8 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
                         };
                     });
 
-                    it('should turn on sync and update app for web', function () {
-                        platformUtils.platform = 'web';
+                    it('should turn on sync and update app for PWA', function () {
+                        platformUtils.platform = 'pwa';
                         deferredPromise.resolve(true);
                         scope.$apply();
                         scope.toggleSync();
