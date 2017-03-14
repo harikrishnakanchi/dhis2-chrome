@@ -38,13 +38,25 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
                 }]
             }));
 
-            spyOn(userRepository, "getUserCredentials").and.returnValue(utils.getPromise(q, {
-                "username": "superadmin",
-                "password": "7536ad6ce98b48f23a1bf8f74f53da83",
-                "userRoles": [{
-                    "name": "Superadmin"
-                }]
-            }));
+            spyOn(userRepository, "getUserCredentials").and.callFake(function (username) {
+                switch (username) {
+                    case 'superadmin':
+                        return {
+                            username: username,
+                            password: '3b591ef0de9a756768f1c48b25d0a8b1976c1cf711ecfc536b94fa3389c43e31'
+                        };
+                    case 'projectadmin':
+                        return {
+                            username: username,
+                            password: '458c59482c64314eed412766e691151071aacdbc8151d66155e1d483c6bc39a4'
+                        };
+                    default:
+                        return {
+                            username: username,
+                            password: 'e1211dfe98ef012c9a7eb8522675ce7bff75c61055163f6e23f7620e74798da3'
+                        };
+                }
+            });
 
             sessionHelper = new SessionHelper();
             spyOn(sessionHelper, "login").and.returnValue(utils.getPromise(q, {}));
@@ -103,7 +115,6 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         it("should set invalid access as true when their is country level product key and there is no common org unit for coordinator level approver", function () {
             initializeController();
             scope.username = "project_user";
-            scope.password = "msfuser";
 
             userRepository.getUser.and.returnValue(utils.getPromise(q, {
                 "id": "xYRvx4y7Gm9",
@@ -185,15 +196,12 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         it("should login project admin user with valid credentials and redirect to orgunits", function () {
             initializeController();
             scope.username = "projectadmin";
-            scope.password = "password";
+            scope.password = "msfprojectadmin";
 
-            userRepository.getUserCredentials.and.returnValue(utils.getPromise(q, {
+            userRepository.getUserCredentials.and.returnValue({
                 "username": "projectadmin",
-                "password": "5f4dcc3b5aa765d61d8327deb882cf99",
-                "userRoles": [{
-                    "name": "Projectadmin"
-                }]
-            }));
+                "password": "458c59482c64314eed412766e691151071aacdbc8151d66155e1d483c6bc39a4"
+            });
 
             rootScope.hasRoles.and.returnValue(true);
 
@@ -220,15 +228,12 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         it("should login project user with valid credentials and redirect to dashboard", function () {
             initializeController();
             scope.username = "someProjectUser";
-            scope.password = "msfuser";
+            scope.password = "msfprojectuser";
 
-            userRepository.getUserCredentials.and.returnValue(utils.getPromise(q, {
+            userRepository.getUserCredentials.and.returnValue({
                 "username": "project_user",
-                "password": "caa63a86bbc63b2ae67ef0a069db7fb9",
-                "userRoles": [{
-                    "name": "Coordination Level Approver"
-                }]
-            }));
+                "password": "e1211dfe98ef012c9a7eb8522675ce7bff75c61055163f6e23f7620e74798da3"
+            });
             scope.login();
             scope.$apply();
 
@@ -239,7 +244,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
         it("should not login project user with invalid password", function () {
             initializeController();
             scope.username = "someProjectUser";
-            scope.password = "msfuser1234";
+            scope.password = "invalid password";
 
             scope.login();
             scope.$apply();
@@ -289,13 +294,10 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             scope.username = "projectadmin";
             scope.password = "password";
 
-            userRepository.getUserCredentials.and.returnValue(utils.getPromise(q, {
+            userRepository.getUserCredentials.and.returnValue({
                 "username": "projectadmin",
-                "password": "5f4dcc3b5aa765d61d8327deb882cf99",
-                "userRoles": [{
-                    "name": "Projectadmin"
-                }]
-            }));
+                "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+            });
             scope.login();
             scope.$apply();
 
@@ -313,13 +315,10 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             scope.username = "ss153";
             scope.password = "password";
 
-            userRepository.getUserCredentials.and.returnValue(utils.getPromise(q, {
+            userRepository.getUserCredentials.and.returnValue({
                 "username": "ss153",
-                "password": "5f4dcc3b5aa765d61d8327deb882cf99",
-                "userRoles": [{
-                    "name": "Project Level Approver"
-                }]
-            }));
+                "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+            });
 
             var previousUser = {
                 "id": "xYRvx4y7Gm9",
@@ -383,12 +382,9 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
 
                 var currentUserCredentials = {
                     "username": "current user",
-                    "password": "7536ad6ce98b48f23a1bf8f74f53da83",
-                    "userRoles": [{
-                        "name": "Superadmin"
-                    }]
+                    "password": "3b591ef0de9a756768f1c48b25d0a8b1976c1cf711ecfc536b94fa3389c43e31"
                 };
-                userRepository.getUserCredentials.and.returnValue(utils.getPromise(q, currentUserCredentials));
+                userRepository.getUserCredentials.and.returnValue(currentUserCredentials);
 
                 scope.login();
                 scope.$apply();

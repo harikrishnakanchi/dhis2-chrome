@@ -1,7 +1,6 @@
-define(["userRepository", "angularMocks", "utils"], function(UserRepository, mocks, utils) {
+define(["userRepository", "angularMocks", "utils", "properties", "platformUtils"], function(UserRepository, mocks, utils, properties, platformUtils) {
     describe("user repository", function() {
         var repo, mockStore, mockDB, rootScope, users, projUser1, projUser2, project1, q, userRepo;
-
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
@@ -52,36 +51,6 @@ define(["userRepository", "angularMocks", "utils"], function(UserRepository, moc
             mockStore = mockDB.objectStore;
             repo = new UserRepository(mockDB.db);
             rootScope = $rootScope;
-
-
-            var superadmin = {
-                "username": "superadmin",
-                "password": "7536ad6ce98b48f23a1bf8f74f53da83",
-                "userRoles": [{
-                    "name": "Superadmin"
-                }]
-            };
-
-            var otherUser = {
-                "username": "project_user",
-                "password": "caa63a86bbc63b2ae67ef0a069db7fb9",
-                "userRoles": [{
-                    "name": "Coordination Level Approver"
-                }]
-            };
-
-            var projectadmin = {
-                "username": "projectadmin",
-                "password": "5f4dcc3b5aa765d61d8327deb882cf99",
-                "userRoles": [{
-                    "name": "Projectadmin"
-                }]
-            };
-
-            var localUserCredentials = [superadmin, projectadmin, otherUser];
-            mockDB = utils.getMockDB(q, superadmin, localUserCredentials);
-            userRepo = new UserRepository(mockDB.db);
-
         }));
 
         it("should upsert new users", function() {
@@ -123,7 +92,6 @@ define(["userRepository", "angularMocks", "utils"], function(UserRepository, moc
             rootScope.$apply();
         });
 
-
         it("should get user from users store", function() {
             var expected = {
                 "userCredentials": {
@@ -138,20 +106,6 @@ define(["userRepository", "angularMocks", "utils"], function(UserRepository, moc
                expect(user).toEqual(expected);
            });
             rootScope.$apply();
-        });
-
-        it("should get user credentials for superadmin from local user credentials store", function() {
-            var expected = {
-                "username": "superadmin",
-                "password": "7536ad6ce98b48f23a1bf8f74f53da83",
-                "userRoles": [{
-                    "name": "Superadmin"
-                }]
-            };
-
-            userRepo.getUserCredentials("superadmin").then(function(userCredentials){
-               expect(userCredentials).toEqual(expected);
-            });
         });
 
         it('should get specified userRoles by role name', function () {
@@ -170,6 +124,42 @@ define(["userRepository", "angularMocks", "utils"], function(UserRepository, moc
                 expect(roles).toEqual([userRolesFromDb[0]]);
             });
             rootScope.$apply();
+        });
+
+        describe('userCredentials', function () {
+            var userRepository;
+
+            beforeEach(function () {
+                platformUtils.platform = 'pwa';
+                userRepository = new UserRepository();
+            });
+
+            it("should get user credentials for superadmin", function() {
+                var expectedCredentials = {
+                    username: 'superadmin',
+                    password: properties.organisationSettings.userCredentials.pwa.superadmin
+                };
+
+                expect(userRepository.getUserCredentials('superadmin')).toEqual(expectedCredentials);
+            });
+
+            it("should get user credentials for projectadmin", function() {
+                var expectedCredentials = {
+                    username: 'projectadmin',
+                    password: properties.organisationSettings.userCredentials.pwa.projectadmin
+                };
+
+                expect(userRepository.getUserCredentials('projectadmin')).toEqual(expectedCredentials);
+            });
+
+            it("should get user credentials for project user", function() {
+                var expectedCredentials = {
+                    username: 'some_user',
+                    password: properties.organisationSettings.userCredentials.pwa.project_user
+                };
+
+                expect(userRepository.getUserCredentials('some_user')).toEqual(expectedCredentials);
+            });
         });
     });
 });

@@ -1,4 +1,4 @@
-define(["lodash"], function(_) {
+define(["lodash", "properties", "platformUtils"], function(_, properties, platformUtils) {
     return function(db) {
         this.upsert = function(user) {
             var dhisUser = _.cloneDeep(user);
@@ -35,12 +35,9 @@ define(["lodash"], function(_) {
         };
 
         this.getUserCredentials = function(username) {
-            var userCredentialsStore = db.objectStore("localUserCredentials");
-
-            if (username === "superadmin" || username === "projectadmin")
-                return userCredentialsStore.find(username);
-            else
-                return userCredentialsStore.find("project_user");
+            var credentials = properties.organisationSettings.userCredentials[platformUtils.platform];
+            var userPassword = (username === "superadmin" || username === "projectadmin") ? credentials[username] : credentials.project_user;
+            return { username: username, password: userPassword };
         };
 
         this.getUserRoles = function (roleNames) {
