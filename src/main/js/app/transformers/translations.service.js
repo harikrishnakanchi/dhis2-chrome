@@ -98,8 +98,9 @@ define(['lodash'], function(_){
             return _.map(arrayOfObjectsToBeTranslated, function (objectToBeTranslated) {
 
                 _.each(TRANSLATABLE_OBJECT_PROPERTIES, function (property) {
-                    if(objectToBeTranslated[property]) {
-                        objectToBeTranslated[property] = getTranslationFromObject(objectToBeTranslated, property, objectToBeTranslated[property]);
+                    var translationValue = getTranslationFromObject(objectToBeTranslated, property);
+                    if(translationValue) {
+                        objectToBeTranslated[property] = translationValue;
                     }
                 });
 
@@ -117,8 +118,9 @@ define(['lodash'], function(_){
         var translateObject = function (objectToBeTranslated) {
 
             _.each(TRANSLATABLE_OBJECT_PROPERTIES, function (property) {
-                if (objectToBeTranslated[property]) {
-                    objectToBeTranslated[property] = getTranslationFromObject(objectToBeTranslated, property, objectToBeTranslated[property]);
+                var translationValue = getTranslationFromObject(objectToBeTranslated, property);
+                if (translationValue) {
+                    objectToBeTranslated[property] = translationValue;
                 }
             });
 

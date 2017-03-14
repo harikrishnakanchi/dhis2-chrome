@@ -67,6 +67,15 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
             initialiseTranslationsServiceForLocale(FRENCH);
             expect(translationsService.translate(object).name).toEqual('someFrenchNameA');
         });
+
+        it('should add translated value if attribute is not present in original object', function () {
+            var object = {
+                id: 'someIdD',
+                name: 'someName'
+            };
+            initialiseTranslationsServiceForLocale(FRENCH);
+            expect(translationsService.translate(object).description).toEqual('someFrenchDescriptionD');
+        });
         
         it('should translate each element if object is an array', function () {
             var array = [{
