@@ -1,4 +1,4 @@
-define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, moment, _) {
+define(["dhisUrl", "moment", "lodashUtils"], function(dhisUrl, moment, _) {
     return function($http, $q) {
 
         var projectSettingsPrefix = "projectSettings_";
