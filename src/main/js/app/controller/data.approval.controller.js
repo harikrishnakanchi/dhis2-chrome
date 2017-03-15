@@ -218,8 +218,14 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
             $scope.isOfflineApproval = false;
 
             var loadAssociatedOrgUnitsAndPrograms = function() {
+                var isGeographicOriginDatasetAssociated = function (originOrgUnits) {
+                    return _.every(originOrgUnits, function (originOrgUnit) {
+                        return _.get(originOrgUnit, 'dataSets.length', 0) > 0;
+                    });
+                };
+
                 return orgUnitRepository.findAllByParent([$scope.selectedModule.id]).then(function(originOrgUnits) {
-                    $scope.moduleAndOriginOrgUnits = [$scope.selectedModule].concat(originOrgUnits);
+                    $scope.moduleAndOriginOrgUnits = [$scope.selectedModule].concat(isGeographicOriginDatasetAssociated(originOrgUnits) ? originOrgUnits : []);
                     $scope.originOrgUnits = originOrgUnits;
                     var orgUnitIdAssociatedToProgram = _.get(originOrgUnits[0], 'id') || $scope.selectedModule.id;
                     return programRepository.getProgramForOrgUnit(orgUnitIdAssociatedToProgram).then(function(program) {

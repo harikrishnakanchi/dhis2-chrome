@@ -433,8 +433,14 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             };
 
             var loadAssociatedOrgUnitsAndPrograms = function() {
+                var isGeographicOriginDatasetAssociated = function (originOrgUnits) {
+                    return _.every(originOrgUnits, function (originOrgUnit) {
+                        return _.get(originOrgUnit, 'dataSets.length', 0) > 0;
+                    });
+                };
+
                 return orgUnitRepository.findAllByParent([$scope.selectedModule.id]).then(function(originOrgUnits) {
-                    $scope.moduleAndOriginOrgUnits = [$scope.selectedModule].concat(originOrgUnits);
+                    $scope.moduleAndOriginOrgUnits = [$scope.selectedModule].concat(isGeographicOriginDatasetAssociated(originOrgUnits) ? originOrgUnits : []);
                     $scope.originOrgUnits = originOrgUnits;
                 });
             };
