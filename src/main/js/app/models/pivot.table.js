@@ -28,8 +28,9 @@ define(['lodash'], function (_) {
         this.geographicOriginReport = this.serviceCode == 'GeographicOrigin';
         this.referralLocationReport = this.serviceCode == 'ReferralLocation';
         this.opUnitReport = this.serviceCode == 'OpUnitReport';
-        this.monthlyReport = isMonthlyReport(config.relativePeriods);
-        this.weeklyReport = !this.monthlyReport;
+        this.monthlyReport = isReportOfType(config.relativePeriods, "Month");
+        this.weeklyReport = isReportOfType(config.relativePeriods, "Week");
+        this.yearlyReport = !(this.monthlyReport || this.weeklyReport);
         this.hideWeeks = hideWeeks(this.dataDimensionItems);
 
         this.displayPosition = parseDisplayPosition(this.name);
@@ -45,9 +46,9 @@ define(['lodash'], function (_) {
         return (matches && matches[DISPLAY_POSITION_INDEX]) ? parseInt(matches[DISPLAY_POSITION_INDEX]) : null;
     };
 
-    var isMonthlyReport = function (relativePeriods) {
+    var isReportOfType = function (relativePeriods, typeOfReport) {
         var selectedPeriod = _.findKey(relativePeriods, function(value) { return value; });
-        return _.contains(selectedPeriod, "Month");
+        return _.contains(selectedPeriod, typeOfReport);
     };
 
     var parseServiceCode = function (pivotTableName) {

@@ -10,7 +10,8 @@ define(['chartData', 'analyticsData'], function (ChartData, AnalyticsData) {
                 serviceCode: 'someDataSetServiceCode',
                 displayPosition: 'someDisplayPosition',
                 weeklyChart: 'someBooleanValue',
-                monthlyChart: 'anotherBooleanValue'
+                monthlyChart: 'anotherBooleanValue',
+                yearlyChart: 'someOtherBooleanValue'
             };
             data = 'mockPivotTableData';
             mockAnalyticsData = {
@@ -34,6 +35,7 @@ define(['chartData', 'analyticsData'], function (ChartData, AnalyticsData) {
                 expect(chartData.displayPosition).toEqual(definition.displayPosition);
                 expect(chartData.weeklyChart).toEqual(definition.weeklyChart);
                 expect(chartData.monthlyChart).toEqual(definition.monthlyChart);
+                expect(chartData.yearlyChart).toEqual(definition.yearlyChart);
             });
         });
 

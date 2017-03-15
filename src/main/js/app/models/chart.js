@@ -20,8 +20,9 @@ define([], function() {
         this.displayPosition = parseDisplayPosition(this.name);
 
         this.geographicOriginChart = this.serviceCode == 'GeographicOrigin';
-        this.monthlyChart = isMonthlyChart(config.relativePeriods);
-        this.weeklyChart = !this.monthlyChart;
+        this.monthlyChart = isChartOfType(config.relativePeriods, "Month");
+        this.weeklyChart = isChartOfType(config.relativePeriods, "Week");
+        this.yearlyChart = !(this.monthlyChart || this.weeklyChart);
     };
 
     var parseServiceCode = function(chartName) {
@@ -34,9 +35,9 @@ define([], function() {
         return matches && parseInt(matches[DISPLAY_POSITION_INDEX]);
     };
 
-    var isMonthlyChart = function(relativePeriods) {
+    var isChartOfType = function (relativePeriods, typeOfReport) {
         var selectedPeriod = _.findKey(relativePeriods, function(value) { return value; });
-        return _.contains(selectedPeriod, "Month");
+        return _.contains(selectedPeriod, typeOfReport);
     };
 
     Chart.create = function () {

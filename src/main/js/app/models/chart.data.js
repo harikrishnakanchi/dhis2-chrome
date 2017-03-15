@@ -8,6 +8,7 @@ define(['analyticsData', 'lodash'], function (AnalyticsData, _) {
         this.displayPosition = definition.displayPosition;
         this.weeklyChart = definition.weeklyChart;
         this.monthlyChart = definition.monthlyChart;
+        this.yearlyChart = definition.yearlyChart;
 
         var analyticsData = AnalyticsData.create(definition, data);
 

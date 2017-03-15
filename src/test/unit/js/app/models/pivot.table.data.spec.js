@@ -9,6 +9,7 @@ define(['pivotTableData', 'analyticsData'], function(PivotTableData, AnalyticsDa
                 displayPosition: 'someDisplayPosition',
                 weeklyReport: 'someBooleanValue',
                 monthlyReport: 'anotherBooleanValue',
+                yearlyReport: 'someOtherBooleanValue',
                 sortAscending: 'sortAscendingBooleanValue',
                 sortDescending: 'sortDescendingBooleanValue',
                 sortable: 'sortableBooleanValue',
@@ -38,6 +39,7 @@ define(['pivotTableData', 'analyticsData'], function(PivotTableData, AnalyticsDa
                 expect(pivotTableData.displayPosition).toEqual(definition.displayPosition);
                 expect(pivotTableData.weeklyReport).toEqual(definition.weeklyReport);
                 expect(pivotTableData.monthlyReport).toEqual(definition.monthlyReport);
+                expect(pivotTableData.yearlyReport).toEqual(definition.yearlyReport);
                 expect(pivotTableData.sortAscending).toEqual(definition.sortAscending);
                 expect(pivotTableData.sortDescending).toEqual(definition.sortDescending);
                 expect(pivotTableData.sortable).toEqual(definition.sortable);

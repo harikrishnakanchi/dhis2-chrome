@@ -123,14 +123,26 @@ define(['pivotTable'], function(PivotTable) {
        });
 
        describe('weeklyReport', function() {
-           it('should return true if relativePeriods does not contain Months', function () {
-               pivotTable = PivotTable.create({ relativePeriods: { anotherTimePeriod: true } });
+           it('should return true if relativePeriods contain Weeks', function () {
+               pivotTable = PivotTable.create({ relativePeriods: { last12Weeks: true } });
                expect(pivotTable.weeklyReport).toBeTruthy();
            });
 
-           it('should return false if relativePeriods contains Months', function () {
-               pivotTable = PivotTable.create({ relativePeriods: { last12Months: true } });
+           it('should return false if relativePeriods does not contain Weeks', function () {
+               pivotTable = PivotTable.create({ relativePeriods: { anotherTimePeriod: true, last12Weeks: false } });
                expect(pivotTable.weeklyReport).toBeFalsy();
+           });
+       });
+
+       describe('yearlyReport', function () {
+           it('should return true if relativePeriods does not contain Months or Weeks', function () {
+               pivotTable = PivotTable.create({ relativePeriods: { last12Weeks: false, last12Months: false } });
+               expect(pivotTable.yearlyReport).toBeTruthy();
+           });
+
+           it('should return false if relativePeriods contains Months or Weeks', function () {
+               pivotTable = PivotTable.create({ relativePeriods: { last12Weeks: true } });
+               expect(pivotTable.yearlyReport).toBeFalsy();
            });
        });
 
