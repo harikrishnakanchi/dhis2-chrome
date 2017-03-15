@@ -89,14 +89,17 @@ define(["lodash", "moment"], function(_, moment) {
             var applyDownloadFrequencyStrategy = function(projectId, charts) {
                 var weeklyChangeLogKey = "weeklyChartData:" + projectId,
                     monthlyChangeLogKey = "monthlyChartData:" + projectId,
-                    changeLogKeys = [weeklyChangeLogKey, monthlyChangeLogKey];
+                    yearlyChangeLogKey = "yearlyChartData:" + projectId,
+                    changeLogKeys = [weeklyChangeLogKey, monthlyChangeLogKey, yearlyChangeLogKey];
 
                 return $q.all({
                     weeklyChartsLastDownloaded: changeLogRepository.get(weeklyChangeLogKey),
-                    monthlyChartsLastDownloaded: changeLogRepository.get(monthlyChangeLogKey)
+                    monthlyChartsLastDownloaded: changeLogRepository.get(monthlyChangeLogKey),
+                    yearlyChartsLastDownloaded: changeLogRepository.get(yearlyChangeLogKey)
                 }).then(function(data) {
-                    var isWeeklyChartDownloadedInSameDay = moment().isSame(data.weeklyChartsLastDownloaded, 'day');
-                    var isMonthlyChartDownloadedInSameDay = moment().isSame(data.monthlyChartsLastDownloaded, 'day');
+                    var isWeeklyChartDownloadedInSameDay = moment.utc().isSame(data.weeklyChartsLastDownloaded, 'day');
+                    var isMonthlyChartDownloadedInSameDay = moment.utc().isSame(data.monthlyChartsLastDownloaded, 'day');
+                    var isYearlyChartDownloadedInSameWeek = moment.utc().isSame(data.yearlyChartsLastDownloaded, 'isoWeek');
                     if (data.weeklyChartsLastDownloaded && isWeeklyChartDownloadedInSameDay) {
                         _.remove(charts, { weeklyChart: true });
                         _.pull(changeLogKeys, weeklyChangeLogKey);
@@ -104,6 +107,10 @@ define(["lodash", "moment"], function(_, moment) {
                     if(data.monthlyChartsLastDownloaded && isMonthlyChartDownloadedInSameDay) {
                         _.remove(charts, { monthlyChart: true});
                         _.pull(changeLogKeys, monthlyChangeLogKey);
+                    }
+                    if(data.yearlyChartsLastDownloaded && isYearlyChartDownloadedInSameWeek) {
+                        _.remove(charts, { yearlyChart: true});
+                        _.pull(changeLogKeys, yearlyChangeLogKey);
                     }
                     return $q.when({
                         charts: charts,

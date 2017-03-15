@@ -123,14 +123,17 @@ define(["lodash", "moment"], function(_, moment) {
             var applyDownloadFrequencyStrategy = function(projectId, pivotTables) {
                 var weeklyChangeLogKey = "weeklyPivotTableData:" + projectId,
                     monthlyChangeLogKey = "monthlyPivotTableData:" + projectId,
-                    changeLogKeys = [weeklyChangeLogKey, monthlyChangeLogKey];
+                    yearlyChangeLogKey = "yearlyPivotTableData:" + projectId,
+                    changeLogKeys = [weeklyChangeLogKey, monthlyChangeLogKey, yearlyChangeLogKey];
 
                 return $q.all({
                     weeklyReportsLastUpdated: changeLogRepository.get(weeklyChangeLogKey),
-                    monthlyReportsLastUpdated: changeLogRepository.get(monthlyChangeLogKey)
+                    monthlyReportsLastUpdated: changeLogRepository.get(monthlyChangeLogKey),
+                    yearlyReportsLastUpdated: changeLogRepository.get(yearlyChangeLogKey)
                 }).then(function(data) {
-                    var isMonthlyReportDownloadedInSameDay = moment().isSame(data.monthlyReportsLastUpdated, 'day');
-                    var isWeeklyReportDownloadedSameDay = moment().isSame(data.weeklyReportsLastUpdated, 'day');
+                    var isMonthlyReportDownloadedInSameDay = moment.utc().isSame(data.monthlyReportsLastUpdated, 'day');
+                    var isWeeklyReportDownloadedSameDay = moment.utc().isSame(data.weeklyReportsLastUpdated, 'day');
+                    var isYearlyReportDownloadedSameWeek = moment.utc().isSame(data.yearlyReportsLastUpdated, 'isoWeek');
                     if(data.weeklyReportsLastUpdated && isWeeklyReportDownloadedSameDay) {
                         _.remove(pivotTables, { weeklyReport: true });
                         _.pull(changeLogKeys, weeklyChangeLogKey);
@@ -138,6 +141,10 @@ define(["lodash", "moment"], function(_, moment) {
                     if(data.monthlyReportsLastUpdated && isMonthlyReportDownloadedInSameDay) {
                         _.remove(pivotTables, { monthlyReport: true });
                         _.pull(changeLogKeys, monthlyChangeLogKey);
+                    }
+                    if(data.yearlyReportsLastUpdated && isYearlyReportDownloadedSameWeek) {
+                        _.remove(pivotTables, { yearlyReport: true });
+                        _.pull(changeLogKeys, yearlyChangeLogKey);
                     }
 
                     return $q.when({

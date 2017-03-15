@@ -206,6 +206,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
 
                 expect(changeLogRepository.get).toHaveBeenCalledWith('weeklyPivotTableData:' + mockProjectId);
                 expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyPivotTableData:' + mockProjectId);
+                expect(changeLogRepository.get).toHaveBeenCalledWith('yearlyPivotTableData:' + mockProjectId);
             });
 
             it('should update the lastUpdated time in the changeLog', function () {
@@ -215,6 +216,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
 
                 expect(changeLogRepository.upsert).toHaveBeenCalledWith('weeklyPivotTableData:' + mockProjectId, 'someTime');
                 expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyPivotTableData:' + mockProjectId, 'someTime');
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('yearlyPivotTableData:' + mockProjectId, 'someTime');
             });
 
             it('should continue downloading remaining pivot table data even if one call fails', function() {
@@ -290,6 +292,27 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
 
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
                 expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('monthlyPivotTableData:' + mockProjectId, currentTime.toISOString());
+            });
+
+            it('should not download yearly pivot table data if it has already been downloaded in the same week', function () {
+                var mockMonthlyPivotTable = {
+                    id: 'someId',
+                    monthlyReport: true,
+                    serviceCode: mockDataSet.serviceCode
+                };
+
+                var lastDownlaodedTime =  moment('2016-02-27T01:03:00.000Z').toISOString();
+                currentTime = moment('2016-02-27T02:03:00.000Z');
+                Timecop.freeze(currentTime.toISOString());
+
+                pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, [mockMonthlyPivotTable]));
+                changeLogRepository.get.and.returnValue(utils.getPromise(q, lastDownlaodedTime));
+
+                downloadPivotTableDataConsumer.run();
+                scope.$apply();
+
+                expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
+                expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('yearlyPivotTableData:' + mockProjectId, currentTime.toISOString());
             });
 
             it('should download monthly pivot table if it has not been downloaded in the same day', function() {
