@@ -73,7 +73,7 @@
 
                             message = (locale == 'en' || locale == 'ar') ?
                                 'Praxis is active here. Please close any other open tabs/window' :
-                                'Praxis est actif ici. Fermez tous les autres onglets/fenêtres ouverts';
+                                'Praxis est ouvert ici. Merci de fermer tout autre onglet/page.';
 
                             global.alert(message);
                         });

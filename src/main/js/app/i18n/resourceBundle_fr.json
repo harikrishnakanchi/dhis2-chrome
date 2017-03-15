@@ -355,12 +355,12 @@
     },
     "selectAll": "Sélectionner Tout",
     "unselectAll": "Tout Déselectionner",
-    "praxisTrainingVersionMessage": "PRAXIS TRAINING VERSION",
+    "praxisTrainingVersionMessage": "VERSION EXERCICE DE PRAXIS",
     "sync": {
-        "turnOffMessage": "Synchronisation désactivée",
+        "turnOffMessage": "SYNCHRONISATION DESACTIVEE",
         "turnOn": "Activer la synchronisation",
         "turnOff": "Désactiver la synchronisation",
-        "turnOnConfirmationMessage": "Warning: Turn On Sync will sync data from Praxis to DHIS. It will update Praxis to the latest versions, if available. Are you sure you want to turn Sync On?",
-        "turnOffConfirmationMessage": "Warning: Turn Off Sync will stop Praxis from getting data and uploading data on DHIS. It will stop Praxis versions from update. Are you sure you want to turn Sync Off?"
+        "turnOnConfirmationMessage": "AVERTISSEMENT: \"Activer la synchronisation\" synchronisera vos données Praxis avec DHIS. Cela mettra à jour la dernière version de Praxis si disponible. Etes-vous sûr de vouloir activer la synchronisation ?",
+        "turnOffConfirmationMessage": "AVERTISSEMENT: \"Désactiver la synchronisation\" stoppera la réception et l'envoi de données de Praxis avec DHIS. La dernière version de Praxis, si disponible, ne sera pas mise à jour. Etes vous sûr de vouloir désactiver la synchronisation ?"
     }
 }
