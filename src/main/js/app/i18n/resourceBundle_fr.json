@@ -277,6 +277,7 @@
     "toLabel": "à",
     "weeklyReports": "Rapports hebdomadaires",
     "monthlyReports": "Rapports Mensuels",
+    "yearlyReports": "Yearly Reports",
     "exportRawData": "Exporter des données",
     "exportEventData": "Exporter les cas soumis",
     "weeksToExport": "Nombre de semaines à exporter",
@@ -362,5 +363,6 @@
         "turnOff": "Désactiver la synchronisation",
         "turnOnConfirmationMessage": "Warning: Turn On Sync will sync data from Praxis to DHIS. It will update Praxis to the latest versions, if available. Are you sure you want to turn Sync On?",
         "turnOffConfirmationMessage": "Warning: Turn Off Sync will stop Praxis from getting data and uploading data on DHIS. It will stop Praxis versions from update. Are you sure you want to turn Sync Off?"
-    }
+    },
+    "selectYearLabel": "Select Year :"
 }
