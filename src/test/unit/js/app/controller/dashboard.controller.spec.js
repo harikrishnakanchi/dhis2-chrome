@@ -52,7 +52,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                 spyOn(hustle, "publish");
                 spyOn(hustle, "publishOnce");
 
-                spyOn(dateUtils, "getPeriodRange").and.returnValue([]);
+                spyOn(dateUtils, "getPeriodRangeInWeeks").and.returnValue([]);
 
                 Timecop.install();
                 Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
@@ -269,7 +269,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
             describe('load dashboard', function() {
 
                 it('should create module data blocks for project', function() {
-                    dateUtils.getPeriodRange.and.returnValue(["2014W01", "2014W02", "2014W03"]);
+                    dateUtils.getPeriodRangeInWeeks.and.returnValue(["2014W01", "2014W02", "2014W03"]);
                     moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, []));
 
                     dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, anchorScroll, approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility, dataSyncFailureRepository);

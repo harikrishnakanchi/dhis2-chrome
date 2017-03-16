@@ -62,23 +62,28 @@ define(['dateUtils', 'moment', 'timecop'], function(dateUtils, moment, timecop) 
             });
         });
 
-        describe('getPeriodRange', function() {
+        describe('getPeriodRangeInWeeks', function() {
             beforeEach(function() {
                 Timecop.freeze(new Date('2016-01-13T12:34:56.789Z'));
             });
 
+            afterEach(function() {
+                Timecop.returnToPresent();
+                Timecop.uninstall();
+            });
+
             it('should return period range for the current week', function() {
-                var actualResult = dateUtils.getPeriodRange(1);
+                var actualResult = dateUtils.getPeriodRangeInWeeks(1);
                 expect(actualResult).toEqual(['2016W02']);
             });
 
             it('should return period range for the last X weeks including the current week', function() {
-                var actualResult = dateUtils.getPeriodRange(3);
+                var actualResult = dateUtils.getPeriodRangeInWeeks(3);
                 expect(actualResult).toEqual(['2015W53', '2016W01', '2016W02']);
             });
 
             it('should return period range for the last X weeks excluding the current week', function() {
-                var actualResult = dateUtils.getPeriodRange(3, { excludeCurrentWeek: true });
+                var actualResult = dateUtils.getPeriodRangeInWeeks(3, { excludeCurrent: true });
                 expect(actualResult).toEqual(['2015W52', '2015W53', '2016W01']);
             });
         });

@@ -350,7 +350,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'da
 
         var reloadView = function () {
             if(!($scope.orgUnit && $scope.selectedService && $scope.selectedWeeksToExport)) return;
-            $scope.weeks = dateUtils.getPeriodRange($scope.selectedWeeksToExport, { excludeCurrentWeek: true });
+            $scope.weeks = dateUtils.getPeriodRangeInWeeks($scope.selectedWeeksToExport, { excludeCurrent: true });
 
             var loadRawData = function () {
                 return $scope.orgUnit.lineListService ? loadLineListRawData() : loadAggregateRawData();

@@ -43,7 +43,7 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 's
                 };
                 someMomentInTime = '2016-05-20T15:48:00.888Z';
 
-                spyOn(dateUtils, "getPeriodRange").and.returnValue(periodRange);
+                spyOn(dateUtils, "getPeriodRangeInWeeks").and.returnValue(periodRange);
 
                 dataService = new DataService();
                 spyOn(dataService, "downloadData").and.returnValue(utils.getPromise(q, {}));

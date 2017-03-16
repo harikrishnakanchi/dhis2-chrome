@@ -125,7 +125,7 @@ define(["properties", "moment", "dateUtils", "lodash", "interpolate"], function(
         };
 
         var loadDashboard = function() {
-            var periodRange = dateUtils.getPeriodRange(properties.weeksToDisplayStatusInDashboard);
+            var periodRange = dateUtils.getPeriodRangeInWeeks(properties.weeksToDisplayStatusInDashboard);
 
             return moduleDataBlockFactory.createForProject($rootScope.currentUser.selectedProject.id, periodRange).then(function(moduleDataBlocks) {
                 moduleDataBlocks = _.sortByAll(moduleDataBlocks, "moduleName", "period");

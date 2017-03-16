@@ -37,8 +37,8 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], func
         };
 
         var downloadData = function (modules) {
-            var periodRange = _.difference(dateUtils.getPeriodRange(properties.projectDataSync.numWeeksForHistoricalData, {excludeCurrentWeek: true}),
-                dateUtils.getPeriodRange(properties.projectDataSync.numWeeksToSync));
+            var periodRange = _.difference(dateUtils.getPeriodRangeInWeeks(properties.projectDataSync.numWeeksForHistoricalData, {excludeCurrent: true}),
+                dateUtils.getPeriodRangeInWeeks(properties.projectDataSync.numWeeksToSync));
 
             var downloadDataForModule = function (module) {
                 var changeLogKey = [CHANGE_LOG_PREFIX, module.projectId, module.id].join(':'),

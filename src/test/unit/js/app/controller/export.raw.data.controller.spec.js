@@ -54,7 +54,7 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
                 scope.orgUnit = selectedOrgUnit;
                 scope.selectedService = selectedService;
 
-                spyOn(dateUtils, 'getPeriodRange').and.returnValue(['2016W20']);
+                spyOn(dateUtils, 'getPeriodRangeInWeeks').and.returnValue(['2016W20']);
 
                 spreadSheetContent = undefined;
                 spyOn(excelBuilder, 'createWorkBook').and.callFake(function (workBookContent) {
@@ -229,10 +229,10 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
 
                 it('should populate the specified week range', function () {
                     var periodRange = ['2016W20', '2016W21'];
-                    dateUtils.getPeriodRange.and.returnValue(periodRange);
+                    dateUtils.getPeriodRangeInWeeks.and.returnValue(periodRange);
                     scope.$apply();
 
-                    expect(dateUtils.getPeriodRange).toHaveBeenCalledWith(scope.selectedWeeksToExport, { excludeCurrentWeek: true });
+                    expect(dateUtils.getPeriodRangeInWeeks).toHaveBeenCalledWith(scope.selectedWeeksToExport, { excludeCurrent: true });
                     expect(scope.weeks).toEqual(periodRange);
                 });
 
@@ -607,7 +607,7 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
 
                     excludedDataElementsRepository.get.and.returnValue(utils.getPromise(q, { dataElements: mockExcludedDataElements }));
 
-                    dateUtils.getPeriodRange.and.returnValue(['2016W36', '2016W37', '2016W38']);
+                    dateUtils.getPeriodRangeInWeeks.and.returnValue(['2016W36', '2016W37', '2016W38']);
 
                     programRepository = new ProgramRepository();
                     spyOn(programRepository, 'getProgramForOrgUnit').and.returnValue(utils.getPromise(q, mockProgram));

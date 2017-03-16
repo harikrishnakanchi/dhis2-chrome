@@ -11,7 +11,7 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
 
         var getPeriodRangeToDownload = function(lastUpdatedTimestamp) {
             var numberOfWeeks = lastUpdatedTimestamp ? properties.projectDataSync.numWeeksToSync : properties.projectDataSync.numWeeksToSyncOnFirstLogIn;
-            return dateUtils.getPeriodRange(numberOfWeeks);
+            return dateUtils.getPeriodRangeInWeeks(numberOfWeeks);
         };
 
         var getModuleDataBlocks = function(data) {
