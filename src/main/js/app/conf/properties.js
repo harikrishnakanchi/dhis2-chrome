@@ -13,7 +13,8 @@ define(['lodash', 'overrides', 'platformConfig'], function(_, overrides, platfor
             intervalInMinutes: 720,
             numWeeksToSync: 12,
             numWeeksToSyncOnFirstLogIn: 12,
-            numWeeksForHistoricalData: 52
+            numWeeksForHistoricalData: 52,
+            numYearsToSyncYearlyReports: 3
         },
         dhisPing: {
             url: url + '/favicon.ico',
