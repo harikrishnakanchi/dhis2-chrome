@@ -11,6 +11,8 @@ require(["app/chrome/chrome.app.config", "app/shared.app.config"], function(conf
             platformUtils.sendMessage('dbReady');
         });
 
+        platformUtils.init();
+
         window.addEventListener('online', function () {
             platformUtils.sendMessage('online');
         });

@@ -11,6 +11,7 @@ require(["app/chrome/chrome.bg.config", "app/shared.bg.config"], function(config
                 console.log("DB Ready");
                 app.bootstrap(app.init());
             };
+            platformUtils.init();
 
             platformUtils.addListener('dbReady', _.once(onDbReady));
             chrome.app.runtime.onLaunched.addListener(function(launchData) {
