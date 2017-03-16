@@ -262,15 +262,19 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             };
             var projectId = $rootScope.currentUser.selectedProject.id;
             return $q.all({
-                monthlyChartsLastUpdated: changeLogRepository.get('monthlyChartData:' + projectId),
                 weeklyChartsLastUpdated: changeLogRepository.get('weeklyChartData:' + projectId),
+                weeklyPivotTableDataLastUpdated: changeLogRepository.get('weeklyPivotTableData:' + projectId),
+                monthlyChartsLastUpdated: changeLogRepository.get('monthlyChartData:' + projectId),
                 monthlyPivotTableLastUpdated: changeLogRepository.get('monthlyPivotTableData:' + projectId),
-                weeklyPivotTableDataLastUpdated: changeLogRepository.get('weeklyPivotTableData:' + projectId)
+                yearlyChartsLastUpdated: changeLogRepository.get('yearlyChartData:' + projectId),
+                yearlyPivotTableLastUpdated: changeLogRepository.get('yearlyPivotTableData:' + projectId)
             }).then(function (data) {
                 $scope.updatedForWeeklyChart = formatlastUpdatedTime(data.weeklyChartsLastUpdated);
                 $scope.updatedForWeeklyPivotTable = formatlastUpdatedTime(data.weeklyPivotTableDataLastUpdated);
                 $scope.updatedForMonthlyChart = formatlastUpdatedTime(data.monthlyChartsLastUpdated);
                 $scope.updatedForMonthlyPivotTable = formatlastUpdatedTime(data.monthlyPivotTableLastUpdated);
+                $scope.updatedForYearlyChart = formatlastUpdatedTime(data.yearlyChartsLastUpdated);
+                $scope.updatedForYearlyPivotTable = formatlastUpdatedTime(data.yearlyPivotTableLastUpdated);
             });
         };
 
