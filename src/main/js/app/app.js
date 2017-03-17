@@ -34,8 +34,8 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                 'SUPER_ADMIN': 'Superadmin'
             });
 
-            var routeResolver = ['$q', '$rootScope', '$location', 'systemSettingRepository', 'changeLogRepository','customAttributeRepository',
-                function ($q, $rootScope, $location, systemSettingRepository, changeLogRepository, customAttributeRepository) {
+            var routeResolver = ['$q', '$rootScope', '$location', 'systemSettingRepository', 'changeLogRepository','customAttributeRepository', 'translationsService',
+                function ($q, $rootScope, $location, systemSettingRepository, changeLogRepository, customAttributeRepository, translationsService) {
 
                     var checkProductKey = function () {
                         return systemSettingRepository.isProductKeySet().then(function (productKeySet) {
@@ -58,9 +58,14 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                         return $rootScope.isLoggedIn || (!$rootScope.isLoggedIn && $location.path() == '/login')? $q.when() : $q.reject('noSession');
                     };
 
+                    var setTranslations = function () {
+                        translationsService.setLocale($rootScope.locale);
+                    };
+
                     return checkProductKey()
                         .then(checkMetadata)
-                        .then(checkSession);
+                        .then(checkSession)
+                        .then(setTranslations);
                 }];
 
             app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider', '$hustleProvider', '$compileProvider', '$provide', '$tooltipProvider', 'USER_ROLES',
