@@ -265,14 +265,14 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
                 };
             });
 
-            it('should call download pivot table data consumer and download chart data consumer for non-admin user', function () {
+            it('should call download historical data consumer for non-admin user', function () {
                 dispatcher.run(message);
                 scope.$apply();
 
                 expect(downloadHistoricalDataConsumer.run).toHaveBeenCalled();
             });
 
-            it('should not call download pivot table data consumer and download chart data consumer for admin user', function () {
+            it('should not call historical data consumer for admin user', function () {
                 userPreferenceRepository.getCurrentUsersUsername.and.returnValue(utils.getPromise(q, 'superadmin'));
                 dispatcher.run(message);
                 scope.$apply();
