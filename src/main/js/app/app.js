@@ -254,8 +254,8 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                 basePath: self.basePath + "js/app/i18n"
             });
 
-            app.run(['dhisMonitor', 'hustleMonitor', 'queueInterceptor', '$rootScope', '$location', '$hustle', '$document', '$timeout', 'storageService', 'initializationRoutine',
-                function(dhisMonitor, hustleMonitor, queueInterceptor, $rootScope, $location, $hustle, $document, $timeout, storageService, InitializationRoutine) {
+            app.run(['dhisMonitor', 'hustleMonitor', 'queueInterceptor', '$rootScope', '$location', '$hustle', '$document', '$timeout', 'storageService', 'initializationRoutine', '$modalStack',
+                function(dhisMonitor, hustleMonitor, queueInterceptor, $rootScope, $location, $hustle, $document, $timeout, storageService, InitializationRoutine, $modalStack) {
 
                     $document.on('keydown', function(e) {
                         disableBackspaceKey(e);
@@ -298,6 +298,9 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
 
                         if (userIsNotAuthorised) {
                             event.preventDefault();
+                        }
+                        else {
+                            $modalStack.dismissAll();
                         }
                     });
 
