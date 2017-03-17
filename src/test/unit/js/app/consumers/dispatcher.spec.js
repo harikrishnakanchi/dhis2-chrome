@@ -179,6 +179,108 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
 
         });
 
+        describe('downloadModuleDataForProject', function () {
+            beforeEach(function () {
+                message.data = {
+                    'data': {},
+                    'type': 'downloadModuleDataForProject'
+                };
+            });
+
+            it('should call download module data block consumer for non-admin user', function () {
+                dispatcher.run(message);
+                scope.$apply();
+
+                expect(downloadProjectSettingsConsumer.run).toHaveBeenCalled();
+                expect(downloadModuleDataBlocksConsumer.run).toHaveBeenCalled();
+            });
+
+            it('should not call download module data block consumer for admin user', function () {
+                userPreferenceRepository.getCurrentUsersUsername.and.returnValue(utils.getPromise(q, 'superadmin'));
+                dispatcher.run(message);
+                scope.$apply();
+
+                expect(downloadProjectSettingsConsumer.run).toHaveBeenCalled();
+                expect(downloadModuleDataBlocksConsumer.run).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('downloadReportDefinitions', function () {
+            beforeEach(function () {
+                message.data = {
+                    'data': {},
+                    'type': 'downloadReportDefinitions'
+                };
+            });
+
+            it('should call download pivot table consumer and download chart consumer for non-admin user', function () {
+                dispatcher.run(message);
+                scope.$apply();
+
+                expect(downloadChartsConsumer.run).toHaveBeenCalled();
+                expect(downloadPivotTablesConsumer.run).toHaveBeenCalled();
+            });
+
+            it('should not call download pivot table consumer and download chart consumer for admin user', function () {
+                userPreferenceRepository.getCurrentUsersUsername.and.returnValue(utils.getPromise(q, 'superadmin'));
+                dispatcher.run(message);
+                scope.$apply();
+
+                expect(downloadChartsConsumer.run).not.toHaveBeenCalled();
+                expect(downloadPivotTablesConsumer.run).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('downloadReportData', function () {
+            beforeEach(function () {
+                message.data = {
+                    'data': {},
+                    'type': 'downloadReportData'
+                };
+            });
+
+            it('should call download pivot table data consumer and download chart data consumer for non-admin user', function () {
+                dispatcher.run(message);
+                scope.$apply();
+
+                expect(downloadChartDataConsumer.run).toHaveBeenCalled();
+                expect(downloadPivotTableDataConsumer.run).toHaveBeenCalled();
+            });
+
+            it('should not call download pivot table data consumer and download chart data consumer for admin user', function () {
+                userPreferenceRepository.getCurrentUsersUsername.and.returnValue(utils.getPromise(q, 'superadmin'));
+                dispatcher.run(message);
+                scope.$apply();
+
+                expect(downloadChartDataConsumer.run).not.toHaveBeenCalled();
+                expect(downloadPivotTableDataConsumer.run).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('downloadHistoricalData', function () {
+            beforeEach(function () {
+                message.data = {
+                    'data': {},
+                    'type': 'downloadHistoricalData'
+                };
+            });
+
+            it('should call download pivot table data consumer and download chart data consumer for non-admin user', function () {
+                dispatcher.run(message);
+                scope.$apply();
+
+                expect(downloadHistoricalDataConsumer.run).toHaveBeenCalled();
+            });
+
+            it('should not call download pivot table data consumer and download chart data consumer for admin user', function () {
+                userPreferenceRepository.getCurrentUsersUsername.and.returnValue(utils.getPromise(q, 'superadmin'));
+                dispatcher.run(message);
+                scope.$apply();
+
+                expect(downloadHistoricalDataConsumer.run).not.toHaveBeenCalled();
+            });
+        });
+
         it("should call upload org units consumer", function() {
             message.data = {
                 "data": {},

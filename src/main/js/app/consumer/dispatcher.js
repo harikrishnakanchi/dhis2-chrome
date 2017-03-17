@@ -8,6 +8,15 @@ define(["lodash"], function(_) {
 
         this.run = function(message) {
             $log.info("Processing message: " + message.data.type, message.data);
+
+            var shouldDownloadProjectData = function () {
+                return userPreferenceRepository.getCurrentUsersUsername().then(function (currentUsersUsername) {
+                    if(currentUsersUsername == 'superadmin' || currentUsersUsername == 'projectadmin' || currentUsersUsername === null)
+                        return $q.reject();
+                    else return $q.when();
+                });
+            };
+
             switch (message.data.type) {
                 case "downloadMetadata":
                     return downloadMetadataConsumer.run(message)
@@ -20,6 +29,7 @@ define(["lodash"], function(_) {
                             $log.info('Metadata sync complete');
                         });
 
+                //TODO: remove the 'downloadProjectData' after release 12.0
                 case "downloadProjectData":
                     return downloadProjectSettingsConsumer.run(message)
                         .then(userPreferenceRepository.getCurrentUsersUsername)
@@ -38,6 +48,24 @@ define(["lodash"], function(_) {
                                     $log.info('Project data sync complete');
                                 });
                         });
+
+                case "downloadModuleDataForProject":
+                    return downloadProjectSettingsConsumer.run()
+                        .then(shouldDownloadProjectData)
+                        .then(downloadModuleDataBlocksConsumer.run);
+
+                case "downloadReportDefinitions":
+                    return shouldDownloadProjectData()
+                        .then(downloadChartsConsumer.run)
+                        .then(downloadPivotTablesConsumer.run);
+
+                case "downloadReportData":
+                    return shouldDownloadProjectData()
+                        .then(downloadChartDataConsumer.run)
+                        .then(downloadPivotTableDataConsumer.run);
+
+                case "downloadHistoricalData":
+                    return shouldDownloadProjectData().then(downloadHistoricalDataConsumer.run);
 
                 case "downloadProjectDataForAdmin":
                     return downloadProjectSettingsConsumer.run(message);
