@@ -5,7 +5,7 @@
                 <span>{{ resourceBundle.patientOriginLabel }}</span>
             </div>
             <div id="forPrinting" name="forPrinting" ng-repeat="programStage in program.programStages">
-                <div class="registrationBook" ng-repeat="section in programStage.programStageSections">
+                <div class="registrationBook" ng-repeat="section in programStage.programStageSections" ng-if="section.isIncluded">
                     <div>
                         <table class="table">
                             <tr>

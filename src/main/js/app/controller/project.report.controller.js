@@ -1,8 +1,9 @@
-define(["moment", "dateUtils", "lodash", "orgUnitMapper", "excelBuilder"], function(moment, dateUtils, _, orgUnitMapper, excelBuilder) {
+define(["moment", "dateUtils", "lodash", "orgUnitMapper", "excelBuilder", "constants"], function(moment, dateUtils, _, orgUnitMapper, excelBuilder, constants) {
     return function($rootScope, $q, $scope, orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService, pivotTableExportBuilder) {
         $scope.selectedProject = $rootScope.currentUser.selectedProject;
 
-        var REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
+        var REPORTS_LAST_UPDATED_TIME_FORMAT = constants.TIME_FORMAT_12HR,
+            REPORTS_LAST_UPDATED_TIME_24HR_FORMAT = constants.TIME_FORMAT_24HR;
 
         var buildSpreadSheetContent = function () {
             var EMPTY_ROW = [];
@@ -141,12 +142,13 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper", "excelBuilder"], funct
         };
 
         var loadLastUpdatedTimeForProjectReport = function() {
-            var formatlastUpdatedTime = function (date) {
-                return date ? moment(date).locale($scope.locale).format(REPORTS_LAST_UPDATED_TIME_FORMAT) : undefined;
+            var formatLastUpdatedTime = function (date) {
+                var timeFormat = $scope.locale == 'fr' ? REPORTS_LAST_UPDATED_TIME_24HR_FORMAT : REPORTS_LAST_UPDATED_TIME_FORMAT;
+                return date ? moment.utc(date).local().locale($scope.locale).format(timeFormat) : undefined;
             };
 
             return changeLogRepository.get('monthlyPivotTableData:' +  $scope.selectedProject.id)
-                .then(formatlastUpdatedTime)
+                .then(formatLastUpdatedTime)
                 .then(function(lastUpdated) {
                 $scope.lastUpdatedTimeForProjectReport = lastUpdated;
             });

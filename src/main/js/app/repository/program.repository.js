@@ -74,10 +74,12 @@ define(["lodash", "moment", "customAttributes"], function(_, moment, customAttri
                 var promises = [];
                 _.each(program.programStages, function(stage) {
                     _.each(stage.programStageSections, function(section) {
+                        section.isIncluded = false;
                         _.each(section.programStageDataElements, function(sde) {
                             promises.push(dataElementRepository.get(sde.dataElement.id).then(function(de) {
                                 de.isIncluded = _.isEmpty(excludedDataElements) || !_.contains(excludedDataElements, de.id);
                                 sde.dataElement = de;
+                                section.isIncluded = section.isIncluded || de.isIncluded;
                             }));
                         });
                     });

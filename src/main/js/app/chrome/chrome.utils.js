@@ -1,9 +1,10 @@
 define(['lodash'], function(_) {
-    var registerMessageCallback = function(messageName, callback) {
-        return function(message) {
-            if (message.name === messageName)
-                callback(message.data);
-        };
+    var messageListeners = {};
+
+    var executeEventListener = function (message) {
+        if (messageListeners[message.name] instanceof Function) {
+            messageListeners[message.name].call({}, message.data);
+        }
     };
 
     var registerAlarmCallback = function(alarmName, callback) {
@@ -14,14 +15,16 @@ define(['lodash'], function(_) {
     };
 
     var addListener = function(message, callback) {
-        chrome.runtime.onMessage.addListener(registerMessageCallback(message, callback));
+        messageListeners[message] = callback;
     };
 
     var sendMessage = function(messageName, data) {
-        chrome.runtime.sendMessage({
+        var payload = {
             name: messageName,
             data: data
-        });
+        };
+        executeEventListener(payload);
+        chrome.runtime.sendMessage(payload);
     };
 
     var createNotification = function (title, message, callBack) {
@@ -58,6 +61,7 @@ define(['lodash'], function(_) {
 
     var os;
     var init = function () {
+        chrome.runtime.onMessage.addListener(executeEventListener);
         chrome.runtime.getPlatformInfo(function (platformInfo) {
             os = platformInfo.os;
         });

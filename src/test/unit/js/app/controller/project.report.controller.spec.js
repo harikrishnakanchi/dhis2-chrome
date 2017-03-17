@@ -256,7 +256,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
 
         describe('Excel Export', function () {
             var spreadSheetContent,
-                LAST_UPDATED_TIME_FORMAT = "D MMMM, YYYY hh[.]mm A";
+                LAST_UPDATED_TIME_FORMAT = "D MMMM YYYY[,] h[:]mm A";
 
             beforeEach(function () {
                 scope.$apply();
@@ -370,13 +370,25 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             expect(scope.projectAttributes).toEqual(expectedProjectAttributes);
         });
 
-        it('should get the lastUpdated', function () {
-            var projectId = rootScope.currentUser.selectedProject.id,
-                REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM[,] YYYY hh[.]mm A";
+        describe('lastUpdatedTimeForProjectReport', function () {
+            it('should get the lastUpdated', function () {
+                var projectId = rootScope.currentUser.selectedProject.id,
+                    REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM YYYY[,] h[:]mm A";
 
-            scope.$apply();
-            expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyPivotTableData:' + projectId);
-            expect(scope.lastUpdatedTimeForProjectReport).toEqual(moment(lastUpdatedTime).format(REPORTS_LAST_UPDATED_TIME_FORMAT));
+                scope.$apply();
+                expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyPivotTableData:' + projectId);
+                expect(scope.lastUpdatedTimeForProjectReport).toEqual(moment(lastUpdatedTime).format(REPORTS_LAST_UPDATED_TIME_FORMAT));
+            });
+
+            it('should get the lastUpdated when the locale is French', function () {
+                var projectId = rootScope.currentUser.selectedProject.id,
+                    REPORTS_LAST_UPDATED_TIME_24HR_FORMAT = "D MMMM YYYY[,] HH[h]mm";
+
+                scope.locale = 'fr';
+                scope.$apply();
+                expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyPivotTableData:' + projectId);
+                expect(scope.lastUpdatedTimeForProjectReport).toEqual(moment(lastUpdatedTime).locale(scope.locale).format(REPORTS_LAST_UPDATED_TIME_24HR_FORMAT));
+            });
         });
     });
 });

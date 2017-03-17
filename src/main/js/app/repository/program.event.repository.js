@@ -30,7 +30,7 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
 
             var extractPeriod = function(events) {
                 return _.map(events, function(ev) {
-                    ev.period = ev.period || moment(ev.eventDate).format("GGGG[W]WW");
+                    ev.period = moment(ev.eventDate).format("GGGG[W]WW");
                     return ev;
                 });
             };
