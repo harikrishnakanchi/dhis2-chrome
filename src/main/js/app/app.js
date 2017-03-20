@@ -59,7 +59,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     };
 
                     var setTranslations = function () {
-                        translationsService.setLocale($rootScope.locale);
+                        translationsService.setLocaleOnce($rootScope.locale);
                     };
 
                     return checkProductKey()

@@ -29,6 +29,10 @@ define(['lodash'], function(_){
             });
         };
 
+        this.setLocaleOnce = function (locale) {
+            return _.once(_.partial(this.setLocale, locale));
+        };
+
         var translateMonthlyPeriods = function (monthlyPeriods) {
             var SEPARATOR = ' ';
             _.each(monthlyPeriods, function (period) {
