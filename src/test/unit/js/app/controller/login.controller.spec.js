@@ -1,5 +1,5 @@
-define(["loginController", "angularMocks", "utils", "sessionHelper", "userPreferenceRepository", "orgUnitRepository", "systemSettingRepository", "userRepository", "platformUtils", "checkVersionCompatibility", "storageService"],
-    function (LoginController, mocks, utils, SessionHelper, UserPreferenceRepository, OrgUnitRepository, SystemSettingRepository, UserRepository, platformUtils, CheckVersionCompatibility, StorageService) {
+define(["loginController", "angularMocks", "utils", "sessionHelper", "userPreferenceRepository", "orgUnitRepository", "systemSettingRepository", "userRepository", "platformUtils", "checkVersionCompatibility", "storageService", "hustlePublishUtils"],
+    function (LoginController, mocks, utils, SessionHelper, UserPreferenceRepository, OrgUnitRepository, SystemSettingRepository, UserRepository, platformUtils, CheckVersionCompatibility, StorageService, hustlePublishUtils) {
     describe("login controller", function () {
         var rootScope, storageService, loginController, scope, location, q, fakeUserStore, sessionHelper, hustle, userPreferenceRepository, systemSettingRepository, userRepository, orgUnitRepository, checkVersionCompatibility, initializeController;
 
@@ -60,6 +60,8 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             spyOn(systemSettingRepository, "getLocale").and.returnValue(utils.getPromise(q, "en"));
 
             spyOn(platformUtils, "getPraxisVersion").and.returnValue("5.1");
+
+            spyOn(hustlePublishUtils, "publishDownloadProjectData").and.returnValue(utils.getPromise(q, undefined));
 
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, {}));
@@ -299,11 +301,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             scope.login();
             scope.$apply();
 
-            expect(hustle.publishOnce).toHaveBeenCalledWith({
-                type: 'downloadProjectData',
-                data: [],
-                locale: scope.locale
-            }, 'dataValues');
+            expect(hustlePublishUtils.publishDownloadProjectData).toHaveBeenCalled();
         });
 
         it("should start sync project data if the currentUser and previousUsers are admin and non-admin users", function () {
@@ -351,11 +349,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             scope.login();
             scope.$apply();
 
-            expect(hustle.publishOnce).toHaveBeenCalledWith({
-                type: 'downloadProjectData',
-                data: [],
-                locale: scope.locale
-            }, 'dataValues');
+            expect(hustlePublishUtils.publishDownloadProjectData).toHaveBeenCalled();
         });
 
         describe('User Session', function () {

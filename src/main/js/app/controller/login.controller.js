@@ -1,4 +1,4 @@
-define(["md5", "properties", "lodash", "interpolate"], function(md5, properties, _, interpolate) {
+define(["md5", "properties", "lodash", "interpolate", "hustlePublishUtils"], function(md5, properties, _, interpolate, hustlePublishUtils) {
     return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility, storageService) {
         var loadUserData = function(loginUsername) {
             var existingUserProjects = userPreferenceRepository.getCurrentUsersProjectIds();
@@ -108,11 +108,7 @@ define(["md5", "properties", "lodash", "interpolate"], function(md5, properties,
                 var projectChanged = !_.isEqual(previousUserProjects, currentUserProjects);
 
                 if (projectChanged || roleChanged) {
-                    $hustle.publishOnce({
-                        type: 'downloadProjectData',
-                        data: [],
-                        locale: $scope.locale
-                    }, 'dataValues');
+                    hustlePublishUtils.publishDownloadProjectData($hustle, $scope.locale);
                 }
             });
 
