@@ -1,5 +1,5 @@
-define(["downloadDataController", "angularMocks", "utils", "lodash", "platformUtils"],
-    function(DownloadDataController, mocks, utils, _, platformUtils) {
+define(["downloadDataController", "angularMocks", "utils", "lodash", "platformUtils", "hustlePublishUtils"],
+    function(DownloadDataController, mocks, utils, _, platformUtils, hustlePublishUtils) {
         describe("downloadDataController", function() {
             var q, rootScope, hustle, downloadDataController, timeout, scope;
 
@@ -25,6 +25,8 @@ define(["downloadDataController", "angularMocks", "utils", "lodash", "platformUt
                         return true;
                 };
 
+                spyOn(hustlePublishUtils, 'publishDownloadProjectData').and.callThrough();
+
                 downloadDataController = new DownloadDataController(scope, hustle, q, rootScope, timeout);
             }));
 
@@ -42,9 +44,9 @@ define(["downloadDataController", "angularMocks", "utils", "lodash", "platformUt
                     };
                 };
 
-                expect(hustle.publishOnce.calls.count()).toEqual(2);
+                expect(hustle.publishOnce.calls.count()).toEqual(5);
                 expect(hustle.publishOnce.calls.argsFor(0)).toEqual([getHustleMessage("downloadMetadata"), "dataValues"]);
-                expect(hustle.publishOnce.calls.argsFor(1)).toEqual([getHustleMessage("downloadProjectData"), "dataValues"]);
+                expect(hustlePublishUtils.publishDownloadProjectData).toHaveBeenCalled();
                 expect(platformUtils.createNotification).toHaveBeenCalled();
             });
         });

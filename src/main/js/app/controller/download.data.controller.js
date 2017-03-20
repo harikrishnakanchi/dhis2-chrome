@@ -1,4 +1,4 @@
-define(["moment", "properties", "lodash", "platformUtils"], function(moment, properties, _, platformUtils) {
+define(["moment", "properties", "lodash", "platformUtils", "hustlePublishUtils"], function(moment, properties, _, platformUtils, hustlePublishUtils) {
     return function($scope, $hustle, $q, $rootScope, $timeout) {
         $scope.syncNow = function() {
 
@@ -12,11 +12,7 @@ define(["moment", "properties", "lodash", "platformUtils"], function(moment, pro
                 locale: $scope.locale
             }, 'dataValues');
 
-            var downloadProjectData = $hustle.publishOnce({
-                type: 'downloadProjectData',
-                data: [],
-                locale: $scope.locale
-            }, 'dataValues');
+            var downloadProjectData = hustlePublishUtils.publishDownloadProjectData($hustle, $scope.locale);
 
             return $q.all([
                     downloadMetadata,
