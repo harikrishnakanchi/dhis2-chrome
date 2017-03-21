@@ -163,7 +163,8 @@
                 <ul class="dropdown-menu multi-level" role="menu">
                     <li class="dropdown-submenu"
                         ng-repeat="opUnit in allOpUnitsWithModules | orderBy: 'name' "
-                        ng-class="{'pull-left': layoutDirection.direction == 'rtl' }">
+                        ng-class="{'pull-left': layoutDirection.direction == 'rtl' }"
+                        ng-if="(opUnit.modules | filter: {isLineListService:false}).length > 0">
                         <a class="dropdown-toggle">
                             {{ opUnit.name }}
                             <i class="fa" ng-class="layoutDirection.direction == 'rtl' ? 'fa-caret-left' : 'fa-caret-right'"></i>

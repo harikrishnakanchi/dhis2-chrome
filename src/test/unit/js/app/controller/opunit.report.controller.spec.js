@@ -88,7 +88,7 @@ define(['moment', 'timecop', 'angularMocks', 'utils', 'orgUnitRepository', 'chan
         describe('lastUpdatedTimeForOpUnitReport', function () {
             it('should get the lastUpdated', function () {
                 var projectId = rootScope.currentUser.selectedProject.id,
-                    REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM YYYY[,] h[:]mm A";
+                    REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM YYYY[,] h[.]mm A";
 
                 scope.$apply();
                 expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyPivotTableData:' + projectId);
@@ -138,7 +138,7 @@ define(['moment', 'timecop', 'angularMocks', 'utils', 'orgUnitRepository', 'chan
 
         describe('should export to excel', function () {
             var spreadSheetContent,
-                LAST_UPDATED_TIME_FORMAT = "D MMMM YYYY[,] h[:]mm A";
+                LAST_UPDATED_TIME_FORMAT = "D MMMM YYYY[,] h[.]mm A";
 
             beforeEach(function () {
                 scope.$apply();
