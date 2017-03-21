@@ -10,10 +10,9 @@ define(["lodash"], function(_) {
             $log.info("Processing message: " + message.data.type, message.data);
 
             var shouldDownloadProjectData = function () {
-                return userPreferenceRepository.getCurrentUsersUsername().then(function (currentUsersUsername) {
-                    if(currentUsersUsername == 'superadmin' || currentUsersUsername == 'projectadmin' || currentUsersUsername === null)
-                        return $q.reject();
-                    else return $q.when();
+                return userPreferenceRepository.getCurrentUsersUsername()
+                    .then(function (currentUsersUsername) {
+                        return !(currentUsersUsername == 'superadmin' || currentUsersUsername == 'projectadmin' || currentUsersUsername === null);
                 });
             };
 
@@ -52,20 +51,33 @@ define(["lodash"], function(_) {
                 case "downloadModuleDataForProject":
                     return downloadProjectSettingsConsumer.run()
                         .then(shouldDownloadProjectData)
-                        .then(downloadModuleDataBlocksConsumer.run);
+                        .then(function (shouldDownload) {
+                            if(!shouldDownload) return;
+                            return downloadModuleDataBlocksConsumer.run();
+                        });
 
                 case "downloadReportDefinitions":
                     return shouldDownloadProjectData()
-                        .then(downloadChartsConsumer.run)
-                        .then(downloadPivotTablesConsumer.run);
+                        .then(function (shouldDownload) {
+                        if(!shouldDownload) return;
+                        return downloadChartsConsumer.run()
+                            .then(downloadPivotTablesConsumer.run);
+                    });
 
                 case "downloadReportData":
                     return shouldDownloadProjectData()
-                        .then(downloadChartDataConsumer.run)
-                        .then(downloadPivotTableDataConsumer.run);
+                        .then(function (shouldDownload) {
+                        if(!shouldDownload) return;
+                        return downloadChartDataConsumer.run()
+                            .then(downloadPivotTableDataConsumer.run);
+                    });
 
                 case "downloadHistoricalData":
-                    return shouldDownloadProjectData().then(downloadHistoricalDataConsumer.run);
+                    return shouldDownloadProjectData()
+                        .then(function (shouldDownload) {
+                        if(!shouldDownload) return;
+                        return downloadHistoricalDataConsumer.run();
+                    });
 
                 case "downloadProjectDataForAdmin":
                     return downloadProjectSettingsConsumer.run(message);
