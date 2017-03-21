@@ -83,7 +83,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                                 USER_ROLES.COORDINATION_LEVEL_APPROVER,USER_ROLES.PROJECT_ADMIN, USER_ROLES.SUPER_ADMIN]
                         },
                         resolve: {
-                            routeResolver: ['$q', 'systemSettingRepository', 'changeLogRepository', function ($q, systemSettingRepository, changeLogRepository) {
+                            routeResolver: ['$q', '$rootScope', 'systemSettingRepository', 'changeLogRepository', function ($q, $rootScope, systemSettingRepository, changeLogRepository) {
                                 var checkMetadata = function () {
                                     return changeLogRepository.get("metaData").then(function (metadataLastUpdated) {
                                         return metadataLastUpdated ? $q.reject('noMetadata'): $q.when();
@@ -94,7 +94,12 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                                         return productKeySet ? $q.when() : $q.reject('noProductKey');
                                     });
                                 };
-                                return checkProductKey().then(checkMetadata);
+
+                                var setTranslations = function () {
+                                    return systemSettingRepository.getLocale().then($rootScope.setLocale);
+                                };
+
+                                return setTranslations().then(checkProductKey).then(checkMetadata);
                             }]
                         }
                     }).
