@@ -2,9 +2,9 @@ define(['lodash', 'platformUtils'], function (_, platformUtils) {
     return function ($rootScope, $location, systemSettingRepository, translationsService, hustleMonitor) {
 
         $rootScope.setLocale = function (locale) {
-            translationsService.setLocale(locale);
             $rootScope.locale = locale;
             $rootScope.layoutDirection = locale == 'ar' ? { 'direction': 'rtl' } : {};
+            return translationsService.setLocale(locale);
         };
 
         $rootScope.hasRoles = function (allowedRoles) {
@@ -25,7 +25,6 @@ define(['lodash', 'platformUtils'], function (_, platformUtils) {
         };
 
         var run = function () {
-            systemSettingRepository.getLocale().then($rootScope.setLocale);
             systemSettingRepository.loadProductKey();
             hustleMonitor.checkHustleQueueCount();
             platformUtils.init();

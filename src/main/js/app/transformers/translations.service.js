@@ -16,6 +16,8 @@ define(['lodash'], function(_){
         };
 
         this.setLocale = function(locale){
+            if(locale === _locale) return $q.when();
+
             _locale = locale;
 
             refreshResourceBundle();
@@ -27,10 +29,6 @@ define(['lodash'], function(_){
                 var validTranslationsWithObjectId = _.filter(data, 'objectId');
                 translations = _.groupBy(validTranslationsWithObjectId, 'objectId');
             });
-        };
-
-        this.setLocaleOnce = function (locale) {
-            return _.once(_.partial(this.setLocale, locale));
         };
 
         var translateMonthlyPeriods = function (monthlyPeriods) {
