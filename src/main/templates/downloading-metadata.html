@@ -10,13 +10,13 @@
 
     <h4 ng-if="!showProgressBar" class="text-center">Initializing Praxis&hellip;</h4>
 
-    <div class="jumbotron alert-danger" ng-if="productKeyExpired">
-        <h2>
-            <i class="fa fa-warning"></i>
-            Product key has expired.
-        </h2>
-        <p>Please submit the updated product key to continue download. Contact {{ supportEmail }} for assistance.</p>
-        <p><button class="btn btn-primary btn-md" ng-click="redirectToProductKeyPage()">Update the Product Key</button></p>
+    <div ng-if="productKeyExpired">
+        <div class="alert alert-danger">
+            <b>Product key has expired.</b> <br>
+            Please submit the updated product key to continue download. Contact {{ supportEmail }} for assistance.
+            <br><br>
+            <button class="btn btn-primary" ng-click="redirectToProductKeyPage()">Update the Product Key</button>
+        </div>
     </div>
 
     <div ng-if="maxRetriesExceeded">
