@@ -234,6 +234,9 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     $indexedDBProvider.connection(properties.praxis.dbName)
                         .upgradeDatabase(migrations.length, function(event, db, tx) {
                             migrator.run(event.oldVersion, db, tx, migrations);
+                        })
+                        .dbReady(function () {
+                            platformUtils.sendMessage("dbReady");
                         });
 
                     var jobComparator = function (itemToBeCompared, itemComparedWith) {
