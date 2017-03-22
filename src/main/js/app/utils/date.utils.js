@@ -38,9 +38,6 @@ define(["moment", "lodash"], function(moment, _) {
         });
     };
 
-    var getPeriodRangeInWeeks = _.partial(getPeriodRange, 'week');
-    var getPeriodRangeInMonths = _.partial(getPeriodRange, 'month');
-
     var getNumberOfISOWeeksInMonth = function (month) {
         var monthMoment = moment(month, 'YYYYMM'),
             daysInMonth = _.range(1, monthMoment.daysInMonth() + 1);
@@ -56,8 +53,8 @@ define(["moment", "lodash"], function(moment, _) {
         max: max,
         getFormattedPeriod: getFormattedPeriod,
         subtractWeeks: subtractWeeks,
-        getPeriodRangeInWeeks: getPeriodRangeInWeeks,
-        getPeriodRangeInMonths: getPeriodRangeInMonths,
+        getPeriodRangeInWeeks: _.partial(getPeriodRange, 'week'),
+        getPeriodRangeInMonths: _.partial(getPeriodRange, 'month'),
         getNumberOfISOWeeksInMonth: getNumberOfISOWeeksInMonth
     };
 });
