@@ -174,6 +174,16 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER,
                                 USER_ROLES.COORDINATION_LEVEL_APPROVER,USER_ROLES.PROJECT_ADMIN, USER_ROLES.SUPER_ADMIN]
+                        },
+                        resolve: {
+                            routeResolver: ['$rootScope', 'systemSettingRepository', function ($rootScope, systemSettingRepository) {
+
+                                var setTranslations = function () {
+                                    return systemSettingRepository.getLocale().then($rootScope.setLocale);
+                                };
+
+                                return setTranslations();
+                            }]
                         }
                     }).
                     when('/aggregate-data-entry/:module?/:week?', {
