@@ -103,32 +103,39 @@
             }
         };
 
+        var serviceWorkerStateObserver = function (serviceWorker) {
+            if (serviceWorker && !serviceWorker.onstatechange) {
+                serviceWorker.onstatechange = function () {
+                    switch (serviceWorker.state) {
+                        case 'installed':
+                            if (navigator.serviceWorker.controller) {
+                                console.log('New or updated content is available.');
+                            } else {
+                                console.log('Content is now available offline!');
+                                loadApp();
+                            }
+                            break;
+
+                        case 'redundant':
+                            if (!navigator.serviceWorker.controller) {
+                                retryServiceWorkerDownload();
+                            }
+                            break;
+                    }
+                };
+            }
+        };
+
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./service.worker.js')
                 .then(checkForMultipleClients)
                 .then(function (registration) {
+                    serviceWorkerStateObserver(registration.installing);
+
                     registration.onupdatefound = function () {
-                        var installingWorker = registration.installing;
-
-                        installingWorker.onstatechange = function () {
-                            switch (installingWorker.state) {
-                                case 'installed':
-                                    if (navigator.serviceWorker.controller) {
-                                        console.log('New or updated content is available.');
-                                    } else {
-                                        console.log('Content is now available offline!');
-                                        loadApp();
-                                    }
-                                    break;
-
-                                case 'redundant':
-                                    if (!navigator.serviceWorker.controller) {
-                                        retryServiceWorkerDownload();
-                                    }
-                                    break;
-                            }
-                        };
+                        serviceWorkerStateObserver(registration.installing);
                     };
+
                 }).catch(function (e) {
                 if (e == 'multipleTabsAreOpen') {
                     showMultipleTabsOpenMessage();
