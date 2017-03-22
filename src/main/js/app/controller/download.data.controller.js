@@ -6,19 +6,22 @@ define(["moment", "properties", "lodash", "platformUtils", "hustlePublishUtils"]
                 platformUtils.createNotification($scope.resourceBundle.downloadDataFromDhis, $scope.resourceBundle.syncScheduled);
             };
 
-            var downloadMetadata = $hustle.publishOnce({
-                type: 'downloadMetadata',
-                data: [],
-                locale: $scope.locale
-            }, 'dataValues');
+            var downloadMetadata = function () {
+                return $hustle.publishOnce({
+                    type: 'downloadMetadata',
+                    data: [],
+                    locale: $scope.locale
+                }, 'dataValues');
+            };
 
-            var downloadProjectData = hustlePublishUtils.publishDownloadProjectData($hustle, $scope.locale);
+            var downloadProjectData = function () {
+                return hustlePublishUtils.publishDownloadProjectData($hustle, $scope.locale);
+            };
 
             return $q.all([
-                    downloadMetadata,
-                    downloadProjectData
-                ])
-                .then(onSuccess);
+                downloadMetadata(),
+                downloadProjectData()
+            ]).then(onSuccess);
         };
     };
 });
