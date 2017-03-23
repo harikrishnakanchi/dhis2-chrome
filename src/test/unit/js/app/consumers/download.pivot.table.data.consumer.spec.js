@@ -247,6 +247,29 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 expect(changeLogRepository.upsert).not.toHaveBeenCalled();
             });
 
+            it('should not continue downloading remaining pivot table data if call fails due to network failure', function() {
+                var userModules = [{
+                    "id": "module1"
+                }, {
+                    "id": "module2"
+                }];
+
+                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, userModules));
+                reportService.getReportDataForOrgUnit.and.callFake(function(table, moduleId) {
+                    if (table === mockPivotTable && moduleId === "module1")
+                        return utils.getPromise(q, "data1");
+                    if (table === mockPivotTable && moduleId === "module2")
+                        return utils.getRejectedPromise(q, {errorCode: 'NETWORK_UNAVAILABLE'});
+                });
+
+                downloadPivotTableDataConsumer.run();
+                scope.$apply();
+
+                expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalledWith(mockPivotTable.id, 'module1', "data1");
+                expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalledWith(mockPivotTable.id, 'module2', "data2");
+                expect(changeLogRepository.upsert).not.toHaveBeenCalled();
+            });
+
             it('should not download pivot table data if user has no modules', function() {
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, []));
 
