@@ -1,8 +1,8 @@
 define(["moment", "properties", "lodash", "platformUtils", "hustlePublishUtils"], function(moment, properties, _, platformUtils, hustlePublishUtils) {
-    return function($scope, $hustle, $q, $rootScope, $timeout) {
+    return function($scope, $hustle, $q) {
         $scope.syncNow = function() {
 
-            var onSuccess = function(response) {
+            var onSuccess = function() {
                 platformUtils.createNotification($scope.resourceBundle.downloadDataFromDhis, $scope.resourceBundle.syncScheduled);
             };
 
