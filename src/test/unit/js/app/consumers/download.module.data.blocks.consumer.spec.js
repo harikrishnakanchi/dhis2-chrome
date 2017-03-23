@@ -321,6 +321,29 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 's
                 expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockC, undefined, undefined, undefined, undefined, undefined);
             });
 
+            it('should not continue to merge and save modules if a module has failed because of loss in network connectivity', function() {
+                    var period = '2016W21',
+                        mockModuleA = { id: 'mockModuleIdA' },
+                        mockModuleB = { id: 'mockModuleIdB' },
+                        mockModuleDataBlockA = { moduleId: mockModuleA.id, period: period, moduleName: 'someModuleName' },
+                        mockModuleDataBlockB = { moduleId: mockModuleB.id, period: period, moduleName: 'someModuleName' };
+
+                    orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [mockModuleA, mockModuleB]));
+
+                    moduleDataBlockFactory.createForModule.and.callFake(function (moduleId) {
+                        var mockModuleDataBlocks = [mockModuleDataBlockA, mockModuleDataBlockB];
+                        return utils.getPromise(q, _.filter(mockModuleDataBlocks, { moduleId: moduleId }));
+                    });
+
+                    dataService.downloadData.and.callFake(function(moduleId) {
+                        return moduleId == mockModuleB.id ? utils.getRejectedPromise(q, { errorCode: 'NETWORK_UNAVAILABLE'}) : utils.getPromise(q, []);
+                    });
+
+                    runConsumer();
+                    expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).not.toHaveBeenCalledWith(mockModuleDataBlockB, undefined, undefined, undefined, undefined, undefined);
+                    expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).not.toHaveBeenCalledWith(mockModuleDataBlockA, undefined, undefined, undefined, undefined, undefined);
+                });
+
             it('should get the system info server data', function () {
                 runConsumer();
                 expect(systemInfoService.getServerDate).toHaveBeenCalled();
