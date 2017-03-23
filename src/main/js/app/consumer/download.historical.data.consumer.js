@@ -1,4 +1,4 @@
-define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], function (_, moment, dateUtils, properties, customAttributes) {
+define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes', 'constants'], function (_, moment, dateUtils, properties, customAttributes, constants) {
     return function ($q, dataService, eventService, systemInfoService, userPreferenceRepository, orgUnitRepository, datasetRepository, changeLogRepository, dataRepository, programEventRepository) {
         var CHANGE_LOG_PREFIX = 'yearlyDataValues',
             CHUNK_SIZE = 11;
@@ -75,7 +75,10 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], func
                     return changeLogRepository.upsert(changeLogKey, downloadStartTime);
                 };
 
-                var onFailure = function () {
+                var onFailure = function (response) {
+                    if(response && response.errorCode === constants.errorCodes.NETWORK_UNAVAILABLE){
+                        return $q.reject();
+                    }
                     return $q.when(); //continue with next module
                 };
 
