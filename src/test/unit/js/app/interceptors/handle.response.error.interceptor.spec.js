@@ -1,6 +1,6 @@
-define(["handleTimeoutInterceptor", "angularMocks", "properties", "platformUtils"], function(HandleTimeoutInterceptor, mocks, properties, platformUtils) {
+define(["handleResponseErrorInterceptor", "angularMocks", "properties", "platformUtils"], function(HandleResponseErrorInterceptor, mocks, properties, platformUtils) {
     describe("httpInterceptor", function() {
-        var q, injector, fakeHttp, timeout, handleTimeoutInterceptor;
+        var q, injector, fakeHttp, timeout, handleResponseErrorInterceptor;
 
         beforeEach(mocks.inject(function($q, $timeout) {
             q = $q;
@@ -23,7 +23,7 @@ define(["handleTimeoutInterceptor", "angularMocks", "properties", "platformUtils
                 return injectorGetStubs[service];
             });
 
-            handleTimeoutInterceptor = new HandleTimeoutInterceptor(q, injector, timeout);
+            handleResponseErrorInterceptor = new HandleResponseErrorInterceptor(q, injector, timeout);
         }));
 
         it("should retry in case of timeout", function() {
@@ -38,9 +38,9 @@ define(["handleTimeoutInterceptor", "angularMocks", "properties", "platformUtils
                 "status": 0
             };
 
-            handleTimeoutInterceptor.responseError(rejection);
+            handleResponseErrorInterceptor.responseError(rejection);
 
-            expect(q.reject).not.toHaveBeenCalled();
+            expect(q.reject).not.toHaveBeenCalled();    
             expect(platformUtils.sendMessage).toHaveBeenCalledWith("timeoutOccurred");
 
             timeout.flush();
@@ -66,7 +66,7 @@ define(["handleTimeoutInterceptor", "angularMocks", "properties", "platformUtils
                 "status": 0
             };
 
-            handleTimeoutInterceptor.responseError(rejection);
+            handleResponseErrorInterceptor.responseError(rejection);
 
             expect(q.reject).toHaveBeenCalledWith(rejection);
             expect(platformUtils.sendMessage).not.toHaveBeenCalled();
@@ -91,7 +91,7 @@ define(["handleTimeoutInterceptor", "angularMocks", "properties", "platformUtils
                 var expectedRejection = getRejectionPayload(401);
                 expectedRejection.errorCode = "UNAUTHORISED";
 
-                handleTimeoutInterceptor.responseError(getRejectionPayload(401));
+                handleResponseErrorInterceptor.responseError(getRejectionPayload(401));
                 expect(q.reject).toHaveBeenCalledWith(expectedRejection);
             });
 
@@ -101,7 +101,7 @@ define(["handleTimeoutInterceptor", "angularMocks", "properties", "platformUtils
                 var expectedRejection = getRejectionPayload('someStatus');
                 expectedRejection.errorCode = "NETWORK_UNAVAILABLE";
 
-                handleTimeoutInterceptor.responseError(getRejectionPayload('someStatus'));
+                handleResponseErrorInterceptor.responseError(getRejectionPayload('someStatus'));
                 expect(q.reject).toHaveBeenCalledWith(expectedRejection);
             });
         });

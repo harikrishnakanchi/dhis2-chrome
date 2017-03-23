@@ -129,7 +129,7 @@ require.config({
         //Interceptors
         "cleanupPayloadInterceptor": "app/interceptors/cleanup.payload.interceptor",
         "configureRequestInterceptor": "app/interceptors/configure.request.interceptor",
-        "handleTimeoutInterceptor": "app/interceptors/handle.timeout.interceptor",
+        "handleResponseErrorInterceptor": "app/interceptors/handle.response.error.interceptor",
         "logRequestReponseInterceptor": "app/interceptors/log.request.response.interceptor",
 
         //Queue
