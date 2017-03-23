@@ -226,6 +226,28 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 expect(chartRepository.upsertChartData).toHaveBeenCalledWith(mockChart.id, 'Mod3', 'data3');
             });
 
+            it('should not continue download of charts if a call fails because of loss of network connectivity', function() {
+                var usersModules = [{
+                    id: 'Mod1'
+                }, {
+                    id: 'Mod2'
+                }];
+
+                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, usersModules));
+                reportService.getReportDataForOrgUnit.and.callFake(function(chart, moduleId) {
+                    if (moduleId === 'Mod1')
+                        return utils.getPromise(q, 'data1');
+                    if (moduleId === 'Mod2')
+                        return utils.getRejectedPromise(q, { errorCode: 'NETWORK_UNAVAILABLE' });
+                });
+
+                downloadChartDataConsumer.run();
+                scope.$apply();
+
+                expect(chartRepository.upsertChartData).not.toHaveBeenCalledWith(mockChart.id, 'Mod2', 'data2');
+                expect(chartRepository.upsertChartData).not.toHaveBeenCalledWith(mockChart.id, 'Mod1', 'data1');
+            });
+
             it('should not download chart data if user has no modules', function() {
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, []));
 

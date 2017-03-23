@@ -1,4 +1,4 @@
-define(["lodash", "moment"], function(_, moment) {
+define(["lodash", "moment", "constants"], function(_, moment, constants) {
     return function(reportService, systemInfoService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository, $q) {
 
         this.run = function() {
@@ -19,8 +19,11 @@ define(["lodash", "moment"], function(_, moment) {
                         });
                     };
 
-                    var onFailure = function() {
+                    var onFailure = function(response) {
                         allDownloadsWereSuccessful = false;
+                        if(response && response.errorCode === constants.errorCodes.NETWORK_UNAVAILABLE) {
+                            return $q.reject();
+                        }
                         return recursivelyDownloadAndUpsertChartData(modulesAndCharts);
                     };
 
