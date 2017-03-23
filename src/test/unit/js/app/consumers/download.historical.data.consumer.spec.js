@@ -153,19 +153,21 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                         scope.$apply();
                     });
 
-                    it('should download data values', function () {
-                        expect(dataService.downloadData).toHaveBeenCalledWith(mockModuleA.id, dataSetIds, jasmine.any(Array));
-                    });
-
-                    it('should not download data values if it were already downloaded', function () {
-                        expect(dataService.downloadData).not.toHaveBeenCalledWith(mockModuleB.id, dataSetIds, jasmine.any(Array));
-                        expect(dataService.downloadData).toHaveBeenCalledWith(mockModuleC.id, dataSetIds, jasmine.any(Array));
-                    });
-
-                    it('should download the data in chunks of periods for each module', function () {
+                    it('should download data values in chunks without lastUpdated if it is downloading for the first time', function () {
                         var periodChunks = _.chunk(mockPeriodRange, periodChunkSize);
-                        expect(dataService.downloadData).toHaveBeenCalledWith(mockModuleA.id, dataSetIds, periodChunks[0]);
-                        expect(dataService.downloadData).toHaveBeenCalledWith(mockModuleA.id, dataSetIds, periodChunks[1]);
+
+                        var methodCallsForModuleC = _.map(dataService.downloadData.calls.allArgs(), function (callArgs, index) {
+                            return [callArgs[0], callArgs[1], periodChunks[index]];
+                        });
+
+                        expect(methodCallsForModuleC).toContain([mockModuleA.id, dataSetIds, periodChunks[0]]);
+                        expect(methodCallsForModuleC).toContain([mockModuleA.id, dataSetIds, periodChunks[1]]);
+                        expect(methodCallsForModuleC).toContain([mockModuleA.id, dataSetIds, periodChunks[2]]);
+                        expect(methodCallsForModuleC).toContain([mockModuleA.id, dataSetIds, periodChunks[3]]);
+                    });
+
+                    it('should download data values in a single chunk with lastUpdated if it were already downloaded', function () {
+                        expect(dataService.downloadData).toHaveBeenCalledWith(mockModuleB.id, dataSetIds, mockPeriodRange, 'someLastUpdatedTime');
                     });
 
                     it('should upsert the datavalues into IndexedDB after downloading data values', function () {
@@ -190,12 +192,12 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                         expect(dataService.downloadData).not.toHaveBeenCalledWith(mockModuleA.id);
                     });
 
-                    it('should download events', function () {
-                        expect(eventService.getEvents).toHaveBeenCalledWith(mockModuleA.id, mockPeriodRange);
+                    it('should download events without lastUpdated if it is downloading for the first time', function () {
+                        expect(eventService.getEvents).toHaveBeenCalledWith(mockModuleA.id, mockPeriodRange, undefined);
                     });
 
-                    it('should not download events if it were already downloaded', function() {
-                        expect(eventService.getEvents).not.toHaveBeenCalledWith(mockModuleC.id);
+                    it('should download the events with lastUpdated if it were already downloaded', function() {
+                        expect(eventService.getEvents).toHaveBeenCalledWith(mockModuleB.id, mockPeriodRange, 'someLastUpdatedTime');
                     });
 
                     it('should upsert the events into IndexedDB after downloading events', function () {
@@ -208,7 +210,8 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                     scope.$apply();
 
                     expect(changeLogRepository.upsert).toHaveBeenCalledWith('yearlyDataValues:projectA:moduleA', jasmine.any(String));
-                    expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('yearlyDataValues:projectB:moduleB', jasmine.any(String));
+                    expect(changeLogRepository.upsert).toHaveBeenCalledWith('yearlyDataValues:projectB:moduleB', jasmine.any(String));
+                    expect(changeLogRepository.upsert).toHaveBeenCalledWith('yearlyDataValues:projectB:moduleC', jasmine.any(String));
                 });
 
                 it('should upsert the changeLog with the server time', function () {
@@ -217,14 +220,6 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                     scope.$apply();
 
                     expect(changeLogRepository.upsert).toHaveBeenCalledWith(jasmine.any(String), 'someTime');
-                });
-
-                it('should not make systemInfo call if historical data is already downloaded', function () {
-                    changeLogRepository.get.and.returnValue(utils.getPromise(q, 'lastUpdatedTime'));
-                    downloadHistoricalDataConsumer.run();
-                    scope.$apply();
-
-                    expect(systemInfoService.getServerDate).not.toHaveBeenCalled();
                 });
             });
         });
