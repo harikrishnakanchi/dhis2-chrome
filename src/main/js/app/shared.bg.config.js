@@ -143,7 +143,10 @@ require.config({
         "dhisUrl": "app/utils/dhis.url",
         "interpolate": "app/utils/interpolate",
         "pagingUtils": "app/utils/paging.utils",
-        "hustlePublishUtils": "app/utils/hustle.publish.utils"
+        "hustlePublishUtils": "app/utils/hustle.publish.utils",
+
+        //Constants
+        "constants": "app/constants/constants"
     },
     waitSeconds: 0,
     shim: {

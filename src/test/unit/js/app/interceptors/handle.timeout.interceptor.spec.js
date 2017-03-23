@@ -72,5 +72,38 @@ define(["handleTimeoutInterceptor", "angularMocks", "properties", "platformUtils
             expect(platformUtils.sendMessage).not.toHaveBeenCalled();
             expect(fakeHttp).not.toHaveBeenCalled();
         });
+
+        describe('errorCodes', function () {
+            beforeEach(function () {
+                spyOn(q, "reject");
+            });
+
+            var getRejectionPayload = function (status) {
+                return {
+                    config: {
+                        method: "HEAD",
+                    },
+                    status: status
+                };
+            };
+
+            it('should send the appropriate error code on failure', function () {
+                var expectedRejection = getRejectionPayload(401);
+                expectedRejection.errorCode = "UNAUTHORISED";
+
+                handleTimeoutInterceptor.responseError(getRejectionPayload(401));
+                expect(q.reject).toHaveBeenCalledWith(expectedRejection);
+            });
+
+            it('should send the appropriate error code when there is no internet', function () {
+                injector.get('dhisMonitor').isOnline.and.returnValue(false);
+
+                var expectedRejection = getRejectionPayload('someStatus');
+                expectedRejection.errorCode = "NETWORK_UNAVAILABLE";
+
+                handleTimeoutInterceptor.responseError(getRejectionPayload('someStatus'));
+                expect(q.reject).toHaveBeenCalledWith(expectedRejection);
+            });
+        });
     });
 });
