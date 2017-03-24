@@ -1,15 +1,19 @@
-define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties', 'moment', 'downloadHistoricalDataConsumer', 'dataService', 'systemInfoService',
+define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties', 'moment', 'mergeBy', 'downloadHistoricalDataConsumer', 'dataService', 'systemInfoService',
         'userPreferenceRepository', 'orgUnitRepository', 'dataSetRepository', 'changeLogRepository', 'dataRepository', 'programEventRepository','eventService','customAttributes'],
-    function (utils, timecop, mocks, _, dateUtils, properties, moment, DownloadHistoricalDataConsumer, DataService, SystemInfoService, UserPreferenceRepository,
+    function (utils, timecop, mocks, _, dateUtils, properties, moment, MergeBy, DownloadHistoricalDataConsumer, DataService, SystemInfoService, UserPreferenceRepository,
               OrgUnitRepository, DatasetRepository, ChangeLogRepository, DataRepository, ProgramEventRepository, EventService, customAttributes) {
         describe('DownloadHistoricalDataConsumer', function () {
-            var scope, q, downloadHistoricalDataConsumer, dataService, eventService, systemInfoService, userPreferenceRepository, orgUnitRepository,
+            var scope, q, log, mergeBy, downloadHistoricalDataConsumer, dataService, eventService, systemInfoService, userPreferenceRepository, orgUnitRepository,
                 datasetRepository, dataRepository, changeLogRepository, programEventRepository,
                 mockOrigins, mockDataSets, mockPeriodRange, periodChunkSize, mockPayload, mockProjectA, mockProjectB, mockModuleA, mockModuleB, mockModuleC;
 
-            beforeEach(mocks.inject(function ($q, $rootScope) {
+            beforeEach(mocks.inject(function ($q, $rootScope, $log) {
                 q = $q;
                 scope = $rootScope.$new();
+                log = $log;
+
+                mergeBy = MergeBy($log);
+                spyOn(mergeBy, 'lastUpdated');
 
                 mockProjectA = { id: 'projectA' };
                 mockProjectB = { id: 'projectB' };
@@ -66,11 +70,12 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
 
                 dataRepository = new DataRepository();
                 spyOn(dataRepository, 'saveDhisData').and.returnValue(utils.getPromise(q, {}));
+                spyOn(dataRepository, 'getDataValuesForOrgUnitsAndPeriods').and.returnValue(utils.getPromise(q, {}));
 
                 programEventRepository = new ProgramEventRepository();
                 spyOn(programEventRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
 
-                downloadHistoricalDataConsumer = new DownloadHistoricalDataConsumer(q, dataService, eventService, systemInfoService, userPreferenceRepository, orgUnitRepository, datasetRepository, changeLogRepository, dataRepository, programEventRepository);
+                downloadHistoricalDataConsumer = new DownloadHistoricalDataConsumer(q, mergeBy, dataService, eventService, systemInfoService, userPreferenceRepository, orgUnitRepository, datasetRepository, changeLogRepository, dataRepository, programEventRepository);
             }));
 
             afterEach(function () {
@@ -153,6 +158,10 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                         scope.$apply();
                     });
 
+                    it('should not download events', function () {
+                        expect(eventService.getEvents).not.toHaveBeenCalled();
+                    });
+
                     it('should download data values in chunks without lastUpdated if it is downloading for the first time', function () {
                         var periodChunks = _.chunk(mockPeriodRange, periodChunkSize);
 
@@ -170,13 +179,39 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                         expect(dataService.downloadData).toHaveBeenCalledWith(mockModuleB.id, dataSetIds, mockPeriodRange, 'someLastUpdatedTime');
                     });
 
-                    it('should upsert the datavalues into IndexedDB after downloading data values', function () {
-                        expect(dataRepository.saveDhisData).toHaveBeenCalledWith(mockPayload);
+                    describe('save to indexedDB', function () {
+                        var mockDHISData, mockPraxisData, mockMergedData;
+
+                        beforeEach(function () {
+                            mockMergedData = ['someMockMergedDataValues'];
+
+                            dataService.downloadData.and.returnValue(utils.getPromise(q, mockDHISData));
+                            dataRepository.getDataValuesForOrgUnitsAndPeriods.and.returnValue(utils.getPromise(q, mockPraxisData));
+                            mergeBy.lastUpdated.and.returnValue(mockMergedData);
+
+                            downloadHistoricalDataConsumer.run();
+                            scope.$apply();
+                        });
+
+                        it('should get praxis data', function () {
+                            expect(dataRepository.getDataValuesForOrgUnitsAndPeriods).toHaveBeenCalledWith([mockOrigins[0].id, mockOrigins[1].id, mockModuleB.id], mockPeriodRange);
+
+                            var periodChunks = _.chunk(mockPeriodRange, periodChunkSize);
+                            expect(dataRepository.getDataValuesForOrgUnitsAndPeriods).toHaveBeenCalledWith([mockOrigins[0].id, mockOrigins[1].id, mockModuleC.id], periodChunks[0]);
+                            expect(dataRepository.getDataValuesForOrgUnitsAndPeriods).toHaveBeenCalledWith([mockOrigins[0].id, mockOrigins[1].id, mockModuleC.id], periodChunks[1]);
+                            expect(dataRepository.getDataValuesForOrgUnitsAndPeriods).toHaveBeenCalledWith([mockOrigins[0].id, mockOrigins[1].id, mockModuleC.id], periodChunks[2]);
+                            expect(dataRepository.getDataValuesForOrgUnitsAndPeriods).toHaveBeenCalledWith([mockOrigins[0].id, mockOrigins[1].id, mockModuleC.id], periodChunks[3]);
+                        });
+
+                        it('should merge the data values from Praxis and DHIS by lastUpdated', function () {
+                            expect(mergeBy.lastUpdated).toHaveBeenCalledWith({ eq: jasmine.any(Function) }, mockDHISData, mockPraxisData);
+                        });
+
+                        it('should upsert the merged datavalues into IndexedDB', function () {
+                            expect(dataRepository.saveDhisData).toHaveBeenCalledWith(mockMergedData);
+                        });
                     });
 
-                    it('should not download events', function () {
-                        expect(eventService.getEvents).not.toHaveBeenCalled();
-                    });
                 });
 
                 describe('LineList modules', function () {

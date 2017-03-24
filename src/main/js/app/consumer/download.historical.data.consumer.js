@@ -1,5 +1,5 @@
 define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes', 'constants'], function (_, moment, dateUtils, properties, customAttributes, constants) {
-    return function ($q, dataService, eventService, systemInfoService, userPreferenceRepository, orgUnitRepository, datasetRepository, changeLogRepository, dataRepository, programEventRepository) {
+    return function ($q, mergeBy, dataService, eventService, systemInfoService, userPreferenceRepository, orgUnitRepository, datasetRepository, changeLogRepository, dataRepository, programEventRepository) {
         var CHANGE_LOG_PREFIX = 'yearlyDataValues',
             CHUNK_SIZE = 11;
 
@@ -37,6 +37,13 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes', 'cons
         };
 
         var downloadData = function (modules) {
+            var dataValueEquals = function (dataValueA, dataValueB) {
+                return dataValueA.dataElement === dataValueB.dataElement &&
+                    dataValueA.period === dataValueB.period &&
+                    dataValueA.orgUnit === dataValueB.orgUnit &&
+                    dataValueA.categoryOptionCombo === dataValueB.categoryOptionCombo;
+            };
+
             var periodRange = _.difference(dateUtils.getPeriodRangeInWeeks(properties.projectDataSync.numWeeksForHistoricalData, {excludeCurrent: true}),
                 dateUtils.getPeriodRangeInWeeks(properties.projectDataSync.numWeeksToSync));
 
@@ -56,7 +63,12 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes', 'cons
 
                         return _.reduce(periodChunks, function (moduleChunkPromise, periodChunk) {
                             return moduleChunkPromise.then(function () {
-                                return dataService.downloadData(module.id, module.dataSetIds, periodChunk, lastUpdatedTime).then(dataRepository.saveDhisData);
+                                return $q.all({
+                                    dataValuesFromDHIS: dataService.downloadData(module.id, module.dataSetIds, periodChunk, lastUpdatedTime),
+                                    dataValuesInPraxis: dataRepository.getDataValuesForOrgUnitsAndPeriods(_.map(module.origins, 'id').concat(module.id), periodChunk)
+                                }).then(function (data) {
+                                    return dataRepository.saveDhisData(mergeBy.lastUpdated({ eq: dataValueEquals }, data.dataValuesFromDHIS, data.dataValuesInPraxis));
+                                });
                             });
                         }, $q.when());
                     };
