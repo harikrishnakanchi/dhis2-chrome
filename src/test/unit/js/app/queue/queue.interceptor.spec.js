@@ -121,7 +121,7 @@ define(["queueInterceptor", "angularMocks", "properties", "platformUtils", "util
             };
 
             var data = {
-                "status": 401
+                "errorCode": "UNAUTHORISED"
             };
 
             queueInterceptor.shouldRetry(job, data);

@@ -1,4 +1,4 @@
-define(['dataStoreService', 'angularMocks', 'dhisUrl'], function (DataStoreService, mocks, dhisUrl) {
+define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataStoreService, mocks, dhisUrl, utils) {
     var dataStoreService, http, httpBackend, storeNamespace, q;
     describe('dataStoreService', function() {
         beforeEach(mocks.inject(function ($httpBackend, $http, $q) {
@@ -52,16 +52,10 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl'], function (DataStoreServi
                 });
 
                 it('should gracefully return undefined if there is no excluded options for specified module', function () {
-                    var mockErrorResponse = {};
-
-                    var result = "someRandomValue";
+                    spyOn(http, 'get').and.returnValue(utils.getRejectedPromise(q, {errorCode: 'NOT_FOUND'}));
                     dataStoreService.getExcludedOptions(moduleId).then(function (data) {
-                        result = data;
+                        expect(data).toBeUndefined();
                     });
-
-                    httpBackend.expectGET(url).respond(404, mockErrorResponse);
-                    httpBackend.flush();
-                    expect(result).toBeUndefined();
                 });
 
                 it('should reject promise if there is some server error', function () {
@@ -101,14 +95,11 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl'], function (DataStoreServi
             });
 
             it('should return empty list if namespace is not exist', function () {
-                var actualKeys;
+                spyOn(http, 'get').and.returnValue(utils.getRejectedPromise(q, {errorCode: 'NOT_FOUND'}));
                 dataStoreService.getKeysForExcludedOptions().then(function (data) {
-                    actualKeys = data;
+                    expect(data).toEqual([]);
                 });
-
-                httpBackend.expectGET(url).respond(404, {});
-                httpBackend.flush();
-                expect(actualKeys).toEqual([]);
+                expect(http.get).toHaveBeenCalled();
             });
         });
     });

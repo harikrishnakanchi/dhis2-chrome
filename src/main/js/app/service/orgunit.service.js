@@ -1,4 +1,4 @@
-define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], function(dhisUrl, _, metadataConf, pagingUtils, properties) {
+define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties", "constants"], function(dhisUrl, _, metadataConf, pagingUtils, properties, constants) {
     return function($http) {
 
         this.assignDataSetToOrgUnit = function(orgUnitId, dataSetId) {
@@ -8,7 +8,7 @@ define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], funct
         this.removeDataSetFromOrgUnit = function(orgUnitId, dataSetId) {
             return $http.delete(dhisUrl.orgUnits + '/' + orgUnitId + '/dataSets/' + dataSetId)
                 .catch(function (response) {
-                    if (response.status != 404) {
+                    if (response.errorCode !== constants.errorCodes.NOT_FOUND) {
                         return $q.reject();
                     }
                 });

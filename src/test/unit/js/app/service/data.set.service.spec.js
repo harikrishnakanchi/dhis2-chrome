@@ -1,4 +1,4 @@
-define(["dataSetService", "angularMocks", "properties", "metadataConf", "pagingUtils"], function(DatasetService, mocks, properties, metadataConf, pagingUtils) {
+define(["dataSetService", "angularMocks", "properties", "metadataConf", "pagingUtils", "utils"], function(DatasetService, mocks, properties, metadataConf, pagingUtils, utils) {
     describe("dataset service", function() {
         var http, httpBackend, datasetService, q;
 
@@ -99,14 +99,12 @@ define(["dataSetService", "angularMocks", "properties", "metadataConf", "pagingU
             var datasetId = 'datasetId';
             var orgUnitId = 'orgUnitId';
 
+            spyOn(http, 'delete').and.returnValue(utils.getRejectedPromise(q, {errorCode: 'NOT_FOUND'}));
             var success = false;
             datasetService.removeOrgUnitFromDataset(datasetId, orgUnitId).then(function () {
                 success = true;
+                expect(success).toBeTruthy();
             });
-
-            httpBackend.expectDELETE(properties.dhis.url + '/api/dataSets/' + datasetId + '/organisationUnits/' + orgUnitId).respond(404);
-            httpBackend.flush();
-            expect(success).toBeTruthy();
         });
     });
 });

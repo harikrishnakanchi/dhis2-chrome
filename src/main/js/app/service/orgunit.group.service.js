@@ -1,4 +1,4 @@
-define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], function(dhisUrl, _, metadataConf, pagingUtils, properties) {
+define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties", "constants"], function(dhisUrl, _, metadataConf, pagingUtils, properties, constants) {
     return function($http, $q) {
 
         this.get = function (orgUnitGroupIds) {
@@ -45,7 +45,7 @@ define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], funct
         this.deleteOrgUnit = function (orgUnitGroupId, orgUnitId) {
             return $http.delete(dhisUrl.orgUnitGroups + "/" + orgUnitGroupId + "/organisationUnits/" + orgUnitId)
                 .catch(function (response) {
-                    if (response.status === 404) {
+                    if (response.errorCode === constants.errorCodes.NOT_FOUND) {
                         return $q.when();
                     } else {
                         return $q.reject(response);

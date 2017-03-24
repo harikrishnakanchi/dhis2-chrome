@@ -1,4 +1,4 @@
-define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataConf'], function (dhisUrl, moment, properties, _, pagingUtils, metadataConf) {
+define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataConf', 'constants'], function (dhisUrl, moment, properties, _, pagingUtils, metadataConf, constants) {
     return function ($http, $q, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository,
                      systemSettingRepository, orgUnitRepository, userRepository, systemInfoService) {
 
@@ -290,7 +290,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 .then(updateMetadataChangeLog)
                 .then(deferred.resolve)
                 .catch(function (response) {
-                    var data = response.status == 401 ? "productKeyExpired" : "downloadFailed";
+                    var data = response.errorCode === constants.errorCodes.UNAUTHORISED ? "productKeyExpired" : "downloadFailed";
                     deferred.reject(data);
                 });
 

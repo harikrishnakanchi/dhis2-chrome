@@ -1,4 +1,4 @@
-define(["dhisUrl"], function (dhisUrl) {
+define(["dhisUrl", "constants"], function (dhisUrl, constants) {
     return function ($http, $q) {
         var NAMESPACE = "praxis";
         var EXCLUDED_OPTIONS = "_excludedOptions";
@@ -23,7 +23,7 @@ define(["dhisUrl"], function (dhisUrl) {
             return $http.get(url)
                 .then(extractDataFromResponse)
                 .catch(function (response) {
-                    return response.status == 404 ? undefined : $q.reject();
+                    return response.errorCode === constants.errorCodes.NOT_FOUND ? undefined : $q.reject();
                 });
         };
 
@@ -32,7 +32,7 @@ define(["dhisUrl"], function (dhisUrl) {
             return $http.get(url)
                 .then(extractDataFromResponse)
                 .catch(function (response) {
-                return response.status == 404 ? [] : $q.reject();
+                return response.errorCode === constants.errorCodes.NOT_FOUND ? [] : $q.reject();
             });
         };
 
