@@ -101,15 +101,7 @@ self.addEventListener('install', function(event) {
     });
   };
 
-  var shouldUpgrade = caches.open(cacheName).then(function (cache) {
-    return setOfCachedUrls(cache).then(function (cachedUrls) {
-      if(cachedUrls.size >= urlsToCacheKeys.size) {
-        return checkForSyncStatus();
-      } else {
-        return Promise.resolve();
-      }
-    });
-  });
+  var shouldUpgrade = self.registration.active ? checkForSyncStatus() : Promise.resolve();
 
   event.waitUntil(
     shouldUpgrade.then(function() {
