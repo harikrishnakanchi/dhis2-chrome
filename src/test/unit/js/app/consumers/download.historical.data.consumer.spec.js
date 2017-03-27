@@ -1,10 +1,10 @@
 define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties', 'moment', 'mergeBy', 'downloadHistoricalDataConsumer', 'dataService', 'systemInfoService',
-        'userPreferenceRepository', 'orgUnitRepository', 'dataSetRepository', 'changeLogRepository', 'dataRepository', 'programEventRepository','eventService','customAttributes'],
+        'userPreferenceRepository', 'orgUnitRepository', 'dataSetRepository', 'changeLogRepository', 'dataRepository', 'programEventRepository', 'eventService', 'lineListEventsMerger', 'customAttributes'],
     function (utils, timecop, mocks, _, dateUtils, properties, moment, MergeBy, DownloadHistoricalDataConsumer, DataService, SystemInfoService, UserPreferenceRepository,
-              OrgUnitRepository, DatasetRepository, ChangeLogRepository, DataRepository, ProgramEventRepository, EventService, customAttributes) {
+              OrgUnitRepository, DatasetRepository, ChangeLogRepository, DataRepository, ProgramEventRepository, EventService, LineListEventsMerger, customAttributes) {
         describe('DownloadHistoricalDataConsumer', function () {
             var scope, q, log, mergeBy, downloadHistoricalDataConsumer, dataService, eventService, systemInfoService, userPreferenceRepository, orgUnitRepository,
-                datasetRepository, dataRepository, changeLogRepository, programEventRepository,
+                datasetRepository, dataRepository, changeLogRepository, programEventRepository, lineListEventsMerger,
                 mockOrigins, mockDataSets, mockPeriodRange, periodChunkSize, mockPayload, mockProjectA, mockProjectB, mockModuleA, mockModuleB, mockModuleC;
 
             beforeEach(mocks.inject(function ($q, $rootScope, $log) {
@@ -74,8 +74,12 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
 
                 programEventRepository = new ProgramEventRepository();
                 spyOn(programEventRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
+                spyOn(programEventRepository, 'getEventsForOrgUnitsAndPeriods').and.returnValue(utils.getPromise(q, {}));
 
-                downloadHistoricalDataConsumer = new DownloadHistoricalDataConsumer(q, mergeBy, dataService, eventService, systemInfoService, userPreferenceRepository, orgUnitRepository, datasetRepository, changeLogRepository, dataRepository, programEventRepository);
+                lineListEventsMerger = new LineListEventsMerger();
+                spyOn(lineListEventsMerger, 'create').and.returnValue({});
+
+                downloadHistoricalDataConsumer = new DownloadHistoricalDataConsumer(q, mergeBy, dataService, eventService, systemInfoService, userPreferenceRepository, orgUnitRepository, datasetRepository, changeLogRepository, dataRepository, programEventRepository, lineListEventsMerger);
             }));
 
             afterEach(function () {
@@ -215,9 +219,17 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                 });
 
                 describe('LineList modules', function () {
+                    var mockDHISEvents, mockPraxisEvents;
+
                     beforeEach(function() {
                         spyOn(customAttributes, 'getBooleanAttributeValue').and.returnValue(true);
-                        eventService.getEvents.and.returnValue(utils.getPromise(q, mockPayload));
+
+                        mockDHISEvents = ['someDHISEvents'];
+                        mockPraxisEvents = ['somePraxisEvents'];
+                        eventService.getEvents.and.returnValue(utils.getPromise(q, mockDHISEvents));
+                        programEventRepository.getEventsForOrgUnitsAndPeriods.and.returnValue(utils.getPromise(q, mockPraxisEvents));
+
+                        lineListEventsMerger.create.and.returnValue({ eventsToUpsert: mockDHISEvents });
 
                         downloadHistoricalDataConsumer.run();
                         scope.$apply();
@@ -235,8 +247,16 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                         expect(eventService.getEvents).toHaveBeenCalledWith(mockModuleB.id, mockPeriodRange, 'someLastUpdatedTime');
                     });
 
+                    it('should get Praxis events from indexedDB', function () {
+                        expect(programEventRepository.getEventsForOrgUnitsAndPeriods).toHaveBeenCalledWith([mockOrigins[0].id, mockOrigins[1].id], mockPeriodRange);
+                    });
+
+                    it('should merge Praxis and DHIS events', function () {
+                        expect(lineListEventsMerger.create).toHaveBeenCalledWith(mockPraxisEvents, mockDHISEvents);
+                    });
+
                     it('should upsert the events into IndexedDB after downloading events', function () {
-                        expect(programEventRepository.upsert).toHaveBeenCalledWith(mockPayload);
+                        expect(programEventRepository.upsert).toHaveBeenCalledWith(mockDHISEvents);
                     });
                 });
 

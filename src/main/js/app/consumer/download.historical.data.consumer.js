@@ -1,5 +1,5 @@
 define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes', 'constants'], function (_, moment, dateUtils, properties, customAttributes, constants) {
-    return function ($q, mergeBy, dataService, eventService, systemInfoService, userPreferenceRepository, orgUnitRepository, datasetRepository, changeLogRepository, dataRepository, programEventRepository) {
+    return function ($q, mergeBy, dataService, eventService, systemInfoService, userPreferenceRepository, orgUnitRepository, datasetRepository, changeLogRepository, dataRepository, programEventRepository, lineListEventsMerger) {
         var CHANGE_LOG_PREFIX = 'yearlyDataValues',
             CHUNK_SIZE = 11;
 
@@ -74,7 +74,12 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes', 'cons
                     };
 
                     var downloadLineListEvents = function () {
-                        return eventService.getEvents(module.id, periodRange, lastUpdatedTime).then(programEventRepository.upsert);
+                        return $q.all({
+                            eventsFromDHIS: eventService.getEvents(module.id, periodRange, lastUpdatedTime),
+                            eventsInPraxis: programEventRepository.getEventsForOrgUnitsAndPeriods(_.map(module.origins, 'id'), periodRange)
+                        }).then(function (data) {
+                            return programEventRepository.upsert(lineListEventsMerger.create(data.eventsInPraxis, data.eventsFromDHIS).eventsToUpsert);
+                        });
                     };
 
                     return getServerTime().then(function () {

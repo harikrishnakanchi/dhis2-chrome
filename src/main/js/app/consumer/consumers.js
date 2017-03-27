@@ -48,7 +48,7 @@ define(["downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupC
                 "moduleDataBlockFactory", "moduleDataBlockMerger", "eventService", "$q", downloadModuleDataBlocksConsumer]);
             app.service("syncModuleDataBlockConsumer", ["moduleDataBlockFactory", "dataService", "eventService", "dataSetRepository", "approvalService", "orgUnitRepository", "changeLogRepository", "moduleDataBlockMerger", "$q", syncModuleDataBlockConsumer]);
             app.service("syncExcludedLinelistOptionsConsumer", ["$q", "excludedLinelistOptionsMerger", syncExcludedLinelistOptionsConsumer]);
-            app.service("downloadHistoricalDataConsumer", ["$q", "mergeBy", "dataService", "eventService", "systemInfoService", "userPreferenceRepository", "orgUnitRepository", "dataSetRepository", "changeLogRepository", "dataRepository", "programEventRepository", downloadHistoricalDataConsumer]);
+            app.service("downloadHistoricalDataConsumer", ["$q", "mergeBy", "dataService", "eventService", "systemInfoService", "userPreferenceRepository", "orgUnitRepository", "dataSetRepository", "changeLogRepository", "dataRepository", "programEventRepository", "lineListEventsMerger", downloadHistoricalDataConsumer]);
             app.service("syncOrgUnitConsumer", ["$q", "orgUnitService", "orgUnitRepository", syncOrgUnitConsumer]);
             app.service("dispatcher", ["$q", "$log", "downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupConsumer", "downloadDataSetConsumer", "assignDataSetsToOrgUnitsConsumer",
                 "createUserConsumer", "updateUserConsumer", "uploadProgramConsumer",
