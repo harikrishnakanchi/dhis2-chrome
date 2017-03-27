@@ -200,6 +200,17 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
             return getEvents().then(filterEvents).then(_.curry(enrichEvents)(programId));
         };
 
+        this.getEventsForOrgUnitsAndPeriods = function (orgUnitIds, periods) {
+            var query = db.queryBuilder().$in(orgUnitIds).$index("by_organisationUnit").compile();
+            var store = db.objectStore('programEvents');
+            return store.each(query).then(function(events) {
+                var eventsGroupedByPeriod = _.groupBy(events, 'period');
+                return _.reduce(periods, function (events, period) {
+                    return eventsGroupedByPeriod[period] ? events.concat(eventsGroupedByPeriod[period]) : events;
+                }, []);
+            });
+        };
+
         this.findEventsByDateRange = function(programId, orgUnitIds, fromDate, toDate) {
             orgUnitIds = _.flatten([orgUnitIds]);
 

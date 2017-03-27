@@ -444,6 +444,24 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             expect(actualData).toEqual(expectedEvents);
         });
 
+        it('should get events for multiple orgUnits and multiple periods', function () {
+            var events = [{ period: '2016W01' }, { period: '2016W03' }, { period: '2016W04' }, { period: '2016W07' }];
+            
+            mockStore.each.and.returnValue(utils.getPromise(q, events));
+            
+            initializeRepository();
+            
+            var actualData;
+            programEventRepository.getEventsForOrgUnitsAndPeriods(['ou1', 'ou2'], ['2016W03', '2016W05', '2016W06', '2016W07']).then(function(data) {
+                actualData = data;
+            });
+            scope.$apply();
+
+            var expectedData = [events[1], events[3]];
+
+            expect(actualData).toEqual(expectedData);
+        });
+
         it("should get Submitable Events", function() {
             var events = [{
                 'event': 'event1',
