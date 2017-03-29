@@ -138,7 +138,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         $rootScope.isBackgroundRunning = false;
                     };
 
-                    platformUtils.addListener("startBgApp", startBgApp);
+                    platformUtils.addListener("startBgApp", _.debounce(startBgApp, 1000, {leading: true}));
 
                     platformUtils.addListener("stopBgApp", stopBgApp);
 
