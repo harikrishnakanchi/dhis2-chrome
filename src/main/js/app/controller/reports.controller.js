@@ -266,16 +266,12 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 weeklyChartsLastUpdated: changeLogRepository.get('weeklyChartData:' + projectId),
                 weeklyPivotTableDataLastUpdated: changeLogRepository.get('weeklyPivotTableData:' + projectId),
                 monthlyChartsLastUpdated: changeLogRepository.get('monthlyChartData:' + projectId),
-                monthlyPivotTableLastUpdated: changeLogRepository.get('monthlyPivotTableData:' + projectId),
-                yearlyChartsLastUpdated: changeLogRepository.get('yearlyChartData:' + projectId),
-                yearlyPivotTableLastUpdated: changeLogRepository.get('yearlyPivotTableData:' + projectId)
+                monthlyPivotTableLastUpdated: changeLogRepository.get('monthlyPivotTableData:' + projectId)
             }).then(function (data) {
                 $scope.updatedForWeeklyChart = formatLastUpdatedTime(data.weeklyChartsLastUpdated);
                 $scope.updatedForWeeklyPivotTable = formatLastUpdatedTime(data.weeklyPivotTableDataLastUpdated);
                 $scope.updatedForMonthlyChart = formatLastUpdatedTime(data.monthlyChartsLastUpdated);
                 $scope.updatedForMonthlyPivotTable = formatLastUpdatedTime(data.monthlyPivotTableLastUpdated);
-                $scope.updatedForYearlyChart = formatLastUpdatedTime(data.yearlyChartsLastUpdated);
-                $scope.updatedForYearlyPivotTable = formatLastUpdatedTime(data.yearlyPivotTableLastUpdated);
             });
         };
 
