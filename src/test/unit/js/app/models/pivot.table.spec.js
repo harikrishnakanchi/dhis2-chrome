@@ -161,6 +161,7 @@ define(['pivotTable'], function(PivotTable) {
        describe('hideWeeks', function () {
            it('should return true if an indicator numerator is using program indicator', function () {
                config = {
+                   relativePeriods: { last12Weeks: false },
                    dataDimensionItems: [{
                        indicator: {
                            id: 'someIndicator',
@@ -174,6 +175,7 @@ define(['pivotTable'], function(PivotTable) {
 
            it('should return false if an indicator numerator is not using program indicator', function () {
                config = {
+                   relativePeriods: { last12Weeks: false },
                    dataDimensionItems: [{
                        indicator: {
                            id: 'someIndicator',
@@ -187,6 +189,7 @@ define(['pivotTable'], function(PivotTable) {
 
            it('should return true if an indicator denominator is using program indicator', function () {
                config = {
+                   relativePeriods: { last12Weeks: false },
                    dataDimensionItems: [{
                        indicator: {
                            id: 'someIndicator',
@@ -198,8 +201,9 @@ define(['pivotTable'], function(PivotTable) {
                expect(pivotTable.hideWeeks).toBe(true);
            });
 
-           it('should return false if an indicator denominator is using program indicator', function () {
+           it('should return false if an indicator denominator is not using program indicator', function () {
                config = {
+                   relativePeriods: { last12Weeks: false },
                    dataDimensionItems: [{
                        indicator: {
                            id: 'someIndicator',
@@ -213,6 +217,7 @@ define(['pivotTable'], function(PivotTable) {
 
            it('should return true if data dimension contains atleast one program indicator', function () {
                config = {
+                   relativePeriods: { last12Weeks: false },
                    dataDimensionItems: [{
                        programIndicator: 'someProgramIndicator'
                    }]
@@ -221,6 +226,11 @@ define(['pivotTable'], function(PivotTable) {
                expect(pivotTable.hideWeeks).toBe(true);
            });
 
+           it('should return true if it is a weekly report', function () {
+               config = { relativePeriods: { last12Weeks: true } };
+               pivotTable = PivotTable.create(config);
+               expect(pivotTable.hideWeeks).toBe(true);
+           });
        });
    });
 });

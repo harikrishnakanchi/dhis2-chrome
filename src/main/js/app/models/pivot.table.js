@@ -31,7 +31,7 @@ define(['lodash'], function (_) {
         this.monthlyReport = isReportOfType(config.relativePeriods, "Month");
         this.weeklyReport = isReportOfType(config.relativePeriods, "Week");
         this.yearlyReport = !(this.monthlyReport || this.weeklyReport);
-        this.hideWeeks = hideWeeks(this.dataDimensionItems);
+        this.hideWeeks = this.weeklyReport || hideWeeks(this.dataDimensionItems);
 
         this.displayPosition = parseDisplayPosition(this.name);
     };
