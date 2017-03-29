@@ -144,7 +144,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     }).
                     when('/orgUnits', {
                         templateUrl: 'templates/orgunits.html',
-                        controller: 'orgUnitContoller',
+                        controller: 'orgUnitController',
                         data: {
                             allowedRoles: [USER_ROLES.PROJECT_ADMIN, USER_ROLES.SUPER_ADMIN]
                         },

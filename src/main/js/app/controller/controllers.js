@@ -1,11 +1,11 @@
-define(['reportsController', 'moduleWeekSelectorController', 'headerController', 'orgUnitContoller', 'loginController', 'opUnitController', 'aggregateModuleController',
+define(['reportsController', 'moduleWeekSelectorController', 'headerController', 'orgUnitController', 'loginController', 'opUnitController', 'aggregateModuleController',
         'lineListModuleController', 'projectController', 'countryController', 'confirmDialogController', 'projectUserController',
         'aggregateDataEntryController', 'lineListDataEntryController', 'patientOriginController', 'productKeyController',
         'lineListSummaryController', 'dataApprovalController', 'dashboardController', 'lineListOfflineApprovalController', 'appCloneController', 'downloadDataController', 'notificationDialogController', 'selectLanguageController',
         'referralLocationsController', 'notificationsController', 'selectProjectPreferenceController', 'projectReportController', 'footerController', 'exportRawDataController', 'alertDialogController', 'opUnitReportController',
         'downloadMetadataController'
     ],
-    function(reportsController, moduleWeekSelectorController, headerController, orgUnitContoller, loginController, opUnitController, aggregateModuleController,
+    function(reportsController, moduleWeekSelectorController, headerController, orgUnitController, loginController, opUnitController, aggregateModuleController,
         lineListModuleController, projectController, countryController, confirmDialogController, projectUserController,
         aggregateDataEntryController, lineListDataEntryController, patientOriginController, productKeyController,
         lineListSummaryController, dataApprovalController, dashboardController, lineListOfflineApprovalController, appCloneController, downloadDataController, notificationDialogController, selectLanguageController,
@@ -19,7 +19,7 @@ define(['reportsController', 'moduleWeekSelectorController', 'headerController',
             app.controller('dataApprovalController', ['$scope', '$routeParams', '$q', '$hustle', 'dataRepository', 'excludedDataElementsRepository', '$anchorScroll', '$location', '$modal', '$rootScope', '$window', 'approvalDataRepository', '$timeout', 'orgUnitRepository', 'dataSetRepository', 'programRepository', 'referralLocationsRepository', 'translationsService', 'moduleDataBlockFactory', 'dataSyncFailureRepository', dataApprovalController]);
             app.controller('lineListDataEntryController', ['$scope', '$rootScope', '$routeParams', '$route', 'historyService','programEventRepository', 'optionSetRepository', 'orgUnitRepository', 'excludedDataElementsRepository', 'programRepository', 'translationsService', lineListDataEntryController]);
             app.controller('lineListSummaryController', ['$scope', '$q', '$hustle', '$modal', '$window', '$timeout', '$location', '$anchorScroll', '$routeParams', 'historyService','programRepository', 'programEventRepository', 'excludedDataElementsRepository', 'orgUnitRepository', 'approvalDataRepository', 'dataSyncFailureRepository', 'translationsService', 'filesystemService', 'optionSetRepository', lineListSummaryController]);
-            app.controller('orgUnitContoller', ['$scope', '$q', '$location', '$timeout', '$anchorScroll', '$rootScope', 'orgUnitRepository', orgUnitContoller]);
+            app.controller('orgUnitController', ['$scope', '$q', '$location', '$timeout', '$anchorScroll', '$rootScope', 'orgUnitRepository', orgUnitController]);
             app.controller('opUnitController', ['$scope', '$q', '$hustle', 'orgUnitRepository', 'orgUnitGroupHelper', '$indexedDB', '$location', '$modal', 'patientOriginRepository', 'orgUnitGroupSetRepository', opUnitController]);
             app.controller('aggregateModuleController', ['$scope', '$rootScope', '$hustle', 'orgUnitRepository', 'dataSetRepository', 'systemSettingRepository', 'excludedDataElementsRepository', '$indexedDB', '$location', '$q', '$modal', 'orgUnitGroupHelper', 'originOrgunitCreator', 'translationsService', aggregateModuleController]);
             app.controller('lineListModuleController', ['$scope', '$rootScope', '$hustle', 'orgUnitRepository', 'excludedDataElementsRepository', '$q', '$modal', 'programRepository', 'orgUnitGroupHelper', 'dataSetRepository', 'originOrgunitCreator', 'translationsService', 'excludedLineListOptionsRepository', lineListModuleController]);
