@@ -376,7 +376,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
                     REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM YYYY[,] h[.]mm A";
 
                 scope.$apply();
-                expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyPivotTableData:' + projectId);
+                expect(changeLogRepository.get).toHaveBeenCalledWith('yearlyPivotTableData:' + projectId);
                 expect(scope.lastUpdatedTimeForProjectReport).toEqual(moment(lastUpdatedTime).format(REPORTS_LAST_UPDATED_TIME_FORMAT));
             });
 
@@ -386,7 +386,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
 
                 scope.locale = 'fr';
                 scope.$apply();
-                expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyPivotTableData:' + projectId);
+                expect(changeLogRepository.get).toHaveBeenCalledWith('yearlyPivotTableData:' + projectId);
                 expect(scope.lastUpdatedTimeForProjectReport).toEqual(moment(lastUpdatedTime).locale(scope.locale).format(REPORTS_LAST_UPDATED_TIME_24HR_FORMAT));
             });
         });

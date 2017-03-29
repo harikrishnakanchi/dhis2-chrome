@@ -147,7 +147,7 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper", "excelBuilder", "const
                 return date ? moment.utc(date).local().locale($scope.locale).format(timeFormat) : undefined;
             };
 
-            return changeLogRepository.get('monthlyPivotTableData:' +  $scope.selectedProject.id)
+            return changeLogRepository.get('yearlyPivotTableData:' +  $scope.selectedProject.id)
                 .then(formatLastUpdatedTime)
                 .then(function(lastUpdated) {
                 $scope.lastUpdatedTimeForProjectReport = lastUpdated;
