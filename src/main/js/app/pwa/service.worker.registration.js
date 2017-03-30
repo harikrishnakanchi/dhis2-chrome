@@ -25,6 +25,10 @@
         addCss('js/lib/nvd3/nv.d3.min.css');
     };
 
+    var setLoadingMessage = function (message) {
+        document.getElementById('praxisMsg').innerHTML = message;
+    };
+
     var showPraxisDownloadError = function () {
         global.document.getElementById('loadingPraxisMsg').style.display = 'none';
         global.document.getElementById('loadingPraxisError').style.display = 'block';
@@ -161,10 +165,19 @@
         serviceWorkerRegistration.update();
     };
 
+    var initialize = function () {
+        setTimeout(function () {
+            if (navigator.serviceWorker.controller) {
+                setLoadingMessage("Initializing Praxis");
+            }
+            registerServiceWorker();
+        }, 0);
+    };
+
     global.Praxis = {
         reload: reload,
         focusActiveTab: focusActiveTab,
-        initialize: registerServiceWorker,
+        initialize: initialize,
         update: updateServiceWorker
     };
 })(window);
