@@ -9,7 +9,7 @@ DHIS2-Chrome is a Chrome extension that is used in the field and synchronises wi
 - IndexedDB
 
 ### Requirements
-- npm
+- yarn
 - bower
 - bower-installer
 - gulp
@@ -20,7 +20,7 @@ DHIS2-Chrome is a Chrome extension that is used in the field and synchronises wi
 
 1. Navigate to the `dhis2-chrome` folder and run the following commands:
   ```
-  npm install
+  yarn
   bower cache clean
   bower-installer
   gulp less
