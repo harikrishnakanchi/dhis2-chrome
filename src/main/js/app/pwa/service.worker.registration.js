@@ -166,12 +166,10 @@
     };
 
     var initialize = function () {
-        setTimeout(function () {
-            if (navigator.serviceWorker.controller) {
-                setLoadingMessage("Initializing Praxis");
-            }
-            registerServiceWorker();
-        }, 0);
+        if (navigator.serviceWorker.controller) {
+            setLoadingMessage("Initializing Praxis");
+        }
+        registerServiceWorker();
     };
 
     global.Praxis = {
