@@ -24,7 +24,7 @@ define(['lodash', 'overrides', 'platformConfig'], function(_, overrides, platfor
             url: url
         },
         praxis: {
-            version: '11.0',
+            version: '11.2',
             fileExtension: 'prx'
         },
         queue: {
