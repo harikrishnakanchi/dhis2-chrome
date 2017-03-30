@@ -25,8 +25,8 @@ define(['lodash'], function (_) {
 
         this.serviceCode = parseServiceCode(this.name);
         this.projectReport = this.serviceCode == 'ProjectReport';
-        this.geographicOriginReport = this.serviceCode == 'GeographicOrigin';
-        this.referralLocationReport = this.serviceCode == 'ReferralLocation';
+        this.geographicOriginReport = _.contains(this.name, 'GeographicOrigin');
+        this.referralLocationReport = _.contains(this.name, 'ReferralLocation');
         this.opUnitReport = this.serviceCode == 'OpUnitReport';
         this.monthlyReport = isReportOfType(config.relativePeriods, "Month");
         this.weeklyReport = isReportOfType(config.relativePeriods, "Week");

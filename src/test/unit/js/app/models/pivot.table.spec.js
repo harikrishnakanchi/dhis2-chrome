@@ -87,8 +87,13 @@ define(['pivotTable'], function(PivotTable) {
        });
 
        describe('geographicOriginReport', function() {
-           it('should return true if pivot table name contains GeographicOrigin', function() {
-               pivotTable = PivotTable.create({ name: '[Praxis - GeographicOrigin] # Name' });
+           it('should return true if pivot table is a Geographic Origin Report for Aggregate', function () {
+               pivotTable = PivotTable.create({name: '[Praxis - GeographicOrigin] # Name'});
+               expect(pivotTable.geographicOriginReport).toBeTruthy();
+           });
+
+           it('should return true if pivot table is a Geographic Origin Report for Linelist', function () {
+               pivotTable = PivotTable.create({name: '[Praxis - someProgram] # GeographicOrigin'});
                expect(pivotTable.geographicOriginReport).toBeTruthy();
            });
 
@@ -99,8 +104,13 @@ define(['pivotTable'], function(PivotTable) {
        });
 
        describe('referralLocationReport', function() {
-           it('should return true if pivot table service code contains Referral location', function() {
+           it('should return true if pivot table service code contains Referral location for Aggregate', function() {
                pivotTable = PivotTable.create({ name: '[Praxis - ReferralLocation] # Name' });
+               expect(pivotTable.referralLocationReport).toBeTruthy();
+           });
+
+           it('should return true if pivot table service code contains Referral location for LineList', function () {
+               pivotTable = PivotTable.create({name: '[Praxis - someProgramCode] # ReferralLocation'});
                expect(pivotTable.referralLocationReport).toBeTruthy();
            });
 
