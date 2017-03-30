@@ -47,8 +47,13 @@ define(['chart'], function(Chart) {
         });
 
         describe('geographicOriginChart', function() {
-            it('should return true if chart name contains GeographicOrigin', function() {
-                chart = Chart.create({ name: '[Praxis - GeographicOrigin] # Name' });
+            it('should return true if is a GeographicOrigin chart for aggregate', function () {
+                chart = Chart.create({name: '[Praxis - GeographicOrigin] # Name'});
+                expect(chart.geographicOriginChart).toBeTruthy();
+            });
+
+            it('should return true if is a GeographicOrigin chart for lineList', function () {
+                chart = Chart.create({name: '[Praxis - someProgramCode] # GeographicOrigin'});
                 expect(chart.geographicOriginChart).toBeTruthy();
             });
 
