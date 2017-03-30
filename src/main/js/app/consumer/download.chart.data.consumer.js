@@ -9,7 +9,7 @@ define(["lodash", "moment", "constants"], function(_, moment, constants) {
                 return $q.all(upsertPromises);
             };
 
-            var downloadRelevantChartData = function(charts, userModules) {
+            var downloadRelevantChartDataForModule = function (module, charts, projectId) {
                 var allDownloadsWereSuccessful = true;
 
                 var recursivelyDownloadAndUpsertChartData = function(modulesAndCharts) {
@@ -36,7 +36,7 @@ define(["lodash", "moment", "constants"], function(_, moment, constants) {
 
                 var getModuleInformation = function() {
                     var getOriginsForModule = function (data) {
-                        return orgUnitRepository.findAllByParent(data.module.id).then(function (origins) {
+                        return orgUnitRepository.findAllByParent(module.id).then(function (origins) {
                             return _.merge({ origins: origins }, data);
                         });
                     };
@@ -55,70 +55,82 @@ define(["lodash", "moment", "constants"], function(_, moment, constants) {
                         });
                     };
 
-                    var promises = _.transform(userModules, function (promises, module) {
-                        promises[module.id] = getOriginsForModule({ module: module }).then(getDataSetsForModuleAndOrigins).then(getProgramForModule);
-                    }, {});
-                    return $q.all(promises);
+                    return getOriginsForModule({module: module}).then(getDataSetsForModuleAndOrigins).then(getProgramForModule);
                 };
 
-                var filterChartsForModules = function(moduleInformation) {
+                var filterChartsForModules = function(moduleInformation, charts) {
                     var modulesAndCharts = [];
-                    _.forEach(userModules, function(module) {
-                        var allServices = moduleInformation[module.id].dataSets.concat([moduleInformation[module.id].program]),
-                            allServiceCodes = _.compact(_.map(allServices, 'serviceCode'));
+                    var allServices = moduleInformation.dataSets.concat([moduleInformation.program]),
+                        allServiceCodes = _.compact(_.map(allServices, 'serviceCode'));
 
-                        _.forEach(allServiceCodes, function (serviceCode) {
-                            var filteredCharts = _.filter(charts, { serviceCode: serviceCode });
-                            _.forEach(filteredCharts, function (chart) {
-                                modulesAndCharts.push({
-                                    moduleId: module.id,
-                                    chart: chart,
-                                    orgUnitDataDimensionItems: chart.geographicOriginChart ? _.map(moduleInformation[module.id].origins, 'id') : module.id
-                                });
+                    _.forEach(allServiceCodes, function (serviceCode) {
+                        var filteredCharts = _.filter(charts, { serviceCode: serviceCode });
+                        _.forEach(filteredCharts, function (chart) {
+                            modulesAndCharts.push({
+                                moduleId: moduleInformation.module.id,
+                                chart: chart,
+                                orgUnitDataDimensionItems: chart.geographicOriginChart ? _.map(moduleInformation.origins, 'id') : moduleInformation.module.id
                             });
                         });
                     });
                     return $q.when(modulesAndCharts);
                 };
 
-                return getModuleInformation()
-                    .then(filterChartsForModules)
-                    .then(recursivelyDownloadAndUpsertChartData)
-                    .then(function() {
-                        return $q.when(allDownloadsWereSuccessful);
-                    });
-            };
+                var applyDownloadFrequencyStrategy = function() {
+                    var weeklyChangeLogKey = "weeklyChartData:" + projectId + ':' + module.id,
+                        monthlyChangeLogKey = "monthlyChartData:" + projectId + ':' + module.id,
+                        yearlyChangeLogKey = "yearlyChartData:" + projectId + ':' + module.id,
+                        changeLogKeys = [weeklyChangeLogKey, monthlyChangeLogKey, yearlyChangeLogKey];
 
-            var applyDownloadFrequencyStrategy = function(projectId, charts) {
-                var weeklyChangeLogKey = "weeklyChartData:" + projectId,
-                    monthlyChangeLogKey = "monthlyChartData:" + projectId,
-                    yearlyChangeLogKey = "yearlyChartData:" + projectId,
-                    changeLogKeys = [weeklyChangeLogKey, monthlyChangeLogKey, yearlyChangeLogKey];
+                    return $q.all({
+                        weeklyChartsLastDownloaded: changeLogRepository.get(weeklyChangeLogKey),
+                        monthlyChartsLastDownloaded: changeLogRepository.get(monthlyChangeLogKey),
+                        yearlyChartsLastDownloaded: changeLogRepository.get(yearlyChangeLogKey),
+                        downloadStartTime: systemInfoService.getServerDate()
+                    }).then(function(data) {
+                        var isWeeklyChartDownloadedInSameDay = moment.utc().isSame(data.weeklyChartsLastDownloaded, 'day');
+                        var isMonthlyChartDownloadedInSameDay = moment.utc().isSame(data.monthlyChartsLastDownloaded, 'day');
+                        var isYearlyChartDownloadedInSameWeek = moment.utc().isSame(data.yearlyChartsLastDownloaded, 'isoWeek');
+                        if (data.weeklyChartsLastDownloaded && isWeeklyChartDownloadedInSameDay) {
+                            _.remove(charts, { weeklyChart: true });
+                            _.pull(changeLogKeys, weeklyChangeLogKey);
+                        }
+                        if(data.monthlyChartsLastDownloaded && isMonthlyChartDownloadedInSameDay) {
+                            _.remove(charts, { monthlyChart: true});
+                            _.pull(changeLogKeys, monthlyChangeLogKey);
+                        }
+                        if(data.yearlyChartsLastDownloaded && isYearlyChartDownloadedInSameWeek) {
+                            _.remove(charts, { yearlyChart: true});
+                            _.pull(changeLogKeys, yearlyChangeLogKey);
+                        }
+                        return $q.when({
+                            charts: charts,
+                            changeLogKeys: changeLogKeys,
+                            downloadStartTime: data.downloadStartTime
+                        });
+                    });
+                };
 
                 return $q.all({
-                    weeklyChartsLastDownloaded: changeLogRepository.get(weeklyChangeLogKey),
-                    monthlyChartsLastDownloaded: changeLogRepository.get(monthlyChangeLogKey),
-                    yearlyChartsLastDownloaded: changeLogRepository.get(yearlyChangeLogKey)
-                }).then(function(data) {
-                    var isWeeklyChartDownloadedInSameDay = moment.utc().isSame(data.weeklyChartsLastDownloaded, 'day');
-                    var isMonthlyChartDownloadedInSameDay = moment.utc().isSame(data.monthlyChartsLastDownloaded, 'day');
-                    var isYearlyChartDownloadedInSameWeek = moment.utc().isSame(data.yearlyChartsLastDownloaded, 'isoWeek');
-                    if (data.weeklyChartsLastDownloaded && isWeeklyChartDownloadedInSameDay) {
-                        _.remove(charts, { weeklyChart: true });
-                        _.pull(changeLogKeys, weeklyChangeLogKey);
-                    }
-                    if(data.monthlyChartsLastDownloaded && isMonthlyChartDownloadedInSameDay) {
-                        _.remove(charts, { monthlyChart: true});
-                        _.pull(changeLogKeys, monthlyChangeLogKey);
-                    }
-                    if(data.yearlyChartsLastDownloaded && isYearlyChartDownloadedInSameWeek) {
-                        _.remove(charts, { yearlyChart: true});
-                        _.pull(changeLogKeys, yearlyChangeLogKey);
-                    }
-                    return $q.when({
-                        charts: charts,
-                        changeLogKeys: changeLogKeys
-                    });
+                    strategyResult: applyDownloadFrequencyStrategy(),
+                    moduleInformation: getModuleInformation()
+                }).then(function (data) {
+                    return filterChartsForModules(data.moduleInformation, data.strategyResult.charts)
+                        .then(recursivelyDownloadAndUpsertChartData)
+                        .then(function() {
+                            if(allDownloadsWereSuccessful) {
+                                updateChangeLogs(data.strategyResult.changeLogKeys, data.strategyResult.downloadStartTime);
+                            }
+                        });
+                });
+            };
+
+            var recursivelyLoopThroughModules = function (moduleIds, charts, projectId) {
+                if(_.isEmpty(moduleIds)){
+                    return $q.when();
+                }
+                return downloadRelevantChartDataForModule(moduleIds.pop(), charts, projectId).then(function () {
+                    recursivelyLoopThroughModules(moduleIds, charts, projectId);
                 });
             };
 
@@ -126,18 +138,8 @@ define(["lodash", "moment", "constants"], function(_, moment, constants) {
                 return $q.all({
                     modules: orgUnitRepository.getAllModulesInOrgUnits([projectId]),
                     charts: chartRepository.getAll(),
-                    downloadStartTime: systemInfoService.getServerDate()
                 }).then(function (data) {
-                    return applyDownloadFrequencyStrategy(projectId, data.charts).then(function(strategyResult) {
-                        var chartsToDownload = strategyResult.charts,
-                            changeLogKeysToUpdate = strategyResult.changeLogKeys;
-
-                        return downloadRelevantChartData(chartsToDownload, data.modules).then(function(allDownloadsWereSuccessful) {
-                            if(allDownloadsWereSuccessful) {
-                                return updateChangeLogs(changeLogKeysToUpdate, data.downloadStartTime);
-                            }
-                        });
-                    });
+                    return recursivelyLoopThroughModules(data.modules, data.charts, projectId);
                 });
             };
 
@@ -145,7 +147,6 @@ define(["lodash", "moment", "constants"], function(_, moment, constants) {
                 if(_.isEmpty(projectIds)) {
                     return $q.when();
                 }
-
                 return updateChartDataForProject(projectIds.pop()).then(function() {
                     return recursivelyLoopThroughProjects(projectIds);
                 });

@@ -77,13 +77,13 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['projectIdB']);
             });
 
-            it('should retrieve the lastUpdated time from the changeLog', function() {
+            it('should retrieve the lastUpdated time from the changeLog for each of the module', function() {
                 downloadChartDataConsumer.run();
                 scope.$apply();
 
-                expect(changeLogRepository.get).toHaveBeenCalledWith('weeklyChartData:' + mockProjectId);
-                expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyChartData:' + mockProjectId);
-                expect(changeLogRepository.get).toHaveBeenCalledWith('yearlyChartData:' + mockProjectId);
+                expect(changeLogRepository.get).toHaveBeenCalledWith('weeklyChartData:' + mockProjectId + ':' + mockModule.id);
+                expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyChartData:' + mockProjectId + ':' + mockModule.id);
+                expect(changeLogRepository.get).toHaveBeenCalledWith('yearlyChartData:' + mockProjectId + ':' + mockModule.id);
             });
 
             it('should update the lastUpdated with the system time in the changeLog', function() {
@@ -92,9 +92,9 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 downloadChartDataConsumer.run();
                 scope.$apply();
 
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith('weeklyChartData:' + mockProjectId, systemTime);
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyChartData:' + mockProjectId, systemTime);
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith('yearlyChartData:' + mockProjectId, systemTime);
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('weeklyChartData:' + mockProjectId + ':' + mockModule.id, systemTime);
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyChartData:' + mockProjectId + ':' + mockModule.id, systemTime);
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('yearlyChartData:' + mockProjectId + ':' + mockModule.id, systemTime);
             });
 
             it('should retrieve dataSets for each module', function() {
