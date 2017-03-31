@@ -16,6 +16,8 @@ define(['lodash'], function(_){
         };
 
         this.setLocale = function(locale){
+            if(locale === _locale) return $q.when();
+
             _locale = locale;
 
             refreshResourceBundle();

@@ -27,42 +27,22 @@ define(['angularMocks', 'utils', 'initializationRoutine', 'packagedDataImporter'
                 initializationRoutine = InitializationRoutine(rootScope, location, systemSettingRepository, translationsService, hustleMonitor);
             }));
 
-            describe('locale', function () {
-                it("should get the locale from system setting repository and call setLocale on rootScope", function () {
-                    spyOn(rootScope, 'setLocale');
-                    initializationRoutine.run();
-
-                    rootScope.$apply();
-
-                    expect(systemSettingRepository.getLocale).toHaveBeenCalled();
-                    expect(rootScope.setLocale).toHaveBeenCalledWith('SOME_LOCALE');
-                });
-
-                it("should set locale on rootScope", function () {
-                    initializationRoutine.run();
-
-                    rootScope.$apply();
-
-                    expect(rootScope.locale).toEqual('SOME_LOCALE');
-                });
-            });
-
             describe('layoutDirection', function () {
                 it("should set layoutDirection to rtl if language is arabic", function () {
-                    systemSettingRepository.getLocale.and.returnValue(utils.getPromise(q, 'ar'));
-                    initializationRoutine.run();
+                    rootScope.setLocale('ar');
 
                     rootScope.$apply();
 
+                    expect(rootScope.locale).toEqual('ar');
                     expect(rootScope.layoutDirection).toEqual({direction: 'rtl'});
                 });
 
                 it("should set layoutDirection to empty object if language is other than arabic", function () {
-                    systemSettingRepository.getLocale.and.returnValue(utils.getPromise(q, 'NOT_ARABIC'));
-                    initializationRoutine.run();
+                    rootScope.setLocale('NOT_ARABIC');
 
                     rootScope.$apply();
 
+                    expect(rootScope.locale).toEqual('NOT_ARABIC');
                     expect(rootScope.layoutDirection).toEqual({});
                 });
             });

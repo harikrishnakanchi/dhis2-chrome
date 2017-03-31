@@ -49,6 +49,36 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
             scope.$apply();
         };
 
+        describe('setLocale', function () {
+            var resourceBundle = {}, locale = 'fr', store;
+
+            beforeEach(function () {
+                i18nResourceBundle.get.and.returnValue(utils.getPromise(q, {data: resourceBundle}));
+
+                store = mockDB.db.objectStore('translations');
+            });
+
+            it('should set the preferred locale', function () {
+                initialiseTranslationsServiceForLocale(locale);
+
+                expect(i18nResourceBundle.get).toHaveBeenCalledWith({ locale: locale });
+                expect(rootScope.resourceBundle).toBe(resourceBundle);
+
+                expect(systemSettingRepository.upsertLocale).toHaveBeenCalledWith(locale);
+
+                expect(store.each).toHaveBeenCalled();
+            });
+
+            it('should not set the locale if the preferred locale is equal to previously set locale', function () {
+                initialiseTranslationsServiceForLocale(locale);
+                initialiseTranslationsServiceForLocale(locale);
+
+                expect(i18nResourceBundle.get.calls.count()).toEqual(1);
+                expect(systemSettingRepository.upsertLocale.calls.count()).toEqual(1);
+                expect(store.each.calls.count()).toEqual(1);
+            });
+        });
+
         it('should return translation value of property for specified object', function () {
             initialiseTranslationsServiceForLocale(FRENCH);
             expect(translationsService.getTranslationForProperty({'id': 'someIdA'}, 'name')).toEqual('someFrenchNameA');

@@ -1,4 +1,4 @@
-define(["md5", "properties", "lodash", "interpolate", "hustlePublishUtils"], function(md5, properties, _, interpolate, hustlePublishUtils) {
+define(["properties", "lodash", "interpolate", "cipherUtils", "hustlePublishUtils"], function(properties, _, interpolate, cipherUtils, hustlePublishUtils) {
     return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility, storageService) {
         var loadUserData = function(loginUsername) {
             var existingUserProjects = userPreferenceRepository.getCurrentUsersProjectIds();
@@ -80,7 +80,7 @@ define(["md5", "properties", "lodash", "interpolate", "hustlePublishUtils"], fun
                 return $q.reject("Disabled user");
             }
 
-            if (md5($scope.password) !== userCredentials.password) {
+            if (cipherUtils.generateSHA256($scope.password) !== userCredentials.password) {
                 $scope.invalidCredentials = true;
                 return $q.reject("Invalid credentials");
             }

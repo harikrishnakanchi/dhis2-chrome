@@ -19,7 +19,15 @@ define(["sjcl", "properties"], function(sjcl, properties) {
         return sjcl.decrypt(properties.encryption.passphrase, createCipherText(text));
     };
 
+    var generateSHA256 = function (message) {
+        var bitArray = sjcl.hash.sha256.hash(message);
+        var digest_sha256 = sjcl.codec.hex.fromBits(bitArray);
+
+        return digest_sha256;
+    };
+
     return {
-        "decrypt": decrypt
+        "decrypt": decrypt,
+        "generateSHA256": generateSHA256
     };
 });

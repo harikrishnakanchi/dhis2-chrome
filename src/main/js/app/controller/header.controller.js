@@ -182,7 +182,7 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
 
             showModal(function () {
                 $scope.isOffline = false;
-                if(platformUtils.platform == 'web') {
+                if(platformUtils.platform == 'pwa') {
                     window.Praxis.update();
                 }
                 systemSettingRepository.upsertSyncSetting($scope.isOffline).then(function () {

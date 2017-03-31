@@ -175,6 +175,6 @@ define(['properties', 'platformConfig', 'lodash', 'indexedDBLogger'], function(p
         addAlarmListener: addAlarmListener,
         clearAlarm: clearAlarm,
         uninstall: uninstall,
-        platform: 'web'
+        platform: 'pwa'
     };
 });

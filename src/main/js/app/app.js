@@ -34,8 +34,8 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                 'SUPER_ADMIN': 'Superadmin'
             });
 
-            var routeResolver = ['$q', '$rootScope', '$location', 'systemSettingRepository', 'changeLogRepository','customAttributeRepository',
-                function ($q, $rootScope, $location, systemSettingRepository, changeLogRepository, customAttributeRepository) {
+            var routeResolver = ['$q', '$rootScope', '$location', 'systemSettingRepository', 'changeLogRepository','customAttributeRepository', 'translationsService',
+                function ($q, $rootScope, $location, systemSettingRepository, changeLogRepository, customAttributeRepository, translationsService) {
 
                     var checkProductKey = function () {
                         return systemSettingRepository.isProductKeySet().then(function (productKeySet) {
@@ -58,9 +58,14 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                         return $rootScope.isLoggedIn || (!$rootScope.isLoggedIn && $location.path() == '/login')? $q.when() : $q.reject('noSession');
                     };
 
+                    var setTranslations = function () {
+                        return systemSettingRepository.getLocale().then($rootScope.setLocale);
+                    };
+
                     return checkProductKey()
                         .then(checkMetadata)
-                        .then(checkSession);
+                        .then(checkSession)
+                        .then(setTranslations);
                 }];
 
             app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider', '$hustleProvider', '$compileProvider', '$provide', '$tooltipProvider', 'USER_ROLES',
@@ -78,7 +83,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                                 USER_ROLES.COORDINATION_LEVEL_APPROVER,USER_ROLES.PROJECT_ADMIN, USER_ROLES.SUPER_ADMIN]
                         },
                         resolve: {
-                            routeResolver: ['$q', 'systemSettingRepository', 'changeLogRepository', function ($q, systemSettingRepository, changeLogRepository) {
+                            routeResolver: ['$q', '$rootScope', 'systemSettingRepository', 'changeLogRepository', function ($q, $rootScope, systemSettingRepository, changeLogRepository) {
                                 var checkMetadata = function () {
                                     return changeLogRepository.get("metaData").then(function (metadataLastUpdated) {
                                         return metadataLastUpdated ? $q.reject('noMetadata'): $q.when();
@@ -89,7 +94,12 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                                         return productKeySet ? $q.when() : $q.reject('noProductKey');
                                     });
                                 };
-                                return checkProductKey().then(checkMetadata);
+
+                                var setTranslations = function () {
+                                    return systemSettingRepository.getLocale().then($rootScope.setLocale);
+                                };
+
+                                return setTranslations().then(checkProductKey).then(checkMetadata);
                             }]
                         }
                     }).
@@ -164,6 +174,16 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                         data: {
                             allowedRoles: [USER_ROLES.DATA_ENTRY, USER_ROLES.OBSERVER, USER_ROLES.PROJECT_LEVEL_APPROVER,
                                 USER_ROLES.COORDINATION_LEVEL_APPROVER,USER_ROLES.PROJECT_ADMIN, USER_ROLES.SUPER_ADMIN]
+                        },
+                        resolve: {
+                            routeResolver: ['$rootScope', 'systemSettingRepository', function ($rootScope, systemSettingRepository) {
+
+                                var setTranslations = function () {
+                                    return systemSettingRepository.getLocale().then($rootScope.setLocale);
+                                };
+
+                                return setTranslations();
+                            }]
                         }
                     }).
                     when('/aggregate-data-entry/:module?/:week?', {
@@ -229,6 +249,9 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     $indexedDBProvider.connection(properties.praxis.dbName)
                         .upgradeDatabase(migrations.length, function(event, db, tx) {
                             migrator.run(event.oldVersion, db, tx, migrations);
+                        })
+                        .dbReady(function () {
+                            platformUtils.sendMessage("dbReady");
                         });
 
                     var jobComparator = function (itemToBeCompared, itemComparedWith) {
@@ -249,8 +272,8 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                 basePath: self.basePath + "js/app/i18n"
             });
 
-            app.run(['dhisMonitor', 'hustleMonitor', 'queueInterceptor', '$rootScope', '$location', '$hustle', '$document', '$timeout', 'storageService', 'initializationRoutine',
-                function(dhisMonitor, hustleMonitor, queueInterceptor, $rootScope, $location, $hustle, $document, $timeout, storageService, InitializationRoutine) {
+            app.run(['dhisMonitor', 'hustleMonitor', 'queueInterceptor', '$rootScope', '$location', '$hustle', '$document', '$timeout', 'storageService', 'initializationRoutine', '$modalStack',
+                function(dhisMonitor, hustleMonitor, queueInterceptor, $rootScope, $location, $hustle, $document, $timeout, storageService, InitializationRoutine, $modalStack) {
 
                     $document.on('keydown', function(e) {
                         disableBackspaceKey(e);
@@ -293,6 +316,9 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
 
                         if (userIsNotAuthorised) {
                             event.preventDefault();
+                        }
+                        else {
+                            $modalStack.dismissAll();
                         }
                     });
 

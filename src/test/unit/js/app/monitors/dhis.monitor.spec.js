@@ -17,7 +17,7 @@ define(["dhisMonitor", "utils", "angularMocks", "platformUtils", "mockChrome", "
             spyOn(platformUtils, 'createAlarm');
             spyOn(platformUtils, 'clearAlarm');
             spyOn(platformUtils, 'addAlarmListener');
-            platformUtils.platform = 'web';
+            platformUtils.platform = 'pwa';
 
             rootScope.praxisUid = "ade3fab1ab0";
             userPreferenceRepository = new UserPreferenceRepository();

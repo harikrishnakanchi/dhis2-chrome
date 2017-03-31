@@ -9,10 +9,22 @@ define([], function() {
             geographicOriginDisabled: false,
             referralLocationDisabled: false,
             userNameValidations: {
-                "Data entry user": "PROJECT_CODE_PREFIX",
-                "Project Level Approver": "PROJECT_CODE_PREFIX",
-                "Observer": "PROJECT_CODE_PREFIX",
-                "Coordination Level Approver": "EMAIL"
+                'Data entry user': 'PROJECT_CODE_PREFIX',
+                'Project Level Approver': 'PROJECT_CODE_PREFIX',
+                'Observer': 'PROJECT_CODE_PREFIX',
+                'Coordination Level Approver': 'EMAIL'
+            },
+            userCredentials: {
+                chrome: {
+                    superadmin: 'f0e933044928bd6faa29f4e113ace2ddba2e9ddce992ecc5cc533dc5301a8310',
+                    projectadmin: '6a8921fe228c0ad25ace0396bc3b2c135fbcfc059861bd8887443c93bbe3d5cf',
+                    project_user: '4cc3534ed26d57c509ff443a2768165da1de947c7368493ebbc29518584d9705'
+                },
+                pwa: {
+                    superadmin: '5397782adb4687321a872ec9b34a77f22f94fe2234cec148e5bb3e6b249c0989',
+                    projectadmin: 'cf5fb18849746f3da8f6abdca24cafc66cdb98cacfc2ba35c88a2cbfebbf6e07',
+                    project_user: '4cc3534ed26d57c509ff443a2768165da1de947c7368493ebbc29518584d9705'
+                }
             }
         }
     };

@@ -41,9 +41,9 @@ define(['lodash', 'angularMocks', 'utils','properties', 'platformUtils', 'downlo
                 });
             });
 
-            describe('Web platform', function () {
+            describe('PWA platform', function () {
                 beforeEach(function () {
-                    platformUtils.platform = 'web';
+                    platformUtils.platform = 'pwa';
                 });
 
                 it('should download the metadata', function () {

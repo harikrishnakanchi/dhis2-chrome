@@ -508,6 +508,10 @@ define(['dateUtils', 'lodash', 'metadataConf'], function(dateUtils, _, metadataC
         changeLogStore.delete("pivotTables");
     };
 
+    var delete_local_user_credentials_store = function(db) {
+        db.deleteObjectStore("localUserCredentials");
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -565,6 +569,7 @@ define(['dateUtils', 'lodash', 'metadataConf'], function(dateUtils, _, metadataC
         add_custom_attributes_store,
         add_user_roles_store,
         update_change_log_keys,
-        migrate_metadata_change_log
+        migrate_metadata_change_log,
+        delete_local_user_credentials_store
     ];
 });

@@ -7,9 +7,7 @@ self.basePath = "./";
 require(["app/chrome/chrome.app.config", "app/shared.app.config"], function(config) {
     require(["app/app", "platformUtils", "moment"], function(app, platformUtils, moment) {
         window.moment = moment;
-        app.bootstrap(app.init()).then(function () {
-            platformUtils.sendMessage('dbReady');
-        });
+        app.bootstrap(app.init());
 
         platformUtils.init();
 
