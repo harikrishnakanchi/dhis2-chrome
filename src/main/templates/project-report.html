@@ -41,7 +41,7 @@
             </ul>
         </div>
 
-        <div ng-show="pivotTables | isEmpty">
+        <div ng-show="(pivotTables | filter: { isDataAvailable: true }).length == 0">
             <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
         </div>
         <div ng-if="!(pivotTables | isEmpty)" class="exp-coll-group">
