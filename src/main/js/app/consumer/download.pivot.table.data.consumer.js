@@ -2,8 +2,56 @@ define(["lodash", "moment", "constants"], function(_, moment, constants) {
     return function(reportService, systemInfoService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository, $q) {
 
         this.run = function() {
-            var downloadPivotTableDataForProject = function(pivotTables, projectId, userModules) {
+            var downloadPivotTableDataForModule = function(pivotTables, projectId, module) {
                 var allDownloadsWereSuccessful = true;
+
+                var applyDownloadFrequencyStrategy = function() {
+                    var weeklyChangeLogKey = "weeklyPivotTableData:" + projectId,
+                        monthlyChangeLogKey = "monthlyPivotTableData:" + projectId,
+                        yearlyChangeLogKey = "yearlyPivotTableData:" + projectId,
+                        changeLogKeys = [weeklyChangeLogKey, monthlyChangeLogKey, yearlyChangeLogKey];
+                        if(!_.isUndefined(module)) {
+                            changeLogKeys = _.map(changeLogKeys, function (changeLogKey) {
+                                return changeLogKey.concat(':' + module.id);
+                            });
+                        }
+
+                    return $q.all({
+                        weeklyReportsLastUpdated: changeLogRepository.get(weeklyChangeLogKey),
+                        monthlyReportsLastUpdated: changeLogRepository.get(monthlyChangeLogKey),
+                        yearlyReportsLastUpdated: changeLogRepository.get(yearlyChangeLogKey),
+                        downloadStartTime: systemInfoService.getServerDate()
+                    }).then(function(data) {
+                        var isMonthlyReportDownloadedInSameDay = moment.utc().isSame(data.monthlyReportsLastUpdated, 'day');
+                        var isWeeklyReportDownloadedSameDay = moment.utc().isSame(data.weeklyReportsLastUpdated, 'day');
+                        var isYearlyReportDownloadedSameWeek = moment.utc().isSame(data.yearlyReportsLastUpdated, 'isoWeek');
+                        if(data.weeklyReportsLastUpdated && isWeeklyReportDownloadedSameDay) {
+                            _.remove(pivotTables, { weeklyReport: true });
+                            _.pull(changeLogKeys, weeklyChangeLogKey);
+                        }
+                        if(data.monthlyReportsLastUpdated && isMonthlyReportDownloadedInSameDay) {
+                            _.remove(pivotTables, { monthlyReport: true });
+                            _.pull(changeLogKeys, monthlyChangeLogKey);
+                        }
+                        if(data.yearlyReportsLastUpdated && isYearlyReportDownloadedSameWeek) {
+                            _.remove(pivotTables, { yearlyReport: true });
+                            _.pull(changeLogKeys, yearlyChangeLogKey);
+                        }
+
+                        return $q.when({
+                            pivotTables: pivotTables,
+                            changeLogKeys: changeLogKeys,
+                            downloadStartTime: data.downloadStartTime
+                        });
+                    });
+                };
+
+                var updateChangeLogs = function(changeLogKeys, downloadStartTime) {
+                    var upsertPromises = _.map(changeLogKeys, function(changeLogKey) {
+                        return changeLogRepository.upsert(changeLogKey, downloadStartTime);
+                    });
+                    return $q.all(upsertPromises);
+                };
 
                 var recursivelyDownloadAndUpsertPivotTableData = function(orgUnitsAndTables) {
                     var onSuccess = function(data) {
@@ -47,113 +95,82 @@ define(["lodash", "moment", "constants"], function(_, moment, constants) {
                         });
                     };
 
-                    var moduleInfoPromises = _.transform(userModules, function (promises, module) {
-                        promises[module.id] = getOriginsForModule({ module: module }).then(getDataSetsForModuleAndOrigins).then(getProgramForModule);
-                    }, {});
-
-                    return $q.all(moduleInfoPromises);
+                    return !_.isUndefined(module) ? getOriginsForModule({ module: module }).then(getDataSetsForModuleAndOrigins).then(getProgramForModule) : $q.when();
                };
 
-                var filterPivotTablesForEachModule = function(moduleInformation) {
-                    var modulesAndPivotTables = [];
-
-                    _.forEach(userModules, function(module) {
-                        var allServices = moduleInformation[module.id].dataSets.concat([moduleInformation[module.id].program]),
+                var filterPivotTablesForEachModule = function(moduleInformation, pivotTables) {
+                    var addPivotTablesForModule = function () {
+                        var modulesAndPivotTables = [];
+                        var allServices = moduleInformation.dataSets.concat([moduleInformation.program]),
                             allServiceCodes = _.compact(_.map(allServices, 'serviceCode'));
 
                         _.forEach(allServiceCodes, function(serviceCode) {
                             var pivotTablesForService = _.filter(pivotTables, { serviceCode: serviceCode });
                             _.forEach(pivotTablesForService, function(pivotTable) {
                                 modulesAndPivotTables.push({
-                                    orgUnitId: module.id,
+                                    orgUnitId: moduleInformation.module.id,
                                     pivotTable: pivotTable,
-                                    orgUnitDimensionItems: pivotTable.geographicOriginReport ? _.map(moduleInformation[module.id].origins, 'id') : module.id
+                                    orgUnitDimensionItems: pivotTable.geographicOriginReport ? _.map(moduleInformation.origins, 'id') : moduleInformation.module.id
                                 });
                             });
                         });
-                    });
-                    return $q.when(modulesAndPivotTables);
-                };
+                        return $q.when(modulesAndPivotTables);
+                    };
 
-                var addProjectReportPivotTables = function(orgUnitsAndTables){
-                    var projectReportPivotTables = _.filter(pivotTables, { projectReport: true });
+                    var addProjectReportPivotTables = function(orgUnitsAndTables){
+                        var projectReportPivotTables = _.filter(pivotTables, { projectReport: true });
 
-                    _.forEach(projectReportPivotTables, function(pivotTable) {
-                        orgUnitsAndTables.push({
-                            orgUnitId: projectId,
-                            pivotTable: pivotTable,
-                            orgUnitDimensionItems: projectId
-                        });
-                    });
-                    return $q.when(orgUnitsAndTables);
-                };
-
-                var addOpUnitReportPivotTables = function (orgUnitsAndTables) {
-                    return orgUnitRepository.getAllOpUnitsInOrgUnits([projectId]).then(function (opUnits) {
-                        var opUnitIds = _.map(opUnits, 'id');
-                        var opUnitReportPivotTables = _.filter(pivotTables, { opUnitReport: true });
-
-                        _.forEach(opUnitReportPivotTables, function(pivotTable) {
-                            _.forEach(opUnitIds, function (opUnitId) {
-                                orgUnitsAndTables.push({
-                                    orgUnitId: opUnitId,
-                                    pivotTable: pivotTable,
-                                    orgUnitDimensionItems: opUnitId
-                                });
+                        _.forEach(projectReportPivotTables, function(pivotTable) {
+                            orgUnitsAndTables.push({
+                                orgUnitId: projectId,
+                                pivotTable: pivotTable,
+                                orgUnitDimensionItems: projectId
                             });
                         });
                         return $q.when(orgUnitsAndTables);
-                    });
+                    };
+
+                    var addOpUnitReportPivotTables = function (orgUnitsAndTables) {
+                        return orgUnitRepository.getAllOpUnitsInOrgUnits([projectId]).then(function (opUnits) {
+                            var opUnitIds = _.map(opUnits, 'id');
+                            var opUnitReportPivotTables = _.filter(pivotTables, { opUnitReport: true });
+
+                            _.forEach(opUnitReportPivotTables, function(pivotTable) {
+                                _.forEach(opUnitIds, function (opUnitId) {
+                                    orgUnitsAndTables.push({
+                                        orgUnitId: opUnitId,
+                                        pivotTable: pivotTable,
+                                        orgUnitDimensionItems: opUnitId
+                                    });
+                                });
+                            });
+                            return $q.when(orgUnitsAndTables);
+                        });
+                    };
+
+                    return !_.isUndefined(module) ? addPivotTablesForModule() : addProjectReportPivotTables([]).then(addOpUnitReportPivotTables);
                 };
 
-                return getModuleInformation()
-                    .then(filterPivotTablesForEachModule)
-                    .then(addProjectReportPivotTables)
-                    .then(addOpUnitReportPivotTables)
-                    .then(recursivelyDownloadAndUpsertPivotTableData)
-                    .then(function() {
-                        return $q.when(allDownloadsWereSuccessful);
-                    });
-            };
-
-            var updateChangeLogs = function(changeLogKeys, downloadStartTime) {
-                var upsertPromises = _.map(changeLogKeys, function(changeLogKey) {
-                    return changeLogRepository.upsert(changeLogKey, downloadStartTime);
-                });
-                return $q.all(upsertPromises);
-            };
-
-            var applyDownloadFrequencyStrategy = function(projectId, pivotTables) {
-                var weeklyChangeLogKey = "weeklyPivotTableData:" + projectId,
-                    monthlyChangeLogKey = "monthlyPivotTableData:" + projectId,
-                    yearlyChangeLogKey = "yearlyPivotTableData:" + projectId,
-                    changeLogKeys = [weeklyChangeLogKey, monthlyChangeLogKey, yearlyChangeLogKey];
-
                 return $q.all({
-                    weeklyReportsLastUpdated: changeLogRepository.get(weeklyChangeLogKey),
-                    monthlyReportsLastUpdated: changeLogRepository.get(monthlyChangeLogKey),
-                    yearlyReportsLastUpdated: changeLogRepository.get(yearlyChangeLogKey)
-                }).then(function(data) {
-                    var isMonthlyReportDownloadedInSameDay = moment.utc().isSame(data.monthlyReportsLastUpdated, 'day');
-                    var isWeeklyReportDownloadedSameDay = moment.utc().isSame(data.weeklyReportsLastUpdated, 'day');
-                    var isYearlyReportDownloadedSameWeek = moment.utc().isSame(data.yearlyReportsLastUpdated, 'isoWeek');
-                    if(data.weeklyReportsLastUpdated && isWeeklyReportDownloadedSameDay) {
-                        _.remove(pivotTables, { weeklyReport: true });
-                        _.pull(changeLogKeys, weeklyChangeLogKey);
-                    }
-                    if(data.monthlyReportsLastUpdated && isMonthlyReportDownloadedInSameDay) {
-                        _.remove(pivotTables, { monthlyReport: true });
-                        _.pull(changeLogKeys, monthlyChangeLogKey);
-                    }
-                    if(data.yearlyReportsLastUpdated && isYearlyReportDownloadedSameWeek) {
-                        _.remove(pivotTables, { yearlyReport: true });
-                        _.pull(changeLogKeys, yearlyChangeLogKey);
-                    }
+                    strategyResult: applyDownloadFrequencyStrategy(),
+                    moduleInformation: getModuleInformation()
+                }).then(function (data) {
+                        filterPivotTablesForEachModule(data.moduleInformation, data.strategyResult.pivotTables)
+                        .then(recursivelyDownloadAndUpsertPivotTableData)
+                        .then(function() {
+                            if(allDownloadsWereSuccessful) {
+                                updateChangeLogs(data.strategyResult.changeLogKeys, data.strategyResult.downloadStartTime);
+                            }
+                        });
+                });
+            };
 
-                    return $q.when({
-                        pivotTables: pivotTables,
-                        changeLogKeys: changeLogKeys
-                    });
+            var recursivelyLoopThroughModules = function (modules, pivotTables, projectId) {
+                if(_.isEmpty(modules)){
+                    return downloadPivotTableDataForModule(pivotTables, projectId);
+                }
+                return downloadPivotTableDataForModule(pivotTables, projectId, modules.pop()).then(function () {
+                    recursivelyLoopThroughModules(modules, pivotTables, projectId);
                 });
             };
 
@@ -161,18 +178,9 @@ define(["lodash", "moment", "constants"], function(_, moment, constants) {
                 return $q.all({
                     modules: orgUnitRepository.getAllModulesInOrgUnits([projectId]),
                     pivotTables: pivotTableRepository.getAll(),
-                    downloadStartTime: systemInfoService.getServerDate()
-                }).then(function (data) {
-                    return applyDownloadFrequencyStrategy(projectId, data.pivotTables).then(function(strategyResult) {
-                        var pivotTablesToDownload = strategyResult.pivotTables,
-                            changeLogKeysToUpdate = strategyResult.changeLogKeys;
 
-                        return downloadPivotTableDataForProject(pivotTablesToDownload, projectId, data.modules).then(function(allDownloadsWereSuccessful) {
-                            if(allDownloadsWereSuccessful) {
-                                return updateChangeLogs(changeLogKeysToUpdate, data.downloadStartTime);
-                            }
-                        });
-                    });
+                }).then(function (data) {
+                    return recursivelyLoopThroughModules(data.modules, data.pivotTables, projectId);
                 });
             };
 

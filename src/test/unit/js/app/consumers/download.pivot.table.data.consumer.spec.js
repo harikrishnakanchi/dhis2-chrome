@@ -244,7 +244,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(mockPivotTable.id, 'module1', "data1");
                 expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalledWith(mockPivotTable.id, 'module2', "data2");
                 expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(mockPivotTable.id, 'module3', "data3");
-                expect(changeLogRepository.upsert).not.toHaveBeenCalled();
+                expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('weeklyPivotTableData:mockProjectId:module2');
             });
 
             it('should not continue downloading remaining pivot table data if call fails due to network failure', function() {
@@ -265,9 +265,13 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
-                expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalledWith(mockPivotTable.id, 'module1', "data1");
+                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(mockPivotTable.id, 'module1', "data1");
                 expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalledWith(mockPivotTable.id, 'module2', "data2");
-                expect(changeLogRepository.upsert).not.toHaveBeenCalled();
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('weeklyPivotTableData:mockProjectId:module1', '');
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyPivotTableData:mockProjectId:module1', '');
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('yearlyPivotTableData:mockProjectId:module1', '');
+                changeLogRepository.upsert.calls.reset();
+                expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('weeklyPivotTableData:mockProjectId:module2');
             });
 
             it('should not download pivot table data if user has no modules', function() {
