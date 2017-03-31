@@ -167,7 +167,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'da
             };
 
             var buildProceduresPerformedSection = function () {
-                var proceduresPerformedOptions = _.first($scope.procedureDataElements).optionSet.options;
+                var proceduresPerformedOptions = _.chain($scope.procedureDataElements).first().get('optionSet.options', []).value();
 
                 if($scope.getProcedureCountForAllOptions()) {
                     return [
@@ -189,7 +189,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'da
             };
 
             var buildReferralLocationData = function () {
-                var referralLocationOptionsForModule = _.filter($scope.referralLocationDataElement.optionSet.options, function (option) {
+                var referralLocationOptionsForModule = _.filter(_.get($scope.referralLocationDataElement, 'optionSet.options', []), function (option) {
                      return $scope.referralLocations[option.genericName] &&
                          (!$scope.referralLocations[option.genericName].isDisabled || $scope.eventSummary[$scope.referralLocationDataElement.id][option.id]);
                 });
