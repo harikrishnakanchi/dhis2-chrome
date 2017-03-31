@@ -32,6 +32,7 @@ define(["moment", "lodash"], function(moment, _) {
         var format;
         if (type === 'week') format = 'GGGG[W]WW';
         if (type === 'month') format = 'YYYYMM';
+        if (type === 'year') format = 'YYYY';
 
         return _.times(total, function(index) {
             return moment().subtract(difference - index, type).format(format);
@@ -55,6 +56,7 @@ define(["moment", "lodash"], function(moment, _) {
         subtractWeeks: subtractWeeks,
         getPeriodRangeInWeeks: _.partial(getPeriodRange, 'week'),
         getPeriodRangeInMonths: _.partial(getPeriodRange, 'month'),
+        getPeriodRangeInYears: _.partial(getPeriodRange, 'year'),
         getNumberOfISOWeeksInMonth: getNumberOfISOWeeksInMonth
     };
 });

@@ -160,12 +160,30 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper", "excelBuilder", "const
                 .then(translationsService.translate)
                 .then(getDataForPivotTables)
                 .then(translationsService.translatePivotTableData)
-                .then(function(pivotTables) {
-                    $scope.pivotTables = _.sortBy(pivotTables, 'displayPosition');
+                .then(_.partialRight(_.sortBy, 'displayPosition'))
+                .then(filterSelectedYearData);
+        };
+
+        var filterSelectedYearData = function (pivotTables) {
+            $scope.pivotTables = _.each(pivotTables, function (pivotTable) {
+                pivotTable.columnConfigurations[0] = _.filter(pivotTable.columnConfigurations[0], function (columnConfiguration) {
+                    return _.includes(columnConfiguration.id, $scope.selectedYear);
                 });
+                if(pivotTable.columnConfigurations[0].length === 0) {
+                    pivotTable.isDataAvailable = false;
+                }
+            });
+        };
+
+        $scope.setSelectedYear = function(year) {
+            $scope.selectedYear = year;
+            init();
         };
 
         var init = function() {
+            $scope.last4years = dateUtils.getPeriodRangeInYears(4).reverse();
+            $scope.selectedYear = $scope.selectedYear || _.first($scope.last4years);
+
             $scope.pivotTables= [];
             $scope.startLoading();
             $q.all([loadProjectBasicInfo(), loadPivotTables(), loadLastUpdatedTimeForProjectReport()])

@@ -1,5 +1,5 @@
-define(["moment", "orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "changeLogRepository", "translationsService", "timecop", "orgUnitGroupSetRepository", "filesystemService", "pivotTableExportBuilder", "excelBuilder"],
-    function(moment, OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, ChangeLogRepository, TranslationsService, timecop, OrgUnitGroupSetRepository, FilesystemService, PivotTableExportBuilder, ExcelBuilder) {
+define(["moment", "orgUnitRepository", "angularMocks", "dateUtils", "projectReportController", "utils", "pivotTableRepository", "changeLogRepository", "translationsService", "timecop", "orgUnitGroupSetRepository", "filesystemService", "pivotTableExportBuilder", "excelBuilder"],
+    function(moment, OrgUnitRepository, mocks, dateUtils, ProjectReportController, utils, PivotTableRepository, ChangeLogRepository, TranslationsService, timecop, OrgUnitGroupSetRepository, FilesystemService, PivotTableExportBuilder, ExcelBuilder) {
     describe("projectReportController", function() {
         var scope, rootScope, q,
             projectReportController,
@@ -129,7 +129,8 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             pivotTableData = {
                 some: 'data',
                 title: 'someTitle',
-                isDataAvailable: true
+                isDataAvailable: true,
+                columnConfigurations: [{}]
             };
 
             orgUnitGroupSets = [{
@@ -220,6 +221,8 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
                     "name": "Direct operation"
                 }]
             }];
+
+            spyOn(dateUtils, 'getPeriodRangeInYears').and.returnValue(['old year', 'new year']);
 
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise($q, mockProjectOrgUnit));
@@ -368,6 +371,19 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             scope.$apply();
             expect(orgUnitRepository.get).toHaveBeenCalledWith("xyz");
             expect(scope.projectAttributes).toEqual(expectedProjectAttributes);
+        });
+
+        describe('yearlyReport', function () {
+            it('should generate last four years', function () {
+                expect(dateUtils.getPeriodRangeInYears).toHaveBeenCalledWith(4);
+
+                scope.$apply();
+                expect(scope.last4years).toEqual(['new year', 'old year']);
+            });
+
+            it('should set current year as selectedYear', function () {
+                expect(scope.selectedYear).toEqual('new year');
+            });
         });
 
         describe('lastUpdatedTimeForProjectReport', function () {

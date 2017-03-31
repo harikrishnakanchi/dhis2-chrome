@@ -114,6 +114,32 @@ define(['dateUtils', 'moment', 'timecop'], function(dateUtils, moment, timecop) 
             });
         });
 
+        describe('getPeriodRangeInYears', function() {
+            beforeEach(function() {
+                Timecop.freeze(new Date('2017-03-16T12:34:56.789Z'));
+            });
+
+            afterEach(function() {
+                Timecop.returnToPresent();
+                Timecop.uninstall();
+            });
+
+            it('should return period range for the current year', function() {
+                var actualResult = dateUtils.getPeriodRangeInYears(1);
+                expect(actualResult).toEqual(['2017']);
+            });
+
+            it('should return period range for the last X years including the current year', function() {
+                var actualResult = dateUtils.getPeriodRangeInYears(3);
+                expect(actualResult).toEqual(['2015', '2016', '2017']);
+            });
+
+            it('should return period range for the last X years excluding the current year', function() {
+                var actualResult = dateUtils.getPeriodRangeInYears(3, { excludeCurrent: true });
+                expect(actualResult).toEqual(['2014', '2015', '2016']);
+            });
+        });
+
         describe('getNumberOfISOWeeksInMonth', function () {
             it('should return the number of weeks for a given month', function () {
                 var monthWith4Weeks = '201601',

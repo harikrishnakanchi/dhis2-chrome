@@ -33,6 +33,14 @@
             </div>
         </div>
 
+        <div>
+            <ul class="nav nav-tabs">
+                <li role="presentation" ng-repeat="year in last4years" ng-class="{ 'active': selectedYear === year }">
+                    <a href="#" ng-click="setSelectedYear(year)">{{ year }}</a>
+                </li>
+            </ul>
+        </div>
+
         <div ng-show="pivotTables | isEmpty">
             <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
         </div>
