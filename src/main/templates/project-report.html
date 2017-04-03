@@ -8,7 +8,7 @@
             </div>
 
             <div class="col-md-4">
-                <button ng-disabled="pivotTables | isEmpty" class="btn btn-sm btn-primary pull-right" ng-click="exportToExcel()">
+                <button ng-disabled="(pivotTables | filter: { isDataAvailable: true }).length == 0" class="btn btn-sm btn-primary pull-right" ng-click="exportToExcel()">
                     {{resourceBundle.downloadReport}}
                 </button>
             </div>
