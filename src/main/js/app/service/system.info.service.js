@@ -16,7 +16,7 @@ define(['dhisUrl', 'lodash', 'moment'], function (dhisUrl, _, moment) {
         this.getServerDate = function () {
             return getSystemInfo()
                 .then(function (systemInfo) {
-                    var timeFormat = 'YYYY-MM-DDThh:mm:ss.SSS';
+                    var timeFormat = 'YYYY-MM-DDTHH:mm:ss.SSS';
                     var serverDate = moment.utc(systemInfo.serverDate, timeFormat);
                     var isServerTimeValid = serverDate.isValid();
                     return isServerTimeValid ? serverDate.format(timeFormat) : moment.utc().format(timeFormat);
