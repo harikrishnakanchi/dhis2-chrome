@@ -130,7 +130,8 @@ define(["moment", "orgUnitRepository", "angularMocks", "dateUtils", "projectRepo
                 some: 'data',
                 title: 'someTitle',
                 isDataAvailable: true,
-                columnConfigurations: [{}]
+                columnConfigurations: [{}],
+                columns: [{}]
             };
 
             orgUnitGroupSets = [{

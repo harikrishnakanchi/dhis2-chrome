@@ -169,6 +169,9 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper", "excelBuilder", "const
                 pivotTable.columnConfigurations[0] = _.filter(pivotTable.columnConfigurations[0], function (columnConfiguration) {
                     return _.includes(columnConfiguration.id, $scope.selectedYear);
                 });
+                pivotTable.columns[0] = _.filter(pivotTable.columns[0], function (column) {
+                    return _.includes(column.id, $scope.selectedYear);
+                });
                 if(pivotTable.columnConfigurations[0].length === 0) {
                     pivotTable.isDataAvailable = false;
                 }
