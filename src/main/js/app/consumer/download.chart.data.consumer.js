@@ -2,7 +2,9 @@ define(["lodash", "moment", "constants"], function(_, moment, constants) {
     return function(reportService, systemInfoService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository, $q) {
 
         this.run = function() {
-            var updateChangeLogs = function(changeLogKeys, downloadStartTime) {
+            var downloadStartTime;
+
+            var updateChangeLogs = function(changeLogKeys) {
                 var upsertPromises = _.map(changeLogKeys, function (changeLogKey) {
                     return changeLogRepository.upsert(changeLogKey, downloadStartTime);
                 });
@@ -85,8 +87,7 @@ define(["lodash", "moment", "constants"], function(_, moment, constants) {
                     return $q.all({
                         weeklyChartsLastDownloaded: changeLogRepository.get(weeklyChangeLogKey),
                         monthlyChartsLastDownloaded: changeLogRepository.get(monthlyChangeLogKey),
-                        yearlyChartsLastDownloaded: changeLogRepository.get(yearlyChangeLogKey),
-                        downloadStartTime: systemInfoService.getServerDate()
+                        yearlyChartsLastDownloaded: changeLogRepository.get(yearlyChangeLogKey)
                     }).then(function(data) {
                         var isWeeklyChartDownloadedInSameDay = moment.utc().isSame(data.weeklyChartsLastDownloaded, 'day');
                         var isMonthlyChartDownloadedInSameDay = moment.utc().isSame(data.monthlyChartsLastDownloaded, 'day');
@@ -105,8 +106,7 @@ define(["lodash", "moment", "constants"], function(_, moment, constants) {
                         }
                         return $q.when({
                             charts: charts,
-                            changeLogKeys: changeLogKeys,
-                            downloadStartTime: data.downloadStartTime
+                            changeLogKeys: changeLogKeys
                         });
                     });
                 };
@@ -119,7 +119,7 @@ define(["lodash", "moment", "constants"], function(_, moment, constants) {
                         .then(recursivelyDownloadAndUpsertChartData)
                         .then(function() {
                             if(allDownloadsWereSuccessful) {
-                                updateChangeLogs(data.strategyResult.changeLogKeys, data.strategyResult.downloadStartTime);
+                                updateChangeLogs(data.strategyResult.changeLogKeys);
                             }
                         });
                 });
@@ -152,7 +152,15 @@ define(["lodash", "moment", "constants"], function(_, moment, constants) {
                 });
             };
 
-            return userPreferenceRepository.getCurrentUsersProjectIds().then(recursivelyLoopThroughProjects);
+            var getDownloadStartTime = function () {
+                return systemInfoService.getServerDate().then(function (serverTime) {
+                    downloadStartTime = serverTime;
+                });
+            };
+
+            return getDownloadStartTime()
+                .then(userPreferenceRepository.getCurrentUsersProjectIds)
+                .then(recursivelyLoopThroughProjects);
         };
     };
 });

@@ -2,6 +2,8 @@ define(["lodash", "moment", "constants"], function(_, moment, constants) {
     return function(reportService, systemInfoService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, programRepository, $q) {
 
         this.run = function() {
+            var downloadStartTime;
+
             var downloadPivotTableDataForModule = function(pivotTables, projectId, module) {
                 var allDownloadsWereSuccessful = true;
 
@@ -19,8 +21,7 @@ define(["lodash", "moment", "constants"], function(_, moment, constants) {
                     return $q.all({
                         weeklyReportsLastUpdated: changeLogRepository.get(weeklyChangeLogKey),
                         monthlyReportsLastUpdated: changeLogRepository.get(monthlyChangeLogKey),
-                        yearlyReportsLastUpdated: changeLogRepository.get(yearlyChangeLogKey),
-                        downloadStartTime: systemInfoService.getServerDate()
+                        yearlyReportsLastUpdated: changeLogRepository.get(yearlyChangeLogKey)
                     }).then(function(data) {
                         var isMonthlyReportDownloadedInSameDay = moment.utc().isSame(data.monthlyReportsLastUpdated, 'day');
                         var isWeeklyReportDownloadedSameDay = moment.utc().isSame(data.weeklyReportsLastUpdated, 'day');
@@ -40,13 +41,12 @@ define(["lodash", "moment", "constants"], function(_, moment, constants) {
 
                         return $q.when({
                             pivotTables: pivotTables,
-                            changeLogKeys: changeLogKeys,
-                            downloadStartTime: data.downloadStartTime
+                            changeLogKeys: changeLogKeys
                         });
                     });
                 };
 
-                var updateChangeLogs = function(changeLogKeys, downloadStartTime) {
+                var updateChangeLogs = function(changeLogKeys) {
                     var upsertPromises = _.map(changeLogKeys, function(changeLogKey) {
                         return changeLogRepository.upsert(changeLogKey, downloadStartTime);
                     });
@@ -159,7 +159,7 @@ define(["lodash", "moment", "constants"], function(_, moment, constants) {
                         .then(recursivelyDownloadAndUpsertPivotTableData)
                         .then(function() {
                             if(allDownloadsWereSuccessful) {
-                                updateChangeLogs(data.strategyResult.changeLogKeys, data.strategyResult.downloadStartTime);
+                                updateChangeLogs(data.strategyResult.changeLogKeys);
                             }
                         });
                 });
@@ -194,7 +194,15 @@ define(["lodash", "moment", "constants"], function(_, moment, constants) {
                 });
             };
 
-            return userPreferenceRepository.getCurrentUsersProjectIds().then(recursivelyLoopThroughProjects);
+            var getDownloadStartTime = function () {
+                return systemInfoService.getServerDate().then(function (serverTime) {
+                    downloadStartTime = serverTime;
+                });
+            };
+
+            return getDownloadStartTime()
+                .then(userPreferenceRepository.getCurrentUsersProjectIds)
+                .then(recursivelyLoopThroughProjects);
         };
     };
 });

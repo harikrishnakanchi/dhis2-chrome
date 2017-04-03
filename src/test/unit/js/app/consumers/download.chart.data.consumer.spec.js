@@ -45,7 +45,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 spyOn(reportService, 'getReportDataForOrgUnit').and.returnValue(utils.getPromise(q, {}));
 
                 systemInfoService = new SystemInfoService();
-                spyOn(systemInfoService, 'getServerDate');
+                spyOn(systemInfoService, 'getServerDate').and.returnValue(utils.getPromise(q, ''));
 
                 changeLogRepository = new ChangeLogRepository();
                 spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, null));
