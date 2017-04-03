@@ -249,6 +249,27 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 });
         };
 
+        var filterServices = function () {
+            //TODO can be removed after 12.0
+
+            if($scope.orgUnit.lineListService) {
+                var reports = $scope.pivotTables.concat($scope.charts);
+                var serviceCodesWithReportData = _.uniq(_.map(reports, 'serviceCode'));
+                var removeGeographicOriginFromServices = !_.contains(serviceCodesWithReportData, 'GeographicOrigin');
+                var removeReferralLocationFromServices = !_.contains(serviceCodesWithReportData, 'ReferralLocation');
+                if(removeGeographicOriginFromServices) {
+                    $scope.services = _.reject($scope.services, function (service) {
+                        return service.serviceCode === 'GeographicOrigin';
+                    });
+                }
+                if(removeReferralLocationFromServices) {
+                    $scope.services = _.reject($scope.services, function (service) {
+                        return service.serviceCode === 'ReferralLocation';
+                    });
+                }
+            }
+        };
+
         var loadReferralLocationForModule = function () {
             return referralLocationsRepository.get($scope.orgUnit.parent.id).then(function (referralLocations) {
                 $scope.referralLocations = referralLocations;
@@ -310,6 +331,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 .then(loadServicesForOrgUnit)
                 .then(loadChartsWithData)
                 .then(loadPivotTablesWithData)
+                .then(filterServices)
                 .then(loadReferralLocationForModule)
                 .then(loadLastUpdatedForChartsAndReports)
                 .then(countAvailableChartsAndReportsForServices)

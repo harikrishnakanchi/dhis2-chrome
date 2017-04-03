@@ -2,7 +2,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
     function(mocks, utils, moment, timecop, ReportsController, DatasetRepository, ProgramRepository, OrgUnitRepository, ChartRepository, PivotTableRepository, ReferralLocationsRepository, TranslationsService, ChangeLogRepository, customAttributes, FilesystemService, SVGUtils, dataURItoBlob, _) {
     describe("reportsController", function() {
         var scope, q, rootScope, routeParams,
-            mockModule, mockDataSet, mockProgram, mockProject, mockOrigin, mockReferralLocations,
+            mockModule, mockDataSet, mockGeographicOriginDataSet, mockReferralLocationDataSet, mockProgram, mockProject, mockOrigin, mockReferralLocations,
             reportsController, datasetRepository, programRepository, orgUnitRepository, chartRepository, pivotTableRepository, referralLocationsRepository, translationsService, changeLogRepository, filesystemService;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
@@ -24,6 +24,14 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
             mockDataSet = {
                 id: 'someDataSetId',
                 serviceCode: 'someDataSetServiceCode'
+            };
+            mockGeographicOriginDataSet = {
+                id: 'geographicOriginDatasetId',
+                serviceCode: 'GeographicOrigin'
+            };
+            mockReferralLocationDataSet = {
+                id: 'referralLocation',
+                serviceCode: 'ReferralLocation'
             };
             mockProgram = {
                 id: 'someProgramId',
@@ -144,6 +152,26 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
 
                 scope.$apply();
                 expect(_.map(scope.services, 'name')).toEqual(['serviceA', 'serviceB']);
+            });
+
+            it('should filter out geographic origin service for lineListModule if there is no data for geographic origin', function () {
+                chartRepository.getChartData.and.returnValue(utils.getPromise(q, []));
+                pivotTableRepository.getPivotTableData.and.returnValue(utils.getPromise(q, []));
+                datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [mockGeographicOriginDataSet]));
+                programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, mockProgram));
+                customAttributes.getBooleanAttributeValue.and.returnValue(true);
+                scope.$apply();
+                expect(_.map(scope.services, 'id')).toEqual([mockProgram.id]);
+            });
+
+            it('should filter out referralLocation service for lineListModule if there is no data for referralLocation', function () {
+                chartRepository.getChartData.and.returnValue(utils.getPromise(q, []));
+                pivotTableRepository.getPivotTableData.and.returnValue(utils.getPromise(q, []));
+                datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [mockReferralLocationDataSet]));
+                programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, mockProgram));
+                customAttributes.getBooleanAttributeValue.and.returnValue(true);
+                scope.$apply();
+                expect(_.map(scope.services, 'id')).toEqual([mockProgram.id]);
             });
         });
 
