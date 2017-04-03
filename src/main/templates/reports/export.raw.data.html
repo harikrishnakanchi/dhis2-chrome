@@ -21,7 +21,7 @@
             {{ resourceBundle.noRawDataAvailable }}
         </div>
 
-        <div ng-if="selectedService.isOriginDataset && !(events | isEmpty)">
+        <div ng-if="showLineListGeographicOrigin() && !(events | isEmpty)">
             <div class="table-responsive">
                 <table class="table table-striped table-bordered" locked-table-header>
                     <thead>
@@ -40,7 +40,7 @@
             </div>
         </div>
 
-        <div ng-if="selectedService.isReferralDataset && isReferralDataAvailable()">
+        <div ng-if="showLineListReferralLocation() && isReferralDataAvailable()">
             <div class="table-responsive">
                 <table class="table table-striped table-bordered" locked-table-header>
                     <thead>

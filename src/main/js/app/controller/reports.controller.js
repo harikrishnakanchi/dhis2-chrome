@@ -193,6 +193,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 var orgUnitId = _.get(_.first(data.origins), 'id') || $scope.orgUnit.id;
                 return programRepository.getProgramForOrgUnit(orgUnitId).then(function (program) {
                     var translatedProgram = translationsService.translate(program);
+                    $scope.programServiceCode = program ? program.serviceCode : undefined;
                     $scope.services = _.compact(data.dataSets.concat([translatedProgram]));
                 });
             };

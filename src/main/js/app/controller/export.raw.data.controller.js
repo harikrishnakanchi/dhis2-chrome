@@ -288,6 +288,22 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'da
             return !_.isEmpty($scope.events) && !!$scope.eventSummary[$scope.referralLocationDataElement.id];
         };
 
+        $scope.showLineListGeographicOrigin = function () {
+            var geographicOriginDoesntExistInServices = !_.some($scope.services, function (service) {
+                return service.serviceCode === 'GeographicOrigin';
+            });
+            var showGeographicOriginInsideProgram = $scope.selectedService.serviceCode === $scope.programServiceCode  && geographicOriginDoesntExistInServices;
+            return $scope.selectedService.isOriginDataset || showGeographicOriginInsideProgram;
+        };
+
+        $scope.showLineListReferralLocation = function () {
+            var referralLocationDoesntExistInServices = !_.some($scope.services, function (service) {
+                return service.serviceCode === 'ReferralLocation';
+            });
+            var showReferralLocationInsideProgram = $scope.selectedService.serviceCode === $scope.programServiceCode && referralLocationDoesntExistInServices;
+            return $scope.selectedService.isReferralDataset || showReferralLocationInsideProgram;
+        };
+
         $scope.getDisplayName = dataElementUtils.getDisplayName;
         
         var fetchEventsForProgram = function (program) {
@@ -320,23 +336,21 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'da
                     return dataElement;
                 });
             };
-
-            if ($scope.selectedService.isOriginDataset) {
-                $scope.originSummary = eventsAggregator.nest($scope.events, ['orgUnit', 'period']);
-            } else {
-                var byPeriod = 'period';
-                var dataElementIds = _.map($scope.allDataElements, 'id');
-                $scope.eventSummary = eventsAggregator.buildEventsTree($scope.events, [byPeriod], dataElementIds);
-                
-                $scope.procedureDataElements = _.filter($scope.allDataElements, { offlineSummaryType: 'procedures' });
-                $scope.summaryDataElements = _.filter($scope.allDataElements, { offlineSummaryType: 'showInOfflineSummary' });
-                $scope.summaryDataElements = excludeLineListDataElementsOptions();
-                if($scope.selectedService.isReferralDataset) {
-                    referralLocationsRepository.get($scope.orgUnit.parent.id).then(function (referralLocations) {
-                        $scope.referralLocations = referralLocations;
-                    });
-                }
+            if ($scope.showLineListReferralLocation()) {
+                referralLocationsRepository.get($scope.orgUnit.parent.id).then(function (referralLocations) {
+                    $scope.referralLocations = referralLocations;
+                });
             }
+            if ($scope.showLineListGeographicOrigin()) {
+                $scope.originSummary = eventsAggregator.nest($scope.events, ['orgUnit', 'period']);
+            }
+            var byPeriod = 'period';
+            var dataElementIds = _.map($scope.allDataElements, 'id');
+            $scope.eventSummary = eventsAggregator.buildEventsTree($scope.events, [byPeriod], dataElementIds);
+
+            $scope.procedureDataElements = _.filter($scope.allDataElements, {offlineSummaryType: 'procedures'});
+            $scope.summaryDataElements = _.filter($scope.allDataElements, {offlineSummaryType: 'showInOfflineSummary'});
+            $scope.summaryDataElements = excludeLineListDataElementsOptions();
         };
         
         var loadLineListRawData = function () {
