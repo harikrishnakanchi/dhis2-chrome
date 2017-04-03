@@ -165,9 +165,13 @@ define(["lodash", "moment", "constants"], function(_, moment, constants) {
                 });
             };
 
+            var downloadOpUnitAndProjectPivotTableData = function (pivotTables, projectId) {
+                downloadPivotTableDataForModule(pivotTables, projectId);
+            };
+
             var recursivelyLoopThroughModules = function (modules, pivotTables, projectId) {
                 if(_.isEmpty(modules)){
-                    return downloadPivotTableDataForModule(pivotTables, projectId);
+                    return downloadOpUnitAndProjectPivotTableData(pivotTables, projectId);
                 }
                 return downloadPivotTableDataForModule(pivotTables, projectId, modules.pop()).then(function () {
                     recursivelyLoopThroughModules(modules, pivotTables, projectId);
