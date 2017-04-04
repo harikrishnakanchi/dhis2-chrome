@@ -137,12 +137,8 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'da
         };
 
         var buildLineListSpreadSheetContent = function () {
-            var buildHeaders = function () {
-                var rowHeader = $scope.selectedService.isOriginDataset && $scope.resourceBundle.originLabel ||
-                                $scope.selectedService.isReferralDataset && $scope.resourceBundle.referralLocationLabel ||
-                                $scope.resourceBundle.optionName;
-
-                return [rowHeader].concat($scope.weeks);
+            var buildHeaders = function (header) {
+                return [header].concat($scope.weeks);
             };
 
             var buildOption = function (dataElement, option) {
@@ -202,14 +198,23 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'da
                 });
             };
 
-            var spreadSheetContent = [buildHeaders()];
-            if($scope.selectedService.isOriginDataset) {
-                return spreadSheetContent.concat(buildOriginData());
-            } else if($scope.selectedService.isReferralDataset) {
-                return spreadSheetContent.concat(buildReferralLocationData());
-            } else {
-                return spreadSheetContent.concat(_.flatten(_.map($scope.summaryDataElements, buildDataElementSection))).concat(buildProceduresPerformedSection());
+            var spreadSheetContent = [];
+            if($scope.selectedService.serviceCode === $scope.programServiceCode) {
+                spreadSheetContent = spreadSheetContent.concat([buildHeaders($scope.resourceBundle.optionName)]);
+                spreadSheetContent = spreadSheetContent.concat(_.flatten(_.map($scope.summaryDataElements, buildDataElementSection))).concat(buildProceduresPerformedSection());
+                spreadSheetContent = spreadSheetContent.concat([EMPTY_LINE]);
             }
+            if($scope.showLineListGeographicOrigin()) {
+                spreadSheetContent = spreadSheetContent.concat([buildHeaders($scope.resourceBundle.originLabel)]);
+                spreadSheetContent = spreadSheetContent.concat(buildOriginData());
+                spreadSheetContent = spreadSheetContent.concat([EMPTY_LINE]);
+            }
+            if($scope.showLineListReferralLocation()) {
+                spreadSheetContent = spreadSheetContent.concat([buildHeaders($scope.resourceBundle.referralLocationLabel)]);
+                spreadSheetContent = spreadSheetContent.concat(buildReferralLocationData());
+                spreadSheetContent = spreadSheetContent.concat([EMPTY_LINE]);
+            }
+            return spreadSheetContent;
         };
 
         $scope.exportToExcel = function () {
