@@ -266,5 +266,18 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
             expect(actualResult).toEqual([]);
         });
 
+        describe('getOrgUnitAndDescendants', function () {
+            it('should get the all ids of descendants and ancestors of specified orgunit', function () {
+                var orgUnitId = "orgUnitID";
+                var expectedOrgUnits = [{'id': "IDA"}, {'id': "IDB"}];
+                httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits/' + orgUnitId + '.json?fields=id&includeAncestors=true&includeDescendants=true').respond(200, {organisationUnits: expectedOrgUnits});
+
+                orgUnitService.getOrgUnitTree(orgUnitId).then(function (actualOrgUnits) {
+                    expect(actualOrgUnits).toEqual(expectedOrgUnits);
+                });
+
+                httpBackend.flush();
+            });
+        });
     });
 });

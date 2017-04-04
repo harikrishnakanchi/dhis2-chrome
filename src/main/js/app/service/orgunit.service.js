@@ -73,5 +73,16 @@ define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties", "const
                 return [];
             });
         };
+
+        this.getOrgUnitTree = function (orgUnitId) {
+            var url = dhisUrl.orgUnits + '/' + orgUnitId + '.json';
+            var params = {
+                fields: 'id',
+                includeDescendants: true,
+                includeAncestors: true
+            };
+            return $http.get(url, {params: params})
+                .then(_.property('data.organisationUnits'));
+        };
     };
 });
