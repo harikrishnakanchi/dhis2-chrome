@@ -1,4 +1,4 @@
-define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'dataElementUtils'], function (moment, _, dateUtils, excelBuilder, eventsAggregator, dataElementUtils) {
+define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'dataElementUtils', 'properties'], function (moment, _, dateUtils, excelBuilder, eventsAggregator, dataElementUtils, properties) {
     return function($scope, $q, datasetRepository, excludedDataElementsRepository, orgUnitRepository, referralLocationsRepository,
                     moduleDataBlockFactory, filesystemService, translationsService, programRepository, programEventRepository, excludedLineListOptionsRepository, categoryRepository) {
         var EMPTY_LINE = [];
@@ -298,7 +298,8 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'da
                 return service.serviceCode === 'GeographicOrigin';
             });
             var showGeographicOriginInsideProgram = $scope.selectedService.serviceCode === $scope.programServiceCode  && geographicOriginDoesntExistInServices;
-            return $scope.selectedService.isOriginDataset || showGeographicOriginInsideProgram;
+            var isGeographicOriginEnabled = !_.get(properties, 'organisationSettings.geographicOriginDisabled');
+            return $scope.selectedService.isOriginDataset || (isGeographicOriginEnabled && showGeographicOriginInsideProgram);
         };
 
         $scope.showLineListReferralLocation = function () {
@@ -306,7 +307,8 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'da
                 return service.serviceCode === 'ReferralLocation';
             });
             var showReferralLocationInsideProgram = $scope.selectedService.serviceCode === $scope.programServiceCode && referralLocationDoesntExistInServices;
-            return $scope.selectedService.isReferralDataset || showReferralLocationInsideProgram;
+            var isReferralLocationEnabled = !_.get(properties, 'organisationSettings.referralLocationDisabled');
+            return $scope.selectedService.isReferralDataset || (isReferralLocationEnabled && showReferralLocationInsideProgram);
         };
 
         $scope.getDisplayName = dataElementUtils.getDisplayName;
