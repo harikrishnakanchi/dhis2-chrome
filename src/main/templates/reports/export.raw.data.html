@@ -21,6 +21,47 @@
             {{ resourceBundle.noRawDataAvailable }}
         </div>
 
+        <div ng-if="!selectedService.isOriginDataset && !selectedService.isReferralDataset && !(events | isEmpty)">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered" locked-table-header>
+                    <thead>
+                    <tr>
+                        <th>{{ resourceBundle.optionName }}</th>
+                        <th ng-repeat="week in weeks">{{ week }}</th>
+                    </tr>
+                    </thead>
+
+                    <tbody ng-repeat="dataElement in summaryDataElements" ng-if="eventSummary[dataElement.id]">
+                    <tr>
+                        <td class="active" colspan="{{ weeks.length + 1 }}">
+                            <strong>{{ getDisplayName(dataElement) }}</strong>
+                        </td>
+                    </tr>
+                    <tr ng-repeat="option in dataElement.optionSet.options" ng-if="eventSummary[dataElement.id][option.id]">
+                        <td>{{ option.name }}</td>
+                        <td ng-repeat="week in weeks">
+                            {{ eventSummary[dataElement.id][option.id][week].length }}
+                        </td>
+                    </tr>
+                    </tbody>
+
+                    <tbody ng-if="getProcedureCountForAllOptions()">
+                    <tr>
+                        <td class="active" colspan="{{ weeks.length + 1 }}">
+                            <strong>{{ resourceBundle.proceduresPerformed }}</strong>
+                        </td>
+                    </tr>
+                    <tr ng-repeat="option in procedureDataElements[0].optionSet.options" ng-if="getProcedureCountForOptionForAllWeeks(option.id)">
+                        <td>{{ option.name }}</td>
+                        <td ng-repeat="week in weeks">
+                            {{ getProcedureCountForOptionForWeek(option.id, week) }}
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <div ng-if="showLineListGeographicOrigin() && !(events | isEmpty)">
             <div class="table-responsive">
                 <table class="table table-striped table-bordered" locked-table-header>
@@ -56,47 +97,6 @@
                         <td>{{ referralLocations[option.genericName].name }}</td>
                         <td ng-repeat="week in weeks">
                             {{ eventSummary[referralLocationDataElement.id][option.id][week].length }}
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div ng-if="!selectedService.isOriginDataset && !selectedService.isReferralDataset && !(events | isEmpty)">
-            <div class="table-responsive">
-                <table class="table table-striped table-bordered" locked-table-header>
-                    <thead>
-                    <tr>
-                        <th>{{ resourceBundle.optionName }}</th>
-                        <th ng-repeat="week in weeks">{{ week }}</th>
-                    </tr>
-                    </thead>
-
-                    <tbody ng-repeat="dataElement in summaryDataElements" ng-if="eventSummary[dataElement.id]">
-                    <tr>
-                        <td class="active" colspan="{{ weeks.length + 1 }}">
-                            <strong>{{ getDisplayName(dataElement) }}</strong>
-                        </td>
-                    </tr>
-                    <tr ng-repeat="option in dataElement.optionSet.options" ng-if="eventSummary[dataElement.id][option.id]">
-                        <td>{{ option.name }}</td>
-                        <td ng-repeat="week in weeks">
-                            {{ eventSummary[dataElement.id][option.id][week].length }}
-                        </td>
-                    </tr>
-                    </tbody>
-
-                    <tbody ng-if="getProcedureCountForAllOptions()">
-                    <tr>
-                        <td class="active" colspan="{{ weeks.length + 1 }}">
-                            <strong>{{ resourceBundle.proceduresPerformed }}</strong>
-                        </td>
-                    </tr>
-                    <tr ng-repeat="option in procedureDataElements[0].optionSet.options" ng-if="getProcedureCountForOptionForAllWeeks(option.id)">
-                        <td>{{ option.name }}</td>
-                        <td ng-repeat="week in weeks">
-                            {{ getProcedureCountForOptionForWeek(option.id, week) }}
                         </td>
                     </tr>
                     </tbody>
