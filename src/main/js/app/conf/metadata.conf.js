@@ -77,7 +77,7 @@ define([], function () {
                 paging: true
             },
             "organisationUnits": {
-                params: ":all,parent[:identifiable],attributeValues[:identifiable,value,attribute[:identifiable]],dataSets,!access,!href,!uuid",
+                params: ":all,parent[id,name],attributeValues[value,attribute[id,code,name]],dataSets,!access,!href,!uuid",
                 pageSize: 150,   //PageSize of 50 : ~ 9KB-10KB
                 paging: true
             },
