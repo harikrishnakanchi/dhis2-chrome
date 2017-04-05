@@ -21,7 +21,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
             spyOn(db, "objectStore").and.returnValue(mockOrgStore);
             spyOn(mockOrgStore, "upsert").and.returnValue(utils.getPromise(q, "someId"));
 
-            orgUnitService = new OrgUnitService(http, db);
+            orgUnitService = new OrgUnitService(http, q);
         }));
 
         afterEach(function() {
@@ -267,15 +267,46 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
         });
 
         describe('getOrgUnitAndDescendants', function () {
+            var orgUnitId, expectedOrgUnitsWithIds, expectedOrgUnits, orgUnitIdHandler;
+            beforeEach(function () {
+                orgUnitId = "orgUnitID";
+                expectedOrgUnitsWithIds = [{'id': "IDA"}, {'id': "IDB"}];
+                expectedOrgUnits = [{'id': "IDA", 'name': 'someName'}, {'id': "IDB", 'name': 'someOtherName'}];
+                orgUnitIdHandler = httpBackend.whenGET(/api\/organisationUnits\/(.+)\.json*/).respond(200, {organisationUnits: expectedOrgUnitsWithIds});
+                httpBackend.whenGET(/api\/organisationUnits\.json*/).respond(200, {organisationUnits: expectedOrgUnits});
+            });
+
             it('should get the all ids of descendants and ancestors of specified orgunit', function () {
-                var orgUnitId = "orgUnitID";
-                var expectedOrgUnits = [{'id': "IDA"}, {'id': "IDB"}];
-                httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits/' + orgUnitId + '.json?fields=id&includeAncestors=true&includeDescendants=true').respond(200, {organisationUnits: expectedOrgUnits});
+                httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits/' + orgUnitId + '.json?fields=id&includeAncestors=true&includeDescendants=true').respond(200, {organisationUnits: expectedOrgUnitsWithIds});
+                orgUnitService.getOrgUnitTree(orgUnitId);
+
+                httpBackend.flush();
+            });
+
+            it('should get the orgunit details of descendants and ancestors of specified orgunit', function () {
+                httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?fields=' + metadataConf.fields.organisationUnits + encodeURI('&filter=id:in:[IDA,IDB]')).respond(200, {organisationUnits: expectedOrgUnits});
 
                 orgUnitService.getOrgUnitTree(orgUnitId).then(function (actualOrgUnits) {
                     expect(actualOrgUnits).toEqual(expectedOrgUnits);
                 });
+                httpBackend.flush();
+            });
 
+            it('should paginate the orgunit details', function () {
+                var mockId = [{id: 'IDA'}, {id: 'IDB'}, {id: 'IDC'}];
+                expectedOrgUnits = [
+                    {id: "IDA", name: "someName"},
+                    {id: "IDB", name: "someOtherName"},
+                    {id: "IDC", name: "someNameC"}
+                ];
+                orgUnitIdHandler.respond(200, {organisationUnits: mockId});
+
+                httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?fields=' + metadataConf.fields.organisationUnits + encodeURI('&filter=id:in:[IDA,IDB]')).respond(200, {organisationUnits: [expectedOrgUnits[0], expectedOrgUnits[1]]});
+                httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?fields=' + metadataConf.fields.organisationUnits + encodeURI('&filter=id:in:[IDC]')).respond(200, {organisationUnits: [expectedOrgUnits[2]]});
+
+                orgUnitService.getOrgUnitTree(orgUnitId, 2).then(function (actualOrgUnits) {
+                    expect(actualOrgUnits).toEqual(expectedOrgUnits);
+                });
                 httpBackend.flush();
             });
         });
