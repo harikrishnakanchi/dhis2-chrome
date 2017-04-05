@@ -155,18 +155,18 @@ define(["lodash", "moment", "constants"], function(_, moment, constants) {
                     strategyResult: applyDownloadFrequencyStrategy(),
                     moduleInformation: getModuleInformation()
                 }).then(function (data) {
-                        filterPivotTablesForEachModule(data.moduleInformation, data.strategyResult.pivotTables)
+                        return filterPivotTablesForEachModule(data.moduleInformation, data.strategyResult.pivotTables)
                         .then(recursivelyDownloadAndUpsertPivotTableData)
                         .then(function() {
                             if(allDownloadsWereSuccessful) {
-                                updateChangeLogs(data.strategyResult.changeLogKeys);
+                                return updateChangeLogs(data.strategyResult.changeLogKeys);
                             }
                         });
                 });
             };
 
             var downloadOpUnitAndProjectPivotTableData = function (pivotTables, projectId) {
-                downloadPivotTableDataForModule(pivotTables, projectId);
+                return downloadPivotTableDataForModule(pivotTables, projectId);
             };
 
             var recursivelyLoopThroughModules = function (modules, pivotTables, projectId) {
@@ -174,15 +174,14 @@ define(["lodash", "moment", "constants"], function(_, moment, constants) {
                     return downloadOpUnitAndProjectPivotTableData(pivotTables, projectId);
                 }
                 return downloadPivotTableDataForModule(pivotTables, projectId, modules.pop()).then(function () {
-                    recursivelyLoopThroughModules(modules, pivotTables, projectId);
+                    return recursivelyLoopThroughModules(modules, pivotTables, projectId);
                 });
             };
 
             var updatePivotTableDataForProject = function(projectId) {
                 return $q.all({
                     modules: orgUnitRepository.getAllModulesInOrgUnits([projectId]),
-                    pivotTables: pivotTableRepository.getAll(),
-
+                    pivotTables: pivotTableRepository.getAll()
                 }).then(function (data) {
                     return recursivelyLoopThroughModules(data.modules, data.pivotTables, projectId);
                 });

@@ -130,7 +130,7 @@ define(["lodash", "moment", "constants"], function(_, moment, constants) {
                     return $q.when();
                 }
                 return downloadRelevantChartDataForModule(moduleIds.pop(), charts, projectId).then(function () {
-                    recursivelyLoopThroughModules(moduleIds, charts, projectId);
+                    return recursivelyLoopThroughModules(moduleIds, charts, projectId);
                 });
             };
 

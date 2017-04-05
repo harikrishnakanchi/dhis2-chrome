@@ -257,21 +257,21 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, userModules));
                 reportService.getReportDataForOrgUnit.and.callFake(function(table, moduleId) {
                     if (table === mockPivotTable && moduleId === "module1")
-                        return utils.getPromise(q, "data1");
-                    if (table === mockPivotTable && moduleId === "module2")
                         return utils.getRejectedPromise(q, {errorCode: 'NETWORK_UNAVAILABLE'});
+                    if (table === mockPivotTable && moduleId === "module2")
+                        return utils.getPromise(q, "data1");
                 });
 
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
-                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(mockPivotTable.id, 'module1', "data1");
-                expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalledWith(mockPivotTable.id, 'module2', "data2");
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith('weeklyPivotTableData:mockProjectId:module1', '');
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyPivotTableData:mockProjectId:module1', '');
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith('yearlyPivotTableData:mockProjectId:module1', '');
+                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(mockPivotTable.id, 'module2', "data1");
+                expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalledWith(mockPivotTable.id, 'module1', "data1");
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('weeklyPivotTableData:mockProjectId:module2', '');
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyPivotTableData:mockProjectId:module2', '');
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('yearlyPivotTableData:mockProjectId:module2', '');
                 changeLogRepository.upsert.calls.reset();
-                expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('weeklyPivotTableData:mockProjectId:module2');
+                expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('weeklyPivotTableData:mockProjectId:module1');
             });
 
             it('should not download pivot table data if user has no modules', function() {
