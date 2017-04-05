@@ -42,7 +42,7 @@ define([], function () {
                 params: "id,name,code,created,lastUpdated,valueType,attributeValues[value,attribute[id,code,name]],options[id,name,code,translations[value,property,locale]],translations[value,property,locale]",
                 paging: true
             },
-            "organisationUnitGroupSets": {
+            "organisationUnitGroupSets": { //TODO Remove name from organisationUnitGroups once all the fields are updated with 12.0
                 params: "id,name,code,shortName,created,lastUpdated,description,dimensionType,dataDimension,organisationUnitGroups[id,name],attributeValues[value,attribute[id,code,name]]",
                 paging: true
             },
