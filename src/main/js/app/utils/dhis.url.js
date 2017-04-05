@@ -34,6 +34,7 @@ define(["properties"], function(properties) {
         "indicators": with_host("/api/indicators.json"),
         "programIndicators": with_host("/api/programIndicators.json"),
         "optionSets": with_host("/api/optionSets.json"),
+        "options": with_host("/api/options.json"),
         "organisationUnitGroupSets": with_host("/api/organisationUnitGroupSets.json"),
         "sections": with_host("/api/sections.json"),
         "organisationUnitGroups": with_host("/api/organisationUnitGroups.json"),

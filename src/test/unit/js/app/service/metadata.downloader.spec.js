@@ -17,6 +17,7 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
             httpBackend.expectGET(/.*indicators.*/).respond(200, options);
             httpBackend.expectGET(/.*programIndicators.*/).respond(200, options);
             httpBackend.expectGET(/.*optionSets.*/).respond(200, options);
+            httpBackend.expectGET(/.*options.*/).respond(200, options);
             httpBackend.expectGET(/.*organisationUnitGroupSets.*/).respond(200, options);
             httpBackend.expectGET(/.*sections.*/).respond(200, options);
             httpBackend.expectGET(/.*users.*/).respond(200, options);
@@ -131,7 +132,7 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
 
             expectMetadataDownload(metadataPayload);
             httpBackend.flush();
-            expect(metadataRepository.upsertMetadataForEntity).toHaveBeenCalledTimes(13);
+            expect(metadataRepository.upsertMetadataForEntity).toHaveBeenCalledTimes(14);
         });
 
         it('should update changeLog with the lastUpdated after metadata has been downloaded and upserted successfully', function () {

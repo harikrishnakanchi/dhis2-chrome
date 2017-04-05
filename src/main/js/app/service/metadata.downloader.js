@@ -136,6 +136,17 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                     return metadataRepository.upsertMetadataForEntity(response, 'optionSets');
                 }
             }, {
+                name: 'options',
+                url: dhisUrl.options,
+                params: {
+                    fields: metadataConf.fields.options.params,
+                    paging: metadataConf.fields.options.paging,
+                    pageSize: metadataConf.fields.options.pageSize
+                },
+                upsertFn: function (response) {
+                    return metadataRepository.upsertMetadataForEntity(response, 'options');
+                }
+            }, {
                 name: 'organisationUnitGroupSets',
                 url: dhisUrl.organisationUnitGroupSets,
                 params: {
