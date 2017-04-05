@@ -303,6 +303,10 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'da
         };
 
         $scope.showLineListReferralLocation = function () {
+            var isReferralLocationExcluded = _.isUndefined($scope.referralLocationDataElement);
+            if(isReferralLocationExcluded) {
+                return false;
+            }
             var referralLocationDoesntExistInServices = !_.some($scope.services, function (service) {
                 return service.serviceCode === 'ReferralLocation';
             });

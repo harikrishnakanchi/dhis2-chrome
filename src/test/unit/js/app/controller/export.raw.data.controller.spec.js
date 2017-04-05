@@ -680,6 +680,23 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
                     });
 
                     it('should get referral locations for the given opUnit', function () {
+                        var mockReferralDataElement = {
+                            id: 'someId',
+                            isIncluded: true,
+                            offlineSummaryType: 'referralLocations'
+                        };
+
+                        mockProgram = {
+                            id: 'someProgram',
+                            programStages: [{
+                                programStageSections: [{
+                                    programStageDataElements: [{
+                                        dataElement: mockReferralDataElement
+                                    }]
+                                }]
+                            }]
+                        };
+                        programRepository.get.and.returnValue(utils.getPromise(q, mockProgram));
                         scope.$apply();
                         expect(referralLocationsRepository.get).toHaveBeenCalledWith(scope.orgUnit.parent.id);
                     });
