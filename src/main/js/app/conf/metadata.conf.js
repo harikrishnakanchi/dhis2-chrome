@@ -23,7 +23,7 @@ define([], function () {
                 params: "id,name,shortName,created,lastUpdated,attributeValues[value,attribute[id,code,name]],dataElements,dimensionItemType,translations[value,property,locale]",
                 paging: true
             },
-            "dataElements": {
+            "dataElements": { //TODO Remove name from optionSet and name, code from options once all the fields are updated with 12.0
                 params: ":all,!href,!publicAccess,!externalAccess,!dimensionItem,!zeroIsSignificant,!url,!access,!user,!userGroupAccesses,!aggregationLevels,optionSet[id,name,options[id,name,code]],categoryCombo,dataElementGroups,attributeValues[value,attribute[id,code,name]],dataSets,translations[value,property,locale]",
                 pageSize: 100,   // PageSize of 50 : ~12KB
                 paging: true
