@@ -304,9 +304,16 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
                 httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?fields=' + metadataConf.fields.organisationUnits + encodeURI('&filter=id:in:[IDA,IDB]')).respond(200, {organisationUnits: [expectedOrgUnits[0], expectedOrgUnits[1]]});
                 httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?fields=' + metadataConf.fields.organisationUnits + encodeURI('&filter=id:in:[IDC]')).respond(200, {organisationUnits: [expectedOrgUnits[2]]});
 
-                orgUnitService.getOrgUnitTree(orgUnitId, 2).then(function (actualOrgUnits) {
+                orgUnitService.getOrgUnitTree(orgUnitId, undefined, 2).then(function (actualOrgUnits) {
                     expect(actualOrgUnits).toEqual(expectedOrgUnits);
                 });
+                httpBackend.flush();
+            });
+
+            it('should download all orgunits that are updated after specified time', function () {
+                var lastUpdatedTime = 'someTime';
+                httpBackend.expectGET(/filter=lastUpdated:gte:someTime/);
+                orgUnitService.getOrgUnitTree(orgUnitId, lastUpdatedTime);
                 httpBackend.flush();
             });
         });

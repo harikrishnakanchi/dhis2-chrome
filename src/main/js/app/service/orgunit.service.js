@@ -74,7 +74,7 @@ define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], funct
             });
         };
 
-        this.getOrgUnitTree = function (orgUnitId, pageSize) {
+        this.getOrgUnitTree = function (orgUnitId, lastUpdated, pageSize) {
             pageSize = pageSize || 200;
             var downloadOrgUnits = function (orgUnitWithIds, allOrgUnits) {
                 var url = dhisUrl.orgUnits + '.json';
@@ -97,6 +97,10 @@ define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], funct
                     includeDescendants: true,
                     includeAncestors: true
                 };
+                if (lastUpdated) {
+                    params.filter = "lastUpdated:gte:" + lastUpdated;
+                }
+
                 return $http.get(url, {params: params})
                     .then(_.property('data.organisationUnits'));
             };
