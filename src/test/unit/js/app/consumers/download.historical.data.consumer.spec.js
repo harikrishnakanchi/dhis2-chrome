@@ -188,7 +188,7 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
 
                         beforeEach(function () {
                             mockMergedData = ['someMockMergedDataValues'];
-
+                            mockPraxisData = [{dataValues: 'someValues'}, {dataValues: 'someOtherValues'}];
                             dataService.downloadData.and.returnValue(utils.getPromise(q, mockDHISData));
                             dataRepository.getDataValuesForOrgUnitsAndPeriods.and.returnValue(utils.getPromise(q, mockPraxisData));
                             mergeBy.lastUpdated.and.returnValue(mockMergedData);
@@ -208,7 +208,8 @@ define(['utils', 'timecop', 'angularMocks', 'lodash', 'dateUtils', 'properties',
                         });
 
                         it('should merge the data values from Praxis and DHIS by lastUpdated', function () {
-                            expect(mergeBy.lastUpdated).toHaveBeenCalledWith({ eq: jasmine.any(Function) }, mockDHISData, mockPraxisData);
+                            var expectedPraxisParams = ['someValues', 'someOtherValues'];
+                            expect(mergeBy.lastUpdated).toHaveBeenCalledWith({ eq: jasmine.any(Function) }, mockDHISData, expectedPraxisParams);
                         });
 
                         it('should upsert the merged datavalues into IndexedDB', function () {

@@ -61,11 +61,17 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes', 'cons
                     var downloadModuleDataValues = function () {
                         var periodChunks = _.chunk(periodRange, lastUpdatedTime ? periodRange.length : CHUNK_SIZE);
 
+                        var getDataValuesFromIndexedDB = function (periodChunk) {
+                            return dataRepository.getDataValuesForOrgUnitsAndPeriods(_.map(module.origins, 'id').concat(module.id), periodChunk).then(function (dataValues) {
+                                return _.map(dataValues, 'dataValues');
+                            });
+                        };
+
                         return _.reduce(periodChunks, function (moduleChunkPromise, periodChunk) {
                             return moduleChunkPromise.then(function () {
                                 return $q.all({
                                     dataValuesFromDHIS: dataService.downloadData(module.id, module.dataSetIds, periodChunk, lastUpdatedTime),
-                                    dataValuesInPraxis: dataRepository.getDataValuesForOrgUnitsAndPeriods(_.map(module.origins, 'id').concat(module.id), periodChunk)
+                                    dataValuesInPraxis: getDataValuesFromIndexedDB(periodChunk)
                                 }).then(function (data) {
                                     return dataRepository.saveDhisData(mergeBy.lastUpdated({ eq: dataValueEquals }, data.dataValuesFromDHIS, data.dataValuesInPraxis));
                                 });
