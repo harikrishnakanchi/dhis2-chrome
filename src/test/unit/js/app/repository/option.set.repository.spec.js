@@ -32,18 +32,18 @@ define(["optionSetRepository", "angularMocks", "utils", "referralLocationsReposi
 
         it("should get all option sets", function() {
             var allOptionSets = [{
-                "id": 123
-            }];
-            mockStore.getAll.and.returnValue(utils.getPromise(q, allOptionSets));
+                id: 123,
+                options: [{id: 'op1'}]
+            }], allOptions = [{id: 'op1', name: 'someName'}];
+
+            mockStore.getAll.and.returnValues(utils.getPromise(q, allOptionSets), utils.getPromise(q, allOptions));
 
             var result;
             optionSetRepository.getAll().then(function(optionSets) {
-                result = optionSets;
+                expect(mockStore.getAll).toHaveBeenCalled();
+                expect(optionSets).toEqual([{id: 123, options: [allOptions[0]]}]);
             });
             scope.$apply();
-
-            expect(mockStore.getAll).toHaveBeenCalled();
-            expect(result).toEqual(allOptionSets);
         });
 
         it('should filter the optionSets by code', function () {

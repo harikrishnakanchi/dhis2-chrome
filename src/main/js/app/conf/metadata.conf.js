@@ -38,7 +38,7 @@ define([], function () {
                 pageSize: 100,   // PageSize of 50 : ~6KB
                 paging: true
             },
-            "optionSets": {
+            "optionSets": { // TODO Remove all fields from options once all the fields are updated with 12.0
                 params: "id,name,code,created,lastUpdated,valueType,attributeValues[value,attribute[id,code,name]],options[id,name,code,translations[value,property,locale]],translations[value,property,locale]",
                 paging: true
             },
