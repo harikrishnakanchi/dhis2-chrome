@@ -1,6 +1,6 @@
 define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataConf'], function (dhisUrl, moment, properties, _, pagingUtils, metadataConf) {
     return function ($http, $q, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository,
-                     systemSettingRepository, orgUnitRepository, userRepository, systemInfoService) {
+                     systemSettingRepository, orgUnitRepository, userRepository, systemInfoService, orgUnitService) {
 
         var MAX_PAGE_REQUESTS = 500, updated, DHIS_VERSION;
 
@@ -192,16 +192,6 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                     return programRepository.upsertDhisDownloadedData(response);
                 }
             }, {
-                name: 'organisationUnits',
-                url: dhisUrl.orgUnits,
-                params: {
-                    fields: metadataConf.fields.organisationUnits,
-                    pageSize: 150   //PageSize of 50 : ~ 9KB-10KB
-                },
-                upsertFn: function(response) {
-                    return orgUnitRepository.upsertDhisDownloadedData(response);
-                }
-            }, {
                 name: 'systemSettings',
                 url: dhisUrl.systemSettings,
                 params: {
@@ -252,6 +242,32 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 });
             };
 
+            var downloadOrgUnits = function () {
+                var downloadOrgUnitTree = function (orgUnitId) {
+                    var entityKey = 'organisationUnits:' + orgUnitId;
+                    var updateOrgUnitChangeLog = _.partial(updateChangeLog, entityKey);
+                    return getChangeLog(entityKey)
+                        .then(function (lastUpdatedTime) {
+                            return lastUpdatedTime ? $q.when() : orgUnitService.getOrgUnitTree(orgUnitId).then(updateOrgUnitChangeLog);
+                        });
+                };
+
+                if(systemSettingRepository.getProductKeyLevel() === 'global') {
+                    return getChangeLog('organisationUnits').then(function (lastUpdatedTime) {
+                        return lastUpdatedTime ? $q.when() : orgUnitService.getAll().then(_.partial(updateChangeLog, 'organisationUnits'));
+                    });
+                }
+                else {
+                    var allowedOrgUnits = systemSettingRepository.getAllowedOrgUnits() || [];
+                    var orgUnitIds = _.map(allowedOrgUnits, 'id');
+                    return _.reduce(orgUnitIds, function (result, orgUnitId) {
+                        return result.then(function () {
+                            return downloadOrgUnitTree(orgUnitId);
+                        });
+                    }, $q.when());
+                }
+            };
+
             var setSystemInfoDetails = function () {
                 return setDownloadStartTime().then(setDhisVersion);
             };
@@ -268,6 +284,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                     });
                 });
             }, setSystemInfoDetails())
+                .then(downloadOrgUnits)
                 .then(updateMetadataChangeLog)
                 .then(deferred.resolve)
                 .catch(function (response) {

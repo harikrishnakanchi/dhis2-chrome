@@ -10,7 +10,7 @@ define(["metadataService", "filesystemService", "dataSetService", "programServic
         app.service('orgUnitService', ['$http', '$q', orgUnitService]);
         app.service('storageService', ['$window', storageService]);
         app.service('systemInfoService', ['$http', '$q', systemInfoService]);
-        app.service('metadataDownloader', ['$http', '$q', 'changeLogRepository', 'metadataRepository', 'orgUnitGroupRepository', 'dataSetRepository', 'programRepository', 'systemSettingRepository', 'orgUnitRepository', 'userRepository', 'systemInfoService', metadataDownloader]);
+        app.service('metadataDownloader', ['$http', '$q', 'changeLogRepository', 'metadataRepository', 'orgUnitGroupRepository', 'dataSetRepository', 'programRepository', 'systemSettingRepository', 'orgUnitRepository', 'userRepository', 'systemInfoService', 'orgUnitService', metadataDownloader]);
     };
     return {
         init: init
