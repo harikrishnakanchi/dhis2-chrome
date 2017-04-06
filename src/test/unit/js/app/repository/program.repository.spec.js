@@ -2,7 +2,7 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
     describe("programRepository", function() {
         var scope, q,
             programRepository, dataElementRepository, mockStore,
-            mockProgram, mockDataElementA, someMomentInTime;
+            mockProgram, mockProgramStageSection, mockDataElementA, someMomentInTime;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
@@ -34,9 +34,19 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
                 }],
                 programStages: [{
                     programStageSections: [{
+                        id: 'someProgramStageSectionId',
                         programStageDataElements: [{
-                            dataElement: { id: mockDataElementA.id}}]
+                            dataElement: { id: mockDataElementA.id }
+                        }]
                     }]
+                }]
+            };
+
+            mockProgramStageSection = {
+                name: 'someProgramStageSectionName',
+                id: 'someProgramStageSectionId',
+                programStageDataElements: [{
+                    dataElement: { id: mockDataElementA.id }
                 }]
             };
 
@@ -61,6 +71,17 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
             it("should get Programs for OrgUnit", function() {
                 programRepository.getProgramForOrgUnit('someOrgUnitId').then(function(program) {
                     expect(program.id).toEqual(mockProgram.id);
+                });
+
+                scope.$apply();
+            });
+
+            it("should enrich programs with programStageSections", function () {
+                mockStore.find.and.returnValue(utils.getPromise(q, mockProgram));
+                mockStore.getAll.and.returnValue(utils.getPromise(q, [mockProgramStageSection]));
+
+                programRepository.getProgramForOrgUnit('someOrgUnitId').then(function(program) {
+                    expect(program.programStages[0].programStageSections[0]).toEqual(mockProgramStageSection);
                 });
 
                 scope.$apply();
@@ -103,6 +124,7 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
             beforeEach(function () {
                 customAttributes.getAttributeValue.and.returnValue('someServiceCode');
                 mockStore.find.and.returnValue(utils.getPromise(q, mockProgram));
+                mockStore.getAll.and.returnValue(utils.getPromise(q, [mockProgramStageSection]));
                 dataElementRepository.get.and.returnValue(utils.getPromise(q, mockDataElementA));
             });
 
@@ -112,6 +134,14 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
                     expect(programStageDataElements).toEqual([{
                         dataElement: _.merge({ isIncluded: true }, mockDataElementA)
                     }]);
+                });
+
+                scope.$apply();
+            });
+
+            it("should enrich program", function () {
+                programRepository.get(mockProgram.id).then(function (program) {
+                    expect(program.programStages[0].programStageSections[0].name).toEqual(mockProgramStageSection.name);
                 });
 
                 scope.$apply();
@@ -142,6 +172,19 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
         });
 
         describe('getAll', function () {
+            it("should enrich programs with programStageSections", function () {
+                customAttributes.getAttributeValue.and.returnValue('someServiceCode');
+                customAttributes.getBooleanAttributeValue.and.returnValue(true);
+
+                mockStore.getAll.and.returnValues(utils.getPromise(q, [mockProgram]), utils.getPromise(q, [mockProgramStageSection]));
+
+                programRepository.getAll().then(function(programs) {
+                    expect(programs[0].programStages[0].programStageSections[0]).toEqual(mockProgramStageSection);
+                });
+
+                scope.$apply();
+            });
+
             it('should parse the service code of the programs', function () {
                 customAttributes.getAttributeValue.and.returnValue('someServiceCode');
                 customAttributes.getBooleanAttributeValue.and.returnValue(true);
@@ -168,12 +211,12 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
 
                 scope.$apply();
             });
-
         });
 
         describe('findAll', function () {
             beforeEach(function () {
                 mockStore.each.and.returnValue(utils.getPromise(q, [mockProgram]));
+                mockStore.getAll.and.returnValue(utils.getPromise(q, [mockProgramStageSection]));
 
                 customAttributes.getAttributeValue.and.returnValue('someServiceCode');
             });
@@ -181,6 +224,13 @@ define(["programRepository", "dataElementRepository", "angularMocks", "utils", "
             it('should find all programs', function() {
                 programRepository.findAll(['someProgramId']).then(function (programs) {
                     expect(_.map(programs, 'id')).toEqual([mockProgram.id]);
+                });
+                scope.$apply();
+            });
+
+            it('should enrich programs with programStageSections', function () {
+                programRepository.findAll(['someProgramId']).then(function (programs) {
+                    expect(programs[0].programStages[0].programStageSections[0]).toEqual(mockProgramStageSection);
                 });
                 scope.$apply();
             });

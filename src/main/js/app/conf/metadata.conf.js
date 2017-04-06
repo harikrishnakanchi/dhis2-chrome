@@ -77,7 +77,7 @@ define([], function () {
                 params: ":all,attributeValues[:identifiable,value,attribute[:identifiable]],!organisationUnits,translations[value,property,locale],!dataSetElements",
                 paging: true
             },
-            "programs": {
+            "programs": { // TODO Remove name & programStageDataElements from programStageSections once all the fields are updated with 12.0
                 params: "id,name,displayName,organisationUnits,attributeValues[:identifiable,value,attribute[:identifiable]],programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]],translations[value,property,locale]",
                 paging: true
             },
