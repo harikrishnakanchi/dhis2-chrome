@@ -81,6 +81,10 @@ define([], function () {
                 params: "id,name,displayName,organisationUnits,attributeValues[:identifiable,value,attribute[:identifiable]],programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]],translations[value,property,locale]",
                 paging: true
             },
+            "programStageSections": {
+                params: "id,name,programStageDataElements[id,compulsory,dataElement[id,name]]",
+                paging: true
+            },
             "organisationUnits": {
                 params: ":all,parent[id,name],attributeValues[value,attribute[id,code,name]],dataSets,!access,!href,!uuid",
                 pageSize: 150,   //PageSize of 50 : ~ 9KB-10KB
@@ -112,7 +116,8 @@ define([], function () {
             "users",
             "userRoles",
             "attributes",
-            "translations"
+            "translations",
+            "programStageSections"
         ]
     };
 });

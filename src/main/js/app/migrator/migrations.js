@@ -516,6 +516,10 @@ define(['dateUtils', 'lodash', 'metadataConf'], function(dateUtils, _, metadataC
         create_store_with_key("options", "id", db);
     };
 
+    var add_program_stage_section_store = function(db) {
+        create_store_with_key("programStageSections", "id", db);
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -575,6 +579,7 @@ define(['dateUtils', 'lodash', 'metadataConf'], function(dateUtils, _, metadataC
         update_change_log_keys,
         migrate_metadata_change_log,
         delete_local_user_credentials_store,
-        add_option_store
+        add_option_store,
+        add_program_stage_section_store
     ];
 });

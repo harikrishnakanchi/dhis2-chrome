@@ -20,6 +20,7 @@ define(["properties"], function(properties) {
         "users": with_host("/api/users"),
         "userRoles": with_host("/api/userRoles.json"),
         "programs": with_host("/api/programs"),
+        "programStageSections": with_host("/api/programStageSections"),
         "dataSets": with_host("/api/dataSets"),
         "charts": with_host("/api/charts"),
         "pivotTables": with_host("/api/reportTables"),

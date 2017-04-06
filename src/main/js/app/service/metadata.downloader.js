@@ -219,6 +219,16 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                     return programRepository.upsertDhisDownloadedData(response);
                 }
             }, {
+                name: 'programStageSections',
+                url: dhisUrl.programStageSections,
+                params: {
+                    fields: metadataConf.fields.programStageSections.params,
+                    paging: metadataConf.fields.programStageSections.paging
+                },
+                upsertFn: function (response) {
+                    return metadataRepository.upsertMetadataForEntity(response, 'programStageSections');
+                }
+            }, {
                 name: 'organisationUnits',
                 url: dhisUrl.orgUnits,
                 params: {
