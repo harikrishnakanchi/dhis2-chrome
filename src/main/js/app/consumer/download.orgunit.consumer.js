@@ -1,5 +1,5 @@
 define(['moment', "lodashUtils", "dateUtils"], function(moment, _, dateUtils) {
-    return function(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, $q, mergeBy) {
+    return function(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, $q, mergeBy, systemSettingRepository) {
         var serverDate;
 
         this.run = function(message) {
@@ -25,7 +25,19 @@ define(['moment', "lodashUtils", "dateUtils"], function(moment, _, dateUtils) {
                 return orgUnitService.get(orgUnitIds);
             };
 
+            var downloadOrgUnitTree = function (orgUnitId) {
+                var changeLogKey = "organisationUnits:" + orgUnitId;
+                return changeLogRepository.get(changeLogKey).then(_.partial(orgUnitService.getOrgUnitTree, orgUnitId));
+            };
+
             var downloadRemotelyChanged = function() {
+                var productKeyLevel = systemSettingRepository.getProductKeyLevel();
+                var allowedOrgUnitIds = _.map(systemSettingRepository.getAllowedOrgUnits() || [], 'id');
+                if (productKeyLevel != 'global') {
+                    return _.reduce(allowedOrgUnitIds, function (result, orgUnitId) {
+                        return result.then(_.partial(downloadOrgUnitTree, orgUnitId));
+                    }, $q.when());
+                }
                 return changeLogRepository.get("organisationUnits").then(function(lastUpdatedTime) {
                     return orgUnitService.getAll(lastUpdatedTime);
                 });

@@ -1,7 +1,9 @@
-define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "lodash", "angularMocks", "orgUnitRepository", "timecop", "mergeBy", "systemInfoService", "changeLogRepository"],
-    function(DownloadOrgunitConsumer, OrgUnitService, utils, _, mocks, OrgUnitRepository, timecop, MergeBy, SystemInfoService, ChangeLogRepository) {
+define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "lodash", "angularMocks", "orgUnitRepository", "timecop",
+"mergeBy", "systemInfoService", "changeLogRepository", "systemSettingRepository"],
+    function(DownloadOrgunitConsumer, OrgUnitService, utils, _, mocks, OrgUnitRepository, timecop, MergeBy,
+             SystemInfoService, ChangeLogRepository, SystemSettingRepository) {
     describe("downloadOrgunitConsumer", function() {
-        var downloadOrgunitConsumer, payload, orgUnitService, orgUnitRepository, systemInfoService, q, scope, changeLogRepository, mergeBy;
+        var downloadOrgunitConsumer, payload, orgUnitService, orgUnitRepository, systemInfoService, systemSettingRepository, q, scope, changeLogRepository, mergeBy, someTime;
         var mockOrgUnit = function (options) {
             return _.merge({
                 'id': 'a4acf9115a7',
@@ -27,6 +29,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "lodash", "angular
         beforeEach(mocks.inject(function($q, $rootScope, $log) {
             q = $q;
             scope = $rootScope.$new();
+            someTime = '2014-10-24T09:01:12.020+0000';
 
             Timecop.install();
             Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
@@ -42,8 +45,12 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "lodash", "angular
             spyOn(systemInfoService, 'getServerDate').and.returnValue(utils.getPromise(q, 'someTime'));
 
             changeLogRepository = new ChangeLogRepository();
-            spyOn(changeLogRepository, "get").and.returnValue(utils.getPromise(q, '2014-10-24T09:01:12.020+0000'));
+            spyOn(changeLogRepository, "get").and.returnValue(utils.getPromise(q, someTime));
             spyOn(changeLogRepository, "upsert");
+
+            systemSettingRepository = new SystemSettingRepository();
+            spyOn(systemSettingRepository, 'getProductKeyLevel').and.returnValue('global');
+            spyOn(systemSettingRepository, 'getAllowedOrgUnits').and.returnValue([]);
 
         }));
 
@@ -68,7 +75,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "lodash", "angular
             spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy]));
 
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy, systemSettingRepository);
 
             downloadOrgunitConsumer.run(message);
             scope.$apply();
@@ -94,7 +101,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "lodash", "angular
             spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy]));
 
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy, systemSettingRepository);
 
             downloadOrgunitConsumer.run(message);
             scope.$apply();
@@ -116,7 +123,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "lodash", "angular
             spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHISSinceLastUpdatedTime));
             spyOn(orgUnitRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy]));
 
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy, systemSettingRepository);
             downloadOrgunitConsumer.run(message);
 
             scope.$apply();
@@ -139,7 +146,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "lodash", "angular
             spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHISSinceLastUpdatedTime));
             spyOn(orgUnitRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy]));
 
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy, systemSettingRepository);
             downloadOrgunitConsumer.run(message);
 
             scope.$apply();
@@ -158,7 +165,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "lodash", "angular
             spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, []));
             spyOn(orgUnitRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
 
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy, systemSettingRepository);
 
             downloadOrgunitConsumer.run(message);
             scope.$apply();
@@ -178,12 +185,55 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "lodash", "angular
             spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, []));
             spyOn(orgUnitRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
 
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy, systemSettingRepository);
 
             downloadOrgunitConsumer.run(message);
             scope.$apply();
 
             expect(changeLogRepository.upsert).toHaveBeenCalledWith('organisationUnits', 'someTime');
+        });
+
+        describe('download relevant orgUnits if product key level is not global', function () {
+            var message, localCopy;
+            beforeEach(function () {
+                message = {
+                    "data": {
+                        "data": [],
+                        "type": "upsertOrgUnit"
+                    }
+                };
+                localCopy = mockOrgUnit();
+
+                spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, []));
+                spyOn(orgUnitService, 'getOrgUnitTree').and.returnValue(utils.getPromise(q, []));
+                spyOn(orgUnitRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy]));
+                systemSettingRepository.getProductKeyLevel.and.returnValue('project');
+                systemSettingRepository.getAllowedOrgUnits.and.returnValue([{id: "IDA"}, {id: "IDB"}]);
+                downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy, systemSettingRepository);
+            });
+
+            it('should get Product key level and allowed orgUnits', function () {
+                downloadOrgunitConsumer.run(message);
+                scope.$apply();
+
+                expect(systemSettingRepository.getProductKeyLevel).toHaveBeenCalled();
+                expect(systemSettingRepository.getAllowedOrgUnits).toHaveBeenCalled();
+            });
+
+            it('should get changelog', function () {
+                downloadOrgunitConsumer.run(message);
+                scope.$apply();
+                expect(changeLogRepository.get).toHaveBeenCalledWith("organisationUnits:" + "IDA");
+                expect(changeLogRepository.get).toHaveBeenCalledWith("organisationUnits:" + "IDB");
+            });
+
+            it('should download only relevant orgUnits', function () {
+                downloadOrgunitConsumer.run(message);
+                scope.$apply();
+
+                expect(orgUnitService.getOrgUnitTree).toHaveBeenCalledWith("IDA", someTime);
+                expect(orgUnitService.getOrgUnitTree).toHaveBeenCalledWith("IDB", someTime);
+            });
         });
     });
 });
