@@ -242,28 +242,26 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 });
             };
 
-            var downloadOrgUnits = function () {
+            var downloadAndUpsertOrgUnits = function () {
+                var downloadAndUpdateChangeLog = function (downloadFunction, entityKey) {
+                    return getChangeLog(entityKey).then(function (lastUpdatedTime) {
+                        return lastUpdatedTime ? $q.when() : downloadFunction();
+                    }).then(_.partial(updateChangeLog, entityKey));
+                };
+
                 var downloadOrgUnitTree = function (orgUnitId) {
                     var entityKey = 'organisationUnits:' + orgUnitId;
-                    var updateOrgUnitChangeLog = _.partial(updateChangeLog, entityKey);
-                    return getChangeLog(entityKey)
-                        .then(function (lastUpdatedTime) {
-                            return lastUpdatedTime ? $q.when() : orgUnitService.getOrgUnitTree(orgUnitId).then(updateOrgUnitChangeLog);
-                        });
+                    return downloadAndUpdateChangeLog(_.partial(orgUnitService.getOrgUnitTree, orgUnitId), entityKey);
                 };
 
                 if(systemSettingRepository.getProductKeyLevel() === 'global') {
-                    return getChangeLog('organisationUnits').then(function (lastUpdatedTime) {
-                        return lastUpdatedTime ? $q.when() : orgUnitService.getAll().then(_.partial(updateChangeLog, 'organisationUnits'));
-                    });
+                    return downloadAndUpdateChangeLog(orgUnitService.getAll, 'organisationUnits');
                 }
                 else {
                     var allowedOrgUnits = systemSettingRepository.getAllowedOrgUnits() || [];
                     var orgUnitIds = _.map(allowedOrgUnits, 'id');
                     return _.reduce(orgUnitIds, function (result, orgUnitId) {
-                        return result.then(function () {
-                            return downloadOrgUnitTree(orgUnitId);
-                        });
+                        return result.then(_.partial(downloadOrgUnitTree, orgUnitId));
                     }, $q.when());
                 }
             };
@@ -303,7 +301,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                     return downloadPromise.then(computeProgress);
                 });
             }, setSystemInfoDetails())
-                .then(downloadOrgUnits)
+                .then(downloadAndUpsertOrgUnits)
                 .then(computeProgress)
                 .then(updateMetadataChangeLog)
                 .then(deferred.resolve)
