@@ -276,15 +276,35 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 return changeLogRepository.upsert('metaData', updated);
             };
 
-            _.reduce(entities, function (promise, entity, index) {
+            var notify = function (percent) {
+                deferred.notify({percent: percent});
+            };
+
+            var calculatePercent = function (num) {
+                var totalNum = entities.length + 1;
+                return _.floor((num / totalNum) * 100);
+            };
+
+            var increment = function (initialValue) {
+                var count = initialValue;
+                return function () {
+                    count = count + 1;
+                    return count;
+                };
+            };
+
+            var incrementOne = increment(0);
+
+            var computeProgress = _.flowRight(notify, calculatePercent, incrementOne);
+
+            _.reduce(entities, function (promise, entity) {
                 return promise.then(function () {
                     var downloadPromise = (entity.name == 'translations' && DHIS_VERSION != '2.23') ? $q.when() : downloadEntityIfNotExists(entity);
-                    return downloadPromise.then(function () {
-                        deferred.notify({percent: _.floor(((index + 1) / entities.length) * 100)});
-                    });
+                    return downloadPromise.then(computeProgress);
                 });
             }, setSystemInfoDetails())
                 .then(downloadOrgUnits)
+                .then(computeProgress)
                 .then(updateMetadataChangeLog)
                 .then(deferred.resolve)
                 .catch(function (response) {
