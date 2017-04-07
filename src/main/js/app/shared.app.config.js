@@ -195,6 +195,7 @@ require.config({
         "sessionHelper": "app/helpers/session.helper",
         "originOrgunitCreator": "app/helpers/origin.orgunit.creator",
         "pivotTableExportBuilder": "app/helpers/pivot.table.export.builder",
+        "metadataHelper": "app/helpers/metadata.helper",
 
         //Directives
         "directives": "app/directives/directives",
