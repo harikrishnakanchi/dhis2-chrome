@@ -243,10 +243,14 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
             };
 
             var downloadAndUpsertOrgUnits = function () {
+                var upsertOrgUnits = function (orgUnits) {
+                    return orgUnitRepository.upsertDhisDownloadedData(orgUnits);
+                };
+
                 var downloadAndUpdateChangeLog = function (downloadFunction, entityKey) {
                     return getChangeLog(entityKey).then(function (lastUpdatedTime) {
-                        return lastUpdatedTime ? $q.when() : downloadFunction();
-                    }).then(_.partial(updateChangeLog, entityKey));
+                        return lastUpdatedTime ? $q.when() : downloadFunction().then(upsertOrgUnits).then(_.partial(updateChangeLog, entityKey));
+                    });
                 };
 
                 var downloadOrgUnitTree = function (orgUnitId) {

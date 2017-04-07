@@ -213,6 +213,16 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
 
                     expect(orgUnitService.getOrgUnitTree).not.toHaveBeenCalled();
                 });
+
+                it('should upsert downloaded data', function () {
+                    changeLogRepository.get.and.callFake(function (name) {
+                        return utils.getPromise(q, _.contains(name, 'organisationUnits') ? undefined : "someTime");
+                    });
+                    metadataDownloader.run();
+                    rootScope.$apply();
+
+                    expect(orgUnitRepository.upsertDhisDownloadedData).toHaveBeenCalled();
+                });
             });
         });
     });
