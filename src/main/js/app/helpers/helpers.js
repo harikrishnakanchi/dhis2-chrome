@@ -6,7 +6,7 @@ define(['orgUnitGroupHelper', 'sessionHelper', 'packagedDataImporter', 'originOr
             app.service('packagedDataImporter', ['$q', 'metadataService', 'systemSettingService', 'dataSetService', 'programService', 'orgUnitService', 'changeLogRepository', 'metadataRepository', 'orgUnitRepository', 'orgUnitGroupRepository', 'dataSetRepository', 'programRepository', 'systemSettingRepository', packagedDataImporter]);
             app.service('originOrgunitCreator', ['$q', 'orgUnitRepository', 'patientOriginRepository', 'orgUnitGroupHelper', 'dataSetRepository', originOrgunitCreator]);
             app.service('pivotTableExportBuilder', ['$rootScope', pivotTableExportBuilder]);
-            app.service('metadataHelper', ['$q', 'changeLogRepository', metadataHelper]);
+            app.service('metadataHelper', ['$q', 'changeLogRepository', 'systemSettingRepository', metadataHelper]);
         };
         return {
             init: init

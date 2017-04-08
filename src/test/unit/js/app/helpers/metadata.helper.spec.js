@@ -1,12 +1,17 @@
-define(['metadataHelper', 'angularMocks', 'utils', 'changeLogRepository'], function (MetadataHelper, mocks, utils, ChangeLogRepository) {
+define(['metadataHelper', 'angularMocks', 'utils', 'changeLogRepository', 'systemSettingRepository'], function (MetadataHelper, mocks, utils, ChangeLogRepository, SystemSettingRepository) {
     describe('MetadataHelper', function () {
-        var metadataHelper, changeLogRepository, q, scope;
+        var metadataHelper, changeLogRepository, q, scope, systemSettingRepository;
         beforeEach(mocks.inject(function ($q, $rootScope) {
             q = $q;
             scope = $rootScope.$new();
             changeLogRepository = new ChangeLogRepository();
-            spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, ""));
-            metadataHelper = new MetadataHelper(q, changeLogRepository);
+            spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, "someTime"));
+
+            systemSettingRepository = new SystemSettingRepository();
+            spyOn(systemSettingRepository, 'getProductKeyLevel').and.returnValue("");
+            spyOn(systemSettingRepository, 'getAllowedOrgUnits').and.returnValue([]);
+
+            metadataHelper = new MetadataHelper(q, changeLogRepository, systemSettingRepository);
         }));
 
         it('should check metadata changeLog', function () {
@@ -23,6 +28,37 @@ define(['metadataHelper', 'angularMocks', 'utils', 'changeLogRepository'], funct
                 done();
             });
             scope.$apply();
+        });
+
+        describe('check relevant orgunits changeLog', function () {
+            it('should get product key level', function () {
+                metadataHelper.checkMetadata();
+                scope.$apply();
+
+                expect(systemSettingRepository.getProductKeyLevel).toHaveBeenCalled();
+            });
+
+            describe('if product key level is not global', function () {
+                beforeEach(function () {
+                    systemSettingRepository.getProductKeyLevel.and.returnValue("notGlobal");
+                });
+                
+                it('should get allowed orgUnits', function () {
+                    metadataHelper.checkMetadata();
+                    scope.$apply();
+
+                    expect(systemSettingRepository.getAllowedOrgUnits).toHaveBeenCalled();
+                });
+
+                it('should check changeLog for each orgUnit in allowed orgUnits', function () {
+                    systemSettingRepository.getAllowedOrgUnits.and.returnValue([{id: "IDA"}, {id: "IDB"}]);
+                    metadataHelper.checkMetadata();
+                    scope.$apply();
+
+                    expect(changeLogRepository.get.calls.allArgs()).toContain(jasmine.arrayContaining(['organisationUnits:IDA']));
+                    expect(changeLogRepository.get.calls.allArgs()).toContain(jasmine.arrayContaining(['organisationUnits:IDB']));
+                });
+            });
         });
     });
 });
