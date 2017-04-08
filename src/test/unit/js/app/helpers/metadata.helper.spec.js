@@ -59,6 +59,27 @@ define(['metadataHelper', 'angularMocks', 'utils', 'changeLogRepository', 'syste
                     expect(changeLogRepository.get.calls.allArgs()).toContain(jasmine.arrayContaining(['organisationUnits:IDB']));
                 });
             });
+
+            describe('if product key level is global', function () {
+                beforeEach(function () {
+                    systemSettingRepository.getProductKeyLevel.and.returnValue("global");
+                });
+                it('should check changeLog for orgunits', function () {
+                    metadataHelper.checkMetadata();
+                    scope.$apply();
+
+                    expect(changeLogRepository.get).toHaveBeenCalledWith('organisationUnits');
+                });
+
+                it('should reject a promise if changeLog is not present for orgunits', function (done) {
+                    changeLogRepository.get.and.returnValues(utils.getPromise(q, "someTime"), utils.getPromise(q, undefined));
+                    metadataHelper.checkMetadata().then(done.fail, function (message) {
+                        expect(message).toEqual('noMetadata');
+                        done();
+                    });
+                    scope.$apply();
+                });
+            });
         });
     });
 });
