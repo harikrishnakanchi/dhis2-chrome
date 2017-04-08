@@ -55,8 +55,18 @@ define(['metadataHelper', 'angularMocks', 'utils', 'changeLogRepository', 'syste
                     metadataHelper.checkMetadata();
                     scope.$apply();
 
-                    expect(changeLogRepository.get.calls.allArgs()).toContain(jasmine.arrayContaining(['organisationUnits:IDA']));
-                    expect(changeLogRepository.get.calls.allArgs()).toContain(jasmine.arrayContaining(['organisationUnits:IDB']));
+                    expect(changeLogRepository.get).toHaveBeenCalledWith('organisationUnits:IDA');
+                    expect(changeLogRepository.get).toHaveBeenCalledWith('organisationUnits:IDB');
+                });
+
+                it('should reject the promise if any one orgUnit does not have changeLog', function (done) {
+                    systemSettingRepository.getAllowedOrgUnits.and.returnValue([{id: "IDA"}, {id: "IDB"}]);
+                    changeLogRepository.get.and.returnValues(utils.getPromise(q, "someTime"), utils.getPromise(q, "someTime"), utils.getPromise(q, undefined));
+                    metadataHelper.checkMetadata().then(done.fail, function (message) {
+                        expect(message).toEqual('noMetadata');
+                        done();
+                    });
+                    scope.$apply();
                 });
             });
 

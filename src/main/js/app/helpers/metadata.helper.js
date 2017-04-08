@@ -12,7 +12,7 @@ define(["lodash"], function (_) {
                     var allowedOrgUnitChangeLogKeys = _.map(systemSettingRepository.getAllowedOrgUnits() || [], function (orgUnit) {
                         return "organisationUnits:" + orgUnit.id;
                     });
-                    return $q.all(_.map(allowedOrgUnitChangeLogKeys, changeLogRepository.get));
+                    return $q.all(_.map(allowedOrgUnitChangeLogKeys, checkForLastUpdated));
                 }
                 else {
                     return checkForLastUpdated('organisationUnits');
