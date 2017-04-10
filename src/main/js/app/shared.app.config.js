@@ -187,6 +187,7 @@ require.config({
         "xlsxLoader": "app/utils/xlsx.loader",
         "dataElementUtils": "app/utils/data.element.utils",
         "pagingUtils": "app/utils/paging.utils",
+        "productKeyUtils": "app/utils/product.key.utils",
 
         //Helpers
         "helpers": "app/helpers/helpers",
