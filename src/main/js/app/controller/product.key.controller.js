@@ -19,16 +19,24 @@ define(["productKeyUtils"], function(productKeyUtils) {
             return systemSettingRepository.upsertProductKey(productKey).then(onSuccess, onFailure);
         };
 
-        $scope.setAuthHeaderAndProceed = function() {
+        var shouldShowModal = function () {
             var allowedOrgUnits = systemSettingRepository.getAllowedOrgUnits();
-            if (_.isUndefined(allowedOrgUnits))
-                return updateProductKey();
-
             var allowedOrgUnitIds = _.map(allowedOrgUnits, 'id');
             var newlyEnteredProductKey = productKeyUtils.decrypt($scope.productKey);
-            var allowedOrgUnitIdsFromNewProductKey = _.map(newlyEnteredProductKey && newlyEnteredProductKey.data.allowedOrgUnits, 'id');
 
-            if (newlyEnteredProductKey && !_.isEqual(allowedOrgUnitIds, allowedOrgUnitIdsFromNewProductKey)) {
+            if (_.isUndefined(allowedOrgUnits) || !newlyEnteredProductKey)
+                return false;
+
+            var allowedOrgUnitIdsFromNewProductKey = _.map(newlyEnteredProductKey.data.allowedOrgUnits, 'id');
+
+            if (!_.isEqual(allowedOrgUnitIds, allowedOrgUnitIdsFromNewProductKey)) {
+                return true;
+            }
+
+        };
+
+        $scope.setAuthHeaderAndProceed = function() {
+            if (shouldShowModal()) {
                 return showModal(updateProductKey);
             }
             return updateProductKey();
