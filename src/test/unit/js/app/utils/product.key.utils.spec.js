@@ -28,5 +28,11 @@ define(['productKeyUtils', 'cipherUtils'], function (productKeyUtils, cipherUtil
 
             expect(actualValue).toEqual(mockProductKeyDetails);
         });
+
+        it('should return false if product key is invalid', function () {
+            cipherUtils.decrypt.and.throwError("Error");
+            var actualValue = productKeyUtils.decrypt("invalidProductKey");
+            expect(actualValue).toBeFalsy();
+        });
     });
 });

@@ -1,6 +1,11 @@
 define(['cipherUtils'], function (cipherUtils) {
     var decrypt = function (productKey) {
-        return JSON.parse(cipherUtils.decrypt(productKey));
+        try{
+            return JSON.parse(cipherUtils.decrypt(productKey));
+        }
+        catch (e) {
+            return false;
+        }
     };
     return {
         decrypt: decrypt
