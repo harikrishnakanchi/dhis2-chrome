@@ -1,5 +1,5 @@
-define(["platformUtils"], function(platformUtils) {
-    return function($scope, $location, $rootScope, packagedDataImporter, sessionHelper, systemSettingRepository) {
+define(["productKeyUtils"], function(productKeyUtils) {
+    return function($scope, $location, $rootScope, $modal, packagedDataImporter, sessionHelper, systemSettingRepository) {
         var onSuccess = function() {
             $scope.isKeyInvalid = false;
 
@@ -11,12 +11,44 @@ define(["platformUtils"], function(platformUtils) {
             $scope.isKeyInvalid = true;
         };
 
-        $scope.setAuthHeaderAndProceed = function() {
+        var updateProductKey = function () {
             var productKey = {
                 "key": "productKey",
                 "value": $scope.productKey
             };
-            systemSettingRepository.upsertProductKey(productKey).then(onSuccess, onFailure);
+            return systemSettingRepository.upsertProductKey(productKey).then(onSuccess, onFailure);
+        };
+
+        $scope.setAuthHeaderAndProceed = function() {
+            var allowedOrgUnits = systemSettingRepository.getAllowedOrgUnits();
+            if (_.isUndefined(allowedOrgUnits))
+                return updateProductKey();
+
+            var allowedOrgUnitIds = _.map(allowedOrgUnits, 'id');
+            var newlyEnteredProductKey = productKeyUtils.decrypt($scope.productKey);
+            var allowedOrgUnitIdsFromNewProductKey = _.map(newlyEnteredProductKey && newlyEnteredProductKey.data.allowedOrgUnits, 'id');
+
+            if (!_.isEqual(allowedOrgUnitIds, allowedOrgUnitIdsFromNewProductKey)) {
+                return showModal(updateProductKey);
+            }
+            return updateProductKey();
+        };
+
+        var showModal = function(okCallback) {
+            var scope = $rootScope.$new();
+            scope.modalMessages = {
+                "ok": $scope.resourceBundle.okLabel,
+                "title": $scope.resourceBundle.updateProductKeyMenuLabel,
+                "confirmationMessage": "Are you sure you want to update the product key?"
+            };
+
+            var modalInstance = $modal.open({
+                templateUrl: 'templates/confirm-dialog.html',
+                controller: 'confirmDialogController',
+                scope: scope
+            });
+
+            return modalInstance.result.then(okCallback);
         };
 
         var previousLocation = $location.search().prev;
