@@ -64,6 +64,11 @@ define(['moment', "lodashUtils", "dateUtils"], function(moment, _, dateUtils) {
         };
 
         var updateChangeLog = function() {
+            var productKeyLevel = systemSettingRepository.getProductKeyLevel();
+            var allowedOrgUnitIds = _.map(systemSettingRepository.getAllowedOrgUnits() || [], 'id');
+            if (productKeyLevel !== 'global') {
+                return $q.all(_.map(allowedOrgUnitIds, _.partial(changeLogRepository.upsert, _, serverDate)));
+            }
             return changeLogRepository.upsert("organisationUnits", serverDate);
         };
     };

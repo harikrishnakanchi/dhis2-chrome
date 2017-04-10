@@ -243,6 +243,14 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "lodash", "angular
 
                 expect(orgUnitRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(mockDHISOrgUnits);
             });
+
+            it('should update changeLog for each allowed orgUnit trees', function () {
+                downloadOrgunitConsumer.run(message);
+                scope.$apply();
+
+                expect(changeLogRepository.upsert.calls.allArgs()).toContain(jasmine.arrayContaining(['IDA', 'someTime']));
+                expect(changeLogRepository.upsert.calls.allArgs()).toContain(jasmine.arrayContaining(['IDB', 'someTime']));
+            });
         });
     });
 });
