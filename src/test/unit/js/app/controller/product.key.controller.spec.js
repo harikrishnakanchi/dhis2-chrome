@@ -110,5 +110,12 @@ define(["productKeyController", "angularMocks", "packagedDataImporter", "utils",
             scope.$apply();
             expect(systemSettingRepository.upsertProductKey).not.toHaveBeenCalled();
         });
+
+        it('should not show the modal if product key is invalid', function () {
+            scope.setAuthHeaderAndProceed();
+            scope.$apply();
+
+            expect(fakeModal.open).not.toHaveBeenCalled();
+        });
     });
 });

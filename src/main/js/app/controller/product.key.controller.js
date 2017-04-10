@@ -28,7 +28,7 @@ define(["productKeyUtils"], function(productKeyUtils) {
             var newlyEnteredProductKey = productKeyUtils.decrypt($scope.productKey);
             var allowedOrgUnitIdsFromNewProductKey = _.map(newlyEnteredProductKey && newlyEnteredProductKey.data.allowedOrgUnits, 'id');
 
-            if (!_.isEqual(allowedOrgUnitIds, allowedOrgUnitIdsFromNewProductKey)) {
+            if (newlyEnteredProductKey && !_.isEqual(allowedOrgUnitIds, allowedOrgUnitIdsFromNewProductKey)) {
                 return showModal(updateProductKey);
             }
             return updateProductKey();
