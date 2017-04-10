@@ -206,7 +206,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "lodash", "angular
 
                 spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, []));
                 spyOn(orgUnitService, 'getOrgUnitTree').and.returnValue(utils.getPromise(q, []));
-                spyOn(orgUnitRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy]));
+                spyOn(orgUnitRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
                 systemSettingRepository.getProductKeyLevel.and.returnValue('project');
                 systemSettingRepository.getAllowedOrgUnits.and.returnValue([{id: "IDA"}, {id: "IDB"}]);
                 downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, systemInfoService, orgUnitRepository, changeLogRepository, q, mergeBy, systemSettingRepository);
@@ -233,6 +233,15 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "lodash", "angular
 
                 expect(orgUnitService.getOrgUnitTree).toHaveBeenCalledWith("IDA", someTime);
                 expect(orgUnitService.getOrgUnitTree).toHaveBeenCalledWith("IDB", someTime);
+            });
+
+            it('should upsert updated orgunits', function () {
+                var mockDHISOrgUnits = [{id: "IDA"}, {id: "IDB"}];
+                orgUnitService.getOrgUnitTree.and.returnValues(utils.getPromise(q, [{id: "IDA"}]), utils.getPromise(q, [{id: "IDB"}]));
+                downloadOrgunitConsumer.run(message);
+                scope.$apply();
+
+                expect(orgUnitRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(mockDHISOrgUnits);
             });
         });
     });

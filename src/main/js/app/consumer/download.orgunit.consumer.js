@@ -25,9 +25,14 @@ define(['moment', "lodashUtils", "dateUtils"], function(moment, _, dateUtils) {
                 return orgUnitService.get(orgUnitIds);
             };
 
-            var downloadOrgUnitTree = function (orgUnitId) {
+            var downloadOrgUnitTree = function (orgUnitId, orgUnitAccumulator) {
                 var changeLogKey = "organisationUnits:" + orgUnitId;
-                return changeLogRepository.get(changeLogKey).then(_.partial(orgUnitService.getOrgUnitTree, orgUnitId));
+                return changeLogRepository.get(changeLogKey)
+                    .then(_.partial(orgUnitService.getOrgUnitTree, orgUnitId))
+                    .then(function (updatedOrgUnits) {
+                        updatedOrgUnits = updatedOrgUnits || [];
+                        return orgUnitAccumulator.concat(updatedOrgUnits);
+                    });
             };
 
             var downloadRemotelyChanged = function() {
@@ -36,7 +41,7 @@ define(['moment', "lodashUtils", "dateUtils"], function(moment, _, dateUtils) {
                 if (productKeyLevel != 'global') {
                     return _.reduce(allowedOrgUnitIds, function (result, orgUnitId) {
                         return result.then(_.partial(downloadOrgUnitTree, orgUnitId));
-                    }, $q.when());
+                    }, $q.when([]));
                 }
                 return changeLogRepository.get("organisationUnits").then(function(lastUpdatedTime) {
                     return orgUnitService.getAll(lastUpdatedTime);
