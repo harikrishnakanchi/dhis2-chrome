@@ -80,7 +80,8 @@ define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], funct
                 var url = dhisUrl.orgUnits + '.json';
                 var params = {
                     fields: metadataConf.fields.organisationUnits,
-                    filter: 'id:in:[' + _.map(orgUnitWithIds, 'id') + ']'
+                    filter: 'id:in:[' + _.map(orgUnitWithIds, 'id') + ']',
+                    paging: false
                 };
 
                 return $http.get(url, {params: params})
