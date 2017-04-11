@@ -47,7 +47,7 @@ define(["productKeyUtils"], function(productKeyUtils) {
             scope.modalMessages = {
                 "ok": $scope.resourceBundle.okLabel,
                 "title": $scope.resourceBundle.updateProductKeyMenuLabel,
-                "confirmationMessage": "Are you sure you want to update the product key?"
+                "confirmationMessage": $scope.resourceBundle.updateProductKeyMessage
             };
 
             var modalInstance = $modal.open({

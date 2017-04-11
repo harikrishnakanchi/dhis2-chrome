@@ -362,5 +362,6 @@
         "turnOff": "Turn off Sync",
         "turnOnConfirmationMessage": "Warning: Turn On Sync will sync data from Praxis to DHIS. It will update Praxis to the latest versions, if available. Are you sure you want to turn Sync On?",
         "turnOffConfirmationMessage": "Warning: Turn Off Sync will stop Praxis from getting data and uploading data on DHIS. It will stop Praxis versions from update. Are you sure you want to turn Sync Off?"
-    }
+    },
+    "updateProductKeyMessage": "Updating product key will download metadata. Please ensure Praxis is online."
 }
