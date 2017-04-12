@@ -1,10 +1,10 @@
 define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'metadataRepository', 'orgUnitGroupRepository',
-    'dataSetRepository', 'programRepository', 'systemSettingRepository', 'orgUnitRepository', 'customAttributeRepository', 'userRepository', 'systemInfoService'],
+    'dataSetRepository', 'programRepository', 'systemSettingRepository', 'orgUnitRepository', 'customAttributeRepository', 'userRepository', 'systemInfoService', 'orgUnitService'],
     function (mocks, utils, MetadataDownloader, ChangeLogRepository, MetadataRepository, OrgUnitGroupRepository,
-              DataSetRepository, ProgramRepository, SystemSettingRepository, OrgUnitRepository, CustomAttributeRepository, UserRepository, SystemInfoService) {
+              DataSetRepository, ProgramRepository, SystemSettingRepository, OrgUnitRepository, CustomAttributeRepository, UserRepository, SystemInfoService, OrgUnitService) {
     describe('metaDataDownloader', function () {
         var http, q, httpBackend, rootScope, metadataDownloader, changeLogRepository, metadataRepository, orgUnitGroupRepository,
-            dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository, userRepository, systemInfoService;
+            dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository, userRepository, systemInfoService, orgUnitService;
 
         var expectMetadataDownload = function (options) {
             options = options || {};
@@ -26,7 +26,6 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
             httpBackend.expectGET(/.*dataSets.*/).respond(200, options);
             httpBackend.expectGET(/.*programs.*/).respond(200, options);
             httpBackend.expectGET(/.*programStageSections.*/).respond(200, options);
-            httpBackend.expectGET(/.*organisationUnits.*/).respond(200, options);
             httpBackend.expectGET(/.*systemSettings.*/).respond(200, options);
             httpBackend.expectGET(/.*attributes.*/).respond(200, options);
         };
@@ -58,9 +57,15 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
 
             systemSettingRepository = new SystemSettingRepository();
             spyOn(systemSettingRepository,'upsert').and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepository,'getProductKeyLevel').and.returnValue('globalProductKey');
+            spyOn(systemSettingRepository,'getAllowedOrgUnits').and.returnValue(utils.getPromise(q, []));
 
             orgUnitRepository = new OrgUnitGroupRepository();
             spyOn(orgUnitRepository,'upsertDhisDownloadedData').and.returnValue(utils.getPromise(q, {}));
+
+            orgUnitService = new OrgUnitService();
+            spyOn(orgUnitService, 'getOrgUnitTree').and.returnValue(utils.getPromise(q, []));
+            spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, []));
 
             userRepository = new UserRepository();
             spyOn(userRepository, 'upsertUserRoles').and.returnValue(utils.getPromise(q, {}));
@@ -69,7 +74,7 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
             spyOn(systemInfoService, 'getServerDate').and.returnValue(utils.getPromise(q, 'someDate'));
             spyOn(systemInfoService, 'getVersion').and.returnValue(utils.getPromise(q, 'someVersion'));
 
-            metadataDownloader = new MetadataDownloader(http, q, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository, userRepository, systemInfoService);
+            metadataDownloader = new MetadataDownloader(http, q, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository, systemSettingRepository, orgUnitRepository, userRepository, systemInfoService, orgUnitService);
         }));
 
         afterEach(function() {
@@ -148,8 +153,79 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
         it('should update metadata changelog after download completes', function () {
             metadataDownloader.run();
             rootScope.$apply();
-
             expect(changeLogRepository.upsert).toHaveBeenCalledWith('metaData', 'someDate');
+        });
+
+        describe('download orgUnits', function () {
+            describe('for global level product key', function () {
+                beforeEach(function () {
+                    systemSettingRepository.getProductKeyLevel.and.returnValue('global');
+                });
+
+                it('should download all orgunits', function () {
+                    changeLogRepository.get.and.callFake(function (name) {
+                        return utils.getPromise(q, name === 'organisationUnits' ? undefined : "someTime");
+                    });
+                    metadataDownloader.run();
+                    rootScope.$apply();
+
+                    expect(orgUnitService.getAll).toHaveBeenCalled();
+                });
+
+                it('should download all orgUnits with lastUpdated if changeLog for orgUnits exists', function () {
+                    var lastUpdated = 'someLastUpdated';
+                    changeLogRepository.get.and.returnValue(utils.getPromise(q, lastUpdated));
+                    metadataDownloader.run();
+                    rootScope.$apply();
+
+                    expect(orgUnitService.getAll).not.toHaveBeenCalled();
+                });
+            });
+
+            describe('for product keys other than global level', function () {
+                var mockAllowedOrgUnits;
+                beforeEach(function () {
+                    mockAllowedOrgUnits = [{id: 'IDA'}, {id: 'IDB'}];
+                    systemSettingRepository.getProductKeyLevel.and.returnValue('project');
+                    systemSettingRepository.getAllowedOrgUnits.and.returnValue(mockAllowedOrgUnits);
+                });
+
+                it('should get allowed orgUnits', function () {
+                    metadataDownloader.run();
+                    rootScope.$apply();
+
+                    expect(systemSettingRepository.getAllowedOrgUnits).toHaveBeenCalled();
+                });
+
+                it('should download orgUnit tree for allowed orgUnits', function () {
+                    changeLogRepository.get.and.callFake(function (name) {
+                        return utils.getPromise(q, _.contains(name, 'organisationUnits') ? undefined : "someTime");
+                    });
+                    metadataDownloader.run();
+                    rootScope.$apply();
+
+                    expect(orgUnitService.getOrgUnitTree).toHaveBeenCalledTimes(mockAllowedOrgUnits.length);
+                });
+
+                it('should not download orgUnits that already has been downloaded', function () {
+                    var lastUpdated = 'someLastUpdated';
+                    changeLogRepository.get.and.returnValue(utils.getPromise(q, lastUpdated));
+                    metadataDownloader.run();
+                    rootScope.$apply();
+
+                    expect(orgUnitService.getOrgUnitTree).not.toHaveBeenCalled();
+                });
+
+                it('should upsert downloaded data', function () {
+                    changeLogRepository.get.and.callFake(function (name) {
+                        return utils.getPromise(q, _.contains(name, 'organisationUnits') ? undefined : "someTime");
+                    });
+                    metadataDownloader.run();
+                    rootScope.$apply();
+
+                    expect(orgUnitRepository.upsertDhisDownloadedData).toHaveBeenCalled();
+                });
+            });
         });
     });
 });

@@ -144,6 +144,7 @@ require.config({
         "interpolate": "app/utils/interpolate",
         "pagingUtils": "app/utils/paging.utils",
         "hustlePublishUtils": "app/utils/hustle.publish.utils",
+        "productKeyUtils": "app/utils/product.key.utils",
 
         //Constants
         "constants": "app/constants/constants"

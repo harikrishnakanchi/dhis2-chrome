@@ -364,5 +364,6 @@
         "turnOnConfirmationMessage": "AVERTISSEMENT: \"Activer la synchronisation\" synchronisera vos données Praxis avec DHIS. Cela mettra à jour la dernière version de Praxis si disponible. Etes-vous sûr de vouloir activer la synchronisation ?",
         "turnOffConfirmationMessage": "AVERTISSEMENT: \"Désactiver la synchronisation\" stoppera la réception et l'envoi de données de Praxis avec DHIS. La dernière version de Praxis, si disponible, ne sera pas mise à jour. Etes vous sûr de vouloir désactiver la synchronisation ?"
     },
-    "selectYearLabel": "Select Year :"
+    "selectYearLabel": "Select Year :",
+    "updateProductKeyMessage": "Updating product key will download metadata. Please ensure Praxis is online."
 }

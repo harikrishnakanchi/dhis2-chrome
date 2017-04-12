@@ -1,5 +1,5 @@
 define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties", "constants"], function(dhisUrl, _, metadataConf, pagingUtils, properties, constants) {
-    return function($http) {
+    return function($http, $q) {
 
         this.assignDataSetToOrgUnit = function(orgUnitId, dataSetId) {
             return $http.post(dhisUrl.orgUnits + '/' + orgUnitId + '/dataSets/' + dataSetId);
@@ -74,15 +74,44 @@ define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties", "const
             });
         };
 
-        this.getOrgUnitTree = function (orgUnitId) {
-            var url = dhisUrl.orgUnits + '/' + orgUnitId + '.json';
-            var params = {
-                fields: 'id',
-                includeDescendants: true,
-                includeAncestors: true
+        this.getOrgUnitTree = function (orgUnitId, lastUpdated, pageSize) {
+            pageSize = pageSize || 200;
+            var downloadOrgUnits = function (orgUnitWithIds, allOrgUnits) {
+                var url = dhisUrl.orgUnits + '.json';
+                var params = {
+                    fields: metadataConf.fields.organisationUnits.params,
+                    filter: 'id:in:[' + _.map(orgUnitWithIds, 'id') + ']',
+                    paging: false
+                };
+
+                return $http.get(url, {params: params})
+                    .then(_.property('data.organisationUnits'))
+                    .then(function (orgUnits) {
+                        return allOrgUnits.concat(orgUnits);
+                    });
             };
-            return $http.get(url, {params: params})
-                .then(_.property('data.organisationUnits'));
+
+            var getOrgUnitIds = function () {
+                var url = dhisUrl.orgUnits + '/' + orgUnitId + '.json';
+                var params = {
+                    fields: 'id',
+                    includeDescendants: true,
+                    includeAncestors: true
+                };
+                if (lastUpdated) {
+                    params.filter = "lastUpdated:gte:" + lastUpdated;
+                }
+
+                return $http.get(url, {params: params})
+                    .then(_.property('data.organisationUnits'));
+            };
+
+            return getOrgUnitIds()
+                .then(function (orgUnitWithIds) {
+                    return _.reduce(_.chunk(orgUnitWithIds, pageSize), function (result, orgUnitIds) {
+                        return result.then(_.partial(downloadOrgUnits, orgUnitIds));
+                    }, $q.when([]));
+                });
         };
     };
 });

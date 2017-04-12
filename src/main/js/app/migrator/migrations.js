@@ -1,4 +1,4 @@
-define(['dateUtils', 'lodash', 'metadataConf'], function(dateUtils, _, metadataConf) {
+define(['dateUtils', 'lodash', 'metadataConf', 'productKeyUtils'], function(dateUtils, _, metadataConf, productKeyUtils) {
     var create_data_store = function(stores, db) {
         _.each(stores, function(type) {
             db.createObjectStore(type, {
@@ -520,6 +520,33 @@ define(['dateUtils', 'lodash', 'metadataConf'], function(dateUtils, _, metadataC
         create_store_with_key("programStageSections", "id", db);
     };
 
+    var update_orgunit_changelog = function (db, tx) {
+        var changeLogStore = tx.objectStore("changeLog");
+        var changeLogReq = changeLogStore.get('organisationUnits');
+        changeLogReq.onsuccess = function (e) {
+            var decryptAndUpdateChangeLog = function (e) {
+                var productKey = e.target.result;
+                if (productKey) {
+                    var decryptedProductKey = productKeyUtils.decrypt(productKey.value) || {data: {}};
+                    var allowedOrgUnitIds = _.map((decryptedProductKey).data.allowedOrgUnits, 'id');
+                    allowedOrgUnitIds.map(function (orgUnitId) {
+                        changeLogStore.put({
+                            'type': 'organisationUnits:' + orgUnitId,
+                            'lastUpdatedTime': orgUnitChangeLog.lastUpdatedTime
+                        });
+                    });
+                }
+            };
+
+            var orgUnitChangeLog = e.target.result;
+            if (orgUnitChangeLog) {
+                var systemSettingStore = tx.objectStore("systemSettings");
+                var req = systemSettingStore.get('productKey');
+                req.onsuccess = decryptAndUpdateChangeLog;
+            }
+        };
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -579,6 +606,7 @@ define(['dateUtils', 'lodash', 'metadataConf'], function(dateUtils, _, metadataC
         update_change_log_keys,
         migrate_metadata_change_log,
         delete_local_user_credentials_store,
+        update_orgunit_changelog,
         add_option_store,
         add_program_stage_section_store
     ];

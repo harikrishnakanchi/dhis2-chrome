@@ -34,8 +34,8 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                 'SUPER_ADMIN': 'Superadmin'
             });
 
-            var routeResolver = ['$q', '$rootScope', '$location', 'systemSettingRepository', 'changeLogRepository','customAttributeRepository', 'translationsService',
-                function ($q, $rootScope, $location, systemSettingRepository, changeLogRepository, customAttributeRepository, translationsService) {
+            var routeResolver = ['$q', '$rootScope', '$location', 'systemSettingRepository','customAttributeRepository', 'metadataHelper',
+                function ($q, $rootScope, $location, systemSettingRepository, customAttributeRepository, metadataHelper) {
 
                     var checkProductKey = function () {
                         return systemSettingRepository.isProductKeySet().then(function (productKeySet) {
@@ -44,13 +44,9 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     };
 
                     var checkMetadata = function () {
-                        return changeLogRepository.get("metaData").then(function (metadataLastUpdated) {
-                            if (metadataLastUpdated) {
-                                platformUtils.sendMessage('startBgApp');
-                                return customAttributeRepository.getAll().then(customAttributes.initializeData);
-                            } else {
-                                return $q.reject('noMetadata');
-                            }
+                        return metadataHelper.checkMetadata().then(function () {
+                            platformUtils.sendMessage('startBgApp');
+                            return customAttributeRepository.getAll().then(customAttributes.initializeData);
                         });
                     };
 
@@ -83,11 +79,9 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                                 USER_ROLES.COORDINATION_LEVEL_APPROVER,USER_ROLES.PROJECT_ADMIN, USER_ROLES.SUPER_ADMIN]
                         },
                         resolve: {
-                            routeResolver: ['$q', '$rootScope', 'systemSettingRepository', 'changeLogRepository', function ($q, $rootScope, systemSettingRepository, changeLogRepository) {
+                            routeResolver: ['$q', '$rootScope', 'systemSettingRepository', 'metadataHelper', function ($q, $rootScope, systemSettingRepository, metadataHelper) {
                                 var checkMetadata = function () {
-                                    return changeLogRepository.get("metaData").then(function (metadataLastUpdated) {
-                                        return metadataLastUpdated ? $q.reject('noMetadata'): $q.when();
-                                    });
+                                    return metadataHelper.checkMetadata().catch($q.when);
                                 };
                                 var checkProductKey = function () {
                                     return systemSettingRepository.isProductKeySet().then(function (productKeySet) {

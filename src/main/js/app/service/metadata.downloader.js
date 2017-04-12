@@ -1,6 +1,6 @@
 define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataConf', 'constants'], function (dhisUrl, moment, properties, _, pagingUtils, metadataConf, constants) {
     return function ($http, $q, changeLogRepository, metadataRepository, orgUnitGroupRepository, dataSetRepository, programRepository,
-                     systemSettingRepository, orgUnitRepository, userRepository, systemInfoService) {
+                     systemSettingRepository, orgUnitRepository, userRepository, systemInfoService, orgUnitService) {
 
         var MAX_PAGE_REQUESTS = 500, updated, DHIS_VERSION;
 
@@ -229,17 +229,6 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                     return metadataRepository.upsertMetadataForEntity(response, 'programStageSections');
                 }
             }, {
-                name: 'organisationUnits',
-                url: dhisUrl.orgUnits,
-                params: {
-                    fields: metadataConf.fields.organisationUnits.params,
-                    paging: metadataConf.fields.organisationUnits.paging,
-                    pageSize: metadataConf.fields.organisationUnits.pageSize
-                },
-                upsertFn: function(response) {
-                    return orgUnitRepository.upsertDhisDownloadedData(response);
-                }
-            }, {
                 name: 'systemSettings',
                 url: dhisUrl.systemSettings,
                 params: {
@@ -292,6 +281,34 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 });
             };
 
+            var downloadAndUpsertOrgUnits = function () {
+                var upsertOrgUnits = function (orgUnits) {
+                    return orgUnitRepository.upsertDhisDownloadedData(orgUnits);
+                };
+
+                var downloadAndUpdateChangeLog = function (downloadFunction, entityKey) {
+                    return getChangeLog(entityKey).then(function (lastUpdatedTime) {
+                        return lastUpdatedTime ? $q.when() : downloadFunction().then(upsertOrgUnits).then(_.partial(updateChangeLog, entityKey));
+                    });
+                };
+
+                var downloadOrgUnitTree = function (orgUnitId) {
+                    var entityKey = 'organisationUnits:' + orgUnitId;
+                    return downloadAndUpdateChangeLog(_.partial(orgUnitService.getOrgUnitTree, orgUnitId), entityKey);
+                };
+
+                if(systemSettingRepository.getProductKeyLevel() === 'global') {
+                    return downloadAndUpdateChangeLog(orgUnitService.getAll, 'organisationUnits');
+                }
+                else {
+                    var allowedOrgUnits = systemSettingRepository.getAllowedOrgUnits() || [];
+                    var orgUnitIds = _.map(allowedOrgUnits, 'id');
+                    return _.reduce(orgUnitIds, function (result, orgUnitId) {
+                        return result.then(_.partial(downloadOrgUnitTree, orgUnitId));
+                    }, $q.when());
+                }
+            };
+
             var setSystemInfoDetails = function () {
                 return setDownloadStartTime().then(setDhisVersion);
             };
@@ -300,14 +317,35 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 return changeLogRepository.upsert('metaData', updated);
             };
 
-            _.reduce(entities, function (promise, entity, index) {
+            var notify = function (percent) {
+                deferred.notify({percent: percent});
+            };
+
+            var calculatePercent = function (num) {
+                var totalNum = entities.length + 1;
+                return _.floor((num / totalNum) * 100);
+            };
+
+            var increment = function (initialValue) {
+                var count = initialValue;
+                return function () {
+                    count = count + 1;
+                    return count;
+                };
+            };
+
+            var incrementOne = increment(0);
+
+            var computeProgress = _.flowRight(notify, calculatePercent, incrementOne);
+
+            _.reduce(entities, function (promise, entity) {
                 return promise.then(function () {
                     var downloadPromise = (entity.name == 'translations' && DHIS_VERSION != '2.23') ? $q.when() : downloadEntityIfNotExists(entity);
-                    return downloadPromise.then(function () {
-                        deferred.notify({percent: _.floor(((index + 1) / entities.length) * 100)});
-                    });
+                    return downloadPromise.then(computeProgress);
                 });
             }, setSystemInfoDetails())
+                .then(downloadAndUpsertOrgUnits)
+                .then(computeProgress)
                 .then(updateMetadataChangeLog)
                 .then(deferred.resolve)
                 .catch(function (response) {
