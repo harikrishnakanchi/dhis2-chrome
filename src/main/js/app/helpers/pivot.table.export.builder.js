@@ -40,7 +40,9 @@ define(['dateUtils', 'lodash'], function (dateUtils, _) {
                         var cells;
                         if(pivotTableData.referralLocationReport){
                             cells = _.map(rowSpecifiers, function (rowSpecifier) {
-                                return referralLocations[pivotTableData.getDisplayName(rowSpecifier)].name;
+                                return _.chain(referralLocations).find(function (referralLocation, aliasName) {
+                                    return _.includes(pivotTableData.getDisplayName(rowSpecifier), aliasName);
+                                }).get('name', '').value();
                             });
                         } else {
                             cells = _.map(rowSpecifiers, function (rowSpecifier) {
