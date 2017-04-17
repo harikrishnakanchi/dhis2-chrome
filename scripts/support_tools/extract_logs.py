@@ -31,6 +31,8 @@ def write_tsv(filename, logs):
         for message in entry["messages"]:
             if type(message) is dict:
                 file.write(separator + json.dumps(message))
+            elif type(message) is unicode:
+                file.write(separator + message.encode('ascii','ignore'))
             else:
                 file.write(separator + str(message))
         file.write("\n")
