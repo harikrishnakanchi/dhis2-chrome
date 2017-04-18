@@ -322,6 +322,10 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             });
         };
 
+        $scope.setSelectedService = function (service) {
+            $scope.selectedService = service;
+        };
+
         var init = function() {
             $scope.startLoading();
 

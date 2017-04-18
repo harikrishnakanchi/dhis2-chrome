@@ -3,7 +3,9 @@
 
         <div class="row">
             <div class="col-md-8">
-                <h4>{{resourceBundle.projectReportLabel}}: {{ selectedProject.name }}</h4>
+                <h4>{{resourceBundle.projectReportLabel}}: {{ selectedProject.name }}
+                    <i class="fa fa-info-circle" aria-hidden="true" tooltip-placement="top" tooltip-trigger="click mouseenter" tooltip="{{ resourceBundle.dataAvailabilityMessage.weekly }}"></i>
+                </h4>
                 <span class="text-info" ng-show="lastUpdatedTimeForProjectReport"><strong>{{ resourceBundle.updated }}: {{ lastUpdatedTimeForProjectReport }}</strong></span>
             </div>
 
