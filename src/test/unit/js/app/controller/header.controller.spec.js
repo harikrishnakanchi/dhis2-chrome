@@ -1,8 +1,8 @@
-define(["headerController", "angularMocks", "utils", "sessionHelper", "platformUtils", "orgUnitRepository", "systemSettingRepository", "dhisMonitor"],
-    function(HeaderController, mocks, utils, SessionHelper, platformUtils, OrgUnitRepository, SystemSettingRepository, DhisMonitor) {
+define(["headerController", "angularMocks", "utils", "sessionHelper", "platformUtils", "orgUnitRepository", "systemSettingRepository", "changeLogRepository", "dhisMonitor", "metadataConf"],
+    function(HeaderController, mocks, utils, SessionHelper, platformUtils, OrgUnitRepository, SystemSettingRepository, ChangeLogRepository, DhisMonitor, metadataConf) {
         describe("headerController", function() {
             var rootScope, headerController, scope, q, timeout, fakeModal, dhisMonitor,
-                translationStore, location, sessionHelper, orgUnitRepository, hustle, systemSettingRepository, deferredPromise;
+                translationStore, location, sessionHelper, orgUnitRepository, hustle, systemSettingRepository, changeLogRepository, deferredPromise;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $location, $hustle, $timeout) {
@@ -25,6 +25,11 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
                         turnOff: "Turn off Sync",
                         turnOnConfirmationMessage: "Warning: Turn On Sync will sync data from Praxis to DHIS. It will update Praxis to the latest versions, if available. Are you sure you want to turn Sync On?",
                         turnOffConfirmationMessage: "Warning: Turn Off Sync will stop Praxis from getting data and uploading data on DHIS. It will stop Praxis versions from update. Are you sure you want to turn Sync Off?"
+                    },
+                    "forceDownloadMetadata": {
+                        "title": "Force Download Metadata",
+                        "okMessage": "Force Download Metadata",
+                        "confirmationMessage": "WARNING: This will download all the data again and should be done only if HIS team has adviced to do so. Are you sure you want to continue"
                     }
                 };
 
@@ -48,6 +53,7 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
                 sessionHelper = new SessionHelper();
                 orgUnitRepository = new OrgUnitRepository();
                 systemSettingRepository = new SystemSettingRepository();
+                changeLogRepository = new ChangeLogRepository();
 
                 dhisMonitor = new DhisMonitor();
                 spyOn(dhisMonitor, "hasPoorConnectivity").and.returnValue(false);
@@ -84,9 +90,9 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
 
                 spyOn(translationStore, "each").and.returnValue(utils.getPromise(q, {}));
 
-                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+                spyOn(hustle, "publishOnce").and.returnValue(utils.getPromise(q, {}));
 
-                headerController = new HeaderController(q, scope, location, rootScope, hustle, timeout, fakeModal, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor);
+                headerController = new HeaderController(q, scope, location, rootScope, hustle, timeout, fakeModal, sessionHelper, orgUnitRepository, systemSettingRepository, changeLogRepository, dhisMonitor);
             }));
 
             it("should logout user", function() {
@@ -270,6 +276,62 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
 
                     expect(fakeModal.open).toHaveBeenCalled();
                     expect(platformUtils.uninstall).not.toHaveBeenCalled();
+                });
+            });
+
+            describe('ForceDownloadMetadata', function () {
+
+                beforeEach(function () {
+                    spyOn(changeLogRepository, 'clear').and.returnValue(utils.getPromise(q, {}));
+                });
+
+                describe('On Force Download Confirmation', function () {
+                    beforeEach(function () {
+                        spyOn(fakeModal, 'open').and.returnValue({
+                            result: utils.getPromise(q, {})
+                        });
+                    });
+
+                    it('should clear the metadata changeLog', function () {
+                        scope.forceDownloadMetadata();
+                        scope.$apply();
+                        var fields = _.keys(metadataConf.fields);
+                        fields = fields.concat(['pivotTables', 'charts']);
+
+                        expect(fakeModal.open).toHaveBeenCalled();
+                        expect(changeLogRepository.clear).toHaveBeenCalledWith(fields[0]);
+                        expect(changeLogRepository.clear).toHaveBeenCalledTimes(fields.length);
+                    });
+
+                    it('should logout the user', function () {
+                        spyOn(scope, 'logout').and.returnValue({});
+
+                        scope.forceDownloadMetadata();
+                        scope.$apply();
+
+                        expect(scope.logout).toHaveBeenCalled();
+                    });
+
+                    it('should stop the bg app', function () {
+                        scope.forceDownloadMetadata();
+                        scope.$apply();
+                        expect(platformUtils.sendMessage).toHaveBeenCalledWith('stopBgApp');
+                    });
+
+                });
+
+                describe('On cancel', function () {
+                    it('should not force download the metadata', function () {
+                        spyOn(fakeModal, 'open').and.returnValue({
+                            result: utils.getRejectedPromise(q, {})
+                        });
+
+                        scope.forceDownloadMetadata();
+                        scope.$apply();
+
+                        expect(fakeModal.open).toHaveBeenCalled();
+                        expect(changeLogRepository.clear).not.toHaveBeenCalled();
+                    });
                 });
             });
         });

@@ -1,5 +1,5 @@
-define(["lodash", "platformUtils", "customAttributes", "properties", "interpolate"], function(_, platformUtils, customAttributes, properties, interpolate) {
-    return function($q, $scope, $location, $rootScope, $hustle, $timeout, $modal, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor) {
+define(["lodash", "platformUtils", "customAttributes", "properties", "interpolate", "metadataConf"], function(_, platformUtils, customAttributes, properties, interpolate, metadataConf) {
+    return function($q, $scope, $location, $rootScope, $hustle, $timeout, $modal, sessionHelper, orgUnitRepository, systemSettingRepository, changeLogRepository, dhisMonitor) {
         $scope.projects = [];
 
         $scope.canChangeProject = function(hasUserLoggedIn, isCoordinationApprover) {
@@ -155,6 +155,33 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
                     $scope.stopLoading();
                 });
 
+            }, modalMessages);
+        };
+
+        var clearMetadataChangeLog = function () {
+            var metadataTypes = _.keys(metadataConf.fields);
+            metadataTypes = metadataTypes.concat(['pivotTables', 'charts']);
+            _.each(metadataTypes, function (metadataType) {
+                changeLogRepository.clear(metadataType);
+            });
+        };
+
+        var downloadMetadata = function () {
+            $location.path('/downloadingMetadata');
+            platformUtils.sendMessage("stopBgApp");
+            $scope.logout();
+        };
+
+        $scope.forceDownloadMetadata = function () {
+            var modalMessages = {
+                "ok": $scope.resourceBundle.forceDownloadMetadata.okMessage,
+                "title": $scope.resourceBundle.forceDownloadMetadata.title,
+                "confirmationMessage": $scope.resourceBundle.forceDownloadMetadata.confirmationMessage
+            };
+
+            showModal(function () {
+                clearMetadataChangeLog();
+                downloadMetadata();
             }, modalMessages);
         };
 
