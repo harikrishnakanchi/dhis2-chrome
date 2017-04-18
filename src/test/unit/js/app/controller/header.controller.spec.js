@@ -1,5 +1,5 @@
-define(["headerController", "angularMocks", "utils", "sessionHelper", "platformUtils", "orgUnitRepository", "systemSettingRepository", "changeLogRepository", "dhisMonitor", "metadataConf"],
-    function(HeaderController, mocks, utils, SessionHelper, platformUtils, OrgUnitRepository, SystemSettingRepository, ChangeLogRepository, DhisMonitor, metadataConf) {
+define(["headerController", "angularMocks", "utils", "sessionHelper", "platformUtils", "orgUnitRepository", "systemSettingRepository", "changeLogRepository", "dhisMonitor", "metadataConf", "hustlePublishUtils"],
+    function(HeaderController, mocks, utils, SessionHelper, platformUtils, OrgUnitRepository, SystemSettingRepository, ChangeLogRepository, DhisMonitor, metadataConf, hustlePublishUtils) {
         describe("headerController", function() {
             var rootScope, headerController, scope, q, timeout, fakeModal, dhisMonitor,
                 translationStore, location, sessionHelper, orgUnitRepository, hustle, systemSettingRepository, changeLogRepository, deferredPromise;
@@ -29,6 +29,11 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
                     "forceDownloadMetadata": {
                         "title": "Force Download Metadata",
                         "okMessage": "Force Download Metadata",
+                        "confirmationMessage": "WARNING: This will download all the data again and should be done only if HIS team has adviced to do so. Are you sure you want to continue"
+                    },
+                    "forceDownloadProjectData": {
+                        "title": "Force Download Project data",
+                        "okMessage": "Force Download Project data",
                         "confirmationMessage": "WARNING: This will download all the data again and should be done only if HIS team has adviced to do so. Are you sure you want to continue"
                     }
                 };
@@ -327,6 +332,52 @@ define(["headerController", "angularMocks", "utils", "sessionHelper", "platformU
                         });
 
                         scope.forceDownloadMetadata();
+                        scope.$apply();
+
+                        expect(fakeModal.open).toHaveBeenCalled();
+                        expect(changeLogRepository.clear).not.toHaveBeenCalled();
+                    });
+                });
+            });
+
+            describe('ForceDownloadProjectdata', function () {
+
+                beforeEach(function () {
+                    spyOn(changeLogRepository, 'clear').and.returnValue(utils.getPromise(q, {}));
+                });
+
+                describe('On Force Download Confirmation', function () {
+                    beforeEach(function () {
+                        spyOn(fakeModal, 'open').and.returnValue({
+                            result: utils.getPromise(q, {})
+                        });
+                        spyOn(hustlePublishUtils, 'publishDownloadProjectData').and.returnValue(utils.getPromise(q, {}));
+
+                        scope.forceDownloadProjectData();
+                        scope.$apply();
+                    });
+
+                    it('should clear the project data', function () {
+                        var fields = ['dataValues:', 'monthlyChartData:', 'monthlyPivotTableData:',  'weeklyChartData:',
+                            'weeklyPivotTableData:',  'yearlyChartData:', 'yearlyPivotTableData:', 'yearlyDataValues:'];
+
+                        expect(fakeModal.open).toHaveBeenCalled();
+                        expect(changeLogRepository.clear).toHaveBeenCalledWith(fields[0]);
+                        expect(changeLogRepository.clear).toHaveBeenCalledTimes(fields.length);
+                    });
+
+                    it('should download the project data again', function () {
+                        expect(hustlePublishUtils.publishDownloadProjectData).toHaveBeenCalled();
+                    });
+                });
+
+                describe('On cancel', function () {
+                    it('should not force download the projectdata', function () {
+                        spyOn(fakeModal, 'open').and.returnValue({
+                            result: utils.getRejectedPromise(q, {})
+                        });
+
+                        scope.forceDownloadProjectData();
                         scope.$apply();
 
                         expect(fakeModal.open).toHaveBeenCalled();

@@ -1,4 +1,4 @@
-define(["lodash", "platformUtils", "customAttributes", "properties", "interpolate", "metadataConf"], function(_, platformUtils, customAttributes, properties, interpolate, metadataConf) {
+define(["lodash", "platformUtils", "customAttributes", "properties", "interpolate", "metadataConf", "hustlePublishUtils"], function(_, platformUtils, customAttributes, properties, interpolate, metadataConf, hustlePublishUtils) {
     return function($q, $scope, $location, $rootScope, $hustle, $timeout, $modal, sessionHelper, orgUnitRepository, systemSettingRepository, changeLogRepository, dhisMonitor) {
         $scope.projects = [];
 
@@ -182,6 +182,31 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
             showModal(function () {
                 clearMetadataChangeLog();
                 downloadMetadata();
+            }, modalMessages);
+        };
+
+        var clearProjectDataChangeLog = function () {
+            var projectDataTypes = ['dataValues:', 'monthlyChartData:', 'monthlyPivotTableData:',  'weeklyChartData:',
+                'weeklyPivotTableData:',  'yearlyChartData:', 'yearlyPivotTableData:', 'yearlyDataValues:'];
+            _.each(projectDataTypes, function (projectDataType) {
+                changeLogRepository.clear(projectDataType);
+            });
+        };
+
+        var downloadProjectData = function () {
+            hustlePublishUtils.publishDownloadProjectData($hustle, $scope.locale);
+        };
+
+        $scope.forceDownloadProjectData = function () {
+            var modalMessages = {
+                "ok": $scope.resourceBundle.forceDownloadProjectData.okMessage,
+                "title": $scope.resourceBundle.forceDownloadProjectData.title,
+                "confirmationMessage": $scope.resourceBundle.forceDownloadProjectData.confirmationMessage
+            };
+
+            showModal(function () {
+                clearProjectDataChangeLog();
+                downloadProjectData();
             }, modalMessages);
         };
 

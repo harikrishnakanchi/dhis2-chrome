@@ -359,6 +359,11 @@
         "okMessage": "Force Download Metadata",
         "confirmationMessage": "WARNING: This will download all the data again and should be done only if HIS team has adviced to do so. Are you sure you want to continue"
     },
+    "forceDownloadProjectData": {
+      "title": "Force Download Project data",
+      "okMessage": "Force Download Project data",
+      "confirmationMessage": "WARNING: This will download all the data again and should be done only if HIS team has adviced to do so. Are you sure you want to continue"
+    },
     "selectAll": "Select All",
     "unselectAll": "Unselect All",
     "praxisTrainingVersionMessage": "PRAXIS TRAINING VERSION",
