@@ -210,8 +210,12 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
             }, modalMessages);
         };
 
-        $scope.showForceDownload = function () {
+        $scope.showForceDownloadMetadata = function () {
           return !$scope.isOffline && !$scope.isChromeApp;
+        };
+
+        $scope.showForceDownloadProjectdata = function () {
+            return !$scope.hasRoles(['Superadmin','Projectadmin']) && !$scope.isOffline && !$scope.isChromeApp;
         };
 
         var turnOffSync = function () {
