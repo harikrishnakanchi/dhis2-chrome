@@ -69,8 +69,8 @@
                                             ng-include="'templates/partials/clone.html'"></li>
                                         <li class="clearfix"></li>
                                         <li class="divider"></li>
-                                        <li><a href="" ng-if="!isOffline" ng-click="forceDownloadMetadata()">{{ resourceBundle.forceDownloadMetadata.title }}</a></li>
-                                        <li><a href="" ng-if="!isOffline" ng-click="forceDownloadProjectData()">{{ resourceBundle.forceDownloadProjectData.title }}</a></li>
+                                        <li><a href="" ng-if="showForceDownload()" ng-click="forceDownloadMetadata()">{{ resourceBundle.forceDownloadMetadata.title }}</a></li>
+                                        <li><a href="" ng-if="showForceDownload()" ng-click="forceDownloadProjectData()">{{ resourceBundle.forceDownloadProjectData.title }}</a></li>
                                         <li><a href="" ng-click="uninstallPraxis()">{{ resourceBundle.uninstall.title }}</a></li>
                                     </ul>
                                     <ul class="dropdown-menu" role="menu" ng-if="!isLoggedIn">
@@ -82,7 +82,7 @@
                                             </a>
                                         </li>
                                         <li ng-hide="hideSyncStatus()" class="divider"></li>
-                                        <li ng-if="!isOffline" ng-hide="hideSyncStatus()"><a href="" ng-click="forceDownloadMetadata()">{{ resourceBundle.forceDownloadMetadata.title }}</a></li>
+                                        <li ng-if="showForceDownload()" ng-hide="hideSyncStatus()"><a href="" ng-click="forceDownloadMetadata()">{{ resourceBundle.forceDownloadMetadata.title }}</a></li>
                                         <li ng-hide="hideSyncStatus()"><a href="" ng-click="uninstallPraxis()">{{ resourceBundle.uninstall.title }}</a></li>
                                     </ul>
                                 </div>

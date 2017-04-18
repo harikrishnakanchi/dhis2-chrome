@@ -210,6 +210,10 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
             }, modalMessages);
         };
 
+        $scope.showForceDownload = function () {
+          return !$scope.isOffline && !$scope.isChromeApp;
+        };
+
         var turnOffSync = function () {
             var modalMessage = {
                 "ok": $scope.resourceBundle.okLabel,
