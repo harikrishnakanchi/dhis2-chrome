@@ -285,10 +285,10 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
         var loadLastUpdatedForChartsAndReports = function () {
             var projectId = $rootScope.currentUser.selectedProject.id;
             return $q.all({
-                weeklyChartsLastUpdated: changeLogRepository.get('weeklyChartData:' + projectId),
-                weeklyPivotTableDataLastUpdated: changeLogRepository.get('weeklyPivotTableData:' + projectId),
-                monthlyChartsLastUpdated: changeLogRepository.get('monthlyChartData:' + projectId),
-                monthlyPivotTableLastUpdated: changeLogRepository.get('monthlyPivotTableData:' + projectId)
+                weeklyChartsLastUpdated: changeLogRepository.get('weeklyChartData:' + projectId + ':' + $scope.orgUnit.id),
+                weeklyPivotTableDataLastUpdated: changeLogRepository.get('weeklyPivotTableData:' + projectId + ':' + $scope.orgUnit.id),
+                monthlyChartsLastUpdated: changeLogRepository.get('monthlyChartData:' + projectId + ':' + $scope.orgUnit.id),
+                monthlyPivotTableLastUpdated: changeLogRepository.get('monthlyPivotTableData:' + projectId + ':' + $scope.orgUnit.id)
             }).then(function (data) {
                 $scope.updatedForWeeklyChart = formatLastUpdatedTime(data.weeklyChartsLastUpdated);
                 $scope.updatedForWeeklyPivotTable = formatLastUpdatedTime(data.weeklyPivotTableDataLastUpdated);

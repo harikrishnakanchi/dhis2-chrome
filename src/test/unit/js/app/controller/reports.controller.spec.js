@@ -350,10 +350,10 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
         describe('Updated date and time for charts and reports', function () {
             it('should get the lastUpdated for reports and charts', function () {
                 scope.$apply();
-                expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyPivotTableData:' + mockProject.id);
-                expect(changeLogRepository.get).toHaveBeenCalledWith('weeklyPivotTableData:' + mockProject.id);
-                expect(changeLogRepository.get).toHaveBeenCalledWith('weeklyChartData:' + mockProject.id);
-                expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyChartData:' + mockProject.id);
+                expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyPivotTableData:' + mockProject.id + ':' + scope.orgUnit.id);
+                expect(changeLogRepository.get).toHaveBeenCalledWith('weeklyPivotTableData:' + mockProject.id + ':' + scope.orgUnit.id);
+                expect(changeLogRepository.get).toHaveBeenCalledWith('weeklyChartData:' + mockProject.id + ':' + scope.orgUnit.id);
+                expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyChartData:' + mockProject.id + ':' + scope.orgUnit.id);
             });
 
             it('should set the updated time on scope', function () {
