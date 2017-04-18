@@ -354,6 +354,17 @@
         "confirmationMessage": "AVERTISSEMENT: Ceci effacera toutes les données existantes et désinstallera l'application. Toutes les données non synchronisées avec DHIS seront perdues. CETTE ACTION EST IRRÉVERSIBLE.",
         "successMessage": "Praxis est désinstallé. Fermez la fenêtre du navigateur."
     },
+    "forceDownloadMetadata": {
+        "title": "Force Download Metadata FR",
+        "okMessage": "Force Download Metadata FR",
+        "confirmationMessage": "WARNING: This will download all the data again and should be done only if HIS team has adviced to do so. Are you sure you want to continue FR"
+    },
+    "forceDownloadProjectData": {
+        "title": "Force Download Project data FR",
+        "okMessage": "Force Download Project data FR",
+        "confirmationMessage": "WARNING: This will download all the project data again and should be done only if HIS team has adviced to do so. Are you sure you want to continue FR"
+    },
+
     "selectAll": "Sélectionner Tout",
     "unselectAll": "Tout Déselectionner",
     "praxisTrainingVersionMessage": "VERSION EXERCICE DE PRAXIS",
