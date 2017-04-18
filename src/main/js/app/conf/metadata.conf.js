@@ -57,8 +57,8 @@ define([], function () {
                 paging: true
             },
             "users": {
-                params: ":all,!href,!externalAccess,!access,!teiSearchOrganisationUnits,!dataViewOrganisationUnits,!userGroupAccesses,userCredentials[:all,userRoles[:all]],organisationUnits[:all]",
-                pageSize: 25,    // PageSize of 50 : ~50KB
+                params: "id,userCredentials[id,username,disabled,userRoles[id,name]],organisationUnits[id,name]",
+                pageSize: 200,    // PageSize of 200 : ~10KB
                 paging: true
             },
             "userRoles": {
