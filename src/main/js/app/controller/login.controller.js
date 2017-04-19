@@ -51,8 +51,8 @@ define(["properties", "lodash", "interpolate", "cipherUtils", "hustlePublishUtil
 
             if (productKeyLevel === 'country' && !isRole(user, "Coordination Level Approver")) {
                 if(!_.isEmpty(userOrgUnitIds))
-                    return orgUnitRepository.get(userOrgUnitIds[0]).then(function(project) {
-                        if (project.parent.id !== allowedOrgUnitIds[0]) {
+                    return orgUnitRepository.get(_.first(userOrgUnitIds)).then(function(project) {
+                        if (_.get(project, 'parent.id') !== _.first(allowedOrgUnitIds)) {
                             $scope.invalidAccess = true;
                             return $q.reject("User doesn’t have access to this Praxis instance.");
                         } else {

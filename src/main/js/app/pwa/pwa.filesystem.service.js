@@ -5,26 +5,9 @@ define(['fileSaver', 'interpolate'], function (saveAs, interpolate) {
            PNG: { extension: 'png' }
        };
 
-       var notify = function (fileName) {
-           var scope = $rootScope.$new();
-           scope.notificationTitle = scope.resourceBundle.fileSystem.successNotification.title;
-           scope.notificationMessage = interpolate(scope.resourceBundle.fileSystem.successNotification.message, { fileName: fileName });
-
-           var modalInstance = $modal.open({
-               templateUrl: 'templates/notification-dialog.html',
-               controller: 'notificationDialogController',
-               scope: scope
-           });
-
-           return modalInstance.result;
-       };
-
-       var writeFileAndNotify = function (fileName, contents, options) {
+       var writeFileWithOptions = function (fileName, contents, options) {
            var fileNameWithExtension = [fileName, options.extension].join('.');
-           var saveFile = saveAs(contents, fileNameWithExtension);
-           saveFile.onwriteend = function () {
-               notify(fileNameWithExtension);
-           };
+           saveAs(contents, fileNameWithExtension);
        };
 
        var writeFile = function (fileName, contents) {
@@ -46,7 +29,7 @@ define(['fileSaver', 'interpolate'], function (saveAs, interpolate) {
 
        return {
            "FILE_TYPE_OPTIONS": FILE_TYPE_OPTIONS,
-           "promptAndWriteFile": writeFileAndNotify,
+           "promptAndWriteFile": writeFileWithOptions,
            "writeFile": writeFile,
            "readFile": readFile
        };
