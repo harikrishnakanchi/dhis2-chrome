@@ -34,7 +34,8 @@ define(['lodash', 'moment'], function(_, moment) {
         REASON_FOR_INTERVENTION_CODE: 'reasonForIntervention',
         MODE_OF_OPERATION_CODE: 'modeOfOperation',
         MODEL_OF_MANAGEMENT_CODE: 'modelOfManagement',
-        PROJECT_TYPE_CODE: 'projectType'
+        PROJECT_TYPE_CODE: 'projectType',
+        ORG_UNIT_GROUP_SET_LEVEL: 'groupSetLevel'
     };
 
     var getBooleanAttributeValue = function(attributeValues, attributeCode) {
