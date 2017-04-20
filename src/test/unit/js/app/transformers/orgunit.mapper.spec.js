@@ -25,49 +25,31 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
             Timecop.uninstall();
         });
 
-        describe('mapToProject', function () {
+        describe('mapOrgUnitToProject', function () {
             it("should convert project from DHIS to project for view", function() {
-                var dhisProject = {
-                    "id": "aa4acf9115a",
-                    "name": "Org1",
-                    "level": 3,
-                    "attributeValues": []
-                };
+                var mockOrgUnitGroupSets = [{
+                    id: 'orgUnitGroupSetId',
+                    organisationUnitGroups: [{
+                        id: 'orgUnitGroupId',
+                        name: 'Direct operation'
+                    }, {
+                        id: 'otherOrgUnitGroupId',
+                        name: 'some name',
+                    }]
+                }];
 
-                var allContexts = [{
-                    "id": "a16b4a97ce4",
-                    "name": "val2",
-                    "englishName": "val2"
-                }];
-                var allPopTypes = [{
-                    "id": "a35778ed565",
-                    "name": "val5",
-                    "englishName": "val5"
-                }, {
-                    "id": "a48f665185e",
-                    "name": "val6",
-                    "englishName": "val6",
-                }];
-                var reasonForIntervention = [{
-                    "id": "a8014cfca5c",
-                    "name": "Armed Conflict",
-                    "englishName": "Armed Conflict"
-                }];
-                var modeOfOperation = [{
-                    "id": "a560238bc90",
-                    "name": "Direct Operation",
-                    "englishName": "Direct Operation"
-                }];
-                var modelOfManagement = [{
-                    "id": "a11a7a5d55a",
-                    "name": "Collaboration",
-                    "englishName": "Collaboration"
-                }];
-                var allProjectTypes = [{
-                    "id": "a11a7aty65a",
-                    "name": "Some Type",
-                    "englishName": "Some Type"
-                }];
+                var dhisProject = {
+                    id: 'aa4acf9115a',
+                    name: 'Org1',
+                    level: 3,
+                    attributeValues: [],
+                    organisationUnitGroups: [{
+                        id: 'orgUnitGroupId',
+                        organisationUnitGroupSet: {
+                            id: 'orgUnitGroupSetId'
+                        }
+                    }]
+                };
 
                 spyOn(customAttributes, 'getAttributeValue').and.callFake(function (attributeValues, code) {
                     var fakeAttributeValues = {
@@ -78,59 +60,29 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                         estimatedTargetPopulation: 1000,
                         estPopulationLessThan1Year: 11,
                         estPopulationBetween1And5Years: 12,
-                        estPopulationOfWomenOfChildBearingAge: 13,
-                        prjCon: 'val2',
-                        prjPopType: 'val5',
-                        projectType: 'Some Type',
-                        reasonForIntervention: 'Armed Conflict',
-                        'modeOfOperation': 'Direct Operation',
-                        'modelOfManagement': 'Collaboration'
+                        estPopulationOfWomenOfChildBearingAge: 13
                     };
                     return fakeAttributeValues[code];
                 });
-                var result = orgUnitMapper.mapToProject(dhisProject, allContexts, allPopTypes, reasonForIntervention, modeOfOperation, modelOfManagement, allProjectTypes);
+                var result = orgUnitMapper.mapOrgUnitToProject(dhisProject, mockOrgUnitGroupSets);
 
                 var expectedResult = {
                     name:'Org1',
                     openingDate: moment(dhisProject.openingDate).toDate(),
-                    context: {
-                        id: 'a16b4a97ce4',
-                        name: 'val2',
-                        englishName: 'val2'
-                    },
                     location: 'val3',
-                    populationType: {
-                        id: 'a35778ed565',
-                        name: 'val5',
-                        englishName: 'val5'
-                    },
                     endDate: moment("2011-01-01").toDate(),
                     projectCode: 'RU118',
-                    projectType: {
-                        id: 'a11a7aty65a',
-                        name: 'Some Type',
-                        englishName: 'Some Type'
-                    },
-                    reasonForIntervention: {
-                        id: 'a8014cfca5c',
-                        name: 'Armed Conflict',
-                        englishName: 'Armed Conflict'
-                    },
-                    modeOfOperation: {
-                        id: 'a560238bc90',
-                        name: 'Direct Operation',
-                        englishName: 'Direct Operation'
-                    },
-                    modelOfManagement: {
-                        id: 'a11a7a5d55a',
-                        name: 'Collaboration',
-                        englishName: 'Collaboration'
-                    },
                     estimatedTargetPopulation: 1000,
                     estPopulationLessThan1Year: 11,
                     estPopulationBetween1And5Years: 12,
                     estPopulationOfWomenOfChildBearingAge: 13,
-                    autoApprove: 'true'
+                    autoApprove: 'true',
+                    orgUnitGroupSets: {
+                        orgUnitGroupSetId: {
+                            id: "orgUnitGroupId",
+                            name: "Direct operation"
+                        }
+                    }
                 };
 
                 expect(result).toEqual(expectedResult);
