@@ -38,7 +38,7 @@ define(["dhisUrl"], function (dhisUrl) {
 
         this.getKeysForExcludedOptions = function () {
             return getAllKeys().then(function (allKeys) {
-                return _.filter(allKeys, _.partial(_.contains, _, EXCLUDED_OPTIONS));
+                return _.filter(allKeys, _.partial(_.contains, _, EXCLUDED_OPTIONS, 0));
             });
         };
 
