@@ -75,14 +75,14 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
         });
 
         describe('getKeysForExcludedOptions', function () {
-            var moduleId, storeKey, url;
+            var moduleId, url;
             beforeEach(function () {
                 moduleId = "someModuleId";
                 url = [dhisUrl.dataStore, storeNamespace].join("/");
             });
 
             it('should get keys only for excludedOptions', function () {
-                var keysFromRemote = ['key1_excludedOptions', 'key2_excludedOptions', 'key3_otherOption'];
+                var keysFromRemote = ['key1_excludedOptions', 'key2_excludedOptions', 'key3_otherOption', 'key4_excludedOptions', 'key5_excludedOptions', 'key6_excludedOptions'];
 
                 var actualKeys;
                 dataStoreService.getKeysForExcludedOptions().then(function (data) {
@@ -91,7 +91,7 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
 
                 httpBackend.expectGET(url).respond(200, keysFromRemote);
                 httpBackend.flush();
-                expect(actualKeys).toEqual(['key1_excludedOptions', 'key2_excludedOptions']);
+                expect(actualKeys).toEqual(['key1_excludedOptions', 'key2_excludedOptions', 'key4_excludedOptions', 'key5_excludedOptions', 'key6_excludedOptions']);
             });
 
             it('should return empty list if namespace is not exist', function () {
