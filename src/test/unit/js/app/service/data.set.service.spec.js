@@ -84,27 +84,5 @@ define(["dataSetService", "angularMocks", "properties", "metadataConf", "pagingU
 
             expect(actualResult).toEqual([]);
         });
-
-        it('should remove orgunit from dataset', function() {
-            var datasetId = 'datasetId';
-            var orgUnitId = 'orgUnitId';
-
-            datasetService.removeOrgUnitFromDataset(datasetId, orgUnitId);
-
-            httpBackend.expectDELETE(properties.dhis.url + '/api/dataSets/' + datasetId + '/organisationUnits/' + orgUnitId).respond(204);
-            httpBackend.flush();
-        });
-
-        it('should not fail if orgunit is already removed from dataset', function() {
-            var datasetId = 'datasetId';
-            var orgUnitId = 'orgUnitId';
-
-            spyOn(http, 'delete').and.returnValue(utils.getRejectedPromise(q, {errorCode: 'NOT_FOUND'}));
-            var success = false;
-            datasetService.removeOrgUnitFromDataset(datasetId, orgUnitId).then(function () {
-                success = true;
-                expect(success).toBeTruthy();
-            });
-        });
     });
 });

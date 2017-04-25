@@ -6,7 +6,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadSystemSettingConsumer, uploadPatientOriginConsumer, uploadExcludedDataElementsConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
             uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer,
             uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadOrgUnitConsumer, downloadOrgUnitGroupConsumer, userPreferenceRepository, downloadModuleDataBlocksConsumer,
-            syncModuleDataBlockConsumer, removeOrgunitDataSetAssociationConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer, syncOrgUnitConsumer;
+            syncModuleDataBlockConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer, syncOrgUnitConsumer;
 
         beforeEach(mocks.inject(function($q, $log, $rootScope) {
             downloadOrgUnitConsumer = {
@@ -81,9 +81,6 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             syncModuleDataBlockConsumer = {
                 'run': jasmine.createSpy("syncModuleDataBlockConsumer")
             };
-            removeOrgunitDataSetAssociationConsumer = {
-                'run': jasmine.createSpy("removeOrgunitDataSetAssociationConsumer")
-            };
             syncExcludedLinelistOptionsConsumer = {
                 'run': jasmine.createSpy("syncExcludedLinelistOptionsConsumer")
             };
@@ -113,7 +110,6 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             userPreferenceRepository.getCurrentUsersUsername.and.returnValue(utils.getPromise(q, 'someUsername'));
             downloadModuleDataBlocksConsumer.run.and.returnValue(utils.getPromise(q, {}));
             syncModuleDataBlockConsumer.run.and.returnValue(utils.getPromise(q, {}));
-            removeOrgunitDataSetAssociationConsumer.run.and.returnValue(utils.getPromise(q, {}));
             syncExcludedLinelistOptionsConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadHistoricalDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
             syncOrgUnitConsumer.run.and.returnValue(utils.getPromise(q, {}));
@@ -123,7 +119,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
                 downloadProgramConsumer, downloadMetadataConsumer,
                 downloadOrgUnitGroupConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
                 uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
-                downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, removeOrgunitDataSetAssociationConsumer, associateOrgunitToProgramConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer, syncOrgUnitConsumer);
+                downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, associateOrgunitToProgramConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer, syncOrgUnitConsumer);
         }));
 
         it("should call syncModuleDataBlock consumer for syncing moduleDataBlock", function() {
@@ -460,18 +456,6 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             scope.$apply();
 
             expect(syncExcludedLinelistOptionsConsumer.run).toHaveBeenCalledWith(message);
-        });
-
-        it("should call remove org unit from dataset", function() {
-            message.data = {
-                "data": {},
-                "type": "removeOrgUnitFromDataset"
-            };
-
-            dispatcher.run(message);
-            scope.$apply();
-
-            expect(removeOrgunitDataSetAssociationConsumer.run).toHaveBeenCalledWith(message);
         });
 
         it("should call associate org unit to program", function() {

@@ -1,15 +1,6 @@
 define(["dhisUrl", "metadataConf", "pagingUtils", "properties", "constants"], function(dhisUrl, metadataConf, pagingUtils, properties, constants) {
     return function($http, $q) {
 
-        this.removeOrgUnitFromDataset = function(datasetId, orgUnitId) {
-            return $http.delete(dhisUrl.dataSets + '/' + datasetId + '/organisationUnits/' + orgUnitId)
-                .catch(function (response) {
-                    if (response.errorCode !== constants.errorCodes.NOT_FOUND) {
-                        return $q.reject();
-                    }
-                });
-        };
-
         this.getAll = function (lastUpdatedTime) {
             var url = dhisUrl.dataSets + ".json";
             var params = {

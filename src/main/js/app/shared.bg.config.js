@@ -91,7 +91,6 @@ require.config({
         "uploadOrgUnitGroupConsumer": "app/consumer/upload.orgunit.group.consumer",
         "downloadDataSetConsumer": "app/consumer/download.data.set.consumer",
         "assignDataSetsToOrgUnitsConsumer": "app/consumer/assign.data.sets.to.org.units.consumer",
-        "removeOrgUnitDataSetAssociationConsumer": "app/consumer/remove.org.unit.data.set.association.consumer",
         "createUserConsumer": "app/consumer/create.user.consumer",
         "updateUserConsumer": "app/consumer/update.user.consumer",
         "uploadProgramConsumer": "app/consumer/upload.program.consumer",
