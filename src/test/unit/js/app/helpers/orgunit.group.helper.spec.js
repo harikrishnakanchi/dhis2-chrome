@@ -9,11 +9,12 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                 q = $q;
                 scope = $rootScope.$new();
 
-                orgUnitRepository = new OrgUnitRepository();
                 orgUnitGroupRepository = {
-                    "getAll": function() {},
+                    "findAll": function () {},
                     "upsert": function() {}
                 };
+
+                orgUnitRepository = new OrgUnitRepository();
 
                 scope.locale = "en";
 
@@ -24,108 +25,61 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                 spyOn(hustle, "publish");
             }));
 
-            it("should add modules to orgunit groups while creating module", function() {
+            it("should associate the orgUnits to the new org unit groups", function() {
                 var modules = [{
-                    "name": "OBGYN",
+                    "name": "someModuleName",
                     "parent": {
-                        "id": "a5dc7e2aa0e"
+                        "id": "someProjectId"
                     },
                     "active": true,
-                    "shortName": "OBGYN",
-                    "id": "a72ec34b863"
+                    "shortName": "someModuleName",
+                    "id": "someModuleId"
                 }];
 
-                var projectAndOpunitAttributes = [{
-                    "attribute": {
-                        "name": "Hospital Unit Code",
-                        "id": "c6d3c8a7286",
-                        "code": "hospitalUnitCode"
-                    },
-                    "value": "C2"
-                }, {
-                    "attribute": {
-                        "name": "Operation Unit Type",
-                        "id": "52ec8ccaf8f"
-                    },
-                    "value": "Hospital"
-                }];
+                var syncedOrgunitGroupIds = [];
+                var localOrgunitGroupIds = ['someOrgunitGroupId', 'someOtherOrgunitGroupId'];
 
-                var orgunitgroups = [{
-                    "name": "Hospital",
-                    "id": "a8b42a1c9b8",
+                var syncedOrgUnitGroups = [];
+                var localOrgunitgroups = [{
+                    "name": "someOrgunitGroupName",
+                    "id": "someOrgunitGroupId",
                     "organisationUnits": []
-                }, {
-                    "name": "Post-conflict",
-                    "id": "a16b4a97ce4",
-                    "organisationUnits": [{
-                        "id": 'a72ec34b863',
-                        "name": 'OBGYN'
-                    }]
-                }, {
-                    "name": "General Population",
-                    "id": "a16b4653ce4",
+                },{
+                    "name": "someOtherOrgunitGroupName",
+                    "id": "someOtherOrgunitGroupId",
                     "organisationUnits": []
-                }, {
-                    "name": "Unit Code - C2",
-                    "id": "a9ab62b5ef3",
-                    "organisationUnits": []
-                }, {
-                    "name": "Unit Code - A",
-                    "id": "w2aws2d2ef3",
-                    "organisationUnits": [{
-                        "id": 'a72ec34b863',
-                        "name": 'OBGYN'
-                    }]
                 }];
 
                 var expectedOutput = [{
-                    "name": "Post-conflict",
-                    "id": "a16b4a97ce4",
+                    "name": 'someOrgunitGroupName',
+                    "id": 'someOrgunitGroupId',
                     "organisationUnits": [{
-                        "id": 'a72ec34b863',
-                        "name": 'OBGYN',
-                        "localStatus": "DELETED"
-                    }]
-                }, {
-                    "name": "Unit Code - A",
-                    "id": "w2aws2d2ef3",
-                    "organisationUnits": [{
-                        "id": 'a72ec34b863',
-                        "name": 'OBGYN',
-                        "localStatus": "DELETED"
-                    }]
-                }, {
-                    "name": 'Unit Code - C2',
-                    "id": 'a9ab62b5ef3',
-                    "organisationUnits": [{
-                        "id": 'a72ec34b863',
-                        "name": 'OBGYN',
+                        "id": 'someModuleId',
+                        "name": 'someModuleName',
                         "localStatus": "NEW"
                     }]
                 }, {
-                    "name": 'Hospital',
-                    "id": 'a8b42a1c9b8',
+                    "name": 'someOtherOrgunitGroupName',
+                    "id": 'someOtherOrgunitGroupId',
                     "organisationUnits": [{
-                        "id": 'a72ec34b863',
-                        "name": 'OBGYN',
+                        "id": 'someModuleId',
+                        "name": 'someModuleName',
                         "localStatus": "NEW"
                     }]
                 }];
 
-                spyOn(orgUnitGroupRepository, "getAll").and.returnValue(utils.getPromise(q, orgunitgroups));
+                spyOn(orgUnitGroupRepository, "findAll").and.returnValues(utils.getPromise(q, syncedOrgUnitGroups), utils.getPromise(q, localOrgunitgroups));
                 spyOn(orgUnitGroupRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
-                spyOn(orgUnitRepository, "getProjectAndOpUnitAttributes").and.returnValue(utils.getPromise(q, projectAndOpunitAttributes));
                 orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepository, orgUnitGroupRepository);
 
-                orgUnitGroupHelper.createOrgUnitGroups(modules, true);
+                orgUnitGroupHelper.associateOrgunitsToGroups(modules, syncedOrgunitGroupIds, localOrgunitGroupIds);
                 scope.$apply();
 
                 expect(orgUnitGroupRepository.upsert).toHaveBeenCalledWith(expectedOutput);
-                expect(orgUnitRepository.getProjectAndOpUnitAttributes).toHaveBeenCalled();
                 expect(hustle.publish.calls.argsFor(0)).toEqual([{
                     "data": {
-                        "orgUnitGroupIds": ["a16b4a97ce4", "w2aws2d2ef3", "a9ab62b5ef3", "a8b42a1c9b8"],
-                        "orgUnitIds": ["a72ec34b863"]
+                        "orgUnitGroupIds": ["someOrgunitGroupId", "someOtherOrgunitGroupId"],
+                        "orgUnitIds": ["someModuleId"]
                     },
                     "type": "upsertOrgUnitGroups",
                     "locale": "en",
@@ -133,50 +87,134 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                 }, "dataValues"]);
             });
 
-            it('should not add modules to orgUnit groups for the unRecorded attributes', function () {
+            it("should unassociate the orgUnits from the orgUnitGroups which are unselected", function() {
                 var modules = [{
-                    "id": "a72ec34b863"
-                }];
-
-                var projectAndOpunitAttributes = [{
-                    "attribute": {
-                        "name": "Hospital Unit Code",
-                        "id": "c6d3c8a7286",
-                        "code": "hospitalUnitCode"
+                    "name": "someModuleName",
+                    "parent": {
+                        "id": "someProjectId"
                     },
-                    "value": undefined
-                }, {
-                    "attribute": {
-                        "name": "Operation Unit Type",
-                        "id": "52ec8ccaf8f"
-                    },
-                    "value": "Hospital"
+                    "active": true,
+                    "shortName": "someModuleName",
+                    "id": "someModuleId"
                 }];
 
-                var orgunitgroups = [{
-                    "name": "Hospital",
-                    "id": "a8b42a1c9b8",
-                    "organisationUnits": []
+                var syncedOrgunitGroupIds = ['someAnotherOrgUnitGroupId'];
+                var localOrgunitGroupIds = [];
+
+                var syncedOrgUnitGroups = [{
+                    "name": "someAnotherGroupName",
+                    "id": "someAnotherOrgUnitGroupId",
+                    "organisationUnits": [{
+                        "id": 'someModuleId',
+                        "name": "someModuleName"
+                    }]
+                }];
+                var localOrgunitgroups = [];
+
+                var expectedOutput = [{
+                    "name": 'someAnotherGroupName',
+                    "id": 'someAnotherOrgUnitGroupId',
+                    "organisationUnits": [{
+                        "id": 'someModuleId',
+                        "name": "someModuleName",
+                        "localStatus": "DELETED"
+                    }]
                 }];
 
-                spyOn(orgUnitGroupRepository, "getAll").and.returnValue(utils.getPromise(q, orgunitgroups));
+                spyOn(orgUnitGroupRepository, "findAll").and.returnValues(utils.getPromise(q, syncedOrgUnitGroups), utils.getPromise(q, localOrgunitgroups));
                 spyOn(orgUnitGroupRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
-                spyOn(orgUnitRepository, "getProjectAndOpUnitAttributes").and.returnValue(utils.getPromise(q, projectAndOpunitAttributes));
                 orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepository, orgUnitGroupRepository);
 
-                orgUnitGroupHelper.createOrgUnitGroups(modules, true);
+                orgUnitGroupHelper.associateOrgunitsToGroups(modules, syncedOrgunitGroupIds, localOrgunitGroupIds);
                 scope.$apply();
 
+                expect(orgUnitGroupRepository.upsert).toHaveBeenCalledWith(expectedOutput);
                 expect(hustle.publish.calls.argsFor(0)).toEqual([{
                     "data": {
-                        "orgUnitGroupIds": ["a8b42a1c9b8"],
-                        "orgUnitIds": ["a72ec34b863"]
+                        "orgUnitGroupIds": ["someAnotherOrgUnitGroupId"],
+                        "orgUnitIds": ["someModuleId"]
                     },
                     "type": "upsertOrgUnitGroups",
                     "locale": "en",
                     "desc": "upsertOrgUnitGroupsDesc"
                 }, "dataValues"]);
+            });
 
+            it("should associate the orgUnits to the newly selected orgUnitGroup and unassociate from the older orgunitGroup", function() {
+                var modules = [{
+                    "name": "someModuleName",
+                    "parent": {
+                        "id": "someProjectId"
+                    },
+                    "active": true,
+                    "shortName": "someModuleName",
+                    "id": "someModuleId"
+                }];
+
+                var syncedOrgunitGroupIds = ['someAnotherOrgunitGroupId'];
+                var localOrgunitGroupIds = ['someOrgunitGroupId', 'someOtherOrgunitGroupId'];
+
+                var syncedOrgUnitGroups = [{
+                    "name": "someAnotherOrgunitGroup",
+                    "id": "someAnotherOrgunitGroupId",
+                    "organisationUnits": [{
+                        "id": "someModuleId",
+                        "name": "someModuleName"
+                    }]
+                }];
+                var localOrgunitgroups = [{
+                    "name": "someOrgunitGroupName",
+                    "id": "someOrgunitGroupId",
+                    "organisationUnits": []
+                },{
+                    "name": "someOtherOrgunitGroupName",
+                    "id": "someOtherOrgunitGroupId",
+                    "organisationUnits": []
+                }];
+
+                var expectedOutput = [{
+                    "name": "someAnotherOrgunitGroup",
+                    "id": "someAnotherOrgunitGroupId",
+                    "organisationUnits": [{
+                        "id": "someModuleId",
+                        "name": "someModuleName",
+                        "localStatus": "DELETED"
+                    }]
+                }, {
+                    "name": 'someOrgunitGroupName',
+                    "id": 'someOrgunitGroupId',
+                    "organisationUnits": [{
+                        "id": "someModuleId",
+                        "name": "someModuleName",
+                        "localStatus": "NEW"
+                    }]
+                }, {
+                    "name": 'someOtherOrgunitGroupName',
+                    "id": 'someOtherOrgunitGroupId',
+                    "organisationUnits": [{
+                        "id": 'someModuleId',
+                        "name": "someModuleName",
+                        "localStatus": "NEW"
+                    }]
+                }];
+
+                spyOn(orgUnitGroupRepository, "findAll").and.returnValues(utils.getPromise(q, syncedOrgUnitGroups), utils.getPromise(q, localOrgunitgroups));
+                spyOn(orgUnitGroupRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
+                orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepository, orgUnitGroupRepository);
+
+                orgUnitGroupHelper.associateOrgunitsToGroups(modules, syncedOrgunitGroupIds, localOrgunitGroupIds);
+                scope.$apply();
+
+                expect(orgUnitGroupRepository.upsert).toHaveBeenCalledWith(expectedOutput);
+                expect(hustle.publish.calls.argsFor(0)).toEqual([{
+                    "data": {
+                        "orgUnitGroupIds": ["someAnotherOrgunitGroupId", "someOrgunitGroupId", "someOtherOrgunitGroupId"],
+                        "orgUnitIds": ["someModuleId"]
+                    },
+                    "type": "upsertOrgUnitGroups",
+                    "locale": "en",
+                    "desc": "upsertOrgUnitGroupsDesc"
+                }, "dataValues"]);
             });
         });
     });
