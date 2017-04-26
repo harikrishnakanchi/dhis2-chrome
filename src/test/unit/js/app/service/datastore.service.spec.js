@@ -74,6 +74,30 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
             });
         });
 
+        describe('referralLocations', function () {
+            var moduleId, storeKey, url;
+            beforeEach(function () {
+                moduleId = "someModuleId";
+                storeKey = moduleId + "_referralLocations";
+                url = [dhisUrl.dataStore, storeNamespace, storeKey].join("/");
+            });
+
+            it('should create referralLocations for specified module', function () {
+                dataStoreService.createReferrals(moduleId, {});
+
+                httpBackend.expectPOST(url, {}).respond(201);
+                httpBackend.flush();
+            });
+
+            it('should update referralLocations for specified module', function () {
+                dataStoreService.updateReferrals(moduleId, {});
+
+                httpBackend.expectPUT(url, {}).respond(200);
+                httpBackend.flush();
+            });
+
+        });
+
         describe('getKeysForExcludedOptions', function () {
             var moduleId, url;
             beforeEach(function () {

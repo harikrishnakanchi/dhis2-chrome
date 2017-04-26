@@ -1,21 +1,26 @@
 define(["dhisUrl", "constants"], function (dhisUrl, constants) {
     return function ($http, $q) {
         var NAMESPACE = "praxis";
-        var EXCLUDED_OPTIONS = "_excludedOptions";
+        var EXCLUDED_OPTIONS = "_excludedOptions",
+        REFERRAL_LOCATIONS = "_referralLocations";
 
         var extractDataFromResponse = function (response) {
             return response.data;
         };
 
-        var upsertDataToStore = function (moduleId, payload, uploadMethod) {
-            var key = moduleId + EXCLUDED_OPTIONS;
+        var upsertDataToStore = function (moduleId, payload, type, uploadMethod) {
+            var key = moduleId + type;
             var url = [dhisUrl.dataStore, NAMESPACE, key].join("/");
             return uploadMethod(url, payload);
         };
 
-        this.updateExcludedOptions = _.partial(upsertDataToStore, _, _, $http.put);
+        this.updateExcludedOptions = _.partialRight(upsertDataToStore, EXCLUDED_OPTIONS, $http.put);
 
-        this.createExcludedOptions = _.partial(upsertDataToStore, _, _, $http.post);
+        this.createExcludedOptions = _.partialRight(upsertDataToStore, EXCLUDED_OPTIONS, $http.post);
+
+        this.createReferrals = _.partialRight(upsertDataToStore, REFERRAL_LOCATIONS, $http.post);
+
+        this.updateReferrals = _.partialRight(upsertDataToStore, REFERRAL_LOCATIONS, $http.put);
 
         this.getExcludedOptions = function (moduleId) {
             var key = moduleId + EXCLUDED_OPTIONS;
