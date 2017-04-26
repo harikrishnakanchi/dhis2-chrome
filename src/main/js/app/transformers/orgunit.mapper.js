@@ -38,26 +38,28 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
         return angular.isArray(orgUnits) ? _.map(orgUnits, disableOrgUnit) : disableOrgUnit(orgUnits);
     };
 
+    var buildOrgUnitGroups = function (orgUnit) {
+        var orgUnitGroupSetsWithValue = _.omit(orgUnit.orgUnitGroupSets, _.isUndefined);
+        return _.transform(orgUnitGroupSetsWithValue, function (acc, orgUnitGroup, orgUniGroupSetId) {
+            var organisationUnitGroup = {
+                id: orgUnitGroup.id,
+                organisationUnitGroupSet: {
+                    id: orgUniGroupSetId
+                }
+            };
+            acc.push(organisationUnitGroup);
+        }, []);
+    };
+
     this.mapToExistingProject = function(newProject, existingProject) {
         existingProject.name = newProject.name;
         existingProject.openingDate = moment(newProject.openingDate).format("YYYY-MM-DD");
         existingProject.attributeValues = buildProjectAttributeValues(newProject);
+        existingProject.organisationUnitGroups = buildOrgUnitGroups(newProject);
         return existingProject;
     };
 
     this.mapToProjectForDhis = function(orgUnit, parentOrgUnit) {
-        var buildOrgUnitGroups = function (orgUnit) {
-            return _.transform(orgUnit.orgUnitGroupSets, function (acc, orgUnitGroup, orgUniGroupSetId) {
-                var organisationUnitGroup = {
-                    id: orgUnitGroup.id,
-                    organisationUnitGroupSet: {
-                        id: orgUniGroupSetId
-                    }
-                };
-                acc.push(organisationUnitGroup);
-            }, []);
-        };
-
         var projectOrgUnit = {
             'id': dhisId.get(orgUnit.name + parentOrgUnit.id),
             'name': orgUnit.name,

@@ -492,7 +492,12 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                 "estimatedTargetPopulation": "1000",
                 "estPopulationLessThan1Year": "11",
                 "estPopulationBetween1And5Years": "12",
-                "estPopulationOfWomenOfChildBearingAge": "13"
+                "estPopulationOfWomenOfChildBearingAge": "13",
+                "orgUnitGroupSets": {
+                    "someOrgUnitGroupSetId": {
+                        id: "someOrgUnitGroupId"
+                    }
+                }
             };
 
             var expectedSavedProject = {
@@ -572,6 +577,12 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                         "code": "prjEndDate"
                     },
                     "value": "2011-01-01"
+                }],
+                "organisationUnitGroups": [{
+                    "id": "someOrgUnitGroupId",
+                    "organisationUnitGroupSet": {
+                        "id": "someOrgUnitGroupSetId"
+                    }
                 }]
             };
 

@@ -307,7 +307,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             spyOn(orgUnitMapper, "mapToExistingProject").and.returnValue(expectedNewOrgUnit);
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
             spyOn(location, 'hash');
-            spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitGroupHelper, "associateOrgunitsToGroups").and.returnValue(utils.getPromise(q, {}));
 
             scope.update({}, {});
             scope.$apply();
@@ -325,7 +325,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             initialiseController();
             spyOn(hustle, "publish").and.returnValue(utils.getRejectedPromise(q, {}));
             spyOn(orgUnitMapper, "mapToExistingProject").and.returnValue([]);
-            spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitGroupHelper, "associateOrgunitsToGroups").and.returnValue(utils.getPromise(q, {}));
 
             scope.update({}, parent);
             scope.$apply();
@@ -509,70 +509,115 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(parentOrgUnit);
         });
 
-        it("should update org unit groups on updating project", function() {
+        it("should associate lineList origins with orgUnitGroups on updating project", function() {
             initialiseController();
             var modules = [{
-                "name": "OBGYN",
-                "parent": {
-                    "id": "a5dc7e2aa0e"
-                },
-                "active": true,
-                "shortName": "OBGYN",
-                "id": "a72ec34b863",
+                "name": "someModuleName",
+                "id": "someModuleId",
                 "attributeValues": [{
-                    "attribute": {
-                        "code": "Type",
-                    },
-                    "value": "Module"
-                }, {
                     "attribute": {
                         "code": "isLineListService",
                     },
                     "value": "true"
                 }]
             }];
-
-            var originOrgUnits = [{
-                "id": "child1",
-                "name": "child1"
-            }, {
-                "id": "child2",
-                "name": "child2"
-            }];
-
-            var orgUnit = {
-                "id": "blah"
+            var someOrigin = {
+                "id": "someOriginId",
+                "name": "someOriginName"
             };
-            var newOrgUnit = {
-                "id": "blah",
-                "autoApprove": true,
-                "children": [{
-                    "id": "op1"
+
+            var originOrgUnits = [someOrigin];
+
+            var project = {
+                "id": "someProjectId",
+                organisationUnitGroups: [{
+                    id: 'someAnotherOrgUnitGroupId'
                 }]
+            };
+
+            var newOrgUnit = {
+                "id": "someProjectId",
+                orgUnitGroupSets: {
+                    someGroupSetId: {
+                        id: 'someOrgUnitGroupId',
+                        name: 'someOrgUnitGroupName'
+                    },
+                    someOtherGroupSetId: {
+                        id: 'someOtherOrgUnitGroupId',
+                        name: 'someOtherOrgUnitGroupName'
+                    }
+                }
             };
 
             orgUnitRepo.findAllByParent.and.returnValue(utils.getPromise(q, originOrgUnits));
 
-            spyOn(orgUnitMapper, "mapToExistingProject").and.returnValue(newOrgUnit);
+            spyOn(orgUnitMapper, "mapToExistingProject").and.returnValue(project);
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
-            spyOn(location, 'hash');
             orgUnitRepo.getAllModulesInOrgUnits = jasmine.createSpy("getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modules));
 
-            spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
+            scope.orgUnit = project;
+            spyOn(orgUnitGroupHelper, "associateOrgunitsToGroups").and.returnValue(utils.getPromise(q, {}));
 
-            scope.update(newOrgUnit, orgUnit);
+            scope.update(newOrgUnit, project);
             scope.$apply();
 
+            var expectedOrgunitsToAssociate = [project, someOrigin];
+            var localOrgUnitGroupIds = ["someOrgUnitGroupId", "someOtherOrgUnitGroupId"];
+            var syncedOrgUnitGroupIds = ["someAnotherOrgUnitGroupId"];
 
-            var expectedOrgunitsToAssociate = [{
-                "id": "child1",
-                "name": "child1"
-            }, {
-                "id": "child2",
-                "name": "child2"
-            }];
+            expect(orgUnitGroupHelper.associateOrgunitsToGroups).toHaveBeenCalledWith(expectedOrgunitsToAssociate, syncedOrgUnitGroupIds, localOrgUnitGroupIds);
+        });
 
-            expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith(expectedOrgunitsToAssociate, true);
+        it("should associate aggregate modules with orgUnitGroups on updating project", function() {
+            initialiseController();
+            var aggregateModule = {
+                "name": "someModuleName",
+                "id": "someModuleId",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isLineListService",
+                    },
+                    "value": "false"
+                }]
+            };
+            var modules = [aggregateModule];
+
+            var project = {
+                "id": "someProjectId",
+                organisationUnitGroups: [{
+                    id: 'someAnotherOrgUnitGroupId'
+                }]
+            };
+
+            var newOrgUnit = {
+                "id": "someProjectId",
+                orgUnitGroupSets: {
+                    someGroupSetId: {
+                        id: 'someOrgUnitGroupId',
+                        name: 'someOrgUnitGroupName'
+                    },
+                    someOtherGroupSetId: {
+                        id: 'someOtherOrgUnitGroupId',
+                        name: 'someOtherOrgUnitGroupName'
+                    }
+                }
+            };
+
+            spyOn(orgUnitMapper, "mapToExistingProject").and.returnValue(project);
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+            orgUnitRepo.getAllModulesInOrgUnits = jasmine.createSpy("getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modules));
+
+            scope.orgUnit = project;
+            spyOn(orgUnitGroupHelper, "associateOrgunitsToGroups").and.returnValue(utils.getPromise(q, {}));
+
+            scope.update(newOrgUnit, project);
+            scope.$apply();
+
+            var expectedOrgunitsToAssociate = [aggregateModule, project];
+            var localOrgUnitGroupIds = ["someOrgUnitGroupId", "someOtherOrgUnitGroupId"];
+            var syncedOrgUnitGroupIds = ["someAnotherOrgUnitGroupId"];
+
+            expect(orgUnitGroupHelper.associateOrgunitsToGroups).toHaveBeenCalledWith(expectedOrgunitsToAssociate, syncedOrgUnitGroupIds, localOrgUnitGroupIds);
         });
     });
 

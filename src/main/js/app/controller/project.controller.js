@@ -79,6 +79,8 @@ define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "custo
 
         $scope.update = function(newOrgUnit, orgUnit) {
 
+            var syncedOrgUnitGroupIds = _.pluck(orgUnit.organisationUnitGroups, 'id');
+
             var dhisProject = orgUnitMapper.mapToExistingProject(newOrgUnit, orgUnit);
 
             var getModulesInProject = function() {
@@ -96,14 +98,21 @@ define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "custo
                 var aggregateModules = partitionedModules[1];
                 var lineListModules = partitionedModules[0];
 
-                if (_.isEmpty(lineListModules)) {
-                    return orgUnitGroupHelper.createOrgUnitGroups(aggregateModules, true).then(function() {
-                        return modules;
-                    });
-                }
 
-                return orgUnitRepository.findAllByParent(_.pluck(lineListModules, "id")).then(function(originGroups) {
-                    return orgUnitGroupHelper.createOrgUnitGroups(aggregateModules.concat(originGroups), true).then(function() {
+                var getOrgUnitsToAssociate = function () {
+                    var orgUnitsToBeAssociated = aggregateModules.concat(dhisProject);
+                    if (_.isEmpty(lineListModules)) {
+                        return $q.when(orgUnitsToBeAssociated);
+                    } else {
+                        return orgUnitRepository.findAllByParent(_.pluck(lineListModules, "id")).then(function (origins) {
+                            return orgUnitsToBeAssociated.concat(origins);
+                        });
+                    }
+                };
+
+                return getOrgUnitsToAssociate().then(function (orgUnitsToBeAssociated) {
+                    var localOrgUnitGroupIds = getProjectOrgUnitGroupIds(newOrgUnit);
+                    return orgUnitGroupHelper.associateOrgunitsToGroups(orgUnitsToBeAssociated, syncedOrgUnitGroupIds, localOrgUnitGroupIds).then(function() {
                         return modules;
                     });
                 });
@@ -159,11 +168,12 @@ define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "custo
         };
 
         $scope.assignValue = function (value) {
-            $scope.newOrgUnit[$scope.orgUnitGroupSets[this.$parent.$index].name] = value.title;
-            $scope.newOrgUnit.orgUnitGroupSets[value.description.organisationUnitGroupSet.id] = {
-                id: value.description.id,
-                name: value.description.name
-            };
+            if(value) {
+                $scope.newOrgUnit.orgUnitGroupSets[value.description.organisationUnitGroupSet.id] = {
+                    id: value.description.id,
+                    name: value.description.name
+                };
+            }
         };
 
         var init = function() {
