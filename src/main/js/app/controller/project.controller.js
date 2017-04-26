@@ -21,7 +21,8 @@ define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "custo
             $scope.saveFailure = false;
             $scope.newOrgUnit = {
                 'openingDate': moment().toDate(),
-                'autoApprove': 'false'
+                'autoApprove': 'false',
+                'orgUnitGroupSets': {}
             };
         };
 
@@ -115,10 +116,22 @@ define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "custo
                 .finally($scope.stopLoading);
         };
 
+        var getProjectOrgUnitGroupIds = function (newOrgUnit) {
+            return _.transform(newOrgUnit.orgUnitGroupSets, function (acc, orgUniGroup, orgUniGroupSetId) {
+                acc.push(orgUniGroup.id);
+            }, []);
+        };
+
         $scope.save = function(newOrgUnit, parentOrgUnit) {
+            var associateProjectToOrgUnitGroups = function (dhisProject) {
+                orgUnitGroupHelper.associateOrgunitsToGroups([dhisProject], [], getProjectOrgUnitGroupIds(newOrgUnit));
+            };
+
             $scope.startLoading();
             var dhisProject = orgUnitMapper.mapToProjectForDhis(newOrgUnit, parentOrgUnit);
-            saveToDbAndPublishMessage(dhisProject).finally($scope.stopLoading);
+            return saveToDbAndPublishMessage(dhisProject)
+                .then(associateProjectToOrgUnitGroups)
+                .finally($scope.stopLoading);
         };
 
         var prepareNewForm = function() {

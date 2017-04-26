@@ -135,7 +135,12 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                 "estPopulationLessThan1Year": 11,
                 "estPopulationBetween1And5Years": 12,
                 "estPopulationOfWomenOfChildBearingAge": 13,
-                "autoApprove": "true"
+                "autoApprove": "true",
+                "orgUnitGroupSets": {
+                    "someOrgUnitGroupSetId": {
+                        id: "someOrgUnitGroupId"
+                    }
+                }
             };
 
             var parentOrgUnit = {
@@ -230,7 +235,13 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                         "code": "prjEndDate"
                     },
                     "value": "2011-01-01"
-                }]
+                }],
+                "organisationUnitGroups": [{
+                        "id": "someOrgUnitGroupId",
+                        "organisationUnitGroupSet": {
+                            "id": "someOrgUnitGroupSetId"
+                        }
+                    }]
             };
 
             expect(result).toEqual(expectedResult);

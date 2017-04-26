@@ -46,6 +46,18 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
     };
 
     this.mapToProjectForDhis = function(orgUnit, parentOrgUnit) {
+        var buildOrgUnitGroups = function (orgUnit) {
+            return _.transform(orgUnit.orgUnitGroupSets, function (acc, orgUnitGroup, orgUniGroupSetId) {
+                var organisationUnitGroup = {
+                    id: orgUnitGroup.id,
+                    organisationUnitGroupSet: {
+                        id: orgUniGroupSetId
+                    }
+                };
+                acc.push(organisationUnitGroup);
+            }, []);
+        };
+
         var projectOrgUnit = {
             'id': dhisId.get(orgUnit.name + parentOrgUnit.id),
             'name': orgUnit.name,
@@ -53,7 +65,8 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             'shortName': orgUnit.name,
             'openingDate': moment(orgUnit.openingDate).format("YYYY-MM-DD"),
             'parent': _.pick(parentOrgUnit, "name", "id"),
-            'attributeValues': buildProjectAttributeValues(orgUnit)
+            'attributeValues': buildProjectAttributeValues(orgUnit),
+            'organisationUnitGroups': buildOrgUnitGroups(orgUnit)
         };
 
         return projectOrgUnit;

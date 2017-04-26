@@ -223,9 +223,15 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             var orgUnit, project, parent;
             beforeEach(function () {
                 orgUnit = { id: 'orgUnitId' };
-                project = { id: 'projectId' };
+                project = {
+                    id: 'projectId',
+                    name: 'projectName'
+                };
                 parent = {id: 'parentID'};
-                spyOn(orgUnitMapper, 'mapToProjectForDhis').and.returnValue(orgUnit);
+                spyOn(orgUnitMapper, 'mapToProjectForDhis').and.returnValue(project);
+                spyOn(orgUnitGroupHelper, 'associateOrgunitsToGroups').and.returnValue(utils.getPromise(q, {}));
+                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+                orgUnitMapper.mapToProjectForDhis.and.returnValue(project);
                 initialiseController();
             });
 
@@ -240,13 +246,12 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 scope.save(project, parent);
                 scope.$apply();
 
-                expect(orgUnitRepo.upsert).toHaveBeenCalledWith([orgUnit]);
+                expect(orgUnitRepo.upsert).toHaveBeenCalledWith([project]);
             });
 
             it('should publish upsertOrgUnit hustle job', function () {
                 var data = 'someData';
 
-                spyOn(hustle, 'publish').and.returnValue(utils.getPromise(q, {}));
                 orgUnitRepo.upsert.and.returnValue(utils.getPromise(q, data));
 
                 scope.save(project, parent);
@@ -260,8 +265,32 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 }, 'dataValues');
             });
 
+            it('should associate orgUnits to selected orgUnitgroups', function () {
+                orgUnit = {
+                    id: 'projectId',
+                    orgUnitGroupSets: {
+                        someGroupSetId: {
+                            id: 'someOrgUnitGroupId',
+                            name: 'someOrgUnitGroupName'
+                        },
+                        someOtherGroupSetId: {
+                            id: 'someOtherOrgUnitGroupId',
+                            name: 'someOtherOrgUnitGroupName'
+                        }
+                    }
+                };
+
+                scope.save(orgUnit, parent);
+                scope.$apply();
+
+                var localOrgUniGroupIds = ['someOrgUnitGroupId', 'someOtherOrgUnitGroupId'];
+                var syncedOrgUnitGroupIds = [];
+                var orgUnitsToAssociate = [project];
+                expect(orgUnitGroupHelper.associateOrgunitsToGroups).toHaveBeenCalledWith(orgUnitsToAssociate, syncedOrgUnitGroupIds, localOrgUniGroupIds);
+            });
+
             it('should display error if saving organization unit fails', function() {
-                spyOn(hustle, 'publish').and.returnValue(utils.getRejectedPromise(q, {}));
+                hustle.publish.and.returnValue(utils.getRejectedPromise(q, {}));
                 scope.save({}, parent);
                 scope.$apply();
 
@@ -319,7 +348,8 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             expect(scope.newOrgUnit).toEqual({
                 openingDate: moment().toDate(),
-                autoApprove: 'false'
+                autoApprove: 'false',
+                orgUnitGroupSets: {}
             });
             expect(scope.saveFailure).toEqual(false);
         });
