@@ -1,6 +1,6 @@
 define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "customAttributes"], function(moment, orgUnitMapper, properties, _, interpolate, customAttributes) {
 
-    return function($scope, $rootScope, $hustle, orgUnitRepository, $q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository, translationsService) {
+    return function($scope, $rootScope, $hustle, orgUnitRepository, $q, orgUnitGroupHelper, orgUnitGroupSetRepository, translationsService) {
         var ORG_UNIT_LEVEL_FOR_PROJECT = 4;
 
         $scope.openOpeningDate = function($event) {

@@ -1,13 +1,13 @@
 define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUnitMapper", "timecop", "orgUnitGroupHelper",
-    "properties", "approvalDataRepository", "orgUnitGroupSetRepository", "translationsService", "customAttributes"],
+    "properties", "orgUnitGroupSetRepository", "translationsService", "customAttributes"],
     function(ProjectController, mocks, utils, _, moment, orgUnitMapper, timecop, OrgUnitGroupHelper,
-             properties, ApprovalDataRepository, OrgUnitGroupSetRepository, TranslationsService, customAttributes) {
+             properties, OrgUnitGroupSetRepository, TranslationsService, customAttributes) {
     describe("project controller tests", function() {
-        var scope, q, userRepository, parent, fakeModal, orgUnitRepo, hustle, rootScope, approvalDataRepository, orgUnitGroupSetRepository,
+        var scope, q, userRepository, parent, fakeModal, orgUnitRepo, hustle, rootScope, orgUnitGroupSetRepository,
             orgUnitGroupSets, translationsService, orgUnitGroupHelper, projectController;
 
         var initialiseController = function () {
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository, translationsService);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, orgUnitGroupSetRepository, translationsService);
         };
 
         beforeEach(module('hustle'));
@@ -23,7 +23,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             orgUnitRepo.getAllModulesInOrgUnits = jasmine.createSpy("getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
             orgUnitRepo.findAllByParent = jasmine.createSpy("findAllByParent").and.returnValue(utils.getPromise(q, []));
 
-            approvalDataRepository = new ApprovalDataRepository();
             orgUnitGroupSetRepository = new OrgUnitGroupSetRepository();
             translationsService = new TranslationsService();
 
@@ -211,7 +210,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             customAttributes.getAttributeValue.and.callFake(function (attributeValues, code) {
                 return attributeValues[0].value;
             });
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository, translationsService);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, orgUnitGroupSetRepository, translationsService);
 
             scope.$apply();
 
@@ -554,7 +553,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             orgUnitRepo.findAllByParent.and.returnValue(utils.getPromise(q, originOrgUnits));
 
-            spyOn(approvalDataRepository, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitMapper, "mapToExistingProject").and.returnValue(newOrgUnit);
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
             spyOn(location, 'hash');
