@@ -1,6 +1,7 @@
 define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "customAttributes"], function(moment, orgUnitMapper, properties, _, interpolate, customAttributes) {
 
     return function($scope, $rootScope, $hustle, orgUnitRepository, $q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository, translationsService) {
+        var ORG_UNIT_LEVEL_FOR_PROJECT = 4;
 
         $scope.openOpeningDate = function($event) {
             $event.preventDefault();
@@ -138,47 +139,34 @@ define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "custo
 
         var prepareEditForm = function() {
             $scope.reset();
-            $scope.newOrgUnit = orgUnitMapper.mapToProject($scope.orgUnit, $scope.allContexts, $scope.allPopTypes, $scope.reasonForIntervention, $scope.modeOfOperation, $scope.modelOfManagement, $scope.allProjectTypes);
+            $scope.newOrgUnit = orgUnitMapper.mapOrgUnitToProject($scope.orgUnit, $scope.orgUnitGroupSets);
             orgUnitRepository.getAllProjects().then(function(allProjects) {
                 $scope.peerProjects = _.without(orgUnitRepository.getChildOrgUnitNames($scope.orgUnit.parent.id), $scope.orgUnit.name);
             });
         };
 
+        $scope.assignValue = function (value) {
+            $scope.newOrgUnit[$scope.orgUnitGroupSets[this.$parent.$index].name] = value.title;
+            $scope.newOrgUnit.orgUnitGroupSets[value.description.organisationUnitGroupSet.id] = {
+                id: value.description.id,
+                name: value.description.name
+            };
+        };
+
         var init = function() {
 
             orgUnitGroupSetRepository.getAll().then(function(orgUnitGroupSets) {
-
-                var addDefaultNameToAttribute = function (orgUnitGroups) {
-                    return _.map(orgUnitGroups, function (orgUnitGroup) {
-                        var defaultName = {
-                            englishName : orgUnitGroup.name
-                        };
-
-                        return _.assign(orgUnitGroup, defaultName);
-                    });
-                };
-
-                var getTranslations = function (code) {
-                    var orgUnitGroups = _.find(orgUnitGroupSets, "code", code).organisationUnitGroups;
-                    orgUnitGroups = addDefaultNameToAttribute(orgUnitGroups);
-
-                    return translationsService.translate(orgUnitGroups);
-                };
-
-                $scope.allContexts = _.sortBy(getTranslations("context"), "name");
-                $scope.allPopTypes = _.sortBy(getTranslations("type_of_population"), "name");
-                $scope.reasonForIntervention = _.sortBy(getTranslations("reason_for_intervention"), "name");
-                $scope.modeOfOperation = _.sortBy(getTranslations("mode_of_operation"), "name");
-                $scope.modelOfManagement = _.sortBy(getTranslations("model_of_management"), "name");
-                $scope.allProjectTypes = _.sortBy(getTranslations("project_type"), "name");
+                $scope.orgUnitGroupSets = _.filter(orgUnitGroupSets, function (orgUnitGroupSet) {
+                    var orgUnitGroupSetLevel = customAttributes.getAttributeValue(orgUnitGroupSet.attributeValues, customAttributes.ORG_UNIT_GROUP_SET_LEVEL);
+                    return orgUnitGroupSetLevel == ORG_UNIT_LEVEL_FOR_PROJECT;
+                });
+                $scope.orgUnitGroupSetsById = _.indexBy($scope.orgUnitGroupSets, 'id');
 
                 if ($scope.isNewMode)
                     prepareNewForm();
                 else
                     prepareEditForm();
             });
-
-
         };
 
         init();
