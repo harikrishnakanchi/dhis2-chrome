@@ -1,28 +1,16 @@
 define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, moment, customAttributes) {
     var buildProjectAttributeValues = function(orgUnit) {
         var attributeValues = [];
-        var projectContext = orgUnit.context ? (orgUnit.context.originalObject ? orgUnit.context.originalObject.englishName : orgUnit.context.englishName) : orgUnit.context;
-        var populationType = orgUnit.populationType ? (orgUnit.populationType.originalObject ? orgUnit.populationType.originalObject.englishName : orgUnit.populationType.englishName) : orgUnit.populationType;
-        var reasonForIntervention = orgUnit.reasonForIntervention ? (orgUnit.reasonForIntervention.originalObject ? orgUnit.reasonForIntervention.originalObject.englishName : orgUnit.reasonForIntervention.englishName) : orgUnit.reasonForIntervention;
-        var modeOfOperation = orgUnit.modeOfOperation ? (orgUnit.modeOfOperation.originalObject ? orgUnit.modeOfOperation.originalObject.englishName : orgUnit.modeOfOperation.englishName) : orgUnit.modeOfOperation;
-        var modelOfManagement = orgUnit.modelOfManagement ? (orgUnit.modelOfManagement.originalObject ? orgUnit.modelOfManagement.originalObject.englishName : orgUnit.modelOfManagement.englishName) : orgUnit.modelOfManagement;
-        var projectType = orgUnit.projectType ? (orgUnit.projectType.originalObject ? orgUnit.projectType.originalObject.englishName : orgUnit.projectType.englishName) : orgUnit.projectType;
         var estimatedTargetPopulation = orgUnit.estimatedTargetPopulation ? orgUnit.estimatedTargetPopulation.toString() : "";
         var estimatedPopulationLessThan1Year = orgUnit.estPopulationLessThan1Year ? orgUnit.estPopulationLessThan1Year.toString() : "";
         var estPopulationBetween1And5Years = orgUnit.estPopulationBetween1And5Years ? orgUnit.estPopulationBetween1And5Years.toString() : "";
         var estimatedPopulationOfWomenOfChildBearingAge = orgUnit.estPopulationOfWomenOfChildBearingAge ? orgUnit.estPopulationOfWomenOfChildBearingAge.toString() : "";
 
         attributeValues.push(customAttributes.createAttribute(customAttributes.TYPE, "Project"),
-            customAttributes.createAttribute(customAttributes.PROJECT_CONTEXT_CODE, projectContext),
             customAttributes.createAttribute(customAttributes.PROJECT_LOCATION_CODE, orgUnit.location),
-            customAttributes.createAttribute(customAttributes.PROJECT_POPULATION_TYPE_CODE, populationType),
             customAttributes.createAttribute(customAttributes.PROJECT_CODE, orgUnit.projectCode),
-            customAttributes.createAttribute(customAttributes.REASON_FOR_INTERVENTION_CODE, reasonForIntervention),
-            customAttributes.createAttribute(customAttributes.MODE_OF_OPERATION_CODE, modeOfOperation),
-            customAttributes.createAttribute(customAttributes.MODEL_OF_MANAGEMENT_CODE, modelOfManagement),
             customAttributes.createAttribute(customAttributes.AUTO_APPROVE, orgUnit.autoApprove),
             customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true"),
-            customAttributes.createAttribute(customAttributes.PROJECT_TYPE_CODE, projectType),
             customAttributes.createAttribute(customAttributes.ESTIMATED_TARGET_POPULATION_CODE, estimatedTargetPopulation),
             customAttributes.createAttribute(customAttributes.EST_POPULATION_LESS_THAN_1_YEAR_CODE, estimatedPopulationLessThan1Year),
             customAttributes.createAttribute(customAttributes.EST_POPULATION_BETWEEN_1_AND_5_YEARS_CODE, estPopulationBetween1And5Years),

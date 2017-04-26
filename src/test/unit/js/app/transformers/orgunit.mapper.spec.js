@@ -171,13 +171,6 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "prjCon"
-                    },
-                    "value": "val2"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
                         "code": "prjLoc"
                     },
                     "value": "val3"
@@ -185,37 +178,9 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "prjPopType"
-                    },
-                    "value": "val6"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
                         "code": "projCode"
                     },
                     "value": "AB001"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "reasonForIntervention"
-                    },
-                    "value": "Armed Conflict"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "modeOfOperation"
-                    },
-                    "value": "Direct Operation"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "modelOfManagement"
-                    },
-                    "value": "Collaboration"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
@@ -230,13 +195,6 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                         "code": "isNewDataModel"
                     },
                     "value": "true"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "projectType"
-                    },
-                    "value": "Some Type"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
@@ -512,10 +470,6 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
             var newProject = {
                 "name": "Org1",
                 "openingDate": moment("2010-01-01").toDate(),
-                "context": {
-                    "name": "val2",
-                    "englishName": "val2"
-                },
                 "location": "val3",
                 "endDate": moment("2011-01-01").toDate(),
                 "populationType": {
@@ -523,22 +477,6 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                     "englishName": "val6"
                 },
                 "projectCode": "AB001",
-                "projectType": {
-                    "name": "Some Type",
-                    "englishName": "Some Type"
-                },
-                "reasonForIntervention": {
-                    "name": "Armed Conflict",
-                    "englishName": "Armed Conflict"
-                },
-                "modeOfOperation": {
-                    "name": "Direct Operation",
-                    "englishName": "Direct Operation"
-                },
-                "modelOfManagement": {
-                    "name": "Collaboration",
-                    "englishName": "Collaboration"
-                },
                 "autoApprove": "true",
                 "estimatedTargetPopulation": "1000",
                 "estPopulationLessThan1Year": "11",
@@ -564,13 +502,6 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "prjCon"
-                    },
-                    "value": "val2"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
                         "code": "prjLoc"
                     },
                     "value": "val3"
@@ -578,37 +509,9 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "prjPopType"
-                    },
-                    "value": "val6"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
                         "code": "projCode"
                     },
                     "value": "AB001"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "reasonForIntervention"
-                    },
-                    "value": "Armed Conflict"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "modeOfOperation"
-                    },
-                    "value": "Direct Operation"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "modelOfManagement"
-                    },
-                    "value": "Collaboration"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
@@ -623,13 +526,6 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                         "code": "isNewDataModel"
                     },
                     "value": "true"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "projectType"
-                    },
-                    "value": "Some Type"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
