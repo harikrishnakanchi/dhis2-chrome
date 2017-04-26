@@ -300,7 +300,7 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
         });
 
         describe('download chart', function () {
-            var svgElement, mockDataUri, mockChart, currentTime, DATETIME_FORMAT;
+            var svgElement, mockDataUri, mockChart, currentTime, DATETIME_FORMAT, mockDOMElemenet;
 
             beforeEach(function () {
                 DATETIME_FORMAT = "DD-MMM-YYYY";
@@ -315,8 +315,10 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
 
                 var mockElement = document.createElement('div');
                 svgElement = document.createElement('svg');
+                mockDOMElemenet = document.createElement('g');
 
                 mockElement.appendChild(svgElement);
+                svgElement.appendChild(mockDOMElemenet);
                 spyOn(document, 'getElementById').and.returnValue(mockElement);
 
                 mockChart = {

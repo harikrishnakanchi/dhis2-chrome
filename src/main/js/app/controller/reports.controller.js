@@ -80,7 +80,26 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
         };
 
         $scope.downloadChartAsPng = function(chart, lastUpdatedTime) {
-            var svgElement = document.getElementById(chart.id).firstElementChild, lastUpdatedTimeDetails;
+            var svgElement = document.getElementById(chart.id).firstElementChild, lastUpdatedTimeDetails, chartTitle, chartTitleNode;
+            var setChartTitle = function () {
+                chartTitle = document.createTextNode(chart.title);
+                chartTitleNode = document.createElement('text');
+
+                chartTitleNode.setAttribute('x', '500');
+                chartTitleNode.setAttribute('y', '15');
+                chartTitleNode.setAttribute('text-anchor', 'middle');
+                chartTitleNode.setAttribute('transform', 'translate(0, -50)');
+                chartTitleNode.setAttribute('style', 'font-size:15');
+
+                chartTitleNode.insertBefore(chartTitle, chartTitleNode.childNodes[0]);
+                svgElement.firstElementChild.setAttribute('transform', 'translate(45, 60)');
+                svgElement.firstElementChild.insertBefore(chartTitleNode, svgElement.firstElementChild.childNodes[0]);
+            };
+            var removeChartTitle = function () {
+                svgElement.firstElementChild.setAttribute('transform', 'translate(45, 30)');
+                chartTitleNode.remove();
+            };
+            setChartTitle();
 
             var getPNGFileName = function() {
                 if (lastUpdatedTime) {
@@ -95,6 +114,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             SVGUtils.svgAsPngUri(svgElement, {}, function(uri) {
                 var blob = dataURItoBlob(uri);
                 filesystemService.promptAndWriteFile(getPNGFileName(), blob, filesystemService.FILE_TYPE_OPTIONS.PNG);
+                removeChartTitle();
             });
         };
 
