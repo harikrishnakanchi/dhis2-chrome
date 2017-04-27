@@ -174,51 +174,53 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         });
 
 
-        it("should save operation unit", function() {
-            opUnitController = initializeOpUnitController();
-            var opUnit = {
-                "name": "OpUnit1",
-                "type": {
-                    "title": "Hospital"
-                },
-                "openingDate": moment().format("YYYY-MM-DD"),
-                "hospitalUnitCode": {
-                    "title": "Unit Code - A"
-                }
-            };
-            scope.orgUnit.level = 4;
+        describe('save', function () {
+            it("should save operation unit", function() {
+                opUnitController = initializeOpUnitController();
+                var opUnit = {
+                    "name": "OpUnit1",
+                    "type": {
+                        "title": "Hospital"
+                    },
+                    "openingDate": moment().format("YYYY-MM-DD"),
+                    "hospitalUnitCode": {
+                        "title": "Unit Code - A"
+                    }
+                };
+                scope.orgUnit.level = 4;
 
-            var attributes = [createMockAttribute('someType', 'someValue', 'someName'),
-                createMockAttribute('someType', 'someValue', 'someName'),
-                createMockAttribute('someType', 'someValue', 'someName'),
-                createMockAttribute('someType', 'someValue', 'someName')
-            ];
-            var expectedOpUnit = {
-                "name": "OpUnit1",
-                "openingDate": moment().format("YYYY-MM-DD"),
-                "id": "someMd5Hash",
-                "shortName": "OpUnit1",
-                "level": 5,
-                "parent": _.pick(scope.orgUnit, ['id', 'name']),
-                "attributeValues": attributes
-            };
+                var attributes = [createMockAttribute('someType', 'someValue', 'someName'),
+                    createMockAttribute('someType', 'someValue', 'someName'),
+                    createMockAttribute('someType', 'someValue', 'someName'),
+                    createMockAttribute('someType', 'someValue', 'someName')
+                ];
+                var expectedOpUnit = {
+                    "name": "OpUnit1",
+                    "openingDate": moment().format("YYYY-MM-DD"),
+                    "id": "someMd5Hash",
+                    "shortName": "OpUnit1",
+                    "level": 5,
+                    "parent": _.pick(scope.orgUnit, ['id', 'name']),
+                    "attributeValues": attributes
+                };
 
-            spyOn(customAttributes, 'createAttribute').and.returnValue(createMockAttribute('someType', 'someValue', 'someName'));
-            spyOn(customAttributes, 'cleanAttributeValues').and.returnValue(attributes);
-            scope.save(opUnit);
-            scope.$apply();
+                spyOn(customAttributes, 'createAttribute').and.returnValue(createMockAttribute('someType', 'someValue', 'someName'));
+                spyOn(customAttributes, 'cleanAttributeValues').and.returnValue(attributes);
+                scope.save(opUnit);
+                scope.$apply();
 
-            expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.OPERATION_UNIT_TYPE_CODE, "Hospital");
-            expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.TYPE, "Operation Unit");
-            expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.HOSPITAL_UNIT_CODE, "Unit Code - A");
-            expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.NEW_DATA_MODEL_CODE, "true");
-            expect(orgUnitRepository.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);
-            expect(hustle.publish).toHaveBeenCalledWith({
-                "data": [expectedOpUnit],
-                "type": "upsertOrgUnit",
-                "locale": "en",
-                "desc": "upsert org unit"
-            }, "dataValues");
+                expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.OPERATION_UNIT_TYPE_CODE, "Hospital");
+                expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.TYPE, "Operation Unit");
+                expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.HOSPITAL_UNIT_CODE, "Unit Code - A");
+                expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.NEW_DATA_MODEL_CODE, "true");
+                expect(orgUnitRepository.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    "data": [expectedOpUnit],
+                    "type": "upsertOrgUnit",
+                    "locale": "en",
+                    "desc": "upsert org unit"
+                }, "dataValues");
+            });
         });
 
         it("should set hospitalUnitCodes on scope on init", function() {
