@@ -4,10 +4,6 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
         var EXCLUDED_OPTIONS = "_excludedOptions",
         REFERRAL_LOCATIONS = "_referralLocations";
 
-        var extractDataFromResponse = function (response) {
-            return response.data;
-        };
-
         var upsertDataToStore = function (moduleId, payload, type, uploadMethod) {
             var key = moduleId + type;
             var url = [dhisUrl.dataStore, NAMESPACE, key].join("/");
@@ -26,7 +22,7 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
             var key = moduleId + EXCLUDED_OPTIONS;
             var url = [dhisUrl.dataStore, NAMESPACE, key].join("/");
             return $http.get(url)
-                .then(extractDataFromResponse)
+                .then(_.property('data'))
                 .catch(function (response) {
                     return response.errorCode === constants.errorCodes.NOT_FOUND ? undefined : $q.reject();
                 });
@@ -35,7 +31,7 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
         var getAllKeys = function () {
             var url = [dhisUrl.dataStore, NAMESPACE].join("/");
             return $http.get(url)
-                .then(extractDataFromResponse)
+                .then(_.property('data'))
                 .catch(function (response) {
                 return response.errorCode === constants.errorCodes.NOT_FOUND ? [] : $q.reject();
             });
