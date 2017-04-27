@@ -1,7 +1,7 @@
 define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "timecop", "moment", "dhisId", "orgUnitRepository", "patientOriginRepository", "orgUnitGroupSetRepository", "customAttributes", "orgUnitMapper"],
     function(OpUnitController, mocks, utils, OrgUnitGroupHelper, timecop, moment, dhisId, OrgUnitRepository, PatientOriginRepository, OrgUnitGroupSetRepository, customAttributes, orgUnitMapper) {
     describe('opUnitController', function() {
-        var scope, db, q, hustle, fakeModal,
+        var scope, db, q, hustle, fakeModal, location,
             opUnitController,
             patientOriginRepository, orgUnitRepository, orgUnitGroupSetRepository, orgUnitGroupHelper,
             orgUnitGroupSets;
@@ -11,6 +11,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope = $rootScope.$new();
             q = $q;
             hustle = $hustle;
+            location = $location;
 
             scope.orgUnit = {
                 id: 'someOrgUnitId',
@@ -81,14 +82,16 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
 
             orgUnitGroupHelper = new OrgUnitGroupHelper();
             spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
-
-            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepository, orgUnitGroupHelper, db, $location, fakeModal, patientOriginRepository, orgUnitGroupSetRepository);
         }));
 
         afterEach(function() {
             Timecop.returnToPresent();
             Timecop.uninstall();
         });
+
+        var initializeOpUnitController = function () {
+            return new OpUnitController(scope, q, hustle, orgUnitRepository, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository, orgUnitGroupSetRepository);
+        };
 
         var createMockAttribute = function (code, value, name) {
             var attribute = {
@@ -106,6 +109,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         };
 
         it("should save operation unit", function() {
+            opUnitController = initializeOpUnitController();
             var opUnit = {
                 "name": "OpUnit1",
                 "type": {
@@ -152,6 +156,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         });
 
         it("should set hospitalUnitCodes on scope on init", function() {
+            opUnitController = initializeOpUnitController();
             scope.$apply();
             expect(scope.hospitalUnitCodes).toEqual([{
                 id: 'orgUnitGroupB1Id',
@@ -163,6 +168,10 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         });
 
         describe('editing an existing opUnit', function () {
+            beforeEach(function () {
+                opUnitController = initializeOpUnitController();
+            });
+
             it('should set the type and hospitalUnitCode', function () {
                 scope.isNewMode = false;
                 scope.$apply();
@@ -185,6 +194,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         });
 
         it("should save operation unit with GIS coordinate information", function() {
+            opUnitController = initializeOpUnitController();
             var opUnit = {
                 "name": "OpUnit1",
                 "type": {
@@ -209,6 +219,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         });
 
         it("should not ask for hospital unit code while saving operation unit if it is not hospital", function() {
+            opUnitController = initializeOpUnitController();
             var opUnit = {
                 "name": "OpUnit1",
                 "type": {
@@ -229,6 +240,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         });
 
         it("should set operation unit for view and show patientOrigins", function() {
+            opUnitController = initializeOpUnitController();
             scope.orgUnit = {
                 "name": "opUnit1",
                 "parent": {
@@ -280,6 +292,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         });
 
         it("should disable disable button for opunit", function() {
+            opUnitController = initializeOpUnitController();
             scope.orgUnit = {
                 "name": "opUnit1",
                 "parent": {
@@ -295,6 +308,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         });
 
         it("should disable opunit and all its modules", function() {
+            opUnitController = initializeOpUnitController();
             var opunit = {
                 "name": "opunit1",
                 "id": "opunit1",
@@ -351,6 +365,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         });
 
         it("should update operation unit", function() {
+            opUnitController = initializeOpUnitController();
             var opUnit = {
                 "name": "OpUnit1",
                 "type": {
@@ -435,6 +450,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         });
 
         it("should update operation unit with GIS coordinates", function() {
+            opUnitController = initializeOpUnitController();
             var opUnit = {
                 "name": "OpUnit1",
                 "type": {
@@ -457,6 +473,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         });
 
         it("should take the user to the view page of the parent project on clicking cancel", function() {
+            opUnitController = initializeOpUnitController();
             scope.closeForm();
 
             expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(scope.orgUnit);
@@ -487,6 +504,8 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                         "locale": "en",
                         "desc": "create patient origin Not Specified"
                     };
+                spyOn(customAttributes, 'createAttribute').and.returnValue(createMockAttribute('someType', 'someValue', 'someName'));
+                opUnitController = initializeOpUnitController();
             });
 
             it('should be created when geographicOriginDisabled is false', function () {
@@ -509,6 +528,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         });
 
         it("should update org unit groups when op unit is updated", function() {
+            opUnitController = initializeOpUnitController();
             var opUnit = {
                 "name": "OpUnit1",
                 "type": "Hospital",
@@ -552,6 +572,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         });
 
         it("should disable patient origin", function() {
+            opUnitController = initializeOpUnitController();
             var originToEnableDisable = {
                 "id": "o1",
                 "name": "origin1"
@@ -623,6 +644,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         });
 
         it("should enable patient origin", function() {
+            opUnitController = initializeOpUnitController();
             var originToEnableDisable = {
                 "id": "0",
                 "name": "origin1"
