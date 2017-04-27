@@ -2,9 +2,9 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
     return function ($http, $q) {
         var NAMESPACE = "praxis";
         var EXCLUDED_OPTIONS = "_excludedOptions",
-        REFERRAL_LOCATIONS = "_referralLocations",
-        PATIENT_ORIGINS = "_patientOrigins",
-        EXCLUDED_DATA_ELEMENTS = "_excludedDataElements";
+            REFERRAL_LOCATIONS = "_referralLocations",
+            PATIENT_ORIGINS = "_patientOrigins",
+            EXCLUDED_DATA_ELEMENTS = "_excludedDataElements";
 
         var upsertDataToStore = function (orgUnitId, payload, type, uploadMethod) {
             var key = orgUnitId + type;
@@ -24,8 +24,8 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
         this.createExcludedDataElements = _.partialRight(upsertDataToStore, EXCLUDED_DATA_ELEMENTS, $http.post);
         this.updateExcludedDataElements = _.partialRight(upsertDataToStore, EXCLUDED_DATA_ELEMENTS, $http.put);
 
-        this.getExcludedOptions = function (moduleId) {
-            var key = moduleId + EXCLUDED_OPTIONS;
+        var getDataForKey = function (orgUnitId, type) {
+            var key = orgUnitId + type;
             var url = [dhisUrl.dataStore, NAMESPACE, key].join("/");
             return $http.get(url)
                 .then(_.property('data'))
@@ -34,37 +34,15 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
                 });
         };
 
-        this.getReferrals = function (opUnitId) {
-            var key = opUnitId + REFERRAL_LOCATIONS;
-            var url = [dhisUrl.dataStore, NAMESPACE, key].join("/");
-            return $http.get(url)
-                .then(_.property('data'))
-                .catch(function (response) {
-                    return response.errorCode === constants.errorCodes.NOT_FOUND ? undefined : $q.reject();
-                });
-        };
+        this.getExcludedOptions = _.partialRight(getDataForKey, EXCLUDED_OPTIONS);
 
-        this.getPatientOrigins = function (opUnitId) {
-            var key = opUnitId + PATIENT_ORIGINS;
-            var url = [dhisUrl.dataStore, NAMESPACE, key].join("/");
-            return $http.get(url)
-                .then(_.property('data'))
-                .catch(function (response) {
-                    return response.errorCode === constants.errorCodes.NOT_FOUND ? undefined : $q.reject();
-                });
-        };
+        this.getReferrals = _.partialRight(getDataForKey, REFERRAL_LOCATIONS);
 
-        this.getExcludedDataElements = function (moduleId) {
-            var key = moduleId + EXCLUDED_DATA_ELEMENTS;
-            var url = [dhisUrl.dataStore, NAMESPACE, key].join("/");
-            return $http.get(url)
-                .then(_.property('data'))
-                .catch(function (response) {
-                    return response.errorCode === constants.errorCodes.NOT_FOUND ? undefined : $q.reject();
-                });
-        };
+        this.getPatientOrigins = _.partialRight(getDataForKey, PATIENT_ORIGINS);
 
-        var getAllKeys = function (lastUpdated) {
+        this.getExcludedDataElements = _.partialRight(getDataForKey, EXCLUDED_DATA_ELEMENTS);
+
+        this.getUpdatedKeys = function (lastUpdated) {
             var url = [dhisUrl.dataStore, NAMESPACE].join("/");
             return $http.get(url, { params: { lastUpdated: lastUpdated } })
                 .then(_.property('data'))
@@ -73,10 +51,8 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
                 });
         };
 
-        this.getUpdatedKeys = getAllKeys;
-
         this.getKeysForExcludedOptions = function () {
-            return getAllKeys().then(function (allKeys) {
+            return this.getUpdatedKeys().then(function (allKeys) {
                 return _.filter(allKeys, _.partial(_.contains, _, EXCLUDED_OPTIONS, 0));
             });
         };
