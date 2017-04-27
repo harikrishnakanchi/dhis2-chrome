@@ -39,7 +39,7 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
             }];
 
             Timecop.install();
-            Timecop.freeze(new Date("2015-04-15T00:00:00.000"));
+            Timecop.freeze(new Date("2015-04-15T00:00:00.000Z"));
         }));
 
         afterEach(function() {
