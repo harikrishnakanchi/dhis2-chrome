@@ -147,6 +147,56 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
            });
         });
 
+        describe('mapToOpUnitForDHIS', function () {
+            it('should return the mapped opUnit for DHIS', function () {
+                var opUnit = {
+                    name:'opUnitName',
+                    openingDate: 'someDate',
+                    longitude: 29,
+                    latitude: -45,
+                    attributeValues: [],
+                    orgUnitGroupSets: {
+                        someOrgUnitGroupSetId: {
+                            id: "someOrgUnitGroupId",
+                            name: "someOrgUnitGroupName"
+                        }
+                    }
+                };
+
+                var project = {
+                    id: 'someProjectId',
+                    name: 'someProjectName',
+                    level: 4
+                };
+
+                var expectedResult = {
+                    name: 'opUnitName',
+                    openingDate: 'someDate',
+                    attributeValues: [],
+                    id: 'opUnitId',
+                    shortName: 'opUnitName',
+                    level: 5,
+                    parent: {
+                        name: "someProjectName",
+                        id: "someProjectId"
+                    },
+                    coordinates: '[29,-45]',
+                    featureType: 'POINT',
+                    organisationUnitGroups: [{
+                        id: 'someOrgUnitGroupId',
+                        organisationUnitGroupSet: {
+                            id: 'someOrgUnitGroupSetId'
+                        }
+                    }]
+                };
+
+                spyOn(dhisId, 'get').and.returnValue('opUnitId');
+
+                var result = orgUnitMapper.mapToOpUnitForDHIS(opUnit, project);
+                expect(result).toEqual(expectedResult);
+            });
+        });
+
         it("should transform orgUnit to contain attributes as per DHIS", function() {
             var orgUnit = {
                 "name": "Org1",

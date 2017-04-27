@@ -130,6 +130,24 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
          return mappedOpUnit;
     };
 
+    this.mapToOpUnitForDHIS = function (opUnit, project) {
+        var orgUnit = _.merge(opUnit, {
+            'id': dhisId.get(opUnit.name + project.id),
+            'shortName': opUnit.name,
+            'level': parseInt(project.level) + 1,
+            'parent': _.pick(project, "name", "id")
+        });
+
+        if (!_.isUndefined(orgUnit.longitude) && !_.isUndefined(orgUnit.latitude)) {
+            orgUnit.coordinates = "[" + opUnit.longitude + "," + orgUnit.latitude + "]";
+            orgUnit.featureType = "POINT";
+        }
+
+        orgUnit.organisationUnitGroups = buildOrgUnitGroups(orgUnit);
+        orgUnit = _.omit(orgUnit, ['type', 'latitude', 'longitude', 'orgUnitGroupSets']);
+        return orgUnit;
+    };
+
     this.mapToProject = function(dhisProject, allContexts, allPopTypes, reasonForIntervention, modeOfOperation, modelOfManagement, allProjectTypes) {
 
         var getTranslatedName = function (allOptions, code) {
