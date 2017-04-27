@@ -28,6 +28,16 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
                 });
         };
 
+        this.getReferrals = function (opUnitId) {
+            var key = opUnitId + REFERRAL_LOCATIONS;
+            var url = [dhisUrl.dataStore, NAMESPACE, key].join("/");
+            return $http.get(url)
+                .then(_.property('data'))
+                .catch(function (response) {
+                    return response.errorCode === constants.errorCodes.NOT_FOUND ? undefined : $q.reject();
+                });
+        };
+
         var getAllKeys = function (lastUpdated) {
             var url = [dhisUrl.dataStore, NAMESPACE].join("/");
             return $http.get(url, { params: { lastUpdated: lastUpdated } })

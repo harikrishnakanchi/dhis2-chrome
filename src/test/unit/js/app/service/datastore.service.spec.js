@@ -75,25 +75,41 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
         });
 
         describe('referralLocations', function () {
-            var moduleId, storeKey, url;
+            var opUnitId, storeKey, url;
             beforeEach(function () {
-                moduleId = "someModuleId";
-                storeKey = moduleId + "_referralLocations";
+                opUnitId = "someModuleId";
+                storeKey = opUnitId + "_referralLocations";
                 url = [dhisUrl.dataStore, storeNamespace, storeKey].join("/");
             });
 
-            it('should create referralLocations for specified module', function () {
-                dataStoreService.createReferrals(moduleId, {});
+            it('should create referralLocations for specified opUnit', function () {
+                dataStoreService.createReferrals(opUnitId, {});
 
                 httpBackend.expectPOST(url, {}).respond(201);
                 httpBackend.flush();
             });
 
-            it('should update referralLocations for specified module', function () {
-                dataStoreService.updateReferrals(moduleId, {});
+            it('should update referralLocations for specified opunit', function () {
+                dataStoreService.updateReferrals(opUnitId, {});
 
                 httpBackend.expectPUT(url, {}).respond(200);
                 httpBackend.flush();
+            });
+
+            it('should get referral locations for specified opUnit', function () {
+                dataStoreService.getReferrals(opUnitId).then(function (data) {
+                    expect(data).toEqual("mockReferrals");
+                });
+
+                httpBackend.expectGET(url).respond(200, "mockReferrals");
+                httpBackend.flush();
+            });
+
+            it('should return undefined if key is not exist on dhis', function () {
+                spyOn(http, 'get').and.returnValue(utils.getRejectedPromise(q, {errorCode: "NOT_FOUND"}));
+                dataStoreService.getReferrals(opUnitId).then(function (data) {
+                    expect(data).toBeUndefined();
+                });
             });
 
         });
