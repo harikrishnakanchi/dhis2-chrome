@@ -4,8 +4,8 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
         var EXCLUDED_OPTIONS = "_excludedOptions",
         REFERRAL_LOCATIONS = "_referralLocations";
 
-        var upsertDataToStore = function (moduleId, payload, type, uploadMethod) {
-            var key = moduleId + type;
+        var upsertDataToStore = function (orgUnitId, payload, type, uploadMethod) {
+            var key = orgUnitId + type;
             var url = [dhisUrl.dataStore, NAMESPACE, key].join("/");
             return uploadMethod(url, payload);
         };
@@ -28,14 +28,16 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
                 });
         };
 
-        var getAllKeys = function () {
+        var getAllKeys = function (lastUpdated) {
             var url = [dhisUrl.dataStore, NAMESPACE].join("/");
-            return $http.get(url)
+            return $http.get(url, { params: { lastUpdated: lastUpdated } })
                 .then(_.property('data'))
                 .catch(function (response) {
-                return response.errorCode === constants.errorCodes.NOT_FOUND ? [] : $q.reject();
-            });
+                    return response.errorCode === constants.errorCodes.NOT_FOUND ? [] : $q.reject();
+                });
         };
+
+        this.getUpdatedKeys = getAllKeys;
 
         this.getKeysForExcludedOptions = function () {
             return getAllKeys().then(function (allKeys) {

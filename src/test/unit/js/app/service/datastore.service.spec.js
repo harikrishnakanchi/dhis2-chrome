@@ -117,13 +117,27 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
                 httpBackend.flush();
                 expect(actualKeys).toEqual(['key1_excludedOptions', 'key2_excludedOptions', 'key4_excludedOptions', 'key5_excludedOptions', 'key6_excludedOptions']);
             });
+        });
+
+        describe('getUpdatedKeys', function () {
+
+            it('should get the updated keys', function () {
+                var url = [dhisUrl.dataStore, storeNamespace].join("/");
+                var keysFromRemote = ['key1_excludedOptions', 'key2_excludedOptions'];
+                var actualKeys;
+                dataStoreService.getUpdatedKeys("lastUpdatedTime").then(function (data) {
+                    actualKeys = data;
+                });
+                httpBackend.expectGET(url + "?lastUpdated=lastUpdatedTime").respond(200, keysFromRemote);
+                httpBackend.flush();
+                expect(actualKeys).toEqual(keysFromRemote);
+            });
 
             it('should return empty list if namespace is not exist', function () {
-                spyOn(http, 'get').and.returnValue(utils.getRejectedPromise(q, {errorCode: 'NOT_FOUND'}));
-                dataStoreService.getKeysForExcludedOptions().then(function (data) {
+                spyOn(http, 'get').and.returnValue(utils.getRejectedPromise(q, {errorCode: "NOT_FOUND"}));
+                dataStoreService.getUpdatedKeys().then(function (data) {
                     expect(data).toEqual([]);
                 });
-                expect(http.get).toHaveBeenCalled();
             });
         });
     });
