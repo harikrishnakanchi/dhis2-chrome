@@ -80,23 +80,27 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
         };
 
         $scope.downloadChartAsPng = function(chart, lastUpdatedTime) {
-            var svgElement = document.getElementById(chart.id).firstElementChild, lastUpdatedTimeDetails, chartTitle, chartTitleNode;
-            var setChartTitle = function () {
-                chartTitle = document.createTextNode(chart.title);
-                chartTitleNode = document.createElement('text');
+            var svgElement = document.getElementById(chart.id).firstElementChild, lastUpdatedTimeDetails, chartTitle, chartTitleNode, transform;
 
+            var setChartTitle = function () {
+                transform = svgElement.firstElementChild.getAttribute('transform');
+                var yAxisTransform = parseInt(transform.slice(transform.length - 3, transform.length - 1));
+                chartTitle = document.createTextNode(chart.title);
+
+                chartTitleNode = document.createElement('text');
                 chartTitleNode.setAttribute('x', '500');
                 chartTitleNode.setAttribute('y', '15');
                 chartTitleNode.setAttribute('text-anchor', 'middle');
-                chartTitleNode.setAttribute('transform', 'translate(0, -50)');
+                chartTitleNode.setAttribute('transform', 'translate(0, -' + (yAxisTransform + 20) + ')');
                 chartTitleNode.setAttribute('style', 'font-size:15');
 
                 chartTitleNode.insertBefore(chartTitle, chartTitleNode.childNodes[0]);
-                svgElement.firstElementChild.setAttribute('transform', 'translate(45, 60)');
+                svgElement.firstElementChild.setAttribute('transform', 'translate(45, ' + (yAxisTransform + 20) +')');
                 svgElement.firstElementChild.insertBefore(chartTitleNode, svgElement.firstElementChild.childNodes[0]);
             };
+
             var removeChartTitle = function () {
-                svgElement.firstElementChild.setAttribute('transform', 'translate(45, 30)');
+                svgElement.firstElementChild.setAttribute('transform', transform);
                 chartTitleNode.remove();
             };
             setChartTitle();

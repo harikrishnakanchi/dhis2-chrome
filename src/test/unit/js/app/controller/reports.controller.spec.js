@@ -316,10 +316,12 @@ define(["angularMocks", "utils", "moment", "timecop", "reportsController", "data
                 var mockElement = document.createElement('div');
                 svgElement = document.createElement('svg');
                 mockDOMElemenet = document.createElement('g');
+                var mockAttribute = "mock attribute";
 
                 mockElement.appendChild(svgElement);
                 svgElement.appendChild(mockDOMElemenet);
                 spyOn(document, 'getElementById').and.returnValue(mockElement);
+                spyOn(svgElement.firstElementChild, 'getAttribute').and.returnValue(mockAttribute);
 
                 mockChart = {
                     serviceCode: 'ServiceName',
