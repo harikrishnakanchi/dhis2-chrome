@@ -154,6 +154,46 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
 
         });
 
+        describe('excludedDataElements', function () {
+            var moduleId, storeKey, url;
+            beforeEach(function () {
+                moduleId = "someModuleId";
+                storeKey = moduleId + "_excludedDataElements";
+                url = [dhisUrl.dataStore, storeNamespace, storeKey].join("/");
+            });
+
+            it('should create patient origins for specified opUnit', function () {
+                dataStoreService.createExcludedDataElements(moduleId, {});
+
+                httpBackend.expectPOST(url, {}).respond(201);
+                httpBackend.flush();
+            });
+
+            it('should update referralLocations for specified opunit', function () {
+                dataStoreService.updateExcludedDataElements(moduleId, {});
+
+                httpBackend.expectPUT(url, {}).respond(200);
+                httpBackend.flush();
+            });
+
+            it('should get referral locations for specified opUnit', function () {
+                dataStoreService.getExcludedDataElements(moduleId).then(function (data) {
+                    expect(data).toEqual("mockPatientOrigins");
+                });
+
+                httpBackend.expectGET(url).respond(200, "mockPatientOrigins");
+                httpBackend.flush();
+            });
+
+            it('should return undefined if key is not exist on dhis', function () {
+                spyOn(http, 'get').and.returnValue(utils.getRejectedPromise(q, {errorCode: "NOT_FOUND"}));
+                dataStoreService.getExcludedDataElements(moduleId).then(function (data) {
+                    expect(data).toBeUndefined();
+                });
+            });
+
+        });
+
         describe('getKeysForExcludedOptions', function () {
             var moduleId, url;
             beforeEach(function () {

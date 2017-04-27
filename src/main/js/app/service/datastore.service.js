@@ -3,7 +3,8 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
         var NAMESPACE = "praxis";
         var EXCLUDED_OPTIONS = "_excludedOptions",
         REFERRAL_LOCATIONS = "_referralLocations",
-        PATIENT_ORIGINS = "_patientOrigins";
+        PATIENT_ORIGINS = "_patientOrigins",
+        EXCLUDED_DATA_ELEMENTS = "_excludedDataElements";
 
         var upsertDataToStore = function (orgUnitId, payload, type, uploadMethod) {
             var key = orgUnitId + type;
@@ -12,16 +13,16 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
         };
 
         this.updateExcludedOptions = _.partialRight(upsertDataToStore, EXCLUDED_OPTIONS, $http.put);
-
         this.createExcludedOptions = _.partialRight(upsertDataToStore, EXCLUDED_OPTIONS, $http.post);
 
         this.createReferrals = _.partialRight(upsertDataToStore, REFERRAL_LOCATIONS, $http.post);
-
         this.updateReferrals = _.partialRight(upsertDataToStore, REFERRAL_LOCATIONS, $http.put);
 
         this.createPatientOrigins = _.partialRight(upsertDataToStore, PATIENT_ORIGINS, $http.post);
-
         this.updatePatientOrigins = _.partialRight(upsertDataToStore, PATIENT_ORIGINS, $http.put);
+
+        this.createExcludedDataElements = _.partialRight(upsertDataToStore, EXCLUDED_DATA_ELEMENTS, $http.post);
+        this.updateExcludedDataElements = _.partialRight(upsertDataToStore, EXCLUDED_DATA_ELEMENTS, $http.put);
 
         this.getExcludedOptions = function (moduleId) {
             var key = moduleId + EXCLUDED_OPTIONS;
@@ -45,6 +46,16 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
 
         this.getPatientOrigins = function (opUnitId) {
             var key = opUnitId + PATIENT_ORIGINS;
+            var url = [dhisUrl.dataStore, NAMESPACE, key].join("/");
+            return $http.get(url)
+                .then(_.property('data'))
+                .catch(function (response) {
+                    return response.errorCode === constants.errorCodes.NOT_FOUND ? undefined : $q.reject();
+                });
+        };
+
+        this.getExcludedDataElements = function (moduleId) {
+            var key = moduleId + EXCLUDED_DATA_ELEMENTS;
             var url = [dhisUrl.dataStore, NAMESPACE, key].join("/");
             return $http.get(url)
                 .then(_.property('data'))
