@@ -74,28 +74,29 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
         return projectOrgUnit;
     };
 
+    var getOrgUnitGroups = function (orgUnit, orgUnitGroupSets) {
+        return  _.transform(orgUnitGroupSets, function (map, orgUnitGroupSet) {
+            var groupSetValue = _.find(orgUnit.organisationUnitGroups, function (orgUnitGroup) {
+                return orgUnitGroupSet.id === _.get(orgUnitGroup.organisationUnitGroupSet, 'id');
+            });
+            if (groupSetValue) {
+                var groupSetName = _.find(orgUnitGroupSet.organisationUnitGroups, function (group) {
+                    return group.id === groupSetValue.id;
+                });
+                map[orgUnitGroupSet.id] = {
+                    id: groupSetValue.id,
+                    name: _.get(groupSetName, 'name')
+                };
+            }
+            else
+                map[orgUnitGroupSet.id] = undefined;
+            return map;
+        }, {});
+    };
+
     this.mapOrgUnitToProject = function (dhisProject, orgUnitGroupSets) {
         var endDate = customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.PROJECT_END_DATE_CODE);
         var autoApprove = customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.AUTO_APPROVE);
-        var getOrgUnitGroupsForProject = function () {
-            return  _.transform(orgUnitGroupSets, function (map, orgUnitGroupSet) {
-                var groupSetValueForProject = _.find(dhisProject.organisationUnitGroups, function (orgUnitGroupInProject) {
-                    return orgUnitGroupSet.id === _.get(orgUnitGroupInProject.organisationUnitGroupSet, 'id');
-                });
-                if (groupSetValueForProject) {
-                    var groupSetName = _.find(orgUnitGroupSet.organisationUnitGroups, function (group) {
-                        return group.id === groupSetValueForProject.id;
-                    });
-                    map[orgUnitGroupSet.id] = {
-                        id: groupSetValueForProject.id,
-                        name: _.get(groupSetName, 'name')
-                    };
-                }
-                else
-                    map[orgUnitGroupSet.id] = undefined;
-                return map;
-            }, {});
-        };
 
         return {
             'name': dhisProject.name,
@@ -110,8 +111,23 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             'estPopulationBetween1And5Years': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.EST_POPULATION_BETWEEN_1_AND_5_YEARS_CODE)),
             'estPopulationOfWomenOfChildBearingAge': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.EST_POPULATION_OF_WOMEN_OF_CHILD_BEARING_AGE_CODE)),
             'autoApprove': autoApprove === undefined ? "false" : autoApprove,
-            'orgUnitGroupSets': getOrgUnitGroupsForProject()
+            'orgUnitGroupSets': getOrgUnitGroups(dhisProject, orgUnitGroupSets)
         };
+    };
+
+    this.mapOrgUnitToOpUnit = function (opUnit, orgUnitGroupSets) {
+        var coordinates = opUnit.coordinates;
+        coordinates = coordinates ? coordinates.substr(1, coordinates.length - 2).split(",") : coordinates;
+        var mappedOpUnit = {
+            name: opUnit.name,
+            openingDate: opUnit.openingDate,
+            orgUnitGroupSets: getOrgUnitGroups(opUnit, orgUnitGroupSets)
+        };
+        if (coordinates) {
+            mappedOpUnit.longitude = parseFloat(coordinates[0]);
+            mappedOpUnit.latitude = parseFloat(coordinates[1]);
+        }
+         return mappedOpUnit;
     };
 
     this.mapToProject = function(dhisProject, allContexts, allPopTypes, reasonForIntervention, modeOfOperation, modelOfManagement, allProjectTypes) {

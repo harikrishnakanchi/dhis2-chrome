@@ -100,6 +100,53 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                 expect(result.autoApprove).toEqual('false');
             });
         });
+
+        describe('mapOrgUnitToOpunit', function () {
+           it('should return the mapped opUnit', function () {
+               var mockOrgUnitGroupSets = [{
+                   id: 'someOrgUnitGroupSetId',
+                   organisationUnitGroups: [{
+                       id: 'someOrgUnitGroupId',
+                       name: 'someOrgUnitGroupName'
+                   }, {
+                       id: 'someOtherOrgUnitGroupId',
+                       name: 'someOtherOrgUnitGroupName',
+                   }]
+               }];
+
+               var opUnit = {
+                   id: 'opUnitId',
+                   name: 'opUnitName',
+                   level: 5,
+                   coordinates: '[29,-45]',
+                   attributeValues: [],
+                   openingDate: 'someDate',
+                   organisationUnitGroups: [{
+                       id: 'someOrgUnitGroupId',
+                       organisationUnitGroupSet: {
+                           id: 'someOrgUnitGroupSetId'
+                       }
+                   }]
+               };
+
+               var expectedResult = {
+                   name:'opUnitName',
+                   openingDate: 'someDate',
+                   longitude: 29,
+                   latitude: -45,
+                   orgUnitGroupSets: {
+                       someOrgUnitGroupSetId: {
+                           id: "someOrgUnitGroupId",
+                           name: "someOrgUnitGroupName"
+                       }
+                   }
+               };
+
+               var result = orgUnitMapper.mapOrgUnitToOpUnit(opUnit, mockOrgUnitGroupSets);
+               expect(result).toEqual(expectedResult);
+           });
+        });
+
         it("should transform orgUnit to contain attributes as per DHIS", function() {
             var orgUnit = {
                 "name": "Org1",
