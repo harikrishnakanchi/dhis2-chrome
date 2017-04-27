@@ -25,34 +25,26 @@
                                 </div>
                             </div>
                         </li>
-                        <li class="form-group">
-                            <label for="opUnitType" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.operationUnitTypeLabel }}</label>
-                            <div class="col-sm-4">
-                                <div angucomplete-alt="" name="opUnitType" form-name="form" placeholder="{{ resourceBundle.startTypingLabel }}" pause="100" selected-object="opUnit.type" local-data="opUnitTypes" search-fields="name" title-field="name" initial-value="{{opUnit.type.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" class="ng-isolate-scope">
-                                </div>
-                            </div>
-                        </li>
-                        <li class="form-group" ng-if="showOpUnitCode">
-                            <label for="hospitalUnitCode" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.hospitalUnitCodeLabel }}</label>
-                            <div class="col-sm-4">
-                                <div angucomplete-alt=""
-                                     name="hospitalUnitCode"
-                                     form-name="form"
-                                     placeholder="{{ resourceBundle.startTypingLabel }}"
-                                     pause="100"
-                                     selected-object="opUnit.hospitalUnitCode"
-                                     local-data="hospitalUnitCodes"
-                                     search-fields="name"
-                                     title-field="name"
-                                     initial-value="{{opUnit.hospitalUnitCode.name}}"
-                                     minlength="0"
-                                     input-class="form-control form-control-small"
-                                     match-class="highlight"
-                                     field-required="true"
-                                     class="ng-isolate-scope">
-                                </div>
-                                <div ng-show="form.hospitalUnitCode.$dirty &amp;&amp; form.hospitalUnitCode.$invalid">
-                                    <span class="errortxt" ng-show="form.hospitalUnitCode.$error.required">{{resourceBundle.hospitalUnitCodeValidation}}</span>
+                        <li class="form-group" ng-repeat="orgUnitGroupSet in orgUnitGroupSets">
+                            <div ng-if="showOrgUnitGroupSet(orgUnitGroupSet)">
+                                <label class="col-sm-4 col-md-4 control-label required">{{ orgUnitGroupSet.name }}</label>
+                                <div class="col-sm-4">
+                                    <div angucomplete-alt=""
+                                         name="opUnitType"
+                                         form-name="form"
+                                         placeholder="{{ resourceBundle.startTypingLabel }}"
+                                         pause="100"
+                                         selected-object="assignValue"
+                                         local-data="orgUnitGroupSet.organisationUnitGroups"
+                                         search-fields="name"
+                                         title-field="name"
+                                         initial-value="{{opUnit.orgUnitGroupSets[orgUnitGroupSet.id].name}}"
+                                         minlength="0"
+                                         input-class="form-control form-control-small"
+                                         match-class="highlight"
+                                         field-required="true"
+                                         class="ng-isolate-scope">
+                                    </div>
                                 </div>
                             </div>
                         </li>

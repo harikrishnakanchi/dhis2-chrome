@@ -108,6 +108,72 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             return attribute;
         };
 
+        xit('should get all organisationUnitGroupSets for the opUnit and set them on scope', function () {
+            var mockOrgUnitGroupSets = [{
+                name: 'someOrgUnitGroupSet',
+                id: 'someOrgUnitGroupSetId',
+                attributeValues:[{
+                    attribute:{
+                        code: 'groupSetLevel',
+                    },
+                    value: 5
+                }],
+                organisationUnitGroups: [{
+                    'id': 'someOrgUnitGroupId',
+                    'name': 'someOrgUnitGroupName'
+                }, {
+                    'id': 'someOtherOrgUnitGroupId',
+                    'name': 'someOrgUnitGroupName',
+                }]
+            },{
+                name: 'someOtherOrgUnitGroupSet',
+                attributeValues:[{
+                    attribute:{
+                        code: 'groupSetLevel',
+                    },
+                    value: 4
+                }],
+                organisationUnitGroups: [{
+                    'id': 'someAnotherOrgUnitGroupId',
+                    'name': 'someAnotherOrgUnitGroupName'
+                }]
+            }];
+
+            orgUnitGroupSetRepository.getAll.and.returnValue(utils.getPromise(q, mockOrgUnitGroupSets));
+            spyOn(customAttributes, 'getAttributeValue').and.callFake(function (attributeValues, code) {
+                return attributeValues[0].value;
+            });
+            scope.isNewMode = true;
+            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepository, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository, orgUnitGroupSetRepository);
+
+            scope.$apply();
+
+            expect(orgUnitGroupSetRepository.getAll).toHaveBeenCalled();
+            expect(scope.orgUnitGroupSets).toEqual([mockOrgUnitGroupSets[0]]);
+        });
+
+        xit('should get all organisationUnitGroupSets for the opUnit and set them on scope', function () {
+            var mockOrgUnitGroupSets = [{
+                name: 'someOrgUnitGroupSet',
+                id: 'someOrgUnitGroupSetId'
+            }];
+
+            orgUnitGroupSetRepository.getAll.and.returnValue(utils.getPromise(q, mockOrgUnitGroupSets));
+            spyOn(customAttributes, 'getAttributeValue').and.returnValues(5, 'someDependentGroupId');
+            scope.isNewMode = true;
+            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepository, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository, orgUnitGroupSetRepository);
+
+            scope.$apply();
+
+            var expectedOrgUnitGroupSet = {
+                name: 'someOrgUnitGroupSet',
+                id: 'someOrgUnitGroupSetId',
+                dependentOrgUnitGroupId: 'someDependentGroupId',
+            };
+            expect(scope.orgUnitGroupSets).toEqual([expectedOrgUnitGroupSet]);
+        });
+
+
         it("should save operation unit", function() {
             opUnitController = initializeOpUnitController();
             var opUnit = {
@@ -169,27 +235,14 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
 
         describe('editing an existing opUnit', function () {
             beforeEach(function () {
+                scope.isNewMode = false;
+                spyOn(orgUnitMapper, 'mapOrgUnitToOpUnit').and.returnValue({});
                 opUnitController = initializeOpUnitController();
             });
 
-            it('should set the type and hospitalUnitCode', function () {
-                scope.isNewMode = false;
+            it('should build the opunit using orgUnitMapper', function () {
                 scope.$apply();
-
-                expect(scope.opUnit.type).toEqual({ name: 'Hospital'});
-                expect(scope.opUnit.hospitalUnitCode).toEqual({
-                    id: 'orgUnitGroupB1Id',
-                    name: 'B1'
-                });
-            });
-
-            it('should leave the type and hospitalUnitCode undefined if customAttributes are not present', function () {
-                scope.orgUnit.attributeValues = null;
-                scope.isNewMode = false;
-                scope.$apply();
-
-                expect(scope.opUnit.type).toBeUndefined();
-                expect(scope.opUnit.hospitalUnitCode).toBeUndefined();
+                expect(orgUnitMapper.mapOrgUnitToOpUnit).toHaveBeenCalledWith(scope.orgUnit, scope.orgUnitGroupSets);
             });
         });
 
@@ -283,10 +336,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope.isNewMode = false;
             scope.$apply();
 
-            expect(scope.opUnit.name).toEqual("opUnit1");
-            expect(scope.opUnit.type.name).toEqual("Health Center");
-            expect(scope.opUnit.longitude).toEqual(29);
-            expect(scope.opUnit.latitude).toEqual(-45);
             expect(scope.isDisabled).toBeFalsy();
             expect(scope.originDetails).toEqual(expectedPatientOrigins.origins);
         });

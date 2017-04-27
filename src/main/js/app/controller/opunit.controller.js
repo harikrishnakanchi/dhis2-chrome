@@ -1,9 +1,11 @@
 define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAttributes"], function(_, dhisId, moment, interpolate, orgUnitMapper, customAttributes) {
     return function($scope, $q, $hustle, orgUnitRepository, orgUnitGroupHelper, db, $location, $modal, patientOriginRepository, orgUnitGroupSetRepository) {
+        var ORG_UNIT_LEVEL_FOR_OPUNIT = 5;
         $scope.isDisabled = false;
         $scope.showOpUnitCode = false;
         $scope.opUnit = {
-            'openingDate': moment().format("YYYY-MM-DD")
+            'openingDate': moment().format("YYYY-MM-DD"),
+            'orgUnitGroupSets': {}
         };
         $scope.showEditOriginForm = false;
         $scope.opUnitTypes = [{
@@ -295,8 +297,43 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
             deregisterOpunitTypeWatcher();
         });
 
+        $scope.assignValue = function (value) {
+            console.info(JSON.stringify(value, undefined, 3));
+            $scope.opUnit[$scope.orgUnitGroupSets[this.$parent.$index].name] = value.title;
+            $scope.opUnit.orgUnitGroupSets[value.description.organisationUnitGroupSet.id] = {
+                id: value.description.id,
+                name: value.description.name
+            };
+        };
+
+        $scope.showOrgUnitGroupSet = function (orgUnitGroupSet) {
+            var dependentOrgUnitGroupId = orgUnitGroupSet.dependentOrgUnitGroupId;
+            var isIndependentOrgUnitGroupSet = _.isUndefined(dependentOrgUnitGroupId);
+            if (isIndependentOrgUnitGroupSet) {
+                return true;
+            } else {
+                var isDependentGroupSelected = _.any($scope.opUnit.orgUnitGroupSets, function (orgUnitGroup, orgUnitGroupSetId) {
+                    return orgUnitGroup.id == dependentOrgUnitGroupId;
+                });
+                return isDependentGroupSelected;
+            }
+        };
+
         var init = function() {
             orgUnitGroupSetRepository.getAll().then(function(data) {
+                var opUnitGroupSets = _.filter(data, function (orgUnitGroupSet) {
+                    var orgUnitGroupSetLevel = customAttributes.getAttributeValue(orgUnitGroupSet.attributeValues, customAttributes.ORG_UNIT_GROUP_SET_LEVEL);
+                    return orgUnitGroupSetLevel == ORG_UNIT_LEVEL_FOR_OPUNIT;
+                });
+
+                $scope.orgUnitGroupSets = _.map(opUnitGroupSets, function (orgUnitGroupSet) {
+                    var dependentGroupId = customAttributes.getAttributeValue(orgUnitGroupSet.attributeValues, customAttributes.DEPENDENT_ORGUNITGROUP_ID);
+                    if (dependentGroupId) {
+                        orgUnitGroupSet.dependentOrgUnitGroupId = dependentGroupId;
+                    }
+                    return orgUnitGroupSet;
+                });
+
                 var hospitalUnitCodes = _.find(data, {
                     "code": "hospital_unit_code"
                 }).organisationUnitGroups;
@@ -309,25 +346,7 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
                 $scope.hospitalUnitCodes = _.sortBy($scope.hospitalUnitCodes, 'name');
 
                 if (!$scope.isNewMode) {
-                    var coordinates = $scope.orgUnit.coordinates;
-                    coordinates = coordinates ? coordinates.substr(1, coordinates.length - 2).split(",") : coordinates;
-
-                    $scope.opUnit = {
-                        name: $scope.orgUnit.name,
-                        openingDate: $scope.orgUnit.openingDate,
-                        type: _.find($scope.opUnitTypes, {
-                            name: customAttributes.getAttributeValue($scope.orgUnit.attributeValues, customAttributes.OPERATION_UNIT_TYPE_CODE)
-                        }),
-                        hospitalUnitCode: _.find($scope.hospitalUnitCodes, {
-                            name: customAttributes.getAttributeValue($scope.orgUnit.attributeValues, customAttributes.HOSPITAL_UNIT_CODE)
-                        })
-                    };
-
-                    if (coordinates) {
-                        $scope.opUnit.longitude = parseFloat(coordinates[0]);
-                        $scope.opUnit.latitude = parseFloat(coordinates[1]);
-                    }
-
+                    $scope.opUnit = orgUnitMapper.mapOrgUnitToOpUnit($scope.orgUnit, $scope.orgUnitGroupSets);
                     $scope.isDisabled = customAttributes.getBooleanAttributeValue($scope.orgUnit.attributeValues, customAttributes.DISABLED_CODE);
 
                     patientOriginRepository.get($scope.orgUnit.id).then(setOriginDetails);
