@@ -37,7 +37,7 @@ define(["uploadExcludedDataElementsConsumer", "utils", "angularMocks", "dataStor
                 uploadExcludedDataElementsConsumer = new UploadExcludedDataElementsConsumer(q, dataStoreService, excludedDataElementsRepository);
             }));
 
-            it("should get excluded dataElements for specified opUnit from dhis", function() {
+            it("should get excluded dataElements for specified module from dhis", function() {
                 uploadExcludedDataElementsConsumer.run(mockMessage);
                 scope.$apply();
 
