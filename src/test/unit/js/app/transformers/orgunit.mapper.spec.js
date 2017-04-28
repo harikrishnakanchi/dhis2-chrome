@@ -148,13 +148,13 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
         });
 
         describe('mapToOpUnitForDHIS', function () {
-            it('should return the mapped opUnit for DHIS', function () {
-                var opUnit = {
+            var opUnit, project, expectedResult;
+            beforeEach(function () {
+                opUnit = {
                     name:'opUnitName',
                     openingDate: 'someDate',
                     longitude: 29,
                     latitude: -45,
-                    attributeValues: [],
                     orgUnitGroupSets: {
                         someOrgUnitGroupSetId: {
                             id: "someOrgUnitGroupId",
@@ -162,17 +162,25 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                         }
                     }
                 };
-
-                var project = {
+                project = {
                     id: 'someProjectId',
                     name: 'someProjectName',
                     level: 4
                 };
-
-                var expectedResult = {
+                expectedResult = {
                     name: 'opUnitName',
                     openingDate: 'someDate',
-                    attributeValues: [],
+                    attributeValues: [{
+                        value: 'Operation Unit',
+                        attribute: {
+                            code: 'Type'
+                        }
+                    }, {
+                        value: 'true',
+                        attribute: {
+                            code: 'isNewDataModel'
+                        }
+                    }],
                     id: 'opUnitId',
                     shortName: 'opUnitName',
                     level: 5,
@@ -189,11 +197,31 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                         }
                     }]
                 };
-
                 spyOn(dhisId, 'get').and.returnValue('opUnitId');
+                customAttributes.createAttribute.and.callFake(function (code, value) {
+                    return {
+                        value: value,
+                        attribute: {
+                            code: code
+                        }
+                    };
+                });
+            });
 
+            it('should return the mapped opUnit for DHIS', function () {
                 var result = orgUnitMapper.mapToOpUnitForDHIS(opUnit, project);
+                expect(dhisId.get).toHaveBeenCalled();
                 expect(result).toEqual(expectedResult);
+            });
+
+            it('should use existing opUnit id and level for an existing opUnit', function () {
+                project.id = 'opUnitId';
+                project.level = 5;
+                var existingOpUnit = true;
+                var result = orgUnitMapper.mapToOpUnitForDHIS(opUnit, project, existingOpUnit);
+                expect(dhisId.get).not.toHaveBeenCalled();
+                expect(result.id).toEqual('opUnitId');
+                expect(result.level).toEqual(5);
             });
         });
 

@@ -130,12 +130,21 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
          return mappedOpUnit;
     };
 
-    this.mapToOpUnitForDHIS = function (opUnit, project) {
+    var createAttributesForOpUnit = function () {
+        return [customAttributes.createAttribute(customAttributes.TYPE, "Operation Unit"),
+            customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true")];
+    };
+    this.mapToOpUnitForDHIS = function (opUnit, project, existingProject) {
+        var opUnitId = existingProject ? project.id : dhisId.get(opUnit.name + project.id),
+            opUnitLevel = existingProject ? project.level : parseInt(project.level) + 1,
+            opUnitParent = existingProject ? project.parent : _.pick(project, "name", "id");
+
         var orgUnit = _.merge(opUnit, {
-            'id': dhisId.get(opUnit.name + project.id),
+            'id': opUnitId,
             'shortName': opUnit.name,
-            'level': parseInt(project.level) + 1,
-            'parent': _.pick(project, "name", "id")
+            'level': opUnitLevel,
+            'parent': opUnitParent,
+            'attributeValues': createAttributesForOpUnit()
         });
 
         if (!_.isUndefined(orgUnit.longitude) && !_.isUndefined(orgUnit.latitude)) {

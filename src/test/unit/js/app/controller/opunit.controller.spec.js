@@ -18,7 +18,8 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 name: 'someOrgUnitName',
                 level: 5,
                 parent: {
-                    id: 'someParentId'
+                    id: 'someParentId',
+                    name: 'parentName'
                 },
                 attributeValues: [createMockAttribute('opUnitType', 'Hospital'),
                     createMockAttribute('hospitalUnitCode', 'B1')]
@@ -82,6 +83,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
 
             orgUnitGroupHelper = new OrgUnitGroupHelper();
             spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitGroupHelper, "associateOrgunitsToGroups").and.returnValue(utils.getPromise(q, {}));
         }));
 
         afterEach(function() {
@@ -108,7 +110,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             return attribute;
         };
 
-        xit('should get all organisationUnitGroupSets for the opUnit and set them on scope', function () {
+        it('should get all organisationUnitGroupSets for the opUnit and set them on scope', function () {
             var mockOrgUnitGroupSets = [{
                 name: 'someOrgUnitGroupSet',
                 id: 'someOrgUnitGroupSetId',
@@ -152,7 +154,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             expect(scope.orgUnitGroupSets).toEqual([mockOrgUnitGroupSets[0]]);
         });
 
-        xit('should get all organisationUnitGroupSets for the opUnit and set them on scope', function () {
+        it('should set dependant organisationUnitGroupSets for the opUnit on scope if the depending group is selected', function () {
             var mockOrgUnitGroupSets = [{
                 name: 'someOrgUnitGroupSet',
                 id: 'someOrgUnitGroupSetId'
@@ -171,56 +173,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 dependentOrgUnitGroupId: 'someDependentGroupId',
             };
             expect(scope.orgUnitGroupSets).toEqual([expectedOrgUnitGroupSet]);
-        });
-
-
-        describe('save', function () {
-            it("should save operation unit", function() {
-                opUnitController = initializeOpUnitController();
-                var opUnit = {
-                    "name": "OpUnit1",
-                    "type": {
-                        "title": "Hospital"
-                    },
-                    "openingDate": moment().format("YYYY-MM-DD"),
-                    "hospitalUnitCode": {
-                        "title": "Unit Code - A"
-                    }
-                };
-                scope.orgUnit.level = 4;
-
-                var attributes = [createMockAttribute('someType', 'someValue', 'someName'),
-                    createMockAttribute('someType', 'someValue', 'someName'),
-                    createMockAttribute('someType', 'someValue', 'someName'),
-                    createMockAttribute('someType', 'someValue', 'someName')
-                ];
-                var expectedOpUnit = {
-                    "name": "OpUnit1",
-                    "openingDate": moment().format("YYYY-MM-DD"),
-                    "id": "someMd5Hash",
-                    "shortName": "OpUnit1",
-                    "level": 5,
-                    "parent": _.pick(scope.orgUnit, ['id', 'name']),
-                    "attributeValues": attributes
-                };
-
-                spyOn(customAttributes, 'createAttribute').and.returnValue(createMockAttribute('someType', 'someValue', 'someName'));
-                spyOn(customAttributes, 'cleanAttributeValues').and.returnValue(attributes);
-                scope.save(opUnit);
-                scope.$apply();
-
-                expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.OPERATION_UNIT_TYPE_CODE, "Hospital");
-                expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.TYPE, "Operation Unit");
-                expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.HOSPITAL_UNIT_CODE, "Unit Code - A");
-                expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.NEW_DATA_MODEL_CODE, "true");
-                expect(orgUnitRepository.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);
-                expect(hustle.publish).toHaveBeenCalledWith({
-                    "data": [expectedOpUnit],
-                    "type": "upsertOrgUnit",
-                    "locale": "en",
-                    "desc": "upsert org unit"
-                }, "dataValues");
-            });
         });
 
         it("should set hospitalUnitCodes on scope on init", function() {
@@ -248,52 +200,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             });
         });
 
-        it("should save operation unit with GIS coordinate information", function() {
-            opUnitController = initializeOpUnitController();
-            var opUnit = {
-                "name": "OpUnit1",
-                "type": {
-                    "title": "Hospital"
-                },
-                "openingDate": moment().format("YYYY-MM-DD"),
-                "hospitalUnitCode": {
-                    "title": "Unit Code - A"
-                },
-                "latitude": 50,
-                "longitude": 25
-            };
-            scope.orgUnit.level = 4;
-
-            spyOn(customAttributes, 'createAttribute').and.returnValue(createMockAttribute('someType', 'someValue'));
-            spyOn(customAttributes, 'cleanAttributeValues').and.returnValue(createMockAttribute('someType', 'someValue'));
-            scope.save(opUnit);
-            scope.$apply();
-
-            expect(orgUnitRepository.upsert.calls.argsFor(0)[0].coordinates).toEqual("[25,50]");
-            expect(orgUnitRepository.upsert.calls.argsFor(0)[0].featureType).toEqual("POINT");
-        });
-
-        it("should not ask for hospital unit code while saving operation unit if it is not hospital", function() {
-            opUnitController = initializeOpUnitController();
-            var opUnit = {
-                "name": "OpUnit1",
-                "type": {
-                    "title": "Health Center"
-                },
-                "openingDate": moment().format("YYYY-MM-DD"),
-                "hospitalUnitCode": {
-                    "title": "Unit Code - A"
-                }
-            };
-            scope.orgUnit.level = 4;
-
-            spyOn(customAttributes, 'createAttribute').and.returnValue(createMockAttribute('someType', 'someValue'));
-            scope.save(opUnit);
-            scope.$apply();
-
-            expect(customAttributes.createAttribute).not.toHaveBeenCalledWith(customAttributes.HOSPITAL_UNIT_CODE, 'Unit Code - A');
-        });
-
         it("should set operation unit for view and show patientOrigins", function() {
             opUnitController = initializeOpUnitController();
             scope.orgUnit = {
@@ -302,7 +208,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     "id": "parent"
                 },
                 "coordinates": "[29,-45]",
-                "attributeValues": []
             };
 
             var patientOrigins = {
@@ -315,14 +220,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     "originName": "Unknown"
                 }]
             };
-
-            spyOn(customAttributes, 'getAttributeValue').and.callFake(function (attributeValues, code) {
-                var fakeAttributeValues = {
-                    opUnitType: 'Health Center',
-                    hospitalUnitCode: 'Unit Code - B1'
-                };
-                return fakeAttributeValues[code];
-            });
 
             var expectedPatientOrigins = {
                 "orgUnit": "opunitid",
@@ -415,114 +312,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             expect(scope.isDisabled).toEqual(true);
         });
 
-        it("should update operation unit", function() {
-            opUnitController = initializeOpUnitController();
-            var opUnit = {
-                "name": "OpUnit1",
-                "type": {
-                    "title": "Hospital"
-                },
-                "openingDate": moment().format("YYYY-MM-DD"),
-                "hospitalUnitCode": {
-                    "name": "Unit Code - A"
-                }
-            };
-
-            scope.orgUnit = {
-                "id": "opUnit1Id",
-                "name": "OpUnit1",
-                "type": "Health Center",
-                "level": 5,
-                "hospitalUnitCode": "Unit Code - B1",
-                "parent": {
-                    "name": "Parent",
-                    "id": "ParentId"
-                }
-            };
-
-            var attributes = [createMockAttribute('someType', 'someValue'),
-                createMockAttribute('someType', 'someValue'),
-                createMockAttribute('someType', 'someValue'),
-                createMockAttribute('someType', 'someValue')];
-
-            var expectedOpUnit = {
-                "name": "OpUnit1",
-                "id": "opUnit1Id",
-                "openingDate": moment().format("YYYY-MM-DD"),
-                "shortName": "OpUnit1",
-                "level": 5,
-                "parent": {
-                    "name": "Parent",
-                    "id": "ParentId"
-                },
-                "attributeValues": attributes
-            };
-
-            var modulesUnderOpunit = [{
-                "id": "aggMod1"
-            }, {
-                "id": "lineMod1",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isLineListService",
-                    },
-                    "value": "true"
-                }]
-            }];
-
-            var originOrgUnits = [{
-                "id": "child1",
-                "name": "child1"
-            }, {
-                "id": "child2",
-                "name": "child2"
-            }];
-
-            spyOn(customAttributes, 'createAttribute').and.returnValue(createMockAttribute('someType', 'someValue'));
-            spyOn(customAttributes, 'cleanAttributeValues').and.returnValue(attributes);
-            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modulesUnderOpunit));
-            orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, originOrgUnits));
-
-            scope.update(opUnit);
-            scope.$apply();
-
-            expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.OPERATION_UNIT_TYPE_CODE, "Hospital");
-            expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.TYPE, "Operation Unit");
-            expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.HOSPITAL_UNIT_CODE, "Unit Code - A");
-            expect(customAttributes.createAttribute).toHaveBeenCalledWith(customAttributes.NEW_DATA_MODEL_CODE, "true");
-            expect(orgUnitRepository.upsert).toHaveBeenCalledWith(expectedOpUnit);
-            expect(hustle.publish).toHaveBeenCalledWith({
-                "data": [expectedOpUnit],
-                "type": "upsertOrgUnit",
-                "locale": "en",
-                "desc": "upsert org unit"
-            }, "dataValues");
-            expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalled();
-        });
-
-        it("should update operation unit with GIS coordinates", function() {
-            opUnitController = initializeOpUnitController();
-            var opUnit = {
-                "name": "OpUnit1",
-                "type": {
-                    "title": "Hospital"
-                },
-                "openingDate": moment().format("YYYY-MM-DD"),
-                "hospitalUnitCode": {
-                    "name": "Unit Code - A"
-                },
-                "latitude": 50,
-                "longitude": 25
-            };
-
-            spyOn(customAttributes, 'createAttribute').and.returnValue(createMockAttribute('someType', 'someValue'));
-            scope.update(opUnit);
-            scope.$apply();
-
-            expect(orgUnitRepository.upsert.calls.argsFor(0)[0].coordinates).toEqual("[25,50]");
-            expect(orgUnitRepository.upsert.calls.argsFor(0)[0].featureType).toEqual("POINT");
-        });
-
         it("should take the user to the view page of the parent project on clicking cancel", function() {
             opUnitController = initializeOpUnitController();
             scope.closeForm();
@@ -578,48 +367,208 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             });
         });
 
-        it("should update org unit groups when op unit is updated", function() {
-            opUnitController = initializeOpUnitController();
-            var opUnit = {
-                "name": "OpUnit1",
-                "type": "Hospital",
-                "openingDate": moment().format("YYYY-MM-DD"),
-                "hospitalUnitCode": "Unit Code - A"
-            };
+        describe('save', function () {
+            var opUnit, expectedOpUnit, opUnitAttribute, newDataModelAttribute;
 
-            var modulesUnderOpunit = [{
-                "id": "aggMod1"
-            }, {
-                "id": "lineMod1",
-                "attributeValues": [createMockAttribute('isLineListService', 'true')]
-            }];
+            beforeEach(function () {
+                opUnitAttribute = {
+                    value: "Operation Unit",
+                    attribute: {
+                        code: "Type"
+                    }
+                };
+                newDataModelAttribute = {
+                    value: "true",
+                    attribute: {
+                        code: "isNewDataModel"
+                    }
+                };
 
-            var originOrgUnits = [{
-                "id": "child1",
-                "name": "child1"
-            }, {
-                "id": "child2",
-                "name": "child2"
-            }];
+                opUnit = {
+                    "name": "OpUnit1",
+                    "type": {
+                        "title": "Hospital"
+                    },
+                    "openingDate": moment().format("YYYY-MM-DD"),
+                    "orgUnitGroupSets": {
+                        "someOrgUnitGroupSetId": {
+                            "id": "someOrgUnitGroupId",
+                            "name": "someOrgUnitGroupName"
+                        }
+                    }
+                };
 
-            spyOn(customAttributes, 'createAttribute').and.returnValue(createMockAttribute('someType', 'someValue'));
-            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modulesUnderOpunit));
-            orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, originOrgUnits));
+                expectedOpUnit = {
+                    "name": "OpUnit1",
+                    "openingDate": moment().format("YYYY-MM-DD"),
+                    "id": "someMd5Hash",
+                    "shortName": "OpUnit1",
+                    "level": 5,
+                    "parent": _.pick(scope.orgUnit, ['name', 'id']),
+                    "attributeValues": [opUnitAttribute, newDataModelAttribute],
+                    "organisationUnitGroups": [{
+                        "id": "someOrgUnitGroupId",
+                        "organisationUnitGroupSet": {
+                            "id": "someOrgUnitGroupSetId"
+                        }
+                    }]
+                };
 
-            scope.update(opUnit);
-            scope.$apply();
+                spyOn(customAttributes, 'createAttribute').and.callFake(function (code, value) {
+                    return {
+                        value: value,
+                        attribute: {
+                            code: code
+                        }
+                    };
+                });
+            });
+            it("should save operation unit", function() {
+                opUnitController = initializeOpUnitController();
+                scope.orgUnit.level = 4;
 
+                scope.save(opUnit);
+                scope.$apply();
 
-            var expectedOrgunitsToAssociate = [{
-                "id": "aggMod1"
-            }, {
-                "id": "child1",
-                "name": "child1"
-            }, {
-                "id": "child2",
-                "name": "child2"
-            }];
-            expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith(expectedOrgunitsToAssociate, true);
+                expect(orgUnitRepository.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    "data": [expectedOpUnit],
+                    "type": "upsertOrgUnit",
+                    "locale": "en",
+                    "desc": "upsert org unit"
+                }, "dataValues");
+            });
+
+            it('should associate orgUnits to orgUnitGroups', function () {
+                opUnitController = initializeOpUnitController();
+                scope.orgUnit.level = 4;
+                var orgUnitsToBeAssociated = [expectedOpUnit];
+                var syncedOrgUnitGroups = [];
+                var localOrgUnitGroups = ["someOrgUnitGroupId"];
+
+                scope.save(opUnit);
+                scope.$apply();
+
+                expect(orgUnitGroupHelper.associateOrgunitsToGroups).toHaveBeenCalledWith(orgUnitsToBeAssociated, syncedOrgUnitGroups, localOrgUnitGroups);
+            });
+        });
+
+        describe('update', function () {
+            var opUnit, expectedOpUnit, opUnitAttribute, newDataModelAttribute;
+            beforeEach(function () {
+                opUnitAttribute = {
+                    value: "Operation Unit",
+                    attribute: {
+                        code: "Type"
+                    }
+                };
+                newDataModelAttribute = {
+                    value: "true",
+                    attribute: {
+                        code: "isNewDataModel"
+                    }
+                };
+
+                opUnit = {
+                    "name": "OpUnit1",
+                    "shortName": "OpUnit1",
+                    "openingDate": moment().format("YYYY-MM-DD"),
+                    "orgUnitGroupSets": {
+                        "someOrgUnitGroupSetId": {
+                            "id": "someOrgUnitGroupId",
+                            "name": "someOrgUnitGroupName"
+                        }
+                    }
+                };
+
+                scope.orgUnit = {
+                    "id": "someMd5Hash",
+                    "level": 5,
+                    "parent": {
+                        "id": "parentId",
+                        "name": "parentName"
+                    },
+                };
+
+                expectedOpUnit = {
+                    "name": "OpUnit1",
+                    "openingDate": moment().format("YYYY-MM-DD"),
+                    "id": "someMd5Hash",
+                    "shortName": "OpUnit1",
+                    "level": 5,
+                    "parent": {
+                        "id": "parentId",
+                        "name": "parentName"
+                    },
+                    "attributeValues": [opUnitAttribute, newDataModelAttribute],
+                    "organisationUnitGroups": [{
+                        "id": "someOrgUnitGroupId",
+                        "organisationUnitGroupSet": {
+                            "id": "someOrgUnitGroupSetId"
+                        }
+                    }]
+                };
+                spyOn(customAttributes, 'createAttribute').and.callFake(function (code, value) {
+                    return {
+                        value: value,
+                        attribute: {
+                            code: code
+                        }
+                    };
+                });
+            });
+            it("should update operation unit", function() {
+                opUnitController = initializeOpUnitController();
+
+                scope.update(opUnit);
+                scope.$apply();
+
+                expect(orgUnitRepository.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    "data": [expectedOpUnit],
+                    "type": "upsertOrgUnit",
+                    "locale": "en",
+                    "desc": "upsert org unit"
+                }, "dataValues");
+            });
+
+            it('should associate orgUnits to orgUnitGroups', function () {
+                opUnitController = initializeOpUnitController();
+                var modulesUnderOpunit = [{
+                    "id": "aggMod1"
+                }, {
+                    "id": "lineMod1",
+                    "attributeValues": [createMockAttribute('isLineListService', 'true')]
+                }];
+
+                var originOrgUnits = [{
+                    "id": "child1",
+                    "name": "child1"
+                }, {
+                    "id": "child2",
+                    "name": "child2"
+                }];
+
+                scope.orgUnit.organisationUnitGroups = [{
+                    id: 'orgUnitGroupId',
+                    organisationUnitGroupSet: {
+                        id: 'orgUnitGroupSetId'
+                    }
+                }];
+
+                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modulesUnderOpunit));
+                orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, originOrgUnits));
+
+                var orgUnitsToBeAssociated = [expectedOpUnit].concat(modulesUnderOpunit[0]).concat(originOrgUnits);
+                var syncedOrgUnitGroups = ["orgUnitGroupId"];
+                var localOrgUnitGroups = ["someOrgUnitGroupId"];
+
+                scope.update(opUnit);
+                scope.$apply();
+
+                expect(orgUnitGroupHelper.associateOrgunitsToGroups).toHaveBeenCalledWith(orgUnitsToBeAssociated, syncedOrgUnitGroups, localOrgUnitGroups);
+            });
+
         });
 
         it("should disable patient origin", function() {

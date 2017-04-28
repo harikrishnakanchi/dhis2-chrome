@@ -8,17 +8,6 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
             'orgUnitGroupSets': {}
         };
         $scope.showEditOriginForm = false;
-        $scope.opUnitTypes = [{
-            "name": "Hospital"
-        }, {
-            "name": "Health Center"
-        }, {
-            "name": "Community"
-        }, {
-            "name": "Epidemic Isolation Unit"
-        }, {
-            "name": "Mobile Clinic"
-        }];
 
         var saveToDhis = function(data, desc) {
             return $hustle.publish({
@@ -36,19 +25,6 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
 
         var onError = function() {
             $scope.saveFailure = true;
-        };
-
-        var getAttributeValues = function(opUnitType, hospitalUnitCode) {
-            var type = opUnitType.name || opUnitType.title;
-            hospitalUnitCode = type === "Hospital" ? hospitalUnitCode : {
-                "name": ""
-            };
-            var attributes = [customAttributes.createAttribute(customAttributes.OPERATION_UNIT_TYPE_CODE, opUnitType.title || opUnitType.name),
-                customAttributes.createAttribute(customAttributes.TYPE, "Operation Unit"),
-                customAttributes.createAttribute(customAttributes.HOSPITAL_UNIT_CODE, hospitalUnitCode.title || hospitalUnitCode.name),
-                customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true")];
-
-            return customAttributes.cleanAttributeValues(attributes);
         };
 
         var publishMessage = function(data, action, desc) {
@@ -74,20 +50,7 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
         $scope.save = function(opUnit) {
             var parent = $scope.orgUnit;
 
-            opUnit = _.merge(opUnit, {
-                'id': dhisId.get(opUnit.name + parent.id),
-                'shortName': opUnit.name,
-                'level': parseInt(parent.level) + 1,
-                'parent': _.pick(parent, "name", "id"),
-                "attributeValues": getAttributeValues(opUnit.type, opUnit.hospitalUnitCode)
-            });
-
-            if (!_.isUndefined(opUnit.longitude) && !_.isUndefined(opUnit.latitude)) {
-                opUnit.coordinates = "[" + opUnit.longitude + "," + opUnit.latitude + "]";
-                opUnit.featureType = "POINT";
-            }
-
-            opUnit = _.omit(opUnit, ['type', 'hospitalUnitCode', 'latitude', 'longitude']);
+            opUnit = orgUnitMapper.mapToOpUnitForDHIS(opUnit, parent);
 
             var patientOriginPayload = {
                 "orgUnit": opUnit.id,
@@ -106,31 +69,23 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
                     : $q.when();
             };
 
+            var associateOrganisationUnitGroups = function (opUnit) {
+                var orgUnitGroupIdsToAssociate = _.map(opUnit.organisationUnitGroups, 'id');
+                return orgUnitGroupHelper.associateOrgunitsToGroups([opUnit], [], orgUnitGroupIdsToAssociate);
+            };
+
             $scope.startLoading();
             return createPatientOriginsIfEnabled()
                 .then(_.partial(orgUnitRepository.upsert, opUnit))
                 .then(saveToDhis)
+                .then(_.partial(associateOrganisationUnitGroups, opUnit))
                 .then(_.partial(exitForm, opUnit))
                 .catch(onError)
                 .finally($scope.stopLoading);
         };
 
         $scope.update = function(opUnit) {
-            opUnit = _.merge(opUnit, {
-                'id': $scope.orgUnit.id,
-                'shortName': opUnit.name,
-                'level': $scope.orgUnit.level,
-                'parent': _.pick($scope.orgUnit.parent, "name", "id"),
-                "attributeValues": getAttributeValues(opUnit.type, opUnit.hospitalUnitCode)
-            });
-
-            if (!_.isUndefined(opUnit.longitude) && !_.isUndefined(opUnit.latitude)) {
-                opUnit.coordinates = "[" + opUnit.longitude + "," + opUnit.latitude + "]";
-                opUnit.featureType = "POINT";
-            }
-
-            opUnit = _.omit(opUnit, ['type', 'hospitalUnitCode', 'latitude', 'longitude']);
-
+            opUnit = orgUnitMapper.mapToOpUnitForDHIS(opUnit, $scope.orgUnit, true);
             var getModulesInOpUnit = function() {
                 return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id);
             };
@@ -143,17 +98,37 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
                     return customAttributes.getBooleanAttributeValue(module.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE);
                 });
 
+                var removeDependantOrgUnitGroup = function () {
+                   var localGroupIds =  _.map(opUnit.organisationUnitGroups, 'id');
+                    var hospitalUnitGroupSet = _.find($scope.orgUnitGroupSets, {"code": "hospital_unit_code"}),
+                        hospitalUnitGroupIds = hospitalUnitGroupSet && _.map(hospitalUnitGroupSet.organisationUnitGroups, 'id'),
+                        dependentGroupId = hospitalUnitGroupSet && customAttributes.getAttributeValue(hospitalUnitGroupSet.attributeValues, customAttributes.DEPENDENT_ORGUNITGROUP_ID);
+
+                    if(!_.contains(localGroupIds, dependentGroupId)) {
+                        _.remove(localGroupIds, function (groupId) {
+                            return _.contains(hospitalUnitGroupIds, groupId);
+                        });
+                    }
+                    return localGroupIds;
+                };
+
                 var aggregateModules = partitionedModules[1];
                 var lineListModules = partitionedModules[0];
+                var orgUnitsToAssociate = [opUnit].concat(aggregateModules);
+                var syncedOrgUnitGroupIds = _.map($scope.orgUnit.organisationUnitGroups, 'id');
+                var localOrgUnitGroupIds = removeDependantOrgUnitGroup();
 
-                if (_.isEmpty(lineListModules)) {
-                    return orgUnitGroupHelper.createOrgUnitGroups(aggregateModules, true).then(function() {
-                        return modules;
-                    });
-                }
+                var getOrigins = function () {
+                    var getOriginsFromDb = function () {
+                        return orgUnitRepository.findAllByParent(_.pluck(lineListModules, "id")).then(function(originGroups) {
+                            return orgUnitsToAssociate.concat(originGroups);
+                        });
+                    };
+                    return !_.isEmpty(lineListModules) ? getOriginsFromDb() : $q.when(orgUnitsToAssociate);
+                };
 
-                return orgUnitRepository.findAllByParent(_.pluck(lineListModules, "id")).then(function(originGroups) {
-                    return orgUnitGroupHelper.createOrgUnitGroups(aggregateModules.concat(originGroups), true).then(function() {
+                return getOrigins().then(function (orgUnitsToAssociate) {
+                    return orgUnitGroupHelper.associateOrgunitsToGroups(orgUnitsToAssociate, syncedOrgUnitGroupIds, localOrgUnitGroupIds).then(function() {
                         return modules;
                     });
                 });
@@ -298,12 +273,12 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
         });
 
         $scope.assignValue = function (value) {
-            console.info(JSON.stringify(value, undefined, 3));
-            $scope.opUnit[$scope.orgUnitGroupSets[this.$parent.$index].name] = value.title;
-            $scope.opUnit.orgUnitGroupSets[value.description.organisationUnitGroupSet.id] = {
-                id: value.description.id,
-                name: value.description.name
-            };
+            if (value) {
+                $scope.opUnit.orgUnitGroupSets[value.description.organisationUnitGroupSet.id] = {
+                    id: value.description.id,
+                    name: value.description.name
+                };
+            }
         };
 
         $scope.showOrgUnitGroupSet = function (orgUnitGroupSet) {
@@ -313,7 +288,7 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
                 return true;
             } else {
                 var isDependentGroupSelected = _.any($scope.opUnit.orgUnitGroupSets, function (orgUnitGroup, orgUnitGroupSetId) {
-                    return orgUnitGroup.id == dependentOrgUnitGroupId;
+                    return _.get(orgUnitGroup, 'id') == dependentOrgUnitGroupId;
                 });
                 return isDependentGroupSelected;
             }
@@ -334,9 +309,7 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
                     return orgUnitGroupSet;
                 });
 
-                var hospitalUnitCodes = _.find(data, {
-                    "code": "hospital_unit_code"
-                }).organisationUnitGroups;
+                var hospitalUnitCodes = _.get(_.find(data, {"code": "hospital_unit_code"}), 'organisationUnitGroups');
 
                 $scope.hospitalUnitCodes = _.map(hospitalUnitCodes, function(hospitalUnitCode) {
                     hospitalUnitCode.name = hospitalUnitCode.name.replace('Unit Code - ', '');
