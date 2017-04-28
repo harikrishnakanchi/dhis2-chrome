@@ -1,13 +1,22 @@
-define(["lodash"], function(_) {
-    return function($q, systemSettingService, excludedDataElementsRepository, orgUnitRepository) {
+define(["lodash", "moment"], function(_, moment) {
+    return function($q, dataStoreService, excludedDataElementsRepository) {
         this.run = function(message) {
             var moduleId = message.data.data;
-            var getParentProjectPromise = orgUnitRepository.getParentProject(moduleId);
-            var getExcludedDataElementsPromise = excludedDataElementsRepository.get(moduleId);
-            return $q.all([getParentProjectPromise, getExcludedDataElementsPromise]).then(function(data) {
-                var projectId = data[0].id;
-                var updatedExcludedDataElements = data[1];
-                return systemSettingService.upsertExcludedDataElements(projectId, updatedExcludedDataElements);
+            return $q.all({
+                remoteExcludedDataElements: dataStoreService.getExcludedDataElements(moduleId),
+                localExcludedDataElements: excludedDataElementsRepository.get(moduleId)
+            }).then(function (data) {
+                if (!data.remoteExcludedDataElements) {
+                    return dataStoreService.createExcludedDataElements(moduleId, data.localExcludedDataElements);
+                } else {
+                    var epoch = '1970-01-01',
+                        localTime = moment(_.get(data, 'localExcludedDataElements.clientLastUpdated', epoch)),
+                        remoteTime = moment(_.get(data, 'remoteExcludedDataElements.clientLastUpdated'));
+
+                    return localTime.isAfter(remoteTime) ?
+                        dataStoreService.updateExcludedDataElements(moduleId, data.localExcludedDataElements) :
+                        excludedDataElementsRepository.upsert(data.remoteExcludedDataElements);
+                }
             });
         };
     };
