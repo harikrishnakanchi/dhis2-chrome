@@ -219,20 +219,24 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
 
             it('should get the updated keys', function () {
                 var url = [dhisUrl.dataStore, storeNamespace].join("/");
-                var keysFromRemote = ['key1_excludedOptions', 'key2_excludedOptions'];
+                var keysFromRemote = ['key1_excludedOptions', 'key2_excludedOptions', 'key1_referralLocations', 'anotherKey'];
                 var actualKeys;
                 dataStoreService.getUpdatedKeys("lastUpdatedTime").then(function (data) {
                     actualKeys = data;
                 });
                 httpBackend.expectGET(url + "?lastUpdated=lastUpdatedTime").respond(200, keysFromRemote);
                 httpBackend.flush();
-                expect(actualKeys).toEqual(keysFromRemote);
+                expect(actualKeys).toEqual({
+                    excludedOptions: ['key1', 'key2'],
+                    referralLocations: ['key1'],
+                    anotherKey: ['anotherKey']
+                });
             });
 
             it('should return empty list if namespace is not exist', function () {
                 spyOn(http, 'get').and.returnValue(utils.getRejectedPromise(q, {errorCode: "NOT_FOUND"}));
                 dataStoreService.getUpdatedKeys().then(function (data) {
-                    expect(data).toEqual([]);
+                    expect(data).toEqual({});
                 });
             });
         });
