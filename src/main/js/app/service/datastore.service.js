@@ -34,9 +34,19 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
                 });
         };
 
+        var getDataForMultipleKeys = function (orgUnitIds, type) {
+            return _.reduce(orgUnitIds, function (result, orgUnitId) {
+                return result.then(function (previousData) {
+                    return getDataForKey(orgUnitId, type).then(function (data) {
+                        return previousData.concat(data);
+                    });
+                });
+            }, $q.when([]));
+        };
+
         this.getExcludedOptions = _.partialRight(getDataForKey, EXCLUDED_OPTIONS);
 
-        this.getReferrals = _.partialRight(getDataForKey, REFERRAL_LOCATIONS);
+        this.getReferrals = _.partialRight(getDataForMultipleKeys, REFERRAL_LOCATIONS);
 
         this.getPatientOrigins = _.partialRight(getDataForKey, PATIENT_ORIGINS);
 

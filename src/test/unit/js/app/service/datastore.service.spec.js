@@ -77,7 +77,7 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
         describe('referralLocations', function () {
             var opUnitId, storeKey, url;
             beforeEach(function () {
-                opUnitId = "someModuleId";
+                opUnitId = "someOpUnitId";
                 storeKey = opUnitId + "_referralLocations";
                 url = [dhisUrl.dataStore, storeNamespace, storeKey].join("/");
             });
@@ -96,19 +96,22 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
                 httpBackend.flush();
             });
 
-            it('should get referral locations for specified opUnit', function () {
-                dataStoreService.getReferrals(opUnitId).then(function (data) {
-                    expect(data).toEqual("mockReferrals");
+            it('should get referral locations for specified multiple opUnits', function () {
+                var opUnitIds = ["opUnit1", "opUnit2"];
+                dataStoreService.getReferrals(opUnitIds).then(function (data) {
+                    expect(data).toEqual(["mockReferralsForOpUnit1", "mockReferralsForOpUnit2"]);
                 });
 
-                httpBackend.expectGET(url).respond(200, "mockReferrals");
+                httpBackend.expectGET([dhisUrl.dataStore, storeNamespace, "opUnit1_referralLocations"].join("/")).respond(200, "mockReferralsForOpUnit1");
+                httpBackend.expectGET([dhisUrl.dataStore, storeNamespace, "opUnit2_referralLocations"].join("/")).respond(200, "mockReferralsForOpUnit2");
                 httpBackend.flush();
             });
 
             it('should return undefined if key is not exist on dhis', function () {
+                var opUnitIds = ["opUnit1", "opUnit2"];
                 spyOn(http, 'get').and.returnValue(utils.getRejectedPromise(q, {errorCode: "NOT_FOUND"}));
-                dataStoreService.getReferrals(opUnitId).then(function (data) {
-                    expect(data).toBeUndefined();
+                dataStoreService.getReferrals(opUnitIds).then(function (data) {
+                    expect(data).toEqual([undefined, undefined]);
                 });
             });
 
