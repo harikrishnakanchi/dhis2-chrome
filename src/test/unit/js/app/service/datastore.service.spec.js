@@ -132,26 +132,29 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
                 httpBackend.flush();
             });
 
-            it('should update referralLocations for specified opunit', function () {
+            it('should update patient origins for specified opunit', function () {
                 dataStoreService.updatePatientOrigins(opUnitId, {});
 
                 httpBackend.expectPUT(url, {}).respond(200);
                 httpBackend.flush();
             });
 
-            it('should get referral locations for specified opUnit', function () {
-                dataStoreService.getPatientOrigins(opUnitId).then(function (data) {
-                    expect(data).toEqual("mockPatientOrigins");
+            it('should get patient origins for specified opUnit', function () {
+                var opUnitIds = ['opUnit1', 'opUnit2'];
+                dataStoreService.getPatientOrigins(opUnitIds).then(function (data) {
+                    expect(data).toEqual(["mockOpUnitsForOpUnit1", "mockOpUnitsForOpUnit2"]);
                 });
 
-                httpBackend.expectGET(url).respond(200, "mockPatientOrigins");
+                httpBackend.expectGET([dhisUrl.dataStore, storeNamespace, "opUnit1_patientOrigins"].join("/")).respond(200, "mockOpUnitsForOpUnit1");
+                httpBackend.expectGET([dhisUrl.dataStore, storeNamespace, "opUnit2_patientOrigins"].join("/")).respond(200, "mockOpUnitsForOpUnit2");
                 httpBackend.flush();
             });
 
             it('should return undefined if key is not exist on dhis', function () {
+                var opUnitIds = ['opUnit1', 'opUnit2'];
                 spyOn(http, 'get').and.returnValue(utils.getRejectedPromise(q, {errorCode: "NOT_FOUND"}));
-                dataStoreService.getPatientOrigins(opUnitId).then(function (data) {
-                    expect(data).toBeUndefined();
+                dataStoreService.getPatientOrigins(opUnitIds).then(function (data) {
+                    expect(data).toEqual([undefined, undefined]);
                 });
             });
 

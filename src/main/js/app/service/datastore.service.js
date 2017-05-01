@@ -48,7 +48,7 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
 
         this.getReferrals = _.partialRight(getDataForMultipleKeys, REFERRAL_LOCATIONS);
 
-        this.getPatientOrigins = _.partialRight(getDataForKey, PATIENT_ORIGINS);
+        this.getPatientOrigins = _.partialRight(getDataForMultipleKeys, PATIENT_ORIGINS);
 
         this.getExcludedDataElements = _.partialRight(getDataForMultipleKeys, EXCLUDED_DATA_ELEMENTS);
 
