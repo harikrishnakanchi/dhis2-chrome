@@ -50,7 +50,7 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
 
         this.getPatientOrigins = _.partialRight(getDataForKey, PATIENT_ORIGINS);
 
-        this.getExcludedDataElements = _.partialRight(getDataForKey, EXCLUDED_DATA_ELEMENTS);
+        this.getExcludedDataElements = _.partialRight(getDataForMultipleKeys, EXCLUDED_DATA_ELEMENTS);
 
         this.getUpdatedKeys = function (lastUpdated) {
             var transformData = function (keys) {
