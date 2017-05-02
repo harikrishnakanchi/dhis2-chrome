@@ -1,9 +1,10 @@
-define(["moment", "dateUtils", "lodash", "orgUnitMapper", "excelBuilder", "constants"], function(moment, dateUtils, _, orgUnitMapper, excelBuilder, constants) {
+define(["moment", "dateUtils", "lodash", "orgUnitMapper", "excelBuilder", "constants", "customAttributes"], function(moment, dateUtils, _, orgUnitMapper, excelBuilder, constants, customAttributes) {
     return function($rootScope, $q, $scope, orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService, pivotTableExportBuilder) {
         $scope.selectedProject = $rootScope.currentUser.selectedProject;
 
         var REPORTS_LAST_UPDATED_TIME_FORMAT = constants.TIME_FORMAT_12HR,
-            REPORTS_LAST_UPDATED_TIME_24HR_FORMAT = constants.TIME_FORMAT_24HR;
+            REPORTS_LAST_UPDATED_TIME_24HR_FORMAT = constants.TIME_FORMAT_24HR,
+            ORG_UNIT_LEVEL_FOR_PROJECT = 4;
 
         var buildSpreadSheetContent = function () {
             var EMPTY_ROW = [];
@@ -55,76 +56,40 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper", "excelBuilder", "const
             filesystemService.promptAndWriteFile(filename, excelBuilder.createWorkBook(buildSpreadSheetContent()), filesystemService.FILE_TYPE_OPTIONS.XLSX);
         };
 
-        var parseProjectAttributes = function(dhisProject) {
-            var mapToProjectLabel = {
-                name: $scope.resourceBundle.nameLabel,
-                projectCode: $scope.resourceBundle.projectCodeLabel,
-                projectType: $scope.resourceBundle.projectTypeLabel,
-                context: $scope.resourceBundle.contextLabel,
-                populationType: $scope.resourceBundle.typeOfPopulationLabel,
-                reasonForIntervention: $scope.resourceBundle.reasonForInterventionLabel,
-                modeOfOperation: $scope.resourceBundle.modeOfOperationLabel,
-                modelOfManagement: $scope.resourceBundle.modelOfManagementLabel,
-                openingDate: $scope.resourceBundle.openingDateLabel,
-                endDate: $scope.resourceBundle.endDateLabel
-            };
+        var parseProjectAttributes = function (dhisProject, parent, orgUnitGroupSetsForProject) {
+            var projectAttributes = [
+                {name: $scope.resourceBundle.country, value: parent.name},
+                {name: $scope.resourceBundle.nameLabel, value: dhisProject.name},
+                {name: $scope.resourceBundle.projectCodeLabel, value: dhisProject.projectCode},
+                {name: $scope.resourceBundle.openingDateLabel, value: dhisProject.openingDate.toLocaleDateString()},
+                {name: $scope.resourceBundle.endDateLabel, value: (dhisProject.endDate && dhisProject.endDate.toLocaleDateString()) || ""}];
 
-            var getProjectMapping = function(orgUnitGroupSets) {
-                var addDefaultNameToAttribute = function (orgUnitGroups) {
-                    return _.map(orgUnitGroups, function (orgUnitGroup) {
-                        var defaultName = {
-                            englishName: orgUnitGroup.name
-                        };
-
-                        return _.assign(orgUnitGroup, defaultName);
-                    });
+            var orgUnitGroups = _.map(orgUnitGroupSetsForProject, function (orgUnitGroupSet) {
+                return {
+                    name: orgUnitGroupSet.name,
+                    value: dhisProject.orgUnitGroupSets[orgUnitGroupSet.id].name || ""
                 };
-
-                var getTranslations = function (code) {
-                    var orgUnitGroups = _.find(orgUnitGroupSets, "code", code).organisationUnitGroups;
-                    orgUnitGroups = addDefaultNameToAttribute(orgUnitGroups);
-                    return translationsService.translate(orgUnitGroups);
-                };
-
-                var allContexts = _.sortBy(getTranslations("context"), "name");
-                var allPopTypes = _.sortBy(getTranslations("type_of_population"), "name");
-                var reasonForIntervention = _.sortBy(getTranslations("reason_for_intervention"), "name");
-                var modeOfOperation = _.sortBy(getTranslations("mode_of_operation"), "name");
-                var modelOfManagement = _.sortBy(getTranslations("model_of_management"), "name");
-                var allProjectTypes = _.sortBy(getTranslations("project_type"), "name");
-
-                return orgUnitMapper.mapToProject(dhisProject, allContexts, allPopTypes, reasonForIntervention, modeOfOperation, modelOfManagement, allProjectTypes);
-            };
-
-            var getProjectAttributes = function(projectMapping) {
-                var countryLabel = $scope.resourceBundle.country;
-                var projectAttributes = [{name: countryLabel, value: dhisProject.parent.name}];
-
-                _.each(mapToProjectLabel, function (value, key) {
-                    if(key == 'openingDate') projectMapping[key] = projectMapping[key].toLocaleDateString();
-                    if(key == 'endDate') projectMapping[key] = projectMapping[key] ? projectMapping[key].toLocaleDateString() : "";
-                    
-                    var projectAttribute = {
-                        name: value,
-                        value: projectMapping[key] && projectMapping[key].name ? projectMapping[key].name : projectMapping[key]
-                    };
-                    projectAttributes.push(projectAttribute);
-                });
-
-                return projectAttributes;
-            };
-
-            orgUnitGroupSetRepository.getAll()
-                .then(getProjectMapping)
-                .then(getProjectAttributes)
-                .then(function (projectAttribute) {
-                    $scope.projectAttributes = projectAttribute;
-                });
+            });
+            $scope.projectAttributes = projectAttributes.concat(orgUnitGroups);
         };
 
-        var loadProjectBasicInfo = function() {
-            return orgUnitRepository.get($scope.selectedProject.id)
-                .then(parseProjectAttributes);
+        var getOrgUnitGroupsets = function () {
+            return orgUnitGroupSetRepository.getAll().then(function (orgUnitGroupSets) {
+                return _.filter(orgUnitGroupSets, function (orgUnitGroupSet) {
+                    var orgUnitGroupSetLevel = customAttributes.getAttributeValue(orgUnitGroupSet.attributeValues, customAttributes.ORG_UNIT_GROUP_SET_LEVEL);
+                    return orgUnitGroupSetLevel == ORG_UNIT_LEVEL_FOR_PROJECT;
+                });
+            });
+        };
+
+        var loadProjectBasicInfo = function () {
+            return $q.all({
+                project: orgUnitRepository.get($scope.selectedProject.id),
+                orgUnitGroupSetsForProject: getOrgUnitGroupsets()
+            }).then(function (data) {
+                var project = orgUnitMapper.mapOrgUnitToProject(data.project, data.orgUnitGroupSetsForProject);
+                parseProjectAttributes(project, data.project.parent, data.orgUnitGroupSetsForProject);
+            });
         };
 
         var filterProjectReportTables = function(tables) {
