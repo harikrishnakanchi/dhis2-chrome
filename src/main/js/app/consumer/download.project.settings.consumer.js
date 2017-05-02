@@ -5,15 +5,17 @@ define(["lodash", "moment"], function(_, moment) {
             var remoteUpdatedKeysPromise = projectIdsPromise.then(getChangeLog).then(dataStoreService.getUpdatedKeys);
             var localOpUnitAndModuleIdsPromise = projectIdsPromise.then(getModuleAndOpUnitIds);
             return $q.all([remoteUpdatedKeysPromise, localOpUnitAndModuleIdsPromise]).then(function (data) {
+                var moduleIds = _.last(data).moduleIds;
                 var opUnitIds = _.last(data).opUnitIds;
                 var updatedKeys = _.first(data);
-                return mergeAndSaveReferralLocations(opUnitIds, updatedKeys.referralLocations);
+                return mergeAndSaveReferralLocations(opUnitIds, updatedKeys.referralLocations)
+                    .then(_.partial(mergeAndSaveExcludedDataElements, moduleIds, updatedKeys.excludedDataElements));
             }).then(function () {
                 return projectIdsPromise
                     .then(downloadAndMergeExcludedOptions)
                     .then(downloadedProjectSettings)
                     .then(function(projectSettings) {
-                        return $q.all([mergeAndSavePatientOriginDetails(projectSettings), saveExcludedDataElements(projectSettings)]);
+                        return mergeAndSavePatientOriginDetails(projectSettings);
                     });
             }).catch(function (err) {
                 return err === 'noProjectIds' ? $q.when() : $q.reject(err);
@@ -66,18 +68,19 @@ define(["lodash", "moment"], function(_, moment) {
             });
         };
 
+        var merge = function (remoteCollection, localCollection) {
+            var equalPredicate = function(itemA, itemB) {
+                return itemA && itemB && itemA.orgUnit === itemB.orgUnit;
+            };
+
+            return $q.when(mergeBy.lastUpdated({"remoteTimeField": "clientLastUpdated", "localTimeField": "clientLastUpdated", "eq": equalPredicate}, remoteCollection, localCollection));
+        };
+
         var mergeAndSaveReferralLocations = function (localOpUnitIds, remoteOpUnitIds) {
             var opUnitIdsToMerge = _.intersection(localOpUnitIds, remoteOpUnitIds);
             return $q.all([referralLocationsRepository.findAll(opUnitIdsToMerge), dataStoreService.getReferrals(opUnitIdsToMerge)]).then(function (data) {
                 var localReferrals = data[0];
                 var remoteReferrals = data[1];
-                var merge = function (remoteReferrals, localReferrals) {
-                    var equalPredicate = function(referralLocation1, referralLocation2) {
-                        return referralLocation1 && referralLocation2 && referralLocation1.orgUnit === referralLocation2.orgUnit;
-                    };
-
-                    return $q.when(mergeBy.lastUpdated({"remoteTimeField": "clientLastUpdated", "localTimeField": "clientLastUpdated", "eq": equalPredicate}, remoteReferrals, localReferrals));
-                };
                 return merge(remoteReferrals, localReferrals).then(referralLocationsRepository.upsert);
             });
         };
@@ -122,17 +125,15 @@ define(["lodash", "moment"], function(_, moment) {
                 .then(updatePatientOrigins);
         };
 
-        var saveExcludedDataElements = function(projectSettings) {
-            var excludedDataElements = _.transform(projectSettings, function(result, settings) {
-                _.each(settings.excludedDataElements, function(item) {
-                    result.push(item);
-                });
-            }, []);
+        var mergeAndSaveExcludedDataElements = function (localModuleIds, remoteModuleIds) {
+            var moduleIdsToMerge = _.intersection(localModuleIds, remoteModuleIds);
 
-            if (_.isEmpty(excludedDataElements))
-                return;
-
-            return excludedDataElementsRepository.upsert(excludedDataElements);
+            return $q.all([excludedDataElementsRepository.findAll(moduleIdsToMerge), dataStoreService.getExcludedDataElements(moduleIdsToMerge)])
+                .then(function (data) {
+                var localExcludedDataElements = data[0];
+                var remoteExcludedDataElements = data[1];
+                return merge(remoteExcludedDataElements, localExcludedDataElements).then(excludedDataElementsRepository.upsert);
+            });
         };
 
     };

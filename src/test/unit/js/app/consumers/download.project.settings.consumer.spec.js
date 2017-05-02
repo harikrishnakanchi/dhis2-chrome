@@ -1,6 +1,6 @@
 define(["angularMocks", "utils", "systemSettingService", "userPreferenceRepository", "referralLocationsRepository", "patientOriginRepository", "excludedDataElementsRepository", "downloadProjectSettingsConsumer", "mergeBy", "excludedLinelistOptionsMerger", "changeLogRepository", "dataStoreService", "orgUnitRepository"],
-    function(mocks, utils, SystemSettingService, UserPreferenceRepository, ReferralLocationsRepository, PatientOriginRepository, ExcludedDataElementsRepository, DownloadProjectSettingsConsumer, MergeBy, ExcludedLinelistOptionsMerger, ChangeLogRepository, DataStoreService, OrgUnitRepository) {
-        describe("downloadProjectSettingsConsumer", function() {
+    function (mocks, utils, SystemSettingService, UserPreferenceRepository, ReferralLocationsRepository, PatientOriginRepository, ExcludedDataElementsRepository, DownloadProjectSettingsConsumer, MergeBy, ExcludedLinelistOptionsMerger, ChangeLogRepository, DataStoreService, OrgUnitRepository) {
+        describe("downloadProjectSettingsConsumer", function () {
             var consumer,
                 systemSettingService,
                 referralLocationsRepository,
@@ -15,7 +15,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 changeLogRepository,
                 dataStoreService;
 
-            beforeEach(mocks.inject(function($q, $rootScope, $log) {
+            beforeEach(mocks.inject(function ($q, $rootScope, $log) {
 
                 q = $q;
                 scope = $rootScope.$new();
@@ -36,6 +36,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
 
                 excludedDataElementsRepository = new ExcludedDataElementsRepository();
                 spyOn(excludedDataElementsRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
+                spyOn(excludedDataElementsRepository, "findAll").and.returnValue(utils.getPromise(q, []));
 
                 excludedLinelistOptionsMerger = new ExcludedLinelistOptionsMerger();
                 spyOn(excludedLinelistOptionsMerger, 'mergeAndSaveForProject').and.returnValue(utils.getPromise(q, undefined));
@@ -46,6 +47,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 dataStoreService = new DataStoreService({});
                 spyOn(dataStoreService, "getUpdatedKeys").and.returnValue(utils.getPromise(q, {}));
                 spyOn(dataStoreService, "getReferrals").and.returnValue(utils.getPromise(q, []));
+                spyOn(dataStoreService, "getExcludedDataElements").and.returnValue(utils.getPromise(q, []));
 
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, 'getAllModulesInOrgUnits').and.returnValue(utils.getPromise(q, []));
@@ -56,7 +58,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 consumer = new DownloadProjectSettingsConsumer(q, systemSettingService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository, excludedDataElementsRepository, mergeBy, excludedLinelistOptionsMerger, changeLogRepository, dataStoreService, orgUnitRepository);
             }));
 
-            it("should download project settings for current user projects", function() {
+            it("should download project settings for current user projects", function () {
                 userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1', 'prj2']));
 
                 consumer.run();
@@ -96,11 +98,12 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
             });
 
             describe('referralLocations', function () {
-                it('should download referralLocations only relevant to current project ids', function () {
+                beforeEach(function () {
                     userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1']));
                     dataStoreService.getUpdatedKeys.and.returnValue(utils.getPromise(q, {referralLocations: ["opUnit1", "opUnit2"]}));
                     orgUnitRepository.getAllOpUnitsInOrgUnits.and.returnValue(utils.getPromise(q, [{id: "opUnit1"}]));
-
+                });
+                it('should download referralLocations only relevant to current project ids', function () {
                     consumer.run();
                     scope.$apply();
 
@@ -108,10 +111,6 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 });
 
                 it('should get local referral locations only relevant to current project ids', function () {
-                    userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1']));
-                    dataStoreService.getUpdatedKeys.and.returnValue(utils.getPromise(q, {referralLocations: ["opUnit1", "opUnit2"]}));
-                    orgUnitRepository.getAllOpUnitsInOrgUnits.and.returnValue(utils.getPromise(q, [{id: "opUnit1"}]));
-
                     consumer.run();
                     scope.$apply();
 
@@ -158,7 +157,52 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 });
             });
 
-            it("should download project settings and save patient origin details", function() {
+            describe('excludedDataElements', function () {
+                beforeEach(function () {
+                    userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1']));
+                    dataStoreService.getUpdatedKeys.and.returnValue(utils.getPromise(q, {excludedDataElements: ["mod1", "mod2"]}));
+                    orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [{id: "mod1"}]));
+                });
+                it('should download excluded data elements only relevant to current project ids', function () {
+                    consumer.run();
+                    scope.$apply();
+
+                    expect(dataStoreService.getExcludedDataElements).toHaveBeenCalledWith(["mod1"]);
+                });
+
+                it('should get local excluded data elements', function () {
+                    consumer.run();
+                    scope.$apply();
+
+                    expect(excludedDataElementsRepository.findAll).toHaveBeenCalledWith(["mod1"]);
+                });
+
+                it('should merge based on lastUpdated time', function () {
+                    var mockRemoteExcludedDataElements = [{
+                        "orgUnit": "opUnit1",
+                        "clientLastUpdated": "2015-07-17T07:00:00.000Z"
+                    }, {
+                        "orgUnit": "opUnit2",
+                        "clientLastUpdated": "2015-07-18T07:00:00.000Z"
+                    }];
+
+                    var localExcludedDataElements = [{
+                        "orgUnit": "opUnit1",
+                        "dataElements": [{id: "someId"}],
+                        "clientLastUpdated": "2015-07-17T08:00:00.000Z"
+                    }];
+                    orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [{id: "mod1"}, {id: "mod2"}]));
+                    dataStoreService.getExcludedDataElements.and.returnValue(utils.getPromise(q, mockRemoteExcludedDataElements));
+                    excludedDataElementsRepository.findAll.and.returnValue(utils.getPromise(q, localExcludedDataElements));
+                    consumer.run();
+                    scope.$apply();
+
+                    var expectedPayload = [localExcludedDataElements[0], mockRemoteExcludedDataElements[1]];
+                    expect(excludedDataElementsRepository.upsert).toHaveBeenCalledWith(expectedPayload);
+                });
+            });
+
+            it("should download project settings and save patient origin details", function () {
                 var userCurrentProjects = ['prj', 'prjWithNoPatientOriginDetails'];
                 userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, userCurrentProjects));
 
@@ -197,7 +241,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 expect(patientOriginRepository.upsert).toHaveBeenCalledWith(expectedPayload);
             });
 
-            it("should merge patient origin details with local patient origin details based on clientLastUpdated time", function() {
+            it("should merge patient origin details with local patient origin details based on clientLastUpdated time", function () {
                 var userCurrentProjects = ['prj'];
                 userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, userCurrentProjects));
 
@@ -272,46 +316,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 expect(patientOriginRepository.get.calls.argsFor(1)).toEqual(["opUnit2"]);
             });
 
-            it("should download project settings and save excluded data element details", function() {
-                var userCurrentProjects = ['prj', 'prjWithNoExcludedDataElements'];
-                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, userCurrentProjects));
-
-                var projectSettingsFromDhis = {
-                    "prjWithNoExcludedDataElements": {
-                        "patientOrigins": []
-                    },
-                    "prj": {
-                        "excludedDataElements": [{
-                            "orgUnit": "mod1",
-                            "dataElements": [{
-                                "id": "de1"
-                            }, {
-                                "id": "de2"
-                            }],
-                            "clientLastUpdated": "2014-05-30T12:43:54.972Z"
-                        }],
-                        "patientOrigins": []
-                    }
-                };
-                systemSettingService.getProjectSettings.and.returnValue(utils.getPromise(q, projectSettingsFromDhis));
-
-                consumer.run();
-                scope.$apply();
-
-                var expectedPayload = [{
-                    "orgUnit": "mod1",
-                    "dataElements": [{
-                        "id": "de1"
-                    }, {
-                        "id": "de2"
-                    }],
-                    "clientLastUpdated": "2014-05-30T12:43:54.972Z"
-                }];
-
-                expect(excludedDataElementsRepository.upsert).toHaveBeenCalledWith(expectedPayload);
-            });
-
-            it("should not fail if current user projects are not available", function() {
+            it("should not fail if current user projects are not available", function () {
                 userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, undefined));
 
                 consumer.run();
