@@ -1,22 +1,27 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function($q, systemSettingService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository, excludedDataElementsRepository, mergeBy, excludedLinelistOptionsMerger, changeLogRepository, dataStoreService, orgUnitRepository) {
-        this.run = function() {
-            var projectIdsPromise = getUserProjectIds();
+    return function($q, systemInfoService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository, excludedDataElementsRepository, mergeBy, excludedLinelistOptionsMerger, changeLogRepository, dataStoreService, orgUnitRepository) {
+        this.run = function () {
+            var systemTimePromise = systemInfoService.getServerDate();
+            var projectIdsPromise = systemTimePromise.then(getUserProjectIds);
             var remoteUpdatedKeysPromise = projectIdsPromise.then(getChangeLog).then(dataStoreService.getUpdatedKeys);
             var localOpUnitAndModuleIdsPromise = projectIdsPromise.then(getModuleAndOpUnitIds);
 
-            return $q.all([remoteUpdatedKeysPromise, localOpUnitAndModuleIdsPromise]).then(function (data) {
-                var moduleIds = _.last(data).moduleIds;
-                var opUnitIds = _.last(data).opUnitIds;
-                var updatedKeys = _.first(data);
-                return mergeAndSaveReferralLocations(opUnitIds, updatedKeys.referralLocations)
-                    .then(_.partial(mergeAndSaveExcludedDataElements, moduleIds, updatedKeys.excludedDataElements))
-                    .then(_.partial(mergeAndSavePatientOrigins, opUnitIds, updatedKeys.patientOrigins));
-            }).then(function () {
-                return projectIdsPromise.then(downloadAndMergeExcludedOptions);
-            }).catch(function (err) {
-                return err === 'noProjectIds' ? $q.when() : $q.reject(err);
-            });
+            return $q.all([remoteUpdatedKeysPromise, localOpUnitAndModuleIdsPromise])
+                .then(function (data) {
+                    var moduleIds = _.last(data).moduleIds;
+                    var opUnitIds = _.last(data).opUnitIds;
+                    var updatedKeys = _.first(data);
+                    return mergeAndSaveReferralLocations(opUnitIds, updatedKeys.referralLocations)
+                        .then(_.partial(mergeAndSaveExcludedDataElements, moduleIds, updatedKeys.excludedDataElements))
+                        .then(_.partial(mergeAndSavePatientOrigins, opUnitIds, updatedKeys.patientOrigins));
+                })
+                .then(_.partial(projectIdsPromise.then.bind(projectIdsPromise), downloadAndMergeExcludedOptions))
+                .then(function () {
+                    return projectIdsPromise.then(_.curry(updateChangeLog)).then(systemTimePromise.then.bind(systemTimePromise));
+                })
+                .catch(function (err) {
+                    return err === 'noProjectIds' ? $q.when() : $q.reject(err);
+                });
         };
 
         var getUserProjectIds = function() {
@@ -50,12 +55,16 @@ define(["lodash", "moment"], function(_, moment) {
             })).then(_.compact).then(getMinimumValue);
         };
 
+        var updateChangeLog = function (projectIds, time) {
+            return $q.all(_.map(projectIds, function (projectId) {
+                return changeLogRepository.upsert("projectSettings:" + projectId, time);
+            }));
+        };
+
         var downloadAndMergeExcludedOptions = function (projectIds) {
             return _.reduce(projectIds, function (promise, projectId) {
                 return promise.then(_.partial(excludedLinelistOptionsMerger.mergeAndSaveForProject, projectId));
-            }, $q.when()).then(function () {
-                return projectIds;
-            });
+            }, $q.when());
         };
 
         var merge = function (remoteCollection, localCollection) {

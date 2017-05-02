@@ -1,5 +1,5 @@
-define(["angularMocks", "utils", "systemSettingService", "userPreferenceRepository", "referralLocationsRepository", "patientOriginRepository", "excludedDataElementsRepository", "downloadProjectSettingsConsumer", "mergeBy", "excludedLinelistOptionsMerger", "changeLogRepository", "dataStoreService", "orgUnitRepository"],
-    function (mocks, utils, SystemSettingService, UserPreferenceRepository, ReferralLocationsRepository, PatientOriginRepository, ExcludedDataElementsRepository, DownloadProjectSettingsConsumer, MergeBy, ExcludedLinelistOptionsMerger, ChangeLogRepository, DataStoreService, OrgUnitRepository) {
+define(["angularMocks", "utils", "systemSettingService", "userPreferenceRepository", "referralLocationsRepository", "patientOriginRepository", "excludedDataElementsRepository", "downloadProjectSettingsConsumer", "mergeBy", "excludedLinelistOptionsMerger", "changeLogRepository", "dataStoreService", "orgUnitRepository", "systemInfoService"],
+    function (mocks, utils, SystemSettingService, UserPreferenceRepository, ReferralLocationsRepository, PatientOriginRepository, ExcludedDataElementsRepository, DownloadProjectSettingsConsumer, MergeBy, ExcludedLinelistOptionsMerger, ChangeLogRepository, DataStoreService, OrgUnitRepository, SystemInfoService) {
         describe("downloadProjectSettingsConsumer", function () {
             var consumer,
                 systemSettingService,
@@ -13,7 +13,8 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 mergeBy,
                 excludedLinelistOptionsMerger,
                 changeLogRepository,
-                dataStoreService;
+                dataStoreService,
+                systemInfoService;
 
             beforeEach(mocks.inject(function ($q, $rootScope, $log) {
 
@@ -44,6 +45,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
 
                 changeLogRepository = new ChangeLogRepository();
                 spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, "2017-05-01T19:10:13.677Z"));
+                spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, ""));
 
                 dataStoreService = new DataStoreService({});
                 spyOn(dataStoreService, "getUpdatedKeys").and.returnValue(utils.getPromise(q, {}));
@@ -55,9 +57,12 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 spyOn(orgUnitRepository, 'getAllModulesInOrgUnits').and.returnValue(utils.getPromise(q, []));
                 spyOn(orgUnitRepository, 'getAllOpUnitsInOrgUnits').and.returnValue(utils.getPromise(q, []));
 
+                systemInfoService = new SystemInfoService();
+                spyOn(systemInfoService, 'getServerDate').and.returnValue(utils.getPromise(q, 'someTime'));
+
                 mergeBy = new MergeBy($log);
 
-                consumer = new DownloadProjectSettingsConsumer(q, systemSettingService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository, excludedDataElementsRepository, mergeBy, excludedLinelistOptionsMerger, changeLogRepository, dataStoreService, orgUnitRepository);
+                consumer = new DownloadProjectSettingsConsumer(q, systemInfoService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository, excludedDataElementsRepository, mergeBy, excludedLinelistOptionsMerger, changeLogRepository, dataStoreService, orgUnitRepository);
             }));
 
             it('should get changeLogs for all projectIds', function () {
@@ -281,6 +286,25 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
 
                 expect(excludedLinelistOptionsMerger.mergeAndSaveForProject.calls.argsFor(0)).toContain('prj1');
                 expect(excludedLinelistOptionsMerger.mergeAndSaveForProject.calls.argsFor(1)).toContain('prj2');
+            });
+
+            it('should get server date from system info', function () {
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1']));
+
+                consumer.run();
+                scope.$apply();
+
+                expect(systemInfoService.getServerDate).toHaveBeenCalled();
+            });
+
+            it('should update the changeLog for all projectIds', function () {
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1', 'prj2']));
+
+                consumer.run();
+                scope.$apply();
+
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith("projectSettings:prj1", "someTime");
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith("projectSettings:prj2", "someTime");
             });
         });
     });
