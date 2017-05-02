@@ -77,9 +77,14 @@ define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "custo
             return _.flatten(periodAndOrgUnits);
         };
 
+        var getProjectOrgUnitGroupIds = function (newOrgUnit) {
+            return _.compact(_.map(newOrgUnit.orgUnitGroupSets, 'id'));
+        };
+
         $scope.update = function(newOrgUnit, orgUnit) {
 
-            var syncedOrgUnitGroupIds = _.pluck(orgUnit.organisationUnitGroups, 'id');
+            var syncedOrgUnitGroupIds = _.pluck(orgUnit.organisationUnitGroups, 'id'),
+                localOrgUnitGroupIds = getProjectOrgUnitGroupIds(newOrgUnit);
 
             var dhisProject = orgUnitMapper.mapToExistingProject(newOrgUnit, orgUnit);
 
@@ -89,7 +94,9 @@ define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "custo
 
             var createOrgUnitGroups = function(modules) {
                 if (_.isEmpty(modules))
-                    return;
+                    return orgUnitGroupHelper.associateOrgunitsToGroups([dhisProject], syncedOrgUnitGroupIds, localOrgUnitGroupIds).then(function() {
+                        return modules;
+                    });
 
                 var partitionedModules = _.partition(modules, function(module) {
                     return customAttributes.getBooleanAttributeValue(module.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE);
@@ -111,7 +118,6 @@ define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "custo
                 };
 
                 return getOrgUnitsToAssociate().then(function (orgUnitsToBeAssociated) {
-                    var localOrgUnitGroupIds = getProjectOrgUnitGroupIds(newOrgUnit);
                     return orgUnitGroupHelper.associateOrgunitsToGroups(orgUnitsToBeAssociated, syncedOrgUnitGroupIds, localOrgUnitGroupIds).then(function() {
                         return modules;
                     });
@@ -123,12 +129,6 @@ define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "custo
                 .then(getModulesInProject)
                 .then(createOrgUnitGroups)
                 .finally($scope.stopLoading);
-        };
-
-        var getProjectOrgUnitGroupIds = function (newOrgUnit) {
-            return _.transform(newOrgUnit.orgUnitGroupSets, function (acc, orgUniGroup, orgUniGroupSetId) {
-                acc.push(orgUniGroup.id);
-            }, []);
         };
 
         $scope.save = function(newOrgUnit, parentOrgUnit) {

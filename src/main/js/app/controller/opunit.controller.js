@@ -86,37 +86,41 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
 
         $scope.update = function(opUnit) {
             opUnit = orgUnitMapper.mapToOpUnitForDHIS(opUnit, $scope.orgUnit, true);
+
+            var removeDependantOrgUnitGroup = function () {
+                var localGroupIds =  _.map(opUnit.organisationUnitGroups, 'id');
+                var hospitalUnitGroupSet = _.find($scope.orgUnitGroupSets, {"code": "hospital_unit_code"}),
+                    hospitalUnitGroupIds = hospitalUnitGroupSet && _.map(hospitalUnitGroupSet.organisationUnitGroups, 'id'),
+                    dependentGroupId = hospitalUnitGroupSet && customAttributes.getAttributeValue(hospitalUnitGroupSet.attributeValues, customAttributes.DEPENDENT_ORGUNITGROUP_ID);
+
+                if(!_.contains(localGroupIds, dependentGroupId)) {
+                    _.remove(localGroupIds, function (groupId) {
+                        return _.contains(hospitalUnitGroupIds, groupId);
+                    });
+                }
+                return localGroupIds;
+            };
+
+            var syncedOrgUnitGroupIds = _.map($scope.orgUnit.organisationUnitGroups, 'id'),
+                localOrgUnitGroupIds = removeDependantOrgUnitGroup();
+
             var getModulesInOpUnit = function() {
                 return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id);
             };
 
             var createOrgUnitGroups = function(modules) {
                 if (_.isEmpty(modules))
-                    return;
+                    return orgUnitGroupHelper.associateOrgunitsToGroups([opUnit], syncedOrgUnitGroupIds, localOrgUnitGroupIds).then(function() {
+                        return modules;
+                    });
 
                 var partitionedModules = _.partition(modules, function(module) {
                     return customAttributes.getBooleanAttributeValue(module.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE);
                 });
 
-                var removeDependantOrgUnitGroup = function () {
-                   var localGroupIds =  _.map(opUnit.organisationUnitGroups, 'id');
-                    var hospitalUnitGroupSet = _.find($scope.orgUnitGroupSets, {"code": "hospital_unit_code"}),
-                        hospitalUnitGroupIds = hospitalUnitGroupSet && _.map(hospitalUnitGroupSet.organisationUnitGroups, 'id'),
-                        dependentGroupId = hospitalUnitGroupSet && customAttributes.getAttributeValue(hospitalUnitGroupSet.attributeValues, customAttributes.DEPENDENT_ORGUNITGROUP_ID);
-
-                    if(!_.contains(localGroupIds, dependentGroupId)) {
-                        _.remove(localGroupIds, function (groupId) {
-                            return _.contains(hospitalUnitGroupIds, groupId);
-                        });
-                    }
-                    return localGroupIds;
-                };
-
                 var aggregateModules = partitionedModules[1];
                 var lineListModules = partitionedModules[0];
                 var orgUnitsToAssociate = [opUnit].concat(aggregateModules);
-                var syncedOrgUnitGroupIds = _.map($scope.orgUnit.organisationUnitGroups, 'id');
-                var localOrgUnitGroupIds = removeDependantOrgUnitGroup();
 
                 var getOrigins = function () {
                     var getOriginsFromDb = function () {
