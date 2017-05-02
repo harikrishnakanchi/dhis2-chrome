@@ -44,7 +44,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             scope.stopLoading = jasmine.createSpy('stopLoading');
 
             orgUnitGroupHelper = new OrgUnitGroupHelper();
-            spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
+            spyOn(orgUnitGroupHelper, "associateModuleAndOriginsToGroups");
 
             patientOriginRepository = new PatientOriginRepository();
             spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, {}));

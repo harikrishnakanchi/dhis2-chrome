@@ -78,7 +78,7 @@ define(["lodash", "moment", "dhisId","interpolate", "orgUnitMapper", "customAttr
 
                 var createOrgUnitGroups = function() {
                     if (!_.isEmpty(orgUnitsForGroups))
-                        return orgUnitGroupHelper.createOrgUnitGroups(orgUnitsForGroups, false);
+                        return orgUnitGroupHelper.associateModuleAndOriginsToGroups(orgUnitsForGroups);
                 };
 
                 var createOrgUnits = function (module) {
