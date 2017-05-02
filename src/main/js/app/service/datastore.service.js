@@ -86,6 +86,46 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
                 });
         };
 
+        this.getUpdatedData = function (projectIds, lastUpdated) {
+            var filterKeysForProjects = function (keys) {
+                return _.filter(keys, function (key) {
+                    var projectId = _.first(key.split("_"));
+                    return _.includes(projectIds, projectId);
+                });
+            };
+
+            var filterKeysOfType = function (keys, type) {
+                return _.filter(keys, function (key) {
+                    return _.includes(type, _.last(key.split("_")));
+                });
+            };
+
+            var downloadDataForEachType = function (keys) {
+                var types = [EXCLUDED_DATA_ELEMENTS, EXCLUDED_OPTIONS, REFERRAL_LOCATIONS, PATIENT_ORIGINS];
+                var formattedTypes = _.map(types, function (type) {
+                    return _.last(type.split("_"));
+                });
+                return _.reduce(formattedTypes, function (result, type) {
+                    var filteredKeys = filterKeysOfType(keys, type);
+                    return result.then(function (previousData) {
+                        return getDataForMultipleKeys(filteredKeys).then(function (data) {
+                            previousData[type] = data;
+                            return previousData;
+                        });
+                    });
+                }, $q.when({}));
+            };
+
+            var url = [dhisUrl.dataStore, NAMESPACE].join("/");
+            return $http.get(url, { params: { lastUpdated: lastUpdated } })
+                .then(_.property('data'))
+                .then(filterKeysForProjects)
+                .then(downloadDataForEachType)
+                .catch(function (response) {
+                    return response.errorCode === constants.errorCodes.NOT_FOUND ? {} : $q.reject();
+                });
+        };
+
         this.getKeysForExcludedOptions = function (projectId) {
             return this.getUpdatedKeys([projectId]).then(function (allKeys) {
                 return _.map(allKeys[_.tail(EXCLUDED_OPTIONS).join("")], function (key) {

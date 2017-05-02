@@ -248,7 +248,52 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
                 spyOn(http, 'get').and.returnValue(utils.getRejectedPromise(q, {errorCode: "NOT_FOUND"}));
                 dataStoreService.getUpdatedKeys().then(function (data) {
                     expect(data).toEqual({});
+                }, fail);
+            });
+        });
+
+        describe('getUpdatedData', function () {
+            var projectIds, keysFromRemote, url;
+            beforeEach(function () {
+                projectIds = ["prj1", "prj2"];
+                keysFromRemote = ['prj1_key1_excludedOptions', 'prj3_key2_excludedOptions', 'prj2_key2_referralLocations'];
+                url = [dhisUrl.dataStore, storeNamespace].join("/");
+                httpBackend.whenGET(url + "?lastUpdated=lastUpdatedTime").respond(200, keysFromRemote);
+                httpBackend.whenGET([dhisUrl.dataStore, storeNamespace, "prj1_key1_excludedOptions"].join("/")).respond(200, "mockExcludedOptions");
+                httpBackend.whenGET([dhisUrl.dataStore, storeNamespace, "prj2_key2_referralLocations"].join("/")).respond(200, "mockReferralLocations");
+            });
+            it('should get the updated keys', function () {
+                url = [dhisUrl.dataStore, storeNamespace].join("/");
+                dataStoreService.getUpdatedData(projectIds, "lastUpdatedTime");
+                httpBackend.expectGET(url + "?lastUpdated=lastUpdatedTime").respond(200, keysFromRemote);
+                httpBackend.flush();
+            });
+
+            it('should return empty list if namespace is not exist', function () {
+                var projectIds = ["prj1", "prj2"];
+                spyOn(http, 'get').and.returnValue(utils.getRejectedPromise(q, {errorCode: "NOT_FOUND"}));
+                dataStoreService.getUpdatedData(projectIds, "lastUpdatedTime").then(function (data) {
+                    expect(data).toEqual({});
+                }, fail);
+            });
+
+            it('should download data for updated keys', function () {
+                dataStoreService.getUpdatedData(projectIds, "lastUpdatedTime");
+                httpBackend.expectGET([dhisUrl.dataStore, storeNamespace, "prj1_key1_excludedOptions"].join("/")).respond(200);
+                httpBackend.expectGET([dhisUrl.dataStore, storeNamespace, "prj2_key2_referralLocations"].join("/")).respond(200);
+                httpBackend.flush();
+            });
+
+            it('should return updated data', function () {
+                dataStoreService.getUpdatedData(projectIds, "lastUpdatedTime").then(function (data) {
+                    expect(data).toEqual({
+                        referralLocations: ["mockReferralLocations"],
+                        excludedOptions: ["mockExcludedOptions"],
+                        excludedDataElements: [],
+                        patientOrigins: []
+                    });
                 });
+                httpBackend.flush();
             });
         });
     });
