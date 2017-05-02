@@ -33,23 +33,30 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
                 });
         };
 
-        var getDataForMultipleKeys = function (orgUnitIds, type) {
-            return _.reduce(orgUnitIds, function (result, orgUnitId) {
+        var getDataForMultipleKeys = function (keys) {
+            return _.reduce(keys, function (result, key) {
                 return result.then(function (previousData) {
-                    return getDataForKey(orgUnitId + type).then(function (data) {
+                    return getDataForKey(key).then(function (data) {
                         return previousData.concat(data);
                     });
                 });
             }, $q.when([]));
         };
 
-        this.getExcludedOptions = _.partialRight(getDataForMultipleKeys, EXCLUDED_OPTIONS);
+        var getDataForOrgUnitIds = function (orgUnitIds, type) {
+            var keys = _.map(orgUnitIds, function (orgUnitId) {
+                return orgUnitId + type;
+            });
+            return getDataForMultipleKeys(keys);
+        };
 
-        this.getReferrals = _.partialRight(getDataForMultipleKeys, REFERRAL_LOCATIONS);
+        this.getExcludedOptions = _.partialRight(getDataForOrgUnitIds, EXCLUDED_OPTIONS);
 
-        this.getPatientOrigins = _.partialRight(getDataForMultipleKeys, PATIENT_ORIGINS);
+        this.getReferrals = _.partialRight(getDataForOrgUnitIds, REFERRAL_LOCATIONS);
 
-        this.getExcludedDataElements = _.partialRight(getDataForMultipleKeys, EXCLUDED_DATA_ELEMENTS);
+        this.getPatientOrigins = _.partialRight(getDataForOrgUnitIds, PATIENT_ORIGINS);
+
+        this.getExcludedDataElements = _.partialRight(getDataForOrgUnitIds, EXCLUDED_DATA_ELEMENTS);
 
         this.getUpdatedKeys = function (projectIds, lastUpdated) {
             var transformData = function (keys) {
