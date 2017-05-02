@@ -293,7 +293,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                 };
 
                 var createOrgUnitGroups = function() {
-                    return orgUnitGroupHelper.createOrgUnitGroups([enrichedModule], false);
+                    return orgUnitGroupHelper.associateModuleAndOriginsToGroups([enrichedModule]);
                 };
 
                 var createOriginsIfConfigured = function() {

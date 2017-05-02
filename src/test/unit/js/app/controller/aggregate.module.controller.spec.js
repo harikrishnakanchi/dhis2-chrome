@@ -53,7 +53,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 spyOn(excludedDataElementsRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
 
                 orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepo, orgunitGroupRepo);
-                spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
+                spyOn(orgUnitGroupHelper, "associateModuleAndOriginsToGroups");
 
                 translationsService = new TranslationsService();
                 spyOn(translationsService, "translate").and.returnValue([]);
@@ -362,7 +362,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.save();
                 scope.$apply();
 
-                expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith([enrichedModule], false);
+                expect(orgUnitGroupHelper.associateModuleAndOriginsToGroups).toHaveBeenCalledWith([enrichedModule]);
             });
 
             it("should set datasets associated with module for edit", function() {
