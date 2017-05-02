@@ -384,7 +384,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
 
                 var createOriginOrgUnitsAndGroups = function() {
                     var createOrgUnitGroups = function(orgUnitPayLoad) {
-                        return orgUnitGroupHelper.createOrgUnitGroups(orgUnitPayLoad, false);
+                        return orgUnitGroupHelper.associateModuleAndOriginsToGroups(orgUnitPayLoad);
                     };
 
                     if (!$scope.geographicOriginDisabled) {

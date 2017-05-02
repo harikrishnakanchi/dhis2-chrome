@@ -97,7 +97,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 spyOn(excludedLineListOptionsRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
 
                 orgUnitGroupHelper = new OrgUnitGroupHelper();
-                spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
+                spyOn(orgUnitGroupHelper, "associateModuleAndOriginsToGroups").and.returnValue(utils.getPromise(q, {}));
 
                 spyOn(excludedLineListOptionsRepository, 'get').and.returnValue(utils.getPromise(q, {}));
 
@@ -1491,7 +1491,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     scope.save();
                     scope.$apply();
 
-                    expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith(originOrgUnit, false);
+                    expect(orgUnitGroupHelper.associateModuleAndOriginsToGroups).toHaveBeenCalledWith(originOrgUnit);
                 });
 
                 it("should associate to modules when geographicOrigin is disabled", function () {
@@ -1502,7 +1502,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     scope.save();
                     scope.$apply();
 
-                    expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith([scope.module], false);
+                    expect(orgUnitGroupHelper.associateModuleAndOriginsToGroups).toHaveBeenCalledWith([scope.module]);
                 });
             });
 
