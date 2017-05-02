@@ -33,6 +33,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 patientOriginRepository = new PatientOriginRepository();
                 spyOn(patientOriginRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
                 spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, {}));
+                spyOn(patientOriginRepository, "findAll").and.returnValue(utils.getPromise(q, {}));
 
                 excludedDataElementsRepository = new ExcludedDataElementsRepository();
                 spyOn(excludedDataElementsRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
@@ -48,6 +49,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 spyOn(dataStoreService, "getUpdatedKeys").and.returnValue(utils.getPromise(q, {}));
                 spyOn(dataStoreService, "getReferrals").and.returnValue(utils.getPromise(q, []));
                 spyOn(dataStoreService, "getExcludedDataElements").and.returnValue(utils.getPromise(q, []));
+                spyOn(dataStoreService, "getPatientOrigins").and.returnValue(utils.getPromise(q, []));
 
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, 'getAllModulesInOrgUnits').and.returnValue(utils.getPromise(q, []));
@@ -57,15 +59,6 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
 
                 consumer = new DownloadProjectSettingsConsumer(q, systemSettingService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository, excludedDataElementsRepository, mergeBy, excludedLinelistOptionsMerger, changeLogRepository, dataStoreService, orgUnitRepository);
             }));
-
-            it("should download project settings for current user projects", function () {
-                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1', 'prj2']));
-
-                consumer.run();
-                scope.$apply();
-
-                expect(systemSettingService.getProjectSettings).toHaveBeenCalledWith(['prj1', 'prj2']);
-            });
 
             it('should get changeLogs for all projectIds', function () {
                 userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1', 'prj2']));
@@ -202,118 +195,70 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 });
             });
 
-            it("should download project settings and save patient origin details", function () {
-                var userCurrentProjects = ['prj', 'prjWithNoPatientOriginDetails'];
-                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, userCurrentProjects));
+            describe('patientOrigins', function () {
+                beforeEach(function () {
+                    userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1']));
+                    dataStoreService.getUpdatedKeys.and.returnValue(utils.getPromise(q, {patientOrigins: ["opUnit1", "opUnit2"]}));
+                    orgUnitRepository.getAllOpUnitsInOrgUnits.and.returnValue(utils.getPromise(q, [{id: "opUnit1"}]));
+                });
+                it('should download patientOrigins only relevant to current project ids', function () {
+                    consumer.run();
+                    scope.$apply();
 
-                var projectSettingsFromDhis = {
-                    "prjWithNoPatientOriginDetails": {
-                        "excludedDataElements": []
-                    },
-                    "prj": {
-                        "excludedDataElements": [],
-                        "patientOrigins": [{
-                            "orgUnit": "opUnit1",
-                            "origins": [{
-                                "id": "origin1",
-                                "name": "Origin 1",
-                                "isDisabled": false,
-                                "clientLastUpdated": "2015-07-17T07:00:00.000Z"
-                            }],
-                        }]
-                    }
-                };
-                systemSettingService.getProjectSettings.and.returnValue(utils.getPromise(q, projectSettingsFromDhis));
+                    expect(dataStoreService.getPatientOrigins).toHaveBeenCalledWith(["opUnit1"]);
+                });
 
-                consumer.run();
-                scope.$apply();
+                it('should get local patient origins', function () {
+                    consumer.run();
+                    scope.$apply();
 
-                var expectedPayload = [{
-                    "orgUnit": "opUnit1",
-                    "origins": [{
-                        "id": "origin1",
-                        "name": "Origin 1",
-                        "isDisabled": false,
-                        "clientLastUpdated": "2015-07-17T07:00:00.000Z"
-                    }],
-                }];
+                    expect(patientOriginRepository.findAll).toHaveBeenCalledWith(["opUnit1"]);
+                });
 
-                expect(patientOriginRepository.upsert).toHaveBeenCalledWith(expectedPayload);
-            });
-
-            it("should merge patient origin details with local patient origin details based on clientLastUpdated time", function () {
-                var userCurrentProjects = ['prj'];
-                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, userCurrentProjects));
-
-                var projectSettingsFromDhis = {
-                    "prj": {
-                        "excludedDataElements": [],
-                        "patientOrigins": [{
-                            "orgUnit": "opUnit1",
-                            "origins": [{
-                                "id": "origin1",
-                                "name": "Origin 1",
-                                "isDisabled": false,
-                                "clientLastUpdated": "2015-07-17T07:00:00.000Z"
-                            }, {
-                                "id": "origin2",
-                                "name": "Origin 2",
-                                "isDisabled": false,
-                                "clientLastUpdated": "2015-07-17T07:00:00.000Z"
-                            }]
+                it('should merge patient origins based on lastUpdated time', function () {
+                    var mockRemotePatientOrigins = [{
+                        "orgUnit": "opUnit1",
+                        "origins": [{
+                            "id": "origin1",
+                            "clientLastUpdated": "2015-07-17T07:00:00.000Z"
                         }, {
-                            "orgUnit": "opUnit2",
-                            "origins": [{
-                                "id": "origin3",
-                                "name": "Origin 3",
-                                "isDisabled": false,
-                                "clientLastUpdated": "2015-07-17T07:00:00.000Z"
-                            }]
+                            "id": "origin2",
+                            "clientLastUpdated": "2015-07-17T07:00:00.000Z"
                         }]
-                    }
-                };
-
-                var patientDetailsFromLocalDb = {
-                    "orgUnit": "opUnit1",
-                    "origins": [{
-                        "id": "origin1",
-                        "name": "Origin Name 1",
-                        "isDisabled": false,
-                        "clientLastUpdated": "2015-07-17T08:00:00.000Z"
-                    }]
-                };
-                systemSettingService.getProjectSettings.and.returnValue(utils.getPromise(q, projectSettingsFromDhis));
-                patientOriginRepository.get.and.returnValues(utils.getPromise(q, patientDetailsFromLocalDb), utils.getPromise(q, undefined));
-
-                consumer.run();
-                scope.$apply();
-
-                var expectedPayload = [{
-                    "orgUnit": "opUnit1",
-                    "origins": [{
-                        "id": "origin1",
-                        "name": "Origin Name 1",
-                        "isDisabled": false,
-                        "clientLastUpdated": "2015-07-17T08:00:00.000Z"
                     }, {
-                        "id": "origin2",
-                        "name": "Origin 2",
-                        "isDisabled": false,
-                        "clientLastUpdated": "2015-07-17T07:00:00.000Z"
-                    }]
-                }, {
-                    "orgUnit": "opUnit2",
-                    "origins": [{
-                        "id": "origin3",
-                        "name": "Origin 3",
-                        "isDisabled": false,
-                        "clientLastUpdated": "2015-07-17T07:00:00.000Z"
-                    }]
-                }];
+                        "orgUnit": "opUnit2",
+                        "origins": [{
+                            "id": "origin3",
+                            "clientLastUpdated": "2015-07-17T07:00:00.000Z"
+                        }]
+                    }];
 
-                expect(patientOriginRepository.upsert).toHaveBeenCalledWith(expectedPayload);
-                expect(patientOriginRepository.get.calls.argsFor(0)).toEqual(["opUnit1"]);
-                expect(patientOriginRepository.get.calls.argsFor(1)).toEqual(["opUnit2"]);
+                    var mockLocalPatientOrigins = [{
+                        "orgUnit": "opUnit1",
+                        "origins": [{
+                            "id": "origin1",
+                            "clientLastUpdated": "2015-07-17T08:00:00.000Z"
+                        }]
+                    }];
+                    patientOriginRepository.findAll.and.returnValue(utils.getPromise(q, mockLocalPatientOrigins));
+                    dataStoreService.getPatientOrigins.and.returnValue(utils.getPromise(q, mockRemotePatientOrigins));
+
+                    consumer.run();
+                    scope.$apply();
+
+                    var expectedPayload = [{
+                        "orgUnit": "opUnit1",
+                        "origins": [{
+                            "id": "origin1",
+                            "clientLastUpdated": "2015-07-17T08:00:00.000Z"
+                        }, {
+                            "id": "origin2",
+                            "clientLastUpdated": "2015-07-17T07:00:00.000Z"
+                        }]
+                    }, mockRemotePatientOrigins[1]];
+
+                    expect(patientOriginRepository.upsert).toHaveBeenCalledWith(expectedPayload);
+                });
             });
 
             it("should not fail if current user projects are not available", function () {
