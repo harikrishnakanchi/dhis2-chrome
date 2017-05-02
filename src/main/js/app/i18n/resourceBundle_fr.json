@@ -219,7 +219,7 @@
     "disableOriginConfirmationMessage": "L'origine géographique patient va être désactivée.Voulez-vous continuer?",
     "enableOriginConfirmationMessage": "L'origine géographique de/du patient va être activée.Voulez-vous continuer?",
     "emailValidation": "Doit être une adresse email",
-    "defaultValidation": "Entrez une valeur comprise entre 2 et 140 caractères.",
+    "defaultValidation": "Entrez une valeur comprise entre 2 et 140 caractères",
     "successNotification": "Réussite",
     "errorNotification": "Erreur",
     "pendingRequests": " En attente",
@@ -376,7 +376,7 @@
         "turnOffConfirmationMessage": "AVERTISSEMENT: \"Désactiver la synchronisation\" stoppera la réception et l'envoi de données de Praxis avec DHIS. La dernière version de Praxis, si disponible, ne sera pas mise à jour. Etes vous sûr de vouloir désactiver la synchronisation ?"
     },
     "selectYearLabel": "Select Year :[FR]",
-    "updateProductKeyMessage": "Updating product key will download metadata. Please ensure Praxis is online.[FR]",
+    "updateProductKeyMessage": "Updating product key will download metadata. Please ensure Praxis is online.",
     "dataAvailabilityMessage": {
         "daily": "Data entered today will be shown in reports only the next day[FR]",
         "weekly": "Data entered today will be shown in reports only the next week[FR]"
