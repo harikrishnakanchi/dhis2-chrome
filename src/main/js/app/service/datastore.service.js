@@ -58,16 +58,7 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
 
         this.getExcludedDataElements = _.partialRight(getDataForOrgUnitIds, EXCLUDED_DATA_ELEMENTS);
 
-        this.getUpdatedKeys = function (projectIds, lastUpdated) {
-            var transformData = function (keys) {
-                return _.reduce(keys, function (result, key) {
-                    var data = key.split('_').slice(1);
-                    var path = _.last(data);
-                    result[path] = _.has(result, path) ? result[path] : [];
-                    result[path] = result[path].concat(_.first(data));
-                    return result;
-                }, {});
-            };
+        var getUpdatedKeys = function (projectIds, lastUpdated) {
 
             var filterKeysForProjects = function (keys) {
                 return _.filter(keys, function (key) {
@@ -80,7 +71,6 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
             return $http.get(url, { params: { lastUpdated: lastUpdated } })
                 .then(_.property('data'))
                 .then(filterKeysForProjects)
-                .then(transformData)
                 .catch(function (response) {
                     return response.errorCode === constants.errorCodes.NOT_FOUND ? {} : $q.reject();
                 });
@@ -127,9 +117,11 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
         };
 
         this.getKeysForExcludedOptions = function (projectId) {
-            return this.getUpdatedKeys([projectId]).then(function (allKeys) {
-                return _.map(allKeys[_.tail(EXCLUDED_OPTIONS).join("")], function (key) {
-                    return key.concat(EXCLUDED_OPTIONS);
+            return getUpdatedKeys([projectId]).then(function (allKeys) {
+                return _.filter(allKeys, _.partial(_.contains, _, EXCLUDED_OPTIONS, 0));
+            }).then(function (filteredKeys) {
+                return _.map(filteredKeys, function (key) {
+                    return key.split("_").slice(1).join("_");
                 });
             });
         };

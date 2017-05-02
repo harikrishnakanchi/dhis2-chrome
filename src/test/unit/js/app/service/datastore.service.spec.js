@@ -226,32 +226,6 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
             });
         });
 
-        describe('getUpdatedKeys', function () {
-
-            it('should get the updated keys', function () {
-                var projectIds = ["prj1", "prj2"];
-                var url = [dhisUrl.dataStore, storeNamespace].join("/");
-                var keysFromRemote = ['prj1_key1_excludedOptions', 'prj3_key2_excludedOptions', 'prj2_key2_referralLocations'];
-                var actualKeys;
-                dataStoreService.getUpdatedKeys(projectIds, "lastUpdatedTime").then(function (data) {
-                    actualKeys = data;
-                });
-                httpBackend.expectGET(url + "?lastUpdated=lastUpdatedTime").respond(200, keysFromRemote);
-                httpBackend.flush();
-                expect(actualKeys).toEqual({
-                    excludedOptions: ['key1'],
-                    referralLocations: ['key2']
-                });
-            });
-
-            it('should return empty list if namespace is not exist', function () {
-                spyOn(http, 'get').and.returnValue(utils.getRejectedPromise(q, {errorCode: "NOT_FOUND"}));
-                dataStoreService.getUpdatedKeys().then(function (data) {
-                    expect(data).toEqual({});
-                }, fail);
-            });
-        });
-
         describe('getUpdatedData', function () {
             var projectIds, keysFromRemote, url;
             beforeEach(function () {
