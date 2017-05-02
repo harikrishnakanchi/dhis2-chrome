@@ -43,18 +43,21 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
             describe('getExcludedOptions', function () {
 
                 it('should download excluded options for specified module', function () {
-                    var mockExcludedLinelistOptions = {};
+                    var moduleIds = ['mod1', 'mod2'];
 
-                    dataStoreService.getExcludedOptions(moduleId);
+                    dataStoreService.getExcludedOptions(moduleIds).then(function (data) {
+                        expect(data).toEqual(['excludedLineListOptionsMod1', 'excludedLineListOptionsMod2']);
+                    });
 
-                    httpBackend.expectGET(url).respond(200, mockExcludedLinelistOptions);
+                    httpBackend.expectGET([dhisUrl.dataStore, storeNamespace, "mod1_excludedOptions"].join("/")).respond(200, "excludedLineListOptionsMod1");
+                    httpBackend.expectGET([dhisUrl.dataStore, storeNamespace, "mod2_excludedOptions"].join("/")).respond(200, "excludedLineListOptionsMod2");
                     httpBackend.flush();
                 });
 
                 it('should gracefully return undefined if there is no excluded options for specified module', function () {
                     spyOn(http, 'get').and.returnValue(utils.getRejectedPromise(q, {errorCode: 'NOT_FOUND'}));
-                    dataStoreService.getExcludedOptions(moduleId).then(function (data) {
-                        expect(data).toBeUndefined();
+                    dataStoreService.getExcludedOptions([moduleId]).then(function (data) {
+                        expect(data).toEqual([undefined]);
                     });
                 });
 
@@ -62,14 +65,13 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
                     var mockErrorResponse = {};
 
                     var result = "someRandomValue";
-                    dataStoreService.getExcludedOptions(moduleId).then(function (data) {
+                    dataStoreService.getExcludedOptions([moduleId]).then(function (data) {
                         result = data;
                     });
 
                     httpBackend.expectGET(url).respond(500, mockErrorResponse);
                     httpBackend.flush();
                     expect(result).toEqual("someRandomValue");
-
                 });
             });
         });

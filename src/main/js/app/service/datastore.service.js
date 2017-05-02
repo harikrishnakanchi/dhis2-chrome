@@ -44,7 +44,7 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
             }, $q.when([]));
         };
 
-        this.getExcludedOptions = _.partialRight(getDataForKey, EXCLUDED_OPTIONS);
+        this.getExcludedOptions = _.partialRight(getDataForMultipleKeys, EXCLUDED_OPTIONS);
 
         this.getReferrals = _.partialRight(getDataForMultipleKeys, REFERRAL_LOCATIONS);
 
