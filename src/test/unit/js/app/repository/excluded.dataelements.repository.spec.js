@@ -1,11 +1,13 @@
 define(["excludedDataElementsRepository", "angularMocks", "utils"], function(ExcludedDataElementsRepository, mocks, utils) {
     describe("excludedDataElementsRepository", function() {
-        var mockStore, scope, excludedDataElementsRepository;
+        var mockStore, scope, excludedDataElementsRepository, q;
         beforeEach(mocks.inject(function($q, $rootScope) {
+            q = $q;
             scope = $rootScope.$new();
+
             var mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
-            excludedDataElementsRepository = new ExcludedDataElementsRepository(mockDB.db, $q);
+            excludedDataElementsRepository = new ExcludedDataElementsRepository(mockDB.db, q);
         }));
 
         it("should upsert exlcuded data elements", function() {
@@ -27,6 +29,12 @@ define(["excludedDataElementsRepository", "angularMocks", "utils"], function(Exc
         it("should get exlcuded data elements", function() {
             excludedDataElementsRepository.get("mod1");
             expect(mockStore.find).toHaveBeenCalledWith("mod1");
+        });
+
+        it('should get excluded data elements for multiple module ids', function () {
+            mockStore.each.and.returnValue(utils.getPromise(q, []));
+            excludedDataElementsRepository.findAll(['mod1', 'mod2']);
+            expect(mockStore.each).toHaveBeenCalled();
         });
     });
 });
