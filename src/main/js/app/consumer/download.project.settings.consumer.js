@@ -67,12 +67,12 @@ define(["lodash", "moment"], function(_, moment) {
             }, $q.when());
         };
 
-        var merge = function (remoteCollection, localCollection) {
-            var equalPredicate = function(itemA, itemB) {
-                return itemA && itemB && itemA.orgUnit === itemB.orgUnit;
-            };
-
+        var merge = function (remoteCollection, localCollection, equalPredicate) {
             return mergeBy.lastUpdated({"remoteTimeField": "clientLastUpdated", "localTimeField": "clientLastUpdated", "eq": equalPredicate}, remoteCollection, localCollection);
+        };
+
+        var equalPredicate = function(itemA, itemB) {
+            return itemA && itemA.orgUnit && itemA.orgUnit === itemB.orgUnit;
         };
 
         var mergeAndSaveReferralLocations = function (localOpUnitIds, remoteOpUnitIds) {
@@ -80,7 +80,7 @@ define(["lodash", "moment"], function(_, moment) {
             return $q.all([referralLocationsRepository.findAll(opUnitIdsToMerge), dataStoreService.getReferrals(opUnitIdsToMerge)]).then(function (data) {
                 var localReferrals = data[0];
                 var remoteReferrals = data[1];
-                return referralLocationsRepository.upsert(merge(remoteReferrals, localReferrals));
+                return referralLocationsRepository.upsert(merge(remoteReferrals, localReferrals, equalPredicate));
             });
         };
 
@@ -104,7 +104,7 @@ define(["lodash", "moment"], function(_, moment) {
                 .then(function (data) {
                 var localExcludedDataElements = data[0];
                 var remoteExcludedDataElements = data[1];
-                return excludedDataElementsRepository.upsert(merge(remoteExcludedDataElements, localExcludedDataElements));
+                return excludedDataElementsRepository.upsert(merge(remoteExcludedDataElements, localExcludedDataElements, equalPredicate));
             });
         };
 
