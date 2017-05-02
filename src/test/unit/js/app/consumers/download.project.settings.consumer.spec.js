@@ -82,7 +82,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 consumer.run();
                 scope.$apply();
 
-                expect(dataStoreService.getUpdatedKeys).toHaveBeenCalledWith("2017-05-01T15:10:13.677Z");
+                expect(dataStoreService.getUpdatedKeys).toHaveBeenCalledWith(['prj1', 'prj2'], "2017-05-01T15:10:13.677Z");
             });
 
             it('should get all modules and opUnits for all projectIds', function () {

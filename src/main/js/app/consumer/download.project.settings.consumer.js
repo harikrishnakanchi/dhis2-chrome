@@ -3,7 +3,8 @@ define(["lodash", "moment"], function(_, moment) {
         this.run = function () {
             var systemTimePromise = systemInfoService.getServerDate();
             var projectIdsPromise = systemTimePromise.then(getUserProjectIds);
-            var remoteUpdatedKeysPromise = projectIdsPromise.then(getChangeLog).then(dataStoreService.getUpdatedKeys);
+            var changeLogPromise = projectIdsPromise.then(getChangeLog);
+            var remoteUpdatedKeysPromise = projectIdsPromise.then(_.curry(dataStoreService.getUpdatedKeys, 2)).then(changeLogPromise.then.bind(changeLogPromise));
             var localOpUnitAndModuleIdsPromise = projectIdsPromise.then(getModuleAndOpUnitIds);
 
             return $q.all([remoteUpdatedKeysPromise, localOpUnitAndModuleIdsPromise])

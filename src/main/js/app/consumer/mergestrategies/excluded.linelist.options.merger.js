@@ -39,7 +39,7 @@ define(['moment'], function (moment) {
         self.mergeAndSaveForProject = function (projectId) {
             return $q.all({
                 moduleIds: orgUnitRepository.getAllModulesInOrgUnits(projectId),
-                remoteKeys: dataStoreService.getKeysForExcludedOptions()
+                remoteKeys: dataStoreService.getKeysForExcludedOptions(projectId)
             }).then(function (data) {
                 var moduleIds = _.map(data.moduleIds, 'id'),
                     remoteKeys = _.map(data.remoteKeys, function (key) {

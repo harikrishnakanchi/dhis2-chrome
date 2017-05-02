@@ -213,10 +213,10 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
             });
 
             it('should get keys only for excludedOptions', function () {
-                var keysFromRemote = ['key1_excludedOptions', 'key2_excludedOptions', 'key3_otherOption', 'key4_excludedOptions', 'key5_excludedOptions', 'key6_excludedOptions'];
+                var keysFromRemote = ['prj1_key1_excludedOptions', 'prj1_key2_excludedOptions', 'key3_otherOption', 'prj1_key4_excludedOptions', 'prj1_key5_excludedOptions', 'prj1_key6_excludedOptions'];
 
                 var actualKeys;
-                dataStoreService.getKeysForExcludedOptions().then(function (data) {
+                dataStoreService.getKeysForExcludedOptions("prj1").then(function (data) {
                     actualKeys = data;
                 });
 
@@ -229,18 +229,18 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
         describe('getUpdatedKeys', function () {
 
             it('should get the updated keys', function () {
+                var projectIds = ["prj1", "prj2"];
                 var url = [dhisUrl.dataStore, storeNamespace].join("/");
-                var keysFromRemote = ['key1_excludedOptions', 'key2_excludedOptions', 'key1_referralLocations', 'anotherKey'];
+                var keysFromRemote = ['prj1_key1_excludedOptions', 'prj3_key2_excludedOptions', 'prj2_key2_referralLocations'];
                 var actualKeys;
-                dataStoreService.getUpdatedKeys("lastUpdatedTime").then(function (data) {
+                dataStoreService.getUpdatedKeys(projectIds, "lastUpdatedTime").then(function (data) {
                     actualKeys = data;
                 });
                 httpBackend.expectGET(url + "?lastUpdated=lastUpdatedTime").respond(200, keysFromRemote);
                 httpBackend.flush();
                 expect(actualKeys).toEqual({
-                    excludedOptions: ['key1', 'key2'],
-                    referralLocations: ['key1'],
-                    anotherKey: ['anotherKey']
+                    excludedOptions: ['key1'],
+                    referralLocations: ['key2']
                 });
             });
 

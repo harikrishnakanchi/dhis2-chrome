@@ -24,8 +24,7 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
         this.createExcludedDataElements = _.partialRight(upsertDataToStore, EXCLUDED_DATA_ELEMENTS, $http.post);
         this.updateExcludedDataElements = _.partialRight(upsertDataToStore, EXCLUDED_DATA_ELEMENTS, $http.put);
 
-        var getDataForKey = function (orgUnitId, type) {
-            var key = orgUnitId + type;
+        var getDataForKey = function (key) {
             var url = [dhisUrl.dataStore, NAMESPACE, key].join("/");
             return $http.get(url)
                 .then(_.property('data'))
@@ -37,7 +36,7 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
         var getDataForMultipleKeys = function (orgUnitIds, type) {
             return _.reduce(orgUnitIds, function (result, orgUnitId) {
                 return result.then(function (previousData) {
-                    return getDataForKey(orgUnitId, type).then(function (data) {
+                    return getDataForKey(orgUnitId + type).then(function (data) {
                         return previousData.concat(data);
                     });
                 });
@@ -52,27 +51,36 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
 
         this.getExcludedDataElements = _.partialRight(getDataForMultipleKeys, EXCLUDED_DATA_ELEMENTS);
 
-        this.getUpdatedKeys = function (lastUpdated) {
+        this.getUpdatedKeys = function (projectIds, lastUpdated) {
             var transformData = function (keys) {
                 return _.reduce(keys, function (result, key) {
-                    var data = key.split('_');
+                    var data = key.split('_').slice(1);
                     var path = _.last(data);
                     result[path] = _.has(result, path) ? result[path] : [];
                     result[path] = result[path].concat(_.first(data));
                     return result;
                 }, {});
             };
+
+            var filterKeysForProjects = function (keys) {
+                return _.filter(keys, function (key) {
+                    var projectId = _.first(key.split("_"));
+                    return _.includes(projectIds, projectId);
+                });
+            };
+
             var url = [dhisUrl.dataStore, NAMESPACE].join("/");
             return $http.get(url, { params: { lastUpdated: lastUpdated } })
                 .then(_.property('data'))
+                .then(filterKeysForProjects)
                 .then(transformData)
                 .catch(function (response) {
                     return response.errorCode === constants.errorCodes.NOT_FOUND ? {} : $q.reject();
                 });
         };
 
-        this.getKeysForExcludedOptions = function () {
-            return this.getUpdatedKeys().then(function (allKeys) {
+        this.getKeysForExcludedOptions = function (projectId) {
+            return this.getUpdatedKeys([projectId]).then(function (allKeys) {
                 return _.map(allKeys[_.tail(EXCLUDED_OPTIONS).join("")], function (key) {
                     return key.concat(EXCLUDED_OPTIONS);
                 });
