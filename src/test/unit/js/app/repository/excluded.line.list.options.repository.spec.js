@@ -21,5 +21,11 @@ define(['angularMocks', 'utils', 'excludedLineListOptionsRepository'], function 
             excludedLineListOptionsRepository.upsert(payload);
             expect(mockStore.upsert).toHaveBeenCalledWith(payload);
         });
+
+        it('should get excluded options for multiple module ids', function () {
+            mockStore.each.and.returnValue(utils.getPromise(q, []));
+            excludedLineListOptionsRepository.findAll(['mod1', 'mod2']);
+            expect(mockStore.each).toHaveBeenCalled();
+        });
     });
 });
