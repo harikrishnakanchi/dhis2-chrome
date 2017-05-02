@@ -166,5 +166,46 @@ define(['customAttributes'], function(customAttributes) {
                 .then(modifyGroups)
                 .then(upsertOrgUnitGroups);
         };
+
+        this.associateModuleAndOriginsToGroups = function (orgUnits) {
+            var getOrgunitGroups = function (orgUnitGroupIds) {
+                return orgUnitGroupRepository.findAll(orgUnitGroupIds);
+            };
+
+            var addOrgUnits = function (orgUnitGroups) {
+                var orgUnitsToAdd = _.map(orgUnits, function(orgUnit) {
+                    return {
+                        'id': orgUnit.id,
+                        'name': orgUnit.name,
+                        'localStatus': 'NEW'
+                    };
+                });
+
+                return _.map(orgUnitGroups, function (group) {
+                    group.organisationUnits = group.organisationUnits ? group.organisationUnits : [];
+                    group.organisationUnits = group.organisationUnits.concat(orgUnitsToAdd);
+                    return group;
+                });
+            };
+
+            var upsertOrgUnitGroups = function(orgUnitGroups) {
+                return orgUnitGroupRepository.upsert(orgUnitGroups).then(function() {
+                    return $hustle.publish({
+                        "data": {
+                            "orgUnitGroupIds": _.pluck(orgUnitGroups, "id"),
+                            "orgUnitIds": _.pluck(orgUnits, "id")
+                        },
+                        "type": "upsertOrgUnitGroups",
+                        "locale": $scope.locale,
+                        "desc": $scope.resourceBundle.upsertOrgUnitGroupsDesc
+                    }, "dataValues");
+                });
+            };
+
+            return orgUnitRepository.getAssociatedOrganisationUnitGroups(_.first(orgUnits).id)
+                .then(getOrgunitGroups)
+                .then(addOrgUnits)
+                .then(upsertOrgUnitGroups);
+        };
     };
 });

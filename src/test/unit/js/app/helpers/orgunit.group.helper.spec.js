@@ -216,5 +216,62 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                     "desc": "upsertOrgUnitGroupsDesc"
                 }, "dataValues"]);
             });
+
+            it("should associate modules and origins to orgUnitGroups", function () {
+                var orgUnits = [{
+                    "name": "someModuleName",
+                    "parent": {
+                        "id": "someProjectId"
+                    },
+                    "id": "someModuleId"
+                }];
+
+                var orgunitgroups = [{
+                    "name": "someOrgunitGroupName",
+                    "id": "someOrgunitGroupId",
+                    "organisationUnits": []
+                },{
+                    "name": "someOtherOrgunitGroupName",
+                    "id": "someOtherOrgunitGroupId",
+                    "organisationUnits": []
+                }];
+
+                var expectedOutput = [{
+                    "name": 'someOrgunitGroupName',
+                    "id": 'someOrgunitGroupId',
+                    "organisationUnits": [{
+                        "id": "someModuleId",
+                        "name": "someModuleName",
+                        "localStatus": "NEW"
+                    }]
+                }, {
+                    "name": 'someOtherOrgunitGroupName',
+                    "id": 'someOtherOrgunitGroupId',
+                    "organisationUnits": [{
+                        "id": 'someModuleId',
+                        "name": "someModuleName",
+                        "localStatus": "NEW"
+                    }]
+                }];
+
+                spyOn(orgUnitRepository, 'getAssociatedOrganisationUnitGroups').and.returnValue(utils.getPromise(q, ['someOrgunitGroupId', 'someOtherOrgunitGroupId']));
+                spyOn(orgUnitGroupRepository, "findAll").and.returnValues(utils.getPromise(q, orgunitgroups));
+                spyOn(orgUnitGroupRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
+                orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepository, orgUnitGroupRepository);
+
+                orgUnitGroupHelper.associateModuleAndOriginsToGroups(orgUnits);
+                scope.$apply();
+
+                expect(orgUnitGroupRepository.upsert).toHaveBeenCalledWith(expectedOutput);
+                expect(hustle.publish.calls.argsFor(0)).toEqual([{
+                    "data": {
+                        "orgUnitGroupIds": ["someOrgunitGroupId", "someOtherOrgunitGroupId"],
+                        "orgUnitIds": ["someModuleId"]
+                    },
+                    "type": "upsertOrgUnitGroups",
+                    "locale": "en",
+                    "desc": "upsertOrgUnitGroupsDesc"
+                }, "dataValues"]);
+            });
         });
     });
