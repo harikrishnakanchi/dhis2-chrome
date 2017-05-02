@@ -48,7 +48,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, ""));
 
                 dataStoreService = new DataStoreService({});
-                spyOn(dataStoreService, "getUpdatedKeys").and.returnValue(utils.getPromise(q, {}));
+                spyOn(dataStoreService, "getUpdatedData").and.returnValue(utils.getPromise(q, {}));
                 spyOn(dataStoreService, "getReferrals").and.returnValue(utils.getPromise(q, []));
                 spyOn(dataStoreService, "getExcludedDataElements").and.returnValue(utils.getPromise(q, []));
                 spyOn(dataStoreService, "getPatientOrigins").and.returnValue(utils.getPromise(q, []));
@@ -82,7 +82,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 consumer.run();
                 scope.$apply();
 
-                expect(dataStoreService.getUpdatedKeys).toHaveBeenCalledWith(['prj1', 'prj2'], "2017-05-01T15:10:13.677Z");
+                expect(dataStoreService.getUpdatedData).toHaveBeenCalledWith(['prj1', 'prj2'], "2017-05-01T15:10:13.677Z");
             });
 
             it('should get all modules and opUnits for all projectIds', function () {
@@ -98,21 +98,15 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
             describe('referralLocations', function () {
                 beforeEach(function () {
                     userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1']));
-                    dataStoreService.getUpdatedKeys.and.returnValue(utils.getPromise(q, {referralLocations: ["opUnit1", "opUnit2"]}));
-                    orgUnitRepository.getAllOpUnitsInOrgUnits.and.returnValue(utils.getPromise(q, [{id: "opUnit1"}]));
-                });
-                it('should download referralLocations only relevant to current project ids', function () {
-                    consumer.run();
-                    scope.$apply();
-
-                    expect(dataStoreService.getReferrals).toHaveBeenCalledWith(["opUnit1"]);
+                    dataStoreService.getUpdatedData.and.returnValue(utils.getPromise(q, {referralLocations: ["opUnit1", "opUnit2"]}));
+                    orgUnitRepository.getAllOpUnitsInOrgUnits.and.returnValue(utils.getPromise(q, [{id: "opUnit1"}, {id: "opUnit3"}]));
                 });
 
                 it('should get local referral locations only relevant to current project ids', function () {
                     consumer.run();
                     scope.$apply();
 
-                    expect(referralLocationsRepository.findAll).toHaveBeenCalledWith(["opUnit1"]);
+                    expect(referralLocationsRepository.findAll).toHaveBeenCalledWith(["opUnit1", "opUnit3"]);
                 });
 
                 it('should merge referral locations based on clientLastUpdated time', function () {
@@ -131,10 +125,8 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                         },
                         "clientLastUpdated": "2015-07-17T08:00:00.000Z"
                     }];
-                    userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1']));
-                    dataStoreService.getUpdatedKeys.and.returnValue(utils.getPromise(q, {referralLocations: ["opUnit1", "opUnit2"]}));
+                    dataStoreService.getUpdatedData.and.returnValue(utils.getPromise(q, {referralLocations: mockRemoteReferrals}));
                     orgUnitRepository.getAllOpUnitsInOrgUnits.and.returnValue(utils.getPromise(q, [{id: "opUnit1"}, {id: "opUnit2"}]));
-                    dataStoreService.getReferrals.and.returnValue(utils.getPromise(q, mockRemoteReferrals));
                     referralLocationsRepository.findAll.and.returnValue(utils.getPromise(q, referralLocationFromLocalDb));
 
                     consumer.run();
@@ -158,21 +150,15 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
             describe('excludedDataElements', function () {
                 beforeEach(function () {
                     userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1']));
-                    dataStoreService.getUpdatedKeys.and.returnValue(utils.getPromise(q, {excludedDataElements: ["mod1", "mod2"]}));
-                    orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [{id: "mod1"}]));
-                });
-                it('should download excluded data elements only relevant to current project ids', function () {
-                    consumer.run();
-                    scope.$apply();
-
-                    expect(dataStoreService.getExcludedDataElements).toHaveBeenCalledWith(["mod1"]);
+                    dataStoreService.getUpdatedData.and.returnValue(utils.getPromise(q, {excludedDataElements: ["mod1", "mod2"]}));
+                    orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [{id: "mod1"}, {id: "mod2"}]));
                 });
 
                 it('should get local excluded data elements', function () {
                     consumer.run();
                     scope.$apply();
 
-                    expect(excludedDataElementsRepository.findAll).toHaveBeenCalledWith(["mod1"]);
+                    expect(excludedDataElementsRepository.findAll).toHaveBeenCalledWith(["mod1", "mod2"]);
                 });
 
                 it('should merge based on lastUpdated time', function () {
@@ -190,7 +176,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                         "clientLastUpdated": "2015-07-17T08:00:00.000Z"
                     }];
                     orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [{id: "mod1"}, {id: "mod2"}]));
-                    dataStoreService.getExcludedDataElements.and.returnValue(utils.getPromise(q, mockRemoteExcludedDataElements));
+                    dataStoreService.getUpdatedData.and.returnValue(utils.getPromise(q, {excludedDataElements: mockRemoteExcludedDataElements}));
                     excludedDataElementsRepository.findAll.and.returnValue(utils.getPromise(q, localExcludedDataElements));
                     consumer.run();
                     scope.$apply();
@@ -203,21 +189,15 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
             describe('patientOrigins', function () {
                 beforeEach(function () {
                     userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1']));
-                    dataStoreService.getUpdatedKeys.and.returnValue(utils.getPromise(q, {patientOrigins: ["opUnit1", "opUnit2"]}));
-                    orgUnitRepository.getAllOpUnitsInOrgUnits.and.returnValue(utils.getPromise(q, [{id: "opUnit1"}]));
-                });
-                it('should download patientOrigins only relevant to current project ids', function () {
-                    consumer.run();
-                    scope.$apply();
-
-                    expect(dataStoreService.getPatientOrigins).toHaveBeenCalledWith(["opUnit1"]);
+                    dataStoreService.getUpdatedData.and.returnValue(utils.getPromise(q, {patientOrigins: ["opUnit1", "opUnit2"]}));
+                    orgUnitRepository.getAllOpUnitsInOrgUnits.and.returnValue(utils.getPromise(q, [{id: "opUnit1"}, {id: "opUnit3"}]));
                 });
 
                 it('should get local patient origins', function () {
                     consumer.run();
                     scope.$apply();
 
-                    expect(patientOriginRepository.findAll).toHaveBeenCalledWith(["opUnit1"]);
+                    expect(patientOriginRepository.findAll).toHaveBeenCalledWith(["opUnit1", "opUnit3"]);
                 });
 
                 it('should merge patient origins based on lastUpdated time', function () {
@@ -246,7 +226,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                         }]
                     }];
                     patientOriginRepository.findAll.and.returnValue(utils.getPromise(q, mockLocalPatientOrigins));
-                    dataStoreService.getPatientOrigins.and.returnValue(utils.getPromise(q, mockRemotePatientOrigins));
+                    dataStoreService.getUpdatedData.and.returnValue(utils.getPromise(q, {patientOrigins: mockRemotePatientOrigins}));
 
                     consumer.run();
                     scope.$apply();

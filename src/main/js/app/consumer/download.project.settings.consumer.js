@@ -4,7 +4,7 @@ define(["lodash", "moment"], function(_, moment) {
             var systemTimePromise = systemInfoService.getServerDate();
             var projectIdsPromise = systemTimePromise.then(getUserProjectIds);
             var changeLogPromise = projectIdsPromise.then(getChangeLog);
-            var remoteUpdatedKeysPromise = projectIdsPromise.then(_.curry(dataStoreService.getUpdatedKeys, 2)).then(changeLogPromise.then.bind(changeLogPromise));
+            var remoteUpdatedKeysPromise = projectIdsPromise.then(_.curry(dataStoreService.getUpdatedData, 2)).then(changeLogPromise.then.bind(changeLogPromise));
             var localOpUnitAndModuleIdsPromise = projectIdsPromise.then(getModuleAndOpUnitIds);
 
             return $q.all([remoteUpdatedKeysPromise, localOpUnitAndModuleIdsPromise])
@@ -76,20 +76,15 @@ define(["lodash", "moment"], function(_, moment) {
             return itemA && itemA.orgUnit && itemA.orgUnit === itemB.orgUnit;
         };
 
-        var mergeAndSaveReferralLocations = function (localOpUnitIds, remoteOpUnitIds) {
-            var opUnitIdsToMerge = _.intersection(localOpUnitIds, remoteOpUnitIds);
-            return $q.all([referralLocationsRepository.findAll(opUnitIdsToMerge), dataStoreService.getReferrals(opUnitIdsToMerge)]).then(function (data) {
-                var localReferrals = data[0];
-                var remoteReferrals = data[1];
+        var mergeAndSaveReferralLocations = function (localOpUnitIds, remoteReferrals) {
+            return referralLocationsRepository.findAll(localOpUnitIds).then(function (localReferrals) {
                 return referralLocationsRepository.upsert(merge(remoteReferrals, localReferrals, equalPredicate));
             });
         };
 
-        var mergeAndSavePatientOrigins = function (localOpUnitIds, remoteOpUnitIds) {
-            var opUnitIdsToMerge = _.intersection(localOpUnitIds, remoteOpUnitIds);
-            return $q.all([patientOriginRepository.findAll(opUnitIdsToMerge), dataStoreService.getPatientOrigins(opUnitIdsToMerge)]).then(function (data) {
-                var remotePatientOriginsForAllOpUnits = data[1];
-                var indexedLocalPatientsOriginsForAllOpUnits = _.indexBy(data[0], 'orgUnit');
+        var mergeAndSavePatientOrigins = function (localOpUnitIds, remotePatientOriginsForAllOpUnits) {
+            return patientOriginRepository.findAll(localOpUnitIds).then(function (localPatientOriginDetails) {
+                var indexedLocalPatientsOriginsForAllOpUnits = _.indexBy(localPatientOriginDetails, 'orgUnit');
                 return _.map(remotePatientOriginsForAllOpUnits, function (patientOriginsForOpUnit) {
                     var matchingLocalPatientOrigin = _.get(indexedLocalPatientsOriginsForAllOpUnits, patientOriginsForOpUnit.orgUnit, {origins: []});
                     patientOriginsForOpUnit.origins = merge(patientOriginsForOpUnit.origins, matchingLocalPatientOrigin.origins);
@@ -98,15 +93,11 @@ define(["lodash", "moment"], function(_, moment) {
             }).then(patientOriginRepository.upsert);
         };
 
-        var mergeAndSaveExcludedDataElements = function (localModuleIds, remoteModuleIds) {
-            var moduleIdsToMerge = _.intersection(localModuleIds, remoteModuleIds);
-
-            return $q.all([excludedDataElementsRepository.findAll(moduleIdsToMerge), dataStoreService.getExcludedDataElements(moduleIdsToMerge)])
-                .then(function (data) {
-                var localExcludedDataElements = data[0];
-                var remoteExcludedDataElements = data[1];
-                return excludedDataElementsRepository.upsert(merge(remoteExcludedDataElements, localExcludedDataElements, equalPredicate));
-            });
+        var mergeAndSaveExcludedDataElements = function (localModuleIds, remoteExcludedDataElements) {
+            return excludedDataElementsRepository.findAll(localModuleIds)
+                .then(function (localExcludedDataElements) {
+                    return excludedDataElementsRepository.upsert(merge(remoteExcludedDataElements, localExcludedDataElements, equalPredicate));
+                });
         };
 
     };
