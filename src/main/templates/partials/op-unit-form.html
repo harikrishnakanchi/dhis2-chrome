@@ -25,12 +25,12 @@
                                 </div>
                             </div>
                         </li>
-                        <li class="form-group" ng-repeat="orgUnitGroupSet in orgUnitGroupSets">
-                            <div ng-if="showOrgUnitGroupSet(orgUnitGroupSet)">
+                        <li class="form-group" ng-repeat="orgUnitGroupSet in orgUnitGroupSets" ng-if="showOrgUnitGroupSet(orgUnitGroupSet)">
+                            <div>
                                 <label class="col-sm-4 col-md-4 control-label required">{{ orgUnitGroupSet.name }}</label>
                                 <div class="col-sm-4">
                                     <div angucomplete-alt=""
-                                         name="opUnitType"
+                                         name="{{ orgUnitGroupSet.name }}"
                                          form-name="form"
                                          placeholder="{{ resourceBundle.startTypingLabel }}"
                                          pause="100"
