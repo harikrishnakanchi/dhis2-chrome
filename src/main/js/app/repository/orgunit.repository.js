@@ -98,6 +98,31 @@ define(["moment", "lodashUtils", "customAttributes"], function(moment, _, custom
             return getAll().then(getAttributes);
         };
 
+        var getAssociatedOrganisationUnitGroups = function (moduleOrOriginId) {
+            var getAssociations = function(orgUnits) {
+                return get(moduleOrOriginId).then(function(enrichedModuleOrOrigin) {
+                    var isOrigin = _.any(enrichedModuleOrOrigin.attributeValues, {
+                        "value": "Patient Origin"
+                    });
+
+                    var module = isOrigin === true ? _.find(orgUnits, {
+                        'id': enrichedModuleOrOrigin.parent.id
+                    }) : enrichedModuleOrOrigin;
+
+                    var opUnit = _.find(orgUnits, {
+                        'id': module.parent.id
+                    });
+                    var project = _.find(orgUnits, {
+                        'id': opUnit.parent.id
+                    });
+
+                    return _.map(opUnit.organisationUnitGroups, 'id').concat(_.map(project.organisationUnitGroups, 'id'));
+                });
+            };
+
+            return getAll().then(getAssociations);
+        };
+
         var getAllProjects = function() {
             var filterProjects = function(orgUnits) {
                 return _.filter(orgUnits, function(orgUnit) {
@@ -307,7 +332,8 @@ define(["moment", "lodashUtils", "customAttributes"], function(moment, _, custom
             "enrichWithParent": enrichWithParent,
             "associateDataSetsToOrgUnits": associateDataSetsToOrgUnits,
             "removeDataSetsFromOrgUnits": removeDataSetsFromOrgUnits,
-            "getAllDataSetsForOrgUnit": getAllDataSetsForOrgUnit
+            "getAllDataSetsForOrgUnit": getAllDataSetsForOrgUnit,
+            "getAssociatedOrganisationUnitGroups": getAssociatedOrganisationUnitGroups
         };
     };
 });
