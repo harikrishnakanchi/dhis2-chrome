@@ -1,5 +1,5 @@
-define(["angularMocks", "utils", "systemSettingService", "userPreferenceRepository", "referralLocationsRepository", "patientOriginRepository", "excludedDataElementsRepository", "downloadProjectSettingsConsumer", "mergeBy", "excludedLinelistOptionsMerger"],
-    function(mocks, utils, SystemSettingService, UserPreferenceRepository, ReferralLocationsRepository, PatientOriginRepository, ExcludedDataElementsRepository, DownloadProjectSettingsConsumer, MergeBy, ExcludedLinelistOptionsMerger) {
+define(["angularMocks", "utils", "systemSettingService", "userPreferenceRepository", "referralLocationsRepository", "patientOriginRepository", "excludedDataElementsRepository", "downloadProjectSettingsConsumer", "mergeBy", "excludedLinelistOptionsMerger", "changeLogRepository", "dataStoreService", "orgUnitRepository"],
+    function(mocks, utils, SystemSettingService, UserPreferenceRepository, ReferralLocationsRepository, PatientOriginRepository, ExcludedDataElementsRepository, DownloadProjectSettingsConsumer, MergeBy, ExcludedLinelistOptionsMerger, ChangeLogRepository, DataStoreService, OrgUnitRepository) {
         describe("downloadProjectSettingsConsumer", function() {
             var consumer,
                 systemSettingService,
@@ -11,7 +11,9 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 q,
                 scope,
                 mergeBy,
-                excludedLinelistOptionsMerger;
+                excludedLinelistOptionsMerger,
+                changeLogRepository,
+                dataStoreService;
 
             beforeEach(mocks.inject(function($q, $rootScope, $log) {
 
@@ -38,9 +40,20 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 excludedLinelistOptionsMerger = new ExcludedLinelistOptionsMerger();
                 spyOn(excludedLinelistOptionsMerger, 'mergeAndSaveForProject').and.returnValue(utils.getPromise(q, undefined));
 
+                changeLogRepository = new ChangeLogRepository();
+                spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, "2017-05-01T19:10:13.677Z"));
+
+                dataStoreService = new DataStoreService({});
+                spyOn(dataStoreService, "getUpdatedKeys").and.returnValue(utils.getPromise(q, {}));
+                spyOn(dataStoreService, "getReferrals").and.returnValue(utils.getPromise(q, []));
+
+                orgUnitRepository = new OrgUnitRepository();
+                spyOn(orgUnitRepository, 'getAllModulesInOrgUnits').and.returnValue(utils.getPromise(q, []));
+                spyOn(orgUnitRepository, 'getAllOpUnitsInOrgUnits').and.returnValue(utils.getPromise(q, []));
+
                 mergeBy = new MergeBy($log);
 
-                consumer = new DownloadProjectSettingsConsumer(q, systemSettingService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository, excludedDataElementsRepository, mergeBy, excludedLinelistOptionsMerger);
+                consumer = new DownloadProjectSettingsConsumer(q, systemSettingService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository, excludedDataElementsRepository, mergeBy, excludedLinelistOptionsMerger, changeLogRepository, dataStoreService, orgUnitRepository);
             }));
 
             it("should download project settings for current user projects", function() {
@@ -52,128 +65,97 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 expect(systemSettingService.getProjectSettings).toHaveBeenCalledWith(['prj1', 'prj2']);
             });
 
-            it("should download project settings and save referral locations", function() {
-                var userCurrentProjects = ['prj', 'prjWithNoReferralLocations'];
-                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, userCurrentProjects));
-
-                var projectSettingsFromDhis = {
-                    "prjWithNoReferralLocations": {
-                        "excludedDataElements": []
-                    },
-                    "prj": {
-                        "excludedDataElements": [],
-                        "referralLocations": [{
-                            "orgUnit": "opUnit1",
-                            "facility 1": {
-                                "value": "some alias",
-                                "isDisabled": true
-                            },
-                            "facility 2": {
-                                "value": "some other alias"
-                            },
-                            "clientLastUpdated": "2015-07-17T07:00:00.000Z"
-                        }]
-                    }
-                };
-                var refferalLocationFromLocalDb = [];
-
-                referralLocationsRepository.findAll.and.returnValue(utils.getPromise(q, refferalLocationFromLocalDb));
-                systemSettingService.getProjectSettings.and.returnValue(utils.getPromise(q, projectSettingsFromDhis));
+            it('should get changeLogs for all projectIds', function () {
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1', 'prj2']));
 
                 consumer.run();
                 scope.$apply();
 
-                var expectedPayload = [{
-                    "orgUnit": "opUnit1",
-                    "facility 1": {
-                        "value": "some alias",
-                        "isDisabled": true
-                    },
-                    "facility 2": {
-                        "value": "some other alias"
-                    },
-                    "clientLastUpdated": "2015-07-17T07:00:00.000Z"
-                }];
-
-                expect(referralLocationsRepository.upsert).toHaveBeenCalledWith(expectedPayload);
+                expect(changeLogRepository.get).toHaveBeenCalledWith('projectSettings:prj1');
+                expect(changeLogRepository.get).toHaveBeenCalledWith('projectSettings:prj2');
             });
 
-            it("should merge referral locations based on clientLastUpdated time", function() {
-                var userCurrentProjects = ['prj', 'prjWithNoReferralLocations'];
-                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, userCurrentProjects));
-
-                var projectSettingsFromDhis = {
-                    "prjWithNoReferralLocations": {
-                        "excludedDataElements": []
-                    },
-                    "prj": {
-                        "excludedDataElements": [],
-                        "referralLocations": [{
-                            "orgUnit": "opUnit1",
-                            "facility 1": {
-                                "value": "some alias",
-                                "isDisabled": true
-                            },
-                            "facility 2": {
-                                "value": "some other alias"
-                            },
-                            "clientLastUpdated": "2015-07-17T07:00:00.000Z"
-                        }, {
-                            "orgUnit": "opUnit2",
-                            "facility 1": {
-                                "value": "some alias2",
-                                "isDisabled": false
-                            },
-                            "facility 2": {
-                                "value": "some other alias 2"
-                            },
-                            "clientLastUpdated": "2015-07-19T07:00:00.000Z"
-                        }]
-                    }
-                };
-
-                var refferalLocationFromLocalDb = [{
-                    "orgUnit": "opUnit1",
-                    "facility 1": {
-                        "value": "some alias",
-                        "isDisabled": true
-                    },
-                    "facility 2": {
-                        "value": "some other local alias"
-                    },
-                    "clientLastUpdated": "2015-07-17T08:00:00.000Z"
-                }];
-
-                referralLocationsRepository.findAll.and.returnValue(utils.getPromise(q, refferalLocationFromLocalDb));
-                systemSettingService.getProjectSettings.and.returnValue(utils.getPromise(q, projectSettingsFromDhis));
+            it('should get minimum lastUpdated time from all lastUpdated times and get updated keys', function () {
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1', 'prj2']));
+                changeLogRepository.get.and.returnValues(utils.getPromise(q, "2017-05-01T19:10:13.677Z"), utils.getPromise(q, "2017-05-01T15:10:13.677Z"));
 
                 consumer.run();
                 scope.$apply();
 
-                var expectedPayload = [{
-                    "orgUnit": "opUnit1",
-                    "facility 1": {
-                        "value": "some alias",
-                        "isDisabled": true
-                    },
-                    "facility 2": {
-                        "value": "some other local alias"
-                    },
-                    "clientLastUpdated": "2015-07-17T08:00:00.000Z"
-                }, {
-                    "orgUnit": "opUnit2",
-                    "facility 1": {
-                        "value": "some alias2",
-                        "isDisabled": false
-                    },
-                    "facility 2": {
-                        "value": "some other alias 2"
-                    },
-                    "clientLastUpdated": "2015-07-19T07:00:00.000Z"
-                }];
+                expect(dataStoreService.getUpdatedKeys).toHaveBeenCalledWith("2017-05-01T15:10:13.677Z");
+            });
 
-                expect(referralLocationsRepository.findAll).toHaveBeenCalledWith(["opUnit1", "opUnit2"]);
-                expect(referralLocationsRepository.upsert).toHaveBeenCalledWith(expectedPayload);
+            it('should get all modules and opUnits for all projectIds', function () {
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1', 'prj2']));
+
+                consumer.run();
+                scope.$apply();
+
+                expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['prj1', 'prj2']);
+                expect(orgUnitRepository.getAllOpUnitsInOrgUnits).toHaveBeenCalledWith(['prj1', 'prj2']);
+            });
+
+            describe('referralLocations', function () {
+                it('should download referralLocations only relevant to current project ids', function () {
+                    userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1']));
+                    dataStoreService.getUpdatedKeys.and.returnValue(utils.getPromise(q, {referralLocations: ["opUnit1", "opUnit2"]}));
+                    orgUnitRepository.getAllOpUnitsInOrgUnits.and.returnValue(utils.getPromise(q, [{id: "opUnit1"}]));
+
+                    consumer.run();
+                    scope.$apply();
+
+                    expect(dataStoreService.getReferrals).toHaveBeenCalledWith(["opUnit1"]);
+                });
+
+                it('should get local referral locations only relevant to current project ids', function () {
+                    userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1']));
+                    dataStoreService.getUpdatedKeys.and.returnValue(utils.getPromise(q, {referralLocations: ["opUnit1", "opUnit2"]}));
+                    orgUnitRepository.getAllOpUnitsInOrgUnits.and.returnValue(utils.getPromise(q, [{id: "opUnit1"}]));
+
+                    consumer.run();
+                    scope.$apply();
+
+                    expect(referralLocationsRepository.findAll).toHaveBeenCalledWith(["opUnit1"]);
+                });
+
+                it('should merge referral locations based on clientLastUpdated time', function () {
+                    var mockRemoteReferrals = [{
+                        "orgUnit": "opUnit1",
+                        "clientLastUpdated": "2015-07-17T07:00:00.000Z"
+                    }, {
+                        "orgUnit": "opUnit2",
+                        "clientLastUpdated": "2015-07-18T07:00:00.000Z"
+                    }];
+
+                    var referralLocationFromLocalDb = [{
+                        "orgUnit": "opUnit1",
+                        "facility 1": {
+                            "value": "some alias"
+                        },
+                        "clientLastUpdated": "2015-07-17T08:00:00.000Z"
+                    }];
+                    userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1']));
+                    dataStoreService.getUpdatedKeys.and.returnValue(utils.getPromise(q, {referralLocations: ["opUnit1", "opUnit2"]}));
+                    orgUnitRepository.getAllOpUnitsInOrgUnits.and.returnValue(utils.getPromise(q, [{id: "opUnit1"}, {id: "opUnit2"}]));
+                    dataStoreService.getReferrals.and.returnValue(utils.getPromise(q, mockRemoteReferrals));
+                    referralLocationsRepository.findAll.and.returnValue(utils.getPromise(q, referralLocationFromLocalDb));
+
+                    consumer.run();
+                    scope.$apply();
+
+                    var expectedPayload = [{
+                        "orgUnit": "opUnit1",
+                        "facility 1": {
+                            "value": "some alias"
+                        },
+                        "clientLastUpdated": "2015-07-17T08:00:00.000Z"
+                    }, {
+                        "orgUnit": "opUnit2",
+                        "clientLastUpdated": "2015-07-18T07:00:00.000Z"
+                    }];
+
+                    expect(referralLocationsRepository.upsert).toHaveBeenCalledWith(expectedPayload);
+                });
             });
 
             it("should download project settings and save patient origin details", function() {
