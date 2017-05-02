@@ -41,7 +41,7 @@ define(["uploadExcludedDataElementsConsumer", "utils", "angularMocks", "dataStor
                 uploadExcludedDataElementsConsumer.run(mockMessage);
                 scope.$apply();
 
-                expect(dataStoreService.getExcludedDataElements).toHaveBeenCalledWith("mod1");
+                expect(dataStoreService.getExcludedDataElements).toHaveBeenCalledWith(["mod1"]);
             });
 
             it('should get local excluded dataElements', function () {
@@ -52,7 +52,7 @@ define(["uploadExcludedDataElementsConsumer", "utils", "angularMocks", "dataStor
             });
 
             it('should upload excluded dataElements to DHIS if remote data is not present', function () {
-                dataStoreService.getExcludedDataElements.and.returnValue(utils.getPromise(q, undefined));
+                dataStoreService.getExcludedDataElements.and.returnValue(utils.getPromise(q, [undefined]));
                 uploadExcludedDataElementsConsumer.run(mockMessage);
                 scope.$apply();
 
@@ -67,7 +67,7 @@ define(["uploadExcludedDataElementsConsumer", "utils", "angularMocks", "dataStor
                     }],
                     "clientLastUpdated": "2014-05-29T12:43:54.972Z"
                 };
-                dataStoreService.getExcludedDataElements.and.returnValue(utils.getPromise(q, remoteExcludedDataElements));
+                dataStoreService.getExcludedDataElements.and.returnValue(utils.getPromise(q, [remoteExcludedDataElements]));
                 uploadExcludedDataElementsConsumer.run(mockMessage);
                 scope.$apply();
 
@@ -82,7 +82,7 @@ define(["uploadExcludedDataElementsConsumer", "utils", "angularMocks", "dataStor
                     }],
                     "clientLastUpdated": "2014-05-30T12:46:54.972Z"
                 };
-                dataStoreService.getExcludedDataElements.and.returnValue(utils.getPromise(q, remoteExcludedDataElements));
+                dataStoreService.getExcludedDataElements.and.returnValue(utils.getPromise(q, [remoteExcludedDataElements]));
                 uploadExcludedDataElementsConsumer.run(mockMessage);
                 scope.$apply();
 

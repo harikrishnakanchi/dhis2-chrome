@@ -42,7 +42,7 @@ define(["uploadPatientOriginConsumer", "angularMocks", "utils", "dataStoreServic
                 uploadPatientOriginConsumer.run(mockMessage);
                 scope.$apply();
 
-                expect(dataStoreService.getPatientOrigins).toHaveBeenCalledWith("opUnit1");
+                expect(dataStoreService.getPatientOrigins).toHaveBeenCalledWith(["opUnit1"]);
             });
 
             it('should get local patient origins', function () {
@@ -53,7 +53,7 @@ define(["uploadPatientOriginConsumer", "angularMocks", "utils", "dataStoreServic
             });
 
             it('should upload patient origins to DHIS if remote data is not present', function () {
-                dataStoreService.getPatientOrigins.and.returnValue(utils.getPromise(q, undefined));
+                dataStoreService.getPatientOrigins.and.returnValue(utils.getPromise(q, [undefined]));
                 uploadPatientOriginConsumer.run(mockMessage);
                 scope.$apply();
 
@@ -73,7 +73,7 @@ define(["uploadPatientOriginConsumer", "angularMocks", "utils", "dataStoreServic
                         "clientLastUpdated": "2014-05-30T12:43:54.972Z"
                     }]
                 };
-                dataStoreService.getPatientOrigins.and.returnValue(utils.getPromise(q, remotePatientOrigin));
+                dataStoreService.getPatientOrigins.and.returnValue(utils.getPromise(q, [remotePatientOrigin]));
                 uploadPatientOriginConsumer.run(mockMessage);
                 scope.$apply();
 
