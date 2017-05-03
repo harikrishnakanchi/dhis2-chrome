@@ -263,16 +263,16 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
 
                 it('should merge based on lastUpdated time', function () {
                     var remoteExcludedOptions = [{
-                        orgUnit: "mod1",
+                        moduleId: "mod1",
                         clientLastUpdated: "2015-07-17T07:00:00.000Z",
                         dataElements: []
                     }, {
-                        orgUnit: "mod2",
+                        moduleId: "mod2",
                         clientLastUpdated: "2015-07-17T07:20:00.000Z",
                         dataElements: []
                     }];
                     var localExcludedOptions = [{
-                        orgUnit: "mod1",
+                        moduleId: "mod1",
                         clientLastUpdated: "2015-07-17T07:30:00.000Z",
                         dataElements: [{id: "someId"}]
                     }];

@@ -66,13 +66,13 @@ define(["lodash", "moment"], function(_, moment) {
             return mergeBy.lastUpdated({"remoteTimeField": "clientLastUpdated", "localTimeField": "clientLastUpdated", "eq": equalPredicate}, remoteCollection, localCollection);
         };
 
-        var equalPredicate = function(itemA, itemB) {
-            return itemA && itemA.orgUnit && itemA.orgUnit === itemB.orgUnit;
+        var equalPredicate = function(itemA, itemB, path) {
+            return itemA && itemA[path] && itemA[path] === _.get(itemB, path);
         };
 
         var mergeAndSaveReferralLocations = function (localOpUnitIds, remoteReferrals) {
             return referralLocationsRepository.findAll(localOpUnitIds).then(function (localReferrals) {
-                return referralLocationsRepository.upsert(merge(remoteReferrals, localReferrals, equalPredicate));
+                return referralLocationsRepository.upsert(merge(remoteReferrals, localReferrals, _.partialRight(equalPredicate, 'orgUnit')));
             });
         };
 
@@ -90,13 +90,13 @@ define(["lodash", "moment"], function(_, moment) {
         var mergeAndSaveExcludedDataElements = function (localModuleIds, remoteExcludedDataElements) {
             return excludedDataElementsRepository.findAll(localModuleIds)
                 .then(function (localExcludedDataElements) {
-                    return excludedDataElementsRepository.upsert(merge(remoteExcludedDataElements, localExcludedDataElements, equalPredicate));
+                    return excludedDataElementsRepository.upsert(merge(remoteExcludedDataElements, localExcludedDataElements, _.partialRight(equalPredicate, 'orgUnit')));
                 });
         };
 
         var mergeAndSaveExcludedLineListOptions = function (localModuleIds, remoteExcludedOptions) {
             return excludedLineListOptionsRepository.findAll(localModuleIds).then(function (localExcludedOptions) {
-                return excludedLineListOptionsRepository.upsert(merge(remoteExcludedOptions, localExcludedOptions, equalPredicate));
+                return excludedLineListOptionsRepository.upsert(merge(remoteExcludedOptions, localExcludedOptions, _.partialRight(equalPredicate, 'moduleId')));
             });
         };
 
