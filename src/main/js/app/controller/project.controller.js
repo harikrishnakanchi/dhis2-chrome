@@ -183,6 +183,7 @@ define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "custo
                     var orgUnitGroupSetLevel = customAttributes.getAttributeValue(orgUnitGroupSet.attributeValues, customAttributes.ORG_UNIT_GROUP_SET_LEVEL);
                     return orgUnitGroupSetLevel == ORG_UNIT_LEVEL_FOR_PROJECT;
                 });
+                $scope.orgUnitGroupSets = translationsService.translate($scope.orgUnitGroupSets);
                 $scope.orgUnitGroupSetsById = _.indexBy($scope.orgUnitGroupSets, 'id');
 
                 if ($scope.isNewMode)

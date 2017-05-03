@@ -120,57 +120,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 }]
             }];
             spyOn(orgUnitGroupSetRepository, "getAll").and.returnValue(utils.getPromise(q, orgUnitGroupSets));
-            spyOn(translationsService, "translate").and.callFake(function(projectFields) {
-                if(projectFields[0].name == "Post-conflict") {
-                    return [{
-                        "id": "a16b4a97ce4",
-                        "name": "Post-conflict",
-                        "englishName": "Post-conflict"
-                    }];
-                }
-                if(projectFields[0].name == "Most-at-risk Population") {
-                    return [{
-                        "id": "a35778ed565",
-                        "name": "Most-at-risk Population",
-                        "englishName": "Most-at-risk Population"
-                    }, {
-                        "id": "a48f665185e",
-                        "name": "Refugee",
-                        "englishName": "Refugee"
-                    }];
-                }
-                if(projectFields[0].name == "Natural Disaster") {
-                    return [{
-                        "id": "a8014cfca5c",
-                        "name": "Natural Disaster",
-                        "englishName": "Natural Disaster"
-                    }];
-                }
-                if(projectFields[0].name == "Direct operation") {
-                    return [{
-                        "id": "a560238bc90",
-                        "name": "Direct operation",
-                        "englishName": "Direct operation"
-                    }, {
-                        "id": "a92cee050b0",
-                        "name": "Remote operation",
-                        "englishName": "Remote operation"
-                    }];
-                }
-                if(projectFields[0].name == "Collaboration") {
-                    return [{
-                        "id": "a11a7a5d55a",
-                        "name": "Collaboration",
-                        "englishName": "Collaboration"
-                    }];
-                }
-                if(projectFields[0].name == "Some Type") {
-                    return [{
-                        'name': 'Some Type',
-                        "englishName": "Some Type"
-                    }];
-                }
-            });
+            spyOn(translationsService, "translate").and.returnValue({});
 
             spyOn(customAttributes, 'getAttributeValue').and.returnValue(undefined);
         }));
@@ -180,7 +130,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             Timecop.uninstall();
         });
 
-        it('should get all organisationUnitGroupSets for the project and set them on scope', function () {
+        it('should get all organisationUnitGroupSets for the project, translate and set them on scope', function () {
             var mockOrgUnitGroupSets = [{
                 'name': 'Mode Of Operation',
                 id: 'a9ca3d1ed93',
@@ -207,6 +157,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 }]
             }];
             orgUnitGroupSetRepository.getAll.and.returnValue(utils.getPromise(q, mockOrgUnitGroupSets));
+            translationsService.translate.and.returnValue([mockOrgUnitGroupSets[0]]);
             customAttributes.getAttributeValue.and.callFake(function (attributeValues, code) {
                 return attributeValues[0].value;
             });
@@ -214,6 +165,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             scope.$apply();
 
+            expect(translationsService.translate).toHaveBeenCalledWith([mockOrgUnitGroupSets[0]]);
             expect(orgUnitGroupSetRepository.getAll).toHaveBeenCalled();
             expect(scope.orgUnitGroupSets).toEqual([mockOrgUnitGroupSets[0]]);
         });
@@ -447,6 +399,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 return fakeAttributeValues[code];
             });
             orgUnitGroupSetRepository.getAll.and.returnValue(utils.getPromise(q, mockGroupSet));
+            translationsService.translate.and.returnValue(mockGroupSet);
             initialiseController();
             scope.$apply();
 
