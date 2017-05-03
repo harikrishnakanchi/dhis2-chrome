@@ -1,5 +1,5 @@
 define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAttributes"], function(_, dhisId, moment, interpolate, orgUnitMapper, customAttributes) {
-    return function($scope, $q, $hustle, orgUnitRepository, orgUnitGroupHelper, db, $location, $modal, patientOriginRepository, orgUnitGroupSetRepository) {
+    return function($scope, $q, $hustle, orgUnitRepository, orgUnitGroupHelper, db, $location, $modal, patientOriginRepository, orgUnitGroupSetRepository, translationsService) {
         var ORG_UNIT_LEVEL_FOR_OPUNIT = 5;
         $scope.isDisabled = false;
         $scope.showOpUnitCode = false;
@@ -312,6 +312,8 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
                     }
                     return orgUnitGroupSet;
                 });
+
+                $scope.orgUnitGroupSets = translationsService.translate($scope.orgUnitGroupSets);
 
                 var hospitalUnitCodes = _.get(_.find(data, {"code": "hospital_unit_code"}), 'organisationUnitGroups');
 

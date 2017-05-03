@@ -1,10 +1,12 @@
-define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "timecop", "moment", "dhisId", "orgUnitRepository", "patientOriginRepository", "orgUnitGroupSetRepository", "customAttributes", "orgUnitMapper"],
-    function(OpUnitController, mocks, utils, OrgUnitGroupHelper, timecop, moment, dhisId, OrgUnitRepository, PatientOriginRepository, OrgUnitGroupSetRepository, customAttributes, orgUnitMapper) {
+define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "timecop", "moment", "dhisId", "orgUnitRepository",
+"patientOriginRepository", "orgUnitGroupSetRepository", "customAttributes", "orgUnitMapper", "translationsService"],
+    function(OpUnitController, mocks, utils, OrgUnitGroupHelper, timecop, moment, dhisId, OrgUnitRepository,
+             PatientOriginRepository, OrgUnitGroupSetRepository, customAttributes, orgUnitMapper, TranslationsService) {
     describe('opUnitController', function() {
         var scope, db, q, hustle, fakeModal, location,
             opUnitController,
             patientOriginRepository, orgUnitRepository, orgUnitGroupSetRepository, orgUnitGroupHelper,
-            orgUnitGroupSets;
+            orgUnitGroupSets, translationsService;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
@@ -84,6 +86,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             orgUnitGroupHelper = new OrgUnitGroupHelper();
             spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitGroupHelper, "associateOrgunitsToGroups").and.returnValue(utils.getPromise(q, {}));
+
+            translationsService = new TranslationsService();
+            spyOn(translationsService, 'translate').and.returnValue(orgUnitGroupSets);
         }));
 
         afterEach(function() {
@@ -92,7 +97,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         });
 
         var initializeOpUnitController = function () {
-            return new OpUnitController(scope, q, hustle, orgUnitRepository, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository, orgUnitGroupSetRepository);
+            return new OpUnitController(scope, q, hustle, orgUnitRepository, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository, orgUnitGroupSetRepository, translationsService);
         };
 
         var createMockAttribute = function (code, value, name) {
@@ -110,7 +115,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             return attribute;
         };
 
-        it('should get all organisationUnitGroupSets for the opUnit and set them on scope', function () {
+        it('should get all organisationUnitGroupSets for the opUnit, translate and set them on scope', function () {
             var mockOrgUnitGroupSets = [{
                 name: 'someOrgUnitGroupSet',
                 id: 'someOrgUnitGroupSetId',
@@ -142,14 +147,15 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             }];
 
             orgUnitGroupSetRepository.getAll.and.returnValue(utils.getPromise(q, mockOrgUnitGroupSets));
+            translationsService.translate.and.returnValue([mockOrgUnitGroupSets[0]]);
             spyOn(customAttributes, 'getAttributeValue').and.callFake(function (attributeValues, code) {
                 return attributeValues[0].value;
             });
             scope.isNewMode = true;
-            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepository, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository, orgUnitGroupSetRepository);
-
+            opUnitController = initializeOpUnitController();
             scope.$apply();
 
+            expect(translationsService.translate).toHaveBeenCalledWith([mockOrgUnitGroupSets[0]]);
             expect(orgUnitGroupSetRepository.getAll).toHaveBeenCalled();
             expect(scope.orgUnitGroupSets).toEqual([mockOrgUnitGroupSets[0]]);
         });
@@ -161,10 +167,10 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             }];
 
             orgUnitGroupSetRepository.getAll.and.returnValue(utils.getPromise(q, mockOrgUnitGroupSets));
+            translationsService.translate.and.returnValue(mockOrgUnitGroupSets);
             spyOn(customAttributes, 'getAttributeValue').and.returnValues(5, 'someDependentGroupId');
             scope.isNewMode = true;
-            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepository, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository, orgUnitGroupSetRepository);
-
+            opUnitController = initializeOpUnitController();
             scope.$apply();
 
             var expectedOrgUnitGroupSet = {
