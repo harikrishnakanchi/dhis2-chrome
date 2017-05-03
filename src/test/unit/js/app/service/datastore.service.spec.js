@@ -15,17 +15,18 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
         });
 
         describe('excludedOptions', function() {
-            var moduleId, storeKey, url;
+            var moduleId, storeKey, url, projectId;
             beforeEach(function () {
                 moduleId = "someModuleId";
-                storeKey = moduleId + "_excludedOptions";
+                projectId = "someProjectId";
+                storeKey = projectId + "_" + moduleId + "_excludedOptions";
                 url = [dhisUrl.dataStore, storeNamespace, storeKey].join("/");
             });
 
             it('should update excluded options for specified module', function() {
                 var mockExcludedLinelistOptions = {};
 
-                dataStoreService.updateExcludedOptions(moduleId, mockExcludedLinelistOptions);
+                dataStoreService.updateExcludedOptions(projectId, moduleId, mockExcludedLinelistOptions);
 
                 httpBackend.expectPUT(url, mockExcludedLinelistOptions).respond(200);
                 httpBackend.flush();
@@ -34,7 +35,7 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
             it('should create excluded options for specified module', function() {
                 var mockExcludedLinelistOptions = {};
 
-                dataStoreService.createExcludedOptions(moduleId, mockExcludedLinelistOptions);
+                dataStoreService.createExcludedOptions(projectId, moduleId, mockExcludedLinelistOptions);
 
                 httpBackend.expectPOST(url, mockExcludedLinelistOptions).respond(200);
                 httpBackend.flush();
@@ -43,21 +44,19 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
             describe('getExcludedOptions', function () {
 
                 it('should download excluded options for specified module', function () {
-                    var moduleIds = ['mod1', 'mod2'];
 
-                    dataStoreService.getExcludedOptions(moduleIds).then(function (data) {
-                        expect(data).toEqual(['excludedLineListOptionsMod1', 'excludedLineListOptionsMod2']);
+                    dataStoreService.getExcludedOptions(projectId, moduleId).then(function (data) {
+                        expect(data).toEqual('excludedLineListOptionsMod1');
                     });
 
-                    httpBackend.expectGET([dhisUrl.dataStore, storeNamespace, "mod1_excludedOptions"].join("/")).respond(200, "excludedLineListOptionsMod1");
-                    httpBackend.expectGET([dhisUrl.dataStore, storeNamespace, "mod2_excludedOptions"].join("/")).respond(200, "excludedLineListOptionsMod2");
+                    httpBackend.expectGET(url).respond(200, "excludedLineListOptionsMod1");
                     httpBackend.flush();
                 });
 
                 it('should gracefully return undefined if there is no excluded options for specified module', function () {
                     spyOn(http, 'get').and.returnValue(utils.getRejectedPromise(q, {errorCode: 'NOT_FOUND'}));
-                    dataStoreService.getExcludedOptions([moduleId]).then(function (data) {
-                        expect(data).toEqual([undefined]);
+                    dataStoreService.getExcludedOptions(projectId, moduleId).then(function (data) {
+                        expect(data).toBeUndefined();
                     });
                 });
 
@@ -65,7 +64,7 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
                     var mockErrorResponse = {};
 
                     var result = "someRandomValue";
-                    dataStoreService.getExcludedOptions([moduleId]).then(function (data) {
+                    dataStoreService.getExcludedOptions(projectId, moduleId).then(function (data) {
                         result = data;
                     });
 

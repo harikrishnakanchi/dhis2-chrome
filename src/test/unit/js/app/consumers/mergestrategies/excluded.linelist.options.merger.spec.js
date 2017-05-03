@@ -1,5 +1,5 @@
 define(['excludedLinelistOptionsMerger', 'angularMocks', 'utils', 'excludedLineListOptionsRepository', 'dataStoreService', 'orgUnitRepository'], function (ExcludedLinelistOptionsMerger, mocks, utils, ExcludedLineListOptionsRepository, DataStoreService, OrgUnitRepository) {
-    var excludedLinelistOptionsMerger, q, scope, message, moduleId, excludedLineListOptionsRepository, dataStoreService, orgUnitRepository;
+    var excludedLinelistOptionsMerger, q, scope, message, moduleId, excludedLineListOptionsRepository, dataStoreService, orgUnitRepository, projectId;
 
     describe('ExcludedLineListOptionsMerger', function() {
         beforeEach(mocks.inject(function ($rootScope, $q) {
@@ -9,6 +9,7 @@ define(['excludedLinelistOptionsMerger', 'angularMocks', 'utils', 'excludedLineL
                 data: {data: undefined}
             };
             moduleId = "someModuleId";
+            projectId = "projectId";
 
             excludedLineListOptionsRepository = new ExcludedLineListOptionsRepository();
             spyOn(excludedLineListOptionsRepository, "get").and.returnValue(utils.getPromise(q, {}));
@@ -22,6 +23,7 @@ define(['excludedLinelistOptionsMerger', 'angularMocks', 'utils', 'excludedLineL
 
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, 'getAllModulesInOrgUnits').and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitRepository, 'getParentProject').and.returnValue(utils.getPromise(q, {id: projectId}));
 
             excludedLinelistOptionsMerger = new ExcludedLinelistOptionsMerger(q, excludedLineListOptionsRepository, dataStoreService, orgUnitRepository);
         }));
@@ -46,6 +48,12 @@ define(['excludedLinelistOptionsMerger', 'angularMocks', 'utils', 'excludedLineL
                 expect(excludedLineListOptionsRepository.get).toHaveBeenCalledWith(moduleId);
             });
 
+            it('should get projectId for specified module', function () {
+                initializeMerger(moduleId);
+
+                expect(orgUnitRepository.getParentProject).toHaveBeenCalledWith(moduleId);
+            });
+
             it('should gracefully return if there is no moduleId specified', function () {
                 moduleId = undefined;
                 initializeMerger(moduleId);
@@ -61,13 +69,13 @@ define(['excludedLinelistOptionsMerger', 'angularMocks', 'utils', 'excludedLineL
 
                 initializeMerger(moduleId);
 
-                expect(dataStoreService.updateExcludedOptions).toHaveBeenCalledWith(moduleId, localExcludedLineListOptions);
+                expect(dataStoreService.updateExcludedOptions).toHaveBeenCalledWith(projectId, moduleId, localExcludedLineListOptions);
             });
 
             it('should get remote excluded linelist options for speific module', function() {
                 initializeMerger(moduleId);
 
-                expect(dataStoreService.getExcludedOptions).toHaveBeenCalledWith(moduleId);
+                expect(dataStoreService.getExcludedOptions).toHaveBeenCalledWith(projectId, moduleId);
             });
 
             it('should update excludedLinelist options on local if localData is older than remote data', function() {
@@ -78,7 +86,7 @@ define(['excludedLinelistOptionsMerger', 'angularMocks', 'utils', 'excludedLineL
 
                 initializeMerger(moduleId);
 
-                expect(dataStoreService.updateExcludedOptions).not.toHaveBeenCalledWith(moduleId, localExcludedLineListOptions);
+                expect(dataStoreService.updateExcludedOptions).not.toHaveBeenCalledWith(projectId, moduleId, localExcludedLineListOptions);
                 expect(excludedLineListOptionsRepository.upsert).toHaveBeenCalledWith(remoteExcludedLineListOptions);
             });
 
@@ -89,7 +97,7 @@ define(['excludedLinelistOptionsMerger', 'angularMocks', 'utils', 'excludedLineL
 
                 initializeMerger(moduleId);
 
-                expect(dataStoreService.createExcludedOptions).toHaveBeenCalledWith(moduleId, localExcludedLineListOptions);
+                expect(dataStoreService.createExcludedOptions).toHaveBeenCalledWith(projectId, moduleId, localExcludedLineListOptions);
             });
 
             it('should gracefully return if remoteData and localData lastUpdatedTimes are same', function () {
@@ -109,6 +117,7 @@ define(['excludedLinelistOptionsMerger', 'angularMocks', 'utils', 'excludedLineL
             var projectId = "someProjectId";
 
             var initializeMerger = function (projectId) {
+                orgUnitRepository.getParentProject.and.returnValue(utils.getPromise(q, {id: projectId}));
                 excludedLinelistOptionsMerger.mergeAndSaveForProject(projectId);
                 scope.$apply();
             };
@@ -137,8 +146,8 @@ define(['excludedLinelistOptionsMerger', 'angularMocks', 'utils', 'excludedLineL
 
                 expect(excludedLineListOptionsRepository.get).toHaveBeenCalledWith("mod2");
                 expect(excludedLineListOptionsRepository.get).toHaveBeenCalledWith("mod3");
-                expect(dataStoreService.getExcludedOptions).toHaveBeenCalledWith("mod2");
-                expect(dataStoreService.getExcludedOptions).toHaveBeenCalledWith("mod3");
+                expect(dataStoreService.getExcludedOptions).toHaveBeenCalledWith(projectId, "mod2");
+                expect(dataStoreService.getExcludedOptions).toHaveBeenCalledWith(projectId, "mod3");
             });
 
             it('should gracefully return if localData is latest over remote data', function () {

@@ -18,8 +18,8 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
             return uploadMethod(url, payload);
         };
 
-        this.updateExcludedOptions = _.partialRight(upsertDataToStore, EXCLUDED_OPTIONS, $http.put);
-        this.createExcludedOptions = _.partialRight(upsertDataToStore, EXCLUDED_OPTIONS, $http.post);
+        this.updateExcludedOptions = _.partialRight(upsertDataToStoreWithProjectId, EXCLUDED_OPTIONS, $http.put);
+        this.createExcludedOptions = _.partialRight(upsertDataToStoreWithProjectId, EXCLUDED_OPTIONS, $http.post);
 
         this.createReferrals = _.partialRight(upsertDataToStoreWithProjectId, REFERRAL_LOCATIONS, $http.post);
         this.updateReferrals = _.partialRight(upsertDataToStoreWithProjectId, REFERRAL_LOCATIONS, $http.put);
@@ -61,7 +61,7 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
             return getDataForKey(key);
         };
 
-        this.getExcludedOptions = _.partialRight(getDataForOrgUnitIds, EXCLUDED_OPTIONS);
+        this.getExcludedOptions = _.partialRight(getDataForOrgUnit, EXCLUDED_OPTIONS);
 
         this.getReferrals = _.partialRight(getDataForOrgUnit, REFERRAL_LOCATIONS);
 
