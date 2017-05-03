@@ -85,7 +85,8 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             var setChartTitle = function () {
                 transform = svgElement.firstElementChild.getAttribute('transform');
                 var yAxisTransform = parseInt(transform.slice(transform.length - 3, transform.length - 1));
-                chartTitle = document.createTextNode(chart.title);
+                var title = chart.title || "";
+                chartTitle = document.createTextNode(title);
 
                 chartTitleNode = document.createElement('text');
                 chartTitleNode.setAttribute('x', '500');
