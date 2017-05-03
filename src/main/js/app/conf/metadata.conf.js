@@ -48,7 +48,7 @@ define([], function () {
                 paging: true
             },
             "organisationUnitGroupSets": { //TODO Remove name from organisationUnitGroups once all the fields are updated with 12.0
-                params: "id,name,code,shortName,created,lastUpdated,description,dimensionType,dataDimension,organisationUnitGroups[id,name],attributeValues[value,attribute[id,code,name]]",
+                params: "id,name,code,shortName,created,lastUpdated,description,dimensionType,dataDimension,organisationUnitGroups[id,name],attributeValues[value,attribute[id,code,name]],translations[value,property,locale]",
                 paging: true
             },
             "sections": {
