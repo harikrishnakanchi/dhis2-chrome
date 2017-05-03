@@ -1,7 +1,7 @@
-define(["uploadPatientOriginConsumer", "angularMocks", "utils", "dataStoreService", "patientOriginRepository", "mergeBy"],
-    function(UploadPatientOriginConsumer, mocks, utils, DataStoreService, PatientOriginRepository, MergeBy) {
+define(["uploadPatientOriginConsumer", "angularMocks", "utils", "dataStoreService", "patientOriginRepository", "mergeBy", "orgUnitRepository"],
+    function(UploadPatientOriginConsumer, mocks, utils, DataStoreService, PatientOriginRepository, MergeBy, OrgUnitRepository) {
 
-        var scope, q, dataStoreService, patientOriginRepository, uploadPatientOriginConsumer, mockMessage, patientOriginDetails, http, mergeBy;
+        var scope, q, dataStoreService, patientOriginRepository, uploadPatientOriginConsumer, mockMessage, patientOriginDetails, http, mergeBy, orgUnitRepository;
 
         describe("uploadPatientOriginConsumer", function() {
             beforeEach(mocks.inject(function($q, $rootScope, $http, $log) {
@@ -35,14 +35,24 @@ define(["uploadPatientOriginConsumer", "angularMocks", "utils", "dataStoreServic
                 spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, patientOriginDetails));
                 spyOn(patientOriginRepository, "upsert").and.returnValue(utils.getPromise(q, undefined));
 
-                uploadPatientOriginConsumer = new UploadPatientOriginConsumer(q, dataStoreService, patientOriginRepository, mergeBy);
+                orgUnitRepository = new OrgUnitRepository();
+                spyOn(orgUnitRepository, 'getParentProject').and.returnValue(utils.getPromise(q, {id: "prj1"}));
+
+                uploadPatientOriginConsumer = new UploadPatientOriginConsumer(q, dataStoreService, patientOriginRepository, orgUnitRepository, mergeBy);
             }));
 
             it("should get patient origins for specified opUnit from dhis", function() {
                 uploadPatientOriginConsumer.run(mockMessage);
                 scope.$apply();
 
-                expect(dataStoreService.getPatientOrigins).toHaveBeenCalledWith(["opUnit1"]);
+                expect(dataStoreService.getPatientOrigins).toHaveBeenCalledWith("prj1", "opUnit1");
+            });
+
+            it('should get projectId for specified opUnit', function () {
+                uploadPatientOriginConsumer.run(mockMessage);
+                scope.$apply();
+
+                expect(orgUnitRepository.getParentProject).toHaveBeenCalledWith('opUnit1');
             });
 
             it('should get local patient origins', function () {
@@ -53,11 +63,11 @@ define(["uploadPatientOriginConsumer", "angularMocks", "utils", "dataStoreServic
             });
 
             it('should upload patient origins to DHIS if remote data is not present', function () {
-                dataStoreService.getPatientOrigins.and.returnValue(utils.getPromise(q, [undefined]));
+                dataStoreService.getPatientOrigins.and.returnValue(utils.getPromise(q, undefined));
                 uploadPatientOriginConsumer.run(mockMessage);
                 scope.$apply();
 
-                expect(dataStoreService.createPatientOrigins).toHaveBeenCalledWith('opUnit1', patientOriginDetails);
+                expect(dataStoreService.createPatientOrigins).toHaveBeenCalledWith('prj1', 'opUnit1', patientOriginDetails);
             });
 
             it('should merge the local and remote origins based on lastUpdated time', function () {
@@ -73,11 +83,11 @@ define(["uploadPatientOriginConsumer", "angularMocks", "utils", "dataStoreServic
                         "clientLastUpdated": "2014-05-30T12:43:54.972Z"
                     }]
                 };
-                dataStoreService.getPatientOrigins.and.returnValue(utils.getPromise(q, [remotePatientOrigin]));
+                dataStoreService.getPatientOrigins.and.returnValue(utils.getPromise(q, remotePatientOrigin));
                 uploadPatientOriginConsumer.run(mockMessage);
                 scope.$apply();
 
-                expect(dataStoreService.updatePatientOrigins).toHaveBeenCalledWith('opUnit1', remotePatientOrigin);
+                expect(dataStoreService.updatePatientOrigins).toHaveBeenCalledWith('prj1', 'opUnit1', remotePatientOrigin);
                 expect(patientOriginRepository.upsert).toHaveBeenCalledWith(remotePatientOrigin);
             });
         });

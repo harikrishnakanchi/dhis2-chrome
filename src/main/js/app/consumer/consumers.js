@@ -35,7 +35,7 @@ define(["downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupC
             app.service("uploadProgramConsumer", ["programService", "programRepository", "$q", uploadProgramConsumer]);
             app.service("downloadProgramConsumer", ["programService", "systemInfoService", "programRepository", "changeLogRepository", "$q", "mergeBy", downloadProgramConsumer]);
             app.service("downloadMetadataConsumer", ["$q" ,"metadataService", "systemInfoService", "metadataRepository", "changeLogRepository", downloadMetadataConsumer]);
-            app.service("uploadPatientOriginConsumer", ["$q", "dataStoreService", "patientOriginRepository", "mergeBy", uploadPatientOriginConsumer]);
+            app.service("uploadPatientOriginConsumer", ["$q", "dataStoreService", "patientOriginRepository", "orgUnitRepository", "mergeBy", uploadPatientOriginConsumer]);
             app.service("downloadPivotTablesConsumer", ["reportService", "systemInfoService", "pivotTableRepository", "changeLogRepository", downloadPivotTablesConsumer]);
             app.service("downloadPivotTableDataConsumer", ["reportService", "systemInfoService", "pivotTableRepository", "userPreferenceRepository", "dataSetRepository", "changeLogRepository", "orgUnitRepository", "programRepository", "$q", downloadPivotTableDataConsumer]);
             app.service("downloadChartsConsumer", ["reportService", "systemInfoService", "chartRepository", "changeLogRepository", downloadChartsConsumer]);

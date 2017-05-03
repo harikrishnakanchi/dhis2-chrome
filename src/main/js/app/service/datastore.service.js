@@ -12,14 +12,20 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
             return uploadMethod(url, payload);
         };
 
+        var upsertDataToStoreWithProjectId = function (projectId, orgUnitId, payload, type, uploadMethod) {
+            var key = [projectId, orgUnitId].join("_") + type;
+            var url = [dhisUrl.dataStore, NAMESPACE, key].join("/");
+            return uploadMethod(url, payload);
+        };
+
         this.updateExcludedOptions = _.partialRight(upsertDataToStore, EXCLUDED_OPTIONS, $http.put);
         this.createExcludedOptions = _.partialRight(upsertDataToStore, EXCLUDED_OPTIONS, $http.post);
 
         this.createReferrals = _.partialRight(upsertDataToStore, REFERRAL_LOCATIONS, $http.post);
         this.updateReferrals = _.partialRight(upsertDataToStore, REFERRAL_LOCATIONS, $http.put);
 
-        this.createPatientOrigins = _.partialRight(upsertDataToStore, PATIENT_ORIGINS, $http.post);
-        this.updatePatientOrigins = _.partialRight(upsertDataToStore, PATIENT_ORIGINS, $http.put);
+        this.createPatientOrigins = _.partialRight(upsertDataToStoreWithProjectId, PATIENT_ORIGINS, $http.post);
+        this.updatePatientOrigins = _.partialRight(upsertDataToStoreWithProjectId, PATIENT_ORIGINS, $http.put);
 
         this.createExcludedDataElements = _.partialRight(upsertDataToStore, EXCLUDED_DATA_ELEMENTS, $http.post);
         this.updateExcludedDataElements = _.partialRight(upsertDataToStore, EXCLUDED_DATA_ELEMENTS, $http.put);
@@ -50,11 +56,16 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
             return getDataForMultipleKeys(keys);
         };
 
+        var getDataForOrgUnit = function (projectId, orgUnitId, type) {
+            var key = [projectId, orgUnitId].join("_") + type;
+            return getDataForKey(key);
+        };
+
         this.getExcludedOptions = _.partialRight(getDataForOrgUnitIds, EXCLUDED_OPTIONS);
 
         this.getReferrals = _.partialRight(getDataForOrgUnitIds, REFERRAL_LOCATIONS);
 
-        this.getPatientOrigins = _.partialRight(getDataForOrgUnitIds, PATIENT_ORIGINS);
+        this.getPatientOrigins = _.partialRight(getDataForOrgUnit, PATIENT_ORIGINS);
 
         this.getExcludedDataElements = _.partialRight(getDataForOrgUnitIds, EXCLUDED_DATA_ELEMENTS);
 

@@ -120,43 +120,41 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
         });
 
         describe('patienOrigins', function () {
-            var opUnitId, storeKey, url;
+            var opUnitId, storeKey, url, projectId;
             beforeEach(function () {
+                projectId = "projectId";
                 opUnitId = "someOpUnitId";
-                storeKey = opUnitId + "_patientOrigins";
+                storeKey = projectId + "_" + opUnitId + "_patientOrigins";
                 url = [dhisUrl.dataStore, storeNamespace, storeKey].join("/");
             });
 
             it('should create patient origins for specified opUnit', function () {
-                dataStoreService.createPatientOrigins(opUnitId, {});
+                dataStoreService.createPatientOrigins(projectId, opUnitId, {});
 
                 httpBackend.expectPOST(url, {}).respond(201);
                 httpBackend.flush();
             });
 
             it('should update patient origins for specified opunit', function () {
-                dataStoreService.updatePatientOrigins(opUnitId, {});
+                dataStoreService.updatePatientOrigins(projectId, opUnitId, {});
 
                 httpBackend.expectPUT(url, {}).respond(200);
                 httpBackend.flush();
             });
 
             it('should get patient origins for specified opUnit', function () {
-                var opUnitIds = ['opUnit1', 'opUnit2'];
-                dataStoreService.getPatientOrigins(opUnitIds).then(function (data) {
-                    expect(data).toEqual(["mockOpUnitsForOpUnit1", "mockOpUnitsForOpUnit2"]);
+                dataStoreService.getPatientOrigins(projectId, opUnitId).then(function (data) {
+                    expect(data).toEqual("mockOpUnitsForOpUnit1");
                 });
 
-                httpBackend.expectGET([dhisUrl.dataStore, storeNamespace, "opUnit1_patientOrigins"].join("/")).respond(200, "mockOpUnitsForOpUnit1");
-                httpBackend.expectGET([dhisUrl.dataStore, storeNamespace, "opUnit2_patientOrigins"].join("/")).respond(200, "mockOpUnitsForOpUnit2");
+                httpBackend.expectGET(url).respond(200, "mockOpUnitsForOpUnit1");
                 httpBackend.flush();
             });
 
             it('should return undefined if key is not exist on dhis', function () {
-                var opUnitIds = ['opUnit1', 'opUnit2'];
                 spyOn(http, 'get').and.returnValue(utils.getRejectedPromise(q, {errorCode: "NOT_FOUND"}));
-                dataStoreService.getPatientOrigins(opUnitIds).then(function (data) {
-                    expect(data).toEqual([undefined, undefined]);
+                dataStoreService.getPatientOrigins('projectId', 'opUnit1').then(function (data) {
+                    expect(data).toBeUndefined();
                 });
             });
 
