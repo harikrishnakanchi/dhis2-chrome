@@ -256,7 +256,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 "name": "blah"
             };
 
-            spyOn(orgUnitMapper, "mapToExistingProject").and.returnValue(expectedNewOrgUnit);
+            spyOn(orgUnitMapper, "mapToExistingProjectForDHIS").and.returnValue(expectedNewOrgUnit);
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
             spyOn(location, 'hash');
             spyOn(orgUnitGroupHelper, "associateOrgunitsToGroups").and.returnValue(utils.getPromise(q, {}));
@@ -276,7 +276,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
         it("should display error if updating organization unit fails", function() {
             initialiseController();
             spyOn(hustle, "publish").and.returnValue(utils.getRejectedPromise(q, {}));
-            spyOn(orgUnitMapper, "mapToExistingProject").and.returnValue([]);
+            spyOn(orgUnitMapper, "mapToExistingProjectForDHIS").and.returnValue([]);
             spyOn(orgUnitGroupHelper, "associateOrgunitsToGroups").and.returnValue(utils.getPromise(q, {}));
 
             scope.update({}, parent);
@@ -504,7 +504,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             orgUnitRepo.findAllByParent.and.returnValue(utils.getPromise(q, originOrgUnits));
 
-            spyOn(orgUnitMapper, "mapToExistingProject").and.returnValue(project);
+            spyOn(orgUnitMapper, "mapToExistingProjectForDHIS").and.returnValue(project);
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
             orgUnitRepo.getAllModulesInOrgUnits = jasmine.createSpy("getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modules));
 
@@ -556,7 +556,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 }
             };
 
-            spyOn(orgUnitMapper, "mapToExistingProject").and.returnValue(project);
+            spyOn(orgUnitMapper, "mapToExistingProjectForDHIS").and.returnValue(project);
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
             orgUnitRepo.getAllModulesInOrgUnits = jasmine.createSpy("getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modules));
 

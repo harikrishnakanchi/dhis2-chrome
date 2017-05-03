@@ -86,7 +86,7 @@ define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "custo
             var syncedOrgUnitGroupIds = _.pluck(orgUnit.organisationUnitGroups, 'id'),
                 localOrgUnitGroupIds = getProjectOrgUnitGroupIds(newOrgUnit);
 
-            var dhisProject = orgUnitMapper.mapToExistingProject(newOrgUnit, orgUnit);
+            var dhisProject = orgUnitMapper.mapToExistingProjectForDHIS(newOrgUnit, orgUnit);
 
             var getModulesInProject = function() {
                 return orgUnitRepository.getAllModulesInOrgUnits([dhisProject.id]);

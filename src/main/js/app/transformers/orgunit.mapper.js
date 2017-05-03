@@ -51,7 +51,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
         }, []);
     };
 
-    this.mapToExistingProject = function(newProject, existingProject) {
+    this.mapToExistingProjectForDHIS = function(newProject, existingProject) {
         existingProject.name = newProject.name;
         existingProject.openingDate = moment(newProject.openingDate).format("YYYY-MM-DD");
         existingProject.attributeValues = buildProjectAttributeValues(newProject);

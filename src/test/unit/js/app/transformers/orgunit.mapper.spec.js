@@ -564,7 +564,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                 }]
             };
 
-            var projectToBeSaved = orgUnitMapper.mapToExistingProject(newProject, project);
+            var projectToBeSaved = orgUnitMapper.mapToExistingProjectForDHIS(newProject, project);
 
             expect(projectToBeSaved).toEqual(expectedSavedProject);
         });
