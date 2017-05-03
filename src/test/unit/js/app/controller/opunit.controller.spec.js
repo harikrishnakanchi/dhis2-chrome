@@ -91,7 +91,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             spyOn(orgUnitGroupSetRepository, 'getAll').and.returnValue(utils.getPromise(q, orgUnitGroupSets));
 
             orgUnitGroupHelper = new OrgUnitGroupHelper();
-            spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitGroupHelper, "associateOrgunitsToGroups").and.returnValue(utils.getPromise(q, {}));
 
             translationsService = new TranslationsService();
