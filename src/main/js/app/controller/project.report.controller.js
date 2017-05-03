@@ -75,7 +75,8 @@ define(["moment", "dateUtils", "lodash", "orgUnitMapper", "excelBuilder", "const
 
         var getOrgUnitGroupsets = function () {
             return orgUnitGroupSetRepository.getAll().then(function (orgUnitGroupSets) {
-                return _.filter(orgUnitGroupSets, function (orgUnitGroupSet) {
+                var translatedOrgUnitGroupSets = translationsService.translate(orgUnitGroupSets);
+                return _.filter(translatedOrgUnitGroupSets, function (orgUnitGroupSet) {
                     var orgUnitGroupSetLevel = customAttributes.getAttributeValue(orgUnitGroupSet.attributeValues, customAttributes.ORG_UNIT_GROUP_SET_LEVEL);
                     return orgUnitGroupSetLevel == ORG_UNIT_LEVEL_FOR_PROJECT;
                 });

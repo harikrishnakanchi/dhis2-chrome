@@ -148,7 +148,6 @@ define(["moment", "orgUnitRepository", "angularMocks", "dateUtils", "projectRepo
             spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise($q, lastUpdatedTime));
 
             translationsService = new TranslationsService();
-            spyOn(translationsService, 'translatePivotTableData').and.callFake(function(object) { return object; });
             spyOn(translationsService, 'translate').and.callFake(function(object) { return object; });
 
             orgUnitGroupSetRepository = new OrgUnitGroupSetRepository();
@@ -166,6 +165,8 @@ define(["moment", "orgUnitRepository", "angularMocks", "dateUtils", "projectRepo
             spyOn(customAttributes, 'getAttributeValue').and.callFake(function (attributeValues, code) {
                  return attributeValues[0].value;
             });
+
+
 
             projectReportController = new ProjectReportController(rootScope, q, scope, orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService, pivotTableExportBuilder);
         }));
@@ -243,8 +244,9 @@ define(["moment", "orgUnitRepository", "angularMocks", "dateUtils", "projectRepo
             expect(scope.pivotTables).toEqual([]);
         });
 
-        it('should add organisationUnitGroups which lists project basic info', function () {
+        it('should add and translate organisationUnitGroups which lists project basic info', function () {
             scope.$apply();
+            expect(translationsService.translate).toHaveBeenCalledWith(orgUnitGroupSets);
             expect(orgUnitMapper.mapOrgUnitToProject).toHaveBeenCalledWith(mockProjectOrgUnit, [orgUnitGroupSets[0]]);
             expect(scope.projectAttributes).toEqual([{
                 name: 'Country',
