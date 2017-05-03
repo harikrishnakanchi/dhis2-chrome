@@ -59,24 +59,6 @@ define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "custo
                 .then(onSuccess, onError);
         };
 
-        var getPeriodsAndOrgUnitsForAutoApprove = function(orgUnits) {
-            var periods = _.times(properties.weeksForAutoApprove, function(n) {
-                return moment().subtract(n + 1, 'week').format("GGGG[W]WW");
-            });
-            var orgUnitIds = _.pluck(orgUnits, 'id');
-
-            var periodAndOrgUnits = _.map(orgUnitIds, function(orgUnitId) {
-                return _.map(periods, function(period) {
-                    return {
-                        "period": period,
-                        "orgUnit": orgUnitId
-                    };
-                });
-            });
-
-            return _.flatten(periodAndOrgUnits);
-        };
-
         var getProjectOrgUnitGroupIds = function (newOrgUnit) {
             return _.compact(_.map(newOrgUnit.orgUnitGroupSets, 'id'));
         };
