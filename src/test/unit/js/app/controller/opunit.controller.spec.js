@@ -55,13 +55,20 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             };
 
             orgUnitGroupSets = [{
-                code: 'hospital_unit_code',
+                attributeValues: [{
+                    value: 'someValue',
+                    attribute: {
+                        code: 'dependentOrgUnitGroupId'
+                    }
+                }],
                 organisationUnitGroups: [{
                     id: 'orgUnitGroupC2Id',
-                    name: 'Unit Code - C2'
+                    name: 'Unit Code - C2',
+                    shortName: 'C2'
                 }, {
                     id: 'orgUnitGroupB1Id',
-                    name: 'Unit Code - B1'
+                    name: 'Unit Code - B1',
+                    shortName: 'B1'
                 }]
             }];
 
@@ -177,14 +184,17 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         });
 
         it("should set hospitalUnitCodes on scope on init", function() {
+            spyOn(customAttributes, 'getAttributeValue').and.returnValue(5, 'someId');
             opUnitController = initializeOpUnitController();
             scope.$apply();
             expect(scope.hospitalUnitCodes).toEqual([{
                 id: 'orgUnitGroupB1Id',
-                name: 'B1'
+                name: 'B1',
+                shortName: 'B1'
             }, {
                 id: 'orgUnitGroupC2Id',
-                name: 'C2'
+                name: 'C2',
+                shortName: 'C2'
             }]);
         });
 

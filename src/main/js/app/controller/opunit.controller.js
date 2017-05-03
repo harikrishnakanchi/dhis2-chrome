@@ -89,7 +89,7 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
 
             var removeDependantOrgUnitGroup = function () {
                 var localGroupIds =  _.map(opUnit.organisationUnitGroups, 'id');
-                var hospitalUnitGroupSet = _.find($scope.orgUnitGroupSets, {"code": "hospital_unit_code"}),
+                var hospitalUnitGroupSet = _.find($scope.orgUnitGroupSets, 'dependentOrgUnitGroupId'),
                     hospitalUnitGroupIds = hospitalUnitGroupSet && _.map(hospitalUnitGroupSet.organisationUnitGroups, 'id'),
                     dependentGroupId = hospitalUnitGroupSet && customAttributes.getAttributeValue(hospitalUnitGroupSet.attributeValues, customAttributes.DEPENDENT_ORGUNITGROUP_ID);
 
@@ -316,10 +316,10 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
 
                 $scope.orgUnitGroupSets = translationsService.translate($scope.orgUnitGroupSets);
 
-                var hospitalUnitCodes = _.get(_.find(data, {"code": "hospital_unit_code"}), 'organisationUnitGroups');
+                var hospitalUnitCodes = _.get(_.find($scope.orgUnitGroupSets, 'dependentOrgUnitGroupId'), 'organisationUnitGroups');
 
                 $scope.hospitalUnitCodes = _.map(hospitalUnitCodes, function(hospitalUnitCode) {
-                    hospitalUnitCode.name = hospitalUnitCode.name.replace('Unit Code - ', '');
+                    hospitalUnitCode.name = hospitalUnitCode.shortName;
                     return hospitalUnitCode;
                 });
 
