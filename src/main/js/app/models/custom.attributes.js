@@ -36,7 +36,8 @@ define(['lodash', 'moment'], function(_, moment) {
         MODEL_OF_MANAGEMENT_CODE: 'modelOfManagement',
         PROJECT_TYPE_CODE: 'projectType',
         ORG_UNIT_GROUP_SET_LEVEL: 'groupSetLevel',
-        DEPENDENT_ORGUNITGROUP_ID: 'dependentOrgUnitGroupId'
+        DEPENDENT_ORGUNITGROUP_ID: 'dependentOrgUnitGroupId',
+        ORG_UNIT_GROUP_SET_MANDATORY: 'isOrgUnitGroupSetMandatory'
     };
 
     var getBooleanAttributeValue = function(attributeValues, attributeCode) {

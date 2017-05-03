@@ -40,7 +40,7 @@
                         </div>
                     </li>
                     <li class="form-group" ng-repeat="(id, orgUnitGroupSet) in orgUnitGroupSetsById">
-                        <label class="col-sm-4 col-md-4 control-label">{{ orgUnitGroupSet.name }}</label>
+                        <label class="col-sm-4 col-md-4 control-label" ng-class="{ 'required' : orgUnitGroupSet.isMandatory }">{{ orgUnitGroupSet.name }}</label>
                         <div class="col-sm-6 col-md-6">
                             <div angucomplete-alt=""
                                  name="{{ orgUnitGroupSet.name }}"
@@ -55,6 +55,7 @@
                                  minlength="0"
                                  input-class="form-control form-control-small"
                                  match-class="highlight"
+                                 field-required="orgUnitGroupSet.isMandatory"
                                  class="ng-isolate-scope">
                             </div>
                         </div>

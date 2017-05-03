@@ -27,7 +27,7 @@
                         </li>
                         <li class="form-group" ng-repeat="orgUnitGroupSet in orgUnitGroupSets" ng-if="showOrgUnitGroupSet(orgUnitGroupSet)">
                             <div>
-                                <label class="col-sm-4 col-md-4 control-label required">{{ orgUnitGroupSet.name }}</label>
+                                <label class="col-sm-4 col-md-4 control-label" ng-class="{'required': orgUnitGroupSet.isMandatory }">{{ orgUnitGroupSet.name }}</label>
                                 <div class="col-sm-4">
                                     <div angucomplete-alt=""
                                          name="{{ orgUnitGroupSet.name }}"
@@ -42,7 +42,7 @@
                                          minlength="0"
                                          input-class="form-control form-control-small"
                                          match-class="highlight"
-                                         field-required="true"
+                                         field-required="orgUnitGroupSet.isMandatory"
                                          class="ng-isolate-scope">
                                     </div>
                                 </div>

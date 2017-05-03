@@ -172,13 +172,8 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope.isNewMode = true;
             opUnitController = initializeOpUnitController();
             scope.$apply();
-
-            var expectedOrgUnitGroupSet = {
-                name: 'someOrgUnitGroupSet',
-                id: 'someOrgUnitGroupSetId',
-                dependentOrgUnitGroupId: 'someDependentGroupId',
-            };
-            expect(scope.orgUnitGroupSets).toEqual([expectedOrgUnitGroupSet]);
+            
+            expect(scope.orgUnitGroupSets[0].dependentOrgUnitGroupId).toEqual('someDependentGroupId');
         });
 
         it("should set hospitalUnitCodes on scope on init", function() {

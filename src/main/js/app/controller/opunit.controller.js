@@ -306,6 +306,7 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
                 });
 
                 $scope.orgUnitGroupSets = _.map(opUnitGroupSets, function (orgUnitGroupSet) {
+                    orgUnitGroupSet.isMandatory = customAttributes.getBooleanAttributeValue(orgUnitGroupSet.attributeValues, customAttributes.ORG_UNIT_GROUP_SET_MANDATORY);
                     var dependentGroupId = customAttributes.getAttributeValue(orgUnitGroupSet.attributeValues, customAttributes.DEPENDENT_ORGUNITGROUP_ID);
                     if (dependentGroupId) {
                         orgUnitGroupSet.dependentOrgUnitGroupId = dependentGroupId;
