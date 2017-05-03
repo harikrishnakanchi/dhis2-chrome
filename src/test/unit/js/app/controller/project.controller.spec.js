@@ -4,8 +4,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
              properties, OrgUnitGroupSetRepository, TranslationsService, customAttributes) {
     describe("project controller tests", function() {
         var scope, q, userRepository, parent, fakeModal, orgUnitRepo, hustle, rootScope, orgUnitGroupSetRepository,
-            orgUnitGroupSets, translationsService, orgUnitGroupHelper, projectController;
-
+            translationsService, orgUnitGroupHelper, projectController;
         var initialiseController = function () {
             projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, orgUnitGroupSetRepository, translationsService);
         };
@@ -58,68 +57,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             Timecop.install();
             Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
 
-            orgUnitGroupSets = [{
-                "name": "Mode Of Operation",
-                "code": "mode_of_operation",
-                "id": "a9ca3d1ed93",
-                "organisationUnitGroups": [{
-                    "id": "a560238bc90",
-                    "englishName": "Direct operation",
-                    "name": "Direct operation"
-                }, {
-                    "id": "a92cee050b0",
-                    "name": "Remote operation",
-                    "englishName": "Remote operation"
-                }]
-            }, {
-                "name": "Model Of Management",
-                "code": "model_of_management",
-                "id": "a2d4a1dee27",
-                "organisationUnitGroups": [{
-                    "id": "a11a7a5d55a",
-                    "name": "Collaboration",
-                    "englishName": "Collaboration"
-                }]
-            }, {
-                "name": "Reason For Intervention",
-                "code": "reason_for_intervention",
-                "id": "a86f66f29d4",
-                "organisationUnitGroups": [{
-                    "id": "a8014cfca5c",
-                    "name": "Natural Disaster",
-                    "englishName": "Natural Disaster"
-                }]
-            }, {
-                "name": "Type of Population",
-                "code": "type_of_population",
-                "id": "a8a579d5fab",
-                "organisationUnitGroups": [{
-                    "id": "a35778ed565",
-                    "name": "Most-at-risk Population",
-                    "englishName": "Most-at-risk Population"
-                }, {
-                    "id": "a48f665185e",
-                    "name": "Refugee",
-                    "englishName": "Refugee"
-                }]
-            }, {
-                "name": "Context",
-                "code": "context",
-                "id": "a5c18ef7277",
-                "organisationUnitGroups": [{
-                    "id": "a16b4a97ce4",
-                    "name": "Post-conflict",
-                    "englishName": "Post-conflict"
-                }]
-            }, {
-                "name": "Project Type",
-                "code": "project_type",
-                "organisationUnitGroups": [{
-                    "name": "Some Type",
-                    "englishName": "Some Type"
-                }]
-            }];
-            spyOn(orgUnitGroupSetRepository, "getAll").and.returnValue(utils.getPromise(q, orgUnitGroupSets));
+            spyOn(orgUnitGroupSetRepository, "getAll").and.returnValue(utils.getPromise(q, {}));
             spyOn(translationsService, "translate").and.returnValue({});
 
             spyOn(customAttributes, 'getAttributeValue').and.returnValue(undefined);
