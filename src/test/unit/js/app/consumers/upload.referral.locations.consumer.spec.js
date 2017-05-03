@@ -1,7 +1,7 @@
-define(["uploadReferralLocationsConsumer", "utils", "angularMocks", "dataStoreService", "referralLocationsRepository"],
-    function(UploadReferralLocationsConsumer, utils, mocks, DataStoreService, ReferralLocationsRepository) {
+define(["uploadReferralLocationsConsumer", "utils", "angularMocks", "dataStoreService", "referralLocationsRepository", "orgUnitRepository"],
+    function(UploadReferralLocationsConsumer, utils, mocks, DataStoreService, ReferralLocationsRepository, OrgUnitRepository) {
         describe("uploadReferralLocationsConsumer", function() {
-            var uploadReferralLocationsConsumer, dataStoreService, referralLocationsRepository, q, scope, mockMessage, http, localReferralLocations;
+            var uploadReferralLocationsConsumer, dataStoreService, referralLocationsRepository, q, scope, mockMessage, http, localReferralLocations, orgUnitRepository;
 
             beforeEach(mocks.inject(function($q, $rootScope, $http) {
                 q = $q;
@@ -34,14 +34,24 @@ define(["uploadReferralLocationsConsumer", "utils", "angularMocks", "dataStoreSe
                 spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, localReferralLocations));
                 spyOn(referralLocationsRepository, "upsert").and.returnValue(utils.getPromise(q, undefined));
 
-                uploadReferralLocationsConsumer = new UploadReferralLocationsConsumer(q, dataStoreService, referralLocationsRepository);
+                orgUnitRepository = new OrgUnitRepository();
+                spyOn(orgUnitRepository, 'getParentProject').and.returnValue(utils.getPromise(q, {id: "prj1"}));
+
+                uploadReferralLocationsConsumer = new UploadReferralLocationsConsumer(q, dataStoreService, referralLocationsRepository, orgUnitRepository);
             }));
 
             it("should get referral locations for specified opUnit from dhis", function() {
                 uploadReferralLocationsConsumer.run(mockMessage);
                 scope.$apply();
 
-                expect(dataStoreService.getReferrals).toHaveBeenCalledWith(["opUnit1"]);
+                expect(dataStoreService.getReferrals).toHaveBeenCalledWith("prj1", "opUnit1");
+            });
+
+            it('should get projectId for specified opUnit', function () {
+                uploadReferralLocationsConsumer.run(mockMessage);
+                scope.$apply();
+
+                expect(orgUnitRepository.getParentProject).toHaveBeenCalledWith('opUnit1');
             });
 
             it('should get local referral locations', function () {
@@ -52,11 +62,11 @@ define(["uploadReferralLocationsConsumer", "utils", "angularMocks", "dataStoreSe
             });
 
             it('should upload referral locations to DHIS if remote referrals are not present', function () {
-                dataStoreService.getReferrals.and.returnValue(utils.getPromise(q, [undefined]));
+                dataStoreService.getReferrals.and.returnValue(utils.getPromise(q, undefined));
                 uploadReferralLocationsConsumer.run(mockMessage);
                 scope.$apply();
 
-                expect(dataStoreService.createReferrals).toHaveBeenCalledWith('opUnit1', localReferralLocations);
+                expect(dataStoreService.createReferrals).toHaveBeenCalledWith('prj1', 'opUnit1', localReferralLocations);
             });
 
             it('should update the remote referral locations if local referrals are latest', function () {
@@ -67,11 +77,11 @@ define(["uploadReferralLocationsConsumer", "utils", "angularMocks", "dataStoreSe
                         value: "facility one"
                     }
                 };
-                dataStoreService.getReferrals.and.returnValue(utils.getPromise(q, [remoteReferrals]));
+                dataStoreService.getReferrals.and.returnValue(utils.getPromise(q, remoteReferrals));
                 uploadReferralLocationsConsumer.run(mockMessage);
                 scope.$apply();
 
-                expect(dataStoreService.updateReferrals).toHaveBeenCalledWith('opUnit1', localReferralLocations);
+                expect(dataStoreService.updateReferrals).toHaveBeenCalledWith('prj1', 'opUnit1', localReferralLocations);
             });
 
             it('should update the local referral locations if remote referrals are latest', function () {
@@ -82,7 +92,7 @@ define(["uploadReferralLocationsConsumer", "utils", "angularMocks", "dataStoreSe
                         value: "facility one"
                     }
                 };
-                dataStoreService.getReferrals.and.returnValue(utils.getPromise(q, [remoteReferrals]));
+                dataStoreService.getReferrals.and.returnValue(utils.getPromise(q, remoteReferrals));
                 uploadReferralLocationsConsumer.run(mockMessage);
                 scope.$apply();
 

@@ -77,43 +77,41 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
         });
 
         describe('referralLocations', function () {
-            var opUnitId, storeKey, url;
+            var opUnitId, storeKey, url, projectId;
             beforeEach(function () {
+                projectId = "someProjectId";
                 opUnitId = "someOpUnitId";
-                storeKey = opUnitId + "_referralLocations";
+                storeKey = projectId + "_" + opUnitId + "_referralLocations";
                 url = [dhisUrl.dataStore, storeNamespace, storeKey].join("/");
             });
 
             it('should create referralLocations for specified opUnit', function () {
-                dataStoreService.createReferrals(opUnitId, {});
+                dataStoreService.createReferrals(projectId, opUnitId, {});
 
                 httpBackend.expectPOST(url, {}).respond(201);
                 httpBackend.flush();
             });
 
             it('should update referralLocations for specified opunit', function () {
-                dataStoreService.updateReferrals(opUnitId, {});
+                dataStoreService.updateReferrals(projectId, opUnitId, {});
 
                 httpBackend.expectPUT(url, {}).respond(200);
                 httpBackend.flush();
             });
 
             it('should get referral locations for specified multiple opUnits', function () {
-                var opUnitIds = ["opUnit1", "opUnit2"];
-                dataStoreService.getReferrals(opUnitIds).then(function (data) {
-                    expect(data).toEqual(["mockReferralsForOpUnit1", "mockReferralsForOpUnit2"]);
+                dataStoreService.getReferrals(projectId, opUnitId).then(function (data) {
+                    expect(data).toEqual("mockReferralsForOpUnit1");
                 });
 
-                httpBackend.expectGET([dhisUrl.dataStore, storeNamespace, "opUnit1_referralLocations"].join("/")).respond(200, "mockReferralsForOpUnit1");
-                httpBackend.expectGET([dhisUrl.dataStore, storeNamespace, "opUnit2_referralLocations"].join("/")).respond(200, "mockReferralsForOpUnit2");
+                httpBackend.expectGET(url).respond(200, "mockReferralsForOpUnit1");
                 httpBackend.flush();
             });
 
             it('should return undefined if key is not exist on dhis', function () {
-                var opUnitIds = ["opUnit1", "opUnit2"];
                 spyOn(http, 'get').and.returnValue(utils.getRejectedPromise(q, {errorCode: "NOT_FOUND"}));
-                dataStoreService.getReferrals(opUnitIds).then(function (data) {
-                    expect(data).toEqual([undefined, undefined]);
+                dataStoreService.getReferrals(projectId, opUnitId).then(function (data) {
+                    expect(data).toBeUndefined();
                 });
             });
 

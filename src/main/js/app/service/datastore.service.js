@@ -21,8 +21,8 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
         this.updateExcludedOptions = _.partialRight(upsertDataToStore, EXCLUDED_OPTIONS, $http.put);
         this.createExcludedOptions = _.partialRight(upsertDataToStore, EXCLUDED_OPTIONS, $http.post);
 
-        this.createReferrals = _.partialRight(upsertDataToStore, REFERRAL_LOCATIONS, $http.post);
-        this.updateReferrals = _.partialRight(upsertDataToStore, REFERRAL_LOCATIONS, $http.put);
+        this.createReferrals = _.partialRight(upsertDataToStoreWithProjectId, REFERRAL_LOCATIONS, $http.post);
+        this.updateReferrals = _.partialRight(upsertDataToStoreWithProjectId, REFERRAL_LOCATIONS, $http.put);
 
         this.createPatientOrigins = _.partialRight(upsertDataToStoreWithProjectId, PATIENT_ORIGINS, $http.post);
         this.updatePatientOrigins = _.partialRight(upsertDataToStoreWithProjectId, PATIENT_ORIGINS, $http.put);
@@ -63,7 +63,7 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
 
         this.getExcludedOptions = _.partialRight(getDataForOrgUnitIds, EXCLUDED_OPTIONS);
 
-        this.getReferrals = _.partialRight(getDataForOrgUnitIds, REFERRAL_LOCATIONS);
+        this.getReferrals = _.partialRight(getDataForOrgUnit, REFERRAL_LOCATIONS);
 
         this.getPatientOrigins = _.partialRight(getDataForOrgUnit, PATIENT_ORIGINS);
 

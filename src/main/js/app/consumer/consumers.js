@@ -40,7 +40,7 @@ define(["downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupC
             app.service("downloadPivotTableDataConsumer", ["reportService", "systemInfoService", "pivotTableRepository", "userPreferenceRepository", "dataSetRepository", "changeLogRepository", "orgUnitRepository", "programRepository", "$q", downloadPivotTableDataConsumer]);
             app.service("downloadChartsConsumer", ["reportService", "systemInfoService", "chartRepository", "changeLogRepository", downloadChartsConsumer]);
             app.service("downloadChartDataConsumer", ["reportService", "systemInfoService", "chartRepository", "userPreferenceRepository", "dataSetRepository", "changeLogRepository", "orgUnitRepository","programRepository", "$q", downloadChartDataConsumer]);
-            app.service("uploadReferralLocationsConsumer", ["$q", "dataStoreService", "referralLocationsRepository", uploadReferralLocationsConsumer]);
+            app.service("uploadReferralLocationsConsumer", ["$q", "dataStoreService", "referralLocationsRepository", "orgUnitRepository", uploadReferralLocationsConsumer]);
             app.service("uploadExcludedDataElementsConsumer", ["$q", "dataStoreService", "excludedDataElementsRepository", uploadExcludedDataElementsConsumer]);
             app.service("downloadModuleDataBlocksConsumer", ["dataService", "approvalService", "systemInfoService", "dataSetRepository", "userPreferenceRepository", "changeLogRepository", "orgUnitRepository",
                 "moduleDataBlockFactory", "moduleDataBlockMerger", "eventService", "$q", downloadModuleDataBlocksConsumer]);
