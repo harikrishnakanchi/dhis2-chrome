@@ -27,8 +27,8 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
         this.createPatientOrigins = _.partialRight(upsertDataToStoreWithProjectId, PATIENT_ORIGINS, $http.post);
         this.updatePatientOrigins = _.partialRight(upsertDataToStoreWithProjectId, PATIENT_ORIGINS, $http.put);
 
-        this.createExcludedDataElements = _.partialRight(upsertDataToStore, EXCLUDED_DATA_ELEMENTS, $http.post);
-        this.updateExcludedDataElements = _.partialRight(upsertDataToStore, EXCLUDED_DATA_ELEMENTS, $http.put);
+        this.createExcludedDataElements = _.partialRight(upsertDataToStoreWithProjectId, EXCLUDED_DATA_ELEMENTS, $http.post);
+        this.updateExcludedDataElements = _.partialRight(upsertDataToStoreWithProjectId, EXCLUDED_DATA_ELEMENTS, $http.put);
 
         var getDataForKey = function (key) {
             var url = [dhisUrl.dataStore, NAMESPACE, key].join("/");
@@ -67,7 +67,7 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
 
         this.getPatientOrigins = _.partialRight(getDataForOrgUnit, PATIENT_ORIGINS);
 
-        this.getExcludedDataElements = _.partialRight(getDataForOrgUnitIds, EXCLUDED_DATA_ELEMENTS);
+        this.getExcludedDataElements = _.partialRight(getDataForOrgUnit, EXCLUDED_DATA_ELEMENTS);
 
         var getUpdatedKeys = function (projectIds, lastUpdated) {
 

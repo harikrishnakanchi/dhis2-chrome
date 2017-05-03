@@ -159,43 +159,41 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
         });
 
         describe('excludedDataElements', function () {
-            var moduleId, storeKey, url;
+            var moduleId, storeKey, url, projectId;
             beforeEach(function () {
+                projectId = "someProjectId";
                 moduleId = "someModuleId";
-                storeKey = moduleId + "_excludedDataElements";
+                storeKey = projectId + "_" + moduleId + "_excludedDataElements";
                 url = [dhisUrl.dataStore, storeNamespace, storeKey].join("/");
             });
 
             it('should create excluded dataelements for specified module', function () {
-                dataStoreService.createExcludedDataElements(moduleId, {});
+                dataStoreService.createExcludedDataElements(projectId, moduleId, {});
 
                 httpBackend.expectPOST(url, {}).respond(201);
                 httpBackend.flush();
             });
 
             it('should update excluded data elements for specified module', function () {
-                dataStoreService.updateExcludedDataElements(moduleId, {});
+                dataStoreService.updateExcludedDataElements(projectId, moduleId, {});
 
                 httpBackend.expectPUT(url, {}).respond(200);
                 httpBackend.flush();
             });
 
             it('should get excluded dataElements for specified module', function () {
-                var moduleIds = ["mod1", "mod2"];
-                dataStoreService.getExcludedDataElements(moduleIds).then(function (data) {
-                    expect(data).toEqual(["mockPatientOriginsMod1", "mockPatientOriginsMod2"]);
+                dataStoreService.getExcludedDataElements(projectId, moduleId).then(function (data) {
+                    expect(data).toEqual("mockPatientOriginsMod1");
                 });
 
-                httpBackend.expectGET([dhisUrl.dataStore, storeNamespace, "mod1_excludedDataElements"].join("/")).respond(200, "mockPatientOriginsMod1");
-                httpBackend.expectGET([dhisUrl.dataStore, storeNamespace, "mod2_excludedDataElements"].join("/")).respond(200, "mockPatientOriginsMod2");
+                httpBackend.expectGET(url).respond(200, "mockPatientOriginsMod1");
                 httpBackend.flush();
             });
 
             it('should return undefined if key is not exist on dhis', function () {
-                var moduleIds = ["mod1", "mod2"];
                 spyOn(http, 'get').and.returnValue(utils.getRejectedPromise(q, {errorCode: "NOT_FOUND"}));
-                dataStoreService.getExcludedDataElements(moduleIds).then(function (data) {
-                    expect(data).toEqual([undefined, undefined]);
+                dataStoreService.getExcludedDataElements(projectId, moduleId).then(function (data) {
+                    expect(data).toBeUndefined();
                 });
             });
 
