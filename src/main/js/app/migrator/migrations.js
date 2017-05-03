@@ -547,6 +547,11 @@ define(['dateUtils', 'lodash', 'metadataConf', 'productKeyUtils'], function(date
         };
     };
 
+    var delete_keys_organisation_unit_group_sets_from_changelog = function (db, tx) {
+        var changeLogStore = tx.objectStore("changeLog");
+        changeLogStore.delete("organisationUnitGroupSets");
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -608,6 +613,7 @@ define(['dateUtils', 'lodash', 'metadataConf', 'productKeyUtils'], function(date
         delete_local_user_credentials_store,
         update_orgunit_changelog,
         add_option_store,
-        add_program_stage_section_store
+        add_program_stage_section_store,
+        delete_keys_organisation_unit_group_sets_from_changelog
     ];
 });
