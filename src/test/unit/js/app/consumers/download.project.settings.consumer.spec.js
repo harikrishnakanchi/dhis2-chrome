@@ -1,5 +1,5 @@
-define(["angularMocks", "utils", "systemSettingService", "userPreferenceRepository", "referralLocationsRepository", "patientOriginRepository", "excludedDataElementsRepository", "downloadProjectSettingsConsumer", "mergeBy", "excludedLinelistOptionsMerger", "changeLogRepository", "dataStoreService", "orgUnitRepository", "systemInfoService"],
-    function (mocks, utils, SystemSettingService, UserPreferenceRepository, ReferralLocationsRepository, PatientOriginRepository, ExcludedDataElementsRepository, DownloadProjectSettingsConsumer, MergeBy, ExcludedLinelistOptionsMerger, ChangeLogRepository, DataStoreService, OrgUnitRepository, SystemInfoService) {
+define(["angularMocks", "utils", "systemSettingService", "userPreferenceRepository", "referralLocationsRepository", "patientOriginRepository", "excludedDataElementsRepository", "downloadProjectSettingsConsumer", "mergeBy", "changeLogRepository", "dataStoreService", "orgUnitRepository", "systemInfoService", "excludedLineListOptionsRepository"],
+    function (mocks, utils, SystemSettingService, UserPreferenceRepository, ReferralLocationsRepository, PatientOriginRepository, ExcludedDataElementsRepository, DownloadProjectSettingsConsumer, MergeBy, ChangeLogRepository, DataStoreService, OrgUnitRepository, SystemInfoService, ExcludedLineListOptionsRepository) {
         describe("downloadProjectSettingsConsumer", function () {
             var consumer,
                 systemSettingService,
@@ -11,10 +11,10 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 q,
                 scope,
                 mergeBy,
-                excludedLinelistOptionsMerger,
                 changeLogRepository,
                 dataStoreService,
-                systemInfoService;
+                systemInfoService,
+                excludedLineListOptionsRepository;
 
             beforeEach(mocks.inject(function ($q, $rootScope, $log) {
 
@@ -40,9 +40,6 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 spyOn(excludedDataElementsRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
                 spyOn(excludedDataElementsRepository, "findAll").and.returnValue(utils.getPromise(q, []));
 
-                excludedLinelistOptionsMerger = new ExcludedLinelistOptionsMerger();
-                spyOn(excludedLinelistOptionsMerger, 'mergeAndSaveForProject').and.returnValue(utils.getPromise(q, undefined));
-
                 changeLogRepository = new ChangeLogRepository();
                 spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, "2017-05-01T19:10:13.677Z"));
                 spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, ""));
@@ -60,9 +57,13 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 systemInfoService = new SystemInfoService();
                 spyOn(systemInfoService, 'getServerDate').and.returnValue(utils.getPromise(q, 'someTime'));
 
+                excludedLineListOptionsRepository = new ExcludedLineListOptionsRepository();
+                spyOn(excludedLineListOptionsRepository, "findAll").and.returnValue(utils.getPromise(q, []));
+                spyOn(excludedLineListOptionsRepository, "upsert").and.returnValue(utils.getPromise(q, []));
+
                 mergeBy = new MergeBy($log);
 
-                consumer = new DownloadProjectSettingsConsumer(q, systemInfoService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository, excludedDataElementsRepository, mergeBy, excludedLinelistOptionsMerger, changeLogRepository, dataStoreService, orgUnitRepository);
+                consumer = new DownloadProjectSettingsConsumer(q, systemInfoService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository, excludedDataElementsRepository, mergeBy, changeLogRepository, dataStoreService, orgUnitRepository, excludedLineListOptionsRepository);
             }));
 
             it('should get changeLogs for all projectIds', function () {
@@ -246,6 +247,45 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 });
             });
 
+            describe('excludedOptions', function () {
+                beforeEach(function () {
+                    userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1']));
+                    dataStoreService.getUpdatedData.and.returnValue(utils.getPromise(q, {excludedOptions: ["mod1", "mod2"]}));
+                    orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [{id: "mod1"}, {id: "mod2"}]));
+                });
+
+                it('should get local excluded options', function () {
+                    consumer.run();
+                    scope.$apply();
+
+                    expect(excludedLineListOptionsRepository.findAll).toHaveBeenCalledWith(["mod1", "mod2"]);
+                });
+
+                it('should merge based on lastUpdated time', function () {
+                    var remoteExcludedOptions = [{
+                        orgUnit: "mod1",
+                        clientLastUpdated: "2015-07-17T07:00:00.000Z",
+                        dataElements: []
+                    }, {
+                        orgUnit: "mod2",
+                        clientLastUpdated: "2015-07-17T07:20:00.000Z",
+                        dataElements: []
+                    }];
+                    var localExcludedOptions = [{
+                        orgUnit: "mod1",
+                        clientLastUpdated: "2015-07-17T07:30:00.000Z",
+                        dataElements: [{id: "someId"}]
+                    }];
+                    dataStoreService.getUpdatedData.and.returnValue(utils.getPromise(q, {excludedOptions: remoteExcludedOptions}));
+                    excludedLineListOptionsRepository.findAll.and.returnValue(utils.getPromise(q, localExcludedOptions));
+                    consumer.run();
+                    scope.$apply();
+
+                    var expectedPayload = [localExcludedOptions[0], remoteExcludedOptions[1]];
+                    expect(excludedLineListOptionsRepository.upsert).toHaveBeenCalledWith(expectedPayload);
+                });
+            });
+
             it("should not fail if current user projects are not available", function () {
                 userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, undefined));
 
@@ -256,16 +296,6 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 expect(referralLocationsRepository.upsert).not.toHaveBeenCalled();
                 expect(patientOriginRepository.upsert).not.toHaveBeenCalled();
                 expect(excludedDataElementsRepository.upsert).not.toHaveBeenCalled();
-            });
-
-            it('should download and merge excludedLineListOptions for users projects', function () {
-                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1', 'prj2']));
-
-                consumer.run();
-                scope.$apply();
-
-                expect(excludedLinelistOptionsMerger.mergeAndSaveForProject.calls.argsFor(0)).toContain('prj1');
-                expect(excludedLinelistOptionsMerger.mergeAndSaveForProject.calls.argsFor(1)).toContain('prj2');
             });
 
             it('should get server date from system info', function () {

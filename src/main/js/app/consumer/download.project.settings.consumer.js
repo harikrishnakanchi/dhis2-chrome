@@ -1,5 +1,5 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function($q, systemInfoService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository, excludedDataElementsRepository, mergeBy, excludedLinelistOptionsMerger, changeLogRepository, dataStoreService, orgUnitRepository) {
+    return function($q, systemInfoService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository, excludedDataElementsRepository, mergeBy, changeLogRepository, dataStoreService, orgUnitRepository, excludedLineListOptionsRepository) {
         this.run = function () {
             var systemTimePromise = systemInfoService.getServerDate();
             var projectIdsPromise = systemTimePromise.then(getUserProjectIds);
@@ -14,9 +14,9 @@ define(["lodash", "moment"], function(_, moment) {
                     var updatedKeys = _.first(data);
                     return mergeAndSaveReferralLocations(opUnitIds, updatedKeys.referralLocations)
                         .then(_.partial(mergeAndSaveExcludedDataElements, moduleIds, updatedKeys.excludedDataElements))
-                        .then(_.partial(mergeAndSavePatientOrigins, opUnitIds, updatedKeys.patientOrigins));
+                        .then(_.partial(mergeAndSavePatientOrigins, opUnitIds, updatedKeys.patientOrigins))
+                        .then(_.partial(mergeAndSaveExcludedLineListOptions, moduleIds, updatedKeys.excludedOptions));
                 })
-                .then(_.partial(projectIdsPromise.then.bind(projectIdsPromise), downloadAndMergeExcludedOptions))
                 .then(function () {
                     return projectIdsPromise.then(_.curry(updateChangeLog)).then(systemTimePromise.then.bind(systemTimePromise));
                 })
@@ -62,12 +62,6 @@ define(["lodash", "moment"], function(_, moment) {
             }));
         };
 
-        var downloadAndMergeExcludedOptions = function (projectIds) {
-            return _.reduce(projectIds, function (promise, projectId) {
-                return promise.then(_.partial(excludedLinelistOptionsMerger.mergeAndSaveForProject, projectId));
-            }, $q.when());
-        };
-
         var merge = function (remoteCollection, localCollection, equalPredicate) {
             return mergeBy.lastUpdated({"remoteTimeField": "clientLastUpdated", "localTimeField": "clientLastUpdated", "eq": equalPredicate}, remoteCollection, localCollection);
         };
@@ -98,6 +92,12 @@ define(["lodash", "moment"], function(_, moment) {
                 .then(function (localExcludedDataElements) {
                     return excludedDataElementsRepository.upsert(merge(remoteExcludedDataElements, localExcludedDataElements, equalPredicate));
                 });
+        };
+
+        var mergeAndSaveExcludedLineListOptions = function (localModuleIds, remoteExcludedOptions) {
+            return excludedLineListOptionsRepository.findAll(localModuleIds).then(function (localExcludedOptions) {
+                return excludedLineListOptionsRepository.upsert(merge(remoteExcludedOptions, localExcludedOptions, equalPredicate));
+            });
         };
 
     };
