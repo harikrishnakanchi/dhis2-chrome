@@ -260,28 +260,6 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash", "cust
             expect(actualOrgUnits).toEqual(expectedOrgUnits);
         });
 
-        it("should get all attributes of parent project and opUnit", function() {
-            var actualAttributes;
-            var expectedAttributes = [{
-                "attribute": {
-                    "code": "Type"
-                },
-                "value": "Operation Unit"
-            }, {
-                "attribute": {
-                    "code": "Type"
-                },
-                "value": "Project"
-            }];
-
-            orgUnitRepository.getProjectAndOpUnitAttributes(module1.id).then(function(data) {
-                actualAttributes = data;
-            });
-
-            scope.$apply();
-            expect(actualAttributes).toEqual(expectedAttributes);
-        });
-
         it('should get all organisationUnitGroups associations of parent project and opUnit', function () {
             orgUnitRepository.getAssociatedOrganisationUnitGroups(module1.id).then(function (data) {
                 expect(data).toEqual(['opUnitOrgUnitGroupId', 'projectOrgUnitGroupId']);

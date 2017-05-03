@@ -30,7 +30,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
 
                 spyOn(orgUnitRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, {}));
-                spyOn(orgUnitRepo, "getProjectAndOpUnitAttributes").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "associateDataSetsToOrgUnits").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "removeDataSetsFromOrgUnits").and.returnValue(utils.getPromise(q, {}));
