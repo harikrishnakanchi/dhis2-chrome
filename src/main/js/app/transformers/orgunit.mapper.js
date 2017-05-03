@@ -157,41 +157,6 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
         return orgUnit;
     };
 
-    this.mapToProject = function(dhisProject, allContexts, allPopTypes, reasonForIntervention, modeOfOperation, modelOfManagement, allProjectTypes) {
-
-        var getTranslatedName = function (allOptions, code) {
-            var value = customAttributes.getAttributeValue(dhisProject.attributeValues, code);
-            var result = _.filter(allOptions, function (option) {
-                return option.englishName == value;
-            });
-            return result[0] ? result[0] : undefined;
-        };
-
-        var endDate = customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.PROJECT_END_DATE_CODE);
-        var autoApprove = customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.AUTO_APPROVE);
-        return {
-            'name': dhisProject.name,
-            'openingDate': moment(dhisProject.openingDate).toDate(),
-            'endDate': endDate ? moment(endDate).toDate() : undefined,
-
-            'location': customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.PROJECT_LOCATION_CODE),
-            'projectCode': customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.PROJECT_CODE),
-
-            'context': getTranslatedName(allContexts, customAttributes.PROJECT_CONTEXT_CODE),
-            'populationType': getTranslatedName(allPopTypes, customAttributes.PROJECT_POPULATION_TYPE_CODE),
-            'projectType': getTranslatedName(allProjectTypes, customAttributes.PROJECT_TYPE_CODE),
-            'reasonForIntervention': getTranslatedName(reasonForIntervention, customAttributes.REASON_FOR_INTERVENTION_CODE),
-            'modeOfOperation': getTranslatedName(modeOfOperation, customAttributes.MODE_OF_OPERATION_CODE),
-            'modelOfManagement': getTranslatedName(modelOfManagement, customAttributes.MODEL_OF_MANAGEMENT_CODE),
-
-            'estimatedTargetPopulation': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.ESTIMATED_TARGET_POPULATION_CODE)),
-            'estPopulationLessThan1Year': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.EST_POPULATION_LESS_THAN_1_YEAR_CODE)),
-            'estPopulationBetween1And5Years': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.EST_POPULATION_BETWEEN_1_AND_5_YEARS_CODE)),
-            'estPopulationOfWomenOfChildBearingAge': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.EST_POPULATION_OF_WOMEN_OF_CHILD_BEARING_AGE_CODE)),
-            'autoApprove': autoApprove === undefined ? "false" : autoApprove
-        };
-    };
-
     this.mapToModule = function(module, moduleId, moduleLevel) {
         var isLineList = module.serviceType === "Linelist" ? "true" : "false";
         return {
