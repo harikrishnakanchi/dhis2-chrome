@@ -6,29 +6,23 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
             PATIENT_ORIGINS = "_patientOrigins",
             EXCLUDED_DATA_ELEMENTS = "_excludedDataElements";
 
-        var upsertDataToStore = function (orgUnitId, payload, type, uploadMethod) {
-            var key = orgUnitId + type;
-            var url = [dhisUrl.dataStore, NAMESPACE, key].join("/");
-            return uploadMethod(url, payload);
-        };
-
-        var upsertDataToStoreWithProjectId = function (projectId, orgUnitId, payload, type, uploadMethod) {
+        var upsertDataToStore = function (projectId, orgUnitId, payload, type, uploadMethod) {
             var key = [projectId, orgUnitId].join("_") + type;
             var url = [dhisUrl.dataStore, NAMESPACE, key].join("/");
             return uploadMethod(url, payload);
         };
 
-        this.updateExcludedOptions = _.partialRight(upsertDataToStoreWithProjectId, EXCLUDED_OPTIONS, $http.put);
-        this.createExcludedOptions = _.partialRight(upsertDataToStoreWithProjectId, EXCLUDED_OPTIONS, $http.post);
+        this.updateExcludedOptions = _.partialRight(upsertDataToStore, EXCLUDED_OPTIONS, $http.put);
+        this.createExcludedOptions = _.partialRight(upsertDataToStore, EXCLUDED_OPTIONS, $http.post);
 
-        this.createReferrals = _.partialRight(upsertDataToStoreWithProjectId, REFERRAL_LOCATIONS, $http.post);
-        this.updateReferrals = _.partialRight(upsertDataToStoreWithProjectId, REFERRAL_LOCATIONS, $http.put);
+        this.createReferrals = _.partialRight(upsertDataToStore, REFERRAL_LOCATIONS, $http.post);
+        this.updateReferrals = _.partialRight(upsertDataToStore, REFERRAL_LOCATIONS, $http.put);
 
-        this.createPatientOrigins = _.partialRight(upsertDataToStoreWithProjectId, PATIENT_ORIGINS, $http.post);
-        this.updatePatientOrigins = _.partialRight(upsertDataToStoreWithProjectId, PATIENT_ORIGINS, $http.put);
+        this.createPatientOrigins = _.partialRight(upsertDataToStore, PATIENT_ORIGINS, $http.post);
+        this.updatePatientOrigins = _.partialRight(upsertDataToStore, PATIENT_ORIGINS, $http.put);
 
-        this.createExcludedDataElements = _.partialRight(upsertDataToStoreWithProjectId, EXCLUDED_DATA_ELEMENTS, $http.post);
-        this.updateExcludedDataElements = _.partialRight(upsertDataToStoreWithProjectId, EXCLUDED_DATA_ELEMENTS, $http.put);
+        this.createExcludedDataElements = _.partialRight(upsertDataToStore, EXCLUDED_DATA_ELEMENTS, $http.post);
+        this.updateExcludedDataElements = _.partialRight(upsertDataToStore, EXCLUDED_DATA_ELEMENTS, $http.put);
 
         var getDataForKey = function (key) {
             var url = [dhisUrl.dataStore, NAMESPACE, key].join("/");
@@ -49,13 +43,6 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
             }, $q.when([]));
         };
 
-        var getDataForOrgUnitIds = function (orgUnitIds, type) {
-            var keys = _.map(orgUnitIds, function (orgUnitId) {
-                return orgUnitId + type;
-            });
-            return getDataForMultipleKeys(keys);
-        };
-
         var getDataForOrgUnit = function (projectId, orgUnitId, type) {
             var key = [projectId, orgUnitId].join("_") + type;
             return getDataForKey(key);
@@ -68,24 +55,6 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
         this.getPatientOrigins = _.partialRight(getDataForOrgUnit, PATIENT_ORIGINS);
 
         this.getExcludedDataElements = _.partialRight(getDataForOrgUnit, EXCLUDED_DATA_ELEMENTS);
-
-        var getUpdatedKeys = function (projectIds, lastUpdated) {
-
-            var filterKeysForProjects = function (keys) {
-                return _.filter(keys, function (key) {
-                    var projectId = _.first(key.split("_"));
-                    return _.includes(projectIds, projectId);
-                });
-            };
-
-            var url = [dhisUrl.dataStore, NAMESPACE].join("/");
-            return $http.get(url, { params: { lastUpdated: lastUpdated } })
-                .then(_.property('data'))
-                .then(filterKeysForProjects)
-                .catch(function (response) {
-                    return response.errorCode === constants.errorCodes.NOT_FOUND ? {} : $q.reject();
-                });
-        };
 
         this.getUpdatedData = function (projectIds, lastUpdated) {
             var filterKeysForProjects = function (keys) {
@@ -126,16 +95,5 @@ define(["dhisUrl", "constants"], function (dhisUrl, constants) {
                     return response.errorCode === constants.errorCodes.NOT_FOUND ? {} : $q.reject();
                 });
         };
-
-        this.getKeysForExcludedOptions = function (projectId) {
-            return getUpdatedKeys([projectId]).then(function (allKeys) {
-                return _.filter(allKeys, _.partial(_.contains, _, EXCLUDED_OPTIONS, 0));
-            }).then(function (filteredKeys) {
-                return _.map(filteredKeys, function (key) {
-                    return key.split("_").slice(1).join("_");
-                });
-            });
-        };
-
     };
 });

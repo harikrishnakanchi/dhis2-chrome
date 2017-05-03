@@ -198,27 +198,6 @@ define(['dataStoreService', 'angularMocks', 'dhisUrl', 'utils'], function (DataS
 
         });
 
-        describe('getKeysForExcludedOptions', function () {
-            var moduleId, url;
-            beforeEach(function () {
-                moduleId = "someModuleId";
-                url = [dhisUrl.dataStore, storeNamespace].join("/");
-            });
-
-            it('should get keys only for excludedOptions', function () {
-                var keysFromRemote = ['prj1_key1_excludedOptions', 'prj1_key2_excludedOptions', 'key3_otherOption', 'prj1_key4_excludedOptions', 'prj1_key5_excludedOptions', 'prj1_key6_excludedOptions'];
-
-                var actualKeys;
-                dataStoreService.getKeysForExcludedOptions("prj1").then(function (data) {
-                    actualKeys = data;
-                });
-
-                httpBackend.expectGET(url).respond(200, keysFromRemote);
-                httpBackend.flush();
-                expect(actualKeys).toEqual(['key1_excludedOptions', 'key2_excludedOptions', 'key4_excludedOptions', 'key5_excludedOptions', 'key6_excludedOptions']);
-            });
-        });
-
         describe('getUpdatedData', function () {
             var projectIds, keysFromRemote, url;
             beforeEach(function () {
