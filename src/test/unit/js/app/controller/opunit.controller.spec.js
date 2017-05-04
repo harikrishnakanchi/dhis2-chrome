@@ -417,10 +417,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     "parent": _.pick(scope.orgUnit, ['name', 'id']),
                     "attributeValues": [opUnitAttribute, newDataModelAttribute],
                     "organisationUnitGroups": [{
-                        "id": "someOrgUnitGroupId",
-                        "organisationUnitGroupSet": {
-                            "id": "someOrgUnitGroupSetId"
-                        }
+                        "id": "someOrgUnitGroupId"
                     }]
                 };
 
@@ -512,10 +509,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     },
                     "attributeValues": [opUnitAttribute, newDataModelAttribute],
                     "organisationUnitGroups": [{
-                        "id": "someOrgUnitGroupId",
-                        "organisationUnitGroupSet": {
-                            "id": "someOrgUnitGroupSetId"
-                        }
+                        "id": "someOrgUnitGroupId"
                     }]
                 };
                 spyOn(customAttributes, 'createAttribute').and.callFake(function (code, value) {

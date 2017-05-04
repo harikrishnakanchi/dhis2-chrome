@@ -191,10 +191,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                     coordinates: '[29,-45]',
                     featureType: 'POINT',
                     organisationUnitGroups: [{
-                        id: 'someOrgUnitGroupId',
-                        organisationUnitGroupSet: {
-                            id: 'someOrgUnitGroupSetId'
-                        }
+                        id: 'someOrgUnitGroupId'
                     }]
                 };
                 spyOn(dhisId, 'get').and.returnValue('opUnitId');
@@ -557,10 +554,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                     "value": "2011-01-01"
                 }],
                 "organisationUnitGroups": [{
-                    "id": "someOrgUnitGroupId",
-                    "organisationUnitGroupSet": {
-                        "id": "someOrgUnitGroupSetId"
-                    }
+                    "id": "someOrgUnitGroupId"
                 }]
             };
 

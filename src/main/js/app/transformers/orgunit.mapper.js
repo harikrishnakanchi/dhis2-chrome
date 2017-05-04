@@ -42,10 +42,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
         var orgUnitGroupSetsWithValue = _.omit(orgUnit.orgUnitGroupSets, _.isUndefined);
         return _.transform(orgUnitGroupSetsWithValue, function (acc, orgUnitGroup, orgUniGroupSetId) {
             var organisationUnitGroup = {
-                id: orgUnitGroup.id,
-                organisationUnitGroupSet: {
-                    id: orgUniGroupSetId
-                }
+                id: orgUnitGroup.id
             };
             acc.push(organisationUnitGroup);
         }, []);
@@ -77,7 +74,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
     var getOrgUnitGroups = function (orgUnit, orgUnitGroupSets) {
         return  _.transform(orgUnitGroupSets, function (map, orgUnitGroupSet) {
             var groupSetValue = _.find(orgUnit.organisationUnitGroups, function (orgUnitGroup) {
-                return orgUnitGroupSet.id === _.get(orgUnitGroup.organisationUnitGroupSet, 'id');
+                return _.contains(_.map(orgUnitGroupSet.organisationUnitGroups, 'id'), orgUnitGroup.id);
             });
             if (groupSetValue) {
                 var groupSetName = _.find(orgUnitGroupSet.organisationUnitGroups, function (group) {
