@@ -216,6 +216,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
             };
             $scope.startLoading();
             $scope.isOfflineApproval = false;
+            $scope.moduleAndOpUnitName = $scope.selectedModule.name + ' - ' + $scope.selectedModule.parent.name;
 
             var loadAssociatedOrgUnitsAndPrograms = function() {
                 return orgUnitRepository.findAllByParent([$scope.selectedModule.id]).then(function(originOrgUnits) {

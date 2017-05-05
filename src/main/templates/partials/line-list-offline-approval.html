@@ -31,6 +31,12 @@
             </div>
         </div>
 
+        <div class="row">
+            <div class="col-md-8 hide-from-print" ng-class="layoutDirection.direction == 'rtl' ? 'pull-right' : 'pull-left'">
+                <h4>{{ moduleAndOpUnitName }}</h4>
+            </div>
+        </div>
+
         <accordion close-others="false">
             <div class="data-set-acc-wrapper" ng-if="showForm()">
                 <accordion-group ng-repeat="dataSet in associatedDataSets | filter:{ isOriginDataset: false, isReferralDataset: false, isPopulationDataset: false }" ng-init="dataSet.open=true" is-open="dataSet.open">

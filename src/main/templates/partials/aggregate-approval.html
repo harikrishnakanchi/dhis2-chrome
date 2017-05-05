@@ -33,6 +33,12 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-md-8 hide-from-print" ng-class="layoutDirection.direction == 'rtl' ? 'pull-right' : 'pull-left'">
+            <h4>{{ moduleAndOpUnitName }}</h4>
+        </div>
+    </div>
+
     <form name="dataentryForm" id="dataentry" ng-if="showForm()">
         <accordion close-others="false">
             <div class="data-set-acc-wrapper">

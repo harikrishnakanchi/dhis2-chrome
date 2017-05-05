@@ -1,6 +1,7 @@
 <div class="line-list dataentrypage parent-margin {{layoutDirection.direction}}">
     <div ng-if="viewRegistrationBook">
         <section class="panel tab-panel panel-default">
+            <h4>{{ selectedModuleAndOpUnit }}</h4>
             <div ng-if="!(originOrgUnits | isEmpty)">
                 <span>{{ resourceBundle.patientOriginLabel }}</span>
             </div>
@@ -31,6 +32,7 @@
         <div ng-show="resultMessageType === 'failure'" class="alert alert-danger">{{ resultMessage }}</div>
         <accordion close-others="false">
             <div class="data-set-acc-wrapper">
+                <h4>{{ moduleAndOpUnitName }}</h4>
                 <accordion-group is-open="true">
                     <accordion-heading>
                         <span>{{ program.name}}</span>
