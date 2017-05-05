@@ -310,20 +310,16 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
                     var dependentGroupId = customAttributes.getAttributeValue(orgUnitGroupSet.attributeValues, customAttributes.DEPENDENT_ORGUNITGROUP_ID);
                     if (dependentGroupId) {
                         orgUnitGroupSet.dependentOrgUnitGroupId = dependentGroupId;
+                        _.map(orgUnitGroupSet.organisationUnitGroups, function(hospitalUnitCode) {
+                            hospitalUnitCode.name = hospitalUnitCode.shortName;
+                            return hospitalUnitCode;
+                        });
                     }
+                    orgUnitGroupSet.organisationUnitGroups = _.sortBy(orgUnitGroupSet.organisationUnitGroups, 'name');
                     return orgUnitGroupSet;
                 });
 
                 $scope.orgUnitGroupSets = translationsService.translate($scope.orgUnitGroupSets);
-
-                var hospitalUnitCodes = _.get(_.find($scope.orgUnitGroupSets, 'dependentOrgUnitGroupId'), 'organisationUnitGroups');
-
-                $scope.hospitalUnitCodes = _.map(hospitalUnitCodes, function(hospitalUnitCode) {
-                    hospitalUnitCode.name = hospitalUnitCode.shortName;
-                    return hospitalUnitCode;
-                });
-
-                $scope.hospitalUnitCodes = _.sortBy($scope.hospitalUnitCodes, 'name');
 
                 if (!$scope.isNewMode) {
                     $scope.opUnit = orgUnitMapper.mapOrgUnitToOpUnit($scope.orgUnit, $scope.orgUnitGroupSets);
