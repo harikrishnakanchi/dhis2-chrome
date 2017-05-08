@@ -37,10 +37,10 @@
                             <strong>{{ getDisplayName(dataElement) }}</strong>
                         </td>
                     </tr>
-                    <tr ng-repeat="option in dataElement.optionSet.options" ng-if="eventSummary[dataElement.id][option.id]">
+                    <tr ng-repeat="option in dataElement.optionSet.options" ng-if="eventSummary[dataElement.id][option.code]">
                         <td>{{ option.name }}</td>
                         <td ng-repeat="week in weeks">
-                            {{ eventSummary[dataElement.id][option.id][week].length }}
+                            {{ eventSummary[dataElement.id][option.code][week].length }}
                         </td>
                     </tr>
                     </tbody>
@@ -51,10 +51,10 @@
                             <strong>{{ resourceBundle.proceduresPerformed }}</strong>
                         </td>
                     </tr>
-                    <tr ng-repeat="option in procedureDataElements[0].optionSet.options" ng-if="getProcedureCountForOptionForAllWeeks(option.id)">
+                    <tr ng-repeat="option in procedureDataElements[0].optionSet.options" ng-if="getProcedureCountForOptionForAllWeeks(option.code)">
                         <td>{{ option.name }}</td>
                         <td ng-repeat="week in weeks">
-                            {{ getProcedureCountForOptionForWeek(option.id, week) }}
+                            {{ getProcedureCountForOptionForWeek(option.code, week) }}
                         </td>
                     </tr>
                     </tbody>
@@ -93,10 +93,10 @@
 
                     <tbody>
                     <tr ng-repeat="option in referralLocationDataElement.optionSet.options"
-                        ng-if="referralLocations[option.genericName] && (!referralLocations[option.genericName].isDisabled || eventSummary[referralLocationDataElement.id][option.id])">
+                        ng-if="referralLocations[option.genericName] && (!referralLocations[option.genericName].isDisabled || eventSummary[referralLocationDataElement.id][option.code])">
                         <td>{{ referralLocations[option.genericName].name }}</td>
                         <td ng-repeat="week in weeks">
-                            {{ eventSummary[referralLocationDataElement.id][option.id][week].length }}
+                            {{ eventSummary[referralLocationDataElement.id][option.code][week].length }}
                         </td>
                     </tr>
                     </tbody>

@@ -144,7 +144,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'da
             var buildOption = function (dataElement, option) {
               return _.flatten([
                   option.name,
-                  _.map($scope.weeks, function(week) { return _.isUndefined($scope.eventSummary[dataElement.id]) ? undefined : _.chain($scope.eventSummary).get(dataElement.id).get(option.id).get(week).get('length').value(); })
+                  _.map($scope.weeks, function(week) { return _.isUndefined($scope.eventSummary[dataElement.id]) ? undefined : _.chain($scope.eventSummary).get(dataElement.id).get(option.code).get(week).get('length').value(); })
               ]);
             };
 
@@ -158,7 +158,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'da
             var buildProceduresPerformedOption = function (option) {
                 return _.flatten([
                     option.name,
-                    _.map($scope.weeks, function(week) { return $scope.getProcedureCountForOptionForWeek(option.id, week); })
+                    _.map($scope.weeks, function(week) { return $scope.getProcedureCountForOptionForWeek(option.code, week); })
                 ]);
             };
 
@@ -187,13 +187,13 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'da
             var buildReferralLocationData = function () {
                 var referralLocationOptionsForModule = _.filter(_.get($scope.referralLocationDataElement, 'optionSet.options', []), function (option) {
                      return $scope.referralLocations[option.genericName] &&
-                         (!$scope.referralLocations[option.genericName].isDisabled || $scope.eventSummary[$scope.referralLocationDataElement.id][option.id]);
+                         (!$scope.referralLocations[option.genericName].isDisabled || $scope.eventSummary[$scope.referralLocationDataElement.id][option.code]);
                 });
 
                 return _.map(referralLocationOptionsForModule, function (referralLocationOption) {
                     return _.flatten([
                         $scope.referralLocations[referralLocationOption.genericName].name,
-                        _.map($scope.weeks, function(week) { return _.chain($scope.eventSummary).get($scope.referralLocationDataElement.id).get(referralLocationOption.id).get(week).get('length').value(); })
+                        _.map($scope.weeks, function(week) { return _.chain($scope.eventSummary).get($scope.referralLocationDataElement.id).get(referralLocationOption.code).get(week).get('length').value(); })
                     ]);
                 });
             };
@@ -341,7 +341,7 @@ define(['moment', 'lodash', 'dateUtils', 'excelBuilder', 'eventsAggregator', 'da
                 return _.map($scope.summaryDataElements, function (dataElement) {
                     if (dataElement.optionSet && dataElement.optionSet.options) {
                         dataElement.optionSet.options = _.reject(dataElement.optionSet.options, function (option) {
-                            return _.contains(_.get($scope.indexedExcludedLineListOptions[dataElement.id], 'excludedOptionIds'), option.id);
+                            return _.contains(_.get($scope.indexedExcludedLineListOptions[dataElement.id], 'excludedOptionIds'), option.code);
                         });
                     }
                     return dataElement;

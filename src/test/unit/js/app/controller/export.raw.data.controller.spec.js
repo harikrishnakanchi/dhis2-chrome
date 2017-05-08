@@ -715,9 +715,11 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
                                 optionSet: {
                                     options: [{
                                         id: 'referralLocationOptionIdA',
+                                        code: 'referralLocationOptionIdA',
                                         genericName: 'someGenericNameA'
                                     }, {
                                         id: 'referralLocationOptionIdB',
+                                        code: 'referralLocationOptionIdB',
                                         genericName: 'someGenericNameB'
                                     }]
                                 }
@@ -802,6 +804,7 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
 
                         optionA = {
                             id: 'optionIdA',
+                            code: 'optionIdA',
                             name: 'optionNameA'
                         };
                         optionB = {
@@ -810,6 +813,7 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
                         };
                         optionC = {
                             id: 'optionIdC',
+                            code: 'optionIdC',
                             name: 'optionNameC'
                         };
                         dataElementA = {
