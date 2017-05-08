@@ -6,7 +6,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "dateUtils", "projectRepo
         var scope, rootScope, q,
             projectReportController,
             orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService, pivotTableExportBuilder,
-            mockPivotTables, pivotTableData, mockProjectOrgUnit, orgUnitGroupSets, currentTime, lastUpdatedTime;
+            mockPivotTables, pivotTableData, mockProjectOrgUnit, orgUnitGroupSets, currentTime, lastUpdatedTime, openingDate;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             rootScope = $rootScope;
@@ -45,10 +45,11 @@ define(["moment", "orgUnitRepository", "angularMocks", "dateUtils", "projectRepo
             scope.stopLoading = jasmine.createSpy('stopLoading');
             scope.locale = 'en';
 
+            openingDate = new Date("2007-12-31");
             mockProjectOrgUnit = {
                 "id": "xyz",
                 "name": "Aweil - SS153",
-                "openingDate": moment("2007-12-31").toDate(),
+                "openingDate": moment(openingDate).toDate(),
                 "parent": {
                     "id": "a18da381f7d",
                     "name": "SOUDAN Sud"
@@ -260,7 +261,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "dateUtils", "projectRepo
                 value: "SS153"
             }, {
                 name: "Opening Date",
-                value: "12/31/2007"
+                value: openingDate.toLocaleDateString()
             }, {
                 name: "End Date",
                 value: ""
