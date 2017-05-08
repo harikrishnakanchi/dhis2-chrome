@@ -48,7 +48,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
                 return _.get(dataValues, [orgUnit.id, dataElementId, option, 'value'].join('.'));
             }).compact().value();
 
-            if(!_.isEmpty(values)) return _.sum(values, _.partial(parseInt));
+            if(!_.isEmpty(values)) return _.sum(values, _.parseInt);
         };
 
         $scope.sum = function(dataValues, orgUnits, dataElementId, catOptComboIdsForTotalling) {
