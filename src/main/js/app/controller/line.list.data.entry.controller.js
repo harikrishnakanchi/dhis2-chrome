@@ -144,7 +144,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
                     $scope.selectedModuleName = module.name;
                     $scope.opUnitId = module.parent.id;
                     $scope.selectedModule = module;
-                    $scope.moduleAndOpUnitName = module.name + ' - ' + module.parent.name;
+                    $scope.moduleAndOpUnitName = module.parent.name + ' - ' + module.name;
                 });
             };
 

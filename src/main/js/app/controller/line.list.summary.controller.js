@@ -390,7 +390,7 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
                     $scope.selectedModuleName = data.name;
                     $scope.opUnitId = data.parent.id;
                     $scope.moduleOpeningDate = data.openingDate;
-                    $scope.moduleAndOpUnitName = data.name + ' - ' + data.parent.name;
+                    $scope.moduleAndOpUnitName = data.parent.name + ' - ' + data.name;
                 });
             };
 

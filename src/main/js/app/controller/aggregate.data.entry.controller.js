@@ -425,7 +425,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
 
         var initializeForm = function() {
             $scope.startLoading();
-            $scope.moduleAndOpUnitName = $scope.selectedModule.name + ' - ' + $scope.selectedModule.parent.name;
+            $scope.moduleAndOpUnitName = $scope.selectedModule.parent.name + ' - ' + $scope.selectedModule.name;
             currentPeriod = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
             $scope.isDataEntryAllowed = moment($scope.week.startOfWeek).isAfter(moment().subtract(properties.projectDataSync.numWeeksToSync, 'week'));
             currentPeriodAndOrgUnit = {
