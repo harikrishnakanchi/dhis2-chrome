@@ -379,5 +379,6 @@
     "dataAvailabilityMessage": {
         "daily": "Data entered today will be shown in reports only the next day",
         "weekly": "Data entered today will be shown in reports only the next week"
-    }
+    },
+    "leavePageConfirmationMessage": "You have unsaved data. This will be lost if you navigate to another page. Are you sure you want to continue?"
 }
