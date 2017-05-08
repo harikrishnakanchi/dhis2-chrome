@@ -158,7 +158,7 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
                 var optionSetId = dataValue.optionSet.id;
                 var optionSet = indexedOptionSets[optionSetId] || {};
                 var option = _.find(optionSet.options, function(o) {
-                    return o.id === dataValue.value;
+                    return o.code === dataValue.value;
                 });
                 return option ? option.name : "";
             }
