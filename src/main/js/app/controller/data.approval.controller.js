@@ -42,24 +42,13 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
         };
 
         $scope.getValue = function(dataValues, dataElementId, option, orgUnits) {
-            if (dataValues === undefined)
-                return;
+            if (dataValues === undefined) return;
 
-            orgUnits = _.isArray(orgUnits) ? orgUnits : [orgUnits];
+            var values = _.chain([orgUnits]).flatten().map(function (orgUnit) {
+                return _.get(dataValues, [orgUnit.id, dataElementId, option, 'value'].join('.'));
+            }).compact().value();
 
-            var result = 0;
-
-            var orgUnitIds = _.pluck(orgUnits, "id");
-            _.forEach(orgUnitIds, function(orgUnitId) {
-                dataValues[orgUnitId] = dataValues[orgUnitId] || {};
-                dataValues[orgUnitId][dataElementId] = dataValues[orgUnitId][dataElementId] || {};
-                dataValues[orgUnitId][dataElementId][option] = dataValues[orgUnitId][dataElementId][option] || {};
-
-                if (!_.isEmpty(dataValues[orgUnitId][dataElementId][option].value))
-                    result += parseInt(dataValues[orgUnitId][dataElementId][option].value);
-            });
-
-            return result;
+            if(!_.isEmpty(values)) return _.sum(values, _.partial(parseInt));
         };
 
         $scope.sum = function(dataValues, orgUnits, dataElementId, catOptComboIdsForTotalling) {
