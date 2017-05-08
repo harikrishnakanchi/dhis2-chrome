@@ -1,5 +1,5 @@
 <div class="dataentrypage parent-margin {{ layoutDirection.direction}}">
-    <section class="tab-panel">
+    <section class="tab-panel notification">
         <div class="alert alert-info" ng-if="noNotificationsForAnyModule"> {{resourceBundle.noNotificationsForAnyModule}} </div>
         <div ng-repeat="(moduleName, dataElementValues) in allDataElementValues | groupBy : 'moduleName'" ng-if="showTable(dataElementValues)">
             <br ng-if="!$first" />

@@ -191,8 +191,7 @@ body {
         }
     }
     .tab-panel {
-        padding: 20px;
-        padding-top: 0px;
+        padding: 20px
     }
     .table {
         th {
@@ -353,6 +352,15 @@ body {
         .panel-group-custom-spacing {
             margin: 0;
             padding: 0 20px;
+        }
+        .tab-panel {
+            padding-top: 0px;
+            &.notification {
+                padding-top: 20px;
+            }
+        }
+        .alert {
+            margin-bottom: 5px;
         }
         .dataentrytable {
             thead {
