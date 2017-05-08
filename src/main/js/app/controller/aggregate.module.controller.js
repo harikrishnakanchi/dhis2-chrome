@@ -86,15 +86,18 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                     }
                 };
 
-                var isDataElementExcluded = function(dataElement) {
+                var isDataElementIncluded = function(dataElement) {
                     var datasetId = $scope.selectedDataset.id;
-                    return _.indexOf($scope.allTemplates[datasetId][$scope.selectedTemplate[datasetId]], dataElement.id) === -1;
+                    var dataSetTemplate = $scope.allTemplates[datasetId];
+                    if(dataSetTemplate)
+                        return _.indexOf(dataSetTemplate[$scope.selectedTemplate[datasetId]], dataElement.id) === -1;
+                    return true;
                 };
 
                 $scope.onTemplateSelect = function() {
                     _.each($scope.selectedDataset.sections, function(section) {
                         _.each(section.dataElements, function(de) {
-                            de.isIncluded = de.isMandatory ? true : isDataElementExcluded(de);
+                            de.isIncluded = de.isMandatory ? true : isDataElementIncluded(de);
                         });
 
                         section.isIncluded = !_.any(section.dataElements, {
