@@ -26,10 +26,10 @@
             <div class="alert alert-danger" ng-show="syncError && moduleDataBlock.awaitingActionAtDataEntryLevel && !submitError">{{resourceBundle.aggregateDataSyncError}}</div>
 
             <div class="row">
-                <div class="col-md-8 hide-from-print" ng-class="layoutDirection.direction == 'rtl' ? 'pull-right' : 'pull-left'">
+                <div class="col-md-6 hide-from-print" ng-class="layoutDirection.direction == 'rtl' ? 'pull-right' : 'pull-left'">
                     <h4>{{ moduleAndOpUnitName }}</h4>
                 </div>
-                <div ng-class="layoutDirection.direction == 'rtl' ? 'pull-right text-left' : 'pull-left text-right'" class="col-md-4">
+                <div ng-class="layoutDirection.direction == 'rtl' ? 'pull-right text-left' : 'pull-left text-right'" class="col-md-6">
                     <button class="btn btn-sm btn-primary printTallySheetBtn" ng-click="exportTallySheetToExcel()" ng-show="selectedModule">{{resourceBundle.exportTallySheetButton}}</button>
                     <button class="btn btn-sm btn-primary printTallySheetBtn" ng-click="printWindow()" ng-show="selectedModule">{{resourceBundle.printTallySheetBtnValue}}</button>
                 </div>
