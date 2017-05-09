@@ -87,7 +87,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
                 dataValues[orgUnit.id] = dataValues[orgUnit.id] || {};
                 _.forEach(dataValues[orgUnit.id], function(value, key) {
                     if (_.includes(dataElementIds, key)) {
-                        allValues.push(parseInt(value[optionId].value));
+                        allValues.push(parseInt(_.get(value, optionId + '.value', 0)));
                     }
                 });
             });
