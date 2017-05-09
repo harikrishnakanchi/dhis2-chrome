@@ -313,16 +313,18 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
         var init = function () {
             $scope.loading = true;
 
-            return $q.all([loadOriginsOrgUnits(), loadProgram(), getOptionSetMapping(), getReferralLocations()]).then(function () {
-                var orgUnitIdsAssociatedToEvents = _.map($scope.originOrgUnits, "id").concat($scope.selectedModule.id);
-                return programEventRepository.getEventsForPeriod($scope.program.id, orgUnitIdsAssociatedToEvents, getPeriod()).then(function (events) {
-                    var submittedEvents = _.filter(events, function (event) {
-                        return event.localStatus === "READY_FOR_DHIS" || event.localStatus === undefined;
+            return loadProgram().then(function () {
+                return $q.all([loadOriginsOrgUnits(), getOptionSetMapping(), getReferralLocations()]).then(function() {
+                    var orgUnitIdsAssociatedToEvents = _.map($scope.originOrgUnits, "id").concat($scope.selectedModule.id);
+                    return programEventRepository.getEventsForPeriod($scope.program.id, orgUnitIdsAssociatedToEvents, getPeriod()).then(function (events) {
+                        var submittedEvents = _.filter(events, function(event) {
+                            return event.localStatus === "READY_FOR_DHIS" || event.localStatus === undefined;
+                        });
+                        loadGroupedDataValues(submittedEvents);
+                        setShowFilterFlag();
+                        getAssociatedDataSets();
+                        getDescriptionsForProceduresPerformed();
                     });
-                    loadGroupedDataValues(submittedEvents);
-                    setShowFilterFlag();
-                    getAssociatedDataSets();
-                    getDescriptionsForProceduresPerformed();
                 });
             }).finally(function () {
                 $scope.loading = false;
