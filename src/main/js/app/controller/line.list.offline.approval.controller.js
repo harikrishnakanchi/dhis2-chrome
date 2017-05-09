@@ -13,9 +13,11 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
             if (_.isUndefined(genderFilters)) {
                 return $scope.getCount(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionCode, undefined, ageFilter);
             } else {
-                return _.reduce(genderfilterIds, function (totalCount, genderFilterId) {
-                    return totalCount + $scope.getCount(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionCode, genderFilterId, ageFilter);
+                var count = _.reduce(genderfilterIds, function (totalCount, genderFilterId) {
+                    return _.add(totalCount, $scope.getCount(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionCode, genderFilterId, ageFilter));
                 }, 0);
+
+                if(count > 0) return count;
             }
         };
 
@@ -56,14 +58,16 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
                     if (dataValue.value > ageFilter[0] && dataValue.value < ageFilter[1])
                         count++;
                 });
-                return count;
+
+                if(count > 0) return count;
             };
 
             if (isGenderFilterApplied && !isAgeFilterApplied) {
                 filteredEventIds = applyGenderFilter();
                 count = _.isEmpty(filteredEventIds) ? 0 : filteredEventIds.length;
-                return count;
+                if(count > 0) return count; else return;
             }
+
             if (isAgeFilterApplied && !isGenderFilterApplied) {
                 filteredEventIds = _.pluck(groupedDataValues[optionCode][dataElementId], "eventId");
                 return applyAgeFilter(filteredEventIds);
@@ -76,7 +80,7 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
 
             count = _.isEmpty(groupedDataValues[optionCode][dataElementId]) ? 0 : groupedDataValues[optionCode][dataElementId].length;
 
-            return count;
+            if(count > 0) return count;
         };
 
         $scope.getTotalProcedureCount = function (isGenderFilterApplied, isAgeFilterApplied, optionCode, genderFilters, ageFilter) {
@@ -84,9 +88,11 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
             if (_.isUndefined(genderFilters)) {
                 return $scope.getProcedureCount(isGenderFilterApplied, isAgeFilterApplied, optionCode, undefined, ageFilter);
             } else {
-                return _.reduce(genderfilterIds, function (totalCount, genderFilterId) {
-                    return totalCount + $scope.getProcedureCount(isGenderFilterApplied, isAgeFilterApplied, optionCode, genderFilterId, ageFilter);
+                var count = _.reduce(genderfilterIds, function (totalCount, genderFilterId) {
+                    return _.add(totalCount, $scope.getProcedureCount(isGenderFilterApplied, isAgeFilterApplied, optionCode, genderFilterId, ageFilter));
                 }, 0);
+
+                if(count > 0) return count;
             }
         };
 
@@ -117,11 +123,13 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
                     if (dataValue.value > ageFilter[0] && dataValue.value < ageFilter[1])
                         count++;
                 });
-                return count;
+
+                if(count > 0) return count;
             };
 
             if (isGenderFilterApplied && !isAgeFilterApplied) {
-                return applyGenderFilter().length;
+                count = applyGenderFilter().length;
+                if(count > 0) return count; else return;
             }
 
             if (isAgeFilterApplied && !isGenderFilterApplied) {
@@ -135,19 +143,21 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
             }
 
             count = _.isEmpty(groupedProcedureDataValues[optionCode]) ? 0 : groupedProcedureDataValues[optionCode].length;
-            return count;
+            if(count > 0) return count;
         };
 
         $scope.getReferralCount = function (locationName) {
-            if (_.isUndefined($scope.dataValues._referralLocations) || _.isEmpty($scope.referralOptions))
-                return 0;
+            if (_.isUndefined($scope.dataValues._referralLocations) || _.isEmpty($scope.referralOptions)) return;
 
             var optionCode = _.find($scope.referralOptions, {
                 "name": locationName
             }).code;
-            return _.filter($scope.dataValues._referralLocations, {
+
+            var eventCount = _.filter($scope.dataValues._referralLocations, {
                 "value": optionCode
             }).length;
+
+            if(eventCount > 0) return eventCount;
         };
 
         $scope.shouldShowInOfflineSummary = function (dataElementId, allDataElements) {
