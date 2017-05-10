@@ -55,8 +55,12 @@
                                  minlength="0"
                                  input-class="form-control form-control-small"
                                  match-class="highlight"
-                                 field-required="orgUnitGroupSet.isMandatory"
-                                 class="ng-isolate-scope">
+                                 field-required="orgUnitGroupSet.isMandatory">
+                            </div>
+                            <div ng-show="createForm[orgUnitGroupSet.name].$dirty && createForm[orgUnitGroupSet.name].$invalid">
+                                <span ng-show="createForm[orgUnitGroupSet.name].$error['autocomplete-required']" class="errortxt">
+                                    {{ orgUnitGroupSet.name }} {{ resourceBundle.required }}
+                                </span>
                             </div>
                         </div>
                     </li>
