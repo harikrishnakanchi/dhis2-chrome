@@ -349,7 +349,7 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 .then(updateMetadataChangeLog)
                 .then(deferred.resolve)
                 .catch(function (response) {
-                    var data = response.errorCode === constants.errorCodes.UNAUTHORISED ? "productKeyExpired" : "downloadFailed";
+                    var data = (response.status === 401) ? "productKeyExpired" : "downloadFailed";
                     deferred.reject(data);
                 });
 

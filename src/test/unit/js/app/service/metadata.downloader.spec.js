@@ -97,7 +97,7 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
         });
 
         it('should handle when product key is invalid', function () {
-            systemInfoService.getServerDate.and.returnValue(utils.getRejectedPromise(q, {errorCode: 'UNAUTHORISED'}));
+            systemInfoService.getServerDate.and.returnValue(utils.getRejectedPromise(q, {status: 401}));
             metadataDownloader.run().catch(function (data) {
                 expect(data).toEqual('productKeyExpired');
             });
