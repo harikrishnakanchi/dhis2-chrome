@@ -57,7 +57,7 @@ define([], function () {
                 paging: true
             },
             "users": {
-                params: "id,userCredentials[id,username,disabled,userRoles[id,name]],organisationUnits[id,name]",
+                params: "id,firstName,surname,userCredentials[id,username,disabled,userRoles[id,name]],organisationUnits[id,name]",
                 pageSize: 200,    // PageSize of 200 : ~10KB
                 paging: true
             },
