@@ -94,8 +94,7 @@ gulp.task('update-webdriver', shell.task([
     './node_modules/protractor/bin/webdriver-manager update'
 ]));
 
-gulp.task('serve', ['generate-service-worker', 'watch'], function() {
-
+gulp.task('start-server', ['generate-service-worker'], function () {
     var app = express();
 
     app.use(compress());    // gzip
@@ -105,7 +104,9 @@ gulp.task('serve', ['generate-service-worker', 'watch'], function() {
     webserver = app.listen(8081);
 });
 
-gulp.task('ft', ['update-webdriver', 'serve'], function() {
+gulp.task('serve', ['start-server', 'watch'], function () {});
+
+gulp.task('ft', ['update-webdriver', 'start-server'], function() {
     return gulp.src('src/test/functional/**/*.js').pipe(protractor({
         configFile: 'src/test/functional/protractor.conf.js'
     })).on('error', function(e) {
