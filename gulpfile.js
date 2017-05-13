@@ -102,7 +102,7 @@ gulp.task('serve', ['generate-service-worker', 'watch'], function() {
     app.use(nocache());     // nocache
 
     app.use('/', express.static(__dirname + '/src/main'));
-    app.listen(8081);
+    webserver = app.listen(8081);
 });
 
 gulp.task('ft', ['update-webdriver', 'serve'], function() {
