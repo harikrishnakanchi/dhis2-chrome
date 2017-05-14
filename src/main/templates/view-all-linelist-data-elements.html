@@ -1,0 +1,49 @@
+<div class="{{ layoutDirection.direction }} popupDialog line-list-data-elements">
+    <div class="modal-header">
+        <button type="button" ng-class="{closeLabelToLeft: layoutDirection.direction == 'rtl'}" class="close" data-dismiss="modal" aria-label="Close" ng-click="dismissModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <h4>{{ resourceBundle.viewAllDataElements }}</h4>
+    </div>
+
+    <div class="modal-body dataentrypage">
+        <accordion close-others="false">
+            <div class="data-set-acc-wrapper">
+                <div ng-repeat="programStage in enrichedProgram.programStages" ng-init="isOpen[programStage.id] = true">
+                    <accordion close-others="false">
+                        <accordion-group is-open="isOpen[programStage.id]">
+                            <accordion-heading>
+                                <span>{{ enrichedProgram.name }}</span>
+                                <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isOpen[programStage.id], 'glyphicon-chevron-right': !isOpen[programStage.id]}"></i>
+                                <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isOpen[programStage.id], 'glyphicon-chevron-left': !isOpen[programStage.id]}"></i>
+                            </accordion-heading>
+                            <div class="exp-coll-group">
+                                <accordion close-others="false">
+                                    <accordion-group ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'" is-open="isOpen[section.id]">
+                                        <accordion-heading>
+                                            <span>{{ section.name }}</span>
+                                            <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isOpen[section.id], 'glyphicon-chevron-right': !isOpen[section.id]}"></i>
+                                            <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isOpen[section.id], 'glyphicon-chevron-left': !isOpen[section.id]}"></i>
+                                        </accordion-heading>
+                                        <div ng-repeat="de in section.programStageDataElements">
+                                            <input type="checkbox" ng-model="de.dataElement.isIncluded" disabled>
+                                            <a description-popup class="changeColor" dp-title="{{ getDisplayName(de.dataElement) }}" dp-desc="{{ de.dataElement.description }}">
+                                                {{ getDisplayName(de.dataElement) }}
+                                            </a>
+                                            <ul class="options">
+                                                <li ng-repeat="option in de.dataElement.optionSet.options" ng-if="section.dataElementsWithOptions | contains: de">
+                                                    <input type="checkbox" ng-model="option.isSelected" disabled>
+                                                    <span>{{ option.name }}</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </accordion-group>
+                                </accordion>
+                            </div>
+                        </accordion-group>
+                    </accordion>
+                </div>
+            </div>
+        </accordion>
+    </div>
+</div>
