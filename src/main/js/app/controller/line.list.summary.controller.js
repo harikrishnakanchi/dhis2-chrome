@@ -1,5 +1,5 @@
 define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpolate", "excelBuilder", "dataElementUtils", "customAttributes"], function(_, moment, properties, dateUtils, orgUnitMapper, interpolate, excelBuilder, dataElementUtils, customAttributes) {
-    return function($scope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, historyService, programRepository, programEventRepository, excludedDataElementsRepository,
+    return function($scope, $rootScope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, historyService, programRepository, programEventRepository, excludedDataElementsRepository,
         orgUnitRepository, approvalDataRepository, dataSyncFailureRepository, translationsService, filesystemService, optionSetRepository) {
 
         $scope.filterParams = {};
@@ -382,10 +382,26 @@ define(["lodash", "moment", "properties", "dateUtils", "orgUnitMapper", "interpo
             $scope.errorMessage = errorMessage;
         });
 
+        $scope.viewAllDataElements = function () {
+            var scope = $rootScope.$new();
+
+            scope.isOpen = {};
+            scope.orgUnit = $scope.orgUnit;
+
+            $modal.open({
+                templateUrl: 'templates/view-all-linelist-data-elements.html',
+                controller: 'lineListModuleController',
+                scope: scope,
+                windowClass: 'modal-lg'
+            });
+        };
+
         var init = function() {
 
             var loadModule = function() {
                 return orgUnitRepository.get($routeParams.module).then(function(data) {
+                    $scope.orgUnit = data;
+
                     $scope.selectedModuleId = data.id;
                     $scope.selectedModuleName = data.name;
                     $scope.opUnitId = data.parent.id;

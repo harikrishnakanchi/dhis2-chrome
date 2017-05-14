@@ -32,13 +32,20 @@
         <div ng-show="resultMessageType === 'failure'" class="alert alert-danger">{{ resultMessage }}</div>
         <accordion close-others="false">
             <div class="data-set-acc-wrapper">
-                <h4>{{ moduleAndOpUnitName }}</h4>
+
+                <div class="row module-name">
+                    <div class="col-md-6 hide-from-print" ng-class="layoutDirection.direction == 'rtl' ? 'pull-right' : 'pull-left'">
+                        <h4>{{ moduleAndOpUnitName }}</h4>
+                    </div>
+                    <div ng-class="layoutDirection.direction == 'rtl' ? 'pull-right text-left' : 'pull-left text-right'" class="col-md-6">
+                        <button class="btn btn-sm btn-primary printTallySheetBtn" ng-click="viewAllDataElements()">{{ resourceBundle.viewAllDataElements }}</button>
+                        <button class="btn btn-sm btn-primary printTallySheetBtn" ng-click="showRegistrationBook()">{{ resourceBundle.viewRegistrationBook }}</button>
+                    </div>
+                </div>
+
                 <accordion-group is-open="true">
                     <accordion-heading>
                         <span>{{ program.name}}</span>
-                        <span ng-class="layoutDirection.direction == 'rtl' ? 'pull-left' : 'pull-right'">
-                            <button class="viewRegistrationBookBtn btn btn-xs btn-default"ng-click="showRegistrationBook()">{{resourceBundle.viewRegistrationBook}}</button>
-                        </span>
                     </accordion-heading>
 
                     <div class="row line-list-menu">
