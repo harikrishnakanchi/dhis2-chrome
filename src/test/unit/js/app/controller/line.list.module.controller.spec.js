@@ -7,7 +7,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
         describe("line list module controller", function() {
             var scope, rootScope, lineListModuleController, mockOrgStore, mockOrigin, db, q, datasets, dataElements,
                 orgUnitRepository, hustle, excludedDataElementsRepository, excludedLineListOptionsRepository,
-                fakeModal, allPrograms, programRepository, datasetRepository, originOrgunitCreator, translationsService;
+                fakeModal, fakeModalStack, allPrograms, programRepository, datasetRepository, originOrgunitCreator, translationsService;
 
             var createMockAttribute = function (code, value) {
                 return {
@@ -123,6 +123,10 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     open: function(object) {}
                 };
 
+                fakeModalStack = {
+                    dismissAll: function () {}
+                };
+
                 scope.orgUnit = {
                     'name': 'SomeName',
                     'id': 'someId',
@@ -151,7 +155,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             });
 
             var createLineListModuleController = function () {
-                lineListModuleController = new LineListModuleController(scope, rootScope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService, excludedLineListOptionsRepository);
+                lineListModuleController = new LineListModuleController(scope, rootScope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, fakeModalStack, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService, excludedLineListOptionsRepository);
             };
 
             it("should save sorted list of all programs", function() {

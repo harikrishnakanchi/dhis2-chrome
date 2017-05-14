@@ -5,11 +5,11 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
         OrgUnitRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, SystemSettingRepository, TranslationsService, orgUnitMapper, systemSettingsTransformer, customAttributes) {
 
         var scope,rootScope, mockOrgStore, db, q, location, orgUnitRepo, orgunitGroupRepo, hustle,
-            dataSetRepo, systemSettingRepository, excludedDataElementsRepository, fakeModal, allPrograms, originOrgunitCreator, translationsService, orgUnitGroupHelper;
+            dataSetRepo, systemSettingRepository, excludedDataElementsRepository, fakeModal, fakeModalStack, allPrograms, originOrgunitCreator, translationsService, orgUnitGroupHelper;
 
         describe("aggregate module controller", function() {
             var initialiseController = function() {
-                new AggregateModuleController(scope, rootScope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal, orgUnitGroupHelper, originOrgunitCreator, translationsService);
+                new AggregateModuleController(scope, rootScope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal, fakeModalStack, orgUnitGroupHelper, originOrgunitCreator, translationsService);
             };
 
             beforeEach(module('hustle'));
@@ -76,6 +76,10 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                         this.result.cancelCallback(type);
                     },
                     open: function(object) {}
+                };
+
+                fakeModalStack = {
+                    dismissAll: function () {}
                 };
 
                 allPrograms = [{

@@ -1,6 +1,6 @@
 define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransformer", "dataElementUtils", "customAttributes"],
     function(_, orgUnitMapper, moment, interpolate, systemSettingsTransformer, dataElementUtils, customAttributes) {
-        return function($scope, $rootScope, $hustle, orgUnitRepository, datasetRepository, systemSettingRepository, excludedDataElementsRepository, db, $location, $q, $modal,
+        return function($scope, $rootScope, $hustle, orgUnitRepository, datasetRepository, systemSettingRepository, excludedDataElementsRepository, db, $location, $q, $modal, $modalStack,
             orgUnitGroupHelper, originOrgunitCreator, translationsService) {
 
             $scope.originalDatasets = [];
@@ -469,6 +469,10 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
             };
 
             $scope.getDisplayName = dataElementUtils.getDisplayName;
+
+            $scope.dismissModal = function() {
+                $modalStack.dismissAll();
+            };
 
             init();
         };
