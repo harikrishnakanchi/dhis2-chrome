@@ -411,6 +411,20 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             return false;
         };
 
+        $scope.viewAllDataElements = function () {
+            var scope = $rootScope.$new();
+
+            scope.orgUnit = $scope.selectedModule;
+            scope.isOpen = {};
+
+            $modal.open({
+                templateUrl: 'templates/view-all-aggregate-data-elements.html',
+                controller: 'aggregateModuleController',
+                scope: scope,
+                windowClass: 'modal-lg'
+            });
+        };
+
         var deregisterDirtyFormWatcher = $scope.$watch('forms.dataentryForm.$dirty', function(dirty) {
             if (dirty) {
                 $scope.preventNavigation = true;

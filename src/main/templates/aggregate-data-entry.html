@@ -30,6 +30,7 @@
                     <h4>{{ moduleAndOpUnitName }}</h4>
                 </div>
                 <div ng-class="layoutDirection.direction == 'rtl' ? 'pull-right text-left' : 'pull-left text-right'" class="col-md-6">
+                    <button class="btn btn-sm btn-primary printTallySheetBtn" ng-click="viewAllDataElements()">{{ resourceBundle.viewAllDataElements }}</button>
                     <button class="btn btn-sm btn-primary printTallySheetBtn" ng-click="exportTallySheetToExcel()" ng-show="selectedModule">{{resourceBundle.exportTallySheetButton}}</button>
                     <button class="btn btn-sm btn-primary printTallySheetBtn" ng-click="printWindow()" ng-show="selectedModule">{{resourceBundle.printTallySheetBtnValue}}</button>
                 </div>
