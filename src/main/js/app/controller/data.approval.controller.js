@@ -308,6 +308,29 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
             $scope.dataType = "all";
         };
 
+        $scope.viewAllDataElements = function () {
+            var scope = $rootScope.$new();
+
+            scope.isOpen = {};
+            scope.orgUnit = $scope.selectedModule;
+
+            if($scope.isLineListModule) {
+                $modal.open({
+                    templateUrl: 'templates/view-all-linelist-data-elements.html',
+                    controller: 'lineListModuleController',
+                    scope: scope,
+                    windowClass: 'modal-lg'
+                });
+            } else {
+                $modal.open({
+                    templateUrl: 'templates/view-all-aggregate-data-elements.html',
+                    controller: 'aggregateModuleController',
+                    scope: scope,
+                    windowClass: 'modal-lg'
+                });
+            }
+        };
+
         var deregisterErrorInfoListener = $scope.$on('errorInfo', function(event, errorMessage) {
             $scope.approveError = true;
         });
