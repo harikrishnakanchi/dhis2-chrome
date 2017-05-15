@@ -74,7 +74,7 @@
     "secondLevelApproveSuccess": "تمت الموافقة على البينات على مستوى التنسيق",
     "dataApprovalConfirmationMessage": "هل أنت متأكد أنك تريد الموافقة؟",
     "dataApproveFailure": "خطأ في الموافقة على البيانات. حاول مرة أخرى في وقت آخر.",
-    "chooseWeek": "يرجى اختيار أسبوعاً لادخال البينات",
+    "chooseWeek": "يرجى اختيار أسبوعاً لإدخال البينات",
     "eventListTitle": "قائمة الحالات",
     "incompleteEventsTitle": "قائمة الحالات غير المكتملة",
     "readyToSubmitEventsTitle": "قائمة الحالات الجاهزة للتسليم",
@@ -203,9 +203,9 @@
     "downloadDataDesc": "تحميل الملفات من النظام الإقليمي للمعلومات الصحية",
     "syncModuleDataBlockDesc": "تحميل البيانات والموافقات ل{{period}}",
     "disableOrgUnitDesc": "تعطيل وحدة التنظيم {{orgUnit}}",
-    "upsertOrgUnitDesc": "حفظ وحدة التنظيم: {{orgUnit}}",
-    "createUserDesc": "إنشاء مستخدم {{username}}",
-    "updateUserDesc": "تحديث المستخدم {{username}} ",
+    "upsertOrgUnitDesc": "حفظ وحدة التنظيم : {{orgUnit}}",
+    "createUserDesc": "إنشاء مستخدم  {{username}}",
+    "updateUserDesc": "تحديث المستخدم  {{username}}",
     "upsertOrgUnitGroupsDesc": "تعيين وحدة التنظيم إلى مجموعات مناسبة",
     "deleteEventDesc": "حذف الحالات",
     "uploadPatientOriginDetailsDesc": "إنشاء أصل المريض {{origin_name}}",
@@ -277,7 +277,7 @@
     "toLabel": "إلى",
     "weeklyReports": "تقارير أسبوعية",
     "monthlyReports": "تقارير شهرية",
-    "yearlyReports": "Yearly reports",
+    "yearlyReports": "تقارير سنوية",
     "exportRawData": "تصدير بيانات",
     "exportEventData": "تصدير الحالات المسلمة",
     "weeksToExport": "عدد الأسابيع للتصدير",
@@ -345,7 +345,7 @@
     "fileSystem": {
         "successNotification": {
             "title": "تم حفظ الملف بنجاح",
-            "message": "تم حفظ ملف \"{{fileName}}\" بنجاح."
+            "message": "تم حفظ ملف \"{{fileName}}\" بنجاح "
         }
     },
     "uninstall": {
@@ -355,14 +355,14 @@
         "successMessage": "تم إلغاء تثبيت برنامج براكسيس. يرجى إغلاق نافذة المتصفح."
     },
     "forceDownloadMetadata": {
-        "title": "Force Download Metadata AR",
-        "okMessage": "Force Download Metadata AR",
-        "confirmationMessage": "WARNING: This will download all the data again and should be done only if HIS team has adviced to do so. Are you sure you want to continue AR"
+        "title": "تنزيل إجباري لواصفات البيانات عربي",
+        "okMessage": "تنزيل إجباري لواصفات البيانات عربي",
+        "confirmationMessage": "تحذير: سيقوم بتنزيل جميع البيانات مجددا ولا ينصح القيام بذلك إلا بتعليمات من قبل فريق نظم المعلومات الصحية، هل أنت متأكد أنك تريد متابعة AR؟"
     },
     "forceDownloadProjectData": {
-        "title": "Force Download Project data AR",
-        "okMessage": "Force Download Project data AR",
-        "confirmationMessage": "WARNING: This will download all the project data again and should be done only if HIS team has adviced to do so. Are you sure you want to continue AR"
+        "title": "تنزيل إجباري لبيانات البرنامج عربي",
+        "okMessage": "تنزيل إجباري لبيانات البرنامج عربي",
+        "confirmationMessage": "تحذير: سيقوم بتنزيل جميع بيانات البرنامج مجددا ولا ينصح القيام بذلك إلا بتعليمات من قبل فريق نظم المعلومات الصحية، هل أنت متأكد أنك تريد متابعة ؟"
     },
     "selectAll": "تحديد الكل",
     "unselectAll": "إلغاء تحديد الكل",
@@ -374,12 +374,12 @@
         "turnOnConfirmationMessage": "تحذير: \"تشغيل المزامنة (السينك)\" سيؤدي إلى مزامنة البيناتات بين برنامج براكسيس والنظام الإقليمي للمعلومات الصحية ، بالإضافة إلى تحديث براكسيس إلى أحدث إصدار إن وُجِدت. هل أنت متأكد من أنك تريد تشغيل المزامنة؟",
         "turnOffConfirmationMessage": "تحذير: \"إيقاف المزامنة (السينك)\" سيؤدي إلى منع نقل البيناتات بين برنامج براكسيس والنظام الإقليمي للمعلومات الصحية، بالإضافة إلى ذلك لن يتم تحديث براكسيس إلى أحدث إصدار. هل أنت متأكد من أنك تريد إيقاف المزامنة؟"
     },
-    "selectYearLabel": "Select Year :",
-    "updateProductKeyMessage": "Updating product key will download metadata. Please ensure Praxis is online.",
+    "selectYearLabel": "اختر السنة:",
+    "updateProductKeyMessage": "تحديث الرقم المفتاحي للمنتج سيؤدي إلى إعادة تنزيل واصفات البيانات. يرجى التأكد من اتصال براكسيس بالانترنت.",
     "dataAvailabilityMessage": {
-        "daily": "Data entered today will be shown in reports only the next day",
-        "weekly": "Data entered today will be shown in reports only the next week"
+        "daily": "البانات التي يتم إدخالها اليوم سيظهر في التقارير ابتداء من اليوم الذي يليه",
+        "weekly": "البانات التي يتم إدخالها اليوم سيظهر في التقارير ابتداء من الأسبوع الذي يليه"
     },
-    "leavePageConfirmationMessage": "You have unsaved data. This will be lost if you navigate to another page. Are you sure you want to continue?",
-    "viewAllDataElements": "View all Data Elements[AR]"
+    "leavePageConfirmationMessage": "توجد بيانات غير محفوظة. ستفقد هذه البيانات إذا انتقلت إلى صفحة أخرى. هل أنت متأكد أنك تريد متابعة ؟",
+    "viewAllDataElements": "مشاهدة عناصر البيانات"
 }

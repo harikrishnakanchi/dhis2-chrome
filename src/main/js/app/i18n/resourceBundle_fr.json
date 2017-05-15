@@ -277,7 +277,7 @@
     "toLabel": "à",
     "weeklyReports": "Rapports hebdomadaires",
     "monthlyReports": "Rapports Mensuels",
-    "yearlyReports": "Yearly Reports",
+    "yearlyReports": "Rapports Annuels",
     "exportRawData": "Exporter des données",
     "exportEventData": "Exporter les cas soumis",
     "weeksToExport": "Nombre de semaines à exporter",
@@ -355,16 +355,15 @@
         "successMessage": "Praxis est désinstallé. Fermez la fenêtre du navigateur."
     },
     "forceDownloadMetadata": {
-        "title": "Force Download Metadata FR",
-        "okMessage": "Force Download Metadata FR",
-        "confirmationMessage": "WARNING: This will download all the data again and should be done only if HIS team has adviced to do so. Are you sure you want to continue FR"
+        "title": "Forcer le téléchargement des métadonnées",
+        "okMessage": "Forcer le téléchargement des métadonnées",
+        "confirmationMessage": "AVERTISSEMENT: Ceci va télécharger toutes les données de nouveau et devrait être fait uniquement si l'équipe HIS vous a conseillé de le faire. Etes-vous sûr de vouloir continuer ?"
     },
     "forceDownloadProjectData": {
-        "title": "Force Download Project data FR",
-        "okMessage": "Force Download Project data FR",
-        "confirmationMessage": "WARNING: This will download all the project data again and should be done only if HIS team has adviced to do so. Are you sure you want to continue FR"
+        "title": "Forcer le téléchargement des données du projet",
+        "okMessage": "Forcer le téléchargement des données du projet",
+        "confirmationMessage": "AVERTISSEMENT: Ceci va télécharger toutes les données du projet de nouveau et devrait être fait uniquement si l'équipe HIS vous a conseillé de le faire. Etes-vous sûr de vouloir continuer ?"
     },
-
     "selectAll": "Sélectionner Tout",
     "unselectAll": "Tout Déselectionner",
     "praxisTrainingVersionMessage": "VERSION EXERCICE DE PRAXIS",
@@ -375,12 +374,12 @@
         "turnOnConfirmationMessage": "AVERTISSEMENT: \"Activer la synchronisation\" synchronisera vos données Praxis avec DHIS. Cela mettra à jour la dernière version de Praxis si disponible. Etes-vous sûr de vouloir activer la synchronisation ?",
         "turnOffConfirmationMessage": "AVERTISSEMENT: \"Désactiver la synchronisation\" stoppera la réception et l'envoi de données de Praxis avec DHIS. La dernière version de Praxis, si disponible, ne sera pas mise à jour. Etes vous sûr de vouloir désactiver la synchronisation ?"
     },
-    "selectYearLabel": "Select Year :[FR]",
-    "updateProductKeyMessage": "Updating product key will download metadata. Please ensure Praxis is online.",
+    "selectYearLabel": "Sélectionnez une année: ",
+    "updateProductKeyMessage": "Mettre à jour la clé produit va télécharger les métadonnées. Assurez-vous d'être en ligne.",
     "dataAvailabilityMessage": {
-        "daily": "Data entered today will be shown in reports only the next day[FR]",
-        "weekly": "Data entered today will be shown in reports only the next week[FR]"
+        "daily": "Les données saisies aujourd'hui apparaîtront dans les rapports seulement le jour suivant",
+        "weekly": "Les données saisies aujourd'hui apparaitront dans les rapports seulement la semaine suivante"
     },
-    "leavePageConfirmationMessage": "You have unsaved data. This will be lost if you navigate to another page. Are you sure you want to continue? FR",
-    "viewAllDataElements": "View all Data Elements[FR]"
+    "leavePageConfirmationMessage": "Vous avez des données non enregistrées. Elles seront perdues si vous naviguez vers une autre page. Etes-vous sûr de vouloir continuer ?",
+    "viewAllDataElements": "Voir tous les éléments de données"
 }
