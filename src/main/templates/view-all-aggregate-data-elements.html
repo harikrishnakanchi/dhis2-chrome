@@ -1,4 +1,4 @@
-<div class="{{ layoutDirection.direction }} popupDialog">
+<div class="{{ layoutDirection.direction }} popupDialog aggregate-data-elements">
     <div class="modal-header">
         <button type="button" ng-class="{closeLabelToLeft: layoutDirection.direction == 'rtl'}" class="close" data-dismiss="modal" aria-label="Close" ng-click="dismissModal()">
             <span aria-hidden="true">&times;</span>
@@ -32,15 +32,22 @@
                                         </a>
                                     </div>
                                 </div>
-                                <div ng-repeat="(subSection, dataElements) in section.dataElements | groupBy: 'subSection'" ng-if="subSection != 'Default'">
-                                    <h4>{{ subSection }}</h4>
-                                    <div ng-repeat="dataElement in dataElements">
-                                        <input type="checkbox" ng-model="dataElement.isIncluded" disabled />
-                                        <a description-popup class="changeColor" dp-title="{{ getDisplayName(dataElement) }}" dp-desc="{{ dataElement.description }}">
-                                            {{ getDisplayName(dataElement) }}
-                                        </a>
-                                    </div>
-                                </div>
+
+                                <accordion close-others="false">
+                                    <accordion-group ng-repeat="(subSection, dataElements) in section.dataElements | groupBy: 'subSection'" is-open="isOpen[subSection]" ng-if="subSection != 'Default'" class="data-element-group">
+                                        <accordion-heading>
+                                            <span>{{ subSection }}</span>
+                                            <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isOpen[subSection], 'glyphicon-chevron-right': !isOpen[subSection]}"></i>
+                                            <i ng-if="layoutDirection.direction == 'rtl'" class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isOpen[subSection], 'glyphicon-chevron-left': !isOpen[subSection]}"></i>
+                                        </accordion-heading>
+                                        <div ng-repeat="dataElement in dataElements">
+                                            <input type="checkbox" ng-model="dataElement.isIncluded" disabled />
+                                            <a description-popup class="changeColor" dp-title="{{ getDisplayName(dataElement) }}" dp-desc="{{ dataElement.description }}">
+                                                {{ getDisplayName(dataElement) }}
+                                            </a>
+                                        </div>
+                                    </accordion-group>
+                                </accordion>
                             </accordion-group>
                         </accordion>
                     </div>
