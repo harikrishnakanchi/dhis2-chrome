@@ -45,7 +45,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 spyOn(reportService, 'getReportDataForOrgUnit').and.returnValue(utils.getPromise(q, {}));
 
                 systemInfoService = new SystemInfoService();
-                spyOn(systemInfoService, 'getServerDate');
+                spyOn(systemInfoService, 'getServerDate').and.returnValue(utils.getPromise(q, ''));
 
                 changeLogRepository = new ChangeLogRepository();
                 spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, null));
@@ -77,12 +77,13 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['projectIdB']);
             });
 
-            it('should retrieve the lastUpdated time from the changeLog', function() {
+            it('should retrieve the lastUpdated time from the changeLog for each of the module', function() {
                 downloadChartDataConsumer.run();
                 scope.$apply();
 
-                expect(changeLogRepository.get).toHaveBeenCalledWith('weeklyChartData:' + mockProjectId);
-                expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyChartData:' + mockProjectId);
+                expect(changeLogRepository.get).toHaveBeenCalledWith('weeklyChartData:' + mockProjectId + ':' + mockModule.id);
+                expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyChartData:' + mockProjectId + ':' + mockModule.id);
+                expect(changeLogRepository.get).toHaveBeenCalledWith('yearlyChartData:' + mockProjectId + ':' + mockModule.id);
             });
 
             it('should update the lastUpdated with the system time in the changeLog', function() {
@@ -91,8 +92,9 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 downloadChartDataConsumer.run();
                 scope.$apply();
 
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith('weeklyChartData:' + mockProjectId, systemTime);
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyChartData:' + mockProjectId, systemTime);
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('weeklyChartData:' + mockProjectId + ':' + mockModule.id, systemTime);
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('monthlyChartData:' + mockProjectId + ':' + mockModule.id, systemTime);
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('yearlyChartData:' + mockProjectId + ':' + mockModule.id, systemTime);
             });
 
             it('should retrieve dataSets for each module', function() {
@@ -224,6 +226,28 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 expect(chartRepository.upsertChartData).toHaveBeenCalledWith(mockChart.id, 'Mod3', 'data3');
             });
 
+            it('should not continue download of charts if a call fails because of loss of network connectivity', function() {
+                var usersModules = [{
+                    id: 'Mod1'
+                }, {
+                    id: 'Mod2'
+                }];
+
+                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, usersModules));
+                reportService.getReportDataForOrgUnit.and.callFake(function(chart, moduleId) {
+                    if (moduleId === 'Mod1')
+                        return utils.getPromise(q, 'data1');
+                    if (moduleId === 'Mod2')
+                        return utils.getRejectedPromise(q, { errorCode: 'NETWORK_UNAVAILABLE' });
+                });
+
+                downloadChartDataConsumer.run();
+                scope.$apply();
+
+                expect(chartRepository.upsertChartData).not.toHaveBeenCalledWith(mockChart.id, 'Mod2', 'data2');
+                expect(chartRepository.upsertChartData).not.toHaveBeenCalledWith(mockChart.id, 'Mod1', 'data1');
+            });
+
             it('should not download chart data if user has no modules', function() {
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, []));
 
@@ -245,7 +269,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 scope.$apply();
 
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
-                expect(changeLogRepository.upsert).not.toHaveBeenCalled();
+                expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('weeklyChartData:' + mockProjectId, currentTime.toISOString());
             });
 
             it('should not download monthly chart data if it has already been downloaded that same day', function() {
@@ -263,7 +287,25 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 scope.$apply();
 
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
-                expect(changeLogRepository.upsert).not.toHaveBeenCalled();
+                expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('monthlyChartData:' + mockProjectId, currentTime.toISOString());
+            });
+
+            it('should not download yearly chart data if it has already been downloaded that same week', function() {
+                var mockYearlyChart = {
+                    id: 'someChartId',
+                    yearlyChart: true
+                };
+
+                var lastDownloadedTime = moment('2014-10-03T12:00:00.000Z').toISOString();
+
+                chartRepository.getAll.and.returnValue(utils.getPromise(q, [mockYearlyChart]));
+                changeLogRepository.get.and.returnValue(utils.getPromise(q, lastDownloadedTime));
+
+                downloadChartDataConsumer.run();
+                scope.$apply();
+
+                expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
+                expect(changeLogRepository.upsert).not.toHaveBeenCalledWith('yearlyChartData:' + mockProjectId, currentTime.toISOString());
             });
 
             it('should download monthly chart data if it has not been downloaded in the same day', function() {

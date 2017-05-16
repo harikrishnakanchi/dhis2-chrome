@@ -15,8 +15,8 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
                 objectStore: function() {}
             };
 
-            orgUnitFields = metadataConf.fields.organisationUnits;
-            metadataConf.fields.organisationUnits = 'orgUnitFields';
+            orgUnitFields = metadataConf.fields.organisationUnits.params;
+            metadataConf.fields.organisationUnits.params = 'orgUnitFields';
 
             spyOn(db, "objectStore").and.returnValue(mockOrgStore);
             spyOn(mockOrgStore, "upsert").and.returnValue(utils.getPromise(q, "someId"));
@@ -25,7 +25,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
         }));
 
         afterEach(function() {
-            metadataConf.fields.organisationUnits = orgUnitFields;
+            metadataConf.fields.organisationUnits.params = orgUnitFields;
             httpBackend.verifyNoOutstandingExpectation();
             httpBackend.verifyNoOutstandingRequest();
         });
@@ -267,6 +267,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
         });
 
         describe('getOrgUnitAndDescendants', function () {
+
             var orgUnitId, expectedOrgUnitsWithIds, expectedOrgUnits, orgUnitIdHandler;
             beforeEach(function () {
                 orgUnitId = "orgUnitID";
@@ -284,11 +285,11 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
             });
 
             it('should get the orgunit details of descendants and ancestors of specified orgunit', function () {
-                httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?fields=' + metadataConf.fields.organisationUnits + encodeURI('&filter=id:in:[IDA,IDB]&paging=false')).respond(200, {organisationUnits: expectedOrgUnits});
-
+                httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?fields=' + metadataConf.fields.organisationUnits.params + encodeURI('&filter=id:in:[IDA,IDB]&paging=false')).respond(200, {organisationUnits: expectedOrgUnits});
                 orgUnitService.getOrgUnitTree(orgUnitId).then(function (actualOrgUnits) {
                     expect(actualOrgUnits).toEqual(expectedOrgUnits);
                 });
+
                 httpBackend.flush();
             });
 
@@ -301,8 +302,8 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
                 ];
                 orgUnitIdHandler.respond(200, {organisationUnits: mockId});
 
-                httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?fields=' + metadataConf.fields.organisationUnits + encodeURI('&filter=id:in:[IDA,IDB]&paging=false')).respond(200, {organisationUnits: [expectedOrgUnits[0], expectedOrgUnits[1]]});
-                httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?fields=' + metadataConf.fields.organisationUnits + encodeURI('&filter=id:in:[IDC]&paging=false')).respond(200, {organisationUnits: [expectedOrgUnits[2]]});
+                httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?fields=' + metadataConf.fields.organisationUnits.params + encodeURI('&filter=id:in:[IDA,IDB]&paging=false')).respond(200, {organisationUnits: [expectedOrgUnits[0], expectedOrgUnits[1]]});
+                httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?fields=' + metadataConf.fields.organisationUnits.params + encodeURI('&filter=id:in:[IDC]&paging=false')).respond(200, {organisationUnits: [expectedOrgUnits[2]]});
 
                 orgUnitService.getOrgUnitTree(orgUnitId, undefined, 2).then(function (actualOrgUnits) {
                     expect(actualOrgUnits).toEqual(expectedOrgUnits);

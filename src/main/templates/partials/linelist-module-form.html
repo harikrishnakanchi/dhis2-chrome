@@ -46,8 +46,7 @@
                                  input-class="form-control form-control-small"
                                  match-class="highlight"
                                  field-required="true"
-                                 initial-value="{{program.name}}"
-                                 class="ng-isolate-scope">
+                                 initial-value="{{program.name}}">
                             </div>
                         </div>
                         <div>
@@ -58,7 +57,7 @@
                             <section class="module-details">
                                 <div class="details">
                                     <div ng-repeat="programStage in enrichedProgram.programStages" ng-if="enrichedProgram !== undefined">
-                                        <div ng-repeat="section in programStage.programStageSections">
+                                        <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
                                             <div class="collapse-head">
                                                 <h5 ng-click="changeCollapsed(section.id)">{{section.name}}</h5>
                                             </div>

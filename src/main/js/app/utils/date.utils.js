@@ -25,12 +25,17 @@ define(["moment", "lodash"], function(moment, _) {
         return moment().subtract(numberOfWeeks, 'week').format("YYYY-MM-DD");
     };
 
-    var getPeriodRange = function(numberOfWeeks, options) {
+    var getPeriodRange = function(type, total, options) {
         options = options || {};
-        var weeksToSubtract = options.excludeCurrentWeek ? numberOfWeeks : numberOfWeeks - 1;
+        var difference = options.excludeCurrent ? total : total - 1;
 
-        return _.times(numberOfWeeks, function(index) {
-            return moment().subtract(weeksToSubtract - index, 'week').format("GGGG[W]WW");
+        var format;
+        if (type === 'week') format = 'GGGG[W]WW';
+        if (type === 'month') format = 'YYYYMM';
+        if (type === 'year') format = 'YYYY';
+
+        return _.times(total, function(index) {
+            return moment().subtract(difference - index, type).format(format);
         });
     };
 
@@ -49,7 +54,9 @@ define(["moment", "lodash"], function(moment, _) {
         max: max,
         getFormattedPeriod: getFormattedPeriod,
         subtractWeeks: subtractWeeks,
-        getPeriodRange: getPeriodRange,
+        getPeriodRangeInWeeks: _.partial(getPeriodRange, 'week'),
+        getPeriodRangeInMonths: _.partial(getPeriodRange, 'month'),
+        getPeriodRangeInYears: _.partial(getPeriodRange, 'year'),
         getNumberOfISOWeeksInMonth: getNumberOfISOWeeksInMonth
     };
 });

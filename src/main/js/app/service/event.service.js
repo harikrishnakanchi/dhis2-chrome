@@ -1,4 +1,4 @@
-define(['dhisUrl', 'dateUtils', 'properties', 'moment', 'lodash', 'pagingUtils'], function(dhisUrl, dateUtils, properties, moment, _, pagingUtils) {
+define(['dhisUrl', 'dateUtils', 'properties', 'moment', 'lodash', 'pagingUtils', 'constants'], function(dhisUrl, dateUtils, properties, moment, _, pagingUtils, constants) {
     return function($http, $q) {
         var MAX_NUMBER_OF_EVENTS = properties.eventsSync.maximumNumberOfEventsToSync,
             EVENT_ID_PAGE_SIZE = properties.eventsSync.pageSize.eventIds,
@@ -71,7 +71,7 @@ define(['dhisUrl', 'dateUtils', 'properties', 'moment', 'lodash', 'pagingUtils']
                 return data;
             };
             var onError = function(data) {
-                if (data.status !== 404) {
+                if (data.errorCode !== constants.errorCodes.NOT_FOUND) {
                     return $q.reject(data);
                 } else {
                     return $q.when(data);

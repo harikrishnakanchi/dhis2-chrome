@@ -512,6 +512,14 @@ define(['dateUtils', 'lodash', 'metadataConf', 'productKeyUtils'], function(date
         db.deleteObjectStore("localUserCredentials");
     };
 
+    var add_option_store = function(db) {
+        create_store_with_key("options", "id", db);
+    };
+
+    var add_program_stage_section_store = function(db) {
+        create_store_with_key("programStageSections", "id", db);
+    };
+
     var update_orgunit_changelog = function (db, tx) {
         var changeLogStore = tx.objectStore("changeLog");
         var changeLogReq = changeLogStore.get('organisationUnits');
@@ -537,6 +545,11 @@ define(['dateUtils', 'lodash', 'metadataConf', 'productKeyUtils'], function(date
                 req.onsuccess = decryptAndUpdateChangeLog;
             }
         };
+    };
+
+    var delete_keys_organisation_unit_group_sets_from_changelog = function (db, tx) {
+        var changeLogStore = tx.objectStore("changeLog");
+        changeLogStore.delete("organisationUnitGroupSets");
     };
 
     return [add_object_stores,
@@ -598,6 +611,9 @@ define(['dateUtils', 'lodash', 'metadataConf', 'productKeyUtils'], function(date
         update_change_log_keys,
         migrate_metadata_change_log,
         delete_local_user_credentials_store,
-        update_orgunit_changelog
+        update_orgunit_changelog,
+        add_option_store,
+        add_program_stage_section_store,
+        delete_keys_organisation_unit_group_sets_from_changelog
     ];
 });

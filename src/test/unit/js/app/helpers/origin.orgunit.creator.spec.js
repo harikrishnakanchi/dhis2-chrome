@@ -1,8 +1,8 @@
-define(["originOrgunitCreator", "angularMocks", "utils", "lodash", "orgUnitRepository", "patientOriginRepository", "dhisId", "orgUnitGroupHelper", "dataSetRepository", "orgUnitMapper"],
-    function(OriginOrgunitCreator, mocks, utils, _, OrgUnitRepository, PatientOriginRepository, dhisId, OrgUnitGroupHelper, DatasetRepository, orgUnitMapper) {
+define(["originOrgunitCreator", "angularMocks", "utils", "lodash", "orgUnitRepository", "patientOriginRepository", "dhisId", "dataSetRepository", "orgUnitMapper"],
+    function(OriginOrgunitCreator, mocks, utils, _, OrgUnitRepository, PatientOriginRepository, dhisId, DatasetRepository, orgUnitMapper) {
         describe("origin orgunit creator", function() {
 
-            var scope, mockOrigin, q, originOrgunitCreator, orgUnitRepository, patientOriginRepository, orgUnitGroupHelper, dataSetRepository;
+            var scope, mockOrigin, q, originOrgunitCreator, orgUnitRepository, patientOriginRepository, dataSetRepository;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q) {
@@ -16,7 +16,6 @@ define(["originOrgunitCreator", "angularMocks", "utils", "lodash", "orgUnitRepos
 
                 orgUnitRepository = new OrgUnitRepository();
                 patientOriginRepository = new PatientOriginRepository();
-                orgUnitGroupHelper = new OrgUnitGroupHelper();
                 dataSetRepository = new DatasetRepository();
 
                 spyOn(orgUnitRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
@@ -25,7 +24,6 @@ define(["originOrgunitCreator", "angularMocks", "utils", "lodash", "orgUnitRepos
 
                 spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, mockOrigin));
 
-                spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
 
                 spyOn(dhisId, "get").and.callFake(function(name) {
                     return name;
@@ -33,7 +31,7 @@ define(["originOrgunitCreator", "angularMocks", "utils", "lodash", "orgUnitRepos
 
                 spyOn(orgUnitMapper, "createPatientOriginPayload").and.returnValue([mockOrigin]);
 
-                originOrgunitCreator = new OriginOrgunitCreator(q, orgUnitRepository, patientOriginRepository, orgUnitGroupHelper, dataSetRepository);
+                originOrgunitCreator = new OriginOrgunitCreator(q, orgUnitRepository, patientOriginRepository, dataSetRepository);
             }));
 
             var createModule = function (options) {

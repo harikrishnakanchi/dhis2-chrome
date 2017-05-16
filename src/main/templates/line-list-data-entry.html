@@ -2,6 +2,7 @@
     <section id="top" class="panel tab-panel">
         <form name="eventDataEntryForm" id="eventDataEntryForm" class="form-horizontal">
             <accordion close-others="false">
+                <h4>{{ moduleAndOpUnitName }}</h4>
                 <accordion-group is-open="true">
                     <accordion-heading>
                         <span>{{ program.name }}</span>
@@ -139,7 +140,7 @@
                                     <input type="button" class="btn btn-main" ng-disabled="eventDataEntryForm.$invalid" ng-if="isNewMode" value="{{ resourceBundle.saveCaseBtnValue }}" ng-click="save()" />
                                     <input type="button" class="btn btn-main" ng-disabled="eventDataEntryForm.$invalid" ng-if="isNewMode" value="{{ resourceBundle.saveAndAddAnotherBtnValue }}" ng-click="save(true)" />
                                     <input type="button" class="btn btn-main" ng-disabled="eventDataEntryForm.$invalid" ng-if="!isNewMode && !isHistoricalEvent" value="{{ resourceBundle.updateBtnValue }}" ng-click="update()" />
-                                    <input type="button" class="btn btn-main" ng-if="!isHistoricalEvent" value="{{ resourceBundle.cancelLabel }}" ng-click="loadEventsView()" />
+                                    <input type="button" class="btn btn-main" ng-if="!isHistoricalEvent" value="{{ resourceBundle.backBtnValue }}" ng-click="loadEventsView()" />
                                     <input type="button" class="btn btn-main" ng-if="isHistoricalEvent" value="{{ resourceBundle.backBtnValue }}" ng-click="loadEventsView()" />
 
                                 </div>

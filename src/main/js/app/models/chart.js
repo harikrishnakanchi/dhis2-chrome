@@ -1,4 +1,4 @@
-define([], function() {
+define(['lodash'], function(_) {
     var FIELD_APP_NAME_REGEX = /^\[Praxis - ([a-zA-Z0-9()><]+)\]([0-9\s]*)([a-zA-Z0-9-\s]+)/;
 
     var SERVICE_CODE_INDEX = 1,
@@ -19,9 +19,10 @@ define([], function() {
         this.serviceCode = parseServiceCode(this.name);
         this.displayPosition = parseDisplayPosition(this.name);
 
-        this.geographicOriginChart = this.serviceCode == 'GeographicOrigin';
-        this.monthlyChart = isMonthlyChart(config.relativePeriods);
-        this.weeklyChart = !this.monthlyChart;
+        this.geographicOriginChart = _.contains(this.name, 'GeographicOrigin');
+        this.monthlyChart = isChartOfType(config.relativePeriods, "Month");
+        this.weeklyChart = isChartOfType(config.relativePeriods, "Week");
+        this.yearlyChart = !(this.monthlyChart || this.weeklyChart);
     };
 
     var parseServiceCode = function(chartName) {
@@ -34,9 +35,9 @@ define([], function() {
         return matches && parseInt(matches[DISPLAY_POSITION_INDEX]);
     };
 
-    var isMonthlyChart = function(relativePeriods) {
+    var isChartOfType = function (relativePeriods, typeOfReport) {
         var selectedPeriod = _.findKey(relativePeriods, function(value) { return value; });
-        return _.contains(selectedPeriod, "Month");
+        return _.contains(selectedPeriod, typeOfReport);
     };
 
     Chart.create = function () {

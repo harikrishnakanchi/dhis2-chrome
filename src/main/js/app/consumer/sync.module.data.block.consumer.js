@@ -55,7 +55,7 @@ define(['properties', 'dateUtils'], function (properties, dateUtils) {
             };
 
             var getEventIdsFromDhis = function(data) {
-                var periodRange = dateUtils.getPeriodRange(properties.projectDataSync.numWeeksToSync);
+                var periodRange = dateUtils.getPeriodRangeInWeeks(properties.projectDataSync.numWeeksToSync);
                 return eventService.getEventIds(data.moduleId, periodRange).then(function (eventIds){
                     return _.merge({ eventIds: eventIds }, data);
                 });

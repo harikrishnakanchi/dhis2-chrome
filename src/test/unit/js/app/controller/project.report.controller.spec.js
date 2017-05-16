@@ -1,10 +1,12 @@
-define(["moment", "orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "changeLogRepository", "translationsService", "timecop", "orgUnitGroupSetRepository", "filesystemService", "pivotTableExportBuilder", "excelBuilder"],
-    function(moment, OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, ChangeLogRepository, TranslationsService, timecop, OrgUnitGroupSetRepository, FilesystemService, PivotTableExportBuilder, ExcelBuilder) {
+define(["moment", "orgUnitRepository", "angularMocks", "dateUtils", "projectReportController", "utils", "orgUnitMapper", "pivotTableRepository", "changeLogRepository",
+"translationsService", "timecop", "orgUnitGroupSetRepository", "filesystemService", "pivotTableExportBuilder", "excelBuilder", "customAttributes"],
+    function(moment, OrgUnitRepository, mocks, dateUtils, ProjectReportController, utils, orgUnitMapper, PivotTableRepository, ChangeLogRepository,
+             TranslationsService, timecop, OrgUnitGroupSetRepository, FilesystemService, PivotTableExportBuilder, ExcelBuilder, customAttributes) {
     describe("projectReportController", function() {
         var scope, rootScope, q,
             projectReportController,
             orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService, pivotTableExportBuilder,
-            mockPivotTables, pivotTableData, mockProjectOrgUnit, orgUnitGroupSets, currentTime, lastUpdatedTime;
+            mockPivotTables, pivotTableData, mockProjectOrgUnit, orgUnitGroupSets, currentTime, lastUpdatedTime, openingDate;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             rootScope = $rootScope;
@@ -43,10 +45,11 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             scope.stopLoading = jasmine.createSpy('stopLoading');
             scope.locale = 'en';
 
+            openingDate = new Date("2007-12-31");
             mockProjectOrgUnit = {
                 "id": "xyz",
                 "name": "Aweil - SS153",
-                "openingDate": "2007-12-31",
+                "openingDate": moment(openingDate).toDate(),
                 "parent": {
                     "id": "a18da381f7d",
                     "name": "SOUDAN Sud"
@@ -54,38 +57,10 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
                 "attributeValues": [
                     {
                         "attribute": {
-                            "name": "Context",
-                            "code" : "prjCon"
-                        },
-                        "value": "Cross-border instability"
-                    },
-                    {
-                        "attribute": {
                             "name": "Project Code",
                             "code": "projCode"
                         },
                         "value": "SS153"
-                    },
-                    {
-                        "attribute": {
-                            "name": "Mode Of Operation",
-                            "code": "modeOfOperation"
-                        },
-                        "value": "Direct operation"
-                    },
-                    {
-                        "attribute": {
-                            "name": "Project Type",
-                            "code": "projectType"
-                        },
-                        "value": "Regular Project"
-                    },
-                    {
-                        "attribute": {
-                            "name": "Model Of Management",
-                            "code": "modelOfManagement"
-                        },
-                        "value": "Collaboration"
                     },
                     {
                         "attribute": {
@@ -96,26 +71,18 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
                     },
                     {
                         "attribute": {
-                            "name": "Type of population",
-                            "code": "prjPopType"
-                        },
-                        "value": "General Population"
-                    },
-                    {
-                        "attribute": {
-                            "name": "Reason For Intervention",
-                            "code": "reasonForIntervention"
-                        },
-                        "value": "Access to health care"
-                    },
-                    {
-                        "attribute": {
                             "name": "Location",
                             "code": "prjLoc"
                         },
                         "value": "Northern Bar El Ghazal"
                     }
-                ]
+                ],
+                "organisationUnitGroups": [{
+                    "id": 'someOrgUnitGroupId',
+                    "organisationUnitGroupSet": {
+                        "id": 'someGroupSetId'
+                    }
+                }]
             };
 
             mockPivotTables = [{
@@ -129,97 +96,47 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             pivotTableData = {
                 some: 'data',
                 title: 'someTitle',
-                isDataAvailable: true
+                isDataAvailable: true,
+                columnConfigurations: [{}],
+                columns: [{}]
             };
 
             orgUnitGroupSets = [{
-                "code": "project_type",
-                "id": "D6yNgLkqIKR",
-                "name": "Project Type",
-                "organisationUnitGroups": [{
-                    "id": "koFDuOVZsoU",
-                    "name": "Regular Project"
-                }, {
-                    "id": "vxKtTBwL2S2",
-                    "name": "Emergency Project"
-                }, {
-                    "id": "I97gskdFUWe",
-                    "name": "Vaccination Campaign"
+                id: 'someGroupSetId',
+                name: 'someGroupSetName',
+                attributeValues: [{
+                    value: 4,
+                    attribute: {
+                        code: 'groupSetLevel'
+                    }
+                }],
+                organisationUnitGroups: [{
+                    id: 'someOrgUnitGroupId',
+                    name: 'someOrgUnitGroupName'
                 }]
             }, {
-                "code": "model_of_management",
-                "id": "a2d4a1dee27",
-                "name": "Model Of Management",
-                "organisationUnitGroups": [{
-                    "id": "aa9a24c9126",
-                    "name": "MSF Management"
-                }, {
-                    "id": "a11a7a5d55a",
-                    "name": "Collaboration"
-                }]
-            }, {
-                "code": "context",
-                "id": "a5c18ef7277",
-                "name": "Context",
-                "organisationUnitGroups": [{
-                    "id": "a16b4a97ce4",
-                    "name": "Post-conflict"
-                }, {
-                    "id": "ac606ebc28f",
-                    "name": "Internal Instability"
-                }, {
-                    "id": "abfef86a4b6",
-                    "name": "Cross-border instability"
-                }, {
-                    "id": "af40faf6384",
-                    "name": "Stable"
-                }]
-            }, {
-                "code": "reason_for_intervention",
-                "id": "a86f66f29d4",
-                "name": "Reason For Intervention",
-                "organisationUnitGroups": [{
-                    "id": "ab4b1006371",
-                    "name": "Armed Conflict"
-                }, {
-                    "id": "a9e29c075cc",
-                    "name": "Epidemic"
-                }, {
-                    "id": "a8014cfca5c",
-                    "name": "Natural Disaster"
-                }, {
-                    "id": "a559915efe5",
-                    "name": "Access to health care"
-                }]
-            }, {
-                "code": "type_of_population",
-                "id": "a8a579d5fab",
-                "name": "Type of Population",
-                "organisationUnitGroups": [{
-                    "id": "a35778ed565",
-                    "name": "Most-at-risk Population"
-                }, {
-                    "id": "afbdf5ffe08",
-                    "name": "General Population"
-                }, {
-                    "id": "a48f665185e",
-                    "name": "Refugee"
-                }, {
-                    "id": "a969403a997",
-                    "name": "Internally Displaced People"
-                }]
-            }, {
-                "code": "mode_of_operation",
-                "id": "a9ca3d1ed93",
-                "name": "Mode Of Operation",
-                "organisationUnitGroups": [{
-                    "id": "a92cee050b0",
-                    "name": "Remote operation"
-                }, {
-                    "id": "a560238bc90",
-                    "name": "Direct operation"
+                id: 'someOtherGroupSetId',
+                name: 'someOtherGroupSetName',
+                attributeValues: [{
+                    value: 5,
+                    attribute: {
+                        code: 'groupSetLevel'
+                    }
                 }]
             }];
+
+            var mockMappedProject = _.merge(mockProjectOrgUnit, {
+                orgUnitGroupSets: {
+                    'someGroupSetId': {
+                        id: 'someOrgUnitGroupId',
+                        name: 'someOrgUnitGroupName'
+                    }
+                },
+                location: "Northern Bar El Ghazal",
+                projectCode: "SS153"
+            });
+
+            spyOn(dateUtils, 'getPeriodRangeInYears').and.returnValue(['old year', 'new year']);
 
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise($q, mockProjectOrgUnit));
@@ -232,7 +149,6 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise($q, lastUpdatedTime));
 
             translationsService = new TranslationsService();
-            spyOn(translationsService, 'translatePivotTableData').and.callFake(function(object) { return object; });
             spyOn(translationsService, 'translate').and.callFake(function(object) { return object; });
 
             orgUnitGroupSetRepository = new OrgUnitGroupSetRepository();
@@ -245,6 +161,13 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             spyOn(pivotTableExportBuilder, 'build');
 
             spyOn(ExcelBuilder, 'createWorkBook').and.returnValue(new Blob());
+            spyOn(orgUnitMapper, 'mapOrgUnitToProject').and.returnValue(mockMappedProject);
+
+            spyOn(customAttributes, 'getAttributeValue').and.callFake(function (attributeValues, code) {
+                 return attributeValues[0].value;
+            });
+
+
 
             projectReportController = new ProjectReportController(rootScope, q, scope, orgUnitRepository, pivotTableRepository, changeLogRepository, translationsService, orgUnitGroupSetRepository, filesystemService, pivotTableExportBuilder);
         }));
@@ -322,52 +245,43 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
             expect(scope.pivotTables).toEqual([]);
         });
 
-        it("should add the projectAttributes which lists all the project basic info into the scope", function() {
-            var expectedProjectAttributes = [
-                {
-                    name: "Country",
-                    value: "SOUDAN Sud"
-                }, {
-                    name: "Name",
-                    value: "Aweil - SS153"
-                }, {
-                    name: 'Project Code',
-                    value: 'SS153'
-                },
-                {
-                    name: 'Project Type',
-                    value: 'Regular Project'
-                },
-                {
-                    name: 'Context',
-                    value: 'Cross-border instability'
-                },
-                {
-                    name: 'Type of population',
-                    value: 'General Population'
-                }, {
-                    name: 'Reason For Intervention',
-                    value: 'Access to health care'
-                },
-                {
-                    name: 'Mode Of Operation',
-                    value: 'Direct operation'
-                }, {
-                    name: 'Model Of Management',
-                    value: 'Collaboration'
-                },  {
-                    name : "Opening Date",
-                    value: new Date("12/31/2007").toLocaleDateString()
-                },
-                {
-                    name : "End Date",
-                    value: ""
-                }
-            ];
-
+        it('should add and translate organisationUnitGroups which lists project basic info', function () {
             scope.$apply();
-            expect(orgUnitRepository.get).toHaveBeenCalledWith("xyz");
-            expect(scope.projectAttributes).toEqual(expectedProjectAttributes);
+            expect(translationsService.translate).toHaveBeenCalledWith(orgUnitGroupSets);
+            expect(orgUnitMapper.mapOrgUnitToProject).toHaveBeenCalledWith(mockProjectOrgUnit, [orgUnitGroupSets[0]]);
+            expect(scope.projectAttributes).toEqual([{
+                name: 'Country',
+                value: 'SOUDAN Sud'
+            },
+                {
+                name: "Name",
+                value: "Aweil - SS153"
+            }, {
+                name: "Project Code",
+                value: "SS153"
+            }, {
+                name: "Opening Date",
+                value: openingDate.toLocaleDateString()
+            }, {
+                name: "End Date",
+                value: ""
+            }, {
+                    name: "someGroupSetName",
+                    value: "someOrgUnitGroupName"
+            }]);
+        });
+
+        describe('yearlyReport', function () {
+            it('should generate last four years', function () {
+                expect(dateUtils.getPeriodRangeInYears).toHaveBeenCalledWith(4);
+
+                scope.$apply();
+                expect(scope.last4years).toEqual(['new year', 'old year']);
+            });
+
+            it('should set current year as selectedYear', function () {
+                expect(scope.selectedYear).toEqual('new year');
+            });
         });
 
         describe('lastUpdatedTimeForProjectReport', function () {
@@ -376,7 +290,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
                     REPORTS_LAST_UPDATED_TIME_FORMAT = "D MMMM YYYY[,] h[.]mm A";
 
                 scope.$apply();
-                expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyPivotTableData:' + projectId);
+                expect(changeLogRepository.get).toHaveBeenCalledWith('yearlyPivotTableData:' + projectId);
                 expect(scope.lastUpdatedTimeForProjectReport).toEqual(moment(lastUpdatedTime).format(REPORTS_LAST_UPDATED_TIME_FORMAT));
             });
 
@@ -386,7 +300,7 @@ define(["moment", "orgUnitRepository", "angularMocks", "projectReportController"
 
                 scope.locale = 'fr';
                 scope.$apply();
-                expect(changeLogRepository.get).toHaveBeenCalledWith('monthlyPivotTableData:' + projectId);
+                expect(changeLogRepository.get).toHaveBeenCalledWith('yearlyPivotTableData:' + projectId);
                 expect(scope.lastUpdatedTimeForProjectReport).toEqual(moment(lastUpdatedTime).locale(scope.locale).format(REPORTS_LAST_UPDATED_TIME_24HR_FORMAT));
             });
         });

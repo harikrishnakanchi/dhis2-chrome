@@ -25,49 +25,31 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
             Timecop.uninstall();
         });
 
-        describe('mapToProject', function () {
+        describe('mapOrgUnitToProject', function () {
             it("should convert project from DHIS to project for view", function() {
-                var dhisProject = {
-                    "id": "aa4acf9115a",
-                    "name": "Org1",
-                    "level": 3,
-                    "attributeValues": []
-                };
+                var mockOrgUnitGroupSets = [{
+                    id: 'orgUnitGroupSetId',
+                    organisationUnitGroups: [{
+                        id: 'orgUnitGroupId',
+                        name: 'Direct operation'
+                    }, {
+                        id: 'otherOrgUnitGroupId',
+                        name: 'some name',
+                    }]
+                }];
 
-                var allContexts = [{
-                    "id": "a16b4a97ce4",
-                    "name": "val2",
-                    "englishName": "val2"
-                }];
-                var allPopTypes = [{
-                    "id": "a35778ed565",
-                    "name": "val5",
-                    "englishName": "val5"
-                }, {
-                    "id": "a48f665185e",
-                    "name": "val6",
-                    "englishName": "val6",
-                }];
-                var reasonForIntervention = [{
-                    "id": "a8014cfca5c",
-                    "name": "Armed Conflict",
-                    "englishName": "Armed Conflict"
-                }];
-                var modeOfOperation = [{
-                    "id": "a560238bc90",
-                    "name": "Direct Operation",
-                    "englishName": "Direct Operation"
-                }];
-                var modelOfManagement = [{
-                    "id": "a11a7a5d55a",
-                    "name": "Collaboration",
-                    "englishName": "Collaboration"
-                }];
-                var allProjectTypes = [{
-                    "id": "a11a7aty65a",
-                    "name": "Some Type",
-                    "englishName": "Some Type"
-                }];
+                var dhisProject = {
+                    id: 'aa4acf9115a',
+                    name: 'Org1',
+                    level: 3,
+                    attributeValues: [],
+                    organisationUnitGroups: [{
+                        id: 'orgUnitGroupId',
+                        organisationUnitGroupSet: {
+                            id: 'orgUnitGroupSetId'
+                        }
+                    }]
+                };
 
                 spyOn(customAttributes, 'getAttributeValue').and.callFake(function (attributeValues, code) {
                     var fakeAttributeValues = {
@@ -78,59 +60,29 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                         estimatedTargetPopulation: 1000,
                         estPopulationLessThan1Year: 11,
                         estPopulationBetween1And5Years: 12,
-                        estPopulationOfWomenOfChildBearingAge: 13,
-                        prjCon: 'val2',
-                        prjPopType: 'val5',
-                        projectType: 'Some Type',
-                        reasonForIntervention: 'Armed Conflict',
-                        'modeOfOperation': 'Direct Operation',
-                        'modelOfManagement': 'Collaboration'
+                        estPopulationOfWomenOfChildBearingAge: 13
                     };
                     return fakeAttributeValues[code];
                 });
-                var result = orgUnitMapper.mapToProject(dhisProject, allContexts, allPopTypes, reasonForIntervention, modeOfOperation, modelOfManagement, allProjectTypes);
+                var result = orgUnitMapper.mapOrgUnitToProject(dhisProject, mockOrgUnitGroupSets);
 
                 var expectedResult = {
                     name:'Org1',
                     openingDate: moment(dhisProject.openingDate).toDate(),
-                    context: {
-                        id: 'a16b4a97ce4',
-                        name: 'val2',
-                        englishName: 'val2'
-                    },
                     location: 'val3',
-                    populationType: {
-                        id: 'a35778ed565',
-                        name: 'val5',
-                        englishName: 'val5'
-                    },
                     endDate: moment("2011-01-01").toDate(),
                     projectCode: 'RU118',
-                    projectType: {
-                        id: 'a11a7aty65a',
-                        name: 'Some Type',
-                        englishName: 'Some Type'
-                    },
-                    reasonForIntervention: {
-                        id: 'a8014cfca5c',
-                        name: 'Armed Conflict',
-                        englishName: 'Armed Conflict'
-                    },
-                    modeOfOperation: {
-                        id: 'a560238bc90',
-                        name: 'Direct Operation',
-                        englishName: 'Direct Operation'
-                    },
-                    modelOfManagement: {
-                        id: 'a11a7a5d55a',
-                        name: 'Collaboration',
-                        englishName: 'Collaboration'
-                    },
                     estimatedTargetPopulation: 1000,
                     estPopulationLessThan1Year: 11,
                     estPopulationBetween1And5Years: 12,
                     estPopulationOfWomenOfChildBearingAge: 13,
-                    autoApprove: 'true'
+                    autoApprove: 'true',
+                    orgUnitGroupSets: {
+                        orgUnitGroupSetId: {
+                            id: "orgUnitGroupId",
+                            name: "Direct operation"
+                        }
+                    }
                 };
 
                 expect(result).toEqual(expectedResult);
@@ -143,187 +95,131 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                     "level": 3
                 };
 
-                var result = orgUnitMapper.mapToProject(dhisProject);
+                var result = orgUnitMapper.mapOrgUnitToProject(dhisProject);
 
                 expect(result.autoApprove).toEqual('false');
             });
         });
-        it("should transform orgUnit to contain attributes as per DHIS", function() {
-            var orgUnit = {
-                "name": "Org1",
-                "openingDate": moment("2010-01-01").toDate(),
-                "context": {
-                    "name": "val2",
-                    "englishName": "val2"
-                },
-                "location": "val3",
-                "endDate": moment("2011-01-01").toDate(),
-                "populationType": {
-                    "name": "val6",
-                    "englishName": "val6"
-                },
-                "projectCode": "AB001",
-                "projectType": {
-                    "name": "Some Type",
-                    "englishName": "Some Type"
-                },
-                "reasonForIntervention": {
-                    "name": "Armed Conflict",
-                    "englishName": "Armed Conflict"
-                },
-                "modeOfOperation": {
-                    "name": "Direct Operation",
-                    "englishName": "Direct Operation"
-                },
-                "modelOfManagement": {
-                    "name": "Collaboration",
-                    "englishName": "Collaboration"
-                },
-                "estimatedTargetPopulation": "1000",
-                "estPopulationLessThan1Year": 11,
-                "estPopulationBetween1And5Years": 12,
-                "estPopulationOfWomenOfChildBearingAge": 13,
-                "autoApprove": "true"
-            };
 
-            var parentOrgUnit = {
-                "name": "Name1",
-                "id": "Id1",
-                "level": "2",
-            };
+        describe('mapOrgUnitToOpunit', function () {
+           it('should return the mapped opUnit', function () {
+               var mockOrgUnitGroupSets = [{
+                   id: 'someOrgUnitGroupSetId',
+                   organisationUnitGroups: [{
+                       id: 'someOrgUnitGroupId',
+                       name: 'someOrgUnitGroupName'
+                   }, {
+                       id: 'someOtherOrgUnitGroupId',
+                       name: 'someOtherOrgUnitGroupName',
+                   }]
+               }];
 
-            spyOn(dhisId, "get").and.callFake(function(name) {
-                return name;
+               var opUnit = {
+                   id: 'opUnitId',
+                   name: 'opUnitName',
+                   level: 5,
+                   coordinates: '[29,-45]',
+                   attributeValues: [],
+                   openingDate: 'someDate',
+                   organisationUnitGroups: [{
+                       id: 'someOrgUnitGroupId',
+                       organisationUnitGroupSet: {
+                           id: 'someOrgUnitGroupSetId'
+                       }
+                   }]
+               };
+
+               var expectedResult = {
+                   name:'opUnitName',
+                   openingDate: 'someDate',
+                   longitude: 29,
+                   latitude: -45,
+                   orgUnitGroupSets: {
+                       someOrgUnitGroupSetId: {
+                           id: "someOrgUnitGroupId",
+                           name: "someOrgUnitGroupName"
+                       }
+                   }
+               };
+
+               var result = orgUnitMapper.mapOrgUnitToOpUnit(opUnit, mockOrgUnitGroupSets);
+               expect(result).toEqual(expectedResult);
+           });
+        });
+
+        describe('mapToOpUnitForDHIS', function () {
+            var opUnit, project, expectedResult;
+            beforeEach(function () {
+                opUnit = {
+                    name:'opUnitName',
+                    openingDate: 'someDate',
+                    longitude: 29,
+                    latitude: -45,
+                    orgUnitGroupSets: {
+                        someOrgUnitGroupSetId: {
+                            id: "someOrgUnitGroupId",
+                            name: "someOrgUnitGroupName"
+                        }
+                    }
+                };
+                project = {
+                    id: 'someProjectId',
+                    name: 'someProjectName',
+                    level: 4
+                };
+                expectedResult = {
+                    name: 'opUnitName',
+                    openingDate: 'someDate',
+                    attributeValues: [{
+                        value: 'Operation Unit',
+                        attribute: {
+                            code: 'Type'
+                        }
+                    }, {
+                        value: 'true',
+                        attribute: {
+                            code: 'isNewDataModel'
+                        }
+                    }],
+                    id: 'opUnitId',
+                    shortName: 'opUnitName',
+                    level: 5,
+                    parent: {
+                        name: "someProjectName",
+                        id: "someProjectId"
+                    },
+                    coordinates: '[29,-45]',
+                    featureType: 'POINT',
+                    organisationUnitGroups: [{
+                        id: 'someOrgUnitGroupId'
+                    }]
+                };
+                spyOn(dhisId, 'get').and.returnValue('opUnitId');
+                customAttributes.createAttribute.and.callFake(function (code, value) {
+                    return {
+                        value: value,
+                        attribute: {
+                            code: code
+                        }
+                    };
+                });
             });
 
-            var result = orgUnitMapper.mapToProjectForDhis(orgUnit, parentOrgUnit);
+            it('should return the mapped opUnit for DHIS', function () {
+                var result = orgUnitMapper.mapToOpUnitForDHIS(opUnit, project);
+                expect(dhisId.get).toHaveBeenCalled();
+                expect(result).toEqual(expectedResult);
+            });
 
-            var expectedResult = {
-                "id": "Org1Id1",
-                "name": "Org1",
-                "level": 3,
-                "shortName": "Org1",
-                "openingDate": "2010-01-01",
-                "parent": {
-                    "name": "Name1",
-                    "id": "Id1"
-                },
-                "attributeValues": [{
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "Type"
-                    },
-                    "value": "Project"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "prjCon"
-                    },
-                    "value": "val2"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "prjLoc"
-                    },
-                    "value": "val3"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "prjPopType"
-                    },
-                    "value": "val6"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "projCode"
-                    },
-                    "value": "AB001"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "reasonForIntervention"
-                    },
-                    "value": "Armed Conflict"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "modeOfOperation"
-                    },
-                    "value": "Direct Operation"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "modelOfManagement"
-                    },
-                    "value": "Collaboration"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "autoApprove"
-                    },
-                    "value": "true"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "projectType"
-                    },
-                    "value": "Some Type"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "estimatedTargetPopulation"
-                    },
-                    "value": "1000"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "estPopulationLessThan1Year"
-                    },
-                    "value": "11"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "estPopulationBetween1And5Years"
-                    },
-                    "value": "12"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "estPopulationOfWomenOfChildBearingAge"
-                    },
-                    "value": "13"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "prjEndDate"
-                    },
-                    "value": "2011-01-01"
-                }]
-            };
-
-            expect(result).toEqual(expectedResult);
+            it('should use existing opUnit id and level for an existing opUnit', function () {
+                project.id = 'opUnitId';
+                project.level = 5;
+                var existingOpUnit = true;
+                var result = orgUnitMapper.mapToOpUnitForDHIS(opUnit, project, existingOpUnit);
+                expect(dhisId.get).not.toHaveBeenCalled();
+                expect(result.id).toEqual('opUnitId');
+                expect(result.level).toEqual(5);
+            });
         });
 
         it("should map modules for dhis if id and level are not given", function() {
@@ -560,10 +456,6 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
             var newProject = {
                 "name": "Org1",
                 "openingDate": moment("2010-01-01").toDate(),
-                "context": {
-                    "name": "val2",
-                    "englishName": "val2"
-                },
                 "location": "val3",
                 "endDate": moment("2011-01-01").toDate(),
                 "populationType": {
@@ -571,27 +463,16 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                     "englishName": "val6"
                 },
                 "projectCode": "AB001",
-                "projectType": {
-                    "name": "Some Type",
-                    "englishName": "Some Type"
-                },
-                "reasonForIntervention": {
-                    "name": "Armed Conflict",
-                    "englishName": "Armed Conflict"
-                },
-                "modeOfOperation": {
-                    "name": "Direct Operation",
-                    "englishName": "Direct Operation"
-                },
-                "modelOfManagement": {
-                    "name": "Collaboration",
-                    "englishName": "Collaboration"
-                },
                 "autoApprove": "true",
                 "estimatedTargetPopulation": "1000",
                 "estPopulationLessThan1Year": "11",
                 "estPopulationBetween1And5Years": "12",
-                "estPopulationOfWomenOfChildBearingAge": "13"
+                "estPopulationOfWomenOfChildBearingAge": "13",
+                "orgUnitGroupSets": {
+                    "someOrgUnitGroupSetId": {
+                        id: "someOrgUnitGroupId"
+                    }
+                }
             };
 
             var expectedSavedProject = {
@@ -612,13 +493,6 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "prjCon"
-                    },
-                    "value": "val2"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
                         "code": "prjLoc"
                     },
                     "value": "val3"
@@ -626,37 +500,9 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "prjPopType"
-                    },
-                    "value": "val6"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
                         "code": "projCode"
                     },
                     "value": "AB001"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "reasonForIntervention"
-                    },
-                    "value": "Armed Conflict"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "modeOfOperation"
-                    },
-                    "value": "Direct Operation"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "modelOfManagement"
-                    },
-                    "value": "Collaboration"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
@@ -671,13 +517,6 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                         "code": "isNewDataModel"
                     },
                     "value": "true"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "projectType"
-                    },
-                    "value": "Some Type"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
@@ -713,10 +552,13 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId", "customA
                         "code": "prjEndDate"
                     },
                     "value": "2011-01-01"
+                }],
+                "organisationUnitGroups": [{
+                    "id": "someOrgUnitGroupId"
                 }]
             };
 
-            var projectToBeSaved = orgUnitMapper.mapToExistingProject(newProject, project);
+            var projectToBeSaved = orgUnitMapper.mapToExistingProjectForDHIS(newProject, project);
 
             expect(projectToBeSaved).toEqual(expectedSavedProject);
         });

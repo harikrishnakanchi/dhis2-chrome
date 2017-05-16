@@ -13,8 +13,8 @@ define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], funct
         this.getAll = function (lastUpdatedTime) {
             var url = dhisUrl.programs + ".json";
             var params = {
-                fields: metadataConf.fields.programs,
-                paging: true
+                fields: metadataConf.fields.programs.params,
+                paging: metadataConf.fields.programs.paging
             };
             if (lastUpdatedTime)
                 params.filter = "lastUpdated:gte:" + lastUpdatedTime;

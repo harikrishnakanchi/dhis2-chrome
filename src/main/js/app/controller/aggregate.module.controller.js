@@ -1,6 +1,6 @@
 define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransformer", "dataElementUtils", "customAttributes"],
     function(_, orgUnitMapper, moment, interpolate, systemSettingsTransformer, dataElementUtils, customAttributes) {
-        return function($scope, $rootScope, $hustle, orgUnitRepository, datasetRepository, systemSettingRepository, excludedDataElementsRepository, db, $location, $q, $modal,
+        return function($scope, $rootScope, $hustle, orgUnitRepository, datasetRepository, systemSettingRepository, excludedDataElementsRepository, db, $location, $q, $modal, $modalStack,
             orgUnitGroupHelper, originOrgunitCreator, translationsService) {
 
             $scope.originalDatasets = [];
@@ -86,15 +86,18 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                     }
                 };
 
-                var isDataElementExcluded = function(dataElement) {
+                var isDataElementIncluded = function(dataElement) {
                     var datasetId = $scope.selectedDataset.id;
-                    return _.indexOf($scope.allTemplates[datasetId][$scope.selectedTemplate[datasetId]], dataElement.id) === -1;
+                    var dataSetTemplate = $scope.allTemplates[datasetId];
+                    if(dataSetTemplate)
+                        return _.indexOf(dataSetTemplate[$scope.selectedTemplate[datasetId]], dataElement.id) === -1;
+                    return true;
                 };
 
                 $scope.onTemplateSelect = function() {
                     _.each($scope.selectedDataset.sections, function(section) {
                         _.each(section.dataElements, function(de) {
-                            de.isIncluded = de.isMandatory ? true : isDataElementExcluded(de);
+                            de.isIncluded = de.isMandatory ? true : isDataElementIncluded(de);
                         });
 
                         section.isIncluded = !_.any(section.dataElements, {
@@ -293,7 +296,7 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
                 };
 
                 var createOrgUnitGroups = function() {
-                    return orgUnitGroupHelper.createOrgUnitGroups([enrichedModule], false);
+                    return orgUnitGroupHelper.associateModuleAndOriginsToGroups([enrichedModule]);
                 };
 
                 var createOriginsIfConfigured = function() {
@@ -466,6 +469,10 @@ define(["lodash", "orgUnitMapper", "moment","interpolate", "systemSettingsTransf
             };
 
             $scope.getDisplayName = dataElementUtils.getDisplayName;
+
+            $scope.dismissModal = function() {
+                $modalStack.dismissAll();
+            };
 
             init();
         };

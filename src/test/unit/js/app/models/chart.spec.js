@@ -47,8 +47,13 @@ define(['chart'], function(Chart) {
         });
 
         describe('geographicOriginChart', function() {
-            it('should return true if chart name contains GeographicOrigin', function() {
-                chart = Chart.create({ name: '[Praxis - GeographicOrigin] # Name' });
+            it('should return true if is a GeographicOrigin chart for aggregate', function () {
+                chart = Chart.create({name: '[Praxis - GeographicOrigin] # Name'});
+                expect(chart.geographicOriginChart).toBeTruthy();
+            });
+
+            it('should return true if is a GeographicOrigin chart for lineList', function () {
+                chart = Chart.create({name: '[Praxis - someProgramCode] # GeographicOrigin'});
                 expect(chart.geographicOriginChart).toBeTruthy();
             });
 
@@ -76,51 +81,37 @@ define(['chart'], function(Chart) {
 
         describe('monthlyChart', function() {
             it('should return true if relativePeriod contains month', function() {
-                chart = Chart.create({
-                    'relativePeriods': {
-                        last12Months: true
-                    }
-                });
+                chart = Chart.create({ relativePeriods: { last12Months: true } });
                 expect(chart.monthlyChart).toEqual(true);
             });
 
             it('should return false if relativePeriod does not contain month', function() {
-                chart = Chart.create({
-                    'relativePeriods': {
-                        someOtherPeriod: true
-                    }
-                });
-                expect(chart.monthlyChart).toEqual(false);
-            });
-
-            it('should return false if relativePeriods does not exist', function() {
-                chart = Chart.create({});
+                chart = Chart.create({ relativePeriods: { someOtherPeriod: true } });
                 expect(chart.monthlyChart).toEqual(false);
             });
         });
 
         describe('weeklyChart', function() {
-            it('should return true if relativePeriod does not contain month', function() {
-                chart = Chart.create({
-                    'relativePeriods': {
-                        someOtherPeriod: true
-                    }
-                });
+            it('should return true if relativePeriod contains week', function() {
+                chart = Chart.create({ relativePeriods: { last12Weeks: true } });
                 expect(chart.weeklyChart).toEqual(true);
             });
 
-            it('should return false if relativePeriod contains month', function() {
-                chart = Chart.create({
-                    'relativePeriods': {
-                        last12Months: true
-                    }
-                });
+            it('should return false if relativePeriod does not contain week', function() {
+                chart = Chart.create({ relativePeriods: { someOtherKey: true } });
                 expect(chart.weeklyChart).toEqual(false);
             });
+        });
 
-            it('should return true if relativePeriods does not exist', function() {
-                chart = Chart.create({});
-                expect(chart.weeklyChart).toEqual(true);
+        describe('yearlyChart', function() {
+            it('should return true if relativePeriod does not contain month or week', function() {
+                chart = Chart.create({ relativePeriods: { last12Weeks: false } });
+                expect(chart.yearlyChart).toEqual(true);
+            });
+
+            it('should return false if relativePeriod contains month or week', function() {
+                chart = Chart.create({ relativePeriods: { last12Months: true } });
+                expect(chart.yearlyChart).toEqual(false);
             });
         });
     });

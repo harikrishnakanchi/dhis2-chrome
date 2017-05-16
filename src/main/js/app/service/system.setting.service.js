@@ -1,4 +1,4 @@
-define(["dhisUrl", "moment", "lodashUtils"], function(dhisUrl, moment, _) {
+define(["dhisUrl", "md5", "moment", "lodashUtils", "metadataConf"], function(dhisUrl, md5, moment, _, metadataConf) {
     return function($http, $q) {
 
         var projectSettingsPrefix = "projectSettings_";
@@ -68,7 +68,7 @@ define(["dhisUrl", "moment", "lodashUtils"], function(dhisUrl, moment, _) {
         };
 
         this.getSystemSettings = function() {
-            return getSettings("fieldAppSettings,versionCompatibilityInfo,notificationSetting").then(transformFieldAppSettings);
+            return getSettings(metadataConf.fields.systemSettings.key).then(transformFieldAppSettings);
         };
 
         this.getProjectSettings = function(projectIds) {

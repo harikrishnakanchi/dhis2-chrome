@@ -4,11 +4,14 @@
         <div class="row">
             <div class="col-md-8">
                 <h4>{{resourceBundle.projectReportLabel}}: {{ selectedProject.name }}</h4>
-                <span class="text-info" ng-show="lastUpdatedTimeForProjectReport"><strong>{{ resourceBundle.updated }}: {{ lastUpdatedTimeForProjectReport }}</strong></span>
+                <span ng-show="lastUpdatedTimeForProjectReport">
+                    <strong class="text-info">{{ resourceBundle.updated }}: {{ lastUpdatedTimeForProjectReport }}</strong>
+                    <i class="fa fa-info-circle" aria-hidden="true" tooltip-placement="top" tooltip-trigger="click mouseenter" tooltip="{{ resourceBundle.dataAvailabilityMessage.weekly }}"></i>
+                </span>
             </div>
 
             <div class="col-md-4">
-                <button ng-disabled="pivotTables | isEmpty" class="btn btn-sm btn-primary pull-right" ng-click="exportToExcel()">
+                <button ng-disabled="(pivotTables | filter: { isDataAvailable: true }).length == 0" class="btn btn-sm btn-primary pull-right" ng-click="exportToExcel()">
                     {{resourceBundle.downloadReport}}
                 </button>
             </div>
@@ -33,7 +36,15 @@
             </div>
         </div>
 
-        <div ng-show="pivotTables | isEmpty">
+        <div>
+            <ul class="nav nav-tabs">
+                <li role="presentation" ng-repeat="year in last4years" ng-class="{ 'active': selectedYear === year }">
+                    <a href="#" ng-click="setSelectedYear(year)">{{ year }}</a>
+                </li>
+            </ul>
+        </div>
+
+        <div ng-show="(pivotTables | filter: { isDataAvailable: true }).length == 0">
             <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
         </div>
         <div ng-if="!(pivotTables | isEmpty)" class="exp-coll-group">

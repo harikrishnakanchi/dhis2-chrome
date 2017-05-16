@@ -80,7 +80,31 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
         };
 
         $scope.downloadChartAsPng = function(chart, lastUpdatedTime) {
-            var svgElement = document.getElementById(chart.id).firstElementChild, lastUpdatedTimeDetails;
+            var svgElement = document.getElementById(chart.id).firstElementChild, lastUpdatedTimeDetails, chartTitle, chartTitleNode, transform;
+
+            var setChartTitle = function () {
+                transform = svgElement.firstElementChild.getAttribute('transform');
+                var yAxisTransform = parseInt(transform.slice(transform.length - 3, transform.length - 1));
+                var title = chart.title || "";
+                chartTitle = document.createTextNode(title);
+
+                chartTitleNode = document.createElement('text');
+                chartTitleNode.setAttribute('x', '500');
+                chartTitleNode.setAttribute('y', '15');
+                chartTitleNode.setAttribute('text-anchor', 'middle');
+                chartTitleNode.setAttribute('transform', 'translate(0, -' + (yAxisTransform + 20) + ')');
+                chartTitleNode.setAttribute('style', 'font-size:15');
+
+                chartTitleNode.insertBefore(chartTitle, chartTitleNode.childNodes[0]);
+                svgElement.firstElementChild.setAttribute('transform', 'translate(45, ' + (yAxisTransform + 20) +')');
+                svgElement.firstElementChild.insertBefore(chartTitleNode, svgElement.firstElementChild.childNodes[0]);
+            };
+
+            var removeChartTitle = function () {
+                svgElement.firstElementChild.setAttribute('transform', transform);
+                chartTitleNode.remove();
+            };
+            setChartTitle();
 
             var getPNGFileName = function() {
                 if (lastUpdatedTime) {
@@ -95,6 +119,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             SVGUtils.svgAsPngUri(svgElement, {}, function(uri) {
                 var blob = dataURItoBlob(uri);
                 filesystemService.promptAndWriteFile(getPNGFileName(), blob, filesystemService.FILE_TYPE_OPTIONS.PNG);
+                removeChartTitle();
             });
         };
 
@@ -193,6 +218,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 var orgUnitId = _.get(_.first(data.origins), 'id') || $scope.orgUnit.id;
                 return programRepository.getProgramForOrgUnit(orgUnitId).then(function (program) {
                     var translatedProgram = translationsService.translate(program);
+                    $scope.programServiceCode = program ? program.serviceCode : undefined;
                     $scope.services = _.compact(data.dataSets.concat([translatedProgram]));
                 });
             };
@@ -249,6 +275,27 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 });
         };
 
+        var filterServices = function () {
+            //TODO can be removed after 12.0
+
+            if($scope.orgUnit.lineListService) {
+                var reports = $scope.pivotTables.concat($scope.charts);
+                var serviceCodesWithReportData = _.uniq(_.map(reports, 'serviceCode'));
+                var removeGeographicOriginFromServices = !_.contains(serviceCodesWithReportData, 'GeographicOrigin');
+                var removeReferralLocationFromServices = !_.contains(serviceCodesWithReportData, 'ReferralLocation');
+                if(removeGeographicOriginFromServices) {
+                    $scope.services = _.reject($scope.services, function (service) {
+                        return service.serviceCode === 'GeographicOrigin';
+                    });
+                }
+                if(removeReferralLocationFromServices) {
+                    $scope.services = _.reject($scope.services, function (service) {
+                        return service.serviceCode === 'ReferralLocation';
+                    });
+                }
+            }
+        };
+
         var loadReferralLocationForModule = function () {
             return referralLocationsRepository.get($scope.orgUnit.parent.id).then(function (referralLocations) {
                 $scope.referralLocations = referralLocations;
@@ -263,10 +310,10 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
         var loadLastUpdatedForChartsAndReports = function () {
             var projectId = $rootScope.currentUser.selectedProject.id;
             return $q.all({
-                monthlyChartsLastUpdated: changeLogRepository.get('monthlyChartData:' + projectId),
-                weeklyChartsLastUpdated: changeLogRepository.get('weeklyChartData:' + projectId),
-                monthlyPivotTableLastUpdated: changeLogRepository.get('monthlyPivotTableData:' + projectId),
-                weeklyPivotTableDataLastUpdated: changeLogRepository.get('weeklyPivotTableData:' + projectId)
+                weeklyChartsLastUpdated: changeLogRepository.get('weeklyChartData:' + projectId + ':' + $scope.orgUnit.id),
+                weeklyPivotTableDataLastUpdated: changeLogRepository.get('weeklyPivotTableData:' + projectId + ':' + $scope.orgUnit.id),
+                monthlyChartsLastUpdated: changeLogRepository.get('monthlyChartData:' + projectId + ':' + $scope.orgUnit.id),
+                monthlyPivotTableLastUpdated: changeLogRepository.get('monthlyPivotTableData:' + projectId + ':' + $scope.orgUnit.id)
             }).then(function (data) {
                 $scope.updatedForWeeklyChart = formatLastUpdatedTime(data.weeklyChartsLastUpdated);
                 $scope.updatedForWeeklyPivotTable = formatLastUpdatedTime(data.weeklyPivotTableDataLastUpdated);
@@ -300,6 +347,10 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
             });
         };
 
+        $scope.setSelectedService = function (service) {
+            $scope.selectedService = service;
+        };
+
         var init = function() {
             $scope.startLoading();
 
@@ -310,6 +361,7 @@ define(["d3", "lodash", "moment", "customAttributes", "saveSvgAsPng", "dataURIto
                 .then(loadServicesForOrgUnit)
                 .then(loadChartsWithData)
                 .then(loadPivotTablesWithData)
+                .then(filterServices)
                 .then(loadReferralLocationForModule)
                 .then(loadLastUpdatedForChartsAndReports)
                 .then(countAvailableChartsAndReportsForServices)

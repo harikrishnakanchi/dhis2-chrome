@@ -1,16 +1,14 @@
-define(["downloadDataController", "angularMocks", "utils", "lodash", "platformUtils"],
-    function(DownloadDataController, mocks, utils, _, platformUtils) {
+define(["downloadDataController", "angularMocks", "utils", "lodash", "platformUtils", "hustlePublishUtils"],
+    function(DownloadDataController, mocks, utils, _, platformUtils, hustlePublishUtils) {
         describe("downloadDataController", function() {
-            var q, rootScope, hustle, downloadDataController, timeout, scope;
+            var q, hustle, downloadDataController, scope;
 
             beforeEach(module("hustle"));
 
-            beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout) {
+            beforeEach(mocks.inject(function($rootScope, $q, $hustle) {
                 q = $q;
                 scope = $rootScope.$new();
                 hustle = $hustle;
-                rootScope = $rootScope;
-                timeout = $timeout;
 
                 scope.resourceBundle = {};
                 scope.locale = 'someLocale';
@@ -18,21 +16,14 @@ define(["downloadDataController", "angularMocks", "utils", "lodash", "platformUt
                 spyOn(hustle, "publishOnce").and.returnValue(utils.getPromise(q, {}));
                 spyOn(platformUtils, "createNotification").and.returnValue(utils.getPromise(q, {}));
 
-                rootScope.hasRoles = function(args) {
-                    if (args[0] === "Projectadmin")
-                        return false;
-                    else
-                        return true;
-                };
+                spyOn(hustlePublishUtils, 'publishDownloadProjectData');
 
-                downloadDataController = new DownloadDataController(scope, hustle, q, rootScope, timeout);
+                downloadDataController = new DownloadDataController(scope, hustle, q);
             }));
 
             it("should fetch data from DHIS", function() {
                 scope.syncNow();
-
                 scope.$apply();
-                timeout.flush();
 
                 var getHustleMessage = function(type) {
                     return {
@@ -42,9 +33,8 @@ define(["downloadDataController", "angularMocks", "utils", "lodash", "platformUt
                     };
                 };
 
-                expect(hustle.publishOnce.calls.count()).toEqual(2);
                 expect(hustle.publishOnce.calls.argsFor(0)).toEqual([getHustleMessage("downloadMetadata"), "dataValues"]);
-                expect(hustle.publishOnce.calls.argsFor(1)).toEqual([getHustleMessage("downloadProjectData"), "dataValues"]);
+                expect(hustlePublishUtils.publishDownloadProjectData).toHaveBeenCalled();
                 expect(platformUtils.createNotification).toHaveBeenCalled();
             });
         });

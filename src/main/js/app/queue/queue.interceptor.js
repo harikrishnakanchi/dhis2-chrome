@@ -1,4 +1,4 @@
-define(["properties", "platformUtils", "interpolate", "moment", "lodash"], function(properties, platformUtils, interpolate, moment, _) {
+define(["properties", "platformUtils", "interpolate", "moment", "lodash", "constants"], function(properties, platformUtils, interpolate, moment, _, constants) {
     return function($log, ngI18nResourceBundle, dataRepository, dataSyncFailureRepository, hustleMonitor) {
         var getResourceBundle = function(locale) {
             return ngI18nResourceBundle.get({
@@ -18,7 +18,7 @@ define(["properties", "platformUtils", "interpolate", "moment", "lodash"], funct
                 return moment().format("YYYY-MM-DD HH:mm") + "\n";
             };
 
-            if (data && data.status === 401) {
+            if (data && data.errorCode === constants.errorCodes.UNAUTHORISED) {
                 getResourceBundle(job.data.locale).then(function(data) {
                     var resourceBundle = data;
                     platformUtils.createNotification(resourceBundle.notificationTitle, getCurrentDateTime() + resourceBundle.productKeyExpiredMessage);

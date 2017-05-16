@@ -41,7 +41,7 @@ define(['syncModuleDataBlockConsumer', "dataSetRepository", 'approvalService', '
                 }];
 
                 periodRange = ['2016W17', '2016W18'];
-                spyOn(dateUtils, "getPeriodRange").and.returnValue(periodRange);
+                spyOn(dateUtils, "getPeriodRangeInWeeks").and.returnValue(periodRange);
 
                 dataSetRepository = new DataSetRepository();
                 spyOn(dataSetRepository, 'findAllForOrgUnits').and.returnValue(utils.getPromise(q, [aggregateDataSet]));
@@ -138,7 +138,7 @@ define(['syncModuleDataBlockConsumer', "dataSetRepository", 'approvalService', '
                 });
 
                 it('should download all event ids for the specified number of weeks to sync', function () {
-                    expect(dateUtils.getPeriodRange).toHaveBeenCalledWith(properties.projectDataSync.numWeeksToSync);
+                    expect(dateUtils.getPeriodRangeInWeeks).toHaveBeenCalledWith(properties.projectDataSync.numWeeksToSync);
                     expect(eventService.getEventIds).toHaveBeenCalledWith(mockModule.id, periodRange);
                 });
             });

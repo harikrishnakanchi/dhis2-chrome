@@ -1,13 +1,26 @@
-define(["lodash"], function(_) {
-    return function($q, systemSettingService, referralLocationsRepository, orgUnitRepository) {
+define(["lodash", "moment"], function(_, moment) {
+    return function($q, dataStoreService, referralLocationsRepository, orgUnitRepository) {
         this.run = function(message) {
             var opUnitId = message.data.data;
-            var parentProjectPromise = orgUnitRepository.getParentProject(opUnitId);
-            var referralLocationsPromise = referralLocationsRepository.get(opUnitId);
-            return $q.all([parentProjectPromise, referralLocationsPromise]).then(function(data) {
-                var projectId = data[0].id;
-                var updatedReferralLocations = data[1];
-                return systemSettingService.upsertReferralLocations(projectId, updatedReferralLocations);
+            var getParentProjectPromise = orgUnitRepository.getParentProject(opUnitId).then(_.property('id'));
+            return $q.all({
+                remoteReferralLocations: getParentProjectPromise.then(_.partialRight(dataStoreService.getReferrals, opUnitId)),
+                localReferralLocations: referralLocationsRepository.get(opUnitId),
+                projectId: getParentProjectPromise
+            }).then(function(data) {
+                var projectId = data.projectId;
+                var remoteReferralLocations = data.remoteReferralLocations;
+                if (!remoteReferralLocations) {
+                    return dataStoreService.createReferrals(projectId, opUnitId, data.localReferralLocations);
+                } else {
+                    var epoch = '1970-01-01',
+                        localTime = moment(_.get(data, 'localReferralLocations.clientLastUpdated', epoch)),
+                        remoteTime = moment(_.get(remoteReferralLocations, 'clientLastUpdated'));
+
+                    return localTime.isAfter(remoteTime) ?
+                        dataStoreService.updateReferrals(projectId, opUnitId, data.localReferralLocations) :
+                        referralLocationsRepository.upsert(remoteReferralLocations);
+                }
             });
         };
     };

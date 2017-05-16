@@ -1,6 +1,7 @@
 define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "customAttributes"], function(moment, orgUnitMapper, properties, _, interpolate, customAttributes) {
 
-    return function($scope, $rootScope, $hustle, orgUnitRepository, $q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository, translationsService) {
+    return function($scope, $rootScope, $hustle, orgUnitRepository, $q, orgUnitGroupHelper, orgUnitGroupSetRepository, translationsService) {
+        var ORG_UNIT_LEVEL_FOR_PROJECT = 4;
 
         $scope.openOpeningDate = function($event) {
             $event.preventDefault();
@@ -20,7 +21,8 @@ define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "custo
             $scope.saveFailure = false;
             $scope.newOrgUnit = {
                 'openingDate': moment().toDate(),
-                'autoApprove': 'false'
+                'autoApprove': 'false',
+                'orgUnitGroupSets': {}
             };
         };
 
@@ -57,27 +59,16 @@ define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "custo
                 .then(onSuccess, onError);
         };
 
-        var getPeriodsAndOrgUnitsForAutoApprove = function(orgUnits) {
-            var periods = _.times(properties.weeksForAutoApprove, function(n) {
-                return moment().subtract(n + 1, 'week').format("GGGG[W]WW");
-            });
-            var orgUnitIds = _.pluck(orgUnits, 'id');
-
-            var periodAndOrgUnits = _.map(orgUnitIds, function(orgUnitId) {
-                return _.map(periods, function(period) {
-                    return {
-                        "period": period,
-                        "orgUnit": orgUnitId
-                    };
-                });
-            });
-
-            return _.flatten(periodAndOrgUnits);
+        var getProjectOrgUnitGroupIds = function (newOrgUnit) {
+            return _.compact(_.map(newOrgUnit.orgUnitGroupSets, 'id'));
         };
 
         $scope.update = function(newOrgUnit, orgUnit) {
 
-            var dhisProject = orgUnitMapper.mapToExistingProject(newOrgUnit, orgUnit);
+            var syncedOrgUnitGroupIds = _.pluck(orgUnit.organisationUnitGroups, 'id'),
+                localOrgUnitGroupIds = getProjectOrgUnitGroupIds(newOrgUnit);
+
+            var dhisProject = orgUnitMapper.mapToExistingProjectForDHIS(newOrgUnit, orgUnit);
 
             var getModulesInProject = function() {
                 return orgUnitRepository.getAllModulesInOrgUnits([dhisProject.id]);
@@ -85,7 +76,9 @@ define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "custo
 
             var createOrgUnitGroups = function(modules) {
                 if (_.isEmpty(modules))
-                    return;
+                    return orgUnitGroupHelper.associateOrgunitsToGroups([dhisProject], syncedOrgUnitGroupIds, localOrgUnitGroupIds).then(function() {
+                        return modules;
+                    });
 
                 var partitionedModules = _.partition(modules, function(module) {
                     return customAttributes.getBooleanAttributeValue(module.attributeValues, customAttributes.LINE_LIST_ATTRIBUTE_CODE);
@@ -94,14 +87,20 @@ define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "custo
                 var aggregateModules = partitionedModules[1];
                 var lineListModules = partitionedModules[0];
 
-                if (_.isEmpty(lineListModules)) {
-                    return orgUnitGroupHelper.createOrgUnitGroups(aggregateModules, true).then(function() {
-                        return modules;
-                    });
-                }
 
-                return orgUnitRepository.findAllByParent(_.pluck(lineListModules, "id")).then(function(originGroups) {
-                    return orgUnitGroupHelper.createOrgUnitGroups(aggregateModules.concat(originGroups), true).then(function() {
+                var getOrgUnitsToAssociate = function () {
+                    var orgUnitsToBeAssociated = aggregateModules.concat(dhisProject);
+                    if (_.isEmpty(lineListModules)) {
+                        return $q.when(orgUnitsToBeAssociated);
+                    } else {
+                        return orgUnitRepository.findAllByParent(_.pluck(lineListModules, "id")).then(function (origins) {
+                            return orgUnitsToBeAssociated.concat(origins);
+                        });
+                    }
+                };
+
+                return getOrgUnitsToAssociate().then(function (orgUnitsToBeAssociated) {
+                    return orgUnitGroupHelper.associateOrgunitsToGroups(orgUnitsToBeAssociated, syncedOrgUnitGroupIds, localOrgUnitGroupIds).then(function() {
                         return modules;
                     });
                 });
@@ -115,9 +114,15 @@ define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "custo
         };
 
         $scope.save = function(newOrgUnit, parentOrgUnit) {
+            var associateProjectToOrgUnitGroups = function (dhisProject) {
+                orgUnitGroupHelper.associateOrgunitsToGroups([dhisProject], [], getProjectOrgUnitGroupIds(newOrgUnit));
+            };
+
             $scope.startLoading();
             var dhisProject = orgUnitMapper.mapToProjectForDhis(newOrgUnit, parentOrgUnit);
-            saveToDbAndPublishMessage(dhisProject).finally($scope.stopLoading);
+            return saveToDbAndPublishMessage(dhisProject)
+                .then(associateProjectToOrgUnitGroups)
+                .finally($scope.stopLoading);
         };
 
         var prepareNewForm = function() {
@@ -138,47 +143,40 @@ define(["moment", "orgUnitMapper", "properties", "lodash", "interpolate", "custo
 
         var prepareEditForm = function() {
             $scope.reset();
-            $scope.newOrgUnit = orgUnitMapper.mapToProject($scope.orgUnit, $scope.allContexts, $scope.allPopTypes, $scope.reasonForIntervention, $scope.modeOfOperation, $scope.modelOfManagement, $scope.allProjectTypes);
+            $scope.newOrgUnit = orgUnitMapper.mapOrgUnitToProject($scope.orgUnit, $scope.orgUnitGroupSets);
             orgUnitRepository.getAllProjects().then(function(allProjects) {
                 $scope.peerProjects = _.without(orgUnitRepository.getChildOrgUnitNames($scope.orgUnit.parent.id), $scope.orgUnit.name);
             });
         };
 
+        $scope.assignValue = function (value) {
+            if(value) {
+                $scope.newOrgUnit.orgUnitGroupSets[value.description.organisationUnitGroupSet.id] = {
+                    id: value.description.id,
+                    name: value.description.name
+                };
+            }
+        };
+
         var init = function() {
 
             orgUnitGroupSetRepository.getAll().then(function(orgUnitGroupSets) {
+                $scope.orgUnitGroupSets = _.filter(orgUnitGroupSets, function (orgUnitGroupSet) {
+                    var orgUnitGroupSetLevel = customAttributes.getAttributeValue(orgUnitGroupSet.attributeValues, customAttributes.ORG_UNIT_GROUP_SET_LEVEL);
+                    return orgUnitGroupSetLevel == ORG_UNIT_LEVEL_FOR_PROJECT;
+                });
+                _.map($scope.orgUnitGroupSets, function (orgUnitGroupSet) {
+                    orgUnitGroupSet.isMandatory = customAttributes.getBooleanAttributeValue(orgUnitGroupSet.attributeValues, customAttributes.ORG_UNIT_GROUP_SET_MANDATORY);
+                });
 
-                var addDefaultNameToAttribute = function (orgUnitGroups) {
-                    return _.map(orgUnitGroups, function (orgUnitGroup) {
-                        var defaultName = {
-                            englishName : orgUnitGroup.name
-                        };
-
-                        return _.assign(orgUnitGroup, defaultName);
-                    });
-                };
-
-                var getTranslations = function (code) {
-                    var orgUnitGroups = _.find(orgUnitGroupSets, "code", code).organisationUnitGroups;
-                    orgUnitGroups = addDefaultNameToAttribute(orgUnitGroups);
-
-                    return translationsService.translate(orgUnitGroups);
-                };
-
-                $scope.allContexts = _.sortBy(getTranslations("context"), "name");
-                $scope.allPopTypes = _.sortBy(getTranslations("type_of_population"), "name");
-                $scope.reasonForIntervention = _.sortBy(getTranslations("reason_for_intervention"), "name");
-                $scope.modeOfOperation = _.sortBy(getTranslations("mode_of_operation"), "name");
-                $scope.modelOfManagement = _.sortBy(getTranslations("model_of_management"), "name");
-                $scope.allProjectTypes = _.sortBy(getTranslations("project_type"), "name");
+                $scope.orgUnitGroupSets = translationsService.translate($scope.orgUnitGroupSets);
+                $scope.orgUnitGroupSetsById = _.indexBy($scope.orgUnitGroupSets, 'id');
 
                 if ($scope.isNewMode)
                     prepareNewForm();
                 else
                     prepareEditForm();
             });
-
-
         };
 
         init();

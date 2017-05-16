@@ -1,5 +1,5 @@
-define(["lodash", "platformUtils", "customAttributes", "properties", "interpolate"], function(_, platformUtils, customAttributes, properties, interpolate) {
-    return function($q, $scope, $location, $rootScope, $hustle, $timeout, $modal, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor) {
+define(["lodash", "platformUtils", "customAttributes", "properties", "interpolate", "metadataConf", "hustlePublishUtils"], function(_, platformUtils, customAttributes, properties, interpolate, metadataConf, hustlePublishUtils) {
+    return function($q, $scope, $location, $rootScope, $hustle, $timeout, $modal, sessionHelper, orgUnitRepository, systemSettingRepository, changeLogRepository, dhisMonitor) {
         $scope.projects = [];
 
         $scope.canChangeProject = function(hasUserLoggedIn, isCoordinationApprover) {
@@ -156,6 +156,66 @@ define(["lodash", "platformUtils", "customAttributes", "properties", "interpolat
                 });
 
             }, modalMessages);
+        };
+
+        var clearMetadataChangeLog = function () {
+            var metadataTypes = _.keys(metadataConf.fields);
+            metadataTypes = metadataTypes.concat(['pivotTables', 'charts']);
+            _.each(metadataTypes, function (metadataType) {
+                changeLogRepository.clear(metadataType);
+            });
+        };
+
+        var downloadMetadata = function () {
+            $location.path('/downloadingMetadata');
+            platformUtils.sendMessage("stopBgApp");
+            $scope.logout();
+        };
+
+        $scope.forceDownloadMetadata = function () {
+            var modalMessages = {
+                "ok": $scope.resourceBundle.forceDownloadMetadata.okMessage,
+                "title": $scope.resourceBundle.forceDownloadMetadata.title,
+                "confirmationMessage": $scope.resourceBundle.forceDownloadMetadata.confirmationMessage
+            };
+
+            showModal(function () {
+                clearMetadataChangeLog();
+                downloadMetadata();
+            }, modalMessages);
+        };
+
+        var clearProjectDataChangeLog = function () {
+            var projectDataTypes = ['dataValues:', 'monthlyChartData:', 'monthlyPivotTableData:',  'weeklyChartData:',
+                'weeklyPivotTableData:',  'yearlyChartData:', 'yearlyPivotTableData:', 'yearlyDataValues:'];
+            _.each(projectDataTypes, function (projectDataType) {
+                changeLogRepository.clear(projectDataType);
+            });
+        };
+
+        var downloadProjectData = function () {
+            hustlePublishUtils.publishDownloadProjectData($hustle, $scope.locale);
+        };
+
+        $scope.forceDownloadProjectData = function () {
+            var modalMessages = {
+                "ok": $scope.resourceBundle.forceDownloadProjectData.okMessage,
+                "title": $scope.resourceBundle.forceDownloadProjectData.title,
+                "confirmationMessage": $scope.resourceBundle.forceDownloadProjectData.confirmationMessage
+            };
+
+            showModal(function () {
+                clearProjectDataChangeLog();
+                downloadProjectData();
+            }, modalMessages);
+        };
+
+        $scope.showForceDownloadMetadata = function () {
+          return !$scope.isOffline && !$scope.isChromeApp;
+        };
+
+        $scope.showForceDownloadProjectdata = function () {
+            return !$scope.hasRoles(['Superadmin','Projectadmin']) && !$scope.isOffline && !$scope.isChromeApp;
         };
 
         var turnOffSync = function () {

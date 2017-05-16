@@ -4,10 +4,18 @@ define(["lodash"], function(_) {
         downloadProgramConsumer, downloadMetadataConsumer,
         downloadOrgUnitGroupConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
         uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
-        downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, removeOrgunitDataSetAssociationConsumer, associateOrgunitToProgramConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer, syncOrgUnitConsumer) {
+        downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, associateOrgunitToProgramConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer, syncOrgUnitConsumer) {
 
         this.run = function(message) {
             $log.info("Processing message: " + message.data.type, message.data);
+
+            var shouldDownloadProjectData = function () {
+                return userPreferenceRepository.getCurrentUsersUsername()
+                    .then(function (currentUsersUsername) {
+                        return !(currentUsersUsername == 'superadmin' || currentUsersUsername == 'projectadmin' || currentUsersUsername === null);
+                });
+            };
+
             switch (message.data.type) {
                 case "downloadMetadata":
                     return downloadMetadataConsumer.run(message)
@@ -20,6 +28,7 @@ define(["lodash"], function(_) {
                             $log.info('Metadata sync complete');
                         });
 
+                //TODO: remove the 'downloadProjectData' after release 12.0
                 case "downloadProjectData":
                     return downloadProjectSettingsConsumer.run(message)
                         .then(userPreferenceRepository.getCurrentUsersUsername)
@@ -39,6 +48,37 @@ define(["lodash"], function(_) {
                                 });
                         });
 
+                case "downloadModuleDataForProject":
+                    return downloadProjectSettingsConsumer.run()
+                        .then(shouldDownloadProjectData)
+                        .then(function (shouldDownload) {
+                            if(!shouldDownload) return;
+                            return downloadModuleDataBlocksConsumer.run();
+                        });
+
+                case "downloadReportDefinitions":
+                    return shouldDownloadProjectData()
+                        .then(function (shouldDownload) {
+                        if(!shouldDownload) return;
+                        return downloadChartsConsumer.run()
+                            .then(downloadPivotTablesConsumer.run);
+                    });
+
+                case "downloadReportData":
+                    return shouldDownloadProjectData()
+                        .then(function (shouldDownload) {
+                        if(!shouldDownload) return;
+                        return downloadChartDataConsumer.run()
+                            .then(downloadPivotTableDataConsumer.run);
+                    });
+
+                case "downloadHistoricalData":
+                    return shouldDownloadProjectData()
+                        .then(function (shouldDownload) {
+                        if(!shouldDownload) return;
+                        return downloadHistoricalDataConsumer.run();
+                    });
+
                 case "downloadProjectDataForAdmin":
                     return downloadProjectSettingsConsumer.run(message);
 
@@ -57,9 +97,6 @@ define(["lodash"], function(_) {
 
                 case "associateOrgUnitToDataset":
                     return assignDataSetsToOrgUnitsConsumer.run(message);
-
-                case "removeOrgUnitFromDataset":
-                    return removeOrgunitDataSetAssociationConsumer.run(message);
                 
                 case "associateOrgunitToProgram":
                     return associateOrgunitToProgramConsumer.run(message);

@@ -42,24 +42,13 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
         };
 
         $scope.getValue = function(dataValues, dataElementId, option, orgUnits) {
-            if (dataValues === undefined)
-                return;
+            if (dataValues === undefined) return;
 
-            orgUnits = _.isArray(orgUnits) ? orgUnits : [orgUnits];
+            var values = _.chain([orgUnits]).flatten().map(function (orgUnit) {
+                return _.get(dataValues, [orgUnit.id, dataElementId, option, 'value'].join('.'));
+            }).compact().value();
 
-            var result = 0;
-
-            var orgUnitIds = _.pluck(orgUnits, "id");
-            _.forEach(orgUnitIds, function(orgUnitId) {
-                dataValues[orgUnitId] = dataValues[orgUnitId] || {};
-                dataValues[orgUnitId][dataElementId] = dataValues[orgUnitId][dataElementId] || {};
-                dataValues[orgUnitId][dataElementId][option] = dataValues[orgUnitId][dataElementId][option] || {};
-
-                if (!_.isEmpty(dataValues[orgUnitId][dataElementId][option].value))
-                    result += parseInt(dataValues[orgUnitId][dataElementId][option].value);
-            });
-
-            return result;
+            if(!_.isEmpty(values)) return _.sum(values, _.parseInt);
         };
 
         $scope.sum = function(dataValues, orgUnits, dataElementId, catOptComboIdsForTotalling) {
@@ -98,7 +87,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
                 dataValues[orgUnit.id] = dataValues[orgUnit.id] || {};
                 _.forEach(dataValues[orgUnit.id], function(value, key) {
                     if (_.includes(dataElementIds, key)) {
-                        allValues.push(parseInt(value[optionId].value));
+                        allValues.push(parseInt(_.get(value, optionId + '.value', 0)));
                     }
                 });
             });
@@ -216,6 +205,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
             };
             $scope.startLoading();
             $scope.isOfflineApproval = false;
+            $scope.moduleAndOpUnitName = $scope.selectedModule.parent.name + ' - ' + $scope.selectedModule.name;
 
             var loadAssociatedOrgUnitsAndPrograms = function() {
                 return orgUnitRepository.findAllByParent([$scope.selectedModule.id]).then(function(originOrgUnits) {
@@ -316,6 +306,29 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "dataSetTransfo
 
         var init = function() {
             $scope.dataType = "all";
+        };
+
+        $scope.viewAllDataElements = function () {
+            var scope = $rootScope.$new();
+
+            scope.isOpen = {};
+            scope.orgUnit = $scope.selectedModule;
+
+            if($scope.isLineListModule) {
+                $modal.open({
+                    templateUrl: 'templates/view-all-linelist-data-elements.html',
+                    controller: 'lineListModuleController',
+                    scope: scope,
+                    windowClass: 'modal-lg'
+                });
+            } else {
+                $modal.open({
+                    templateUrl: 'templates/view-all-aggregate-data-elements.html',
+                    controller: 'aggregateModuleController',
+                    scope: scope,
+                    windowClass: 'modal-lg'
+                });
+            }
         };
 
         var deregisterErrorInfoListener = $scope.$on('errorInfo', function(event, errorMessage) {

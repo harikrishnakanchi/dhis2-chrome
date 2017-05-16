@@ -1,4 +1,4 @@
-define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _, dateUtils, moment) {
+define(['properties', 'lodash', 'dateUtils', 'moment', 'constants'], function (properties, _, dateUtils, moment, constants) {
     return function (dataService, approvalService, systemInfoService, datasetRepository, userPreferenceRepository, changeLogRepository, orgUnitRepository,
                      moduleDataBlockFactory, moduleDataBlockMerger, eventService, $q) {
 
@@ -11,7 +11,7 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
 
         var getPeriodRangeToDownload = function(lastUpdatedTimestamp) {
             var numberOfWeeks = lastUpdatedTimestamp ? properties.projectDataSync.numWeeksToSync : properties.projectDataSync.numWeeksToSyncOnFirstLogIn;
-            return dateUtils.getPeriodRange(numberOfWeeks);
+            return dateUtils.getPeriodRangeInWeeks(numberOfWeeks);
         };
 
         var getModuleDataBlocks = function(data) {
@@ -137,7 +137,14 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
                 return $q.when();
             }
 
-            var onSuccessOrFailure = function() {
+            var onSuccess = function() {
+                return recursivelyDownloadMergeAndSaveModules(options);
+            };
+
+            var onFailure = function (response) {
+                if(response && response.errorCode === constants.errorCodes.NETWORK_UNAVAILABLE){
+                    return $q.reject();
+                }
                 return recursivelyDownloadMergeAndSaveModules(options);
             };
 
@@ -154,7 +161,7 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
                 .then(getIndexedApprovalsFromDhis)
                 .then(mergeAndSaveModuleDataBlocks)
                 .then(updateLastUpdatedTime)
-                .then(onSuccessOrFailure, onSuccessOrFailure);
+                .then(onSuccess, onFailure);
         };
 
         var downloadModuleDataForProject = function(projectId) {

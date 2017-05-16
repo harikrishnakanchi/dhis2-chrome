@@ -54,7 +54,7 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
                 scope.orgUnit = selectedOrgUnit;
                 scope.selectedService = selectedService;
 
-                spyOn(dateUtils, 'getPeriodRange').and.returnValue(['2016W20']);
+                spyOn(dateUtils, 'getPeriodRangeInWeeks').and.returnValue(['2016W20']);
 
                 spreadSheetContent = undefined;
                 spyOn(excelBuilder, 'createWorkBook').and.callFake(function (workBookContent) {
@@ -229,10 +229,10 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
 
                 it('should populate the specified week range', function () {
                     var periodRange = ['2016W20', '2016W21'];
-                    dateUtils.getPeriodRange.and.returnValue(periodRange);
+                    dateUtils.getPeriodRangeInWeeks.and.returnValue(periodRange);
                     scope.$apply();
 
-                    expect(dateUtils.getPeriodRange).toHaveBeenCalledWith(scope.selectedWeeksToExport, { excludeCurrentWeek: true });
+                    expect(dateUtils.getPeriodRangeInWeeks).toHaveBeenCalledWith(scope.selectedWeeksToExport, { excludeCurrent: true });
                     expect(scope.weeks).toEqual(periodRange);
                 });
 
@@ -607,7 +607,7 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
 
                     excludedDataElementsRepository.get.and.returnValue(utils.getPromise(q, { dataElements: mockExcludedDataElements }));
 
-                    dateUtils.getPeriodRange.and.returnValue(['2016W36', '2016W37', '2016W38']);
+                    dateUtils.getPeriodRangeInWeeks.and.returnValue(['2016W36', '2016W37', '2016W38']);
 
                     programRepository = new ProgramRepository();
                     spyOn(programRepository, 'getProgramForOrgUnit').and.returnValue(utils.getPromise(q, mockProgram));
@@ -680,6 +680,23 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
                     });
 
                     it('should get referral locations for the given opUnit', function () {
+                        var mockReferralDataElement = {
+                            id: 'someId',
+                            isIncluded: true,
+                            offlineSummaryType: 'referralLocations'
+                        };
+
+                        mockProgram = {
+                            id: 'someProgram',
+                            programStages: [{
+                                programStageSections: [{
+                                    programStageDataElements: [{
+                                        dataElement: mockReferralDataElement
+                                    }]
+                                }]
+                            }]
+                        };
+                        programRepository.get.and.returnValue(utils.getPromise(q, mockProgram));
                         scope.$apply();
                         expect(referralLocationsRepository.get).toHaveBeenCalledWith(scope.orgUnit.parent.id);
                     });
@@ -698,9 +715,11 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
                                 optionSet: {
                                     options: [{
                                         id: 'referralLocationOptionIdA',
+                                        code: 'referralLocationOptionIdA',
                                         genericName: 'someGenericNameA'
                                     }, {
                                         id: 'referralLocationOptionIdB',
+                                        code: 'referralLocationOptionIdB',
                                         genericName: 'someGenericNameB'
                                     }]
                                 }
@@ -785,6 +804,7 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
 
                         optionA = {
                             id: 'optionIdA',
+                            code: 'optionIdA',
                             name: 'optionNameA'
                         };
                         optionB = {
@@ -793,6 +813,7 @@ define(['exportRawDataController', 'angularMocks', 'dataSetRepository', 'exclude
                         };
                         optionC = {
                             id: 'optionIdC',
+                            code: 'optionIdC',
                             name: 'optionNameC'
                         };
                         dataElementA = {

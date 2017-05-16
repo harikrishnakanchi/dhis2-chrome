@@ -73,8 +73,8 @@ define(["moment", "lodashUtils", "customAttributes"], function(moment, _, custom
             return store.each(query);
         };
 
-        var getProjectAndOpUnitAttributes = function(moduleOrOriginId) {
-            var getAttributes = function(orgUnits) {
+        var getAssociatedOrganisationUnitGroups = function (moduleOrOriginId) {
+            var getAssociations = function(orgUnits) {
                 return get(moduleOrOriginId).then(function(enrichedModuleOrOrigin) {
                     var isOrigin = _.any(enrichedModuleOrOrigin.attributeValues, {
                         "value": "Patient Origin"
@@ -91,11 +91,11 @@ define(["moment", "lodashUtils", "customAttributes"], function(moment, _, custom
                         'id': opUnit.parent.id
                     });
 
-                    return opUnit.attributeValues.concat(project.attributeValues);
+                    return _.map(opUnit.organisationUnitGroups, 'id').concat(_.map(project.organisationUnitGroups, 'id'));
                 });
             };
 
-            return getAll().then(getAttributes);
+            return getAll().then(getAssociations);
         };
 
         var getAllProjects = function() {
@@ -294,7 +294,6 @@ define(["moment", "lodashUtils", "customAttributes"], function(moment, _, custom
             "get": get,
             "findAll": findAll,
             "findAllByParent": findAllByParent,
-            "getProjectAndOpUnitAttributes": getProjectAndOpUnitAttributes,
             "getAllProjects": getAllProjects,
             "getParentProject": getParentProject,
             "getAllModulesInOrgUnits": getAllModulesInOrgUnits,
@@ -307,7 +306,8 @@ define(["moment", "lodashUtils", "customAttributes"], function(moment, _, custom
             "enrichWithParent": enrichWithParent,
             "associateDataSetsToOrgUnits": associateDataSetsToOrgUnits,
             "removeDataSetsFromOrgUnits": removeDataSetsFromOrgUnits,
-            "getAllDataSetsForOrgUnit": getAllDataSetsForOrgUnit
+            "getAllDataSetsForOrgUnit": getAllDataSetsForOrgUnit,
+            "getAssociatedOrganisationUnitGroups": getAssociatedOrganisationUnitGroups
         };
     };
 });

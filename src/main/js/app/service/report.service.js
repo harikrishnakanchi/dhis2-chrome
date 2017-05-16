@@ -1,13 +1,30 @@
-define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
+define(["dhisUrl", "lodash", "moment", "dateUtils", "properties"], function(dhisUrl, _, moment, dateUtils, properties) {
     return function($http, $q) {
-        var ORG_UNIT_DIMENSION = 'ou';
+        var ORG_UNIT_DIMENSION = 'ou',
+            PERIOD_DIMENSION = 'pe';
 
         this.getReportDataForOrgUnit = function(report, orgUnit) {
             var orgUnits = _.isArray(orgUnit) ? orgUnit : [orgUnit];
 
-            var buildDimensions = function (dimensionConfig) {
+            var generatePeriodForYearlyReport = function () {
+                var numberOfMonthsInCurrentYear = parseInt(moment().format('M'));
+                var numberOfMonthsForYearlyReport = (properties.projectDataSync.numYearsToSyncYearlyReports * 12) + numberOfMonthsInCurrentYear;
+                return dateUtils.getPeriodRangeInMonths(numberOfMonthsForYearlyReport, { excludeCurrent: false });
+            };
+
+            var buildDimensions = function (dimensionConfig, yearlyReport) {
                 return _.map(dimensionConfig, function (config) {
-                    var items = config.dimension == ORG_UNIT_DIMENSION ? orgUnits : _.map(config.items, 'id');
+                    var items;
+                    switch (config.dimension) {
+                        case ORG_UNIT_DIMENSION:
+                            items = orgUnits;
+                            break;
+                        case PERIOD_DIMENSION:
+                            items = yearlyReport ? generatePeriodForYearlyReport() : _.map(config.items, 'id');
+                            break;
+                        default:
+                            items = _.map(config.items, 'id');
+                    }
                     return config.dimension + ":" + items.join(';');
                 });
             };
@@ -15,8 +32,8 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
             var config = {
                 params: {
                     dimension: _.flatten([
-                        buildDimensions(report.columns),
-                        buildDimensions(report.rows)
+                        buildDimensions(report.columns, report.yearlyReport || report.yearlyChart),
+                        buildDimensions(report.rows, report.yearlyReport || report.yearlyChart)
                     ]),
                     filter: buildDimensions(report.filters),
                     lastUpdatedAt: moment().toISOString() //required for cache-busting purposes

@@ -38,7 +38,7 @@ define(['dhisUrl', 'angularMocks', 'systemInfoService', 'moment', 'timecop'], fu
             httpBackend.expectGET(dhisUrl.systemInfo).respond(200, systemInfoResponse);
 
             systemInfoService.getServerDate().then(function (serverDate) {
-                expect(serverDate).toEqual(moment.utc(currentTime).format('YYYY-MM-DDThh:mm:ss.SSS'));
+                expect(serverDate).toEqual(moment.utc(currentTime).format('YYYY-MM-DDTHH:mm:ss.SSS'));
             });
 
             httpBackend.flush();

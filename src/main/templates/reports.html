@@ -7,9 +7,15 @@
             </div>
         </div>
         <div class="row form-inline">
-            <div class="col-md-4 form-group">
-                {{ resourceBundle.selectServiceNameLabel }}&nbsp;
-                <select id="selectService" class="form-control" ng-model="selectedService" ng-options="service as service.name for service in services"></select>
+            <div class="col-md-12 form-group">
+                <div role="toolbar">
+                    <div class="btn-group" role="group">
+                        <div>{{ resourceBundle.selectServiceNameLabel }}:</div>
+                    </div>
+                    <div class="btn-group service" role="group" ng-repeat="service in services">
+                        <button type="button" class="btn btn-sm btn-default" ng-class="{'btn-primary active': selectedService == service }" ng-click="setSelectedService(service)">{{ service.name }}</button>
+                    </div>
+                </div>
             </div>
         </div>
 

@@ -2,7 +2,7 @@ define(["moduleWeekSelectorController", "testData", "angularMocks", "lodash", "u
     function(ModuleWeekSelectorController, testData, mocks, _, utils, orgUnitMapper, moment, DataRepository, OrgUnitRepository) {
         describe("moduleWeekSelectorController ", function() {
 
-            var scope, rootScope, q, location, window, orgUnitRepository, routeParams, modules;
+            var scope, rootScope, q, location, fakeModal, orgUnitRepository, routeParams, modules;
 
             beforeEach(mocks.inject(function($rootScope, $q, $location) {
                 scope = $rootScope.$new();
@@ -42,6 +42,11 @@ define(["moduleWeekSelectorController", "testData", "angularMocks", "lodash", "u
                         "name": "MISSIONS EXPLOS"
                     }
                 };
+
+                fakeModal = { open: function() {} };
+                spyOn(fakeModal, "open").and.returnValue({
+                    result: utils.getPromise(q, {})
+                });
 
                 orgUnitRepository = new OrgUnitRepository();
                 routeParams = {};
@@ -111,7 +116,7 @@ define(["moduleWeekSelectorController", "testData", "angularMocks", "lodash", "u
                     }]
                 }];
 
-                moduleWeekSelectorController = new ModuleWeekSelectorController(scope, routeParams, q, location, rootScope, orgUnitRepository);
+                moduleWeekSelectorController = new ModuleWeekSelectorController(scope, routeParams, q, location, rootScope, fakeModal, orgUnitRepository);
                 scope.$apply();
 
                 expect(scope.modules).toEqual(expectedModules);
@@ -158,7 +163,7 @@ define(["moduleWeekSelectorController", "testData", "angularMocks", "lodash", "u
                     }]
                 }];
 
-                moduleWeekSelectorController = new ModuleWeekSelectorController(scope, routeParams, q, location, rootScope, orgUnitRepository);
+                moduleWeekSelectorController = new ModuleWeekSelectorController(scope, routeParams, q, location, rootScope, fakeModal, orgUnitRepository);
                 scope.$apply();
 
                 expect(scope.modules).toEqual(expectedModules);
@@ -173,7 +178,7 @@ define(["moduleWeekSelectorController", "testData", "angularMocks", "lodash", "u
                 scope.resourceBundle = {
                     "openingDateInFutureError": "openingDateInFutureError"
                 };
-                moduleWeekSelectorController = new ModuleWeekSelectorController(scope, routeParams, q, location, rootScope, orgUnitRepository);
+                moduleWeekSelectorController = new ModuleWeekSelectorController(scope, routeParams, q, location, rootScope, fakeModal, orgUnitRepository);
                 scope.$apply();
 
                 expect(scope.week).toEqual({

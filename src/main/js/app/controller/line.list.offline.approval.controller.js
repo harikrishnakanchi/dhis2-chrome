@@ -1,5 +1,5 @@
-define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], function(_, moment, properties, interpolate, dataElementUtils) {
-    return function($scope, $q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, datasetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService) {
+define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], function (_, moment, properties, interpolate, dataElementUtils) {
+    return function ($scope, $q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, datasetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService) {
 
         $scope.isGenderFilterApplied = false;
         $scope.isAgeFilterApplied = false;
@@ -8,65 +8,68 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
         };
         var groupedProcedureDataValues, groupedDataValues, filteredEventIds;
 
-        $scope.getTotalCount = function(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilters, ageFilter) {
+        $scope.getTotalCount = function (dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionCode, genderFilters, ageFilter) {
             var genderfilterIds = _.map(genderFilters, 'id');
-            if(_.isUndefined(genderFilters)) {
-                return $scope.getCount(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionId, undefined, ageFilter);
+            if (_.isUndefined(genderFilters)) {
+                return $scope.getCount(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionCode, undefined, ageFilter);
             } else {
-                return _.reduce(genderfilterIds, function (totalCount, genderFilterId) {
-                    return totalCount + $scope.getCount(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter);
+                var count = _.reduce(genderfilterIds, function (totalCount, genderFilterId) {
+                    return _.add(totalCount, $scope.getCount(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionCode, genderFilterId, ageFilter));
                 }, 0);
+
+                if(count > 0) return count;
             }
         };
 
         $scope.canShowDataElement = function (optionSetId, dataElementId) {
             var options = $scope.optionSetMapping[optionSetId];
             return _.any(options, function (option) {
-                return $scope.getCount(dataElementId, false, false, option.id) > 0;
+                return $scope.getCount(dataElementId, false, false, option.code) > 0;
             });
         };
 
         $scope.canShowReferralLocations = function () {
-            return _.any($scope.locationNames, function(name) {
+            return _.any($scope.locationNames, function (name) {
                 return $scope.getReferralCount(name) > 0;
             });
         };
 
-        $scope.getCount = function(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter) {
+        $scope.getCount = function (dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionCode, genderFilterId, ageFilter) {
             var count;
 
-            if (_.isUndefined(groupedDataValues[optionId]))
+            if (_.isUndefined(groupedDataValues[optionCode]))
                 return 0;
 
-            var applyGenderFilter = function() {
+            var applyGenderFilter = function () {
                 if (_.isUndefined(groupedDataValues[genderFilterId]))
                     return [];
                 var genderDataElement = _.keys(groupedDataValues[genderFilterId]);
 
-                return _.intersection(_.pluck(groupedDataValues[optionId][dataElementId], "eventId"), _.pluck(groupedDataValues[genderFilterId][genderDataElement[0]], "eventId"));
+                return _.intersection(_.pluck(groupedDataValues[optionCode][dataElementId], "eventId"), _.pluck(groupedDataValues[genderFilterId][genderDataElement[0]], "eventId"));
             };
 
-            var applyAgeFilter = function(eventIds) {
+            var applyAgeFilter = function (eventIds) {
                 var count = 0;
-                var filteredEventIds;
 
-                _.forEach(eventIds, function(eventId) {
+                _.forEach(eventIds, function (eventId) {
                     var dataValue = _.find($scope.dataValues._age, {
                         "eventId": eventId
                     });
                     if (dataValue.value > ageFilter[0] && dataValue.value < ageFilter[1])
                         count++;
                 });
-                return count;
+
+                if(count > 0) return count;
             };
 
             if (isGenderFilterApplied && !isAgeFilterApplied) {
                 filteredEventIds = applyGenderFilter();
                 count = _.isEmpty(filteredEventIds) ? 0 : filteredEventIds.length;
-                return count;
+                if(count > 0) return count; else return;
             }
+
             if (isAgeFilterApplied && !isGenderFilterApplied) {
-                filteredEventIds = _.pluck(groupedDataValues[optionId][dataElementId], "eventId");
+                filteredEventIds = _.pluck(groupedDataValues[optionCode][dataElementId], "eventId");
                 return applyAgeFilter(filteredEventIds);
             }
 
@@ -75,58 +78,62 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
                 return applyAgeFilter(filteredEventIds);
             }
 
-            count = _.isEmpty(groupedDataValues[optionId][dataElementId]) ? 0 : groupedDataValues[optionId][dataElementId].length;
+            count = _.isEmpty(groupedDataValues[optionCode][dataElementId]) ? 0 : groupedDataValues[optionCode][dataElementId].length;
 
-            return count;
+            if(count > 0) return count;
         };
 
-        $scope.getTotalProcedureCount = function (isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilters, ageFilter) {
+        $scope.getTotalProcedureCount = function (isGenderFilterApplied, isAgeFilterApplied, optionCode, genderFilters, ageFilter) {
             var genderfilterIds = _.map(genderFilters, 'id');
-            if(_.isUndefined(genderFilters)) {
-                return $scope.getProcedureCount(isGenderFilterApplied, isAgeFilterApplied, optionId, undefined, ageFilter);
+            if (_.isUndefined(genderFilters)) {
+                return $scope.getProcedureCount(isGenderFilterApplied, isAgeFilterApplied, optionCode, undefined, ageFilter);
             } else {
-                return _.reduce(genderfilterIds, function (totalCount, genderFilterId) {
-                    return totalCount + $scope.getProcedureCount(isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter);
+                var count = _.reduce(genderfilterIds, function (totalCount, genderFilterId) {
+                    return _.add(totalCount, $scope.getProcedureCount(isGenderFilterApplied, isAgeFilterApplied, optionCode, genderFilterId, ageFilter));
                 }, 0);
+
+                if(count > 0) return count;
             }
         };
 
-        $scope.getProcedureCount = function(isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter) {
+        $scope.getProcedureCount = function (isGenderFilterApplied, isAgeFilterApplied, optionCode, genderFilterId, ageFilter) {
             var count = 0;
             var eventIds;
 
-            var applyGenderFilter = function() {
-                if (_.isUndefined(groupedDataValues[genderFilterId]) || _.isUndefined(groupedProcedureDataValues[optionId]))
+            var applyGenderFilter = function () {
+                if (_.isUndefined(groupedDataValues[genderFilterId]) || _.isUndefined(groupedProcedureDataValues[optionCode]))
                     return [];
                 var filteredEventIds = [];
-                var eventIdsInOption = _.pluck(groupedProcedureDataValues[optionId], "eventId");
+                var eventIdsInOption = _.pluck(groupedProcedureDataValues[optionCode], "eventId");
                 var genderDataElement = _.keys(groupedDataValues[genderFilterId]);
                 var eventIdsInFilter = _.pluck(groupedDataValues[genderFilterId][genderDataElement[0]], "eventId");
-                _.forEach(eventIdsInOption, function(eventId) {
+                _.forEach(eventIdsInOption, function (eventId) {
                     if (_.contains(eventIdsInFilter, eventId))
                         filteredEventIds.push(eventId);
                 });
                 return filteredEventIds;
             };
 
-            var applyAgeFilter = function(eventIds) {
+            var applyAgeFilter = function (eventIds) {
                 count = 0;
-                _.forEach(eventIds, function(eventId) {
+                _.forEach(eventIds, function (eventId) {
                     var dataValue = _.find($scope.dataValues._age, {
                         "eventId": eventId
                     });
                     if (dataValue.value > ageFilter[0] && dataValue.value < ageFilter[1])
                         count++;
                 });
-                return count;
+
+                if(count > 0) return count;
             };
 
             if (isGenderFilterApplied && !isAgeFilterApplied) {
-                return applyGenderFilter().length;
+                count = applyGenderFilter().length;
+                if(count > 0) return count; else return;
             }
 
             if (isAgeFilterApplied && !isGenderFilterApplied) {
-                eventIds = _.pluck(groupedProcedureDataValues[optionId], "eventId");
+                eventIds = _.pluck(groupedProcedureDataValues[optionCode], "eventId");
                 return applyAgeFilter(eventIds);
             }
 
@@ -135,32 +142,34 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
                 return applyAgeFilter(eventIds);
             }
 
-            count = _.isEmpty(groupedProcedureDataValues[optionId]) ? 0 : groupedProcedureDataValues[optionId].length;
-            return count;
+            count = _.isEmpty(groupedProcedureDataValues[optionCode]) ? 0 : groupedProcedureDataValues[optionCode].length;
+            if(count > 0) return count;
         };
 
-        $scope.getReferralCount = function(locationName) {
-            if (_.isUndefined($scope.dataValues._referralLocations) || _.isEmpty($scope.referralOptions))
-                return 0;
+        $scope.getReferralCount = function (locationName) {
+            if (_.isUndefined($scope.dataValues._referralLocations) || _.isEmpty($scope.referralOptions)) return;
 
-            var optionId = _.find($scope.referralOptions, {
+            var optionCode = _.find($scope.referralOptions, {
                 "name": locationName
-            }).id;
-            return _.filter($scope.dataValues._referralLocations, {
-                "value": optionId
+            }).code;
+
+            var eventCount = _.filter($scope.dataValues._referralLocations, {
+                "value": optionCode
             }).length;
+
+            if(eventCount > 0) return eventCount;
         };
 
-        $scope.shouldShowInOfflineSummary = function(dataElementId, allDataElements) {
+        $scope.shouldShowInOfflineSummary = function (dataElementId, allDataElements) {
 
-            allDataElements = _.filter(allDataElements, function(de) {
+            allDataElements = _.filter(allDataElements, function (de) {
                 return (_.endsWith(de.dataElement.code, "_showInOfflineSummary") || de.dataElement.offlineSummaryType == 'showInOfflineSummary') && de.dataElement.optionSet;
             });
             var dataElementIds = _.pluck(_.pluck(allDataElements, 'dataElement'), 'id');
             return _.contains(dataElementIds, dataElementId);
         };
 
-        $scope.showSummary = function() {
+        $scope.showSummary = function () {
             return $scope.showFilters && ($scope.showOfflineSummaryForViewOnly || ($scope.isCompleted && hasRoles(['Coordination Level Approver', 'Observer'])) || (hasRoles(['Project Level Approver', 'Observer'])));
         };
 
@@ -168,57 +177,57 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
 
         var getDescriptionsForProceduresPerformed = function () {
             var proceduresPerformed = _.uniq($scope.dataValues._procedures, 'formName');
-            proceduresPerformed =  _.map(proceduresPerformed, function (procedurePerformed) {
+            proceduresPerformed = _.map(proceduresPerformed, function (procedurePerformed) {
                 return {
-                    "title" : translationsService.getTranslationForProperty(procedurePerformed, 'formName', procedurePerformed.formName),
+                    "title": translationsService.getTranslationForProperty(procedurePerformed, 'formName', procedurePerformed.formName),
                     "description": translationsService.getTranslationForProperty(procedurePerformed, 'description', procedurePerformed.description)
                 };
             });
             $scope.proceduresPerformed = _.groupBy(proceduresPerformed, 'description');
         };
 
-        $scope.shouldShowProceduresInOfflineSummary = function() {
+        $scope.shouldShowProceduresInOfflineSummary = function () {
             return !_.isEmpty($scope.procedureDataValueIds);
         };
 
-        $scope.contactSupport = interpolate($scope.resourceBundle.contactSupport, { supportEmail:properties.support_email });
+        $scope.contactSupport = interpolate($scope.resourceBundle.contactSupport, {supportEmail: properties.support_email});
 
-        var getPeriod = function() {
+        var getPeriod = function () {
             $scope.isValidWeek = moment($scope.week.startOfWeek).isAfter(moment().subtract(properties.projectDataSync.numWeeksForHistoricalData, 'week'));
             return moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
         };
 
-        var loadOriginsOrgUnits = function() {
-            return orgUnitRepository.findAllByParent($scope.selectedModule.id).then(function(data) {
+        var loadOriginsOrgUnits = function () {
+            return orgUnitRepository.findAllByParent($scope.selectedModule.id).then(function (data) {
                 data = _.sortBy(data, "displayName");
                 $scope.originOrgUnits = data;
                 $scope.originMap = {};
-                _.forEach(data, function(origin) {
+                _.forEach(data, function (origin) {
                     $scope.originMap[origin.id] = origin.displayName || origin.name;
                 });
             });
         };
 
-        var loadProgram = function() {
-            var getExcludedDataElementsForModule = function() {
-                return excludedDataElementsRepository.get($scope.selectedModule.id).then(function(data) {
+        var loadProgram = function () {
+            var getExcludedDataElementsForModule = function () {
+                return excludedDataElementsRepository.get($scope.selectedModule.id).then(function (data) {
                     return data ? _.pluck(data.dataElements, "id") : [];
                 });
             };
 
-            var getProgram = function(excludedDataElements) {
-                return programRepository.get($scope.program.id, excludedDataElements).then(function(program) {
+            var getProgram = function (excludedDataElements) {
+                return programRepository.get($scope.program.id, excludedDataElements).then(function (program) {
                     $scope.program = translationsService.translate(program);
                 });
             };
 
             var setReferralLocationsFlag = function () {
-                var referralLocationDataElement =  _.chain($scope.program.programStages)
+                var referralLocationDataElement = _.chain($scope.program.programStages)
                     .map('programStageSections').flatten()
                     .map('programStageDataElements').flatten()
                     .map('dataElement')
                     .filter('isIncluded')
-                    .find({ offlineSummaryType: 'referralLocations'}).value();
+                    .find({offlineSummaryType: 'referralLocations'}).value();
 
                 $scope.shouldShowReferrals = !!referralLocationDataElement;
             };
@@ -256,7 +265,7 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
 
             $scope.eventsMap = _.groupBy(allDataValues, "eventId");
 
-            $scope.dataValues = _.groupBy(allDataValues, function(dv) {
+            $scope.dataValues = _.groupBy(allDataValues, function (dv) {
                 var lineListSummaryfilters = {
                     'showInOfflineSummary': '_showInOfflineSummary',
                     'age': '_age',
@@ -274,7 +283,7 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
             groupedDataValues = _.groupBy(allDataValues, "value");
 
             var keys = _.keys(groupedDataValues);
-            _.forEach(keys, function(key) {
+            _.forEach(keys, function (key) {
                 var groupedByDataelements = _.groupBy(groupedDataValues[key], "dataElement");
                 groupedDataValues[key] = groupedByDataelements;
             });
@@ -287,19 +296,19 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
             $scope.procedureDataValues = _.groupBy($scope.dataValues._procedures, "value");
         };
 
-        var setShowFilterFlag = function() {
+        var setShowFilterFlag = function () {
             $scope.showFilters = !_.isEmpty($scope.procedureDataValueIds) || !_.isEmpty(_.compact(_.pluck($scope.dataValues._showInOfflineSummary, "value")));
         };
 
-        var getAssociatedDataSets = function() {
+        var getAssociatedDataSets = function () {
             var orgUnitAssociatedWithDataSet = [$scope.originOrgUnits[0]].concat($scope.selectedModule);
-            return datasetRepository.findAllForOrgUnits(orgUnitAssociatedWithDataSet).then(function(dataSets) {
+            return datasetRepository.findAllForOrgUnits(orgUnitAssociatedWithDataSet).then(function (dataSets) {
                 $scope.associatedDataSets = translationsService.translate(dataSets);
             });
         };
 
-        var getReferralLocations = function() {
-            return referralLocationsRepository.get($scope.selectedModule.parent.id).then(function(locations) {
+        var getReferralLocations = function () {
+            return referralLocationsRepository.get($scope.selectedModule.parent.id).then(function (locations) {
                 if (_.isUndefined(locations)) {
                     $scope.shouldShowReferrals = false;
                     return;
@@ -311,19 +320,21 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
             });
         };
 
-        var init = function() {
+        var init = function () {
             $scope.loading = true;
 
-            return $q.all([loadOriginsOrgUnits(), loadProgram(), getOptionSetMapping(), getReferralLocations()]).then(function() {
-                var orgUnitIdsAssociatedToEvents = _.map($scope.originOrgUnits, "id").concat($scope.selectedModule.id);
-                return programEventRepository.getEventsForPeriod($scope.program.id, orgUnitIdsAssociatedToEvents, getPeriod()).then(function(events) {
-                    var submittedEvents = _.filter(events, function(event) {
-                        return event.localStatus === "READY_FOR_DHIS" || event.localStatus === undefined;
+            return loadProgram().then(function () {
+                return $q.all([loadOriginsOrgUnits(), getOptionSetMapping(), getReferralLocations()]).then(function() {
+                    var orgUnitIdsAssociatedToEvents = _.map($scope.originOrgUnits, "id").concat($scope.selectedModule.id);
+                    return programEventRepository.getEventsForPeriod($scope.program.id, orgUnitIdsAssociatedToEvents, getPeriod()).then(function (events) {
+                        var submittedEvents = _.filter(events, function(event) {
+                            return event.localStatus === "READY_FOR_DHIS" || event.localStatus === undefined;
+                        });
+                        loadGroupedDataValues(submittedEvents);
+                        setShowFilterFlag();
+                        getAssociatedDataSets();
+                        getDescriptionsForProceduresPerformed();
                     });
-                    loadGroupedDataValues(submittedEvents);
-                    setShowFilterFlag();
-                    getAssociatedDataSets();
-                    getDescriptionsForProceduresPerformed();
                 });
             }).finally(function () {
                 $scope.loading = false;

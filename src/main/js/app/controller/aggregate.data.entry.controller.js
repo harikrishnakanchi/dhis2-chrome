@@ -411,7 +411,21 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
             return false;
         };
 
-        var deregisterDirtyFormWatcher = $scope.$watch('dataentryForm.$dirty', function(dirty) {
+        $scope.viewAllDataElements = function () {
+            var scope = $rootScope.$new();
+
+            scope.orgUnit = $scope.selectedModule;
+            scope.isOpen = {};
+
+            $modal.open({
+                templateUrl: 'templates/view-all-aggregate-data-elements.html',
+                controller: 'aggregateModuleController',
+                scope: scope,
+                windowClass: 'modal-lg'
+            });
+        };
+
+        var deregisterDirtyFormWatcher = $scope.$watch('forms.dataentryForm.$dirty', function(dirty) {
             if (dirty) {
                 $scope.preventNavigation = true;
             } else {
@@ -425,6 +439,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties", "
 
         var initializeForm = function() {
             $scope.startLoading();
+            $scope.moduleAndOpUnitName = $scope.selectedModule.parent.name + ' - ' + $scope.selectedModule.name;
             currentPeriod = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
             $scope.isDataEntryAllowed = moment($scope.week.startOfWeek).isAfter(moment().subtract(properties.projectDataSync.numWeeksToSync, 'week'));
             currentPeriodAndOrgUnit = {

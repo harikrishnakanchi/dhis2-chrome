@@ -1,5 +1,5 @@
-define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], function (_, moment, dateUtils, properties, customAttributes) {
-    return function ($q, dataService, eventService, systemInfoService, userPreferenceRepository, orgUnitRepository, datasetRepository, changeLogRepository, dataRepository, programEventRepository) {
+define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes', 'constants'], function (_, moment, dateUtils, properties, customAttributes, constants) {
+    return function ($q, mergeBy, dataService, eventService, systemInfoService, userPreferenceRepository, orgUnitRepository, datasetRepository, changeLogRepository, dataRepository, programEventRepository, lineListEventsMerger) {
         var CHANGE_LOG_PREFIX = 'yearlyDataValues',
             CHUNK_SIZE = 11;
 
@@ -37,14 +37,21 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], func
         };
 
         var downloadData = function (modules) {
-            var periodRange = _.difference(dateUtils.getPeriodRange(properties.projectDataSync.numWeeksForHistoricalData, {excludeCurrentWeek: true}),
-                dateUtils.getPeriodRange(properties.projectDataSync.numWeeksToSync));
+            var dataValueEquals = function (dataValueA, dataValueB) {
+                return dataValueA.dataElement === dataValueB.dataElement &&
+                    dataValueA.period === dataValueB.period &&
+                    dataValueA.orgUnit === dataValueB.orgUnit &&
+                    dataValueA.categoryOptionCombo === dataValueB.categoryOptionCombo;
+            };
+
+            var periodRange = _.difference(dateUtils.getPeriodRangeInWeeks(properties.projectDataSync.numWeeksForHistoricalData, {excludeCurrent: true}),
+                dateUtils.getPeriodRangeInWeeks(properties.projectDataSync.numWeeksToSync));
 
             var downloadDataForModule = function (module) {
                 var changeLogKey = [CHANGE_LOG_PREFIX, module.projectId, module.id].join(':'),
                     downloadStartTime;
 
-                var downloadModuleData = function () {
+                var downloadModuleData = function (lastUpdatedTime) {
                     var getServerTime = function () {
                         return systemInfoService.getServerDate().then(function (serverTime) {
                             downloadStartTime = serverTime;
@@ -52,17 +59,33 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], func
                     };
 
                     var downloadModuleDataValues = function () {
-                        var periodChunks = _.chunk(periodRange, CHUNK_SIZE);
+                        var periodChunks = _.chunk(periodRange, lastUpdatedTime ? periodRange.length : CHUNK_SIZE);
+
+                        var getDataValuesFromIndexedDB = function (periodChunk) {
+                            return dataRepository.getDataValuesForOrgUnitsAndPeriods(_.map(module.origins, 'id').concat(module.id), periodChunk).then(function (dataValues) {
+                                return _.flatten(_.map(dataValues, 'dataValues'));
+                            });
+                        };
 
                         return _.reduce(periodChunks, function (moduleChunkPromise, periodChunk) {
                             return moduleChunkPromise.then(function () {
-                                return dataService.downloadData(module.id, module.dataSetIds, periodChunk).then(dataRepository.saveDhisData);
+                                return $q.all({
+                                    dataValuesFromDHIS: dataService.downloadData(module.id, module.dataSetIds, periodChunk, lastUpdatedTime),
+                                    dataValuesInPraxis: getDataValuesFromIndexedDB(periodChunk)
+                                }).then(function (data) {
+                                    return dataRepository.saveDhisData(mergeBy.lastUpdated({ eq: dataValueEquals }, data.dataValuesFromDHIS, data.dataValuesInPraxis));
+                                });
                             });
                         }, $q.when());
                     };
 
                     var downloadLineListEvents = function () {
-                        return eventService.getEvents(module.id, periodRange).then(programEventRepository.upsert);
+                        return $q.all({
+                            eventsFromDHIS: eventService.getEvents(module.id, periodRange, lastUpdatedTime),
+                            eventsInPraxis: programEventRepository.getEventsForOrgUnitsAndPeriods(_.map(module.origins, 'id'), periodRange)
+                        }).then(function (data) {
+                            return programEventRepository.upsert(lineListEventsMerger.create(data.eventsInPraxis, data.eventsFromDHIS).eventsToUpsert);
+                        });
                     };
 
                     return getServerTime().then(function () {
@@ -75,14 +98,16 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes'], func
                     return changeLogRepository.upsert(changeLogKey, downloadStartTime);
                 };
 
-                var onFailure = function () {
+                var onFailure = function (response) {
+                    if(response && response.errorCode === constants.errorCodes.NETWORK_UNAVAILABLE){
+                        return $q.reject();
+                    }
                     return $q.when(); //continue with next module
                 };
 
-                return changeLogRepository.get(changeLogKey).then(function (lastUpdatedTime) {
-                    var areDataValuesAlreadyDownloaded = !!lastUpdatedTime;
-                    return areDataValuesAlreadyDownloaded ? $q.when() : downloadModuleData().then(onSuccess, onFailure);
-                });
+                return changeLogRepository.get(changeLogKey)
+                    .then(downloadModuleData)
+                    .then(onSuccess, onFailure);
             };
 
             return _.reduce(modules, function (existingPromises, module) {

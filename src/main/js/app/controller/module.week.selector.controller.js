@@ -1,6 +1,6 @@
 define(["lodash", "moment", "interpolate", "customAttributes"],
     function(_, moment, interpolate, customAttributes) {
-        return function($scope, $routeParams, $q, $location, $rootScope, orgUnitRepository) {
+        return function($scope, $routeParams, $q, $location, $rootScope, $modal, orgUnitRepository) {
 
             var deregisterWeekModulerWatcher = $scope.$watchCollection('[week, currentModule, resourceBundle]', function() {
                 $scope.errorMessage = undefined;
@@ -21,13 +21,37 @@ define(["lodash", "moment", "interpolate", "customAttributes"],
                 return moment($scope.currentModule.openingDate).isAfter(moment($scope.week.endOfWeek));
             };
 
-            var deregisterSelf = $scope.$on('$locationChangeStart', function(event, newUrl, oldUrl) {
+            var confirmAndProceed = function(okCallback, message) {
+                $scope.modalMessages = message;
+                var modalInstance = $modal.open({
+                    templateUrl: 'templates/confirm-dialog.html',
+                    controller: 'confirmDialogController',
+                    scope: $scope
+                });
+
+                return modalInstance.result
+                    .then(function() {
+                        $scope.cancelSubmit = false;
+                        return okCallback();
+                    }, function() {
+                        $scope.cancelSubmit = true;
+                    });
+            };
+
+            var deregisterSelf = $scope.$on('$routeChangeStart', function(event, newUrl) {
                 var okCallback = function() {
                     deregisterSelf();
-                    $location.url(newUrl);
+                    var url = _.reduce(newUrl.pathParams, function(path, value, key) {
+                        var regex = new RegExp(':'+ key, "gi");
+                        return path.replace(regex, value.toString());
+                        }, newUrl.originalPath);
+                    $location.url(url);
+                };
+                var message = {
+                    "confirmationMessage": $scope.resourceBundle.leavePageConfirmationMessage
                 };
                 if ($scope.preventNavigation) {
-                    confirmAndMove(okCallback);
+                    confirmAndProceed(okCallback, message);
                     event.preventDefault();
                 }
             });

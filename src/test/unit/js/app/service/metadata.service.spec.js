@@ -52,21 +52,21 @@ define(["metadataService", "properties", "angularMocks", "moment", "dhisUrl", "m
 
         describe('getMetadataOfType', function () {
             var type = "categories";
-            var fields = metadataConf.fields[type];
+            var fields = metadataConf.fields[type].params;
 
             it('should get the data based on the given type', function () {
-                var url = dhisUrl[type] + "?fields=" + fields + "&paging=false";
+                var url = dhisUrl[type] + "?fields=" + fields + "&page=1&paging=true&totalPages=true";
                 var categories = 'someData';
                 httpBackend.expectGET(encodeURI(url)).respond(200, {"categories": categories});
                 metadataService.getMetadataOfType(type).then(function (data) {
-                    expect(data).toEqual(categories);
+                    expect(data).toEqual([categories]);
                 });
                 httpBackend.flush();
             });
 
             it('should get only lastUpdated data', function () {
                 var lastUpdated = "someTime";
-                var url = dhisUrl[type] + "?fields=" + fields + "&filter=lastUpdated:ge:" + lastUpdated  + "&paging=false";
+                var url = dhisUrl[type] + "?fields=" + fields + "&filter=lastUpdated:ge:" + lastUpdated  + "&page=1&paging=true&totalPages=true";
                 httpBackend.expectGET(encodeURI(url)).respond(200, {"categories": ""});
                 metadataService.getMetadataOfType(type, lastUpdated);
                 httpBackend.flush();
@@ -74,11 +74,12 @@ define(["metadataService", "properties", "angularMocks", "moment", "dhisUrl", "m
 
             it('should paginate the given entity type which has pagination params', function () {
                 var type = "indicators";
-                var fields = metadataConf.fields[type];
+                var fields = metadataConf.fields[type].params;
+                var pageSize = metadataConf.fields[type].pageSize;
                 var lastUpdated = "someTime";
                 spyOn(pagingUtils, 'paginateRequest').and.callThrough();
 
-                var url = dhisUrl[type] + "?fields=" + fields + "&filter=lastUpdated:ge:" + lastUpdated  + "&page=1&pageSize=100&paging=true&totalPages=true";
+                var url = dhisUrl[type] + "?fields=" + fields + "&filter=lastUpdated:ge:" + lastUpdated  + "&page=1&pageSize=" + pageSize + "&paging=true&totalPages=true";
                 httpBackend.expectGET(encodeURI(url)).respond(200, {"indicators": ""});
                 metadataService.getMetadataOfType(type, lastUpdated);
                 expect(pagingUtils.paginateRequest).toHaveBeenCalled();

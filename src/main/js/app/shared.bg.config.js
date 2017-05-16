@@ -91,7 +91,6 @@ require.config({
         "uploadOrgUnitGroupConsumer": "app/consumer/upload.orgunit.group.consumer",
         "downloadDataSetConsumer": "app/consumer/download.data.set.consumer",
         "assignDataSetsToOrgUnitsConsumer": "app/consumer/assign.data.sets.to.org.units.consumer",
-        "removeOrgUnitDataSetAssociationConsumer": "app/consumer/remove.org.unit.data.set.association.consumer",
         "createUserConsumer": "app/consumer/create.user.consumer",
         "updateUserConsumer": "app/consumer/update.user.consumer",
         "uploadProgramConsumer": "app/consumer/upload.program.consumer",
@@ -129,7 +128,7 @@ require.config({
         //Interceptors
         "cleanupPayloadInterceptor": "app/interceptors/cleanup.payload.interceptor",
         "configureRequestInterceptor": "app/interceptors/configure.request.interceptor",
-        "handleTimeoutInterceptor": "app/interceptors/handle.timeout.interceptor",
+        "handleResponseErrorInterceptor": "app/interceptors/handle.response.error.interceptor",
         "logRequestReponseInterceptor": "app/interceptors/log.request.response.interceptor",
 
         //Queue
@@ -143,7 +142,11 @@ require.config({
         "dhisUrl": "app/utils/dhis.url",
         "interpolate": "app/utils/interpolate",
         "pagingUtils": "app/utils/paging.utils",
-        "productKeyUtils": "app/utils/product.key.utils"
+        "hustlePublishUtils": "app/utils/hustle.publish.utils",
+        "productKeyUtils": "app/utils/product.key.utils",
+
+        //Constants
+        "constants": "app/constants/constants"
     },
     waitSeconds: 0,
     shim: {

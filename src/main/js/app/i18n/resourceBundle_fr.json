@@ -219,7 +219,7 @@
     "disableOriginConfirmationMessage": "L'origine géographique patient va être désactivée.Voulez-vous continuer?",
     "enableOriginConfirmationMessage": "L'origine géographique de/du patient va être activée.Voulez-vous continuer?",
     "emailValidation": "Doit être une adresse email",
-    "defaultValidation": "Entrez une valeur comprise entre 2 et 140 caractères.",
+    "defaultValidation": "Entrez une valeur comprise entre 2 et 140 caractères",
     "successNotification": "Réussite",
     "errorNotification": "Erreur",
     "pendingRequests": " En attente",
@@ -277,6 +277,7 @@
     "toLabel": "à",
     "weeklyReports": "Rapports hebdomadaires",
     "monthlyReports": "Rapports Mensuels",
+    "yearlyReports": "Rapports Annuels",
     "exportRawData": "Exporter des données",
     "exportEventData": "Exporter les cas soumis",
     "weeksToExport": "Nombre de semaines à exporter",
@@ -353,6 +354,16 @@
         "confirmationMessage": "AVERTISSEMENT: Ceci effacera toutes les données existantes et désinstallera l'application. Toutes les données non synchronisées avec DHIS seront perdues. CETTE ACTION EST IRRÉVERSIBLE.",
         "successMessage": "Praxis est désinstallé. Fermez la fenêtre du navigateur."
     },
+    "forceDownloadMetadata": {
+        "title": "Forcer le téléchargement des métadonnées",
+        "okMessage": "Forcer le téléchargement des métadonnées",
+        "confirmationMessage": "AVERTISSEMENT: Ceci va télécharger toutes les données de nouveau et devrait être fait uniquement si l'équipe HIS vous a conseillé de le faire. Etes-vous sûr de vouloir continuer ?"
+    },
+    "forceDownloadProjectData": {
+        "title": "Forcer le téléchargement des données du projet",
+        "okMessage": "Forcer le téléchargement des données du projet",
+        "confirmationMessage": "AVERTISSEMENT: Ceci va télécharger toutes les données du projet de nouveau et devrait être fait uniquement si l'équipe HIS vous a conseillé de le faire. Etes-vous sûr de vouloir continuer ?"
+    },
     "selectAll": "Sélectionner Tout",
     "unselectAll": "Tout Déselectionner",
     "praxisTrainingVersionMessage": "VERSION EXERCICE DE PRAXIS",
@@ -363,5 +374,12 @@
         "turnOnConfirmationMessage": "AVERTISSEMENT: \"Activer la synchronisation\" synchronisera vos données Praxis avec DHIS. Cela mettra à jour la dernière version de Praxis si disponible. Etes-vous sûr de vouloir activer la synchronisation ?",
         "turnOffConfirmationMessage": "AVERTISSEMENT: \"Désactiver la synchronisation\" stoppera la réception et l'envoi de données de Praxis avec DHIS. La dernière version de Praxis, si disponible, ne sera pas mise à jour. Etes vous sûr de vouloir désactiver la synchronisation ?"
     },
-    "updateProductKeyMessage": "Updating product key will download metadata. Please ensure Praxis is online."
+    "selectYearLabel": "Sélectionnez une année: ",
+    "updateProductKeyMessage": "Mettre à jour la clé produit va télécharger les métadonnées. Assurez-vous d'être en ligne.",
+    "dataAvailabilityMessage": {
+        "daily": "Les données saisies aujourd'hui apparaîtront dans les rapports seulement le jour suivant",
+        "weekly": "Les données saisies aujourd'hui apparaitront dans les rapports seulement la semaine suivante"
+    },
+    "leavePageConfirmationMessage": "Vous avez des données non enregistrées. Elles seront perdues si vous naviguez vers une autre page. Etes-vous sûr de vouloir continuer ?",
+    "viewAllDataElements": "Voir tous les éléments de données"
 }

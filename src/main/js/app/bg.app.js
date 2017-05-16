@@ -1,5 +1,9 @@
-define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "queueInterceptor", "monitors", "logRequestReponseInterceptor", "indexedDBLogger", "platformUtils", "factories", "angular-indexedDB", "ng-i18n"],
-    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, queueInterceptor, monitors, logRequestReponseInterceptor, indexedDBLogger, platformUtils, factories) {
+define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor",
+        "handleResponseErrorInterceptor", "properties", "queueInterceptor", "monitors", "logRequestReponseInterceptor", "indexedDBLogger",
+        "platformUtils", "factories", "hustlePublishUtils", "angular-indexedDB", "ng-i18n"],
+    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor,
+             handleResponseErrorInterceptor, properties, queueInterceptor, monitors, logRequestReponseInterceptor, indexedDBLogger,
+             platformUtils, factories, hustlePublishUtils) {
         var init = function() {
             var app = angular.module('PRAXIS', ["xc.indexedDB", "hustle", "ngI18n"]);
             services.init(app);
@@ -10,7 +14,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
 
             app.factory('configureRequestInterceptor', ['$rootScope', 'systemSettingRepository', configureRequestInterceptor]);
             app.factory('cleanupPayloadInterceptor', [cleanupPayloadInterceptor]);
-            app.factory('handleTimeoutInterceptor', ['$q', '$injector', '$timeout', handleTimeoutInterceptor]);
+            app.factory('handleResponseErrorInterceptor', ['$q', '$injector', '$timeout', handleResponseErrorInterceptor]);
             app.factory('logRequestReponseInterceptor', ['$log', '$q', logRequestReponseInterceptor]);
             app.factory('queueInterceptor', ['$log', 'ngI18nResourceBundle', 'dataRepository','dataSyncFailureRepository', 'hustleMonitor', queueInterceptor]);
 
@@ -35,7 +39,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     $indexedDBProvider.connection(properties.praxis.dbName);
                     $httpProvider.interceptors.push('configureRequestInterceptor');
                     $httpProvider.interceptors.push('cleanupPayloadInterceptor');
-                    $httpProvider.interceptors.push('handleTimeoutInterceptor');
+                    $httpProvider.interceptors.push('handleResponseErrorInterceptor');
                     $httpProvider.interceptors.push('logRequestReponseInterceptor');
 
                     var jobComparator = function (itemToBeCompared, itemComparedWith) {
@@ -77,11 +81,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         if (!dhisMonitor.isOnline())
                             return;
 
-                        $hustle.publishOnce({
-                            "type": "downloadProjectData",
-                            "data": [],
-                            "locale": "en"
-                        }, "dataValues");
+                        hustlePublishUtils.publishDownloadProjectData($hustle, "en");
                     };
 
                     var startConsumers = function() {

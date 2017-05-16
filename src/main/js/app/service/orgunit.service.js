@@ -1,4 +1,4 @@
-define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], function(dhisUrl, _, metadataConf, pagingUtils, properties) {
+define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties", "constants"], function(dhisUrl, _, metadataConf, pagingUtils, properties, constants) {
     return function($http, $q) {
 
         this.assignDataSetToOrgUnit = function(orgUnitId, dataSetId) {
@@ -8,7 +8,7 @@ define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], funct
         this.removeDataSetFromOrgUnit = function(orgUnitId, dataSetId) {
             return $http.delete(dhisUrl.orgUnits + '/' + orgUnitId + '/dataSets/' + dataSetId)
                 .catch(function (response) {
-                    if (response.status != 404) {
+                    if (response.errorCode !== constants.errorCodes.NOT_FOUND) {
                         return $q.reject();
                     }
                 });
@@ -21,7 +21,7 @@ define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], funct
                 filter: _.map(orgUnitIds, function (orgUnitId) {
                     return 'id:eq:' + orgUnitId;
                 }),
-                fields: metadataConf.fields.organisationUnits,
+                fields: metadataConf.fields.organisationUnits.params,
                 paging: false
             };
             return $http.get(url, {params: params}).then(function (response) {
@@ -39,9 +39,9 @@ define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], funct
             var url = dhisUrl.orgUnits + '.json';
 
             var params = {
-                fields: metadataConf.fields.organisationUnits,
-                paging: true,
-                pageSize: 150
+                fields: metadataConf.fields.organisationUnits.params,
+                paging: metadataConf.fields.organisationUnits.paging,
+                pageSize: metadataConf.fields.organisationUnits.pageSize
             };
             if (lastUpdatedTime) {
                 params.filter = "lastUpdated:gte:" + lastUpdatedTime;
@@ -79,7 +79,7 @@ define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], funct
             var downloadOrgUnits = function (orgUnitWithIds, allOrgUnits) {
                 var url = dhisUrl.orgUnits + '.json';
                 var params = {
-                    fields: metadataConf.fields.organisationUnits,
+                    fields: metadataConf.fields.organisationUnits.params,
                     filter: 'id:in:[' + _.map(orgUnitWithIds, 'id') + ']',
                     paging: false
                 };

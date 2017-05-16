@@ -53,8 +53,11 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash", "cust
                 }],
                 "parent": {
                     "id": "country1"
-                }
-            };
+                },
+                "organisationUnitGroups": [{
+                "id": 'projectOrgUnitGroupId'
+            }]
+        };
 
             opUnit = {
                 "id": "opUnit1",
@@ -68,7 +71,10 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash", "cust
                 }],
                 "parent": {
                     "id": "project1"
-                }
+                },
+                "organisationUnitGroups": [{
+                    "id": 'opUnitOrgUnitGroupId'
+                }]
             };
 
             module1 = {
@@ -254,26 +260,11 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash", "cust
             expect(actualOrgUnits).toEqual(expectedOrgUnits);
         });
 
-        it("should get all attributes of parent project and opUnit", function() {
-            var actualAttributes;
-            var expectedAttributes = [{
-                "attribute": {
-                    "code": "Type"
-                },
-                "value": "Operation Unit"
-            }, {
-                "attribute": {
-                    "code": "Type"
-                },
-                "value": "Project"
-            }];
-
-            orgUnitRepository.getProjectAndOpUnitAttributes(module1.id).then(function(data) {
-                actualAttributes = data;
+        it('should get all organisationUnitGroups associations of parent project and opUnit', function () {
+            orgUnitRepository.getAssociatedOrganisationUnitGroups(module1.id).then(function (data) {
+                expect(data).toEqual(['opUnitOrgUnitGroupId', 'projectOrgUnitGroupId']);
             });
-
             scope.$apply();
-            expect(actualAttributes).toEqual(expectedAttributes);
         });
 
         it("should get all projects", function() {

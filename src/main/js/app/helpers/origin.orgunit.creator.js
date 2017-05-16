@@ -1,5 +1,5 @@
 define(["lodash", "orgUnitMapper"], function(_, orgUnitMapper) {
-    return function($q, orgUnitRepository, patientOriginRepository, orgUnitGroupHelper, datasetRepository) {
+    return function($q, orgUnitRepository, patientOriginRepository, datasetRepository) {
 
         var create = function(module, patientOrigins, associateOriginDataset) {
             var getPatientOrigins = function() {

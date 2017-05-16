@@ -5,13 +5,14 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
              OrgUnitRepository, ApprovalDataRepository, DataSyncFailureRepository, TranslationsService, FilesystemService, HistoryService,
              excelBuilder, customAttributes, OptionSetRepository) {
         describe("lineListSummaryController ", function() {
-            var scope, q, hustle, timeout, fakeModal, anchorScroll, location, routeParams, window, currentTime,
+            var scope, rootScope, q, hustle, timeout, fakeModal, anchorScroll, location, routeParams, window, currentTime,
                 lineListSummaryController,
                 programRepository, programEventRepository, approvalDataRepository, excludedDataElementsRepository, orgUnitRepository, dataSyncFailureRepository, translationsService,
                 systemSettings, currentModule, originOrgUnits, program, project, mockEvent, filesystemService, historyService, optionSetRepository;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout, $location, $window) {
+                rootScope = $rootScope;
                 scope = $rootScope.$new();
                 q = $q;
                 hustle = $hustle;
@@ -174,7 +175,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "timecop", "moment
             });
 
             var createLineListSummary = function () {
-                lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, historyService, programRepository, programEventRepository, excludedDataElementsRepository, orgUnitRepository, approvalDataRepository, dataSyncFailureRepository, translationsService, filesystemService, optionSetRepository);
+                lineListSummaryController = new LineListSummaryController(scope, rootScope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, historyService, programRepository, programEventRepository, excludedDataElementsRepository, orgUnitRepository, approvalDataRepository, dataSyncFailureRepository, translationsService, filesystemService, optionSetRepository);
             };
 
             var createMockEvent = function (options) {

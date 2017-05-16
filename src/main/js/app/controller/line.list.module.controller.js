@@ -1,6 +1,6 @@
 define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTransformer", "dataElementUtils", "customAttributes"],
     function(_, orgUnitMapper, moment, interpolate, systemSettingsTransformer, dataElementUtils, customAttributes) {
-        return function($scope, $rootScope, $hustle, orgUnitRepository, excludedDataElementsRepository, $q, $modal,
+        return function($scope, $rootScope, $hustle, orgUnitRepository, excludedDataElementsRepository, $q, $modal, $modalStack,
             programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService, excludedLineListOptionsRepository) {
 
             $scope.module = {};
@@ -384,7 +384,7 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
 
                 var createOriginOrgUnitsAndGroups = function() {
                     var createOrgUnitGroups = function(orgUnitPayLoad) {
-                        return orgUnitGroupHelper.createOrgUnitGroups(orgUnitPayLoad, false);
+                        return orgUnitGroupHelper.associateModuleAndOriginsToGroups(orgUnitPayLoad);
                     };
 
                     if (!$scope.geographicOriginDisabled) {
@@ -496,6 +496,10 @@ define(["lodash", "orgUnitMapper", "moment", "interpolate", "systemSettingsTrans
 
             $scope.allOptionsSelected = function (dataElement) {
                 return !_.any(dataElement.dataElement.optionSet && dataElement.dataElement.optionSet.options, {"isSelected": false});
+            };
+
+            $scope.dismissModal = function() {
+                $modalStack.dismissAll();
             };
 
             init();

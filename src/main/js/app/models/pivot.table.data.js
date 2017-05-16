@@ -7,6 +7,7 @@ define(['analyticsData', 'lodash'], function(AnalyticsData, _) {
         this.displayPosition = definition.displayPosition;
         this.weeklyReport = definition.weeklyReport;
         this.monthlyReport = definition.monthlyReport;
+        this.yearlyReport = definition.yearlyReport;
         this.sortAscending = definition.sortAscending;
         this.sortDescending = definition.sortDescending;
         this.sortable = definition.sortable;

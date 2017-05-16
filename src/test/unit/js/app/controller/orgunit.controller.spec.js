@@ -1,7 +1,7 @@
 /*global Date:true*/
-define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepository", "customAttributes", "properties"], function(OrgUnitController, mocks, utils, _, OrgUnitRepository, customAttributes, properties) {
+define(["orgUnitController", "angularMocks", "utils", "lodash", "orgUnitRepository", "customAttributes", "properties"], function(OrgUnitController, mocks, utils, _, OrgUnitRepository, customAttributes, properties) {
     describe("org unit controller", function() {
-        var q, scope, orgUnitContoller, location, timeout, anchorScroll, orgUnitRepository, rootScope;
+        var q, scope, orgUnitController, location, timeout, anchorScroll, orgUnitRepository, rootScope;
 
         beforeEach(mocks.inject(function($rootScope, $q, $location, $timeout) {
             q = $q;
@@ -45,7 +45,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
 
         it("should fetch and display all countries for superadmin when productKeylevel is global", function() {
             rootScope.productKeyLevel = "global";
-            orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
+            orgUnitController = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
 
             spyOn(scope, "onOrgUnitSelect");
             scope.$apply();
@@ -77,7 +77,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             rootScope.allowedOrgUnits = [{
                 "id": 1
             }];
-            orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
+            orgUnitController = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
 
             spyOn(scope, "onOrgUnitSelect");
             scope.$apply();
@@ -141,7 +141,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
                 "children" : []
             }];
 
-            orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
+            orgUnitController = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
 
             spyOn(scope, "onOrgUnitSelect");
             scope.$apply();
@@ -182,7 +182,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
 
         it("should fetch and select the newly created organization unit", function() {
             spyOn(location, 'hash').and.returnValue(["2", 1]);
-            orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
+            orgUnitController = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
             spyOn(scope, 'onOrgUnitSelect');
 
             scope.$apply();
@@ -206,7 +206,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
 
         it("should display a timed message after creating a organization unit", function() {
             spyOn(location, 'hash').and.returnValue(["1", 2]);
-            orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
+            orgUnitController = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
             spyOn(scope, 'onOrgUnitSelect');
 
             scope.$apply();
@@ -236,7 +236,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             }];
             orgUnitRepository.getOrgUnitAndDescendants.and.returnValue(utils.getPromise(q, orgunits));
 
-            orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
+            orgUnitController = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
 
             scope.closeNewForm({
                 "id": "2"
@@ -279,7 +279,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
                 }
             };
 
-            orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
+            orgUnitController = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
             scope.$apply();
 
             scope.onOrgUnitSelect(orgUnit);
@@ -305,7 +305,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
 
             spyOn(location, 'hash').and.returnValue(["2", 1]);
 
-            orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
+            orgUnitController = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
 
             scope.$apply();
 
@@ -317,7 +317,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
         });
 
         it("should set the template url to be displayed for New mode", function() {
-            orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
+            orgUnitController = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
 
             scope.openInNewMode('Country');
             timeout.flush();
@@ -327,7 +327,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
         });
 
         it("should set the template url for view mode", function() {
-            orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
+            orgUnitController = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
 
             scope.openInViewMode('Module');
             timeout.flush();
@@ -346,7 +346,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
                 "selectedProject": undefined
             };
 
-            orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
+            orgUnitController = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
 
             scope.$apply();
 
@@ -368,7 +368,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
                 "children" : [{"id":"4"}]
             }];
 
-            orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
+            orgUnitController = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
 
             scope.$apply();
 
@@ -397,7 +397,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             }];
 
             orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, projectOrgUnits));
-            orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
+            orgUnitController = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
 
             scope.$apply();
 
@@ -415,7 +415,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
                 "selectedProject": "123"
             };
 
-            orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
+            orgUnitController = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
 
             scope.$apply();
 
@@ -431,7 +431,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
                 }
             };
 
-            orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
+            orgUnitController = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
 
             scope.$apply();
 

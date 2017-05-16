@@ -1,28 +1,16 @@
 define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, moment, customAttributes) {
     var buildProjectAttributeValues = function(orgUnit) {
         var attributeValues = [];
-        var projectContext = orgUnit.context ? (orgUnit.context.originalObject ? orgUnit.context.originalObject.englishName : orgUnit.context.englishName) : orgUnit.context;
-        var populationType = orgUnit.populationType ? (orgUnit.populationType.originalObject ? orgUnit.populationType.originalObject.englishName : orgUnit.populationType.englishName) : orgUnit.populationType;
-        var reasonForIntervention = orgUnit.reasonForIntervention ? (orgUnit.reasonForIntervention.originalObject ? orgUnit.reasonForIntervention.originalObject.englishName : orgUnit.reasonForIntervention.englishName) : orgUnit.reasonForIntervention;
-        var modeOfOperation = orgUnit.modeOfOperation ? (orgUnit.modeOfOperation.originalObject ? orgUnit.modeOfOperation.originalObject.englishName : orgUnit.modeOfOperation.englishName) : orgUnit.modeOfOperation;
-        var modelOfManagement = orgUnit.modelOfManagement ? (orgUnit.modelOfManagement.originalObject ? orgUnit.modelOfManagement.originalObject.englishName : orgUnit.modelOfManagement.englishName) : orgUnit.modelOfManagement;
-        var projectType = orgUnit.projectType ? (orgUnit.projectType.originalObject ? orgUnit.projectType.originalObject.englishName : orgUnit.projectType.englishName) : orgUnit.projectType;
         var estimatedTargetPopulation = orgUnit.estimatedTargetPopulation ? orgUnit.estimatedTargetPopulation.toString() : "";
         var estimatedPopulationLessThan1Year = orgUnit.estPopulationLessThan1Year ? orgUnit.estPopulationLessThan1Year.toString() : "";
         var estPopulationBetween1And5Years = orgUnit.estPopulationBetween1And5Years ? orgUnit.estPopulationBetween1And5Years.toString() : "";
         var estimatedPopulationOfWomenOfChildBearingAge = orgUnit.estPopulationOfWomenOfChildBearingAge ? orgUnit.estPopulationOfWomenOfChildBearingAge.toString() : "";
 
         attributeValues.push(customAttributes.createAttribute(customAttributes.TYPE, "Project"),
-            customAttributes.createAttribute(customAttributes.PROJECT_CONTEXT_CODE, projectContext),
             customAttributes.createAttribute(customAttributes.PROJECT_LOCATION_CODE, orgUnit.location),
-            customAttributes.createAttribute(customAttributes.PROJECT_POPULATION_TYPE_CODE, populationType),
             customAttributes.createAttribute(customAttributes.PROJECT_CODE, orgUnit.projectCode),
-            customAttributes.createAttribute(customAttributes.REASON_FOR_INTERVENTION_CODE, reasonForIntervention),
-            customAttributes.createAttribute(customAttributes.MODE_OF_OPERATION_CODE, modeOfOperation),
-            customAttributes.createAttribute(customAttributes.MODEL_OF_MANAGEMENT_CODE, modelOfManagement),
             customAttributes.createAttribute(customAttributes.AUTO_APPROVE, orgUnit.autoApprove),
             customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true"),
-            customAttributes.createAttribute(customAttributes.PROJECT_TYPE_CODE, projectType),
             customAttributes.createAttribute(customAttributes.ESTIMATED_TARGET_POPULATION_CODE, estimatedTargetPopulation),
             customAttributes.createAttribute(customAttributes.EST_POPULATION_LESS_THAN_1_YEAR_CODE, estimatedPopulationLessThan1Year),
             customAttributes.createAttribute(customAttributes.EST_POPULATION_BETWEEN_1_AND_5_YEARS_CODE, estPopulationBetween1And5Years),
@@ -50,10 +38,21 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
         return angular.isArray(orgUnits) ? _.map(orgUnits, disableOrgUnit) : disableOrgUnit(orgUnits);
     };
 
-    this.mapToExistingProject = function(newProject, existingProject) {
+    var buildOrgUnitGroups = function (orgUnit) {
+        var orgUnitGroupSetsWithValue = _.omit(orgUnit.orgUnitGroupSets, _.isUndefined);
+        return _.transform(orgUnitGroupSetsWithValue, function (acc, orgUnitGroup, orgUniGroupSetId) {
+            var organisationUnitGroup = {
+                id: orgUnitGroup.id
+            };
+            acc.push(organisationUnitGroup);
+        }, []);
+    };
+
+    this.mapToExistingProjectForDHIS = function(newProject, existingProject) {
         existingProject.name = newProject.name;
         existingProject.openingDate = moment(newProject.openingDate).format("YYYY-MM-DD");
         existingProject.attributeValues = buildProjectAttributeValues(newProject);
+        existingProject.organisationUnitGroups = buildOrgUnitGroups(newProject);
         return existingProject;
     };
 
@@ -65,24 +64,37 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             'shortName': orgUnit.name,
             'openingDate': moment(orgUnit.openingDate).format("YYYY-MM-DD"),
             'parent': _.pick(parentOrgUnit, "name", "id"),
-            'attributeValues': buildProjectAttributeValues(orgUnit)
+            'attributeValues': buildProjectAttributeValues(orgUnit),
+            'organisationUnitGroups': buildOrgUnitGroups(orgUnit)
         };
 
         return projectOrgUnit;
     };
 
-    this.mapToProject = function(dhisProject, allContexts, allPopTypes, reasonForIntervention, modeOfOperation, modelOfManagement, allProjectTypes) {
-
-        var getTranslatedName = function (allOptions, code) {
-            var value = customAttributes.getAttributeValue(dhisProject.attributeValues, code);
-            var result = _.filter(allOptions, function (option) {
-                return option.englishName == value;
+    var getOrgUnitGroups = function (orgUnit, orgUnitGroupSets) {
+        return  _.transform(orgUnitGroupSets, function (map, orgUnitGroupSet) {
+            var groupSetValue = _.find(orgUnit.organisationUnitGroups, function (orgUnitGroup) {
+                return _.contains(_.map(orgUnitGroupSet.organisationUnitGroups, 'id'), orgUnitGroup.id);
             });
-            return result[0] ? result[0] : undefined;
-        };
+            if (groupSetValue) {
+                var groupSetName = _.find(orgUnitGroupSet.organisationUnitGroups, function (group) {
+                    return group.id === groupSetValue.id;
+                });
+                map[orgUnitGroupSet.id] = {
+                    id: groupSetValue.id,
+                    name: _.get(groupSetName, 'name')
+                };
+            }
+            else
+                map[orgUnitGroupSet.id] = undefined;
+            return map;
+        }, {});
+    };
 
+    this.mapOrgUnitToProject = function (dhisProject, orgUnitGroupSets) {
         var endDate = customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.PROJECT_END_DATE_CODE);
         var autoApprove = customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.AUTO_APPROVE);
+
         return {
             'name': dhisProject.name,
             'openingDate': moment(dhisProject.openingDate).toDate(),
@@ -91,19 +103,55 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
             'location': customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.PROJECT_LOCATION_CODE),
             'projectCode': customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.PROJECT_CODE),
 
-            'context': getTranslatedName(allContexts, customAttributes.PROJECT_CONTEXT_CODE),
-            'populationType': getTranslatedName(allPopTypes, customAttributes.PROJECT_POPULATION_TYPE_CODE),
-            'projectType': getTranslatedName(allProjectTypes, customAttributes.PROJECT_TYPE_CODE),
-            'reasonForIntervention': getTranslatedName(reasonForIntervention, customAttributes.REASON_FOR_INTERVENTION_CODE),
-            'modeOfOperation': getTranslatedName(modeOfOperation, customAttributes.MODE_OF_OPERATION_CODE),
-            'modelOfManagement': getTranslatedName(modelOfManagement, customAttributes.MODEL_OF_MANAGEMENT_CODE),
-
             'estimatedTargetPopulation': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.ESTIMATED_TARGET_POPULATION_CODE)),
             'estPopulationLessThan1Year': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.EST_POPULATION_LESS_THAN_1_YEAR_CODE)),
             'estPopulationBetween1And5Years': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.EST_POPULATION_BETWEEN_1_AND_5_YEARS_CODE)),
             'estPopulationOfWomenOfChildBearingAge': parseInt(customAttributes.getAttributeValue(dhisProject.attributeValues, customAttributes.EST_POPULATION_OF_WOMEN_OF_CHILD_BEARING_AGE_CODE)),
-            'autoApprove': autoApprove === undefined ? "false" : autoApprove
+            'autoApprove': autoApprove === undefined ? "false" : autoApprove,
+            'orgUnitGroupSets': getOrgUnitGroups(dhisProject, orgUnitGroupSets)
         };
+    };
+
+    this.mapOrgUnitToOpUnit = function (opUnit, orgUnitGroupSets) {
+        var coordinates = opUnit.coordinates;
+        coordinates = coordinates ? coordinates.substr(1, coordinates.length - 2).split(",") : coordinates;
+        var mappedOpUnit = {
+            name: opUnit.name,
+            openingDate: opUnit.openingDate,
+            orgUnitGroupSets: getOrgUnitGroups(opUnit, orgUnitGroupSets)
+        };
+        if (coordinates) {
+            mappedOpUnit.longitude = parseFloat(coordinates[0]);
+            mappedOpUnit.latitude = parseFloat(coordinates[1]);
+        }
+         return mappedOpUnit;
+    };
+
+    var createAttributesForOpUnit = function () {
+        return [customAttributes.createAttribute(customAttributes.TYPE, "Operation Unit"),
+            customAttributes.createAttribute(customAttributes.NEW_DATA_MODEL_CODE, "true")];
+    };
+    this.mapToOpUnitForDHIS = function (opUnit, project, existingProject) {
+        var opUnitId = existingProject ? project.id : dhisId.get(opUnit.name + project.id),
+            opUnitLevel = existingProject ? project.level : parseInt(project.level) + 1,
+            opUnitParent = existingProject ? project.parent : _.pick(project, "name", "id");
+
+        var orgUnit = _.merge(opUnit, {
+            'id': opUnitId,
+            'shortName': opUnit.name,
+            'level': opUnitLevel,
+            'parent': opUnitParent,
+            'attributeValues': createAttributesForOpUnit()
+        });
+
+        if (!_.isUndefined(orgUnit.longitude) && !_.isUndefined(orgUnit.latitude)) {
+            orgUnit.coordinates = "[" + opUnit.longitude + "," + orgUnit.latitude + "]";
+            orgUnit.featureType = "POINT";
+        }
+
+        orgUnit.organisationUnitGroups = buildOrgUnitGroups(orgUnit);
+        orgUnit = _.omit(orgUnit, ['type', 'latitude', 'longitude', 'orgUnitGroupSets']);
+        return orgUnit;
     };
 
     this.mapToModule = function(module, moduleId, moduleLevel) {

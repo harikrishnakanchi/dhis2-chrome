@@ -62,24 +62,81 @@ define(['dateUtils', 'moment', 'timecop'], function(dateUtils, moment, timecop) 
             });
         });
 
-        describe('getPeriodRange', function() {
+        describe('getPeriodRangeInWeeks', function() {
             beforeEach(function() {
                 Timecop.freeze(new Date('2016-01-13T12:34:56.789Z'));
             });
 
+            afterEach(function() {
+                Timecop.returnToPresent();
+                Timecop.uninstall();
+            });
+
             it('should return period range for the current week', function() {
-                var actualResult = dateUtils.getPeriodRange(1);
+                var actualResult = dateUtils.getPeriodRangeInWeeks(1);
                 expect(actualResult).toEqual(['2016W02']);
             });
 
             it('should return period range for the last X weeks including the current week', function() {
-                var actualResult = dateUtils.getPeriodRange(3);
+                var actualResult = dateUtils.getPeriodRangeInWeeks(3);
                 expect(actualResult).toEqual(['2015W53', '2016W01', '2016W02']);
             });
 
             it('should return period range for the last X weeks excluding the current week', function() {
-                var actualResult = dateUtils.getPeriodRange(3, { excludeCurrentWeek: true });
+                var actualResult = dateUtils.getPeriodRangeInWeeks(3, { excludeCurrent: true });
                 expect(actualResult).toEqual(['2015W52', '2015W53', '2016W01']);
+            });
+        });
+
+        describe('getPeriodRangeInMonths', function() {
+            beforeEach(function() {
+                Timecop.freeze(new Date('2017-03-16T12:34:56.789Z'));
+            });
+
+            afterEach(function() {
+                Timecop.returnToPresent();
+                Timecop.uninstall();
+            });
+
+            it('should return period range for the current month', function() {
+                var actualResult = dateUtils.getPeriodRangeInMonths(1);
+                expect(actualResult).toEqual(['201703']);
+            });
+
+            it('should return period range for the last X months including the current month', function() {
+                var actualResult = dateUtils.getPeriodRangeInMonths(3);
+                expect(actualResult).toEqual(['201701', '201702', '201703']);
+            });
+
+            it('should return period range for the last X months excluding the current month', function() {
+                var actualResult = dateUtils.getPeriodRangeInMonths(3, { excludeCurrent: true });
+                expect(actualResult).toEqual(['201612', '201701', '201702']);
+            });
+        });
+
+        describe('getPeriodRangeInYears', function() {
+            beforeEach(function() {
+                Timecop.freeze(new Date('2017-03-16T12:34:56.789Z'));
+            });
+
+            afterEach(function() {
+                Timecop.returnToPresent();
+                Timecop.uninstall();
+            });
+
+            it('should return period range for the current year', function() {
+                var actualResult = dateUtils.getPeriodRangeInYears(1);
+                expect(actualResult).toEqual(['2017']);
+            });
+
+            it('should return period range for the last X years including the current year', function() {
+                var actualResult = dateUtils.getPeriodRangeInYears(3);
+                expect(actualResult).toEqual(['2015', '2016', '2017']);
+            });
+
+            it('should return period range for the last X years excluding the current year', function() {
+                var actualResult = dateUtils.getPeriodRangeInYears(3, { excludeCurrent: true });
+                expect(actualResult).toEqual(['2014', '2015', '2016']);
             });
         });
 

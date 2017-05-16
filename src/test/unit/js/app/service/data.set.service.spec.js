@@ -1,4 +1,4 @@
-define(["dataSetService", "angularMocks", "properties", "metadataConf", "pagingUtils"], function(DatasetService, mocks, properties, metadataConf, pagingUtils) {
+define(["dataSetService", "angularMocks", "properties", "metadataConf", "pagingUtils", "utils"], function(DatasetService, mocks, properties, metadataConf, pagingUtils, utils) {
     describe("dataset service", function() {
         var http, httpBackend, datasetService, q;
 
@@ -26,7 +26,7 @@ define(["dataSetService", "angularMocks", "properties", "metadataConf", "pagingU
                 'id': 'ds1'
             }];
 
-            var url = properties.dhis.url + "/api/dataSets.json?fields=" + metadataConf.fields.dataSets + "&page=1&paging=true&totalPages=true";
+            var url = properties.dhis.url + "/api/dataSets.json?fields=" + metadataConf.fields.dataSets.params + "&page=1&paging=true&totalPages=true";
             var responsePayload = {
                 'dataSets': datasets
             };
@@ -44,7 +44,7 @@ define(["dataSetService", "angularMocks", "properties", "metadataConf", "pagingU
                 'dataSets': []
             };
 
-            var url = properties.dhis.url + "/api/dataSets.json?fields="+ metadataConf.fields.dataSets +"&filter=lastUpdated:gte:" + lastUpdatedTime + "&page=1&paging=true&totalPages=true";
+            var url = properties.dhis.url + "/api/dataSets.json?fields="+ metadataConf.fields.dataSets.params +"&filter=lastUpdated:gte:" + lastUpdatedTime + "&page=1&paging=true&totalPages=true";
             datasetService.getAll(lastUpdatedTime);
 
             httpBackend.expectGET(encodeURI(url)).respond(200, responsePayload);
@@ -83,30 +83,6 @@ define(["dataSetService", "angularMocks", "properties", "metadataConf", "pagingU
             httpBackend.flush();
 
             expect(actualResult).toEqual([]);
-        });
-
-        it('should remove orgunit from dataset', function() {
-            var datasetId = 'datasetId';
-            var orgUnitId = 'orgUnitId';
-
-            datasetService.removeOrgUnitFromDataset(datasetId, orgUnitId);
-
-            httpBackend.expectDELETE(properties.dhis.url + '/api/dataSets/' + datasetId + '/organisationUnits/' + orgUnitId).respond(204);
-            httpBackend.flush();
-        });
-
-        it('should not fail if orgunit is already removed from dataset', function() {
-            var datasetId = 'datasetId';
-            var orgUnitId = 'orgUnitId';
-
-            var success = false;
-            datasetService.removeOrgUnitFromDataset(datasetId, orgUnitId).then(function () {
-                success = true;
-            });
-
-            httpBackend.expectDELETE(properties.dhis.url + '/api/dataSets/' + datasetId + '/organisationUnits/' + orgUnitId).respond(404);
-            httpBackend.flush();
-            expect(success).toBeTruthy();
         });
     });
 });

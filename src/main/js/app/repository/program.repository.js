@@ -8,14 +8,35 @@ define(["lodash", "moment", "customAttributes"], function(_, moment, customAttri
             }
         };
 
+        var enrichPrograms = function (programs) {
+            var store = db.objectStore("programStageSections");
+            return store.getAll().then(function (programStageSections) {
+                var indexedProgramStageSections = _.indexBy(programStageSections, 'id');
+                return _.each(programs, function (program) {
+                    _.each(program.programStages, function (programStage) {
+                        programStage.programStageSections = _.map(programStage.programStageSections, function (programStageSection) {
+                            return _.merge(programStageSection, _.get(indexedProgramStageSections, programStageSection.id));
+                        });
+                    });
+                });
+            });
+        };
+
+        var enrichProgram = function (program) {
+            if(!_.isUndefined(program)) {
+                return enrichPrograms([program]).then(_.first);
+            }
+        };
+
         this.getProgramForOrgUnit = function(orgUnitId) {
             var store = db.objectStore("programs");
-            return store.find("by_organisationUnit", orgUnitId).then(addServiceCode);
+            return store.find("by_organisationUnit", orgUnitId).then(enrichProgram).then(addServiceCode);
         };
 
         this.getAll = function() {
             var store = db.objectStore("programs");
             return store.getAll()
+                .then(enrichPrograms)
                 .then(addServiceCode)
                 .then(function(programs) {
                 return _.filter(programs, function(p) {
@@ -60,13 +81,13 @@ define(["lodash", "moment", "customAttributes"], function(_, moment, customAttri
             var store = db.objectStore("programs");
 
             var query = db.queryBuilder().$in(programIds).compile();
-            return store.each(query).then(addServiceCode);
+            return store.each(query).then(enrichPrograms).then(addServiceCode);
         };
 
         this.get = function(programId, excludedDataElements) {
             var getProgram = function(programId) {
                 var programsStore = db.objectStore("programs");
-                return programsStore.find(programId);
+                return programsStore.find(programId).then(enrichProgram);
             };
 
             var enrichDataElements = function(program) {

@@ -191,7 +191,7 @@ body {
         }
     }
     .tab-panel {
-        padding: 20px;
+        padding: 20px
     }
     .table {
         th {
@@ -352,6 +352,15 @@ body {
         .panel-group-custom-spacing {
             margin: 0;
             padding: 0 20px;
+        }
+        .tab-panel {
+            padding-top: 0px;
+            &.notification {
+                padding-top: 20px;
+            }
+        }
+        .alert {
+            margin-bottom: 5px;
         }
         .dataentrytable {
             thead {
@@ -1204,6 +1213,10 @@ input[type="checkbox"].dashboard-form-checkbox {
             cursor: pointer;
         }
     }
+    .service {
+        padding-left: 5px;
+        padding-bottom: 5px;
+    }
 }
 .selectLanguage a
 {
@@ -1226,6 +1239,9 @@ input[type="checkbox"].dashboard-form-checkbox {
 .line-list{
     .new-case-btn {
         margin-left: 5px;
+    }
+    .module-name {
+        margin-top: 10px;
     }
     .line-list-menu {
         padding-bottom: 20px;
@@ -1392,6 +1408,9 @@ li.dropdown-submenu {
         padding-right: 12px;
     }
     &.dataentrypage {
+        .section {
+            padding-top: 5px;
+        }
         .dataentrytable {
             th {
                 text-align: right;
@@ -1489,10 +1508,6 @@ header .sync-status {
     }
 }
 
-.viewRegistrationBookBtn {
-    margin: -2px -7px 0;
-}
-
 .op-unit-form, .project-user-form {
     .delete {
         color: #000;
@@ -1537,4 +1552,21 @@ header .sync-status {
     left: 50%;
     top: 30px;
     transform: translateX(-50%);
+}
+
+.line-list-data-elements {
+    ul.options > li {
+        list-style-type: none;
+    }
+}
+
+.aggregate-data-elements .dataentrypage {
+    .data-element-group  {
+        h4 {
+            background-color: #ccc;
+        }
+        &:first-child {
+            padding-top: 15px;
+        }
+    }
 }

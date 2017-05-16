@@ -1,112 +1,106 @@
-define(["lodash"], function(_) {
-    return function($q, systemSettingService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository, excludedDataElementsRepository, mergeBy, excludedLinelistOptionsMerger) {
-        this.run = function() {
-            return getUserProjectIds()
-                .then(downloadAndMergeExcludedOptions)
-                .then(downloadedProjectSettings)
-                .then(function(projectSettings) {
-                    return $q.all([saveReferrals(projectSettings), mergeAndSavePatientOriginDetails(projectSettings), saveExcludedDataElements(projectSettings)]);
+define(["lodash", "moment"], function(_, moment) {
+    return function($q, systemInfoService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository, excludedDataElementsRepository, mergeBy, changeLogRepository, dataStoreService, orgUnitRepository, excludedLineListOptionsRepository) {
+        this.run = function () {
+            var systemTimePromise = systemInfoService.getServerDate();
+            var projectIdsPromise = systemTimePromise.then(getUserProjectIds);
+            var changeLogPromise = projectIdsPromise.then(getChangeLog);
+            var remoteUpdatedKeysPromise = projectIdsPromise.then(_.curry(dataStoreService.getUpdatedData, 2)).then(changeLogPromise.then.bind(changeLogPromise));
+            var localOpUnitAndModuleIdsPromise = projectIdsPromise.then(getModuleAndOpUnitIds);
+
+            return $q.all([remoteUpdatedKeysPromise, localOpUnitAndModuleIdsPromise])
+                .then(function (data) {
+                    var moduleIds = _.last(data).moduleIds;
+                    var opUnitIds = _.last(data).opUnitIds;
+                    var updatedKeys = _.first(data);
+                    return mergeAndSaveReferralLocations(opUnitIds, updatedKeys.referralLocations)
+                        .then(_.partial(mergeAndSaveExcludedDataElements, moduleIds, updatedKeys.excludedDataElements))
+                        .then(_.partial(mergeAndSavePatientOrigins, opUnitIds, updatedKeys.patientOrigins))
+                        .then(_.partial(mergeAndSaveExcludedLineListOptions, moduleIds, updatedKeys.excludedOptions));
+                })
+                .then(function () {
+                    return projectIdsPromise.then(_.curry(updateChangeLog)).then(systemTimePromise.then.bind(systemTimePromise));
+                })
+                .catch(function (err) {
+                    return err === 'noProjectIds' ? $q.when() : $q.reject(err);
                 });
         };
 
         var getUserProjectIds = function() {
-            return userPreferenceRepository.getCurrentUsersProjectIds();
-        };
-
-        var downloadedProjectSettings = function(projectIds) {
-            if (_.isEmpty(projectIds))
-                return;
-
-            return systemSettingService.getProjectSettings(projectIds);
-        };
-
-        var downloadAndMergeExcludedOptions = function (projectIds) {
-            return _.reduce(projectIds, function (promise, projectId) {
-                return promise.then(_.partial(excludedLinelistOptionsMerger.mergeAndSaveForProject, projectId));
-            }, $q.when()).then(function () {
-                return projectIds;
+            return userPreferenceRepository.getCurrentUsersProjectIds().then(function (projectIds) {
+                return _.isEmpty(projectIds) ? $q.reject('noProjectIds') : $q.when(projectIds);
             });
         };
 
-        var saveReferrals = function(projectSettings) {
-            var allReferralLocations = _.transform(projectSettings, function(result, settings) {
-                _.each(settings.referralLocations, function(item) {
-                    result.push(item);
+        var getModuleAndOpUnitIds = function (projectIds) {
+            return $q.all([orgUnitRepository.getAllModulesInOrgUnits(projectIds), orgUnitRepository.getAllOpUnitsInOrgUnits(projectIds)])
+                .then(function (data) {
+                    var modules = _.first(data);
+                    var opUnits = _.last(data);
+                    return {
+                        moduleIds: _.map(modules, 'id'),
+                        opUnitIds: _.map(opUnits, 'id')
+                    };
                 });
-            }, []);
-
-            if (_.isEmpty(allReferralLocations))
-                return;
-
-            var getLocalReferralLocations = function (referralLocationsFromDHIS) {
-                var orgUnitIds = _.pluck(referralLocationsFromDHIS, "orgUnit");
-                return referralLocationsRepository.findAll(orgUnitIds);
-            };
-
-            var mergeAndSave = function (remoteLocations, localLocations) {
-                var equalPredicate = function(referralLocation1, referralLocation2) {
-                    return referralLocation1.orgUnit && referralLocation2 && referralLocation1.orgUnit === referralLocation2.orgUnit;
-                };
-
-                return $q.when(mergeBy.lastUpdated({"remoteTimeField": "clientLastUpdated", "localTimeField": "clientLastUpdated", "eq": equalPredicate}, remoteLocations, localLocations));
-            };
-
-            return getLocalReferralLocations(allReferralLocations)
-                .then(_.partial(mergeAndSave, allReferralLocations))
-                .then(referralLocationsRepository.upsert);
         };
 
-        var mergeAndSavePatientOriginDetails = function(allProjectSettings) {
-
-            var mergePatientOrigins = function(remoteOriginsAndOrgUnit) {
-                return patientOriginRepository.get(remoteOriginsAndOrgUnit.orgUnit)
-                    .then(function(localOriginsAndOrgUnit) {
-                        localOriginsAndOrgUnit = localOriginsAndOrgUnit || {};
-                        var mergedOrigins = mergeBy.lastUpdated({"remoteTimeField": "clientLastUpdated", "localTimeField": "clientLastUpdated"}, remoteOriginsAndOrgUnit.origins, localOriginsAndOrgUnit.origins || []);
-                        return $q.when(mergedOrigins);
-                    });
-            };
-
-            var createMergedPatientOrigins = function(orgUnitAndOriginMap) {
-                var patientOrigins = _.reduce(orgUnitAndOriginMap, function(patientOrigins, origins, orgUnit){
-                    patientOrigins.push({
-                        "orgUnit" : orgUnit,
-                        "origins" : origins
-                    });
-                    return patientOrigins;
-                }, []);
-                return $q.when(patientOrigins);
-            };
-
-            var updatePatientOrigins = function(patientOrigins) {
-                if (_.isEmpty(patientOrigins))
-                    return $q.when({});
-                return patientOriginRepository.upsert(patientOrigins);
-            };
-
-            var orgUnitAndOriginsMapper = _.reduce(allProjectSettings, function(orgUnitAndOrigins, projectSettings) {
-                _.each(projectSettings.patientOrigins, function(item) {
-                    orgUnitAndOrigins[item.orgUnit] = mergePatientOrigins(item);
+        var getChangeLog = function (projectIds) {
+            var getMinimumValue = function (changeLogs) {
+                if (_.isEmpty(changeLogs)) return;
+                return _.min(changeLogs, function (changeLog) {
+                    return moment(changeLog).valueOf();
                 });
-                return orgUnitAndOrigins;
-            }, {});
+            };
 
-            return $q.all(orgUnitAndOriginsMapper)
-                .then(createMergedPatientOrigins)
-                .then(updatePatientOrigins);
+            return $q.all(_.map(projectIds, function (projectId) {
+                return changeLogRepository.get("projectSettings:" + projectId);
+            })).then(_.compact).then(getMinimumValue);
         };
 
-        var saveExcludedDataElements = function(projectSettings) {
-            var excludedDataElements = _.transform(projectSettings, function(result, settings) {
-                _.each(settings.excludedDataElements, function(item) {
-                    result.push(item);
+        var updateChangeLog = function (projectIds, time) {
+            return $q.all(_.map(projectIds, function (projectId) {
+                return changeLogRepository.upsert("projectSettings:" + projectId, time);
+            }));
+        };
+
+        var merge = function (remoteCollection, localCollection, equalPredicate) {
+            return mergeBy.lastUpdated({"remoteTimeField": "clientLastUpdated", "localTimeField": "clientLastUpdated", "eq": equalPredicate}, remoteCollection, localCollection);
+        };
+
+        var equalPredicate = function(itemA, itemB) {
+            return itemA && itemA.orgUnit && itemA.orgUnit === itemB.orgUnit;
+        };
+
+        var mergeAndSaveReferralLocations = function (localOpUnitIds, remoteReferrals) {
+            return referralLocationsRepository.findAll(localOpUnitIds).then(function (localReferrals) {
+                return referralLocationsRepository.upsert(merge(remoteReferrals, localReferrals, equalPredicate));
+            });
+        };
+
+        var mergeAndSavePatientOrigins = function (localOpUnitIds, remotePatientOriginsForAllOpUnits) {
+            return patientOriginRepository.findAll(localOpUnitIds).then(function (localPatientOriginDetails) {
+                var indexedLocalPatientsOriginsForAllOpUnits = _.indexBy(localPatientOriginDetails, 'orgUnit');
+                return _.map(remotePatientOriginsForAllOpUnits, function (patientOriginsForOpUnit) {
+                    var matchingLocalPatientOrigin = _.get(indexedLocalPatientsOriginsForAllOpUnits, patientOriginsForOpUnit.orgUnit, {origins: []});
+                    patientOriginsForOpUnit.origins = merge(patientOriginsForOpUnit.origins, matchingLocalPatientOrigin.origins);
+                    return patientOriginsForOpUnit;
                 });
-            }, []);
+            }).then(patientOriginRepository.upsert);
+        };
 
-            if (_.isEmpty(excludedDataElements))
-                return;
+        var mergeAndSaveExcludedDataElements = function (localModuleIds, remoteExcludedDataElements) {
+            return excludedDataElementsRepository.findAll(localModuleIds)
+                .then(function (localExcludedDataElements) {
+                    return excludedDataElementsRepository.upsert(merge(remoteExcludedDataElements, localExcludedDataElements, equalPredicate));
+                });
+        };
 
-            return excludedDataElementsRepository.upsert(excludedDataElements);
+        var mergeAndSaveExcludedLineListOptions = function (localModuleIds, remoteExcludedOptions) {
+            var equalPredicate = function(itemA, itemB) {
+                return itemA && itemA.moduleId && itemA.moduleId === itemB.moduleId;
+            };
+            return excludedLineListOptionsRepository.findAll(localModuleIds).then(function (localExcludedOptions) {
+                return excludedLineListOptionsRepository.upsert(merge(remoteExcludedOptions, localExcludedOptions, equalPredicate));
+            });
         };
 
     };

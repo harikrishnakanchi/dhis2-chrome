@@ -60,9 +60,9 @@
                                                             </tr>
                                                         </thead>
                                                         <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]"
-                                                            ng-if="getTotalCount(psde.dataElement.id, isGenderFilterApplied, isAgeFilterApplied, option.id) != 0">
+                                                            ng-if="!!getTotalCount(psde.dataElement.id, isGenderFilterApplied, isAgeFilterApplied, option.code)">
                                                             <td>{{option.name}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.id)}}</td>
+                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code)}}</td>
                                                         </tr>
                                                     </table>
                                                 </accordion-group>
@@ -96,9 +96,9 @@
                                                 </tr>
                                             </thead>
                                             <tr ng-repeat="pdv in procedureOptions"
-                                                ng-if="getTotalProcedureCount(isGenderFilterApplied, isAgeFilterApplied, pdv.id) != 0">
+                                                ng-if="!!getTotalProcedureCount(isGenderFilterApplied, isAgeFilterApplied, pdv.code)">
                                                 <td>{{optionMapping[pdv.id]}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id)}}</td>
+                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.code)}}</td>
                                             </tr>
                                         </table>
                                     </accordion-group>
@@ -135,9 +135,9 @@
                                                             </tr>
                                                         </thead>
                                                         <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]"
-                                                            ng-if="getTotalCount(psde.dataElement.id, isGenderFilterApplied, isAgeFilterApplied, option.id, genderOptions) != 0">
+                                                            ng-if="!!getTotalCount(psde.dataElement.id, isGenderFilterApplied, isAgeFilterApplied, option.code, genderOptions)">
                                                             <td>{{option.name}}</td>
-                                                            <td ng-repeat="genderOption in genderOptions">{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.id, genderOption.id)}}</td>
+                                                            <td ng-repeat="genderOption in genderOptions">{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, genderOption.code)}}</td>
                                                         </tr>
                                                     </table>
                                                 </accordion-group>
@@ -172,9 +172,9 @@
                                                 </tr>
                                             </thead>
                                             <tr ng-repeat="pdv in procedureOptions"
-                                                ng-if="getTotalProcedureCount(isGenderFilterApplied, isAgeFilterApplied, pdv.id, genderOptions) != 0">
+                                                ng-if="!!getTotalProcedureCount(isGenderFilterApplied, isAgeFilterApplied, pdv.code, genderOptions)">
                                                 <td>{{optionMapping[pdv.id]}}</td>
-                                                <td ng-repeat="genderOption in genderOptions">{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id, genderOption.id)}}</td>
+                                                <td ng-repeat="genderOption in genderOptions">{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.code, genderOption.code)}}</td>
                                             </tr>
                                         </table>
                                     </accordion-group>
@@ -204,14 +204,14 @@
                                                     <table locked-table-header class="table table-bordered">
                                                         <thead>
                                                             <tr>
-                                                                <th>{{resourceBundle.optionName}}</th>
+                                                                <th>{{resourceBundle.optionName}} test</th>
                                                                 <th>{{resourceBundle.lessThanFive}}</th>
                                                                 <th>{{resourceBundle.fiveToFourtenn}}</th>
                                                                 <th>{{resourceBundle.greaterThanFifteen}}</th>
                                                             </tr>
                                                         </thead>
                                                         <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]"
-                                                            ng-if="getTotalCount(psde.dataElement.id, isGenderFilterApplied, isAgeFilterApplied, option.code, undefined, [0,9999]) != 0">
+                                                            ng-if="!!getTotalCount(psde.dataElement.id, isGenderFilterApplied, isAgeFilterApplied, option.code, undefined, [0,9999])">
                                                             <td>{{option.name}}</td>
                                                             <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [0,5])}}</td>
                                                             <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [4,15])}}</td>
@@ -251,11 +251,11 @@
                                                 </tr>
                                             </thead>
                                             <tr ng-repeat="pdv in procedureOptions"
-                                                ng-if="getTotalProcedureCount(isGenderFilterApplied, isAgeFilterApplied, pdv.id, undefined, [0,9999]) != 0">
+                                                ng-if="!!getTotalProcedureCount(isGenderFilterApplied, isAgeFilterApplied, pdv.code, undefined, [0,9999])">
                                                 <td>{{optionMapping[pdv.id]}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id, undefined,[0,5])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id, undefined,[4,15])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id, undefined,[14, 9999])}}</td>
+                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.code, undefined,[0,5])}}</td>
+                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.code, undefined,[4,15])}}</td>
+                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.code, undefined,[14, 9999])}}</td>
                                             </tr>
                                         </table>
                                     </accordion-group>
@@ -296,17 +296,17 @@
                                                             </tr>
                                                         </thead>
                                                         <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]"
-                                                            ng-if="getTotalCount(psde.dataElement.id, isGenderFilterApplied, isAgeFilterApplied, option.code, genderOptions, [0,9999]) != 0">
+                                                            ng-if="!!getTotalCount(psde.dataElement.id, isGenderFilterApplied, isAgeFilterApplied, option.code, genderOptions, [0,9999])">
                                                             <td>{{option.name}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [0,5])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [4,15])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [14, 9999])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[1].id, [0,5])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[1].id, [4,15])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[1].id, [14, 9999])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[2].id, [0,5])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[2].id, [4,15])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[2].id, [14, 9999])}}</td>
+                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].code, [0,5])}}</td>
+                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].code, [4,15])}}</td>
+                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].code, [14, 9999])}}</td>
+                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[1].code, [0,5])}}</td>
+                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[1].code, [4,15])}}</td>
+                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[1].code, [14, 9999])}}</td>
+                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[2].code, [0,5])}}</td>
+                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[2].code, [4,15])}}</td>
+                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[2].code, [14, 9999])}}</td>
                                                         </tr>
                                                     </table>
                                                 </accordion-group>
@@ -346,17 +346,17 @@
                                                 </tr>
                                             </thead>
                                             <tr ng-repeat="pdv in procedureOptions"
-                                                ng-if="getTotalProcedureCount(isGenderFilterApplied, isAgeFilterApplied, pdv.id, genderOptions, [0,9999]) != 0">
+                                                ng-if="!!getTotalProcedureCount(isGenderFilterApplied, isAgeFilterApplied, pdv.code, genderOptions, [0,9999])">
                                                 <td>{{optionMapping[pdv.id]}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[0].id, [0,5])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[0].id, [4,15])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[0].id, [14, 9999])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[1].id, [0,5])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[1].id, [4,15])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[1].id, [14, 9999])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[2].id, [0,5])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[2].id, [4,15])}}</td>
-                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.id,genderOptions[2].id, [14, 9999])}}</td>
+                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.code,genderOptions[0].code, [0,5])}}</td>
+                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.code,genderOptions[0].code, [4,15])}}</td>
+                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.code,genderOptions[0].code, [14, 9999])}}</td>
+                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.code,genderOptions[1].code, [0,5])}}</td>
+                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.code,genderOptions[1].code, [4,15])}}</td>
+                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.code,genderOptions[1].code, [14, 9999])}}</td>
+                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.code,genderOptions[2].code, [0,5])}}</td>
+                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.code,genderOptions[2].code, [4,15])}}</td>
+                                                <td>{{getProcedureCount(isGenderFilterApplied,isAgeFilterApplied, pdv.code,genderOptions[2].code, [14, 9999])}}</td>
                                             </tr>
                                         </table>
                                     </accordion-group>
@@ -389,7 +389,7 @@
                                         </thead>
                                         <tr ng-repeat="(originId, originName) in originMap">
                                             <td>{{originName}}</td>
-                                            <td>{{originEvents[originId].length || 0}}</td>
+                                            <td>{{originEvents[originId].length }}</td>
                                         </tr>
                                     </table>
                                 </accordion-group>

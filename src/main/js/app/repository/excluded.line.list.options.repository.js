@@ -11,5 +11,11 @@ define([], function () {
             var store = db.objectStore(excludedLineListOptionsStore);
             return store.upsert(payLoad);
         };
+
+        this.findAll = function (moduleIds) {
+            var store = db.objectStore(excludedLineListOptionsStore);
+            var query = db.queryBuilder().$in(moduleIds).compile();
+            return store.each(query);
+        };
     };
 });

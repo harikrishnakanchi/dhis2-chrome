@@ -1,4 +1,4 @@
-define(["properties", "lodash", "interpolate", "cipherUtils"], function(properties, _, interpolate, cipherUtils) {
+define(["properties", "lodash", "interpolate", "cipherUtils", "hustlePublishUtils"], function(properties, _, interpolate, cipherUtils, hustlePublishUtils) {
     return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility, storageService) {
         var loadUserData = function(loginUsername) {
             var existingUserProjects = userPreferenceRepository.getCurrentUsersProjectIds();
@@ -51,8 +51,8 @@ define(["properties", "lodash", "interpolate", "cipherUtils"], function(properti
 
             if (productKeyLevel === 'country' && !isRole(user, "Coordination Level Approver")) {
                 if(!_.isEmpty(userOrgUnitIds))
-                    return orgUnitRepository.get(userOrgUnitIds[0]).then(function(project) {
-                        if (project.parent.id !== allowedOrgUnitIds[0]) {
+                    return orgUnitRepository.get(_.first(userOrgUnitIds)).then(function(project) {
+                        if (_.get(project, 'parent.id') !== _.first(allowedOrgUnitIds)) {
                             $scope.invalidAccess = true;
                             return $q.reject("User doesn’t have access to this Praxis instance.");
                         } else {
@@ -108,11 +108,7 @@ define(["properties", "lodash", "interpolate", "cipherUtils"], function(properti
                 var projectChanged = !_.isEqual(previousUserProjects, currentUserProjects);
 
                 if (projectChanged || roleChanged) {
-                    $hustle.publishOnce({
-                        type: 'downloadProjectData',
-                        data: [],
-                        locale: $scope.locale
-                    }, 'dataValues');
+                    hustlePublishUtils.publishDownloadProjectData($hustle, $scope.locale);
                 }
             });
 

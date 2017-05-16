@@ -54,6 +54,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                     }],
                     "ref_id": [{
                         "id": 'ref_id',
+                        "code": 'ref_id',
                         "name": 'ref 1'
                     }]
                 };
@@ -82,6 +83,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                     id: 'ref_id',
                     options: [{
                         "id": 'ref_id',
+                        "code": 'ref_id',
                         "name": 'ref 1'
                     }]
                 }];

@@ -7,7 +7,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
         describe("line list module controller", function() {
             var scope, rootScope, lineListModuleController, mockOrgStore, mockOrigin, db, q, datasets, dataElements,
                 orgUnitRepository, hustle, excludedDataElementsRepository, excludedLineListOptionsRepository,
-                fakeModal, allPrograms, programRepository, datasetRepository, originOrgunitCreator, translationsService;
+                fakeModal, fakeModalStack, allPrograms, programRepository, datasetRepository, originOrgunitCreator, translationsService;
 
             var createMockAttribute = function (code, value) {
                 return {
@@ -68,7 +68,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
-                spyOn(orgUnitRepository, "getProjectAndOpUnitAttributes").and.returnValue(utils.getPromise(q, undefined));
                 spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, undefined));
                 spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, [mockOrigin]));
                 spyOn(orgUnitRepository, "associateDataSetsToOrgUnits").and.returnValue(utils.getPromise(q, {}));
@@ -97,7 +96,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 spyOn(excludedLineListOptionsRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
 
                 orgUnitGroupHelper = new OrgUnitGroupHelper();
-                spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
+                spyOn(orgUnitGroupHelper, "associateModuleAndOriginsToGroups").and.returnValue(utils.getPromise(q, {}));
 
                 spyOn(excludedLineListOptionsRepository, 'get').and.returnValue(utils.getPromise(q, {}));
 
@@ -122,6 +121,10 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         this.result.cancelCallback(type);
                     },
                     open: function(object) {}
+                };
+
+                fakeModalStack = {
+                    dismissAll: function () {}
                 };
 
                 scope.orgUnit = {
@@ -152,7 +155,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             });
 
             var createLineListModuleController = function () {
-                lineListModuleController = new LineListModuleController(scope, rootScope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService, excludedLineListOptionsRepository);
+                lineListModuleController = new LineListModuleController(scope, rootScope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, fakeModalStack, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService, excludedLineListOptionsRepository);
             };
 
             it("should save sorted list of all programs", function() {
@@ -1491,7 +1494,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     scope.save();
                     scope.$apply();
 
-                    expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith(originOrgUnit, false);
+                    expect(orgUnitGroupHelper.associateModuleAndOriginsToGroups).toHaveBeenCalledWith(originOrgUnit);
                 });
 
                 it("should associate to modules when geographicOrigin is disabled", function () {
@@ -1502,7 +1505,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     scope.save();
                     scope.$apply();
 
-                    expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith([scope.module], false);
+                    expect(orgUnitGroupHelper.associateModuleAndOriginsToGroups).toHaveBeenCalledWith([scope.module]);
                 });
             });
 

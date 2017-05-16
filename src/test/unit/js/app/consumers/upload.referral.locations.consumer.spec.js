@@ -1,23 +1,19 @@
-define(["uploadReferralLocationsConsumer", "utils", "angularMocks", "systemSettingService", "referralLocationsRepository", "orgUnitRepository"],
-    function(UploadReferralLocationsConsumer, utils, mocks, SystemSettingService, ReferralLocationsRepository, OrgUnitRepository) {
+define(["uploadReferralLocationsConsumer", "utils", "angularMocks", "dataStoreService", "referralLocationsRepository", "orgUnitRepository"],
+    function(UploadReferralLocationsConsumer, utils, mocks, DataStoreService, ReferralLocationsRepository, OrgUnitRepository) {
         describe("uploadReferralLocationsConsumer", function() {
-            var uploadReferralLocationsConsumer, systemSettingService, referralLocationsRepository, orgUnitRepository, q, scope;
+            var uploadReferralLocationsConsumer, dataStoreService, referralLocationsRepository, q, scope, mockMessage, http, localReferralLocations, orgUnitRepository;
 
-            beforeEach(mocks.inject(function($q, $rootScope) {
+            beforeEach(mocks.inject(function($q, $rootScope, $http) {
                 q = $q;
                 scope = $rootScope.$new();
-
-                systemSettingService = new SystemSettingService();
-                referralLocationsRepository = new ReferralLocationsRepository();
-                orgUnitRepository = new OrgUnitRepository();
-            }));
-
-            it("should save referral locations to dhis", function() {
-                var project = {
-                    "id": "prj1"
+                http = $http;
+                mockMessage = {
+                    "data": {
+                        "data": "opUnit1",
+                        "type": "uploadReferralLocations"
+                    }
                 };
-
-                var referralLocations = {
+                localReferralLocations = {
                     "id": "opUnit1",
                     "facility 1": {
                         "value": "some alias",
@@ -29,24 +25,78 @@ define(["uploadReferralLocationsConsumer", "utils", "angularMocks", "systemSetti
                     "clientLastUpdated": "2015-07-17T07:00:00.000Z"
                 };
 
-                var message = {
-                    "data": {
-                        "data": "opUnit1",
-                        "type": "uploadReferralLocations"
-                    }
-                };
+                dataStoreService = new DataStoreService(http, q);
+                spyOn(dataStoreService, "updateReferrals").and.returnValue(utils.getPromise(q, {}));
+                spyOn(dataStoreService, "createReferrals").and.returnValue(utils.getPromise(q, {}));
+                spyOn(dataStoreService, "getReferrals").and.returnValue(utils.getPromise(q, undefined));
 
-                spyOn(orgUnitRepository, "getParentProject").and.returnValue(utils.getPromise(q, project));
-                spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, referralLocations));
-                spyOn(systemSettingService, "upsertReferralLocations").and.returnValue(utils.getPromise(q, {}));
+                referralLocationsRepository = new ReferralLocationsRepository();
+                spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, localReferralLocations));
+                spyOn(referralLocationsRepository, "upsert").and.returnValue(utils.getPromise(q, undefined));
 
-                uploadReferralLocationsConsumer = new UploadReferralLocationsConsumer(q, systemSettingService, referralLocationsRepository, orgUnitRepository);
-                uploadReferralLocationsConsumer.run(message);
+                orgUnitRepository = new OrgUnitRepository();
+                spyOn(orgUnitRepository, 'getParentProject').and.returnValue(utils.getPromise(q, {id: "prj1"}));
+
+                uploadReferralLocationsConsumer = new UploadReferralLocationsConsumer(q, dataStoreService, referralLocationsRepository, orgUnitRepository);
+            }));
+
+            it("should get referral locations for specified opUnit from dhis", function() {
+                uploadReferralLocationsConsumer.run(mockMessage);
                 scope.$apply();
 
-                expect(orgUnitRepository.getParentProject).toHaveBeenCalledWith("opUnit1");
+                expect(dataStoreService.getReferrals).toHaveBeenCalledWith("prj1", "opUnit1");
+            });
+
+            it('should get projectId for specified opUnit', function () {
+                uploadReferralLocationsConsumer.run(mockMessage);
+                scope.$apply();
+
+                expect(orgUnitRepository.getParentProject).toHaveBeenCalledWith('opUnit1');
+            });
+
+            it('should get local referral locations', function () {
+                uploadReferralLocationsConsumer.run(mockMessage);
+                scope.$apply();
+
                 expect(referralLocationsRepository.get).toHaveBeenCalledWith("opUnit1");
-                expect(systemSettingService.upsertReferralLocations).toHaveBeenCalledWith(project.id, referralLocations);
+            });
+
+            it('should upload referral locations to DHIS if remote referrals are not present', function () {
+                dataStoreService.getReferrals.and.returnValue(utils.getPromise(q, undefined));
+                uploadReferralLocationsConsumer.run(mockMessage);
+                scope.$apply();
+
+                expect(dataStoreService.createReferrals).toHaveBeenCalledWith('prj1', 'opUnit1', localReferralLocations);
+            });
+
+            it('should update the remote referral locations if local referrals are latest', function () {
+                var remoteReferrals = {
+                    "orgUnit": "opUnit1",
+                    "clientLastUpdated": "2015-07-16T07:00:00.000Z",
+                    "Facility1": {
+                        value: "facility one"
+                    }
+                };
+                dataStoreService.getReferrals.and.returnValue(utils.getPromise(q, remoteReferrals));
+                uploadReferralLocationsConsumer.run(mockMessage);
+                scope.$apply();
+
+                expect(dataStoreService.updateReferrals).toHaveBeenCalledWith('prj1', 'opUnit1', localReferralLocations);
+            });
+
+            it('should update the local referral locations if remote referrals are latest', function () {
+                var remoteReferrals = {
+                    "orgUnit": "opUnit1",
+                    "clientLastUpdated": "2015-07-18T07:00:00.000Z",
+                    "Facility1": {
+                        value: "facility one"
+                    }
+                };
+                dataStoreService.getReferrals.and.returnValue(utils.getPromise(q, remoteReferrals));
+                uploadReferralLocationsConsumer.run(mockMessage);
+                scope.$apply();
+
+                expect(referralLocationsRepository.upsert).toHaveBeenCalledWith(remoteReferrals);
             });
         });
     });

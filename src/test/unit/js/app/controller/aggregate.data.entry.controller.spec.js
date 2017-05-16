@@ -656,8 +656,8 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it('should prevent navigation if data entry form is dirty', function() {
-                scope.dataentryForm.$dirty = false;
-                scope.dataentryForm.$dirty = true;
+                scope.forms.dataentryForm.$dirty = false;
+                scope.forms.dataentryForm.$dirty = true;
                 scope.$apply();
 
                 expect(scope.preventNavigation).toEqual(true);

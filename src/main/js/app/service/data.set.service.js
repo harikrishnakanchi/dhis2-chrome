@@ -1,20 +1,11 @@
-define(["dhisUrl", "metadataConf", "pagingUtils", "properties"], function(dhisUrl, metadataConf, pagingUtils, properties) {
+define(["dhisUrl", "metadataConf", "pagingUtils", "properties", "constants"], function(dhisUrl, metadataConf, pagingUtils, properties, constants) {
     return function($http, $q) {
-
-        this.removeOrgUnitFromDataset = function(datasetId, orgUnitId) {
-            return $http.delete(dhisUrl.dataSets + '/' + datasetId + '/organisationUnits/' + orgUnitId)
-                .catch(function (response) {
-                    if (response.status != 404) {
-                        return $q.reject();
-                    }
-                });
-        };
 
         this.getAll = function (lastUpdatedTime) {
             var url = dhisUrl.dataSets + ".json";
             var params = {
-                fields: metadataConf.fields.dataSets,
-                paging: true
+                fields: metadataConf.fields.dataSets.params,
+                paging: metadataConf.fields.dataSets.paging
             };
             if (lastUpdatedTime)
                 params.filter = "lastUpdated:gte:" + lastUpdatedTime;

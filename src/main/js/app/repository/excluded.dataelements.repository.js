@@ -11,5 +11,11 @@ define(["lodash"], function(_) {
             var store = db.objectStore(storeName);
             return store.find(moduleId);
         };
+
+        this.findAll = function (moduleIds) {
+            var store = db.objectStore(storeName);
+            var query = db.queryBuilder().$in(moduleIds).compile();
+            return store.each(query);
+        };
     };
 });

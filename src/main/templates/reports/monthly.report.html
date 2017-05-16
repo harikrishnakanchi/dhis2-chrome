@@ -5,8 +5,9 @@
     </div>
     <div id="monthlyCharts">
         <div ng-if="!(charts | filter: { monthlyChart: true, serviceCode: selectedService.serviceCode } | isEmpty)">
-            <span ng-show="updatedForMonthlyChart" class="text-info">
-                <strong>{{ resourceBundle.updated }}: {{ updatedForMonthlyChart }} </strong>
+            <span ng-show="updatedForMonthlyChart">
+                <strong class="text-info">{{ resourceBundle.updated }}: {{ updatedForMonthlyChart }} </strong>
+                <i class="fa fa-info-circle" aria-hidden="true" tooltip-placement="top" tooltip-trigger="click mouseenter" tooltip="{{ resourceBundle.dataAvailabilityMessage.daily }}"></i>
             </span>
             <div ng-repeat="chart in charts | filter: { monthlyChart: true, serviceCode: selectedService.serviceCode, isDataAvailable: true } | orderBy: 'displayPosition'">
                 <div class="row chart-title">
@@ -30,8 +31,9 @@
                     <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isReportOpen, 'glyphicon-chevron-right': !isReportOpen}"></i>
                 </accordion-heading>
                 <div class="exp-coll-group">
-                    <div ng-show="updatedForMonthlyPivotTable" class="text-info mb15">
-                        <strong>{{ resourceBundle.updated }}: {{ updatedForMonthlyPivotTable }} </strong>
+                    <div ng-show="updatedForMonthlyPivotTable" class="mb15">
+                        <strong class="text-info ">{{ resourceBundle.updated }}: {{ updatedForMonthlyPivotTable }} </strong>
+                        <i class="fa fa-info-circle" aria-hidden="true" tooltip-placement="top" tooltip-trigger="click mouseenter" tooltip="{{ resourceBundle.dataAvailabilityMessage.daily }}"></i>
                     </div>
                     <div ng-repeat="table in pivotTables | filter: { monthlyReport: true, serviceCode: selectedService.serviceCode, isDataAvailable: true } | orderBy: 'displayPosition'" class="exportCSV-container">
                         <accordion close-others="false">

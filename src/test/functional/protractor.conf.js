@@ -1,15 +1,17 @@
 exports.config = {
+    allScriptsTimeout: 20000,
+    specs: ['**/*.js', '**/**/*.js'],
+
     chromeOnly: true,
-    chromeDriver: '../../../node_modules/protractor/selenium/chromedriver',
     capabilities: {
         'browserName': 'chrome'
     },
-
-    specs: ['**/*.js', '**/**/*.js'],
-    rootElement: '#dhis2',
+    framework: 'jasmine',
+    baseUrl: 'http://localhost:8081/',
+    rootElement: '#praxis',
 
     jasmineNodeOpts: {
         showColors: true,
-        defaultTimeoutInterval: 30000
+        defaultTimeoutInterval: 300000
     }
 };

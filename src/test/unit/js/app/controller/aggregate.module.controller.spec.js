@@ -5,11 +5,11 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
         OrgUnitRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, SystemSettingRepository, TranslationsService, orgUnitMapper, systemSettingsTransformer, customAttributes) {
 
         var scope,rootScope, mockOrgStore, db, q, location, orgUnitRepo, orgunitGroupRepo, hustle,
-            dataSetRepo, systemSettingRepository, excludedDataElementsRepository, fakeModal, allPrograms, originOrgunitCreator, translationsService, orgUnitGroupHelper;
+            dataSetRepo, systemSettingRepository, excludedDataElementsRepository, fakeModal, fakeModalStack, allPrograms, originOrgunitCreator, translationsService, orgUnitGroupHelper;
 
         describe("aggregate module controller", function() {
             var initialiseController = function() {
-                new AggregateModuleController(scope, rootScope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal, orgUnitGroupHelper, originOrgunitCreator, translationsService);
+                new AggregateModuleController(scope, rootScope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal, fakeModalStack, orgUnitGroupHelper, originOrgunitCreator, translationsService);
             };
 
             beforeEach(module('hustle'));
@@ -30,7 +30,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
 
                 spyOn(orgUnitRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, {}));
-                spyOn(orgUnitRepo, "getProjectAndOpUnitAttributes").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "associateDataSetsToOrgUnits").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "removeDataSetsFromOrgUnits").and.returnValue(utils.getPromise(q, {}));
@@ -53,7 +52,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 spyOn(excludedDataElementsRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
 
                 orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepo, orgunitGroupRepo);
-                spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
+                spyOn(orgUnitGroupHelper, "associateModuleAndOriginsToGroups");
 
                 translationsService = new TranslationsService();
                 spyOn(translationsService, "translate").and.returnValue([]);
@@ -77,6 +76,10 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                         this.result.cancelCallback(type);
                     },
                     open: function(object) {}
+                };
+
+                fakeModalStack = {
+                    dismissAll: function () {}
                 };
 
                 allPrograms = [{
@@ -362,7 +365,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.save();
                 scope.$apply();
 
-                expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith([enrichedModule], false);
+                expect(orgUnitGroupHelper.associateModuleAndOriginsToGroups).toHaveBeenCalledWith([enrichedModule]);
             });
 
             it("should set datasets associated with module for edit", function() {

@@ -53,6 +53,15 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                         }]
                     }]
                 };
+
+                currentMomentInTime = moment("2017-02-02");
+                Timecop.install();
+                Timecop.freeze(currentMomentInTime);
+            });
+
+            afterEach(function() {
+                Timecop.returnToPresent();
+                Timecop.uninstall();
             });
 
             it('should download data for the specified dimensions and filters', function () {
@@ -98,6 +107,24 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                     }]
                 };
                 httpBackend.expectGET(new RegExp('dimension=ou:' + orgUnitId)).respond(200, {});
+
+                reportService.getReportDataForOrgUnit(chartDefinition, orgUnitId);
+                httpBackend.flush();
+            });
+
+            it('should replace the existing period column dimensions', function () {
+                properties.projectDataSync.numYearsToSyncYearlyReports = 1;
+
+                chartDefinition = {
+                    yearlyReport: true,
+                    columns: [{
+                        dimension: 'pe'
+                    }]
+                };
+
+                var expectedPeriodRange = ['201601', '201602', '201603', '201604', '201605', '201606', '201607', '201608', '201609', '201610', '201611', '201612', '201701', '201702'];
+
+                httpBackend.expectGET(new RegExp('dimension=pe:' + expectedPeriodRange.join(';'))).respond(200, {});
 
                 reportService.getReportDataForOrgUnit(chartDefinition, orgUnitId);
                 httpBackend.flush();

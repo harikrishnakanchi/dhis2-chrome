@@ -87,8 +87,13 @@ define(['pivotTable'], function(PivotTable) {
        });
 
        describe('geographicOriginReport', function() {
-           it('should return true if pivot table name contains GeographicOrigin', function() {
-               pivotTable = PivotTable.create({ name: '[Praxis - GeographicOrigin] # Name' });
+           it('should return true if pivot table is a Geographic Origin Report for Aggregate', function () {
+               pivotTable = PivotTable.create({name: '[Praxis - GeographicOrigin] # Name'});
+               expect(pivotTable.geographicOriginReport).toBeTruthy();
+           });
+
+           it('should return true if pivot table is a Geographic Origin Report for Linelist', function () {
+               pivotTable = PivotTable.create({name: '[Praxis - someProgram] # GeographicOrigin'});
                expect(pivotTable.geographicOriginReport).toBeTruthy();
            });
 
@@ -99,8 +104,13 @@ define(['pivotTable'], function(PivotTable) {
        });
 
        describe('referralLocationReport', function() {
-           it('should return true if pivot table service code contains Referral location', function() {
+           it('should return true if pivot table service code contains Referral location for Aggregate', function() {
                pivotTable = PivotTable.create({ name: '[Praxis - ReferralLocation] # Name' });
+               expect(pivotTable.referralLocationReport).toBeTruthy();
+           });
+
+           it('should return true if pivot table service code contains Referral location for LineList', function () {
+               pivotTable = PivotTable.create({name: '[Praxis - someProgramCode] # ReferralLocation'});
                expect(pivotTable.referralLocationReport).toBeTruthy();
            });
 
@@ -123,14 +133,26 @@ define(['pivotTable'], function(PivotTable) {
        });
 
        describe('weeklyReport', function() {
-           it('should return true if relativePeriods does not contain Months', function () {
-               pivotTable = PivotTable.create({ relativePeriods: { anotherTimePeriod: true } });
+           it('should return true if relativePeriods contain Weeks', function () {
+               pivotTable = PivotTable.create({ relativePeriods: { last12Weeks: true } });
                expect(pivotTable.weeklyReport).toBeTruthy();
            });
 
-           it('should return false if relativePeriods contains Months', function () {
-               pivotTable = PivotTable.create({ relativePeriods: { last12Months: true } });
+           it('should return false if relativePeriods does not contain Weeks', function () {
+               pivotTable = PivotTable.create({ relativePeriods: { anotherTimePeriod: true, last12Weeks: false } });
                expect(pivotTable.weeklyReport).toBeFalsy();
+           });
+       });
+
+       describe('yearlyReport', function () {
+           it('should return true if relativePeriods does not contain Months or Weeks', function () {
+               pivotTable = PivotTable.create({ relativePeriods: { last12Weeks: false, last12Months: false } });
+               expect(pivotTable.yearlyReport).toBeTruthy();
+           });
+
+           it('should return false if relativePeriods contains Months or Weeks', function () {
+               pivotTable = PivotTable.create({ relativePeriods: { last12Weeks: true } });
+               expect(pivotTable.yearlyReport).toBeFalsy();
            });
        });
 
@@ -149,6 +171,7 @@ define(['pivotTable'], function(PivotTable) {
        describe('hideWeeks', function () {
            it('should return true if an indicator numerator is using program indicator', function () {
                config = {
+                   relativePeriods: { last12Weeks: false },
                    dataDimensionItems: [{
                        indicator: {
                            id: 'someIndicator',
@@ -162,6 +185,7 @@ define(['pivotTable'], function(PivotTable) {
 
            it('should return false if an indicator numerator is not using program indicator', function () {
                config = {
+                   relativePeriods: { last12Weeks: false },
                    dataDimensionItems: [{
                        indicator: {
                            id: 'someIndicator',
@@ -175,6 +199,7 @@ define(['pivotTable'], function(PivotTable) {
 
            it('should return true if an indicator denominator is using program indicator', function () {
                config = {
+                   relativePeriods: { last12Weeks: false },
                    dataDimensionItems: [{
                        indicator: {
                            id: 'someIndicator',
@@ -186,8 +211,9 @@ define(['pivotTable'], function(PivotTable) {
                expect(pivotTable.hideWeeks).toBe(true);
            });
 
-           it('should return false if an indicator denominator is using program indicator', function () {
+           it('should return false if an indicator denominator is not using program indicator', function () {
                config = {
+                   relativePeriods: { last12Weeks: false },
                    dataDimensionItems: [{
                        indicator: {
                            id: 'someIndicator',
@@ -201,6 +227,7 @@ define(['pivotTable'], function(PivotTable) {
 
            it('should return true if data dimension contains atleast one program indicator', function () {
                config = {
+                   relativePeriods: { last12Weeks: false },
                    dataDimensionItems: [{
                        programIndicator: 'someProgramIndicator'
                    }]
@@ -209,6 +236,11 @@ define(['pivotTable'], function(PivotTable) {
                expect(pivotTable.hideWeeks).toBe(true);
            });
 
+           it('should return true if it is a weekly report', function () {
+               config = { relativePeriods: { last12Weeks: true } };
+               pivotTable = PivotTable.create(config);
+               expect(pivotTable.hideWeeks).toBe(true);
+           });
        });
    });
 });

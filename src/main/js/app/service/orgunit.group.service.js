@@ -1,4 +1,4 @@
-define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], function(dhisUrl, _, metadataConf, pagingUtils, properties) {
+define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties", "constants"], function(dhisUrl, _, metadataConf, pagingUtils, properties, constants) {
     return function($http, $q) {
 
         this.get = function (orgUnitGroupIds) {
@@ -8,7 +8,7 @@ define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], funct
                 filter: _.map(orgUnitGroupIds, function (orgUnitGroupId) {
                     return 'id:eq:' + orgUnitGroupId;
                 }),
-                fields: metadataConf.fields.organisationUnitGroups,
+                fields: metadataConf.fields.organisationUnitGroups.params,
                 paging: false
             };
             return $http.get(url, {params: params}).then(function (response) {
@@ -19,8 +19,8 @@ define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], funct
         this.getAll = function (lastUpdatedTime) {
             var url = dhisUrl.orgUnitGroups + '.json';
             var params = {
-                fields: metadataConf.fields.organisationUnitGroups,
-                paging: true
+                fields: metadataConf.fields.organisationUnitGroups.params,
+                paging: metadataConf.fields.organisationUnitGroups.paging
             };
 
             if (lastUpdatedTime) {
@@ -45,7 +45,7 @@ define(["dhisUrl", "lodash", "metadataConf", "pagingUtils", "properties"], funct
         this.deleteOrgUnit = function (orgUnitGroupId, orgUnitId) {
             return $http.delete(dhisUrl.orgUnitGroups + "/" + orgUnitGroupId + "/organisationUnits/" + orgUnitId)
                 .catch(function (response) {
-                    if (response.status === 404) {
+                    if (response.errorCode === constants.errorCodes.NOT_FOUND) {
                         return $q.when();
                     } else {
                         return $q.reject(response);

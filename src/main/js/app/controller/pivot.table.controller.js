@@ -62,7 +62,7 @@ define(["lodash", "dateUtils", "moment", "excelBuilder"], function(_, dateUtils,
 
         $scope.getDisplayNameForReferralLocations = function (pivotTableRow) {
             var referralLocation = _.find(_.keys($scope.referralLocations), function (referralLocationName) {
-                return _.contains(pivotTableRow.name, referralLocationName);
+                return _.contains([pivotTableRow.formName, pivotTableRow.shortName, pivotTableRow.name].join(), referralLocationName);
             });
             return $scope.referralLocations[referralLocation].name;
         };
