@@ -461,6 +461,48 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 });
             });
 
+            describe('getNumberPattern', function () {
+                beforeEach(function () {
+                    initializeController();
+                });
+
+                it('should return the zero or positive regex pattern for dataElement with integerZeroOrPositive type', function () {
+                    var integerZeroOrPositiveDataElement = {
+                        name: 'someDataElement',
+                        valueType: 'INTEGER_ZERO_OR_POSITIVE'
+                    };
+                    var expectedRegexType = '^[0-9][0-9]?$';
+                    var regexType = scope.getNumberPattern(integerZeroOrPositiveDataElement);
+                    expect(regexType).toEqual(expectedRegexType);
+                });
+
+                it('should return the number pattern for dataElement with number type', function () {
+                    var numberDataElement = {
+                        name: 'someDataElement',
+                        valueType: 'NUMBER'
+                    };
+                    var expectedRegexType = '^[1-9][0-9]?$';
+                    var regexType = scope.getNumberPattern(numberDataElement);
+                    expect(regexType).toEqual(expectedRegexType);
+                });
+
+                it('should return the pediatric regex pattern for pediatric age dataElement', function () {
+                    var pediatricAgeDataElement = {
+                        name: 'someDataElement',
+                        valueType: 'NUMBER',
+                        attributeValues: [{
+                            value: 'true',
+                            attribute: {
+                                code: customAttributes.PEDIATRIC_AGE_FIELD_CODE
+                            }
+                        }]
+                    };
+                    var expectedRegexType = '^((0.5)|[1-9][0-9]?)$';
+                    var regexType = scope.getNumberPattern(pediatricAgeDataElement);
+                    expect(regexType).toEqual(expectedRegexType);
+                });
+            });
+
             it('should set isEventDateSubstitute to true for the corresponding data element', function () {
                 var mockDataElement = {
                     id: 'someDataElementId'

@@ -19,10 +19,16 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties", "dataElementUti
 
         $scope.getNumberPattern = function(dataElement) {
             var isPediatricAgeDataElement = customAttributes.getBooleanAttributeValue(dataElement.attributeValues, customAttributes.PEDIATRIC_AGE_FIELD_CODE);
-            if(isPediatricAgeDataElement)
+            var isIntegerZeroOrPositiveDataElement = dataElement.valueType === 'INTEGER_ZERO_OR_POSITIVE';
+            if (isPediatricAgeDataElement) {
                 return '^((0.5)|[1-9][0-9]?)$';
-            else
+            }
+            else if (isIntegerZeroOrPositiveDataElement) {
+                return '^[0-9][0-9]?$';
+            }
+            else {
                 return '^[1-9][0-9]?$';
+            }
         };
 
         var getDataValuesAndEventDate = function() {
