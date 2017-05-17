@@ -603,6 +603,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "origins": [{
                     "id": "o1",
                     "name": "origin1",
+                    "clientLastUpdated": "2014-10-29T12:43:54.972Z",
                     "isDisabled": true
                 }]
             };
@@ -665,6 +666,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "origins": [{
                     "id": "0",
                     "name": "origin1",
+                    "clientLastUpdated": "2014-10-29T12:43:54.972Z",
                     "isDisabled": false
                 }]
             };

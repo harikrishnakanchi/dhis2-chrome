@@ -193,6 +193,7 @@ define(["lodash", "dhisId", "moment", "interpolate", "orgUnitMapper", "customAtt
                     var originToUpdate = _.remove(patientOrigin.origins, function(origin) {
                         return origin.id == originToEnableDisable.id;
                     })[0];
+                    originToUpdate.clientLastUpdated = moment().toISOString();
                     originToUpdate.isDisabled = !originToUpdate.isDisabled;
                     patientOrigin.origins.push(originToUpdate);
                     updatedPatientOrigin = patientOrigin;
