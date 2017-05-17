@@ -387,10 +387,12 @@
                                                 <th> {{resourceBundle.countLabel}} </th>
                                             </tr>
                                         </thead>
-                                        <tr ng-repeat="(originId, originName) in originMap">
-                                            <td>{{originName}}</td>
-                                            <td>{{originEvents[originId].length }}</td>
+                                        <tbody>
+                                        <tr ng-repeat="origin in originOrgUnits">
+                                            <td>{{ (origin.displayName || origin.name) }}</td>
+                                            <td>{{ originEvents[origin.id].length }}</td>
                                         </tr>
+                                        </tbody>
                                     </table>
                                 </accordion-group>
                             </accordion>

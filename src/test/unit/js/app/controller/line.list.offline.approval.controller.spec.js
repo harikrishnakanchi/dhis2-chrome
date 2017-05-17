@@ -389,12 +389,6 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                     }]
                 });
                 expect(scope.showFilters).toEqual(true);
-                expect(scope.originMap).toEqual({
-                    origin1: 'Not Specified',
-                    origin2: 'Origin 2',
-                    origin3: 'testOrigin',
-                    origin4: 'foo'
-                });
                 expect(scope.originEvents).toEqual({
                     "origin1": [events[0]],
                     "origin2": [events[1]]
