@@ -30,7 +30,7 @@
                                             <a description-popup class="changeColor" dp-title="{{ getDisplayName(de.dataElement) }}" dp-desc="{{ de.dataElement.description }}">
                                                 {{ getDisplayName(de.dataElement) }}
                                             </a>
-                                            <ul class="options">
+                                            <ul class="options" ng-class="{'disabled': !de.dataElement.isIncluded}">
                                                 <li ng-repeat="option in de.dataElement.optionSet.options" ng-if="section.dataElementsWithOptions | contains: de">
                                                     <input type="checkbox" ng-model="option.isSelected" disabled>
                                                     <span>{{ option.name }}</span>
