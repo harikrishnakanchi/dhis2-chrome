@@ -17,7 +17,7 @@
         "angularjs-directives": "https://github.com/DWB-eHealth/angularjs-directives.git#v0.3.2",
         "moment": "2.17.1",
         "js-md5": "1.1.0",
-        "angularjs-hustle": "https://github.com/DWB-eHealth/angularjs-hustle.git#8aa06ea",
+        "angularjs-hustle": "https://github.com/DWB-eHealth/angularjs-hustle.git#v0.7.0",
         "angular-sanitize": "1.6.1",
         "jszip": "2.5.0",
         "sjcl": "1.0.2",
