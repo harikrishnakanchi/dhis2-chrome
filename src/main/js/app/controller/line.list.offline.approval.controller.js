@@ -201,10 +201,6 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
             return orgUnitRepository.findAllByParent($scope.selectedModule.id).then(function (data) {
                 data = _.sortBy(data, "displayName");
                 $scope.originOrgUnits = data;
-                $scope.originMap = {};
-                _.forEach(data, function (origin) {
-                    $scope.originMap[origin.id] = origin.displayName || origin.name;
-                });
             });
         };
 
