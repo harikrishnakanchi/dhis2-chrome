@@ -24,6 +24,7 @@ define(["properties"], function(properties) {
         "dataSets": with_host("/api/dataSets"),
         "charts": with_host("/api/charts"),
         "pivotTables": with_host("/api/reportTables"),
+        "eventReports": with_host("/api/eventReports"),
         "analytics": with_host("/api/analytics"),
         "dataStore": with_host("/api/dataStore"),
         "categories": with_host("/api/categories.json"),

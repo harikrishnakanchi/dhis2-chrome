@@ -300,5 +300,83 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                 httpBackend.flush();
             });
         });
+
+        describe('getAllEventReportIds', function () {
+            it('should get all the ids of all praxis app event reports', function () {
+                var someEventReportId = 'someEventReportId';
+                var someOtherEventReportId = 'someOtherEventReportId';
+
+
+                reportService.getAllEventReportIds().then(function (eventReports) {
+                    expect(eventReports).toEqual([someEventReportId, someOtherEventReportId]);
+                });
+
+                var eventReportsIdsResponse = {
+                    'eventReports': [
+                        {'id': someEventReportId},
+                        {'id': someOtherEventReportId}
+                    ]
+                };
+                var expectedQueryParamsForEventReportIds = 'fields=id&filter=name:like:%5BPraxis+-+&paging=false';
+
+                httpBackend.expectGET(properties.dhis.url + '/api/eventReports.json?' + expectedQueryParamsForEventReportIds).respond(200, eventReportsIdsResponse);
+                httpBackend.flush();
+            });
+        });
+
+        describe('getUpdatedEventReports', function () {
+
+            var eventReportIds;
+            beforeEach(function () {
+                eventReportIds = {
+                    eventReports: [
+                        {id: 'someEventReportId'},
+                        {id: 'someOtherEventReportId'}
+                    ]
+                };
+            });
+
+            it('downloads the id of each event report', function () {
+                var expectedQueryParams = 'fields=id&filter=name:like:%5BPraxis+-+&paging=false';
+
+                httpBackend.expectGET(properties.dhis.url + '/api/eventReports.json?' + expectedQueryParams).respond(200, {});
+
+                reportService.getUpdatedEventReports();
+                httpBackend.flush();
+            });
+
+            it('should download the id of each event report modified since specified lastUpdated timestamp', function () {
+                reportService.getUpdatedEventReports('someTimeStamp');
+                httpBackend.expectGET(/.*filter=lastUpdated:gte:someTimeStamp.*/).respond(200, {});
+                httpBackend.flush();
+            });
+
+            it('should download the event report details', function () {
+                httpBackend.expectGET(/.*eventReports.json.*/).respond(200, eventReportIds);
+
+                var expectedQueryParams = encodeURI('fields=id,name,title,translations,sortOrder,relativePeriods,categoryDimensions,' +
+                    'dataElementDimensions[:all,legendSet[id,name,legends[id,name]],dataElement[id,name]]' +
+                    ',columns[dimension,items[id,name]],rows[dimension,items[id,name]]');
+                httpBackend.expectGET(properties.dhis.url + '/api/eventReports/someEventReportId.json?' + expectedQueryParams).respond(200, {});
+                httpBackend.expectGET(properties.dhis.url + '/api/eventReports/someOtherEventReportId.json?' + expectedQueryParams).respond(200, {});
+
+                reportService.getUpdatedEventReports();
+                httpBackend.flush();
+            });
+
+            it('should return the updated event reports', function () {
+                var someEventReport = 'someEventReport';
+                var someOtherEventReport = 'someOtherEventReport';
+                httpBackend.expectGET(/.*eventReports.json.*/).respond(200, eventReportIds);
+                httpBackend.expectGET(/.*someEventReportId.json.*/).respond(200, someEventReport);
+                httpBackend.expectGET(/.*someOtherEventReportId.json.*/).respond(200, someOtherEventReport);
+
+                reportService.getUpdatedEventReports().then(function (data) {
+                    expect(data).toEqual([someEventReport, someOtherEventReport]);
+                });
+
+                httpBackend.flush();
+            });
+        });
     });
 });
