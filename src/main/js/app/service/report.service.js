@@ -114,15 +114,15 @@ define(["dhisUrl", "lodash", "moment", "dateUtils", "properties"], function(dhis
             return getResourceIds(dhisUrl.pivotTables, 'reportTables');
         };
 
-        this.getAllEventReportIds = function () {
-            return getResourceIds(dhisUrl.eventReports, 'eventReports');
-        };
-
         this.getUpdatedEventReports = function (lastUpdatedTime) {
             var requiredFields = 'id,name,title,translations,sortOrder,relativePeriods,categoryDimensions,' +
                 'dataElementDimensions[:all,legendSet[id,name,legends[id,name]],dataElement[id,name]],' +
                 'columns[dimension,items[id,name]],rows[dimension,items[id,name]]';
             return getResourceIds(dhisUrl.eventReports, 'eventReports', lastUpdatedTime).then(_.partial(getResourceDetails, dhisUrl.eventReports, requiredFields));
+        };
+
+        this.getAllEventReportIds = function () {
+            return getResourceIds(dhisUrl.eventReports, 'eventReports');
         };
     };
 });
