@@ -552,6 +552,10 @@ define(['dateUtils', 'lodash', 'metadataConf', 'productKeyUtils'], function(date
         changeLogStore.delete("organisationUnitGroupSets");
     };
 
+    var create_event_report_definitions_store = function (db) {
+        create_store_with_key('eventReportDefinitions', 'id', db);
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -614,6 +618,7 @@ define(['dateUtils', 'lodash', 'metadataConf', 'productKeyUtils'], function(date
         update_orgunit_changelog,
         add_option_store,
         add_program_stage_section_store,
-        delete_keys_organisation_unit_group_sets_from_changelog
+        delete_keys_organisation_unit_group_sets_from_changelog,
+        create_event_report_definitions_store
     ];
 });
