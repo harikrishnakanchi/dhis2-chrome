@@ -4,7 +4,7 @@ define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'repo
             var scope, q,
                 downloadPivotTablesConsumer,
                 reportService, systemInfoService, pivotTableRepository, changeLogRepository,
-                lastUpdated, currentTime;
+                lastUpdated;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
                 scope = $rootScope;
