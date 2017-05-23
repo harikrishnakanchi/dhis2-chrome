@@ -1,4 +1,4 @@
-define(["dataService", "angularMocks", "properties", "moment", "testData"], function(DataService, mocks, properties, moment, testData) {
+define(["dataService", "angularMocks", "properties", "moment", "testData", "dhisUrl"], function(DataService, mocks, properties, moment, testData, dhisUrl) {
     describe("dataService", function() {
         var httpBackend, http, dataSetStore, dataValuesStore;
 
@@ -37,7 +37,7 @@ define(["dataService", "angularMocks", "properties", "moment", "testData"], func
             var expectedPayload = {
                 "dataValues": dataValues
             };
-            httpBackend.expectPOST(properties.dhis.url + "/api/dataValueSets", expectedPayload).respond(200, "ok");
+            httpBackend.expectPOST(dhisUrl.dataValueSets, expectedPayload).respond(200, "ok");
 
             var dataService = new DataService(http);
             dataService.save(dataValues);
@@ -64,7 +64,7 @@ define(["dataService", "angularMocks", "properties", "moment", "testData"], func
             var startDate = "2014-02-10";
             var period = "2014W08";
 
-            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?children=true&dataSet=DS_OPD&dataSet=Vacc&orgUnit=company_0&period=2014W08&period=2014W09").respond(200, dataValuesFromDhis);
+            httpBackend.expectGET(dhisUrl.dataValueSets + "?children=true&dataSet=DS_OPD&dataSet=Vacc&orgUnit=company_0&period=2014W08&period=2014W09").respond(200, dataValuesFromDhis);
 
             var actualDataValues;
             var dataService = new DataService(http, q);

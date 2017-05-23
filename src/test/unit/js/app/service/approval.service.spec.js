@@ -56,7 +56,7 @@ define(["approvalService", "angularMocks", "utils", "moment", "lodash", "propert
                 "multiOu": true
             }];
 
-            httpBackend.expectPOST(properties.dhis.url + "/api/completeDataSetRegistrations/multiple", expectedPayload).respond(200, "ok");
+            httpBackend.expectPOST(dhisUrl.approvalMultipleL1, expectedPayload).respond(200, "ok");
 
             var periodsAndOrgUnits = [{
                 "period": "2014W01",
@@ -84,7 +84,7 @@ define(["approvalService", "angularMocks", "utils", "moment", "lodash", "propert
                 ]
             };
 
-            httpBackend.expectPOST(properties.dhis.url + '/api/dataApprovals/approvals', expectedPayload).respond(200, 'ok');
+            httpBackend.expectPOST(dhisUrl.approvalMultipleL2, expectedPayload).respond(200, 'ok');
 
             approvalService.markAsApproved(dataSets, periods, [orgUnitIdA, orgUnitIdB]);
 
@@ -115,7 +115,7 @@ define(["approvalService", "angularMocks", "utils", "moment", "lodash", "propert
                     orgUnitId = 'someOrgUnitId',
                     originOrgUnits = [];
 
-                httpBackend.expectGET(properties.dhis.url + "/api/completeDataSetRegistrations" +
+                httpBackend.expectGET(dhisUrl.approvalL1 +
                     "?children=" +  true +
                     "&dataSet=" + dataSetId +
                     "&endDate=" + expectedEndDate +
@@ -241,7 +241,7 @@ define(["approvalService", "angularMocks", "utils", "moment", "lodash", "propert
                     dataSetId = 'someDataSetId',
                     orgUnitId = 'someOrgUnitId';
 
-                httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status" +
+                httpBackend.expectGET(dhisUrl.approvalStatus +
                     "?ds=" + dataSetId +
                     "&endDate=" + expectedEndDate +
                     "&fields=dataSet%5Bid,name%5D,period%5Bid%5D,organisationUnit%5Bid,name%5D,state,createdByUsername,createdDate" +
@@ -378,9 +378,9 @@ define(["approvalService", "angularMocks", "utils", "moment", "lodash", "propert
         });
 
         it("should mark data as incomplete in dhis", function() {
-            httpBackend.expectDELETE(properties.dhis.url + "/api/completeDataSetRegistrations?ds=170b8cd5e53&multiOu=true&ou=orgUnit1&pe=2014W01")
+            httpBackend.expectDELETE(dhisUrl.approvalL1 + "?ds=170b8cd5e53&multiOu=true&ou=orgUnit1&pe=2014W01")
                 .respond(200, "ok");
-            httpBackend.expectDELETE(properties.dhis.url + "/api/completeDataSetRegistrations?ds=170b8cd5e53&multiOu=true&ou=orgUnit2&pe=2014W02")
+            httpBackend.expectDELETE(dhisUrl.approvalL1 + "?ds=170b8cd5e53&multiOu=true&ou=orgUnit2&pe=2014W02")
                 .respond(200, "ok");
 
             approvalService.markAsIncomplete(["170b8cd5e53"], [{"period": "2014W01", "orgUnit": "orgUnit1"},{"period": "2014W02", "orgUnit": "orgUnit2"}]);

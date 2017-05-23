@@ -1,4 +1,4 @@
-define(["reportService", "angularMocks", "properties", "utils", "lodash", "timecop", "moment"], function(ReportService, mocks, properties, utils, _, timecop, moment) {
+define(["reportService", "angularMocks", "properties", "utils", "lodash", "timecop", "moment", "dhisUrl"], function(ReportService, mocks, properties, utils, _, timecop, moment, dhisUrl) {
     describe("report service", function() {
         var http, httpBackend, reportService, q, currentMomentInTime;
 
@@ -65,7 +65,7 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
             });
 
             it('should download data for the specified dimensions and filters', function () {
-                httpBackend.expectGET(new RegExp(properties.dhis.url + '/api/analytics' +
+                httpBackend.expectGET(new RegExp(dhisUrl.analytics +
                     '.*dimension=columnDimensionId:columnDimensionItemA;columnDimensionItemB' +
                     '.*dimension=rowDimensionId:rowDimensionItemA' +
                     '.*filter=filterDimensionId:filterDimensionItemA;filterDimensionItemB'
@@ -157,7 +157,7 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
             it('downloads the id of each chart', function () {
                 var expectedQueryParams = 'fields=id&filter=name:like:%5BPraxis+-+&paging=false';
 
-                httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedQueryParams).respond(200, {});
+                httpBackend.expectGET(dhisUrl.charts + '.json?' + expectedQueryParams).respond(200, {});
 
                 reportService.getUpdatedCharts();
                 httpBackend.flush();
@@ -172,8 +172,8 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                                                     'columns[dimension,items[id,name]],' +
                                                     'rows[dimension,items[id,name]],' +
                                                     'filters[dimension,items[id]]');
-                httpBackend.expectGET(properties.dhis.url + '/api/charts/chart1.json?' + expectedQueryParams).respond(200, {});
-                httpBackend.expectGET(properties.dhis.url + '/api/charts/chart2.json?' + expectedQueryParams).respond(200, {});
+                httpBackend.expectGET(dhisUrl.charts + '/' + 'chart1.json?' + expectedQueryParams).respond(200, {});
+                httpBackend.expectGET(dhisUrl.charts + '/' + 'chart2.json?' + expectedQueryParams).respond(200, {});
 
                 reportService.getUpdatedCharts();
                 httpBackend.flush();
@@ -216,7 +216,7 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                 };
 
                 var expectedQueryParamsForChartIds = 'fields=id&filter=name:like:%5BPraxis+-+&paging=false';
-                httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedQueryParamsForChartIds).respond(200, chartIdsResponse);
+                httpBackend.expectGET(dhisUrl.charts + '.json?' + expectedQueryParamsForChartIds).respond(200, chartIdsResponse);
                 httpBackend.flush();
             });
         });
@@ -236,7 +236,7 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
             it('downloads the id of each pivot table', function () {
                 var expectedQueryParams = 'fields=id&filter=name:like:%5BPraxis+-+&paging=false';
 
-                httpBackend.expectGET(properties.dhis.url + '/api/reportTables.json?' + expectedQueryParams).respond(200, {});
+                httpBackend.expectGET(dhisUrl.pivotTables + '.json?' + expectedQueryParams).respond(200, {});
 
                 reportService.getUpdatedPivotTables();
                 httpBackend.flush();
@@ -251,8 +251,8 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                                                     'columns[dimension,items[id,name]],' +
                                                     'rows[dimension,items[id,name]],' +
                                                     'filters[dimension,items[id]]');
-                httpBackend.expectGET(properties.dhis.url + '/api/reportTables/pivotTable1.json?' + expectedQueryParams).respond(200, {});
-                httpBackend.expectGET(properties.dhis.url + '/api/reportTables/pivotTable2.json?' + expectedQueryParams).respond(200, {});
+                httpBackend.expectGET(dhisUrl.pivotTables + '/pivotTable1.json?' + expectedQueryParams).respond(200, {});
+                httpBackend.expectGET(dhisUrl.pivotTables + '/pivotTable2.json?' + expectedQueryParams).respond(200, {});
 
                 reportService.getUpdatedPivotTables();
                 httpBackend.flush();
@@ -296,7 +296,7 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
 
                 var expectedQueryParamsForPivotTableIds = 'fields=id&filter=name:like:%5BPraxis+-+&paging=false';
 
-                httpBackend.expectGET(properties.dhis.url + '/api/reportTables.json?' + expectedQueryParamsForPivotTableIds).respond(200, pivotTableIdsResponse);
+                httpBackend.expectGET(dhisUrl.pivotTables + '.json?' + expectedQueryParamsForPivotTableIds).respond(200, pivotTableIdsResponse);
                 httpBackend.flush();
             });
         });
@@ -319,7 +319,7 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                 };
                 var expectedQueryParamsForEventReportIds = 'fields=id&filter=name:like:%5BPraxis+-+&paging=false';
 
-                httpBackend.expectGET(properties.dhis.url + '/api/eventReports.json?' + expectedQueryParamsForEventReportIds).respond(200, eventReportsIdsResponse);
+                httpBackend.expectGET(dhisUrl.eventReports + '.json?' + expectedQueryParamsForEventReportIds).respond(200, eventReportsIdsResponse);
                 httpBackend.flush();
             });
         });
@@ -339,7 +339,7 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
             it('downloads the id of each event report', function () {
                 var expectedQueryParams = 'fields=id&filter=name:like:%5BPraxis+-+&paging=false';
 
-                httpBackend.expectGET(properties.dhis.url + '/api/eventReports.json?' + expectedQueryParams).respond(200, {});
+                httpBackend.expectGET(dhisUrl.eventReports + '.json?' + expectedQueryParams).respond(200, {});
 
                 reportService.getUpdatedEventReports();
                 httpBackend.flush();
@@ -357,8 +357,8 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                 var expectedQueryParams = encodeURI('fields=id,name,title,translations,sortOrder,relativePeriods,categoryDimensions,' +
                     'dataElementDimensions[:all,legendSet[id,name,legends[id,name]],dataElement[id,name]]' +
                     ',columns[dimension,items[id,name]],rows[dimension,items[id,name]]');
-                httpBackend.expectGET(properties.dhis.url + '/api/eventReports/someEventReportId.json?' + expectedQueryParams).respond(200, {});
-                httpBackend.expectGET(properties.dhis.url + '/api/eventReports/someOtherEventReportId.json?' + expectedQueryParams).respond(200, {});
+                httpBackend.expectGET(dhisUrl.eventReports + '/someEventReportId.json?' + expectedQueryParams).respond(200, {});
+                httpBackend.expectGET(dhisUrl.eventReports + '/someOtherEventReportId.json?' + expectedQueryParams).respond(200, {});
 
                 reportService.getUpdatedEventReports();
                 httpBackend.flush();

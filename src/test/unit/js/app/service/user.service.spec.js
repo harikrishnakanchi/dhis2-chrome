@@ -1,4 +1,4 @@
-define(["userService", "angularMocks", "properties", "utils"], function(UserService, mocks, properties, utils) {
+define(["userService", "angularMocks", "properties", "utils", "dhisUrl"], function(UserService, mocks, properties, utils, dhisUrl) {
     describe("user service", function() {
         var http, httpBackend, userService, db, fakeUserStore, fakeUserCredentialsStore, q, rootScope;
 
@@ -45,7 +45,7 @@ define(["userService", "angularMocks", "properties", "utils"], function(UserServ
                 }]
             };
 
-            httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
+            httpBackend.expectPOST(dhisUrl.metadata, expectedPayload).respond(200, "ok");
             httpBackend.flush();
         });
 
@@ -74,7 +74,7 @@ define(["userService", "angularMocks", "properties", "utils"], function(UserServ
 
             userService.update(user);
 
-            httpBackend.expectPUT(properties.dhis.url + '/api/users/' + user.id, expectedPayload).respond(200, "ok");
+            httpBackend.expectPUT(dhisUrl.users + '/' + user.id, expectedPayload).respond(200, "ok");
             httpBackend.flush();
         });
     });

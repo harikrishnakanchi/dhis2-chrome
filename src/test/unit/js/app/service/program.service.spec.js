@@ -1,4 +1,4 @@
-define(["programService", "angularMocks", "properties", "metadataConf", "pagingUtils"], function(ProgramService, mocks, properties, metadataConf, pagingUtils) {
+define(["programService", "angularMocks", "properties", "metadataConf", "pagingUtils", "dhisUrl"], function(ProgramService, mocks, properties, metadataConf, pagingUtils, dhisUrl) {
     describe("programService", function() {
         var http, httpBackend, programService;
 
@@ -25,7 +25,7 @@ define(["programService", "angularMocks", "properties", "metadataConf", "pagingU
             }];
 
             programService.upsert(programs);
-            httpBackend.expectPOST(properties.dhis.url + "/api/metadata", {
+            httpBackend.expectPOST(dhisUrl.metadata, {
                 "programs": programs
             }).respond(200, "ok");
             httpBackend.flush();
@@ -47,7 +47,7 @@ define(["programService", "angularMocks", "properties", "metadataConf", "pagingU
                 programs: programs
             };
 
-            var url = properties.dhis.url + '/api/programs.json?fields=' + metadataConf.fields.programs.params + '&filter=lastUpdated:gte:2014-12-30T09:13:41.092Z&page=1&paging=true&totalPages=true';
+            var url = dhisUrl.programs + '.json?fields=' + metadataConf.fields.programs.params + '&filter=lastUpdated:gte:2014-12-30T09:13:41.092Z&page=1&paging=true&totalPages=true';
 
             httpBackend.expectGET(encodeURI(url)).respond(200, payload);
             httpBackend.flush();
@@ -95,7 +95,7 @@ define(["programService", "angularMocks", "properties", "metadataConf", "pagingU
 
                 programService.assignOrgUnitToProgram(programId, orgUnitId);
 
-                httpBackend.expectPOST(properties.dhis.url + '/api/programs/' + programId + '/organisationUnits/' + orgUnitId).respond(204);
+                httpBackend.expectPOST(dhisUrl.programs + '/' + programId + '/organisationUnits/' + orgUnitId).respond(204);
                 httpBackend.flush();
             });
         });

@@ -1,4 +1,4 @@
-define(["dataSetService", "angularMocks", "properties", "metadataConf", "pagingUtils", "utils"], function(DatasetService, mocks, properties, metadataConf, pagingUtils, utils) {
+define(["dataSetService", "angularMocks", "properties", "metadataConf", "pagingUtils", "utils", "dhisUrl"], function(DatasetService, mocks, properties, metadataConf, pagingUtils, utils, dhisUrl) {
     describe("dataset service", function() {
         var http, httpBackend, datasetService, q;
 
@@ -26,7 +26,7 @@ define(["dataSetService", "angularMocks", "properties", "metadataConf", "pagingU
                 'id': 'ds1'
             }];
 
-            var url = properties.dhis.url + "/api/dataSets.json?fields=" + metadataConf.fields.dataSets.params + "&page=1&paging=true&totalPages=true";
+            var url = dhisUrl.dataSets + ".json?fields=" + metadataConf.fields.dataSets.params + "&page=1&paging=true&totalPages=true";
             var responsePayload = {
                 'dataSets': datasets
             };
@@ -44,7 +44,7 @@ define(["dataSetService", "angularMocks", "properties", "metadataConf", "pagingU
                 'dataSets': []
             };
 
-            var url = properties.dhis.url + "/api/dataSets.json?fields="+ metadataConf.fields.dataSets.params +"&filter=lastUpdated:gte:" + lastUpdatedTime + "&page=1&paging=true&totalPages=true";
+            var url = dhisUrl.dataSets + ".json?fields="+ metadataConf.fields.dataSets.params +"&filter=lastUpdated:gte:" + lastUpdatedTime + "&page=1&paging=true&totalPages=true";
             datasetService.getAll(lastUpdatedTime);
 
             httpBackend.expectGET(encodeURI(url)).respond(200, responsePayload);

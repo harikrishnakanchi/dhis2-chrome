@@ -1,4 +1,4 @@
-define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf", "pagingUtils"], function(OrgUnitService, mocks, properties, utils, metadataConf, pagingUtils) {
+define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf", "pagingUtils", "dhisUrl"], function(OrgUnitService, mocks, properties, utils, metadataConf, pagingUtils, dhisUrl) {
     describe("org unit service", function() {
         var http, httpBackend, orgUnitService, db, mockOrgStore, q, orgUnitFields;
 
@@ -51,7 +51,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
 
             orgUnitService.upsert(orgUnit);
 
-            httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
+            httpBackend.expectPOST(dhisUrl.metadata, expectedPayload).respond(200, "ok");
             httpBackend.flush();
         });
 
@@ -70,7 +70,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
 
             orgUnitService.upsert(orgUnit);
 
-            httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
+            httpBackend.expectPOST(dhisUrl.metadata, expectedPayload).respond(200, "ok");
             httpBackend.flush();
         });
 
@@ -138,7 +138,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
 
             orgUnitService.upsert(payload);
 
-            httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
+            httpBackend.expectPOST(dhisUrl.metadata, expectedPayload).respond(200, "ok");
             httpBackend.flush();
         });
 
@@ -146,7 +146,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
             var orgUnitId = "org1234";
 
             orgUnitService.get(orgUnitId);
-            var url = properties.dhis.url + '/api/organisationUnits.json?fields=orgUnitFields&filter=id:eq:org1234&paging=false';
+            var url = dhisUrl.orgUnits + '.json?fields=orgUnitFields&filter=id:eq:org1234&paging=false';
 
             httpBackend.expectGET(url).respond(200, "ok");
             httpBackend.flush();
@@ -157,8 +157,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
 
             orgUnitService.get(orgUnitIds);
 
-            httpBackend.expectGET(properties.dhis.url +
-                '/api/organisationUnits.json?fields=orgUnitFields&filter=id:eq:id1&filter=id:eq:id2&paging=false').respond(200, "ok");
+            httpBackend.expectGET(dhisUrl.orgUnits + '.json?fields=orgUnitFields&filter=id:eq:id1&filter=id:eq:id2&paging=false').respond(200, "ok");
             httpBackend.flush();
         });
 
@@ -169,14 +168,14 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
             orgUnitService.getAll(lastUpdatedTime);
 
             expect(pagingUtils.paginateRequest).toHaveBeenCalled();
-            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?fields=orgUnitFields&filter=lastUpdated:gte:2014-12-30T09:13:41.092Z&page=1&pageSize=150&paging=true&totalPages=true').respond(200, "ok");
+            httpBackend.expectGET(dhisUrl.orgUnits + '.json?fields=orgUnitFields&filter=lastUpdated:gte:2014-12-30T09:13:41.092Z&page=1&pageSize=150&paging=true&totalPages=true').respond(200, "ok");
             httpBackend.flush();
         });
 
         it("should get all org units with pagination", function() {
             orgUnitService.getAll();
 
-            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?fields=orgUnitFields&page=1&pageSize=150&paging=true&totalPages=true').respond(200, "ok");
+            httpBackend.expectGET(dhisUrl.orgUnits + '.json?fields=orgUnitFields&page=1&pageSize=150&paging=true&totalPages=true').respond(200, "ok");
             httpBackend.flush();
         });
 
@@ -186,7 +185,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
 
             orgUnitService.assignDataSetToOrgUnit(orgUnitId, dataSetId);
 
-            httpBackend.expectPOST(properties.dhis.url + '/api/organisationUnits/' + orgUnitId + '/dataSets/' + dataSetId).respond(204);
+            httpBackend.expectPOST(dhisUrl.orgUnits + '/' + orgUnitId + '/dataSets/' + dataSetId).respond(204);
             httpBackend.flush();
         });
 
@@ -196,7 +195,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
 
             orgUnitService.removeDataSetFromOrgUnit(orgUnitId, dataSetId);
 
-            httpBackend.expectDELETE(properties.dhis.url + '/api/organisationUnits/' + orgUnitId + '/dataSets/' + dataSetId).respond(204);
+            httpBackend.expectDELETE(dhisUrl.orgUnits + '/' + orgUnitId + '/dataSets/' + dataSetId).respond(204);
             httpBackend.flush();
         });
 
@@ -212,7 +211,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
 
             orgUnitService.create(newMockOrgUnit);
 
-            httpBackend.expectPOST(properties.dhis.url + "/api/organisationUnits", newMockOrgUnit).respond(200, 'ok');
+            httpBackend.expectPOST(dhisUrl.orgUnits, newMockOrgUnit).respond(200, 'ok');
             httpBackend.flush();
         });
 
@@ -228,7 +227,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
 
             orgUnitService.update(existingMockOrgUnit);
 
-            httpBackend.expectPUT(properties.dhis.url + "/api/organisationUnits/" + existingMockOrgUnit.id, existingMockOrgUnit).respond(200, 'ok');
+            httpBackend.expectPUT(dhisUrl.orgUnits + '/'+ existingMockOrgUnit.id, existingMockOrgUnit).respond(200, 'ok');
             httpBackend.flush();
         });
 
@@ -273,19 +272,19 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
                 orgUnitId = "orgUnitID";
                 expectedOrgUnitsWithIds = [{'id': "IDA"}, {'id': "IDB"}];
                 expectedOrgUnits = [{'id': "IDA", 'name': 'someName'}, {'id': "IDB", 'name': 'someOtherName'}];
-                orgUnitIdHandler = httpBackend.whenGET(/api\/organisationUnits\/(.+)\.json*/).respond(200, {organisationUnits: expectedOrgUnitsWithIds});
-                httpBackend.whenGET(/api\/organisationUnits\.json*/).respond(200, {organisationUnits: expectedOrgUnits});
+                orgUnitIdHandler = httpBackend.whenGET(/api\/25\/organisationUnits\/(.+)\.json*/).respond(200, {organisationUnits: expectedOrgUnitsWithIds});
+                httpBackend.whenGET(/api\/25\/organisationUnits\.json*/).respond(200, {organisationUnits: expectedOrgUnits});
             });
 
             it('should get the all ids of descendants and ancestors of specified orgunit', function () {
-                httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits/' + orgUnitId + '.json?fields=id&includeAncestors=true&includeDescendants=true').respond(200, {organisationUnits: expectedOrgUnitsWithIds});
+                httpBackend.expectGET(dhisUrl.orgUnits + '/' + orgUnitId + '.json?fields=id&includeAncestors=true&includeDescendants=true').respond(200, {organisationUnits: expectedOrgUnitsWithIds});
                 orgUnitService.getOrgUnitTree(orgUnitId);
 
                 httpBackend.flush();
             });
 
             it('should get the orgunit details of descendants and ancestors of specified orgunit', function () {
-                httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?fields=' + metadataConf.fields.organisationUnits.params + encodeURI('&filter=id:in:[IDA,IDB]&paging=false')).respond(200, {organisationUnits: expectedOrgUnits});
+                httpBackend.expectGET(dhisUrl.orgUnits + '.json?fields=' + metadataConf.fields.organisationUnits.params + encodeURI('&filter=id:in:[IDA,IDB]&paging=false')).respond(200, {organisationUnits: expectedOrgUnits});
                 orgUnitService.getOrgUnitTree(orgUnitId).then(function (actualOrgUnits) {
                     expect(actualOrgUnits).toEqual(expectedOrgUnits);
                 });
@@ -302,8 +301,8 @@ define(["orgUnitService", "angularMocks", "properties", "utils", "metadataConf",
                 ];
                 orgUnitIdHandler.respond(200, {organisationUnits: mockId});
 
-                httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?fields=' + metadataConf.fields.organisationUnits.params + encodeURI('&filter=id:in:[IDA,IDB]&paging=false')).respond(200, {organisationUnits: [expectedOrgUnits[0], expectedOrgUnits[1]]});
-                httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?fields=' + metadataConf.fields.organisationUnits.params + encodeURI('&filter=id:in:[IDC]&paging=false')).respond(200, {organisationUnits: [expectedOrgUnits[2]]});
+                httpBackend.expectGET(dhisUrl.orgUnits + '.json?fields=' + metadataConf.fields.organisationUnits.params + encodeURI('&filter=id:in:[IDA,IDB]&paging=false')).respond(200, {organisationUnits: [expectedOrgUnits[0], expectedOrgUnits[1]]});
+                httpBackend.expectGET(dhisUrl.orgUnits + '.json?fields=' + metadataConf.fields.organisationUnits.params + encodeURI('&filter=id:in:[IDC]&paging=false')).respond(200, {organisationUnits: [expectedOrgUnits[2]]});
 
                 orgUnitService.getOrgUnitTree(orgUnitId, undefined, 2).then(function (actualOrgUnits) {
                     expect(actualOrgUnits).toEqual(expectedOrgUnits);

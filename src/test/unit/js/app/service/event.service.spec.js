@@ -1,4 +1,4 @@
-define(['eventService', 'angularMocks', 'properties', 'moment', 'lodash'], function(EventService, mocks, properties, moment, _) {
+define(['eventService', 'angularMocks', 'properties', 'moment', 'lodash', "dhisUrl"], function(EventService, mocks, properties, moment, _, dhisUrl) {
     describe('eventService', function() {
         var httpBackend, http, eventService;
 
@@ -27,7 +27,7 @@ define(['eventService', 'angularMocks', 'properties', 'moment', 'lodash'], funct
                 var expectedEndDate = moment(_.last(periodRange), 'GGGG[W]WW').endOf('isoWeek').format('YYYY-MM-DD'),
                     expectedStartDate = moment(_.first(periodRange), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD');
 
-                httpBackend.expectGET(properties.dhis.url + '/api/events' +
+                httpBackend.expectGET(dhisUrl.events +
                     '?endDate=' + expectedEndDate +
                     '&fields=:all,dataValues%5Bvalue,dataElement,providedElsewhere,storedBy%5D' +
                     '&orgUnit=' + orgUnitId +
@@ -130,7 +130,7 @@ define(['eventService', 'angularMocks', 'properties', 'moment', 'lodash'], funct
                 var expectedEndDate = moment(_.last(periodRange), 'GGGG[W]WW').endOf('isoWeek').format('YYYY-MM-DD'),
                     expectedStartDate = moment(_.first(periodRange), 'GGGG[W]WW').startOf('isoWeek').format('YYYY-MM-DD');
 
-                httpBackend.expectGET(properties.dhis.url + '/api/events' +
+                httpBackend.expectGET(dhisUrl.events +
                     '?endDate=' + expectedEndDate +
                     '&fields=event' +
                     '&orgUnit=' + orgUnitId +
@@ -203,7 +203,7 @@ define(['eventService', 'angularMocks', 'properties', 'moment', 'lodash'], funct
                 var events = [{
                     event: 'someEventId'
                 }];
-                httpBackend.expectPOST(properties.dhis.url + '/api/events', { events: events }).respond(200, {});
+                httpBackend.expectPOST(dhisUrl.events, { events: events }).respond(200, {});
 
                 eventService.createEvents(events);
                 httpBackend.flush();
@@ -222,7 +222,7 @@ define(['eventService', 'angularMocks', 'properties', 'moment', 'lodash'], funct
                     ]
                 };
 
-                httpBackend.expectPOST(properties.dhis.url + '/api/events', expectedPayLoad).respond(200, {});
+                httpBackend.expectPOST(dhisUrl.events, expectedPayLoad).respond(200, {});
 
                 eventService.createEvents([event]);
                 httpBackend.flush();
@@ -234,8 +234,8 @@ define(['eventService', 'angularMocks', 'properties', 'moment', 'lodash'], funct
                 var eventA = { event: 'eventAId' },
                     eventB = { event: 'eventBId' };
 
-                httpBackend.expectPUT(properties.dhis.url + '/api/events/' + eventA.event, eventA).respond(200, {});
-                httpBackend.expectPUT(properties.dhis.url + '/api/events/' + eventB.event, eventB).respond(200, {});
+                httpBackend.expectPUT(dhisUrl.events + '/' + eventA.event, eventA).respond(200, {});
+                httpBackend.expectPUT(dhisUrl.events + '/' + eventB.event, eventB).respond(200, {});
 
                 eventService.updateEvents([eventA, eventB]);
                 httpBackend.flush();
@@ -247,7 +247,7 @@ define(['eventService', 'angularMocks', 'properties', 'moment', 'lodash'], funct
 
             eventService.deleteEvent(eventId);
 
-            httpBackend.expectDELETE(properties.dhis.url + "/api/events/" + eventId).respond(200, "OK");
+            httpBackend.expectDELETE(dhisUrl.events + "/" + eventId).respond(200, "OK");
 
             httpBackend.flush();
         });
