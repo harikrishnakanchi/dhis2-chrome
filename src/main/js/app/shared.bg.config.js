@@ -56,6 +56,7 @@ require.config({
         "programIndicatorRepository": "app/repository/program.indicator.repository",
         "customAttributeRepository": "app/repository/custom.attribute.repository",
         "optionSetRepository": "app/repository/option.set.repository",
+        "eventReportRepository": "app/repository/event.report.repository",
 
         //Models
         "chart": "app/models/chart",
