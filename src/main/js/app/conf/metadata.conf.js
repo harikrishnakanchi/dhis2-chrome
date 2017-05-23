@@ -70,11 +70,11 @@ define([], function () {
                 paging: true
             },
             "organisationUnitGroups": {
-                params: ":all,!externalAccess,!access,!userGroupAccess,attributeValues[value,attribute[id,code,name]],translations[value,property,locale]",
+                params: "id,lastUpdated,created,name,shortName,organisationUnitGroupSet,organisationUnits,attributeValues[value,attribute[id,code,name]],translations[value,property,locale]",
                 paging: true
             },
             "dataSets": {
-                params: ":all,attributeValues[:identifiable,value,attribute[:identifiable]],!organisationUnits,translations[value,property,locale],!dataSetElements",
+                params: "id,lastUpdated,created,name,shortName,code,categoryCombo,workflow,user,sections,attributeValues[value,attribute[id,code,name]],translations[value,property,locale]",
                 paging: true
             },
             "programs": { // TODO Remove name & programStageDataElements from programStageSections once all the fields are updated with 12.0
@@ -86,7 +86,7 @@ define([], function () {
                 paging: true
             },
             "organisationUnits": {
-                params: ":all,parent[id,name],attributeValues[value,attribute[id,code,name]],dataSets,!access,!href,!uuid",
+                params: "id,lastUpdated,level,created,name,shortName,openingDate,coordinates,user,ancestors,dataSets,programs,organisationUnitGroups,parent[id,name],attributeValues[value,attribute[id,code,name]]",
                 pageSize: 150,   //PageSize of 50 : ~ 9KB-10KB
                 paging: true
             },
