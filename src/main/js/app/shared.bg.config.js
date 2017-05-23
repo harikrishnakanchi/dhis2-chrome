@@ -107,6 +107,7 @@ require.config({
         "downloadPivotTableDataConsumer": "app/consumer/download.pivot.table.data.consumer",
         "downloadChartsConsumer": "app/consumer/download.charts.consumer",
         "downloadChartDataConsumer": "app/consumer/download.chart.data.consumer",
+        "downloadEventReportsConsumer": "app/consumer/download.event.reports.consumer",
         "uploadReferralLocationsConsumer": "app/consumer/upload.referral.locations.consumer",
         "downloadModuleDataBlocksConsumer": "app/consumer/download.module.data.blocks.consumer",
         "syncModuleDataBlockConsumer": "app/consumer/sync.module.data.block.consumer",
