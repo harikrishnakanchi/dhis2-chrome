@@ -111,16 +111,6 @@ define(['angularMocks', 'utils', 'metadataDownloader', 'changeLogRepository', 'm
             expect(systemInfoService.getVersion).toHaveBeenCalled();
         });
 
-        it('should download translation if DHIS is on 2.23', function () {
-            systemInfoService.getVersion.and.returnValue(utils.getPromise(q, '2.23'));
-            changeLogRepository.get.and.returnValue(utils.getPromise(q, null));
-            metadataDownloader.run();
-
-            expectMetadataDownload();
-            httpBackend.expectGET(/.*translations.*/).respond(200, {});
-            httpBackend.flush();
-        });
-
         it('should not download metadata if changeLog exists',function () {
             changeLogRepository.get.and.returnValue(utils.getPromise(q, true));
             metadataDownloader.run();

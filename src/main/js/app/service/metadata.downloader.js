@@ -254,17 +254,6 @@ define(['dhisUrl', 'moment', 'properties', 'lodash', 'pagingUtils', 'metadataCon
                 upsertFn: function (attributes) {
                     return metadataRepository.upsertMetadataForEntity(attributes, 'attributes');
                 }
-            }, {
-                name: 'translations',
-                url: dhisUrl.translations,
-                params: {
-                    fields: metadataConf.fields.translations.params,
-                    paging: metadataConf.fields.translations.paging,
-                    pageSize: metadataConf.fields.translations.pageSize
-                },
-                upsertFn: function (response) {
-                    return metadataRepository.upsertMetadataForEntity(response, 'translations');
-                }
             }];
 
             var deferred = $q.defer();

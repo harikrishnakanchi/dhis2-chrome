@@ -90,11 +90,6 @@ define([], function () {
                 pageSize: 150,   //PageSize of 50 : ~ 9KB-10KB
                 paging: true
             },
-            "translations": {
-                params: ":all,!access,!userGroupAccesses,!externalAccess,!href,attributeValues[value,attribute[id,code,name]]",
-                pageSize: 300,   //PageSize of 50 : ~2KB - 3KB
-                paging: true
-            },
             "systemSettings": {
                 key: "fieldAppSettings,versionCompatibilityInfo,notificationSetting",
                 paging: false
@@ -116,7 +111,6 @@ define([], function () {
             "users",
             "userRoles",
             "attributes",
-            "translations",
             "programStageSections"
         ]
     };
