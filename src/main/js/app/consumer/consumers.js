@@ -53,7 +53,7 @@ define(["downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupC
                 "createUserConsumer", "updateUserConsumer", "uploadProgramConsumer",
                 "downloadProgramConsumer", "downloadMetadataConsumer",
                 "downloadOrgUnitGroupConsumer", "downloadSystemSettingConsumer", "uploadPatientOriginConsumer", "downloadPivotTableDataConsumer", "downloadChartDataConsumer",
-                "uploadReferralLocationsConsumer", "downloadProjectSettingsConsumer", "uploadExcludedDataElementsConsumer", "downloadChartsConsumer", "downloadPivotTablesConsumer", "userPreferenceRepository",
+                "uploadReferralLocationsConsumer", "downloadProjectSettingsConsumer", "uploadExcludedDataElementsConsumer", "downloadChartsConsumer", "downloadPivotTablesConsumer", "downloadEventReportsConsumer", "userPreferenceRepository",
                 "downloadModuleDataBlocksConsumer", "syncModuleDataBlockConsumer", "associateOrgunitToProgramConsumer", "syncExcludedLinelistOptionsConsumer", "downloadHistoricalDataConsumer", "syncOrgUnitConsumer", dispatcher
             ]);
 

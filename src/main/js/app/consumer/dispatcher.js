@@ -3,7 +3,7 @@ define(["lodash"], function(_) {
         createUserConsumer, updateUserConsumer, uploadProgramConsumer,
         downloadProgramConsumer, downloadMetadataConsumer,
         downloadOrgUnitGroupConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
-        uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
+        uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, downloadEventReportsConsumer, userPreferenceRepository,
         downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, associateOrgunitToProgramConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer, syncOrgUnitConsumer) {
 
         this.run = function(message) {
@@ -42,6 +42,7 @@ define(["lodash"], function(_) {
                                 .then(_.partial(downloadChartDataConsumer.run, message))
                                 .then(_.partial(downloadPivotTablesConsumer.run, message))
                                 .then(_.partial(downloadPivotTableDataConsumer.run, message))
+                                .then(_.partial(downloadEventReportsConsumer.run, message))
                                 .then(_.partial(downloadHistoricalDataConsumer.run, message))
                                 .then(function() {
                                     $log.info('Project data sync complete');
@@ -61,7 +62,8 @@ define(["lodash"], function(_) {
                         .then(function (shouldDownload) {
                         if(!shouldDownload) return;
                         return downloadChartsConsumer.run()
-                            .then(downloadPivotTablesConsumer.run);
+                            .then(downloadPivotTablesConsumer.run)
+                            .then(downloadEventReportsConsumer.run);
                     });
 
                 case "downloadReportData":

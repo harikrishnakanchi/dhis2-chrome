@@ -4,7 +4,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer,
             downloadMetadataConsumer, downloadDataSetConsumer, updateDataSetConsumer, associateOrgunitToProgramConsumer,
             downloadSystemSettingConsumer, uploadPatientOriginConsumer, uploadExcludedDataElementsConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
-            uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer,
+            uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, downloadEventReportsConsumer,
             uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadOrgUnitConsumer, downloadOrgUnitGroupConsumer, userPreferenceRepository, downloadModuleDataBlocksConsumer,
             syncModuleDataBlockConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer, syncOrgUnitConsumer;
 
@@ -72,6 +72,9 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadPivotTablesConsumer = {
                 'run': jasmine.createSpy("downloadPivotTablesConsumer")
             };
+            downloadEventReportsConsumer = {
+                'run': jasmine.createSpy("downloadEventReportsConsumer")
+            };
             userPreferenceRepository = {
                 'getCurrentUsersUsername': jasmine.createSpy("userPreferenceRepository")
             };
@@ -107,6 +110,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadProjectSettingsConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadChartsConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadPivotTablesConsumer.run.and.returnValue(utils.getPromise(q, {}));
+            downloadEventReportsConsumer.run.and.returnValue(utils.getPromise(q, {}));
             userPreferenceRepository.getCurrentUsersUsername.and.returnValue(utils.getPromise(q, 'someUsername'));
             downloadModuleDataBlocksConsumer.run.and.returnValue(utils.getPromise(q, {}));
             syncModuleDataBlockConsumer.run.and.returnValue(utils.getPromise(q, {}));
@@ -118,7 +122,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
                 createUserConsumer, updateUserConsumer, uploadProgramConsumer,
                 downloadProgramConsumer, downloadMetadataConsumer,
                 downloadOrgUnitGroupConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
-                uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
+                uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, downloadEventReportsConsumer, userPreferenceRepository,
                 downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, associateOrgunitToProgramConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer, syncOrgUnitConsumer);
         }));
 
@@ -152,6 +156,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
                 expect(downloadPivotTableDataConsumer.run).toHaveBeenCalledWith(message, {});
                 expect(downloadChartDataConsumer.run).toHaveBeenCalledWith(message, {});
                 expect(downloadPivotTablesConsumer.run).toHaveBeenCalledWith(message, {});
+                expect(downloadEventReportsConsumer.run).toHaveBeenCalledWith(message, {});
                 expect(downloadHistoricalDataConsumer.run).toHaveBeenCalledWith(message, {});
             });
 
@@ -215,6 +220,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
 
                 expect(downloadChartsConsumer.run).toHaveBeenCalled();
                 expect(downloadPivotTablesConsumer.run).toHaveBeenCalled();
+                expect(downloadEventReportsConsumer.run).toHaveBeenCalled();
             });
 
             it('should not call download pivot table consumer and download chart consumer for admin user', function () {
@@ -224,6 +230,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
 
                 expect(downloadChartsConsumer.run).not.toHaveBeenCalled();
                 expect(downloadPivotTablesConsumer.run).not.toHaveBeenCalled();
+                expect(downloadEventReportsConsumer.run).not.toHaveBeenCalled();
             });
         });
 
