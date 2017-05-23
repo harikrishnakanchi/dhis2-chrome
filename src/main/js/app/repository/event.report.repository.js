@@ -1,6 +1,7 @@
 define([], function () {
     return function ($q, db) {
-        var EVENT_REPORTS_STORE_NAME = 'eventReports';
+        var EVENT_REPORTS_STORE_NAME = 'eventReportDefinitions';
+
         this.getAll = function () {
             var store = db.objectStore(EVENT_REPORTS_STORE_NAME);
             return store.getAll();
