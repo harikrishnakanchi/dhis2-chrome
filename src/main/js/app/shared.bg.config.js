@@ -66,6 +66,7 @@ require.config({
         "pivotTableData": "app/models/pivot.table.data",
         "chartData": "app/models/chart.data",
         "analyticsData": "app/models/analytics.data",
+        "eventReport": "app/models/event.report",
 
         //Factories
         "factories":"app/factories/factories",
