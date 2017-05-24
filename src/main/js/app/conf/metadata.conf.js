@@ -24,17 +24,17 @@ define([], function () {
                 paging: true
             },
             "dataElements": { //TODO Remove name from optionSet and name, code from options once all the fields are updated with 12.0
-                params: ":all,!href,!publicAccess,!externalAccess,!dimensionItem,!zeroIsSignificant,!url,!access,!user,!userGroupAccesses,!aggregationLevels,optionSet[id,name,options[id,name,code]],categoryCombo,dataElementGroups,attributeValues[value,attribute[id,code,name]],dataSets,translations[value,property,locale]",
+                params: "id,lastUpdated,created,name,shortName,formName,valueType,dimensionItemType,domainType,optionSetValue,description,optionSet[id,name,options[id,name,code]],categoryCombo,dataElementGroups,attributeValues[value,attribute[id,code,name]],translations[value,property,locale]",
                 pageSize: 100,   // PageSize of 50 : ~12KB
                 paging: true
             },
             "indicators": {
-                params: ":all,!href,!displayName,!publicAccess,!externalAccess,!displayShortName,!access,!userGroupAccesses,attributeValues[value,attribute[id,code,name]],translations[value,property,locale]",
+                params: "id,lastUpdated,created,name,shortName,description,dimensionItem,numerator,denominator,dimensionItemType,indicatorType,attributeValues[value,attribute[id,code,name]],translations[value,property,locale]",
                 pageSize: 100,   // PageSize of 50 : ~8KB
                 paging: true
             },
             "programIndicators": {
-                params: ":all,!href,!displayName,!displayInForm,!publicAccess,!access,!userGroupAccesses,attributeValues[value,attribute[id,code,name]],translations[value,property,locale]",
+                params: "id,lastUpdated,created,name,shortName,aggregationType,expression,filter,dimensionItemType,program,description,attributeValues[value,attribute[id,code,name]],translations[value,property,locale]",
                 pageSize: 100,   // PageSize of 50 : ~6KB
                 paging: true
             },
