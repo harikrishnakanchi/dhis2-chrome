@@ -15,7 +15,7 @@ define([], function() {
         var removeEventReportsThatHaveBeenDeletedRemotely = function() {
             return reportService.getAllEventReportIds().then(function(remoteEventReportIds) {
                 return eventReportRepository.getAll().then(function(localDbEventReports) {
-                    var localDbEventReportIds = _.pluck(localDbEventReports, 'id');
+                    var localDbEventReportIds = _.map(localDbEventReports, 'id');
                     var eventReportIdsIdsToRemove = _.difference(localDbEventReportIds, remoteEventReportIds);
                     return eventReportRepository.deleteEventReportsById(eventReportIdsIdsToRemove);
                 });

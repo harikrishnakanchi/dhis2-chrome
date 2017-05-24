@@ -1,10 +1,10 @@
-define([], function () {
+define(['lodash', 'eventReport'], function (_, EventReport) {
     return function ($q, db) {
         var EVENT_REPORTS_STORE_NAME = 'eventReportDefinitions';
 
         this.getAll = function () {
             var store = db.objectStore(EVENT_REPORTS_STORE_NAME);
-            return store.getAll();
+            return store.getAll().then(_.partial(_.map, _, EventReport.create));
         };
 
         this.upsert = function (eventReports) {

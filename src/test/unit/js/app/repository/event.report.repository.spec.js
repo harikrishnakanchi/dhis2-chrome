@@ -1,11 +1,12 @@
-define(["eventReportRepository", "utils", "angularMocks"], function (EventReportRepository, utils, mocks) {
+define(["eventReportRepository", "utils", "angularMocks", "eventReport"], function (EventReportRepository, utils, mocks, EventReport) {
     describe('Event Repository', function () {
-        var mockDB, mockStore, eventReportRepository, q;
+        var mockDB, mockStore, eventReportRepository, q, scope;
 
-        beforeEach(mocks.inject(function ($q) {
+        beforeEach(mocks.inject(function ($q, $rootScope) {
             q = $q;
             mockDB = utils.getMockDB(q);
             mockStore = mockDB.objectStore;
+            scope = $rootScope.$new();
 
             eventReportRepository = new EventReportRepository(q, mockDB.db);
         }));
@@ -19,8 +20,11 @@ define(["eventReportRepository", "utils", "angularMocks"], function (EventReport
             mockStore.getAll.and.returnValue(utils.getPromise(q, allEvents));
 
             eventReportRepository.getAll().then(function (events) {
-                expect(events).toEqual(allEvents);
+                expect(events).toEqual([jasmine.any(EventReport), jasmine.any(EventReport)]);
             });
+
+            scope.$apply();
+
             expect(mockStore.getAll).toHaveBeenCalled();
         });
 
