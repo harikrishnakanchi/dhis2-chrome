@@ -1,7 +1,7 @@
 define(["pivotTableRepository", "pivotTable", "pivotTableData", "categoryRepository", "dataElementRepository", "indicatorRepository", "programIndicatorRepository", "angularMocks", "utils", "lodash"],
     function(PivotTableRepository, PivotTable, PivotTableData, CategoryRepository, DataElementRepository, IndicatorRepository, ProgramIndicatorRepository, mocks, utils, _) {
     describe('Pivot Table Repository', function() {
-        var mockStore, pivotTableRepository, categoryRepository, dataElementRepository, indicatorRepository, programIndicatorRepository, q, mockDB;
+        var mockStore, pivotTableRepository, categoryRepository, dataElementRepository, indicatorRepository, programIndicatorRepository, q, mockDB, scope;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             mockDB = utils.getMockDB($q);
