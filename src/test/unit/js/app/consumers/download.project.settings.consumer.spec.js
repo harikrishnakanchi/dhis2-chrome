@@ -1,8 +1,7 @@
-define(["angularMocks", "utils", "systemSettingService", "userPreferenceRepository", "referralLocationsRepository", "patientOriginRepository", "excludedDataElementsRepository", "downloadProjectSettingsConsumer", "mergeBy", "changeLogRepository", "dataStoreService", "orgUnitRepository", "systemInfoService", "excludedLineListOptionsRepository"],
-    function (mocks, utils, SystemSettingService, UserPreferenceRepository, ReferralLocationsRepository, PatientOriginRepository, ExcludedDataElementsRepository, DownloadProjectSettingsConsumer, MergeBy, ChangeLogRepository, DataStoreService, OrgUnitRepository, SystemInfoService, ExcludedLineListOptionsRepository) {
+define(["angularMocks", "utils", "userPreferenceRepository", "referralLocationsRepository", "patientOriginRepository", "excludedDataElementsRepository", "downloadProjectSettingsConsumer", "mergeBy", "changeLogRepository", "dataStoreService", "orgUnitRepository", "systemInfoService", "excludedLineListOptionsRepository"],
+    function (mocks, utils, UserPreferenceRepository, ReferralLocationsRepository, PatientOriginRepository, ExcludedDataElementsRepository, DownloadProjectSettingsConsumer, MergeBy, ChangeLogRepository, DataStoreService, OrgUnitRepository, SystemInfoService, ExcludedLineListOptionsRepository) {
         describe("downloadProjectSettingsConsumer", function () {
             var consumer,
-                systemSettingService,
                 referralLocationsRepository,
                 patientOriginRepository,
                 orgUnitRepository,
@@ -20,9 +19,6 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
 
                 q = $q;
                 scope = $rootScope.$new();
-
-                systemSettingService = new SystemSettingService();
-                spyOn(systemSettingService, "getProjectSettings").and.returnValue(utils.getPromise(q, {}));
 
                 userPreferenceRepository = new UserPreferenceRepository();
                 spyOn(userPreferenceRepository, "getCurrentUsersProjectIds").and.returnValue(utils.getPromise(q, []));
@@ -292,7 +288,6 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 consumer.run();
                 scope.$apply();
 
-                expect(systemSettingService.getProjectSettings).not.toHaveBeenCalled();
                 expect(referralLocationsRepository.upsert).not.toHaveBeenCalled();
                 expect(patientOriginRepository.upsert).not.toHaveBeenCalled();
                 expect(excludedDataElementsRepository.upsert).not.toHaveBeenCalled();
