@@ -44,6 +44,50 @@ define(["dhisUrl", "lodash", "moment", "dateUtils", "properties"], function(dhis
                 return response.data;
             });
         };
+        
+        this.getEventReportDataForOrgUnit = function (eventReport, orgUnit) {
+            var buildDimensions = function (dimensionConfig) {
+                return _.map(dimensionConfig, function (config) {
+                    var items;
+                    switch (config.dimension) {
+                        case ORG_UNIT_DIMENSION:
+                            items = [orgUnit.id];
+                            break;
+                        case PERIOD_DIMENSION:
+                            items = _.map(config.items, 'id');
+                            break;
+                        default:
+                            items = [];
+                    }
+                    return _.isEmpty(items) ? '' : config.dimension + ':' + items.join(';');
+                });
+            };
+
+            var buildDataElementDimensions = function (dataElementDimensions) {
+                return _.map(dataElementDimensions, function (dataElementDimension) {
+                    return _.compact([
+                        dataElementDimension.dataElement.id,
+                        dataElementDimension.legendSet ? '-' + dataElementDimension.legendSet.id : '',
+                        dataElementDimension.filter ? ':' + dataElementDimension.filter : ''
+                    ]).join('');
+                });
+            };
+
+            var config = {
+                params: {
+                    stage: eventReport.programStage.id,
+                    lastUpdatedAt: moment().toISOString(), //required for cache-busting purposes
+                    filter: buildDimensions(eventReport.filters),
+                    dimension: _.compact(_.flatten([
+                        buildDimensions(eventReport.rows),
+                        buildDimensions(eventReport.columns),
+                        buildDataElementDimensions(eventReport.dataElementDimensions)
+                    ]))
+                }
+            };
+
+            return $http.get([dhisUrl.eventAnalytics, eventReport.program.id].join('/'), config).then(_.property('data'));
+        };
 
         var getResourceIds = function(resourceUrl, resourceCollectionName, lastUpdatedTime) {
             var config = {

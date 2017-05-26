@@ -380,5 +380,136 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                 httpBackend.flush();
             });
         });
+
+        describe('getEventReportDataForOrgUnit', function () {
+            var eventReportDefinition, orgUnit;
+
+            beforeEach(function () {
+                eventReportDefinition = {
+                    program: {
+                        id: 'someProgramId'
+                    },
+                    programStage: {
+                        id: 'someProgramStageId'
+                    },
+                    columns: [{
+                        dimension: 'pe',
+                        items: [{
+                            name: 'LAST_12_MONTHS',
+                            id: 'LAST_12_MONTHS'
+                        }]
+                    }, {
+                        dimension: 'columnDimensionItemA',
+                        items: []
+                    }],
+                    rows: [{
+                        dimension: 'rowDimensionItemA',
+                        items: []
+                    }],
+                    filters: [{
+                        dimension: 'ou',
+                        items: []
+                    }],
+                    dataElementDimensions: [{
+                        dataElement: {
+                            id: 'someDataElementId'
+                        }
+                    }]
+                };
+
+                orgUnit = {
+                    id: 'moduleId'
+                };
+
+                currentMomentInTime = moment("2017-02-02");
+                Timecop.install();
+                Timecop.freeze(currentMomentInTime);
+            });
+
+            afterEach(function() {
+                Timecop.returnToPresent();
+                Timecop.uninstall();
+            });
+
+            it('should add a timestamp to the URL for cache-busting', function () {
+                httpBackend.expectGET(new RegExp('lastUpdatedAt=' + currentMomentInTime.toISOString())).respond(200, {});
+
+                reportService.getEventReportDataForOrgUnit(eventReportDefinition, orgUnit);
+                httpBackend.flush();
+            });
+
+            it('should append program id to the url', function () {
+                httpBackend.expectGET(new RegExp(dhisUrl.eventAnalytics + '/' + eventReportDefinition.program.id)).respond(200, {});
+
+                reportService.getEventReportDataForOrgUnit(eventReportDefinition, orgUnit);
+                httpBackend.flush();
+            });
+
+            it('should add program stage as a query parameter', function () {
+                httpBackend.expectGET(new RegExp('stage=' + eventReportDefinition.programStage.id)).respond(200, {});
+
+                reportService.getEventReportDataForOrgUnit(eventReportDefinition, orgUnit);
+                httpBackend.flush();
+            });
+
+            it('should add orgUnit filter', function () {
+                httpBackend.expectGET(new RegExp('filter=ou:' + orgUnit.id)).respond(200, {});
+
+                reportService.getEventReportDataForOrgUnit(eventReportDefinition, orgUnit);
+                httpBackend.flush();
+            });
+
+            describe('dataElementDimensions', function () {
+                it('should add the data element', function () {
+                    httpBackend.expectGET(new RegExp('dimension=someDataElementId')).respond(200, {});
+
+                    reportService.getEventReportDataForOrgUnit(eventReportDefinition, orgUnit);
+                    httpBackend.flush();
+                });
+
+                it('should add the legend set if it exists', function () {
+                    eventReportDefinition.dataElementDimensions = [{
+                        legendSet: { id: 'someLegendSetId' },
+                        dataElement: { id: 'someDataElementId' }
+                    }];
+
+                    httpBackend.expectGET(new RegExp('dimension=someDataElementId-someLegendSetId')).respond(200, {});
+
+                    reportService.getEventReportDataForOrgUnit(eventReportDefinition, orgUnit);
+                    httpBackend.flush();
+                });
+
+                it('should add the filter if it exists', function () {
+                    eventReportDefinition.dataElementDimensions = [{
+                        filter: 'IN:someFilter',
+                        legendSet: { id: 'someLegendSetId' },
+                        dataElement: { id: 'someDataElementId' }
+                    }];
+
+                    httpBackend.expectGET(new RegExp('dimension=someDataElementId-someLegendSetId:IN:someFilter')).respond(200, {});
+
+                    reportService.getEventReportDataForOrgUnit(eventReportDefinition, orgUnit);
+                    httpBackend.flush();
+                });
+            });
+
+            it('should add the period column dimensions', function () {
+                httpBackend.expectGET(new RegExp('dimension=pe:LAST_12_MONTHS')).respond(200, {});
+
+                reportService.getEventReportDataForOrgUnit(eventReportDefinition, orgUnit);
+                httpBackend.flush();
+            });
+
+            it('should return the report data', function () {
+                var mockReportData = { some: 'data' };
+
+                httpBackend.expectGET(/.*/).respond(200, mockReportData);
+
+                reportService.getEventReportDataForOrgUnit(eventReportDefinition, orgUnit).then(function(eventReportData) {
+                    expect(_.omit(eventReportData, 'url')).toEqual(mockReportData);
+                });
+                httpBackend.flush();
+            });
+        });
     });
 });
