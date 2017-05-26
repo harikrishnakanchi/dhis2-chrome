@@ -26,6 +26,7 @@ define(["properties"], function(properties) {
         "pivotTables": with_host("reportTables"),
         "eventReports": with_host("eventReports"),
         "analytics": with_host("analytics"),
+        "eventAnalytics": with_host("analytics/events/aggregate"),
         "dataStore": with_host("dataStore"),
         "categories": with_host("categories.json"),
         "categoryCombos": with_host("categoryCombos.json"),
