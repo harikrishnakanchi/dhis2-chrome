@@ -86,7 +86,7 @@ define(["lodash", "dhisId", "moment", "customAttributes"], function(_, dhisId, m
                 };
             }
             else
-                map[orgUnitGroupSet.id] = undefined;
+                map[orgUnitGroupSet.id] = {};
             return map;
         }, {});
     };
