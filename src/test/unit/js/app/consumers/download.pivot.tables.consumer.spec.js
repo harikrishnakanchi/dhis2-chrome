@@ -27,7 +27,7 @@ define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'repo
                 spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, lastUpdated));
                 spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
 
-                downloadPivotTablesConsumer = new DownloadPivotTablesConsumer(reportService, systemInfoService, pivotTableRepository, changeLogRepository, $q);
+                downloadPivotTablesConsumer = new DownloadPivotTablesConsumer(reportService, systemInfoService, pivotTableRepository, changeLogRepository, q);
             }));
 
             it('should download and upsert any pivot tables that have been updated', function () {
