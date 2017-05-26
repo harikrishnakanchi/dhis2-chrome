@@ -10,7 +10,7 @@
                 </span>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-4 download-button">
                 <button ng-disabled="(pivotTables | filter: { isDataAvailable: true }).length == 0" class="btn btn-sm btn-primary pull-right" ng-click="exportToExcel()">
                     {{resourceBundle.downloadReport}}
                 </button>
