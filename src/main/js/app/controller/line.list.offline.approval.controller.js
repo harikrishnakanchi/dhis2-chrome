@@ -4,7 +4,7 @@ define(["lodash", "moment", "properties", "interpolate", "dataElementUtils"], fu
         $scope.isGenderFilterApplied = false;
         $scope.isAgeFilterApplied = false;
         $scope.origins = {
-            'open': true
+            'open': false
         };
         var groupedProcedureDataValues, groupedDataValues, filteredEventIds;
 
