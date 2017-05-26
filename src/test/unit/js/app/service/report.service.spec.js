@@ -354,9 +354,11 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
             it('should download the event report details', function () {
                 httpBackend.expectGET(/.*eventReports.json.*/).respond(200, eventReportIds);
 
-                var expectedQueryParams = encodeURI('fields=id,name,title,translations,sortOrder,relativePeriods,categoryDimensions,' +
-                    'dataElementDimensions[:all,legendSet[id,name,legends[id,name]],dataElement[id,name]]' +
-                    ',columns[dimension,items[id,name]],rows[dimension,items[id,name]]');
+                var expectedQueryParams = encodeURI('fields=id,name,translations,sortOrder,relativePeriods,program,programStage,' +
+                    'dataElementDimensions[filter,legendSet[id],dataElement[id,optionSet[id],legendSet[id]]],' +
+                    'columns[dimension,items[id,name]],' +
+                    'rows[dimension,items[id,name]],' +
+                    'filters[dimension,items[id,name]]');
                 httpBackend.expectGET(dhisUrl.eventReports + '/someEventReportId.json?' + expectedQueryParams).respond(200, {});
                 httpBackend.expectGET(dhisUrl.eventReports + '/someOtherEventReportId.json?' + expectedQueryParams).respond(200, {});
 

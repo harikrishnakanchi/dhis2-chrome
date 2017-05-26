@@ -7,12 +7,14 @@ define(['eventReport'], function (EventReport) {
                 config = {
                     id: 'someId',
                     name: '[Praxis - IntensiveCareWard] 1 Event Report Title',
-                    title: 'someTitle',
+                    sortOrder: 'sortOrderInfo',
                     translations: [],
                     columns: 'columnInfo',
                     rows: 'rowInfo',
-                    categoryDimensions: 'categoryDimensionInfo',
-                    dataElementDimensions: 'dataElementDimensionInfo'
+                    filters: 'filterInfo',
+                    dataElementDimensions: 'dataElementDimensionInfo',
+                    program: 'programInfo',
+                    programStage: 'programStageInfo'
                 };
             });
 
@@ -21,12 +23,13 @@ define(['eventReport'], function (EventReport) {
 
                 expect(eventReport.id).toEqual(config.id);
                 expect(eventReport.name).toEqual(config.name);
-                expect(eventReport.title).toEqual('Event Report Title');
                 expect(eventReport.translations).toEqual(config.translations);
+                expect(eventReport.sortOrder).toEqual(config.sortOrder);
+
                 expect(eventReport.columns).toEqual(config.columns);
                 expect(eventReport.rows).toEqual(config.rows);
-
-                expect(eventReport.categoryDimensions).toEqual(config.categoryDimensions);
+                expect(eventReport.filters).toEqual(config.filters);
+                
                 expect(eventReport.dataDimensionItems).toEqual(config.dataDimensionItems);
             });
 

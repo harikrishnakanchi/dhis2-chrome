@@ -7,12 +7,16 @@ define([], function () {
     var EventReport = function (config) {
         this.id = config.id;
         this.name = config.name;
+        this.sortOrder = config.sortOrder;
 
         this.translations = config.translations;
         this.columns = config.columns;
         this.rows = config.rows;
-        this.categoryDimensions = config.categoryDimensions;
+        this.filters = config.filters;
         this.dataElementDimensions = config.dataElementDimensions;
+
+        this.program = config.program;
+        this.programStage = config.programStage;
 
         this.title = parseTitle(config.name);
         this.serviceCode = parseProgramName(config.name);
