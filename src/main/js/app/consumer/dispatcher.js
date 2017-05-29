@@ -2,7 +2,7 @@ define(["lodash"], function(_) {
     return function($q, $log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDataSetConsumer, assignDataSetsToOrgUnitsConsumer,
         createUserConsumer, updateUserConsumer, uploadProgramConsumer,
         downloadProgramConsumer, downloadMetadataConsumer,
-        downloadOrgUnitGroupConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
+        downloadOrgUnitGroupConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer, downloadEventReportDataConsumer,
         uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, downloadEventReportsConsumer, userPreferenceRepository,
         downloadModuleDataBlocksConsumer, syncModuleDataBlockConsumer, associateOrgunitToProgramConsumer, syncExcludedLinelistOptionsConsumer, downloadHistoricalDataConsumer, syncOrgUnitConsumer) {
 
@@ -43,6 +43,7 @@ define(["lodash"], function(_) {
                                 .then(_.partial(downloadPivotTablesConsumer.run, message))
                                 .then(_.partial(downloadPivotTableDataConsumer.run, message))
                                 .then(_.partial(downloadEventReportsConsumer.run, message))
+                                .then(_.partial(downloadEventReportDataConsumer.run, message))
                                 .then(_.partial(downloadHistoricalDataConsumer.run, message))
                                 .then(function() {
                                     $log.info('Project data sync complete');
@@ -71,7 +72,8 @@ define(["lodash"], function(_) {
                         .then(function (shouldDownload) {
                         if(!shouldDownload) return;
                         return downloadChartDataConsumer.run()
-                            .then(downloadPivotTableDataConsumer.run);
+                            .then(downloadPivotTableDataConsumer.run)
+                            .then(downloadEventReportDataConsumer.run);
                     });
 
                 case "downloadHistoricalData":

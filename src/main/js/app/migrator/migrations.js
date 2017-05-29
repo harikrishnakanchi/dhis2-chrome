@@ -556,6 +556,10 @@ define(['dateUtils', 'lodash', 'metadataConf', 'productKeyUtils'], function(date
         create_store_with_key('eventReportDefinitions', 'id', db);
     };
 
+    var create_event_report_data_store = function (db) {
+        create_store_with_key('eventReportData', ['eventReport', 'orgUnit'], db);
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -619,6 +623,7 @@ define(['dateUtils', 'lodash', 'metadataConf', 'productKeyUtils'], function(date
         add_option_store,
         add_program_stage_section_store,
         delete_keys_organisation_unit_group_sets_from_changelog,
-        create_event_report_definitions_store
+        create_event_report_definitions_store,
+        create_event_report_data_store
     ];
 });
