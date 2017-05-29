@@ -366,7 +366,7 @@
                     </accordion-group>
                 </div>
                 <div class="data-set-acc-wrapper">
-                    <accordion-group ng-repeat="dataSet in associatedDataSets | filter:{ isOriginDataset: true }" ng-init="dataSet.open=true" is-open="dataSet.open">
+                    <accordion-group ng-repeat="dataSet in associatedDataSets | filter:{ isOriginDataset: true }" is-open="dataSet.open">
                         <accordion-heading>
                             <span>{{ dataSet.name }}</span>
                             <i ng-if="layoutDirection.direction != 'rtl'" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': dataSet.open, 'glyphicon-chevron-right': !dataSet.open}"></i>
