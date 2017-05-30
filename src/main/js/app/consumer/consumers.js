@@ -2,7 +2,7 @@ define(["downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupC
         "associateOrgunitToProgramConsumer", "createUserConsumer", "updateUserConsumer", "dispatcher", "consumerRegistry",
         "orgUnitRepository", "programRepository", "uploadProgramConsumer", "downloadProgramConsumer", "eventService", "programEventRepository",
         "downloadMetadataConsumer", "downloadOrgUnitGroupConsumer", "downloadSystemSettingConsumer", "metadataService",
-        "metadataRepository", "uploadPatientOriginConsumer", "mergeBy", "downloadPivotTableDataConsumer", "downloadChartDataConsumer", "excludedDataElementsRepository", "uploadExcludedDataElementsConsumer", "uploadReferralLocationsConsumer",
+        "metadataRepository", "uploadPatientOriginConsumer", "mergeBy", "downloadPivotTableDataConsumer", "downloadChartDataConsumer", "downloadEventReportDataConsumer", "excludedDataElementsRepository", "uploadExcludedDataElementsConsumer", "uploadReferralLocationsConsumer",
         "referralLocationsRepository", "downloadProjectSettingsConsumer", "downloadChartsConsumer", "downloadPivotTablesConsumer", "downloadEventReportsConsumer", "downloadModuleDataBlocksConsumer", "moduleDataBlockMerger",
         "syncModuleDataBlockConsumer", "aggregateDataValuesMerger", "lineListEventsMerger", "syncExcludedLinelistOptionsConsumer",
         "excludedLinelistOptionsMerger", "downloadHistoricalDataConsumer", "syncOrgUnitConsumer"
@@ -11,7 +11,7 @@ define(["downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupC
         updateUserConsumer, dispatcher, consumerRegistry, orgUnitRepository, programRepository, uploadProgramConsumer,
         downloadProgramConsumer, eventService, programEventRepository, downloadMetadataConsumer,
         downloadOrgUnitGroupConsumer, downloadSystemSettingConsumer, metadataService, metadataRepository, uploadPatientOriginConsumer, mergeBy, downloadPivotTableDataConsumer,
-        downloadChartDataConsumer, excludedDataElementsRepository, uploadExcludedDataElementsConsumer, uploadReferralLocationsConsumer, referralLocationsRepository, downloadProjectSettingsConsumer,
+        downloadChartDataConsumer, downloadEventReportDataConsumer, excludedDataElementsRepository, uploadExcludedDataElementsConsumer, uploadReferralLocationsConsumer, referralLocationsRepository, downloadProjectSettingsConsumer,
         downloadChartsConsumer, downloadPivotTablesConsumer, downloadEventReportsConsumer, downloadModuleDataBlocksConsumer, moduleDataBlockMerger, syncModuleDataBlockConsumer, aggregateDataValuesMerger, lineListEventsMerger, syncExcludedLinelistOptionsConsumer, excludedLinelistOptionsMerger, downloadHistoricalDataConsumer, syncOrgUnitConsumer) {
 
         var init = function(app) {
@@ -41,6 +41,7 @@ define(["downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupC
             app.service("downloadChartsConsumer", ["reportService", "systemInfoService", "chartRepository", "changeLogRepository", downloadChartsConsumer]);
             app.service("downloadChartDataConsumer", ["reportService", "systemInfoService", "chartRepository", "userPreferenceRepository", "dataSetRepository", "changeLogRepository", "orgUnitRepository","programRepository", "$q", downloadChartDataConsumer]);
             app.service("downloadEventReportsConsumer", ["systemInfoService", "changeLogRepository", "reportService", "eventReportRepository", downloadEventReportsConsumer]);
+            app.service("downloadEventReportDataConsumer", ["$q", "systemInfoService", "userPreferenceRepository", "orgUnitRepository", "programRepository", "eventReportRepository", "changeLogRepository", "reportService", downloadEventReportDataConsumer]);
             app.service("uploadReferralLocationsConsumer", ["$q", "dataStoreService", "referralLocationsRepository", "orgUnitRepository", uploadReferralLocationsConsumer]);
             app.service("uploadExcludedDataElementsConsumer", ["$q", "dataStoreService", "excludedDataElementsRepository", "orgUnitRepository", uploadExcludedDataElementsConsumer]);
             app.service("downloadModuleDataBlocksConsumer", ["dataService", "approvalService", "systemInfoService", "dataSetRepository", "userPreferenceRepository", "changeLogRepository", "orgUnitRepository",
