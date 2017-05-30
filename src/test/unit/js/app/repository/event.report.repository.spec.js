@@ -34,6 +34,17 @@ define(["eventReportRepository", "utils", "angularMocks", "eventReport"], functi
             expect(mockStore.upsert).toHaveBeenCalledWith(eventReports);
         });
 
+        it('should upsert the event report data', function () {
+            var data = {id: 'eventReportId'};
+            eventReportRepository.upsertEventReportData('someEventReport', 'someOrgUnit', data);
+
+            expect(mockStore.upsert).toHaveBeenCalledWith({
+                eventReport: 'someEventReport',
+                orgUnit: 'someOrgUnit',
+                data: data
+            });
+        });
+
         it('should delete the given event reports', function () {
             var eventReportIds = ['someReportId', 'someOtherReportId'];
             eventReportRepository.deleteEventReportsById(eventReportIds);
