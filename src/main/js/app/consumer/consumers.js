@@ -53,7 +53,7 @@ define(["downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupC
             app.service("dispatcher", ["$q", "$log", "downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupConsumer", "downloadDataSetConsumer", "assignDataSetsToOrgUnitsConsumer",
                 "createUserConsumer", "updateUserConsumer", "uploadProgramConsumer",
                 "downloadProgramConsumer", "downloadMetadataConsumer",
-                "downloadOrgUnitGroupConsumer", "downloadSystemSettingConsumer", "uploadPatientOriginConsumer", "downloadPivotTableDataConsumer", "downloadChartDataConsumer",
+                "downloadOrgUnitGroupConsumer", "downloadSystemSettingConsumer", "uploadPatientOriginConsumer", "downloadPivotTableDataConsumer", "downloadChartDataConsumer", "downloadEventReportDataConsumer",
                 "uploadReferralLocationsConsumer", "downloadProjectSettingsConsumer", "uploadExcludedDataElementsConsumer", "downloadChartsConsumer", "downloadPivotTablesConsumer", "downloadEventReportsConsumer", "userPreferenceRepository",
                 "downloadModuleDataBlocksConsumer", "syncModuleDataBlockConsumer", "associateOrgunitToProgramConsumer", "syncExcludedLinelistOptionsConsumer", "downloadHistoricalDataConsumer", "syncOrgUnitConsumer", dispatcher
             ]);
