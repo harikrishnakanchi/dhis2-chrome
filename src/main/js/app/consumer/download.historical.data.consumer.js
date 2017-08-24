@@ -63,7 +63,7 @@ define(['lodash', 'moment', 'dateUtils', 'properties', 'customAttributes', 'cons
 
                         var getDataValuesFromIndexedDB = function (periodChunk) {
                             return dataRepository.getDataValuesForOrgUnitsAndPeriods(_.map(module.origins, 'id').concat(module.id), periodChunk).then(function (dataValues) {
-                                return _.map(dataValues, 'dataValues');
+                                return _.flatten(_.map(dataValues, 'dataValues'));
                             });
                         };
 
